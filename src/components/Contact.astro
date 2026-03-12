@@ -1,0 +1,104 @@
+---
+---
+
+<section
+  id="contact"
+  class="section-container pb-16 pt-6 sm:pb-20 sm:pt-8"
+>
+  <div class="grid gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:items-start">
+    <div class="space-y-4 animate-fade-up">
+      <p class="section-kicker">Contact</p>
+      <h2 class="section-title">
+        Spune-mi câteva detalii despre proiectul tău.
+      </h2>
+      <p class="section-description">
+        Completează formularul de mai jos și vei primi un răspuns cu idei concrete de
+        structură, conținut și estimare de timp pentru landing page-ul tău.
+      </p>
+      <ul class="mt-4 space-y-2 text-sm text-slate-600">
+        <li>• Răspuns în cel mult 1–2 zile lucrătoare.</li>
+        <li>• Fără spam, doar discuții legate de proiect.</li>
+      </ul>
+    </div>
+
+    <form
+      class="card-soft space-y-4 p-5 sm:p-6 animate-fade-up"
+      method="post"
+      action="#"
+    >
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div class="space-y-1.5">
+          <label for="name" class="text-xs font-medium text-slate-700">
+            Nume
+          </label>
+          <input
+            id="name"
+            name="name"
+            type="text"
+            required
+            aria-required="true"
+            aria-invalid="false"
+            autocomplete="name"
+            class="w-full rounded-xl border border-slate-200/80 bg-white/80 px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-pastel-purple focus:ring-2 focus:ring-pastel-purple/60"
+            placeholder="Numele tău"
+          />
+        </div>
+        <div class="space-y-1.5">
+          <label for="email" class="text-xs font-medium text-slate-700">
+            Email
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            aria-required="true"
+            aria-invalid="false"
+            autocomplete="email"
+            class="w-full rounded-xl border border-slate-200/80 bg-white/80 px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-pastel-purple focus:ring-2 focus:ring-pastel-purple/60"
+            placeholder="tu@exemplu.com"
+          />
+        </div>
+      </div>
+
+      <div class="space-y-1.5">
+        <label for="subject" class="text-xs font-medium text-slate-700">
+          Subiect
+        </label>
+        <input
+          id="subject"
+          name="subject"
+          type="text"
+          class="w-full rounded-xl border border-slate-200/80 bg-white/80 px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-pastel-purple focus:ring-2 focus:ring-pastel-purple/60"
+          placeholder="Landing page pentru produsul X"
+        />
+      </div>
+
+      <div class="space-y-1.5">
+        <label for="message" class="text-xs font-medium text-slate-700">
+          Detalii despre proiect
+        </label>
+        <textarea
+          id="message"
+          name="message"
+          required
+          aria-required="true"
+          aria-invalid="false"
+          rows={4}
+          class="w-full resize-none rounded-xl border border-slate-200/80 bg-white/80 px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-pastel-purple focus:ring-2 focus:ring-pastel-purple/60"
+          placeholder="Descrie pe scurt obiectivul landing page-ului, publicul țintă și termenul dorit."
+        />
+      </div>
+
+      <button type="submit" class="btn-primary w-full sm:w-auto">
+        Trimite mesajul
+      </button>
+
+      <p class="text-[11px] leading-relaxed text-slate-500">
+        Trimițând acest formular, ești de acord ca datele tale să fie folosite pentru a
+        răspunde la mesaj. Nu vor fi partajate cu terți.
+      </p>
+    </form>
+  </div>
+</section>
+

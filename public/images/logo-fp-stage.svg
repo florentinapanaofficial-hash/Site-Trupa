@@ -1,0 +1,35 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="logoTitle logoDesc">
+  <title id="logoTitle">Logo Formația Florentina Pană</title>
+  <desc id="logoDesc">Monogramă FP într-un disc luminos, inspirat de scenă live.</desc>
+  <defs>
+    <linearGradient id="bg" x1="72" y1="56" x2="438" y2="458" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5EEEFF"/>
+      <stop offset="0.55" stop-color="#7EFFA1"/>
+      <stop offset="1" stop-color="#D1FF4F"/>
+    </linearGradient>
+    <linearGradient id="ring" x1="50" y1="50" x2="462" y2="462" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.2"/>
+    </linearGradient>
+    <filter id="glow" x="0" y="0" width="512" height="512" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="14" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <circle cx="256" cy="256" r="208" fill="#0F1631"/>
+  <circle cx="256" cy="256" r="184" fill="url(#bg)" fill-opacity="0.18"/>
+  <circle cx="256" cy="256" r="184" stroke="url(#ring)" stroke-width="8"/>
+
+  <g filter="url(#glow)">
+    <path d="M170 335V176H254C292 176 315 197 315 230C315 263 292 284 254 284H209V335H170ZM209 250H247C264 250 276 241 276 230C276 218 264 210 247 210H209V250Z" fill="#ECF8FF"/>
+    <path d="M340 335V176H418V210H379V244H414V277H379V335H340Z" fill="#ECF8FF"/>
+  </g>
+
+  <circle cx="128" cy="152" r="10" fill="#5EEEFF" fill-opacity="0.8"/>
+  <circle cx="390" cy="146" r="8" fill="#D1FF4F" fill-opacity="0.7"/>
+  <circle cx="402" cy="362" r="9" fill="#FF8552" fill-opacity="0.65"/>
+</svg>

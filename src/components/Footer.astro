@@ -1,0 +1,32 @@
+---
+import siteContent from '../data/siteContent.json';
+
+const year = new Date().getFullYear();
+const { brand, contact } = siteContent;
+---
+
+<footer class="border-t border-white/20 bg-ink text-white/90">
+  <div class="section-container grid gap-4 py-8 text-sm md:grid-cols-3 md:items-center">
+    <div class="inline-flex items-center gap-3">
+      <img
+        src="/images/logo-fp-stage.svg"
+        alt="Logo Formația Florentina Pană"
+        class="h-10 w-10 rounded-xl border border-white/20 bg-white/5 p-1"
+        loading="lazy"
+        decoding="async"
+      />
+      <p>© {year} {brand.name}. Toate drepturile rezervate.</p>
+    </div>
+
+    <a href="#acasa" class="justify-self-start text-white transition hover:text-lime-200 md:justify-self-center">
+      Înapoi sus
+    </a>
+
+    <div class="justify-self-start text-white/90 md:justify-self-end">
+      <a href={`mailto:${contact.email}`} class="transition hover:text-cyan-200">{contact.email}</a>
+      <span aria-hidden="true"> | </span>
+      <a href={`tel:${contact.phoneRaw}`} class="transition hover:text-cyan-200">{contact.phoneDisplay}</a>
+    </div>
+  </div>
+</footer>
+

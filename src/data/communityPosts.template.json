@@ -1,0 +1,26 @@
+[
+  {
+    "id": "post-unic-001",
+    "title": "Titlu postare",
+    "caption": "Text scurt pentru postare: ce se vede în clip, de ce merită like și share.",
+    "youtubeUrl": "https://www.youtube.com/watch?v=VIDEO_ID",
+    "source": "Galerie video",
+    "publishedLabel": "1 h"
+  },
+  {
+    "id": "post-unic-002",
+    "title": "Titlu postare 2",
+    "caption": "Alt text scurt, prietenos, orientat spre interacțiune.",
+    "youtubeUrl": "https://www.youtube.com/watch?v=ALT_VIDEO_ID",
+    "source": "Apariții TV 2026",
+    "publishedLabel": "3 h"
+  },
+  {
+    "id": "post-unic-003",
+    "title": "Titlu postare 3",
+    "caption": "Invită comunitatea la comentarii și distribuire social media.",
+    "youtubeUrl": "https://www.youtube.com/watch?v=AL_TREILEA_VIDEO_ID",
+    "source": "Comunitate",
+    "publishedLabel": "1 zi"
+  }
+]

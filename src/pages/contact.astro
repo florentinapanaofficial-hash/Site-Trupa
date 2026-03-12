@@ -1,0 +1,208 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import siteContent from '../data/siteContent.json';
+
+const { seo, contact } = siteContent;
+
+const whatsappNumber = contact.phoneRaw.replace(/\D/g, '');
+const whatsappBase = `https://wa.me/${whatsappNumber}`;
+const whatsappPrefilledText = encodeURIComponent('Bună ziua! Aș dori informații pentru rezervare în sezonul 2026-2027.');
+const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
+---
+
+<BaseLayout title={`Contact | ${seo.title}`} description="Contact rapid pentru rezervări Formația Florentina Pană.">
+  <section class="section-container contact-compact py-12" id="contact">
+    <div id="form-feedback" class="mb-3 hidden rounded-xl border border-lime-200/35 bg-lime-300/10 px-3 py-2 text-xs font-semibold text-lime-100" role="status" aria-live="polite"></div>
+
+    <div class="rounded-2xl border border-white/20 bg-white/10 p-4 sm:p-6">
+      <div class="grid gap-6 lg:grid-cols-[1.05fr_1fr] lg:items-start">
+        <div>
+          <p class="kicker">Contact</p>
+          <h1 class="section-title">Hai să construim un eveniment memorabil</h1>
+          <p class="section-copy">Scrie-ne sau sună-ne direct. Programăm rapid o discuție de 15 minute.</p>
+
+          <div class="mt-4 flex flex-wrap gap-2">
+            <a class="btn-solid" href={`tel:${contact.phoneRaw}`}>Telefon: {contact.phoneDisplay}</a>
+            <a class="btn-outline" href={`mailto:${contact.email}`}>Email: {contact.email}</a>
+          </div>
+
+          <div class="desktop-whatsapp-actions mt-3 flex flex-wrap gap-2" aria-label="Comunicare rapidă desktop">
+            <a class="btn-whatsapp" href={whatsappBase} target="_blank" rel="noopener noreferrer" aria-label="Deschide WhatsApp pentru comunicare rapidă">
+              <span class="btn-whatsapp-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" role="img" fill="none">
+                  <path
+                    d="M20 11.89C20 16.31 16.42 19.89 12 19.89C10.7 19.89 9.46 19.58 8.37 19.03L4.67 19.92L5.59 16.35C4.98 15.24 4.63 13.97 4.63 12.63C4.63 8.21 8.21 4.63 12.63 4.63C17.05 4.63 20.63 8.21 20.63 12.63"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M9.55 9.66C9.74 9.22 9.92 9.21 10.12 9.21C10.27 9.21 10.43 9.21 10.58 9.21C10.73 9.21 10.95 9.15 11.13 9.35C11.31 9.55 11.8 10.11 11.87 10.26C11.94 10.41 11.98 10.58 11.87 10.76C11.76 10.94 11.71 11.05 11.6 11.18C11.49 11.31 11.37 11.46 11.52 11.71C11.67 11.96 12.2 12.81 13.02 13.52C14.08 14.44 14.98 14.73 15.24 14.84C15.49 14.95 15.64 14.94 15.75 14.82C15.86 14.7 16.23 14.28 16.36 14.1C16.49 13.92 16.62 13.95 16.83 14.03C17.04 14.1 18.14 14.64 18.37 14.75C18.59 14.86 18.75 14.91 18.8 15.01C18.86 15.12 18.86 15.62 18.63 16.05C18.41 16.48 17.35 16.86 16.86 16.9C16.37 16.94 15.76 17.06 14.12 16.41C12.47 15.76 11.38 14.2 11.17 13.91C10.96 13.62 10 12.35 10 10.97C10 10.56 10.05 10.13 9.55 9.66Z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </span>
+              <span>WhatsApp: Comunică rapid</span>
+            </a>
+            <a class="btn-outline" href={`tel:${contact.phoneRaw}`}>Apelează direct</a>
+            <a class="btn-outline" href={whatsappMessageLink} target="_blank" rel="noopener noreferrer">Trimite mesaj WhatsApp</a>
+          </div>
+
+          <p class="mt-3 text-xs text-white/90">{contact.city}</p>
+        </div>
+
+        <form
+          class="form-shell"
+          name="rezervare-rapida"
+          method="POST"
+          data-netlify="true"
+          netlify-honeypot="bot-field"
+          action="/contact?trimis=rezervare#contact"
+        >
+          <input type="hidden" name="form-name" value="rezervare-rapida" />
+          <p class="hidden" aria-hidden="true">
+            <label>
+              Nu completa acest câmp dacă ești om:
+              <input name="bot-field" />
+            </label>
+          </p>
+          <h2 class="text-sm font-extrabold text-white">Rezervare rapidă</h2>
+          <p class="mt-1 text-[11px] text-white/90">Completezi câmpurile, iar noi revenim cu ofertă personalizată.</p>
+
+          <div class="form-grid mt-3">
+            <label class="form-label">
+              Nume complet
+              <input class="input-glass" type="text" name="Nume" placeholder="Ex: Ionescu Andreea" autocomplete="name" maxlength="90" required />
+            </label>
+            <label class="form-label">
+              Telefon
+              <input
+                class="input-glass"
+                type="tel"
+                name="Telefon"
+                placeholder="07xx xxx xxx"
+                autocomplete="tel"
+                inputmode="tel"
+                pattern="^(0[0-9]{9}|\+40[0-9]{9})$"
+                title="Introdu un număr valid (ex: 07xxxxxxxx sau +407xxxxxxxx)"
+                required
+              />
+            </label>
+            <label class="form-label">
+              Tip eveniment
+              <select class="input-glass" name="Eveniment" required>
+                <option value="">Alege opțiunea</option>
+                <option>Nuntă</option>
+                <option>Botez</option>
+                <option>Aniversare</option>
+                <option>Corporate</option>
+                <option>Alt tip</option>
+              </select>
+            </label>
+            <label class="form-label">
+              Data evenimentului
+              <input class="input-glass" type="date" name="Data" required />
+            </label>
+            <label class="form-label form-label-full">
+              Mesaj
+              <textarea class="input-glass min-h-24 resize-y" name="Mesaj" placeholder="Spune-ne locația și atmosfera dorită" maxlength="1000"></textarea>
+            </label>
+          </div>
+
+          <button type="submit" class="btn-solid btn-compact mt-3 w-full justify-center">Trimite solicitarea</button>
+          <p class="mt-2 text-[11px] leading-relaxed text-white/85">
+            Prin trimitere ești de acord să te contactăm pentru ofertă. Nu trimitem mesaje promoționale fără acord.
+          </p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const feedbackEl = document.getElementById('form-feedback');
+    const feedbackType = new URLSearchParams(window.location.search).get('trimis');
+
+    if (feedbackEl && feedbackType === 'rezervare') {
+      feedbackEl.textContent = 'Solicitarea de rezervare a fost trimisă. Te contactăm în cel mai scurt timp.';
+      feedbackEl.classList.remove('hidden');
+    }
+
+    const phoneInput = document.querySelector('input[name="Telefon"]');
+
+    if (phoneInput instanceof HTMLInputElement) {
+      const phoneMessage = 'Numărul trebuie să fie în format 07xxxxxxxx sau +407xxxxxxxx.';
+
+      phoneInput.addEventListener('invalid', () => {
+        if (phoneInput.validity.patternMismatch) {
+          phoneInput.setCustomValidity(phoneMessage);
+        } else {
+          phoneInput.setCustomValidity('');
+        }
+      });
+
+      phoneInput.addEventListener('input', () => {
+        phoneInput.setCustomValidity('');
+      });
+    }
+  </script>
+
+  <style>
+    .contact-compact .section-title {
+      font-size: clamp(1.55rem, 2.8vw, 2.1rem);
+      line-height: 1.1;
+    }
+
+    .contact-compact .section-copy {
+      font-size: 0.92rem;
+      line-height: 1.5;
+      max-width: 58ch;
+    }
+
+    .contact-compact .kicker {
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+    }
+
+    .contact-compact .btn-solid,
+    .contact-compact .btn-outline,
+    .contact-compact .btn-whatsapp {
+      min-height: 38px;
+      padding: 0.52rem 0.86rem;
+      font-size: 0.82rem;
+    }
+
+    .contact-compact .form-shell {
+      padding: 0.95rem;
+      border-radius: 0.95rem;
+    }
+
+    .contact-compact .form-label {
+      font-size: 0.74rem;
+    }
+
+    .contact-compact .input-glass {
+      min-height: 38px;
+      padding: 0.5rem 0.72rem;
+      font-size: 0.86rem;
+    }
+
+    .contact-compact textarea.input-glass {
+      min-height: 86px;
+    }
+
+    @media (max-width: 767px) {
+      .contact-compact {
+        padding-top: 2.5rem;
+        padding-bottom: 2.5rem;
+      }
+
+      .contact-compact .btn-solid,
+      .contact-compact .btn-outline,
+      .contact-compact .btn-whatsapp {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</BaseLayout>

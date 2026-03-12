@@ -1,0 +1,30 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import siteContent from '../data/siteContent.json';
+
+const { seo, gallery } = siteContent;
+---
+
+<BaseLayout title={`Galerie Foto | ${seo.title}`} description="Galerie foto cu momente din evenimentele Formației Florentina Pană.">
+  <section class="section-container py-16">
+    <header class="section-head mx-auto text-center">
+      <p class="kicker">Galerie Foto</p>
+      <h1 class="section-title">Cadre din evenimente reale</h1>
+      <p class="section-copy">Selectăm constant fotografii reprezentative pentru atmosferă, energie și eleganță.</p>
+    </header>
+
+    <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {gallery.map((item) => (
+        item.image ? (
+          <img src={item.image} alt={item.alt} class="h-56 w-full rounded-xl border border-white/20 object-cover" loading="lazy" />
+        ) : (
+          <div class="gallery-placeholder h-56" role="img" aria-label={item.alt}>{item.alt}</div>
+        )
+      ))}
+    </div>
+
+    <div class="mt-8 flex justify-center">
+      <a href="/comunitatea-noastra#galerie" class="btn-outline">Vezi galeria extinsă din comunitate</a>
+    </div>
+  </section>
+</BaseLayout>

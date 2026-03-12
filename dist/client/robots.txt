@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Allow: /video/
+Disallow: /api/
+
+Sitemap: https://landing-ul-meu.example.com/sitemap-index.xml
+

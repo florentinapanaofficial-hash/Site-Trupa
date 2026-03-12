@@ -1,0 +1,1970 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import siteContent from '../data/siteContent.json';
+import { query as dbQuery } from '../lib/db.js';
+
+const { seo, realMoments } = siteContent;
+const isDevelopment = import.meta.env.DEV;
+
+export const prerender = false;
+
+let dbMomentPhotos: Array<{
+  id: number;
+  titlu: string;
+  imagine_url: string;
+  data_upload: string;
+}> = [];
+
+try {
+  const rows = (await dbQuery(
+    `SELECT id, titlu, imagine_url, data_upload
+     FROM gallery
+     WHERE imagine_url LIKE '/uploads/%'
+     ORDER BY data_upload DESC, id DESC
+     LIMIT 60`,
+  )) as Array<{ id: number; titlu: string; imagine_url: string; data_upload: string }>;
+
+  dbMomentPhotos = rows.filter((row) => typeof row.imagine_url === 'string' && row.imagine_url.startsWith('/uploads/'));
+} catch (error) {
+  console.error('Nu s-au putut citi pozele pentru galeria completă:', error);
+}
+
+const hasDbMomentPhotos = dbMomentPhotos.length > 0;
+
+const deriveAudioUrlFromImage = (imageUrl: string) => {
+  const cleanUrl = String(imageUrl || '').split('?')[0];
+  const fileName = cleanUrl.split('/').pop() ?? '';
+  const baseName = fileName.replace(/\.[^.]+$/, '');
+
+  if (!baseName) return '';
+  return `/uploads/audio/${baseName}.mp3`;
+};
+
+const albumSourcePhotos = hasDbMomentPhotos
+  ? dbMomentPhotos.map((photo) => ({
+      title: photo.titlu,
+      image: photo.imagine_url,
+      caption: `${photo.titlu} • ${new Date(photo.data_upload).toLocaleDateString('ro-RO')}`,
+      audio: deriveAudioUrlFromImage(photo.imagine_url),
+    }))
+  : realMoments.events.map((item) => ({
+      title: item.couple,
+      image: item.image,
+      caption: `${item.couple} • ${item.city} • ${item.date}`,
+      audio: item.audioUrl ?? '',
+    }));
+
+const minimumPhotosForPreview = 12;
+const demoPhotos = Array.from({ length: minimumPhotosForPreview }, (_, index) => {
+  const photoNumber = index + 1;
+  return {
+    title: `Demo Album ${photoNumber}`,
+    image: `https://placehold.co/900x1200/${photoNumber % 2 === 0 ? '1d2e5f' : '293d78'}/f1f7ff?text=Demo+${photoNumber}`,
+    caption: `Cadru demo ${photoNumber} • verificare paginare`,
+    audio: '',
+  };
+});
+
+const paddedAlbumPhotos =
+  albumSourcePhotos.length > 0
+    ? albumSourcePhotos
+    : [...realMoments.events.map((item) => ({
+        title: item.couple,
+        image: item.image,
+        caption: `${item.couple} • ${item.city} • ${item.date}`,
+        audio: item.audioUrl ?? '',
+      })), ...demoPhotos];
+
+const albumPhotos = paddedAlbumPhotos.slice(0, 60);
+---
+
+<BaseLayout title={`Povestea noastră rămâne în ecouri și imagini | ${seo.title}`} description="Galerie completă cu poze ale mirilor și trupei, cu upload drag-and-drop și redimensionare automată.">
+  <section class="section-container py-16" id="momente-reale">
+    <header class="section-head mx-auto text-center">
+      <p class="kicker mx-auto">Galerie specială</p>
+      <h1 class="section-title">Povestea noastră rămâne în ecouri și imagini</h1>
+      <p class="section-copy">Album în format landscape, cu pagini stânga-dreapta ca o foaie A4 pe orizontală, ideal pentru cadre largi cu mirii și trupa.</p>
+    </header>
+
+    <div class="mt-5 flex flex-wrap justify-center gap-2">
+      <span class="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-cyan-100">
+        {hasDbMomentPhotos ? `${dbMomentPhotos.length}+` : realMoments.stats.events} cadre
+      </span>
+      <span class="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-lime-100">
+        Upload drag and drop
+      </span>
+    </div>
+
+    <section class="mx-auto mt-6 max-w-3xl rounded-2xl border border-white/20 bg-[#120722de] p-4 backdrop-blur">
+      <div class="flex flex-wrap items-end gap-3">
+        <label class="form-label m-0 flex-1 min-w-[220px]">
+          Caută în galerie
+          <input
+            class="input-glass"
+            type="search"
+            data-album-search-input
+            placeholder="Ex: Pitești, nuntă, Andreea și Florin"
+            maxlength="120"
+          />
+        </label>
+        <button type="button" class="btn-solid" data-album-search-button>Caută</button>
+        <button type="button" class="btn-outline" data-album-search-clear>Resetează</button>
+      </div>
+      <p class="mt-2 text-xs font-semibold text-white/80" data-album-search-result>Se afișează toate fotografiile.</p>
+    </section>
+
+    <section class="mx-auto mt-6 max-w-3xl rounded-2xl border border-white/20 bg-[#140a2fe3] p-4 backdrop-blur">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <h2 class="text-sm font-extrabold uppercase tracking-[0.08em] text-white">Upload poze miri + trupă</h2>
+        <span class="rounded-full border border-white/25 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white/90">
+          Redimensionare automată
+        </span>
+      </div>
+
+      <form class="mt-3 grid gap-3" data-home-gallery-upload-form>
+        <label class="form-label">
+          Titlu fotografie
+          <input
+            class="input-glass"
+            type="text"
+            name="title"
+            data-home-gallery-title
+            placeholder="Ex: Mirii + formația - Pitești"
+            minlength="2"
+            maxlength="180"
+            required
+          />
+        </label>
+
+        <input id="home-gallery-photo-input" name="photo" type="file" accept="image/png,image/jpeg,image/webp" class="hidden" />
+        <input id="home-gallery-audio-input" name="audio" type="file" accept="audio/mpeg,.mp3" class="hidden" />
+
+        <div
+          class="rounded-xl border-2 border-dashed border-fuchsia-300/70 bg-fuchsia-500/10 p-4 text-center transition-all duration-200"
+          data-home-gallery-dropzone
+          role="button"
+          tabindex="0"
+          aria-label="Dropzone încărcare foto"
+        >
+          <p class="text-sm font-semibold text-white">Trage poza aici sau apasă pentru selecție</p>
+          <p class="mt-1 text-xs text-white/90">Formate acceptate: JPG, PNG, WebP, max 5MB</p>
+          <img data-home-gallery-preview class="mx-auto mt-3 hidden max-h-40 rounded-xl border border-white/20" alt="Preview fotografie" />
+        </div>
+
+        <div
+          class="rounded-xl border-2 border-dashed border-cyan-300/70 bg-cyan-500/10 p-4 text-center transition-all duration-200"
+          data-home-audio-dropzone
+          role="button"
+          tabindex="0"
+          aria-label="Dropzone încărcare audio MP3"
+        >
+          <p class="text-sm font-semibold text-white">Trage MP3-ul testimonial aici sau apasă pentru selecție</p>
+          <p class="mt-1 text-xs text-white/90">Opțional, dar recomandat pentru personalizare foto. Format: MP3, max 4MB</p>
+          <p class="mt-2 text-xs font-semibold text-cyan-100" data-home-audio-file-name>Nu ai selectat audio.</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <button type="button" class="btn-outline" data-home-gallery-dropzone-trigger>Selectează fișier</button>
+          <button type="button" class="btn-outline" data-home-audio-dropzone-trigger>Selectează MP3</button>
+          <button type="submit" class="btn-solid" data-home-gallery-submit>Optimizează și încarcă</button>
+        </div>
+
+        <input class="input-glass" type="text" readonly placeholder="URL imagine încărcată" data-home-gallery-url />
+
+        <p class="hidden rounded-xl border px-3 py-2 text-xs" data-home-gallery-status aria-live="polite"></p>
+      </form>
+    </section>
+
+    <div
+      class="cinematic-album-wrap mt-10"
+      data-home-gallery-grid
+      data-home-gallery-source={hasDbMomentPhotos ? 'db' : 'fallback'}
+      data-album-photos={JSON.stringify(albumPhotos)}
+    >
+      <div class="cinematic-album" role="region" aria-label="Album virtual cinematic">
+        <div class="album-spine" aria-hidden="true"></div>
+        <div class="album-flip-sheet" aria-hidden="true"></div>
+
+        <article class="album-page album-page-left" data-album-page-left>
+        </article>
+
+        <article class="album-page album-page-right" data-album-page-right>
+        </article>
+      </div>
+
+      <div class="album-controls" aria-label="Navigare album">
+        <button type="button" class="album-nav-btn" data-album-prev aria-label="Pagina anterioară">Pagina anterioară</button>
+        <p class="album-page-indicator" data-album-indicator>Pagina 1</p>
+        <button type="button" class="album-nav-btn" data-album-next aria-label="Pagina următoare">Pagina următoare</button>
+        <button type="button" class="album-sound-btn" data-album-sound-toggle aria-pressed="true" aria-label="Comută sunetul de întoarcere pagină">Sunet flip: ON</button>
+      </div>
+    </div>
+
+    <p class="mt-5 text-xs font-semibold uppercase tracking-wider text-white/85">{realMoments.consentNote}</p>
+
+    <dialog id="photo-lightbox" class="photo-lightbox cinematic-lightbox">
+      <div class="lightbox-balloons" aria-hidden="true">
+        <span class="balloon-dot"></span>
+        <span class="balloon-dot"></span>
+        <span class="balloon-dot"></span>
+        <span class="balloon-dot"></span>
+        <span class="balloon-dot"></span>
+        <span class="balloon-dot"></span>
+        <span class="balloon-dot"></span>
+        <span class="balloon-dot"></span>
+        <span class="balloon-dot"></span>
+        <span class="balloon-dot"></span>
+        <span class="balloon-dot"></span>
+        <span class="balloon-dot"></span>
+      </div>
+      <div class="lightbox-image-shell">
+        <div class="lightbox-image-frame">
+          <img id="photo-lightbox-image" src="" alt="" class="lightbox-image" />
+        </div>
+      </div>
+      <p id="photo-lightbox-caption" class="lightbox-caption"></p>
+      <div class="lightbox-frame-selector" aria-label="Alege stilul ramei">
+        <button type="button" class="lightbox-frame-btn is-active" data-frame-theme-button="gold">Auriu</button>
+        <button type="button" class="lightbox-frame-btn" data-frame-theme-button="silver">Argintiu</button>
+        <button type="button" class="lightbox-frame-btn" data-frame-theme-button="wood">Lemn</button>
+      </div>
+      <div class="lightbox-size-selector" aria-label="Alege dimensiunea imaginii">
+        <button type="button" class="lightbox-size-btn" data-lightbox-size-toggle>Preset: Normal</button>
+      </div>
+      <div class="lightbox-demo-sound-wrap">
+        <button type="button" class="lightbox-demo-sound-btn" data-lightbox-demo-sound>Redă sunet demo</button>
+      </div>
+      <div class="lightbox-audio-wrap">
+        <p id="photo-lightbox-audio-note" class="lightbox-audio-note hidden">Testimonial audio personalizat pentru această fotografie.</p>
+        <button type="button" class="audio-play-btn" data-lightbox-audio-play aria-label="Redă testimonial audio">
+          <span class="audio-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 9V15H7L12 20V4L7 9H3Z" fill="#eaf4ff"/>
+              <path d="M16.5 12C16.5 13.1046 15.6046 14 14.5 14V10C15.6046 10 16.5 10.8954 16.5 12Z" fill="#eaf4ff"/>
+              <path d="M19 12C19 15.3137 16.3137 18 13 18V16C15.2091 16 17 14.2091 17 12C17 9.79086 15.2091 8 13 8V6C16.3137 6 19 8.68629 19 12Z" fill="#eaf4ff"/>
+            </svg>
+          </span>
+        </button>
+        <audio id="photo-lightbox-audio" class="lightbox-audio hidden" controls preload="none"></audio>
+      </div>
+    </dialog>
+  </section>
+
+  <script>
+    const lightbox = document.getElementById('photo-lightbox');
+    const lightboxImage = document.getElementById('photo-lightbox-image');
+    const lightboxCaption = document.getElementById('photo-lightbox-caption');
+    const lightboxAudio = document.getElementById('photo-lightbox-audio');
+    const lightboxAudioNote = document.getElementById('photo-lightbox-audio-note');
+    const rootElement = document.documentElement;
+    const frameThemeButtons = Array.from(document.querySelectorAll('[data-frame-theme-button]'));
+    const lightboxDemoSoundButton = document.querySelector('[data-lightbox-demo-sound]');
+    const lightboxSizeToggleButton = document.querySelector('[data-lightbox-size-toggle]');
+
+    const albumRoot = document.querySelector('[data-home-gallery-grid]');
+    const albumLeftPage = document.querySelector('[data-album-page-left]');
+    const albumRightPage = document.querySelector('[data-album-page-right]');
+    const cinematicAlbum = document.querySelector('.cinematic-album');
+    const albumPrevButton = document.querySelector('[data-album-prev]');
+    const albumNextButton = document.querySelector('[data-album-next]');
+    const albumIndicator = document.querySelector('[data-album-indicator]');
+    const albumSoundToggle = document.querySelector('[data-album-sound-toggle]');
+    const albumSearchInput = document.querySelector('[data-album-search-input]');
+    const albumSearchButton = document.querySelector('[data-album-search-button]');
+    const albumSearchClearButton = document.querySelector('[data-album-search-clear]');
+    const albumSearchResult = document.querySelector('[data-album-search-result]');
+
+    const photosPerPage = 1;
+    const photosPerSpread = photosPerPage * 2;
+    const pageTurnDurationMs = 950;
+    const pageTurnMidpointMs = Math.round(pageTurnDurationMs * 0.5);
+    const soundStorageKey = 'fp-album-sound-enabled';
+    const frameThemeStorageKey = 'fp-lightbox-frame-theme';
+    const sizePresetStorageKey = 'fp-lightbox-size-preset';
+    const rawAlbumPhotos = albumRoot?.getAttribute('data-album-photos') ?? '[]';
+    let allAlbumPhotos = [];
+    let albumPhotos = [];
+
+    try {
+      const parsed = JSON.parse(rawAlbumPhotos);
+      allAlbumPhotos = Array.isArray(parsed) ? parsed : [];
+      albumPhotos = [...allAlbumPhotos];
+    } catch {
+      allAlbumPhotos = [];
+      albumPhotos = [];
+    }
+
+    let currentSpread = 0;
+    let isTurningPage = false;
+    let soundEnabled = window.localStorage.getItem(soundStorageKey) !== '0';
+    let currentSearchTerm = '';
+    let searchDebounceTimer = null;
+    let currentFrameTheme = window.localStorage.getItem(frameThemeStorageKey) || 'gold';
+    let currentSizePreset = window.localStorage.getItem(sizePresetStorageKey) || 'normal';
+    let isClosingLightbox = false;
+
+    const syncFrameThemeUi = () => {
+      if (!(lightbox instanceof HTMLElement)) return;
+
+      lightbox.setAttribute('data-frame-theme', currentFrameTheme);
+      frameThemeButtons.forEach((button) => {
+        if (!(button instanceof HTMLButtonElement)) return;
+
+        const isActive = button.getAttribute('data-frame-theme-button') === currentFrameTheme;
+        button.classList.toggle('is-active', isActive);
+        button.setAttribute('aria-pressed', String(isActive));
+      });
+    };
+
+    if (!['gold', 'silver', 'wood'].includes(currentFrameTheme)) {
+      currentFrameTheme = 'gold';
+    }
+
+    syncFrameThemeUi();
+
+    if (!['normal', 'large'].includes(currentSizePreset)) {
+      currentSizePreset = 'normal';
+    }
+
+    const syncSizePresetUi = () => {
+      if (!(lightbox instanceof HTMLElement)) return;
+
+      lightbox.setAttribute('data-size-preset', currentSizePreset);
+
+      if (!(lightboxSizeToggleButton instanceof HTMLButtonElement)) return;
+      const isLarge = currentSizePreset === 'large';
+      lightboxSizeToggleButton.textContent = isLarge ? 'Preset: Large (+10%)' : 'Preset: Normal';
+      lightboxSizeToggleButton.setAttribute('aria-pressed', String(isLarge));
+    };
+
+    syncSizePresetUi();
+
+    const updateSoundToggleUi = () => {
+      if (!(albumSoundToggle instanceof HTMLButtonElement)) return;
+
+      albumSoundToggle.textContent = soundEnabled ? 'Sunet flip: ON' : 'Sunet flip: OFF';
+      albumSoundToggle.setAttribute('aria-pressed', String(soundEnabled));
+    };
+
+    updateSoundToggleUi();
+
+    if (lightboxAudio instanceof HTMLAudioElement) {
+      lightboxAudio.addEventListener('error', () => {
+        lightboxAudio.classList.add('hidden');
+        if (lightboxAudioNote instanceof HTMLElement) {
+          lightboxAudioNote.classList.add('hidden');
+        }
+      });
+    }
+
+    const playPageFlipSound = () => {
+      if (!soundEnabled) return;
+
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return;
+
+      const audioContext = new AudioContextClass();
+      const masterGain = audioContext.createGain();
+      masterGain.gain.setValueAtTime(0.75, audioContext.currentTime);
+      masterGain.connect(audioContext.destination);
+
+      const firstOsc = audioContext.createOscillator();
+      const firstGain = audioContext.createGain();
+      firstOsc.type = 'triangle';
+      firstOsc.frequency.setValueAtTime(520, audioContext.currentTime);
+      firstOsc.frequency.exponentialRampToValueAtTime(165, audioContext.currentTime + 0.21);
+      firstGain.gain.setValueAtTime(0.0001, audioContext.currentTime);
+      firstGain.gain.exponentialRampToValueAtTime(0.028, audioContext.currentTime + 0.03);
+      firstGain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.22);
+
+      const secondOsc = audioContext.createOscillator();
+      const secondGain = audioContext.createGain();
+      secondOsc.type = 'sine';
+      secondOsc.frequency.setValueAtTime(760, audioContext.currentTime + 0.09);
+      secondOsc.frequency.exponentialRampToValueAtTime(240, audioContext.currentTime + 0.28);
+      secondGain.gain.setValueAtTime(0.0001, audioContext.currentTime);
+      secondGain.gain.exponentialRampToValueAtTime(0.016, audioContext.currentTime + 0.12);
+      secondGain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.3);
+
+      firstOsc.connect(firstGain);
+      secondOsc.connect(secondGain);
+      firstGain.connect(masterGain);
+      secondGain.connect(masterGain);
+
+      firstOsc.start(audioContext.currentTime);
+      firstOsc.stop(audioContext.currentTime + 0.24);
+
+      secondOsc.start(audioContext.currentTime + 0.09);
+      secondOsc.stop(audioContext.currentTime + 0.32);
+
+      window.setTimeout(() => {
+        audioContext.close().catch(() => {});
+      }, 420);
+    };
+
+    const playDemoSound = () => {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return;
+
+      const audioContext = new AudioContextClass();
+      const masterGain = audioContext.createGain();
+      masterGain.gain.setValueAtTime(0.5, audioContext.currentTime);
+      masterGain.connect(audioContext.destination);
+
+      const sequence = [392, 523.25, 659.25, 523.25];
+      sequence.forEach((frequency, index) => {
+        const oscillator = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        const startAt = audioContext.currentTime + index * 0.16;
+        const stopAt = startAt + 0.14;
+
+        oscillator.type = 'triangle';
+        oscillator.frequency.setValueAtTime(frequency, startAt);
+
+        gain.gain.setValueAtTime(0.0001, startAt);
+        gain.gain.exponentialRampToValueAtTime(0.06, startAt + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, stopAt);
+
+        oscillator.connect(gain);
+        gain.connect(masterGain);
+        oscillator.start(startAt);
+        oscillator.stop(stopAt);
+      });
+
+      window.setTimeout(() => {
+        audioContext.close().catch(() => {});
+      }, 980);
+    };
+
+    const closeLightbox = () => {
+      if (!lightbox || !lightbox.open) return;
+      if (isClosingLightbox) return;
+
+      isClosingLightbox = true;
+      lightbox.classList.add('is-closing');
+
+      window.setTimeout(() => {
+        if (lightbox.open) {
+          lightbox.close();
+        }
+      }, 210);
+    };
+
+    const lockPageScrollForLightbox = () => {
+      rootElement.classList.add('lightbox-open-lock');
+      document.body.classList.add('lightbox-open-lock');
+    };
+
+    const unlockPageScrollForLightbox = () => {
+      rootElement.classList.remove('lightbox-open-lock');
+      document.body.classList.remove('lightbox-open-lock');
+    };
+
+    const openLightboxFromTrigger = (trigger) => {
+      if (!lightbox || !lightboxImage || !lightboxCaption) return;
+
+      const src = trigger.getAttribute('data-lightbox-src') ?? '';
+      const alt = trigger.getAttribute('data-lightbox-alt') ?? 'Fotografie eveniment';
+      const caption = trigger.getAttribute('data-lightbox-caption') ?? '';
+      const audioSrc = trigger.getAttribute('data-lightbox-audio') ?? '';
+
+      lightboxImage.setAttribute('src', src);
+      lightboxImage.setAttribute('alt', alt);
+      lightboxCaption.textContent = caption;
+
+      if (lightboxAudio instanceof HTMLAudioElement) {
+        lightboxAudio.pause();
+        lightboxAudio.removeAttribute('src');
+        lightboxAudio.classList.add('hidden');
+        lightboxAudio.load();
+
+        if (audioSrc) {
+          lightboxAudio.setAttribute('src', audioSrc);
+          lightboxAudio.classList.remove('hidden');
+
+          const playPromise = lightboxAudio.play();
+          if (playPromise && typeof playPromise.catch === 'function') {
+            playPromise.catch(() => {});
+          }
+        }
+      }
+
+      if (lightboxAudioNote instanceof HTMLElement) {
+        lightboxAudioNote.classList.toggle('hidden', !audioSrc);
+      }
+
+      isClosingLightbox = false;
+      lightbox.classList.remove('is-closing');
+      lockPageScrollForLightbox();
+      lightbox.showModal();
+    };
+
+    const createAlbumCard = (photo, animationDelay = 0) => {
+      const frame = document.createElement('article');
+      frame.className = 'album-photo-frame gallery-stage-fade';
+      frame.style.animationDelay = `${animationDelay}ms`;
+
+      const trigger = document.createElement('button');
+      trigger.type = 'button';
+      trigger.className = 'moment-photo-trigger';
+      trigger.setAttribute('data-lightbox-src', String(photo.image ?? ''));
+      trigger.setAttribute('data-lightbox-alt', String(photo.title ?? 'Fotografie eveniment'));
+      trigger.setAttribute('data-lightbox-caption', String(photo.caption ?? ''));
+      trigger.setAttribute('data-lightbox-audio', String(photo.audio ?? ''));
+      trigger.setAttribute('aria-label', `Deschide fotografia ${String(photo.title ?? 'eveniment')}`);
+
+      const image = document.createElement('img');
+      image.src = String(photo.image ?? '');
+      image.alt = String(photo.title ?? 'Fotografie eveniment');
+      image.loading = 'lazy';
+      image.className = 'album-photo';
+
+      const label = document.createElement('p');
+      label.className = 'album-photo-label';
+      label.textContent = String(photo.title ?? 'Moment special');
+
+      trigger.append(image);
+      frame.append(trigger, label);
+      return frame;
+    };
+
+    const normalizeSearchText = (value) =>
+      String(value ?? '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .trim();
+
+    const updateSearchResultText = () => {
+      if (!(albumSearchResult instanceof HTMLElement)) return;
+
+      if (!currentSearchTerm) {
+        albumSearchResult.textContent = `Se afișează toate fotografiile (${albumPhotos.length}).`;
+        return;
+      }
+
+      albumSearchResult.textContent = `Rezultate pentru „${currentSearchTerm}”: ${albumPhotos.length}`;
+    };
+
+    const applyAlbumSearch = () => {
+      const needle = normalizeSearchText(currentSearchTerm);
+
+      if (!needle) {
+        albumPhotos = [...allAlbumPhotos];
+      } else {
+        albumPhotos = allAlbumPhotos.filter((photo) => {
+          const title = normalizeSearchText(photo?.title);
+          const caption = normalizeSearchText(photo?.caption);
+          return title.includes(needle) || caption.includes(needle);
+        });
+      }
+
+      currentSpread = 0;
+      renderSpread('next');
+      updateSearchResultText();
+    };
+
+    const totalSpreads = () => Math.max(1, Math.ceil(albumPhotos.length / photosPerSpread));
+
+    const updateAlbumControls = () => {
+      const spreads = totalSpreads();
+
+      if (albumIndicator) {
+        if (albumPhotos.length === 0) {
+          albumIndicator.textContent = 'Nu există rezultate pentru filtrul curent';
+          return;
+        }
+
+        albumIndicator.textContent = `Pagini ${currentSpread * 2 + 1}-${Math.min(currentSpread * 2 + 2, spreads * 2)} din ${spreads * 2}`;
+      }
+
+      if (albumPrevButton instanceof HTMLButtonElement) {
+        albumPrevButton.disabled = currentSpread <= 0 || isTurningPage;
+      }
+
+      if (albumNextButton instanceof HTMLButtonElement) {
+        albumNextButton.disabled = currentSpread >= spreads - 1 || isTurningPage;
+      }
+    };
+
+    const renderSpread = (direction = 'next') => {
+      if (!(albumLeftPage instanceof HTMLElement) || !(albumRightPage instanceof HTMLElement)) return;
+
+      const start = currentSpread * photosPerSpread;
+      const leftPhotos = albumPhotos.slice(start, start + photosPerPage);
+      const rightPhotos = albumPhotos.slice(start + photosPerPage, start + photosPerSpread);
+
+      albumLeftPage.classList.remove('is-flipping-forward', 'is-flipping-backward');
+      albumRightPage.classList.remove('is-flipping-forward', 'is-flipping-backward');
+
+      if (direction === 'next') {
+        albumRightPage.classList.add('is-flipping-forward');
+      } else if (direction === 'prev') {
+        albumLeftPage.classList.add('is-flipping-backward');
+      }
+
+      albumLeftPage.innerHTML = '';
+      albumRightPage.innerHTML = '';
+
+      if (albumPhotos.length === 0) {
+        const empty = document.createElement('p');
+        empty.className = 'm-auto max-w-xs rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-center text-sm font-semibold text-white/90';
+        empty.textContent = 'Nu am găsit fotografii pentru această căutare.';
+        albumLeftPage.appendChild(empty);
+        updateAlbumControls();
+        return;
+      }
+
+      leftPhotos.forEach((photo, index) => {
+        albumLeftPage.appendChild(createAlbumCard(photo, index * 70));
+      });
+
+      rightPhotos.forEach((photo, index) => {
+        albumRightPage.appendChild(createAlbumCard(photo, (index + photosPerPage) * 70));
+      });
+
+      updateAlbumControls();
+    };
+
+    renderSpread('next');
+    updateSearchResultText();
+
+    const runSearchFromInput = () => {
+      if (!(albumSearchInput instanceof HTMLInputElement)) return;
+      currentSearchTerm = albumSearchInput.value.trim();
+      applyAlbumSearch();
+    };
+
+    albumSearchButton?.addEventListener('click', runSearchFromInput);
+
+    albumSearchInput?.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        runSearchFromInput();
+      }
+    });
+
+    albumSearchInput?.addEventListener('input', () => {
+      if (searchDebounceTimer) {
+        window.clearTimeout(searchDebounceTimer);
+      }
+
+      searchDebounceTimer = window.setTimeout(() => {
+        runSearchFromInput();
+      }, 220);
+    });
+
+    albumSearchClearButton?.addEventListener('click', () => {
+      if (albumSearchInput instanceof HTMLInputElement) {
+        albumSearchInput.value = '';
+      }
+      currentSearchTerm = '';
+      applyAlbumSearch();
+    });
+
+    const turnAlbumPage = (direction, onHalfTurn) => {
+      if (!(cinematicAlbum instanceof HTMLElement) || isTurningPage) return;
+
+      isTurningPage = true;
+      updateAlbumControls();
+      playPageFlipSound();
+
+      cinematicAlbum.classList.remove('is-turning-next', 'is-turning-prev');
+      cinematicAlbum.classList.add(direction === 'next' ? 'is-turning-next' : 'is-turning-prev');
+
+      if (albumRoot instanceof HTMLElement) {
+        albumRoot.classList.add('is-turning');
+      }
+
+      window.setTimeout(() => {
+        onHalfTurn();
+      }, pageTurnMidpointMs);
+
+      window.setTimeout(() => {
+        cinematicAlbum.classList.remove('is-turning-next', 'is-turning-prev');
+        albumRoot?.classList.remove('is-turning');
+        isTurningPage = false;
+        updateAlbumControls();
+      }, pageTurnDurationMs);
+    };
+
+    albumSoundToggle?.addEventListener('click', () => {
+      soundEnabled = !soundEnabled;
+      window.localStorage.setItem(soundStorageKey, soundEnabled ? '1' : '0');
+      updateSoundToggleUi();
+    });
+
+    albumPrevButton?.addEventListener('click', () => {
+      if (currentSpread <= 0) return;
+      turnAlbumPage('prev', () => {
+        currentSpread -= 1;
+        renderSpread('prev');
+      });
+    });
+
+    albumNextButton?.addEventListener('click', () => {
+      if (currentSpread >= totalSpreads() - 1) return;
+      turnAlbumPage('next', () => {
+        currentSpread += 1;
+        renderSpread('next');
+      });
+    });
+
+    albumRoot?.addEventListener('click', (event) => {
+      const trigger = event.target instanceof Element ? event.target.closest('[data-lightbox-src]') : null;
+      if (!trigger) return;
+      openLightboxFromTrigger(trigger);
+    });
+
+    if (lightbox && lightboxImage && lightboxCaption) {
+      // Keep exit click-only: prevent default ESC/cancel close behavior.
+      lightbox.addEventListener('cancel', (event) => {
+        event.preventDefault();
+      });
+
+      lightboxDemoSoundButton?.addEventListener('click', () => {
+        playDemoSound();
+      });
+
+      lightboxSizeToggleButton?.addEventListener('click', () => {
+        currentSizePreset = currentSizePreset === 'large' ? 'normal' : 'large';
+        window.localStorage.setItem(sizePresetStorageKey, currentSizePreset);
+        syncSizePresetUi();
+      });
+
+      frameThemeButtons.forEach((button) => {
+        if (!(button instanceof HTMLButtonElement)) return;
+
+        button.addEventListener('click', () => {
+          const theme = button.getAttribute('data-frame-theme-button') || 'gold';
+          currentFrameTheme = theme;
+          window.localStorage.setItem(frameThemeStorageKey, currentFrameTheme);
+          syncFrameThemeUi();
+        });
+      });
+
+      lightbox.addEventListener('click', (event) => {
+        const target = event.target instanceof Element ? event.target : null;
+        if (
+          target?.closest('.lightbox-frame-selector') ||
+          target?.closest('.lightbox-size-selector') ||
+          target?.closest('.lightbox-demo-sound-wrap') ||
+          target?.closest('.lightbox-audio-wrap')
+        ) {
+          return;
+        }
+
+        closeLightbox();
+      });
+
+      lightbox.addEventListener('close', () => {
+        isClosingLightbox = false;
+        lightbox.classList.remove('is-closing');
+        unlockPageScrollForLightbox();
+        lightboxImage.setAttribute('src', '');
+        lightboxImage.setAttribute('alt', '');
+        lightboxCaption.textContent = '';
+
+        if (lightboxAudio instanceof HTMLAudioElement) {
+          lightboxAudio.pause();
+          lightboxAudio.removeAttribute('src');
+          lightboxAudio.classList.add('hidden');
+          lightboxAudio.load();
+        }
+
+        if (lightboxAudioNote instanceof HTMLElement) {
+          lightboxAudioNote.classList.add('hidden');
+        }
+      });
+    }
+
+    const homeGalleryUploadForm = document.querySelector('[data-home-gallery-upload-form]');
+    const homeGalleryDropzone = document.querySelector('[data-home-gallery-dropzone]');
+    const homeGalleryDropzoneTrigger = document.querySelector('[data-home-gallery-dropzone-trigger]');
+    const homeAudioDropzone = document.querySelector('[data-home-audio-dropzone]');
+    const homeAudioDropzoneTrigger = document.querySelector('[data-home-audio-dropzone-trigger]');
+    const homeAudioFileName = document.querySelector('[data-home-audio-file-name]');
+    const homeGalleryFileInput = document.getElementById('home-gallery-photo-input');
+    const homeGalleryAudioInput = document.getElementById('home-gallery-audio-input');
+    const homeGalleryTitleInput = document.querySelector('[data-home-gallery-title]');
+    const homeGalleryPreview = document.querySelector('[data-home-gallery-preview]');
+    const homeGalleryStatus = document.querySelector('[data-home-gallery-status]');
+    const homeGalleryUrlInput = document.querySelector('[data-home-gallery-url]');
+    const homeGallerySubmitButton = document.querySelector('[data-home-gallery-submit]');
+
+    let selectedHomeGalleryFile = null;
+    let selectedHomeGalleryAudioFile = null;
+
+    const showHomeGalleryStatus = (message, type = 'info') => {
+      if (!homeGalleryStatus) return;
+
+      homeGalleryStatus.textContent = message;
+      homeGalleryStatus.classList.remove('hidden', 'border-red-300/50', 'bg-red-500/10', 'text-red-100', 'border-lime-300/50', 'bg-lime-500/10', 'text-lime-100', 'border-white/30', 'bg-white/10', 'text-white');
+
+      if (type === 'error') {
+        homeGalleryStatus.classList.add('border-red-300/50', 'bg-red-500/10', 'text-red-100');
+        return;
+      }
+
+      if (type === 'success') {
+        homeGalleryStatus.classList.add('border-lime-300/50', 'bg-lime-500/10', 'text-lime-100');
+        return;
+      }
+
+      homeGalleryStatus.classList.add('border-white/30', 'bg-white/10', 'text-white');
+    };
+
+    const validateHomeGalleryFile = (file) => {
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+      if (!allowedTypes.includes((file.type || '').toLowerCase())) {
+        return 'Sunt permise doar fișiere JPG, PNG și WebP.';
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        return 'Fișierul este prea mare. Limita este 5MB.';
+      }
+
+      return '';
+    };
+
+    const validateHomeGalleryAudioFile = (file) => {
+      const mime = (file.type || '').toLowerCase();
+      const ext = (file.name || '').toLowerCase().split('.').pop() ?? '';
+      const isMp3 = mime === 'audio/mpeg' || mime === 'audio/mp3' || ext === 'mp3';
+
+      if (!isMp3) {
+        return 'Fișierul audio trebuie să fie MP3.';
+      }
+
+      if (file.size > 4 * 1024 * 1024) {
+        return 'Fișierul audio este prea mare. Limita este 4MB.';
+      }
+
+      return '';
+    };
+
+    const setHomeGalleryPreview = (file) => {
+      if (!(homeGalleryPreview instanceof HTMLImageElement)) return;
+
+      const objectUrl = URL.createObjectURL(file);
+      homeGalleryPreview.src = objectUrl;
+      homeGalleryPreview.classList.remove('hidden');
+      homeGalleryPreview.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+      };
+    };
+
+    const resizeHomeGalleryFile = async (file) => {
+      const imageUrl = URL.createObjectURL(file);
+
+      try {
+        const imageElement = await new Promise((resolve, reject) => {
+          const image = new Image();
+          image.onload = () => resolve(image);
+          image.onerror = () => reject(new Error('Nu s-a putut procesa imaginea.'));
+          image.src = imageUrl;
+        });
+
+        const maxWidth = 1400;
+        const maxHeight = 1400;
+        const scale = Math.min(maxWidth / imageElement.width, maxHeight / imageElement.height, 1);
+        const targetWidth = Math.max(1, Math.round(imageElement.width * scale));
+        const targetHeight = Math.max(1, Math.round(imageElement.height * scale));
+
+        const canvas = document.createElement('canvas');
+        canvas.width = targetWidth;
+        canvas.height = targetHeight;
+
+        const context = canvas.getContext('2d');
+        if (!context) return file;
+
+        context.drawImage(imageElement, 0, 0, targetWidth, targetHeight);
+
+        const blob = await new Promise((resolve) => {
+          canvas.toBlob((result) => resolve(result), 'image/webp', 0.86);
+        });
+
+        if (!(blob instanceof Blob)) return file;
+        const optimizedName = file.name.replace(/\.[^.]+$/, '') + '.webp';
+        return new File([blob], optimizedName, { type: 'image/webp' });
+      } finally {
+        URL.revokeObjectURL(imageUrl);
+      }
+    };
+
+    const handleHomeGalleryFile = async (file) => {
+      const error = validateHomeGalleryFile(file);
+      if (error) {
+        selectedHomeGalleryFile = null;
+        showHomeGalleryStatus(error, 'error');
+        return;
+      }
+
+      showHomeGalleryStatus('Optimizăm fotografia înainte de upload...', 'info');
+
+      try {
+        const optimizedFile = await resizeHomeGalleryFile(file);
+        selectedHomeGalleryFile = optimizedFile;
+        setHomeGalleryPreview(optimizedFile);
+        showHomeGalleryStatus(`Fișier pregătit: ${optimizedFile.name}`, 'info');
+      } catch {
+        selectedHomeGalleryFile = file;
+        setHomeGalleryPreview(file);
+        showHomeGalleryStatus(`Fișier pregătit: ${file.name}`, 'info');
+      }
+    };
+
+    const handleHomeGalleryAudioFile = (file) => {
+      const error = validateHomeGalleryAudioFile(file);
+      if (error) {
+        selectedHomeGalleryAudioFile = null;
+        if (homeAudioFileName instanceof HTMLElement) {
+          homeAudioFileName.textContent = 'Nu ai selectat audio.';
+        }
+        showHomeGalleryStatus(error, 'error');
+        return;
+      }
+
+      selectedHomeGalleryAudioFile = file;
+      if (homeAudioFileName instanceof HTMLElement) {
+        homeAudioFileName.textContent = `Audio pregătit: ${file.name}`;
+      }
+      showHomeGalleryStatus('Fișier audio pregătit pentru upload.', 'info');
+    };
+
+    if (homeGalleryDropzone && homeGalleryFileInput instanceof HTMLInputElement) {
+      homeGalleryDropzone.addEventListener('click', () => homeGalleryFileInput.click());
+
+      homeGalleryDropzone.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          homeGalleryFileInput.click();
+        }
+      });
+
+      homeGalleryFileInput.addEventListener('change', () => {
+        const file = homeGalleryFileInput.files?.[0];
+        if (!file) return;
+        handleHomeGalleryFile(file);
+      });
+
+      homeGalleryDropzone.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        homeGalleryDropzone.classList.add('border-lime-300', 'bg-lime-500/15');
+      });
+
+      homeGalleryDropzone.addEventListener('dragleave', () => {
+        homeGalleryDropzone.classList.remove('border-lime-300', 'bg-lime-500/15');
+      });
+
+      homeGalleryDropzone.addEventListener('drop', (event) => {
+        event.preventDefault();
+        homeGalleryDropzone.classList.remove('border-lime-300', 'bg-lime-500/15');
+
+        const file = event.dataTransfer?.files?.[0];
+        if (!file) return;
+        handleHomeGalleryFile(file);
+      });
+    }
+
+    homeGalleryDropzoneTrigger?.addEventListener('click', () => {
+      if (homeGalleryFileInput instanceof HTMLInputElement) {
+        homeGalleryFileInput.click();
+      }
+    });
+
+    if (homeAudioDropzone && homeGalleryAudioInput instanceof HTMLInputElement) {
+      homeAudioDropzone.addEventListener('click', () => homeGalleryAudioInput.click());
+
+      homeAudioDropzone.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          homeGalleryAudioInput.click();
+        }
+      });
+
+      homeGalleryAudioInput.addEventListener('change', () => {
+        const file = homeGalleryAudioInput.files?.[0];
+        if (!file) return;
+        handleHomeGalleryAudioFile(file);
+      });
+
+      homeAudioDropzone.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        homeAudioDropzone.classList.add('border-cyan-200', 'bg-cyan-500/20');
+      });
+
+      homeAudioDropzone.addEventListener('dragleave', () => {
+        homeAudioDropzone.classList.remove('border-cyan-200', 'bg-cyan-500/20');
+      });
+
+      homeAudioDropzone.addEventListener('drop', (event) => {
+        event.preventDefault();
+        homeAudioDropzone.classList.remove('border-cyan-200', 'bg-cyan-500/20');
+
+        const file = event.dataTransfer?.files?.[0];
+        if (!file) return;
+        handleHomeGalleryAudioFile(file);
+      });
+    }
+
+    homeAudioDropzoneTrigger?.addEventListener('click', () => {
+      if (homeGalleryAudioInput instanceof HTMLInputElement) {
+        homeGalleryAudioInput.click();
+      }
+    });
+
+    homeGalleryUploadForm?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const photoTitle =
+        homeGalleryTitleInput instanceof HTMLInputElement
+          ? homeGalleryTitleInput.value.trim()
+          : '';
+
+      if (photoTitle.length < 2 || photoTitle.length > 180) {
+        showHomeGalleryStatus('Titlul fotografiei trebuie să aibă între 2 și 180 de caractere.', 'error');
+        return;
+      }
+
+      if (!(selectedHomeGalleryFile instanceof File)) {
+        showHomeGalleryStatus('Selectează mai întâi o imagine validă.', 'error');
+        return;
+      }
+
+      if (homeGallerySubmitButton instanceof HTMLButtonElement) {
+        homeGallerySubmitButton.disabled = true;
+        homeGallerySubmitButton.textContent = 'Se procesează...';
+      }
+
+      try {
+        const formData = new FormData();
+        formData.append('photo', selectedHomeGalleryFile);
+        formData.append('title', photoTitle);
+        if (selectedHomeGalleryAudioFile instanceof File) {
+          formData.append('audio', selectedHomeGalleryAudioFile);
+        }
+
+        const response = await fetch('/api/upload-photo', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(data.error || 'Upload-ul a eșuat.');
+        }
+
+        if (homeGalleryUrlInput instanceof HTMLInputElement) {
+          homeGalleryUrlInput.value = data.url || '';
+        }
+
+        if (albumRoot && data.url) {
+          if (albumRoot.getAttribute('data-home-gallery-source') === 'fallback') {
+            window.location.reload();
+            return;
+          }
+
+          const safeTitle = String(data.title || photoTitle);
+          const newPhoto = {
+            title: safeTitle,
+            image: String(data.url),
+            caption: `${safeTitle} • ${new Date().toLocaleDateString('ro-RO')}`,
+            audio: String(data.audioUrl || `/uploads/audio/${String(data.url).split('/').pop()?.replace(/\.[^.]+$/, '') || ''}.mp3`),
+          };
+
+          allAlbumPhotos.unshift(newPhoto);
+
+          const normalizedNeedle = normalizeSearchText(currentSearchTerm);
+          const matchesFilter =
+            !normalizedNeedle ||
+            normalizeSearchText(newPhoto.title).includes(normalizedNeedle) ||
+            normalizeSearchText(newPhoto.caption).includes(normalizedNeedle);
+
+          if (matchesFilter) {
+            albumPhotos.unshift(newPhoto);
+          }
+
+          currentSpread = 0;
+          renderSpread('next');
+          updateSearchResultText();
+        }
+
+        showHomeGalleryStatus('Imagine încărcată cu succes în galerie.', 'success');
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Eroare la upload.';
+        showHomeGalleryStatus(message, 'error');
+      } finally {
+        if (homeGallerySubmitButton instanceof HTMLButtonElement) {
+          homeGallerySubmitButton.disabled = false;
+          homeGallerySubmitButton.textContent = 'Optimizează și încarcă';
+        }
+      }
+    });
+  </script>
+
+  <style>
+    .cinematic-album-wrap {
+      perspective: 1400px;
+      max-width: min(96vw, 1240px);
+      max-height: min(66vh, 620px);
+      margin-inline: auto;
+    }
+
+    .cinematic-album {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.72rem;
+      border: 1px solid #ffffff2b;
+      border-radius: 1.35rem;
+      background:
+        radial-gradient(110% 120% at 0% 0%, #ffffff1a 0%, transparent 60%),
+        linear-gradient(120deg, #12132a, #171a33 52%, #11152e);
+      padding: 0.85rem;
+      box-shadow: 0 25px 50px rgba(3, 6, 16, 0.5);
+      transform: rotateX(4.5deg) rotateY(-1.4deg);
+      transform-style: preserve-3d;
+      overflow: hidden;
+      transition: filter 220ms ease;
+      max-height: min(58vh, 540px);
+    }
+
+    .cinematic-album-wrap.is-turning .cinematic-album {
+      filter: saturate(1.08) contrast(1.04);
+      animation: album-rock 950ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+
+    .album-spine {
+      position: absolute;
+      left: 50%;
+      top: 1rem;
+      bottom: 1rem;
+      width: 1px;
+      background: linear-gradient(180deg, #ffffff59 0%, #ffffff1f 50%, #ffffff59 100%);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+      transform: translateX(-0.5px) translateZ(10px);
+      pointer-events: none;
+    }
+
+    .album-flip-sheet {
+      position: absolute;
+      top: 0.72rem;
+      bottom: 0.72rem;
+      width: calc(50% - 0.36rem);
+      border-radius: 0.95rem;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 8;
+      backface-visibility: hidden;
+      background:
+        linear-gradient(100deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.04) 40%, rgba(5, 6, 18, 0.4) 100%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.03) 100%);
+      box-shadow: 0 16px 34px rgba(0, 0, 0, 0.4);
+      will-change: transform, opacity;
+    }
+
+    .album-flip-sheet::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      opacity: 0;
+      background: linear-gradient(110deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.38) 45%, rgba(255, 255, 255, 0) 78%);
+      transform: translateX(-85%);
+    }
+
+    .cinematic-album.is-turning-next .album-flip-sheet {
+      left: calc(50% + 0.18rem);
+      transform-origin: left center;
+      animation: page-sheet-next 950ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+
+    .cinematic-album.is-turning-next .album-flip-sheet::after {
+      animation: flip-glint 950ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+
+    .cinematic-album.is-turning-prev .album-flip-sheet {
+      left: 0.72rem;
+      transform-origin: right center;
+      animation: page-sheet-prev 950ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+
+    .cinematic-album.is-turning-prev .album-flip-sheet::after {
+      animation: flip-glint 950ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+
+    .album-page {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.65rem;
+      align-content: start;
+      min-height: clamp(11rem, 21vh, 16rem);
+      border-radius: 1rem;
+      border: 1px solid #ffffff22;
+      background: linear-gradient(145deg, #ffffff10, #ffffff05);
+      padding: 0.68rem;
+      backdrop-filter: blur(2px);
+      transition: filter 220ms ease;
+    }
+
+    .cinematic-album-wrap.is-turning .album-page {
+      filter: blur(0.9px);
+    }
+
+    .album-page-left {
+      transform: rotateY(6deg) translateZ(2px);
+      transform-origin: right center;
+    }
+
+    .album-page-right {
+      transform: rotateY(-6deg) translateZ(2px);
+      transform-origin: left center;
+    }
+
+    .album-page.is-flipping-forward {
+      animation: page-turn-forward 950ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+
+    .album-page.is-flipping-backward {
+      animation: page-turn-backward 950ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+
+    .album-photo-frame {
+      display: grid;
+      gap: 0.35rem;
+    }
+
+    .album-photo {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: 0.7rem;
+      border: 1px solid #ffffff2b;
+      object-fit: cover;
+      box-shadow: 0 12px 24px rgba(3, 6, 16, 0.42);
+      transition: transform 200ms ease;
+      max-height: clamp(8.6rem, 17vh, 13rem);
+    }
+
+    .moment-photo-trigger:hover .album-photo {
+      transform: scale(1.03);
+    }
+
+    .album-photo-label {
+      margin: 0;
+      font-size: 0.66rem;
+      line-height: 1.3;
+      color: #eaf2ff;
+      font-weight: 700;
+      text-align: center;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.65);
+    }
+
+    .album-controls {
+      margin-top: 0.55rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    .album-nav-btn {
+      border: 1px solid #ffffff3a;
+      border-radius: 9999px;
+      background: #ffffff12;
+      color: #f4f8ff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 0.42rem 0.7rem;
+      transition: background 180ms ease, opacity 180ms ease;
+    }
+
+    .album-nav-btn:hover {
+      background: #ffffff1e;
+    }
+
+    .album-nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .album-sound-btn {
+      border: 1px solid #ffffff36;
+      border-radius: 9999px;
+      background: #101529d4;
+      color: #eff6ff;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 0.42rem 0.66rem;
+      transition: background 180ms ease, border-color 180ms ease;
+    }
+
+    .album-sound-btn:hover {
+      background: #171e3ad4;
+      border-color: #ffffff52;
+    }
+
+    .album-page-indicator {
+      margin: 0;
+      min-width: 9rem;
+      text-align: center;
+      color: #e9f4ff;
+      font-size: 0.64rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .cinematic-lightbox {
+      --lightbox-shell-height-desktop: min(60vh, calc(100dvh - 16.5rem));
+      --lightbox-image-max-height-desktop: min(55vh, calc(100dvh - 18.5rem));
+      --lightbox-image-max-width-desktop: min(94vw, 1160px);
+      --lightbox-shell-height-mobile: min(52vh, calc(100dvh - 18.5rem));
+      --lightbox-image-max-height-mobile: min(46vh, calc(100dvh - 20rem));
+      position: relative;
+      position: fixed;
+      inset: 0;
+      margin: 0;
+      width: 100vw;
+      max-width: none;
+      min-height: 100vh;
+      height: 100dvh;
+      border: 0;
+      border-radius: 0;
+      padding: 1.2rem;
+      background: linear-gradient(180deg, rgba(3, 6, 17, 0.98), rgba(9, 12, 29, 0.98));
+      overflow: hidden;
+    }
+
+    .cinematic-lightbox[open] {
+      animation: lightbox-fade-in 220ms ease;
+    }
+
+    .cinematic-lightbox.is-closing {
+      animation: lightbox-fade-out 210ms ease forwards;
+    }
+
+    .cinematic-lightbox[data-size-preset='large'] {
+      --lightbox-shell-height-desktop: min(64vh, calc(100dvh - 15rem));
+      --lightbox-image-max-height-desktop: min(60vh, calc(100dvh - 17rem));
+      --lightbox-image-max-width-desktop: min(95vw, 1220px);
+      --lightbox-shell-height-mobile: min(56vh, calc(100dvh - 17rem));
+      --lightbox-image-max-height-mobile: min(50vh, calc(100dvh - 18.5rem));
+    }
+
+    :global(html.lightbox-open-lock),
+    :global(body.lightbox-open-lock) {
+      height: 100%;
+      overflow: hidden;
+      overscroll-behavior: none;
+      touch-action: none;
+      background: linear-gradient(180deg, #090f25 0%, #0f1733 100%);
+    }
+
+    .cinematic-lightbox::backdrop {
+      background: rgba(2, 4, 12, 0.92);
+      backdrop-filter: blur(4px);
+    }
+
+    .lightbox-image-shell {
+      margin-top: 0.35rem;
+      display: grid;
+      place-items: center;
+      min-height: 0;
+      height: var(--lightbox-shell-height-desktop);
+      transform-origin: top center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .lightbox-close,
+    .lightbox-caption,
+    .lightbox-frame-selector,
+    .lightbox-demo-sound-wrap,
+    .lightbox-audio-wrap {
+      position: relative;
+      z-index: 2;
+    }
+
+    .lightbox-balloons {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+      opacity: 0.82;
+    }
+
+    .balloon-dot {
+      position: absolute;
+      bottom: -22vh;
+      width: clamp(18px, 2.9vw, 38px);
+      aspect-ratio: 0.82 / 1;
+      border-radius: 9999px;
+      filter: saturate(1.12);
+      transform-origin: center;
+      box-shadow:
+        inset -7px -10px 12px rgba(0, 0, 0, 0.12),
+        inset 6px 9px 12px rgba(255, 255, 255, 0.26),
+        0 8px 24px rgba(0, 0, 0, 0.24);
+      animation: balloon-rise 12s linear infinite;
+    }
+
+    .balloon-dot::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: calc(100% - 1px);
+      width: 1px;
+      height: 34px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.04) 100%);
+      transform: translateX(-50%);
+      opacity: 0.7;
+    }
+
+    .balloon-dot:nth-child(1) {
+      left: 4%;
+      background: radial-gradient(circle at 28% 24%, #fff3 0%, #fff0 28%), #f87171;
+      animation-duration: 11.4s;
+      animation-delay: -4.8s;
+      width: clamp(30px, 4.2vw, 54px);
+      opacity: 0.92;
+      filter: saturate(1.18) blur(0.1px);
+      z-index: 3;
+    }
+
+    .balloon-dot:nth-child(2) {
+      left: 12%;
+      background: radial-gradient(circle at 28% 24%, #fff3 0%, #fff0 28%), #fb923c;
+      animation-duration: 12.1s;
+      animation-delay: -8.1s;
+      width: clamp(17px, 2.1vw, 28px);
+      opacity: 0.56;
+      filter: saturate(1.05) blur(1.1px);
+      z-index: 1;
+    }
+
+    .balloon-dot:nth-child(3) {
+      left: 20%;
+      background: radial-gradient(circle at 28% 24%, #fff3 0%, #fff0 28%), #facc15;
+      animation-duration: 10.9s;
+      animation-delay: -1.8s;
+      width: clamp(26px, 3.5vw, 44px);
+      opacity: 0.86;
+      filter: saturate(1.16) blur(0.3px);
+      z-index: 2;
+    }
+
+    .balloon-dot:nth-child(4) {
+      left: 28%;
+      background: radial-gradient(circle at 28% 24%, #fff3 0%, #fff0 28%), #4ade80;
+      animation-duration: 12.8s;
+      animation-delay: -7.4s;
+      width: clamp(15px, 1.9vw, 24px);
+      opacity: 0.54;
+      filter: saturate(1.02) blur(1.2px);
+      z-index: 1;
+    }
+
+    .balloon-dot:nth-child(5) {
+      left: 36%;
+      background: radial-gradient(circle at 28% 24%, #fff3 0%, #fff0 28%), #34d399;
+      animation-duration: 11.7s;
+      animation-delay: -2.6s;
+      width: clamp(29px, 4vw, 50px);
+      opacity: 0.9;
+      filter: saturate(1.2) blur(0.08px);
+      z-index: 3;
+    }
+
+    .balloon-dot:nth-child(6) {
+      left: 44%;
+      background: radial-gradient(circle at 28% 24%, #fff3 0%, #fff0 28%), #22d3ee;
+      animation-duration: 12.6s;
+      animation-delay: -9.7s;
+      width: clamp(16px, 2vw, 25px);
+      opacity: 0.52;
+      filter: saturate(1.04) blur(1.25px);
+      z-index: 1;
+    }
+
+    .balloon-dot:nth-child(7) {
+      left: 52%;
+      background: radial-gradient(circle at 28% 24%, #fff3 0%, #fff0 28%), #38bdf8;
+      animation-duration: 10.8s;
+      animation-delay: -5.9s;
+      width: clamp(24px, 3.2vw, 40px);
+      opacity: 0.82;
+      filter: saturate(1.14) blur(0.4px);
+      z-index: 2;
+    }
+
+    .balloon-dot:nth-child(8) {
+      left: 60%;
+      background: radial-gradient(circle at 28% 24%, #fff3 0%, #fff0 28%), #818cf8;
+      animation-duration: 12.3s;
+      animation-delay: -3.3s;
+      width: clamp(27px, 3.6vw, 46px);
+      opacity: 0.88;
+      filter: saturate(1.16) blur(0.22px);
+      z-index: 3;
+    }
+
+    .balloon-dot:nth-child(9) {
+      left: 68%;
+      background: radial-gradient(circle at 28% 24%, #fff3 0%, #fff0 28%), #a78bfa;
+      animation-duration: 11.6s;
+      animation-delay: -6.5s;
+      width: clamp(14px, 1.8vw, 22px);
+      opacity: 0.5;
+      filter: saturate(1) blur(1.35px);
+      z-index: 1;
+    }
+
+    .balloon-dot:nth-child(10) {
+      left: 76%;
+      background: radial-gradient(circle at 28% 24%, #fff3 0%, #fff0 28%), #f472b6;
+      animation-duration: 12.9s;
+      animation-delay: -1.2s;
+      width: clamp(31px, 4.3vw, 56px);
+      opacity: 0.93;
+      filter: saturate(1.22) blur(0.06px);
+      z-index: 3;
+    }
+
+    .balloon-dot:nth-child(11) {
+      left: 84%;
+      background: radial-gradient(circle at 28% 24%, #fff3 0%, #fff0 28%), #fb7185;
+      animation-duration: 11.2s;
+      animation-delay: -8.7s;
+      width: clamp(23px, 3vw, 38px);
+      opacity: 0.8;
+      filter: saturate(1.12) blur(0.45px);
+      z-index: 2;
+    }
+
+    .balloon-dot:nth-child(12) {
+      left: 92%;
+      background: radial-gradient(circle at 28% 24%, #fff3 0%, #fff0 28%), #60a5fa;
+      animation-duration: 12.5s;
+      animation-delay: -4.1s;
+      width: clamp(16px, 2vw, 26px);
+      opacity: 0.56;
+      filter: saturate(1.05) blur(1.05px);
+      z-index: 1;
+    }
+
+    .lightbox-image-frame {
+      position: relative;
+      border-radius: 1rem;
+      padding: 0.44rem;
+      background-color: #0b1024;
+      background:
+        linear-gradient(130deg, rgba(245, 228, 176, 0.92) 0%, rgba(208, 170, 92, 0.88) 32%, rgba(143, 111, 48, 0.9) 68%, rgba(244, 227, 170, 0.92) 100%),
+        radial-gradient(120% 140% at 12% 8%, rgba(255, 255, 255, 0.52) 0%, rgba(255, 255, 255, 0) 56%);
+      box-shadow:
+        0 0 0 1px rgba(255, 239, 195, 0.45),
+        0 16px 44px rgba(0, 0, 0, 0.56),
+        0 0 28px rgba(214, 179, 94, 0.24);
+      overflow: hidden;
+    }
+
+    .lightbox-image-frame::before {
+      content: '';
+      position: absolute;
+      inset: 0.25rem;
+      border-radius: 0.72rem;
+      border: 1px solid rgba(255, 247, 217, 0.6);
+      pointer-events: none;
+    }
+
+    .lightbox-image-frame::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(115deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0) 42%);
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+
+    .cinematic-lightbox[open] .lightbox-image-shell {
+      animation: vertical-unfold 300ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+
+    .cinematic-lightbox .lightbox-image {
+      max-height: var(--lightbox-image-max-height-desktop);
+      width: auto;
+      max-width: var(--lightbox-image-max-width-desktop);
+      border-radius: 0.62rem;
+      object-fit: contain;
+      background: #0b1024;
+      border: 1px solid rgba(255, 245, 217, 0.56);
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.5);
+    }
+
+    .lightbox-audio-wrap {
+      margin: 0.45rem auto 0;
+      width: min(92vw, 560px);
+      text-align: center;
+    }
+
+    .lightbox-demo-sound-wrap {
+      margin: 0.35rem auto 0;
+      width: min(92vw, 560px);
+      text-align: center;
+    }
+
+    .lightbox-demo-sound-btn {
+      border: 1px solid rgba(255, 255, 255, 0.38);
+      border-radius: 9999px;
+      background: rgba(23, 33, 67, 0.8);
+      color: #f0f6ff;
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 0.4rem 0.76rem;
+      transition: background 180ms ease, border-color 180ms ease;
+    }
+
+    .lightbox-demo-sound-btn:hover {
+      background: rgba(35, 49, 96, 0.92);
+      border-color: rgba(255, 255, 255, 0.62);
+    }
+
+    .lightbox-frame-selector {
+      margin: 0.35rem auto 0;
+      width: min(92vw, 560px);
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+    }
+
+    .lightbox-size-selector {
+      margin: 0.3rem auto 0;
+      width: min(92vw, 560px);
+      text-align: center;
+    }
+
+    .lightbox-size-btn {
+      border: 1px solid rgba(255, 255, 255, 0.32);
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #eef5ff;
+      font-size: 0.66rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 0.32rem 0.66rem;
+      transition: background 180ms ease, border-color 180ms ease;
+    }
+
+    .lightbox-size-btn:hover {
+      background: rgba(255, 255, 255, 0.16);
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .lightbox-frame-btn {
+      border: 1px solid rgba(255, 255, 255, 0.32);
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #eef5ff;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 0.34rem 0.62rem;
+      transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
+    }
+
+    .lightbox-frame-btn:hover {
+      background: rgba(255, 255, 255, 0.16);
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .lightbox-frame-btn.is-active {
+      background: rgba(255, 255, 255, 0.24);
+      border-color: rgba(255, 255, 255, 0.72);
+      transform: translateY(-1px);
+    }
+
+    .cinematic-lightbox[data-frame-theme='silver'] .lightbox-image-frame {
+      background:
+        linear-gradient(130deg, rgba(227, 233, 242, 0.93) 0%, rgba(163, 176, 198, 0.9) 34%, rgba(111, 121, 141, 0.9) 68%, rgba(224, 232, 242, 0.93) 100%),
+        radial-gradient(120% 140% at 12% 8%, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 56%);
+      box-shadow:
+        0 0 0 1px rgba(225, 234, 248, 0.52),
+        0 16px 44px rgba(0, 0, 0, 0.56),
+        0 0 30px rgba(162, 186, 218, 0.24);
+    }
+
+    .cinematic-lightbox[data-frame-theme='silver'] .lightbox-image-frame::before {
+      border-color: rgba(241, 247, 255, 0.68);
+    }
+
+    .cinematic-lightbox[data-frame-theme='silver'] .lightbox-image {
+      border-color: rgba(238, 246, 255, 0.58);
+    }
+
+    .cinematic-lightbox[data-frame-theme='wood'] .lightbox-image-frame {
+      background:
+        linear-gradient(135deg, rgba(120, 82, 47, 0.96) 0%, rgba(84, 55, 31, 0.95) 40%, rgba(58, 38, 25, 0.96) 72%, rgba(132, 90, 52, 0.95) 100%),
+        radial-gradient(120% 140% at 12% 8%, rgba(255, 233, 184, 0.2) 0%, rgba(255, 255, 255, 0) 58%);
+      box-shadow:
+        0 0 0 1px rgba(196, 151, 99, 0.35),
+        0 16px 44px rgba(0, 0, 0, 0.62),
+        0 0 22px rgba(95, 62, 36, 0.35);
+    }
+
+    .cinematic-lightbox[data-frame-theme='wood'] .lightbox-image-frame::before {
+      border-color: rgba(223, 180, 126, 0.45);
+    }
+
+    .cinematic-lightbox[data-frame-theme='wood'] .lightbox-image {
+      border-color: rgba(229, 194, 149, 0.48);
+    }
+
+    .lightbox-audio-note {
+      margin: 0 0 0.35rem;
+      color: #d9e9ff;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .lightbox-audio {
+      width: 100%;
+      height: 38px;
+      border-radius: 9999px;
+      outline: 0;
+    }
+
+    @keyframes vertical-unfold {
+      from {
+        opacity: 0;
+        transform: scaleY(0.08);
+      }
+      to {
+        opacity: 1;
+        transform: scaleY(1);
+      }
+    }
+
+    @keyframes lightbox-fade-in {
+      from {
+        opacity: 0;
+        filter: saturate(0.9);
+      }
+      to {
+        opacity: 1;
+        filter: saturate(1);
+      }
+    }
+
+    @keyframes lightbox-fade-out {
+      from {
+        opacity: 1;
+        filter: saturate(1);
+      }
+      to {
+        opacity: 0;
+        filter: saturate(0.92);
+      }
+    }
+
+    @keyframes balloon-rise {
+      0% {
+        transform: translate3d(0, 0, 0) rotate(-2deg);
+      }
+      25% {
+        transform: translate3d(8px, -28vh, 0) rotate(2deg);
+      }
+      50% {
+        transform: translate3d(-7px, -56vh, 0) rotate(-1deg);
+      }
+      75% {
+        transform: translate3d(9px, -84vh, 0) rotate(2deg);
+      }
+      100% {
+        transform: translate3d(-6px, -124vh, 0) rotate(-2deg);
+      }
+    }
+
+    @keyframes page-turn-forward {
+      from {
+        transform: rotateY(-6deg) translateZ(2px);
+      }
+      50% {
+        transform: rotateY(-24deg) translateZ(5px);
+      }
+      to {
+        transform: rotateY(-6deg) translateZ(2px);
+      }
+    }
+
+    @keyframes page-turn-backward {
+      from {
+        transform: rotateY(6deg) translateZ(2px);
+      }
+      50% {
+        transform: rotateY(24deg) translateZ(5px);
+      }
+      to {
+        transform: rotateY(6deg) translateZ(2px);
+      }
+    }
+
+    @keyframes page-sheet-next {
+      0% {
+        opacity: 0;
+        transform: perspective(1300px) rotateY(0deg) translateX(0);
+      }
+      12% {
+        opacity: 1;
+      }
+      55% {
+        opacity: 1;
+        transform: perspective(1300px) rotateY(-100deg) translateX(-12%);
+      }
+      100% {
+        opacity: 0;
+        transform: perspective(1300px) rotateY(-178deg) translateX(-56%);
+      }
+    }
+
+    @keyframes page-sheet-prev {
+      0% {
+        opacity: 0;
+        transform: perspective(1300px) rotateY(0deg) translateX(0);
+      }
+      12% {
+        opacity: 1;
+      }
+      55% {
+        opacity: 1;
+        transform: perspective(1300px) rotateY(100deg) translateX(12%);
+      }
+      100% {
+        opacity: 0;
+        transform: perspective(1300px) rotateY(178deg) translateX(56%);
+      }
+    }
+
+    @keyframes album-rock {
+      0% {
+        transform: rotateX(4.5deg) rotateY(-1.4deg);
+      }
+      50% {
+        transform: rotateX(5.4deg) rotateY(-2.7deg);
+      }
+      100% {
+        transform: rotateX(4.5deg) rotateY(-1.4deg);
+      }
+    }
+
+    @keyframes flip-glint {
+      0% {
+        opacity: 0;
+        transform: translateX(-85%);
+      }
+      16% {
+        opacity: 0.8;
+      }
+      70% {
+        opacity: 0.55;
+      }
+      100% {
+        opacity: 0;
+        transform: translateX(110%);
+      }
+    }
+
+    .gallery-stage-fade {
+      opacity: 0;
+      transform: translateY(12px);
+      animation: galleryStageFadeIn 620ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes galleryStageFadeIn {
+      0% {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .cinematic-lightbox[open] .lightbox-image-shell,
+      .gallery-stage-fade {
+        opacity: 1;
+        transform: none;
+        animation: none;
+      }
+
+      .balloon-dot {
+        animation: none;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .lightbox-image-shell {
+        height: var(--lightbox-shell-height-mobile);
+      }
+
+      .lightbox-image-frame {
+        padding: 0.48rem;
+        border-radius: 0.86rem;
+      }
+
+      .cinematic-lightbox .lightbox-image {
+        max-height: var(--lightbox-image-max-height-mobile);
+      }
+
+      .cinematic-album {
+        grid-template-columns: 1fr;
+        transform: none;
+        max-height: none;
+      }
+
+      .album-spine {
+        display: none;
+      }
+
+      .album-flip-sheet {
+        display: none;
+      }
+
+      .album-page-left,
+      .album-page-right {
+        transform: none;
+      }
+
+      .album-page-indicator {
+        min-width: 8.5rem;
+      }
+
+      .cinematic-album-wrap {
+        max-height: none;
+      }
+
+      .album-page {
+        min-height: clamp(10.5rem, 30vh, 15rem);
+      }
+
+      .album-photo {
+        max-height: clamp(8rem, 26vh, 12rem);
+      }
+    }
+  </style>
+</BaseLayout>

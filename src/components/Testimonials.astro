@@ -1,0 +1,64 @@
+---
+type Testimonial = {
+  name: string;
+  role: string;
+  quote: string;
+  colorClass: string;
+};
+
+const testimonials: Testimonial[] = [
+  {
+    name: 'Andreea M.',
+    role: 'Fondator startup',
+    quote:
+      'Landing page-ul a fost gata rapid, iar scorul de performanță este excelent. Am observat o creștere clară a conversiilor.',
+    colorClass: 'bg-purple-200',
+  },
+  {
+    name: 'Mihai C.',
+    role: 'Consultant marketing',
+    quote:
+      'Structura clară, textul ușor de parcurs și viteza de încărcare fac diferența. SEO-ul este deja configurat corect.',
+    colorClass: 'bg-pink-200',
+  },
+  {
+    name: 'Ioana R.',
+    role: 'Freelancer digital',
+    quote:
+      'Îmi place mult paleta pastel și animațiile discrete. Site-ul arată profesionist fără să fie încărcat.',
+    colorClass: 'bg-blue-200',
+  },
+];
+---
+
+<section id="testimonials" class="section-container py-14 sm:py-16">
+  <header class="max-w-3xl animate-fade-up">
+    <p class="section-kicker">Testimoniale</p>
+    <h2 class="section-title">Clienți care își prezintă brandul cu încredere.</h2>
+    <p class="section-description">
+      Secțiunea de testimoniale consolidează încrederea și arată că soluția ta a fost
+      deja validată de alții.
+    </p>
+  </header>
+
+  <div class="mt-8 grid gap-6 lg:grid-cols-3">
+    {testimonials.map((item) => (
+      <figure class="card-soft flex h-full flex-col gap-4 p-5 sm:p-6 animate-fade-up">
+        <div class="flex items-center gap-3">
+          <div
+            class={`h-12 w-12 shrink-0 rounded-full ${item.colorClass}`}
+            aria-hidden="true"
+          />
+          <figcaption class="space-y-0.5">
+            <div class="text-sm font-semibold text-slate-900">{item.name}</div>
+            <div class="text-xs text-slate-500">{item.role}</div>
+          </figcaption>
+        </div>
+        <blockquote class="text-sm leading-relaxed text-slate-600">
+          „{item.quote}”
+        </blockquote>
+      </figure>
+    ))}
+  </div>
+</section>
+

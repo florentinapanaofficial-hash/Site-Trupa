@@ -1,0 +1,33 @@
+CREATE TABLE IF NOT EXISTS posts (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  titlu VARCHAR(255) NOT NULL,
+  youtube_id VARCHAR(64) NOT NULL,
+  imagine_url VARCHAR(500) DEFAULT NULL,
+  data TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  INDEX idx_posts_youtube_id (youtube_id)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS comments (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  post_id INT UNSIGNED NOT NULL,
+  nume_utilizator VARCHAR(120) NOT NULL,
+  text_comentariu TEXT NOT NULL,
+  data TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  INDEX idx_comments_post_id (post_id),
+  CONSTRAINT fk_comments_post
+    FOREIGN KEY (post_id)
+    REFERENCES posts(id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS gallery (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  titlu VARCHAR(180) NOT NULL,
+  imagine_url VARCHAR(500) NOT NULL,
+  data_upload TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  INDEX idx_gallery_data_upload (data_upload)
+) ENGINE=InnoDB;

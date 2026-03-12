@@ -1,0 +1,82 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import siteContent from '../data/siteContent.json';
+import '../styles/globals.css';
+
+interface Props {
+  title: string;
+  description: string;
+  ogImage?: string;
+}
+
+const { title, description, ogImage = '/images/og-placeholder.png' } = Astro.props as Props;
+
+const site = Astro.site?.toString().replace(/\/$/, '') ?? '';
+const canonical =
+  site && Astro.url
+    ? new URL(Astro.url.pathname, site).toString()
+    : Astro.url?.href ?? '';
+
+const { navigation } = siteContent;
+const isHomePage = Astro.url.pathname === '/';
+const sectionLink = (anchor: string) => (isHomePage ? anchor : `/${anchor}`);
+
+const sideMenuTopItems = [
+  { href: sectionLink('#acasa'), label: 'Acasă' },
+  { href: sectionLink('#video'), label: 'Galerie Video' },
+  { href: '/aparitii-tv', label: 'Galerie Video Apariții TV' },
+  { href: '/galerie-foto', label: 'Galerie Foto' },
+  { href: '/momente-cu-mirii', label: 'Momente cu mirii' },
+];
+
+const sideMenuBottomItems = [
+  { href: '/comunitatea-noastra', label: 'Comunitatea noastră' },
+  { href: '/contact', label: 'Contact' },
+];
+---
+
+<!DOCTYPE html>
+<html lang="ro" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#0c0f1f" />
+    {canonical && <link rel="canonical" href={canonical} />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    <meta property="og:image" content={ogImage} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <slot name="head" />
+  </head>
+  <body class="page-shell">
+    <a href="#continut" class="skip-link">Sari la conținut</a>
+    <Header />
+
+    <aside class="left-side-menu" aria-label="Acces rapid">
+      {sideMenuTopItems.map((item) => (
+        <a href={item.href} class="left-side-link" data-nav-link>{item.label}</a>
+      ))}
+
+      {sideMenuBottomItems.map((item) => (
+        <a href={item.href} class="left-side-link" data-nav-link>{item.label}</a>
+      ))}
+    </aside>
+
+    <main id="continut" class="flex-1 pt-24 sm:pt-28 lg:pl-24">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
+

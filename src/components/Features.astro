@@ -1,0 +1,55 @@
+---
+const features = [
+  {
+    title: 'Performanță și viteză',
+    description:
+      'Astro livrează doar HTML-ul necesar, astfel încât landing page-ul tău se încarcă instant, chiar și pe conexiuni lente.',
+    tag: 'Astro &amp; Island Architecture',
+  },
+  {
+    title: 'Design pastel, modern',
+    description:
+      'TailwindCSS + un sistem de culori pastel creează un aspect profesionist, calm și memorabil pentru brandul tău.',
+    tag: 'UI modern &amp; responsive',
+  },
+  {
+    title: 'SEO pregătit pentru producție',
+    description:
+      'Meta tags, Open Graph, sitemap și robots.txt — tot ce ai nevoie pentru o indexare corectă în motoarele de căutare.',
+    tag: 'SEO complet',
+  },
+];
+---
+
+<section id="features" class="section-container py-14 sm:py-16">
+  <header class="max-w-3xl animate-fade-up">
+    <p class="section-kicker">Beneficii</p>
+    <h2 class="section-title">Tot ce trebuie pentru un landing page convingător.</h2>
+    <p class="section-description">
+      Structură clară, copy ușor de citit, animații subtile și imagini lazy-loaded —
+      astfel încât vizitatorii să rămână concentrați pe mesajul tău principal.
+    </p>
+  </header>
+
+  <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    {features.map((feature) => (
+      <article class="card-soft flex flex-col gap-4 p-5 sm:p-6 animate-fade-up">
+        <div class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-tr from-pastel-pink via-pastel-blue to-pastel-mint text-sm font-semibold text-slate-900 shadow-soft">
+          ✨
+        </div>
+        <div class="space-y-2">
+          <h3 class="text-sm font-semibold text-slate-900 sm:text-base">
+            {feature.title}
+          </h3>
+          <p class="text-sm leading-relaxed text-slate-600">
+            {feature.description}
+          </p>
+        </div>
+        <span class="mt-auto inline-flex items-center text-xs font-medium text-slate-500">
+          {feature.tag}
+        </span>
+      </article>
+    ))}
+  </div>
+</section>
+

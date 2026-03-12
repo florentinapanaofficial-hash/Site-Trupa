@@ -1,0 +1,150 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: public/images
+public_folder: /images
+locale: ro
+
+collections:
+  - name: site_content
+    label: Continut Site
+    files:
+      - file: src/data/siteContent.json
+        label: Date principale
+        name: site_content
+        fields:
+          - label: Brand
+            name: brand
+            widget: object
+            fields:
+              - { label: Scurt, name: short, widget: string }
+              - { label: Nume, name: name, widget: string }
+              - { label: Slogan, name: tagline, widget: string }
+
+          - label: SEO
+            name: seo
+            widget: object
+            fields:
+              - { label: Titlu SEO, name: title, widget: string }
+              - { label: Descriere SEO, name: description, widget: text }
+              - { label: Imagine Open Graph, name: ogImage, widget: image }
+
+          - label: Contact
+            name: contact
+            widget: object
+            fields:
+              - { label: Telefon brut, name: phoneRaw, widget: string }
+              - { label: Telefon afișat, name: phoneDisplay, widget: string }
+              - { label: Email, name: email, widget: string }
+              - { label: Oraș, name: city, widget: string }
+
+          - label: Social Media
+            name: socialLinks
+            widget: object
+            fields:
+              - { label: YouTube URL, name: youtube, widget: string }
+              - { label: Facebook URL, name: facebook, widget: string }
+              - { label: Instagram URL, name: instagram, widget: string }
+
+          - label: Hero
+            name: hero
+            widget: object
+            fields:
+              - { label: Subtitlu, name: kicker, widget: string }
+              - { label: Titlu principal, name: title, widget: string }
+              - { label: Descriere, name: description, widget: text }
+              - label: Buton principal
+                name: ctaPrimary
+                widget: object
+                fields:
+                  - { label: Text, name: label, widget: string }
+                  - { label: Link, name: href, widget: string }
+              - label: Buton secundar
+                name: ctaSecondary
+                widget: object
+                fields:
+                  - { label: Text, name: label, widget: string }
+                  - { label: Link, name: href, widget: string }
+              - label: Buline beneficii
+                name: bullets
+                widget: list
+                field: { label: Beneficiu, name: bullet, widget: string }
+
+          - label: Servicii
+            name: services
+            widget: list
+            summary: '{{fields.title}}'
+            fields:
+              - { label: Titlu, name: title, widget: string }
+              - { label: Descriere, name: description, widget: text }
+
+          - label: Repertoriu
+            name: repertoire
+            widget: list
+            summary: '{{fields.label}}'
+            fields:
+              - { label: Titlu secțiune, name: label, widget: string }
+              - { label: Text detaliat, name: details, widget: text }
+
+          - label: Noutăți și Comunitate
+            name: news
+            widget: object
+            fields:
+              - { label: Introducere secțiune, name: intro, widget: text }
+              - label: Postări noutăți
+                name: posts
+                widget: list
+                summary: '{{fields.title}}'
+                fields:
+                  - { label: Titlu, name: title, widget: string }
+                  - { label: Data, name: date, widget: string }
+                  - { label: Categorie, name: category, widget: string }
+                  - { label: Rezumat, name: summary, widget: text }
+              - label: Comentarii aprobate (publice)
+                name: approvedComments
+                widget: list
+                summary: '{{fields.author}} • {{fields.relatedPost}}'
+                fields:
+                  - { label: Autor, name: author, widget: string }
+                  - { label: Noutatea asociată, name: relatedPost, widget: string }
+                  - { label: Comentariu, name: text, widget: text }
+                  - { label: Reacție emoji, name: reaction, widget: string, required: false }
+                  - label: Nivel încredere
+                    name: trustLevel
+                    widget: select
+                    default: nou
+                    options:
+                      - { label: Nou, value: nou }
+                      - { label: Verificat, value: verificat }
+                      - { label: Client confirmat, value: confirmat }
+
+          - label: Echipă
+            name: team
+            widget: object
+            fields:
+              - label: Soliști vocali
+                name: vocalists
+                widget: list
+                summary: '{{fields.name}}'
+                fields:
+                  - { label: Nume, name: name, widget: string }
+                  - { label: Rol, name: role, widget: string }
+                  - { label: Descriere, name: description, widget: text }
+                  - { label: Imagine, name: image, widget: image }
+              - label: Soliști instrumentiști
+                name: instrumentalists
+                widget: list
+                summary: '{{fields.name}}'
+                fields:
+                  - { label: Nume, name: name, widget: string }
+                  - { label: Rol, name: role, widget: string }
+                  - { label: Descriere, name: description, widget: text }
+                  - { label: Imagine, name: image, widget: image }
+              - label: Colaboratori
+                name: collaborators
+                widget: list
+                summary: '{{fields.instrument}}'
+                fields:
+                  - { label: Instrument, name: instrument, widget: string }
+                  - { label: Descriere, name: description, widget: text }

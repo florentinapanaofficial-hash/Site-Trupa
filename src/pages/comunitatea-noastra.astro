@@ -1,0 +1,1127 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import siteContent from '../data/siteContent.json';
+import communityPosts from '../data/communityPosts.json';
+import { query as dbQuery } from '../lib/db.js';
+
+export const prerender = false;
+
+const { brand, seo, videos, tvAppearances, contact } = siteContent;
+
+const getYoutubeId = (url: string) => {
+  const match = url.match(/(?:v=|youtu\.be\/)([^&?/]+)/);
+  return match?.[1] ?? '';
+};
+
+const getFeedType = (source: string) => (source.toLowerCase().includes('apari') ? 'tv' : 'gallery');
+
+const whatsappNumber = contact.phoneRaw.replace(/\D/g, '');
+const buildWhatsAppCta = (videoUrl: string) => {
+  const message = encodeURIComponent(`Bună! Vreau ofertă pentru sezonul 2026-2027. Am văzut această postare: ${videoUrl}`);
+  return `https://wa.me/${whatsappNumber}?text=${message}`;
+};
+
+const fallbackFeedPosts = [
+  ...videos.map((item, index) => ({
+    id: `video-${item.youtubeId}`,
+    title: item.title,
+    caption: `Atmosferă reală din evenimentele noastre. Dacă îți place vibe-ul, dă like, comentează și distribuie mai departe.`,
+    youtubeId: item.youtubeId,
+    youtubeUrl: item.youtubeUrl ?? `https://www.youtube.com/watch?v=${item.youtubeId}`,
+    source: 'Galerie video',
+    publishedLabel: `${index + 1} h`,
+  })),
+  ...tvAppearances
+    .map((item, index) => {
+      const youtubeId = getYoutubeId(item.videoUrl);
+      if (!youtubeId) return null;
+
+      return {
+        id: `tv-${youtubeId}-${index + 1}`,
+        title: item.show,
+        caption: `Apariție TV ${item.year}. Susține-ne cu un like și un share ca să ajungem la cât mai mulți clienți noi.`,
+        youtubeId,
+        youtubeUrl: item.videoUrl,
+        source: `Apariții TV ${item.year}`,
+        publishedLabel: `${index + 2} h`,
+      };
+    })
+    .filter(Boolean),
+];
+
+const adminFeedPosts = (communityPosts ?? [])
+  .map((item, index) => {
+    const imageUrl = typeof item.imageUrl === 'string' ? item.imageUrl.trim() : '';
+    const youtubeId = getYoutubeId(item.youtubeUrl ?? '');
+    if (!youtubeId && !imageUrl) return null;
+
+    return {
+      id: item.id || `admin-post-${index + 1}`,
+      title: item.title || `Postare ${index + 1}`,
+      caption: item.caption || 'Postare comunitate.',
+      youtubeId,
+      youtubeUrl: item.youtubeUrl || '',
+      imageUrl,
+      source: item.source || 'Comunitate',
+      publishedLabel: item.publishedLabel || `${index + 1} h`,
+    };
+  })
+  .filter(Boolean);
+
+const feedPosts = adminFeedPosts.length > 0 ? adminFeedPosts : fallbackFeedPosts;
+
+const editorialCards = [
+  {
+    category: 'Istorie',
+    title: 'Rădăcini lăutărești în România',
+    excerpt: 'Spațiu editorial pentru articole despre originile și evoluția tarafurilor românești.',
+    readTime: '6 min',
+    href: '#',
+  },
+  {
+    category: 'Genuri',
+    title: 'Diferențe între hore, sârbe și geamparale',
+    excerpt: 'Loc dedicat textelor despre ritmuri, specific regional și context cultural.',
+    readTime: '5 min',
+    href: '#',
+  },
+  {
+    category: 'Vlog',
+    title: 'Din culisele unui eveniment live',
+    excerpt: 'Secțiune pentru materiale vlog și publicații despre pregătirea show-ului.',
+    readTime: '4 min',
+    href: '#',
+  },
+  {
+    category: 'Educație muzicală',
+    title: 'Cum alegi repertoriul potrivit pe momente',
+    excerpt: 'Rubrică utilă pentru clienți: dansul mirilor, momente tradiționale și final de seară.',
+    readTime: '7 min',
+    href: '#',
+  },
+];
+
+let galleryPhotos: Array<{
+  id: number;
+  titlu: string;
+  imagine_url: string;
+  data_upload: string;
+}> = [];
+
+try {
+  const rows = (await dbQuery(
+    `SELECT id, titlu, imagine_url, data_upload
+     FROM gallery
+     WHERE imagine_url LIKE '/uploads/%'
+     ORDER BY data_upload DESC`,
+  )) as Array<{ id: number; titlu: string; imagine_url: string; data_upload: string }>;
+
+  galleryPhotos = rows.filter((row) => typeof row.imagine_url === 'string' && row.imagine_url.startsWith('/uploads/'));
+} catch (error) {
+  console.error('Nu s-a putut citi galeria foto din DB:', error);
+}
+
+const pageTitle = `Comunitatea noastră | ${brand.name}`;
+const pageDescription = 'Distribuie videoclipurile preferate, interacționează cu comunitatea și susține formația prin like-uri și share-uri.';
+---
+
+<BaseLayout title={pageTitle} description={pageDescription} ogImage={seo.ogImage}>
+  <section class="section-container pt-8 pb-6 sm:pt-10">
+    <header class="section-head mx-auto text-center">
+      <p class="kicker">Comunitatea noastră</p>
+      <h1 class="section-title">Feed social activ</h1>
+      <p class="section-copy">
+        Scroll ca pe Facebook: fiecare postare are videoclip, text, like, comentarii și distribuire în social media.
+      </p>
+    </header>
+
+    <div class="community-feed-intro mt-6 rounded-3xl border border-white/20 bg-white/10 p-5 sm:p-6">
+      <p class="text-sm font-semibold uppercase tracking-wider text-cyan-100">Obiectiv comunitate</p>
+      <p class="mt-2 text-sm leading-relaxed text-white/80">
+        Fiecare share contează. Distribuie postările, lasă comentarii și ajută-ne să creștem comunitatea pentru sezonul 2026-2027.
+      </p>
+      <p class="mt-3 text-xs font-semibold uppercase tracking-wider text-lime-100">
+        Administrare rapidă: editezi postările în fișierul src/data/communityPosts.json (model în src/data/communityPosts.template.json).
+      </p>
+    </div>
+  </section>
+
+  <section class="section-container pb-16 sm:pb-20">
+    <section class="community-gallery-wrap mx-auto mb-6 max-w-5xl rounded-2xl border border-white/20 bg-[#120a27d6] p-4 sm:p-5">
+      <div class="flex items-center justify-between gap-3">
+        <h2 class="text-lg font-extrabold text-white">Galerie Foto Comunitate</h2>
+        <span class="rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white/90">
+          {galleryPhotos.length} imagini
+        </span>
+      </div>
+
+      {galleryPhotos.length > 0 ? (
+        <div class="community-gallery-grid mt-4" data-db-gallery-grid>
+          {galleryPhotos.map((photo) => (
+            <article class="community-gallery-item" aria-label={photo.titlu}>
+              <img src={photo.imagine_url} alt={photo.titlu} loading="lazy" />
+              <div class="community-gallery-meta">
+                <p class="community-gallery-title">{photo.titlu}</p>
+                <p class="community-gallery-date">{new Date(photo.data_upload).toLocaleDateString('ro-RO')}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <p class="mt-3 text-sm text-white/90">Nu există poze în galerie momentan. Încarcă prima imagine din zona de administrator.</p>
+      )}
+    </section>
+
+    <section class="admin-upload-panel mx-auto mb-4 max-w-3xl rounded-2xl border border-white/20 bg-[#140a2fe3] p-4 backdrop-blur">
+      <p class="text-sm font-extrabold uppercase tracking-wider text-lime-100">Administrator: încărcare foto postare</p>
+      <p class="mt-1 text-xs text-white/90">Drag & drop o imagine sau selectează fișierul. Imaginea este optimizată automat (max 1200px, WebP).</p>
+
+      <form class="mt-3 grid gap-3" data-admin-upload-form>
+        <input id="admin-photo-input" type="file" name="photo" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" class="hidden" />
+
+        <label class="grid gap-1 text-xs font-semibold uppercase tracking-wider text-white/90">
+          Titlu fotografie
+          <input data-upload-title class="input-glass" type="text" maxlength="180" placeholder="Ex: Public în delir la final de seară" required />
+        </label>
+
+        <div class="community-dropzone" data-dropzone role="button" tabindex="0" aria-label="Dropzone încărcare foto">
+          <p class="text-sm font-bold text-white">Trage fotografia aici</p>
+          <p class="mt-1 text-xs text-white/90">sau apasă pentru selectare (JPG, PNG, WebP, max 5MB)</p>
+        </div>
+
+        <img data-upload-preview class="community-upload-preview hidden" alt="Previzualizare fotografie" />
+
+        <div class="flex flex-wrap gap-2">
+          <button type="button" class="btn-outline" data-dropzone-trigger>Selectează fișier</button>
+          <button type="submit" class="btn-solid" data-upload-submit>Optimizează și încarcă</button>
+        </div>
+
+        <p class="hidden rounded-lg border px-3 py-2 text-xs font-semibold" data-upload-status role="status" aria-live="polite"></p>
+
+        <label class="grid gap-1 text-xs font-semibold uppercase tracking-wider text-white/90">
+          URL imagine încărcată
+          <input data-upload-url class="input-glass" type="text" readonly placeholder="Va apărea aici după upload" />
+        </label>
+      </form>
+    </section>
+
+    <div class="community-main-layout mx-auto max-w-7xl gap-5 grid grid-cols-1 md:grid-cols-[0.8fr_1.7fr]">
+      <section class="community-feed-column min-w-0 md:max-w-md">
+        <div class="community-toolbar sticky top-24 z-20 mb-4 grid gap-3 rounded-2xl border border-white/20 bg-[#0a1433de] p-3 backdrop-blur sm:grid-cols-[1fr_auto] sm:items-center">
+          <div class="flex items-center gap-3">
+            <div class="community-avatar" aria-hidden="true">FP</div>
+            <label class="w-full" for="new-community-post">
+              <span class="sr-only">Creare postare</span>
+              <input
+                id="new-community-post"
+                type="text"
+                class="input-glass w-full"
+                placeholder="Ce vrei să postezi astăzi în comunitate?"
+                readonly
+              />
+            </label>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <button type="button" class="btn-outline" data-create-post-demo>Publică postare</button>
+            <select class="input-glass min-w-48" data-feed-sort aria-label="Sortează feed-ul comunității">
+              <option value="newest" selected>Cele mai noi</option>
+              <option value="top">Cele mai apreciate</option>
+            </select>
+            <div class="community-filter-wrap flex flex-wrap gap-2" role="group" aria-label="Filtrează postările comunității">
+              <button type="button" class="community-filter-btn is-active" data-feed-filter="all" aria-pressed="true">Toate</button>
+              <button type="button" class="community-filter-btn" data-feed-filter="gallery" aria-pressed="false">Galerie Video</button>
+              <button type="button" class="community-filter-btn" data-feed-filter="tv" aria-pressed="false">Apariții TV</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="community-feed grid w-full max-w-none gap-4">
+      {feedPosts.map((item, index) => {
+        const mediaUrl = item.youtubeUrl || item.imageUrl || '';
+
+        return (
+        <article
+          class="community-post glass-card"
+          data-social-card
+          data-video-id={item.id}
+          data-feed-order={index + 1}
+          data-feed-type={getFeedType(item.source)}
+        >
+          <header class="community-post-head flex items-center gap-3">
+            <div class="community-avatar" aria-hidden="true">FP</div>
+            <div>
+              <p class="text-sm font-extrabold text-white">{brand.name}</p>
+              <p class="text-xs font-semibold text-white/85">{item.source} • {item.publishedLabel}</p>
+            </div>
+            {index === 0 && <span class="community-pinned">Postare recomandată</span>}
+          </header>
+
+          <h2 class="mt-3 text-base font-extrabold text-white">{item.title}</h2>
+          <p class="mt-2 text-sm leading-relaxed text-white/80">{item.caption}</p>
+
+          {item.youtubeId ? (
+            <iframe
+              class="community-video mt-4 aspect-video w-full rounded-xl"
+              src={`https://www.youtube.com/embed/${item.youtubeId}`}
+              title={item.title}
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen
+            />
+          ) : item.imageUrl ? (
+            <img class="community-video community-photo mt-4 w-full rounded-xl" src={item.imageUrl} alt={item.title} loading="lazy" />
+          ) : null}
+
+          <div class="mt-4 flex items-center justify-between gap-3 border-b border-white/15 pb-3 text-xs font-semibold text-white/85">
+            <p><span data-like-count>0</span> aprecieri</p>
+            <p><span data-comment-count>0</span> comentarii</p>
+          </div>
+
+          <div class="community-post-actions mt-3 flex flex-wrap gap-2">
+            <button type="button" class="community-action-btn" data-like-button>Like</button>
+            {mediaUrl && (
+              <a
+                href={mediaUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="community-action-btn"
+              >
+                {item.youtubeId ? 'Vezi pe YouTube' : 'Vezi fotografia'}
+              </a>
+            )}
+            <button type="button" class="community-action-btn" data-share-facebook={mediaUrl}>Distribuie Facebook</button>
+            <button type="button" class="community-action-btn" data-share-whatsapp={mediaUrl}>Distribuie WhatsApp</button>
+            <button type="button" class="community-action-btn" data-copy-link={mediaUrl}>Copiază link postare</button>
+          </div>
+
+          <a
+            href={buildWhatsAppCta(mediaUrl || 'https://landing-ul-meu.example.com/comunitatea-noastra')}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="community-whatsapp-cta mt-3"
+          >
+            Cere ofertă pe WhatsApp pentru acest tip de moment
+          </a>
+
+          <form class="mt-4 grid gap-2" data-comment-form>
+            <label class="sr-only" for={`name-${item.id}`}>Nume</label>
+            <input id={`name-${item.id}`} name="name" type="text" class="input-glass" maxlength="60" placeholder="Numele tău" required />
+            <label class="sr-only" for={`comment-${item.id}`}>Comentariu</label>
+            <textarea id={`comment-${item.id}`} name="comment" class="input-glass min-h-24 resize-y" minlength="3" maxlength="360" placeholder="Scrie un comentariu la această postare" required></textarea>
+            <button type="submit" class="btn-solid justify-center">Publică comentariul</button>
+          </form>
+
+          <div class="community-comments mt-4" data-comment-list aria-live="polite"></div>
+        </article>
+        );
+      })}
+        </div>
+      </section>
+
+      <aside class="community-editorial-column min-w-0 md:max-w-full md:min-w-[420px]" aria-label="Publicații muzicale">
+        <section class="community-editorial-wrap rounded-2xl border border-white/20 bg-[#0f1733d9] p-4 sm:p-5">
+          <p class="text-xs font-extrabold uppercase tracking-wider text-cyan-100">Rubrică editorială</p>
+          <h2 class="mt-2 text-lg font-extrabold text-white">Universul Muzicii în Cuvinte de Poveste</h2>
+          <p class="mt-2 text-sm leading-relaxed text-white/80">
+            Zonă dedicată publicațiilor tale: vlog, articole despre muzică, genuri muzicale, istoria lăutarilor și povești din culise.
+          </p>
+
+          <div class="mt-4 grid gap-3">
+            {editorialCards.map((card) => (
+              <article class="editorial-card rounded-xl border border-white/20 bg-white/5 p-3">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="rounded-full border border-white/20 bg-white/10 px-2 py-1 text-[10px] font-extrabold uppercase tracking-wider text-lime-100">{card.category}</span>
+                  <span class="text-[11px] font-semibold uppercase tracking-wider text-white/70">{card.readTime}</span>
+                </div>
+                <h3 class="mt-2 text-sm font-extrabold text-white">{card.title}</h3>
+                <p class="mt-1 text-xs leading-relaxed text-white/80">{card.excerpt}</p>
+                <a href={card.href} class="editorial-link mt-2 inline-flex text-xs font-extrabold uppercase tracking-wider text-cyan-100">Editezi tu articolul</a>
+              </article>
+            ))}
+          </div>
+
+          <p class="mt-4 rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-xs font-semibold text-white/85">
+            Pont: poți transforma această rubrică într-un blog complet cu pagini dedicate pentru fiecare articol.
+          </p>
+        </section>
+      </aside>
+    </div>
+  </section>
+
+  <script>
+    const communityStorageKey = 'fp-community-feed-v2';
+
+    const readCommunityState = () => {
+      try {
+        const raw = window.localStorage.getItem(communityStorageKey);
+        const parsed = raw ? JSON.parse(raw) : null;
+
+        if (!parsed || typeof parsed !== 'object') {
+          return { likes: {}, likedByMe: {}, comments: {} };
+        }
+
+        return {
+          likes: parsed.likes && typeof parsed.likes === 'object' ? parsed.likes : {},
+          likedByMe: parsed.likedByMe && typeof parsed.likedByMe === 'object' ? parsed.likedByMe : {},
+          comments: parsed.comments && typeof parsed.comments === 'object' ? parsed.comments : {},
+        };
+      } catch {
+        return { likes: {}, likedByMe: {}, comments: {} };
+      }
+    };
+
+    const writeCommunityState = (state) => {
+      window.localStorage.setItem(communityStorageKey, JSON.stringify(state));
+    };
+
+    const communityState = readCommunityState();
+    const sortSelect = document.querySelector('[data-feed-sort]');
+    const filterButtons = Array.from(document.querySelectorAll('[data-feed-filter]'));
+    const feedContainer = document.querySelector('.community-feed');
+    const createPostDemoButton = document.querySelector('[data-create-post-demo]');
+    const cards = Array.from(document.querySelectorAll('[data-social-card]'));
+
+    let activeFilter = 'all';
+
+    const applyFeedSorting = (mode) => {
+      if (!feedContainer) return;
+
+      const sortedCards = [...cards].sort((a, b) => {
+        const aId = a.getAttribute('data-video-id') ?? '';
+        const bId = b.getAttribute('data-video-id') ?? '';
+        const aLikes = Number(communityState.likes[aId] ?? 0);
+        const bLikes = Number(communityState.likes[bId] ?? 0);
+        const aOrder = Number(a.getAttribute('data-feed-order') ?? 0);
+        const bOrder = Number(b.getAttribute('data-feed-order') ?? 0);
+
+        if (mode === 'top') {
+          if (bLikes !== aLikes) return bLikes - aLikes;
+          return aOrder - bOrder;
+        }
+
+        return aOrder - bOrder;
+      });
+
+      sortedCards.forEach((card) => feedContainer.appendChild(card));
+    };
+
+    sortSelect?.addEventListener('change', () => {
+      applyFeedSorting(sortSelect.value);
+      applyFeedFilter(activeFilter);
+    });
+
+    const applyFeedFilter = (filter) => {
+      activeFilter = filter;
+
+      cards.forEach((card) => {
+        const type = card.getAttribute('data-feed-type') ?? 'gallery';
+        const shouldShow = filter === 'all' || type === filter;
+        card.classList.toggle('community-post-hidden', !shouldShow);
+      });
+
+      filterButtons.forEach((button) => {
+        const value = button.getAttribute('data-feed-filter') ?? '';
+        const isActive = value === filter;
+        button.classList.toggle('is-active', isActive);
+        button.setAttribute('aria-pressed', String(isActive));
+      });
+    };
+
+    filterButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const value = button.getAttribute('data-feed-filter') ?? 'all';
+        applyFeedFilter(value);
+      });
+    });
+
+    createPostDemoButton?.addEventListener('click', () => {
+      window.alert('Modul de publicare directă va fi conectat la un backend. Pentru moment, feed-ul afișează postările video active.');
+    });
+
+    const adminUploadForm = document.querySelector('[data-admin-upload-form]');
+    const dropzone = document.querySelector('[data-dropzone]');
+    const dropzoneTrigger = document.querySelector('[data-dropzone-trigger]');
+    const fileInput = document.getElementById('admin-photo-input');
+    const uploadTitleInput = document.querySelector('[data-upload-title]');
+    const previewImage = document.querySelector('[data-upload-preview]');
+    const uploadStatus = document.querySelector('[data-upload-status]');
+    const uploadUrlInput = document.querySelector('[data-upload-url]');
+    const uploadSubmitButton = document.querySelector('[data-upload-submit]');
+    const dbGalleryGrid = document.querySelector('[data-db-gallery-grid]');
+
+    let selectedFile = null;
+
+    const showUploadStatus = (message, type = 'info') => {
+      if (!uploadStatus) return;
+
+      uploadStatus.textContent = message;
+      uploadStatus.classList.remove('hidden', 'border-red-300/50', 'bg-red-500/10', 'text-red-100', 'border-lime-300/50', 'bg-lime-500/10', 'text-lime-100', 'border-white/30', 'bg-white/10', 'text-white');
+
+      if (type === 'error') {
+        uploadStatus.classList.add('border-red-300/50', 'bg-red-500/10', 'text-red-100');
+        return;
+      }
+
+      if (type === 'success') {
+        uploadStatus.classList.add('border-lime-300/50', 'bg-lime-500/10', 'text-lime-100');
+        return;
+      }
+
+      uploadStatus.classList.add('border-white/30', 'bg-white/10', 'text-white');
+    };
+
+    const validateImageFile = (file) => {
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+      if (!allowedTypes.includes((file.type || '').toLowerCase())) {
+        return 'Sunt permise doar fișiere JPG, PNG și WebP.';
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        return 'Fișierul este prea mare. Limita este 5MB.';
+      }
+
+      return '';
+    };
+
+    const setPreview = (file) => {
+      if (!(previewImage instanceof HTMLImageElement)) return;
+
+      const objectUrl = URL.createObjectURL(file);
+      previewImage.src = objectUrl;
+      previewImage.classList.remove('hidden');
+      previewImage.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+      };
+    };
+
+    const handleSelectedFile = (file) => {
+      const error = validateImageFile(file);
+      if (error) {
+        selectedFile = null;
+        showUploadStatus(error, 'error');
+        return;
+      }
+
+      selectedFile = file;
+      setPreview(file);
+      showUploadStatus(`Fișier pregătit: ${file.name}`, 'info');
+    };
+
+    if (dropzone && fileInput instanceof HTMLInputElement) {
+      dropzone.addEventListener('click', () => fileInput.click());
+
+      dropzone.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          fileInput.click();
+        }
+      });
+
+      fileInput.addEventListener('change', () => {
+        const file = fileInput.files?.[0];
+        if (!file) return;
+        handleSelectedFile(file);
+      });
+
+      dropzone.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        dropzone.classList.add('is-dragover');
+      });
+
+      dropzone.addEventListener('dragleave', () => {
+        dropzone.classList.remove('is-dragover');
+      });
+
+      dropzone.addEventListener('drop', (event) => {
+        event.preventDefault();
+        dropzone.classList.remove('is-dragover');
+
+        const file = event.dataTransfer?.files?.[0];
+        if (!file) return;
+        handleSelectedFile(file);
+      });
+    }
+
+    dropzoneTrigger?.addEventListener('click', () => {
+      if (fileInput instanceof HTMLInputElement) {
+        fileInput.click();
+      }
+    });
+
+    adminUploadForm?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const photoTitle =
+        uploadTitleInput instanceof HTMLInputElement
+          ? uploadTitleInput.value.trim()
+          : '';
+
+      if (photoTitle.length < 2 || photoTitle.length > 180) {
+        showUploadStatus('Titlul fotografiei trebuie sa aiba intre 2 si 180 de caractere.', 'error');
+        return;
+      }
+
+      if (!(selectedFile instanceof File)) {
+        showUploadStatus('Selectează mai întâi o imagine validă.', 'error');
+        return;
+      }
+
+      if (uploadSubmitButton instanceof HTMLButtonElement) {
+        uploadSubmitButton.disabled = true;
+        uploadSubmitButton.textContent = 'Se procesează...';
+      }
+
+      try {
+        const formData = new FormData();
+        formData.append('photo', selectedFile);
+        formData.append('title', photoTitle);
+
+        const response = await fetch('/api/upload-photo', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(data.error || 'Upload-ul a eșuat.');
+        }
+
+        if (uploadUrlInput instanceof HTMLInputElement) {
+          uploadUrlInput.value = data.url || '';
+        }
+
+        if (dbGalleryGrid && data.url) {
+          const safeTitle = String(data.title || photoTitle);
+          const card = document.createElement('article');
+          card.className = 'community-gallery-item';
+          card.setAttribute('aria-label', safeTitle);
+
+          const image = document.createElement('img');
+          image.src = String(data.url);
+          image.alt = safeTitle;
+          image.loading = 'lazy';
+
+          const meta = document.createElement('div');
+          meta.className = 'community-gallery-meta';
+
+          const title = document.createElement('p');
+          title.className = 'community-gallery-title';
+          title.textContent = safeTitle;
+
+          const date = document.createElement('p');
+          date.className = 'community-gallery-date';
+          date.textContent = new Date().toLocaleDateString('ro-RO');
+
+          meta.append(title, date);
+          card.append(image, meta);
+          dbGalleryGrid.prepend(card);
+        }
+
+        showUploadStatus('Imagine încărcată cu succes. Copiază URL-ul și adaugă-l în imageUrl pentru postare.', 'success');
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Eroare la upload.';
+        showUploadStatus(message, 'error');
+      } finally {
+        if (uploadSubmitButton instanceof HTMLButtonElement) {
+          uploadSubmitButton.disabled = false;
+          uploadSubmitButton.textContent = 'Optimizează și încarcă';
+        }
+      }
+    });
+
+    const renderComments = (container, comments) => {
+      if (!container) return;
+
+      if (!Array.isArray(comments) || comments.length === 0) {
+        container.innerHTML = '<p class="text-xs text-white/85">Nu există comentarii încă. Fii primul care scrie.</p>';
+        return;
+      }
+
+      container.innerHTML = comments
+        .map((item) => {
+          const safeName = String(item.name ?? 'Anonim').slice(0, 60);
+          const safeText = String(item.text ?? '').slice(0, 360);
+
+          return `
+            <article class="community-comment-item">
+              <p class="community-comment-meta">${safeName}</p>
+              <p class="community-comment-text">${safeText}</p>
+            </article>
+          `;
+        })
+        .join('');
+    };
+
+    cards.forEach((card) => {
+      const id = card.getAttribute('data-video-id') ?? '';
+      if (!id) return;
+
+      const likeButton = card.querySelector('[data-like-button]');
+      const likeCount = card.querySelector('[data-like-count]');
+      const commentCount = card.querySelector('[data-comment-count]');
+      const facebookButton = card.querySelector('[data-share-facebook]');
+      const whatsappButton = card.querySelector('[data-share-whatsapp]');
+      const copyButton = card.querySelector('[data-copy-link]');
+      const commentForm = card.querySelector('[data-comment-form]');
+      const commentList = card.querySelector('[data-comment-list]');
+
+      if (!communityState.likes[id]) communityState.likes[id] = 0;
+      if (!communityState.comments[id]) communityState.comments[id] = [];
+
+      const isLikedByMe = Boolean(communityState.likedByMe[id]);
+      const currentLikeCount = Math.max(0, Number(communityState.likes[id] ?? 0));
+      const currentComments = communityState.comments[id];
+
+      if (likeCount) likeCount.textContent = String(currentLikeCount);
+      if (commentCount) commentCount.textContent = String(currentComments.length);
+      renderComments(commentList, currentComments);
+
+      if (likeButton) {
+        likeButton.classList.toggle('community-like-active', isLikedByMe);
+        likeButton.textContent = isLikedByMe ? 'Apreciat' : 'Like';
+      }
+
+      likeButton?.addEventListener('click', () => {
+        const liked = Boolean(communityState.likedByMe[id]);
+        const baseCount = Math.max(0, Number(communityState.likes[id] ?? 0));
+        const nextCount = liked ? Math.max(0, baseCount - 1) : baseCount + 1;
+
+        communityState.likedByMe[id] = !liked;
+        communityState.likes[id] = nextCount;
+
+        if (likeCount) likeCount.textContent = String(nextCount);
+        likeButton.classList.toggle('community-like-active', !liked);
+        likeButton.textContent = !liked ? 'Apreciat' : 'Like';
+        writeCommunityState(communityState);
+        applyFeedSorting(sortSelect?.value ?? 'newest');
+        applyFeedFilter(activeFilter);
+      });
+
+      facebookButton?.addEventListener('click', () => {
+        const url = facebookButton.getAttribute('data-share-facebook') ?? '';
+        if (!url) return;
+        const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+        window.open(shareUrl, '_blank', 'noopener,noreferrer');
+      });
+
+      whatsappButton?.addEventListener('click', () => {
+        const url = whatsappButton.getAttribute('data-share-whatsapp') ?? '';
+        if (!url) return;
+        const shareText = `Uite o postare nouă de la ${brand.name}: ${url}`;
+        const shareUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+        window.open(shareUrl, '_blank', 'noopener,noreferrer');
+      });
+
+      copyButton?.addEventListener('click', async () => {
+        const url = copyButton.getAttribute('data-copy-link') ?? '';
+        if (!url) return;
+
+        try {
+          await navigator.clipboard.writeText(url);
+          copyButton.textContent = 'Link copiat';
+          window.setTimeout(() => {
+            copyButton.textContent = 'Copiază link postare';
+          }, 1400);
+        } catch {
+          window.prompt('Copiază manual linkul:', url);
+        }
+      });
+
+      commentForm?.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const nameInput = commentForm.querySelector('input[name="name"]');
+        const commentInput = commentForm.querySelector('textarea[name="comment"]');
+
+        const name = (nameInput?.value ?? '').trim();
+        const text = (commentInput?.value ?? '').trim();
+
+        if (name.length < 2 || text.length < 3) return;
+
+        const nextComments = [
+          { name, text, at: Date.now() },
+          ...communityState.comments[id],
+        ].slice(0, 60);
+
+        communityState.comments[id] = nextComments;
+        if (commentCount) commentCount.textContent = String(nextComments.length);
+        renderComments(commentList, nextComments);
+        writeCommunityState(communityState);
+
+        commentForm.reset();
+      });
+    });
+
+    applyFeedSorting(sortSelect?.value ?? 'newest');
+    applyFeedFilter(activeFilter);
+  </script>
+
+  <style>
+    .community-gallery-wrap {
+      box-shadow: 0 14px 34px rgba(8, 9, 18, 0.5);
+    }
+
+    .community-gallery-grid {
+      display: grid;
+      gap: 0.75rem;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+
+    .community-gallery-item {
+      position: relative;
+      overflow: hidden;
+      border-radius: 0.9rem;
+      border: 1px solid rgba(187, 134, 252, 0.42);
+      background: #0d1020;
+      box-shadow: 0 0 0 1px rgba(187, 134, 252, 0.2) inset, 0 12px 24px rgba(8, 9, 18, 0.45);
+      transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+    }
+
+    .community-gallery-item:hover {
+      transform: scale(1.03);
+      border-color: rgba(187, 134, 252, 0.85);
+      box-shadow: 0 0 0 1px rgba(187, 134, 252, 0.4) inset, 0 0 22px rgba(187, 134, 252, 0.45), 0 16px 30px rgba(8, 9, 18, 0.52);
+    }
+
+    .community-gallery-item img {
+      width: 100%;
+      height: 13rem;
+      object-fit: cover;
+      display: block;
+      transition: transform 220ms ease;
+    }
+
+    .community-gallery-item:hover img {
+      transform: scale(1.05);
+    }
+
+    .community-gallery-meta {
+      position: absolute;
+      left: 0.5rem;
+      right: 0.5rem;
+      bottom: 0.5rem;
+      border: 1px solid #ffffff33;
+      border-radius: 0.7rem;
+      background: linear-gradient(180deg, rgba(11, 14, 20, 0.78), rgba(11, 14, 20, 0.95));
+      backdrop-filter: blur(6px);
+      padding: 0.45rem 0.55rem;
+    }
+
+    .community-gallery-title {
+      margin: 0;
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: #e0e0e0;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.72);
+      line-height: 1.35;
+    }
+
+    .community-gallery-date {
+      margin: 0.1rem 0 0;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #e0e0e0;
+    }
+
+    .community-feed-intro {
+      max-width: 54rem;
+      margin-inline: auto;
+    }
+
+    .community-post {
+      border-radius: 1.35rem;
+      padding: 1rem;
+      background:
+        radial-gradient(120% 110% at 0% 0%, #5eeeff1f 0%, transparent 68%),
+        #0f1733d8;
+    }
+
+    .community-feed {
+      max-width: 31rem;
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .community-main-layout {
+      display: grid;
+      align-items: start;
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .community-editorial-wrap {
+      box-shadow: 0 14px 32px rgba(8, 9, 18, 0.44);
+    }
+
+    .editorial-card {
+      transition: transform 160ms ease, border-color 160ms ease, background-color 160ms ease;
+    }
+
+    .editorial-card:hover {
+      transform: translateY(-1px);
+      border-color: rgba(142, 219, 255, 0.6);
+      background: rgba(94, 238, 255, 0.08);
+    }
+
+    .editorial-link {
+      text-decoration: none;
+    }
+
+    .editorial-link:hover {
+      color: #e6f9ff;
+    }
+
+    .community-toolbar {
+      box-shadow: 0 14px 28px rgba(3, 10, 30, 0.28);
+    }
+
+    .community-pinned {
+      margin-left: auto;
+      border: 1px solid #d1ff4f8c;
+      border-radius: 9999px;
+      background: #d1ff4f1f;
+      color: #f0ffd0;
+      font-size: 0.62rem;
+      font-weight: 900;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      padding: 0.26rem 0.5rem;
+      white-space: nowrap;
+    }
+
+    .community-filter-btn {
+      border: 1px solid #ffffff2f;
+      border-radius: 9999px;
+      background: #ffffff10;
+      color: #e5f2ff;
+      font-size: 0.66rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 0.34rem 0.55rem;
+      cursor: pointer;
+      transition: transform 140ms ease, border-color 140ms ease, background-color 140ms ease;
+    }
+
+    .community-filter-btn:hover {
+      transform: translateY(-1px);
+      border-color: #8edbff8c;
+      background: #5eeeff21;
+    }
+
+    .community-filter-btn.is-active {
+      border-color: #9de0ffbd;
+      background: linear-gradient(120deg, #5eeeff2d, #7fa8ff27);
+      color: #f7fdff;
+    }
+
+    .community-avatar {
+      width: 2.15rem;
+      height: 2.15rem;
+      border-radius: 9999px;
+      border: 1px solid #ffffff40;
+      display: grid;
+      place-items: center;
+      font-size: 0.72rem;
+      font-weight: 900;
+      color: #ecf6ff;
+      background: linear-gradient(140deg, #56dcff52, #7f9dff4a);
+      flex-shrink: 0;
+    }
+
+    .community-video {
+      border: 1px solid #ffffff2a;
+      background: #0a1228;
+    }
+
+    .community-photo {
+      max-height: 26rem;
+      object-fit: cover;
+    }
+
+    .admin-upload-panel {
+      box-shadow: 0 14px 32px rgba(8, 9, 18, 0.5);
+    }
+
+    .community-dropzone {
+      border: 2px dashed #bb86fc;
+      border-radius: 0.9rem;
+      padding: 1rem;
+      text-align: center;
+      background: linear-gradient(135deg, rgba(187, 134, 252, 0.14), rgba(255, 255, 255, 0.06));
+      cursor: pointer;
+      transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease, background-color 180ms ease;
+    }
+
+    .community-dropzone:hover,
+    .community-dropzone.is-dragover {
+      border-color: #f3ff00;
+      transform: translateY(-1px);
+      box-shadow: 0 0 0 1px #f3ff0038 inset, 0 0 20px rgba(187, 134, 252, 0.45);
+      background: linear-gradient(135deg, rgba(187, 134, 252, 0.22), rgba(243, 255, 0, 0.08));
+    }
+
+    .community-upload-preview {
+      width: 100%;
+      max-height: 16rem;
+      object-fit: cover;
+      border: 1px solid #ffffff33;
+      border-radius: 0.8rem;
+      box-shadow: 0 0 0 1px rgba(187, 134, 252, 0.2) inset, 0 10px 24px rgba(8, 9, 18, 0.52);
+    }
+
+    .community-like-active {
+      border-color: #89d9ffcc;
+      background: linear-gradient(120deg, #5eeeff34, #7fa8ff2a);
+      color: #f7fdff;
+    }
+
+    .community-post-actions {
+      align-items: center;
+      gap: 0.7rem;
+    }
+
+    .community-action-btn {
+      border: 1px solid #ffffff2f;
+      border-radius: 9999px;
+      background: #ffffff10;
+      color: #eaf4ff;
+      text-decoration: none;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      line-height: 1;
+      min-height: 44px;
+      padding: 0.5rem 0.74rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+      transition: transform 140ms ease, border-color 140ms ease, background-color 140ms ease;
+    }
+
+    .community-action-btn:hover {
+      transform: translateY(-1px);
+      border-color: #8edbff8c;
+      background: #5eeeff21;
+    }
+
+    .community-action-btn:focus-visible {
+      outline: 3px solid #ffffff;
+      outline-offset: 2px;
+    }
+
+    .community-whatsapp-cta {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #7affb58c;
+      border-radius: 9999px;
+      background: linear-gradient(135deg, #2fdc81 0%, #1cbf6a 100%);
+      color: #062315;
+      text-decoration: none;
+      font-size: 0.67rem;
+      font-weight: 900;
+      letter-spacing: 0.03em;
+      line-height: 1.1;
+      padding: 0.5rem 0.74rem;
+      transition: transform 140ms ease, filter 140ms ease;
+    }
+
+    @media (max-width: 767px) {
+      .community-gallery-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .community-feed {
+        max-width: none;
+        width: 100%;
+      }
+
+      .community-editorial-column {
+        margin-top: 0.6rem;
+      }
+
+      .community-post {
+        padding: 0.85rem;
+      }
+
+      .community-post-actions {
+        gap: 0.85rem;
+      }
+
+      .community-action-btn {
+        flex: 1 1 calc(50% - 0.43rem);
+      }
+    }
+
+    @media (min-width: 768px) and (max-width: 1023px) {
+      .community-gallery-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .community-whatsapp-cta:hover {
+      transform: translateY(-1px);
+      filter: saturate(1.08) brightness(1.03);
+    }
+
+    .community-post-hidden {
+      display: none;
+    }
+
+    .community-comments {
+      display: grid;
+      gap: 0.45rem;
+    }
+
+    .community-comment-item {
+      border: 1px solid #ffffff24;
+      border-radius: 0.85rem;
+      background: #ffffff10;
+      padding: 0.52rem 0.62rem;
+    }
+
+    .community-comment-meta {
+      margin: 0;
+      color: #f3f9ff;
+      font-size: 0.76rem;
+      font-weight: 800;
+    }
+
+    .community-comment-text {
+      margin: 0.22rem 0 0;
+      color: #dbe8ff;
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+
+    @media (min-width: 1024px) {
+      .community-main-layout {
+        grid-template-columns: minmax(0, 1.22fr) minmax(0, 0.78fr);
+        column-gap: 1rem;
+      }
+
+      .community-feed {
+        max-width: none;
+      }
+
+      .community-post {
+        padding: 0.75rem;
+        border-radius: 1.05rem;
+      }
+
+      .community-video {
+        border-radius: 0.75rem;
+      }
+
+      .community-editorial-column {
+        position: sticky;
+        top: 6rem;
+      }
+    }
+  </style>
+</BaseLayout>
