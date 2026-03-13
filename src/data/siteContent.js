@@ -17,14 +17,10 @@ export const siteContent = {
     },
     navigation: [
         { href: '#acasa', label: 'Acasă' },
-        { href: '#noutati', label: 'Noutăți' },
-        { href: '#video', label: 'Video' },
-        { href: '#aparitii-tv', label: 'Apariții TV' },
+        { href: '/comunitatea-noastra', label: 'Noutăți' },
         { href: '#servicii', label: 'Servicii' },
         { href: '#membri', label: 'Membri' },
-        { href: '#galerie', label: 'Galerie' },
         { href: '#faq', label: 'FAQ' },
-        { href: '#momente-reale', label: 'Povestea noastră rămâne în ecouri și imagini' },
         { href: '#contact', label: 'Contact' },
     ],
     hero: {
@@ -69,12 +65,6 @@ export const siteContent = {
             youtubeId: 'FyrQQqFMZvg',
             youtubeUrl: 'https://www.youtube.com/watch?v=FyrQQqFMZvg',
             category: 'usoara-diverse',
-        },
-        {
-            title: 'Tineret - set live dedicat',
-            youtubeId: 'ID_VIDEO_3',
-            youtubeUrl: 'https://www.youtube.com/watch?v=ID_VIDEO_3',
-            category: 'tineret-manele',
         },
     ],
     videoAdmin: {

@@ -23,7 +23,7 @@ const getYoutubeId = (url: string) => {
         const youtubeId = getYoutubeId(item.videoUrl);
 
         return (
-          <article class="glass-card group h-full transition-all duration-300 hover:-translate-y-1 hover:border-cyan-200/45 hover:shadow-[0_20px_45px_rgba(94,238,255,0.16)]">
+          <article class="glass-card group h-full transition-all duration-300 hover:-translate-y-1 hover:border-[rgba(245,166,35,0.5)] hover:shadow-[0_20px_45px_rgba(245,166,35,0.16)]">
             {youtubeId ? (
               <iframe
                 class="aspect-video w-full rounded-xl"
@@ -45,7 +45,7 @@ const getYoutubeId = (url: string) => {
               href={item.videoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              class="mt-2 inline-flex items-center rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-cyan-100 transition hover:-translate-y-0.5 hover:border-cyan-200/50 hover:bg-cyan-300/10"
+              class="mt-2 inline-flex items-center rounded-full border border-[rgba(245,166,35,0.3)] bg-[rgba(245,166,35,0.08)] px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-[#FFD166] transition hover:-translate-y-0.5 hover:border-[rgba(245,166,35,0.6)] hover:bg-[rgba(245,166,35,0.15)]"
             >
               Vezi pe YouTube
             </a>

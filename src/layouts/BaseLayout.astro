@@ -23,7 +23,6 @@ const isHomePage = Astro.url.pathname === '/';
 const sectionLink = (anchor: string) => (isHomePage ? anchor : `/${anchor}`);
 
 const sideMenuTopItems = [
-  { href: sectionLink('#acasa'), label: 'Acasă' },
   { href: sectionLink('#video'), label: 'Galerie Video' },
   { href: '/aparitii-tv', label: 'Galerie Video Apariții TV' },
   { href: '/galerie-foto', label: 'Galerie Foto' },
@@ -32,7 +31,6 @@ const sideMenuTopItems = [
 
 const sideMenuBottomItems = [
   { href: '/comunitatea-noastra', label: 'Comunitatea noastră' },
-  { href: '/contact', label: 'Contact' },
 ];
 ---
 
@@ -63,20 +61,48 @@ const sideMenuBottomItems = [
     <a href="#continut" class="skip-link">Sari la conținut</a>
     <Header />
 
-    <aside class="left-side-menu" aria-label="Acces rapid">
-      {sideMenuTopItems.map((item) => (
-        <a href={item.href} class="left-side-link" data-nav-link>{item.label}</a>
-      ))}
+    <div class="layout-content-shell">
+      <aside class="left-side-menu" aria-label="Acces rapid">
+        {sideMenuTopItems.map((item) => (
+          <a href={item.href} class="left-side-link" data-nav-link>{item.label}</a>
+        ))}
 
-      {sideMenuBottomItems.map((item) => (
-        <a href={item.href} class="left-side-link" data-nav-link>{item.label}</a>
-      ))}
-    </aside>
+        {sideMenuBottomItems.map((item) => (
+          <a href={item.href} class="left-side-link" data-nav-link>{item.label}</a>
+        ))}
+      </aside>
 
-    <main id="continut" class="flex-1 pt-24 sm:pt-28 lg:pl-24">
-      <slot />
-    </main>
+      <main id="continut" class="flex-1 min-w-0 pt-24 sm:pt-28">
+        <slot />
+      </main>
+    </div>
     <Footer />
+
+    <script is:inline>
+      (() => {
+        const root = document.documentElement;
+        let ticking = false;
+
+        const updateScrollProgress = () => {
+          const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
+          const progress = scrollableHeight > 0 ? Math.min(Math.max(window.scrollY / scrollableHeight, 0), 1) : 0;
+          root.style.setProperty('--scroll-progress', progress.toFixed(4));
+        };
+
+        const onScroll = () => {
+          if (ticking) return;
+          ticking = true;
+          requestAnimationFrame(() => {
+            updateScrollProgress();
+            ticking = false;
+          });
+        };
+
+        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('resize', updateScrollProgress);
+        updateScrollProgress();
+      })();
+    </script>
   </body>
 </html>
 

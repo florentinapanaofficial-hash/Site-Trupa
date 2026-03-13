@@ -8,27 +8,28 @@ const socialLinks = {
   instagram: siteContent.socialLinks?.instagram || 'https://www.instagram.com/',
   tiktok: siteContent.socialLinks?.tiktok || 'https://www.tiktok.com/',
 };
-const leftRailHrefs = new Set(['#acasa', '#noutati', '#video', '#aparitii-tv', '#galerie', '#contact']);
-const leftRailLabelTokens = ['acasa', 'noutati', 'video', 'aparitii', 'galerie', 'contact'];
 const isHomePage = Astro.url.pathname === '/';
+const normalizeNavHref = (href) => {
+  if (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('mailto:') || href.startsWith('tel:')) {
+    return href;
+  }
+
+  if (href.startsWith('/')) {
+    return href;
+  }
+
+  if (href.startsWith('#')) {
+    return isHomePage ? href : `/${href}`;
+  }
+
+  return `/${href}`;
+};
+
 const normalizedNavigation = navigation.map((item) => ({
   ...item,
-  href: isHomePage ? item.href : `/${item.href}`,
+  href: normalizeNavHref(item.href),
 }));
-const normalizeText = (value) =>
-  String(value)
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
-
-const topNavigation = normalizedNavigation.filter((item) => {
-  const normalizedHref = item.href.replace(/^\//, '');
-  const normalizedLabel = normalizeText(item.label);
-  const isLeftRailHref = leftRailHrefs.has(normalizedHref);
-  const isLeftRailLabel = leftRailLabelTokens.some((token) => normalizedLabel.includes(token));
-
-  return !isLeftRailHref && !isLeftRailLabel;
-});
+const topNavigation = normalizedNavigation;
 const desktopNavigation = topNavigation;
 const mobileNavigation = topNavigation;
 const hasExpandableTopMenu = mobileNavigation.length > 1;
@@ -36,11 +37,11 @@ const hasExpandableTopMenu = mobileNavigation.length > 1;
 
 <header class="top-header fixed inset-x-0 top-0 z-40 border-b border-white/20 bg-ink" data-top-header>
   <div class="section-container flex items-center justify-between gap-3 py-3">
-    <a href="#acasa" class="inline-flex items-center gap-3" aria-label="Mergi la începutul paginii">
+    <a href={isHomePage ? '#acasa' : '/#acasa'} class="inline-flex items-center gap-3" aria-label="Mergi la începutul paginii">
       <img
         src="/images/logo-fp-stage.svg"
         alt="Logo Formația Florentina Pană"
-        class="h-10 w-10 rounded-xl border border-white/25 bg-white/5 p-1 shadow-[0_8px_24px_rgba(94,238,255,0.22)]"
+        class="h-10 w-10 rounded-xl border border-white/20 bg-white/5 p-1 shadow-[0_8px_24px_rgba(245,166,35,0.22)]"
         loading="eager"
         decoding="async"
       />
@@ -69,30 +70,51 @@ const hasExpandableTopMenu = mobileNavigation.length > 1;
         </button>
       )}
 
-      <a href={socialLinks.youtube} class="inline-grid h-10 w-10 place-items-center rounded-xl border border-white/25 bg-white/10 text-white/90 transition-all duration-200 hover:-translate-y-0.5 hover:border-red-300/70 hover:bg-red-500/20" target="_blank" rel="noopener noreferrer" aria-label="Deschide YouTube">
+      <!-- YouTube — roșu brand oficial -->
+      <a href={socialLinks.youtube}
+        class="inline-grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl transition-all duration-200 hover:-translate-y-1 hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+        style="background:#FF0000;box-shadow:0 2px 14px rgba(255,0,0,0.55),0 1px 3px rgba(0,0,0,0.35);"
+        target="_blank" rel="noopener noreferrer" aria-label="Deschide YouTube">
         <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" role="img" aria-hidden="true">
-          <path d="M22 12C22 9.35 21.77 7.91 21.53 7.02C21.34 6.3 20.78 5.74 20.06 5.55C18.75 5.2 12 5.2 12 5.2C12 5.2 5.25 5.2 3.94 5.55C3.22 5.74 2.66 6.3 2.47 7.02C2.23 7.91 2 9.35 2 12C2 14.65 2.23 16.09 2.47 16.98C2.66 17.7 3.22 18.26 3.94 18.45C5.25 18.8 12 18.8 12 18.8C12 18.8 18.75 18.8 20.06 18.45C20.78 18.26 21.34 17.7 21.53 16.98C21.77 16.09 22 14.65 22 12Z" fill="currentColor"/>
-          <path d="M10 15.5V8.5L16 12L10 15.5Z" fill="#ffffff"/>
+          <rect x="2" y="6" width="20" height="13" rx="4" fill="#fff"/>
+          <polygon points="9.5,9.5 9.5,15.5 16.5,12.5" fill="#FF0000"/>
         </svg>
       </a>
 
-      <a href={socialLinks.facebook} class="inline-grid h-10 w-10 place-items-center rounded-xl border border-white/25 bg-white/10 text-white/90 transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300/70 hover:bg-blue-500/20" target="_blank" rel="noopener noreferrer" aria-label="Deschide Facebook">
+      <!-- Facebook — albastru brand oficial -->
+      <a href={socialLinks.facebook}
+        class="inline-grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl transition-all duration-200 hover:-translate-y-1 hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+        style="background:#1877F2;box-shadow:0 2px 14px rgba(24,119,242,0.55),0 1px 3px rgba(0,0,0,0.35);"
+        target="_blank" rel="noopener noreferrer" aria-label="Deschide Facebook">
         <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" role="img" aria-hidden="true">
-          <path d="M24 12.07C24 5.4 18.63 0 12 0C5.37 0 0 5.4 0 12.07C0 18.09 4.39 23.08 10.12 24V15.56H7.08V12.07H10.12V9.41C10.12 6.39 11.91 4.72 14.66 4.72C15.98 4.72 17.37 4.96 17.37 4.96V7.93H15.84C14.34 7.93 13.88 8.87 13.88 9.84V12.07H17.23L16.69 15.56H13.88V24C19.61 23.08 24 18.09 24 12.07Z" fill="currentColor"/>
+          <path d="M13.5 21V14.3H16l.4-2.85H13.5V9.7c0-.82.38-1.2 1.38-1.2H16.5V5.85C16.05 5.77 15.1 5.7 14 5.7c-2.65 0-4.05 1.4-4.05 4.15v1.6H8v2.85h1.95V21H13.5z" fill="#fff"/>
         </svg>
       </a>
 
-      <a href={socialLinks.instagram} class="inline-grid h-10 w-10 place-items-center rounded-xl border border-white/25 bg-white/10 text-white/90 transition-all duration-200 hover:-translate-y-0.5 hover:border-pink-300/70 hover:bg-pink-500/20" target="_blank" rel="noopener noreferrer" aria-label="Deschide Instagram">
+      <!-- Instagram — gradient brand oficial -->
+      <a href={socialLinks.instagram}
+        class="inline-grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl transition-all duration-200 hover:-translate-y-1 hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+        style="background:radial-gradient(circle at 30% 110%,#ffd676 0%,#f46f30 25%,#e1306c 55%,#833ab4 80%,#405de6 100%);box-shadow:0 2px 14px rgba(225,48,108,0.55),0 1px 3px rgba(0,0,0,0.35);"
+        target="_blank" rel="noopener noreferrer" aria-label="Deschide Instagram">
         <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" role="img" aria-hidden="true">
-          <rect x="2.3" y="2.3" width="19.4" height="19.4" rx="6" stroke="currentColor" stroke-width="2.2"/>
-          <circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="2.2"/>
-          <circle cx="17.45" cy="6.55" r="1.2" fill="currentColor"/>
+          <rect x="2.5" y="2.5" width="19" height="19" rx="5.5" stroke="#fff" stroke-width="2.1"/>
+          <circle cx="12" cy="12" r="4.3" stroke="#fff" stroke-width="2"/>
+          <circle cx="17.5" cy="6.6" r="1.4" fill="#fff"/>
         </svg>
       </a>
 
-      <a href={socialLinks.tiktok} class="inline-grid h-10 w-10 place-items-center rounded-xl border border-white/25 bg-white/10 text-white/90 transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-300/70 hover:bg-cyan-500/20" target="_blank" rel="noopener noreferrer" aria-label="Deschide TikTok">
-        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="currentColor" role="img" aria-hidden="true">
-          <path d="M14.5 3.2c.5 1.5 1.4 2.8 2.7 3.7 1 .7 2.1 1.1 3.3 1.2v3.2c-1.7-.1-3.4-.6-4.8-1.4V16c0 3.1-2.5 5.6-5.6 5.6S4.5 19.1 4.5 16 7 10.4 10.1 10.4c.3 0 .6 0 .9.1v3.3c-.3-.1-.6-.2-.9-.2-1.3 0-2.4 1.1-2.4 2.4s1.1 2.4 2.4 2.4 2.4-1.1 2.4-2.4V3.2h2z"/>
+      <!-- TikTok — negru brand + efect neon cyan/roșu -->
+      <a href={socialLinks.tiktok}
+        class="inline-grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl transition-all duration-200 hover:-translate-y-1 hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+        style="background:#010101;box-shadow:0 2px 14px rgba(254,44,85,0.45),0 1px 3px rgba(0,0,0,0.5);"
+        target="_blank" rel="noopener noreferrer" aria-label="Deschide TikTok">
+        <svg viewBox="0 0 24 24" class="h-5 w-5" role="img" aria-hidden="true" fill="none">
+          <!-- strat cyan (umbra stânga-sus) -->
+          <path transform="translate(-0.6,-0.5)" d="M16.5 3h-2.3v11.6a2.8 2.8 0 0 1-2.8 2.8 2.8 2.8 0 0 1-2.8-2.8 2.8 2.8 0 0 1 2.8-2.8c.3 0 .55.05.8.12V9.45a6.2 6.2 0 0 0-.8-.05 6.1 6.1 0 0 0-6.1 6.1 6.1 6.1 0 0 0 6.1 6.1 6.1 6.1 0 0 0 6.1-6.1V8.35a8.5 8.5 0 0 0 4.8 1.5V7.3a6.1 6.1 0 0 1-4.5-4.3h-.3z" fill="#25f4ee"/>
+          <!-- strat roșu (umbra dreapta-jos) -->
+          <path transform="translate(0.6,0.5)" d="M16.5 3h-2.3v11.6a2.8 2.8 0 0 1-2.8 2.8 2.8 2.8 0 0 1-2.8-2.8 2.8 2.8 0 0 1 2.8-2.8c.3 0 .55.05.8.12V9.45a6.2 6.2 0 0 0-.8-.05 6.1 6.1 0 0 0-6.1 6.1 6.1 6.1 0 0 0 6.1 6.1 6.1 6.1 0 0 0 6.1-6.1V8.35a8.5 8.5 0 0 0 4.8 1.5V7.3a6.1 6.1 0 0 1-4.5-4.3h-.3z" fill="#fe2c55"/>
+          <!-- strat alb (fața) -->
+          <path d="M16.5 3h-2.3v11.6a2.8 2.8 0 0 1-2.8 2.8 2.8 2.8 0 0 1-2.8-2.8 2.8 2.8 0 0 1 2.8-2.8c.3 0 .55.05.8.12V9.45a6.2 6.2 0 0 0-.8-.05 6.1 6.1 0 0 0-6.1 6.1 6.1 6.1 0 0 0 6.1 6.1 6.1 6.1 0 0 0 6.1-6.1V8.35a8.5 8.5 0 0 0 4.8 1.5V7.3a6.1 6.1 0 0 1-4.5-4.3h-.3z" fill="#fff"/>
         </svg>
       </a>
     </div>
@@ -158,6 +180,60 @@ const hasExpandableTopMenu = mobileNavigation.length > 1;
     const links = Array.from(document.querySelectorAll('[data-nav-link]'));
     if (links.length === 0) return;
 
+    const normalizePathnameFromHref = (href) => {
+      if (!href || href.startsWith('#')) return null;
+      if (href.startsWith('mailto:') || href.startsWith('tel:')) return null;
+
+      const isHttp = href.startsWith('http://') || href.startsWith('https://');
+      if (isHttp) {
+        try {
+          const url = new URL(href);
+          if (url.origin !== window.location.origin) return null;
+          return url.pathname.replace(/\/$/, '') || '/';
+        } catch {
+          return null;
+        }
+      }
+
+      try {
+        const url = new URL(href, window.location.origin);
+        return url.pathname.replace(/\/$/, '') || '/';
+      } catch {
+        return null;
+      }
+    };
+
+    const routeLinkMap = links
+      .map((link) => {
+        const href = link.getAttribute('href') ?? '';
+        const pathname = normalizePathnameFromHref(href);
+        if (!pathname) return null;
+        return { link, href, pathname };
+      })
+      .filter(Boolean);
+
+    const hashLinkMap = links
+      .map((link) => {
+        const href = link.getAttribute('href') ?? '';
+        if (!href.startsWith('#')) return null;
+        return { link, href };
+      })
+      .filter(Boolean);
+
+    const setActiveByPathname = (pathname) => {
+      if (!pathname) return;
+
+      routeLinkMap.forEach((item) => {
+        const isActive = item.pathname === pathname;
+        item.link.classList.toggle('is-active', isActive);
+        if (isActive) {
+          item.link.setAttribute('aria-current', 'page');
+        } else {
+          item.link.removeAttribute('aria-current');
+        }
+      });
+    };
+
     const sectionMap = links
       .map((link) => {
         const href = link.getAttribute('href') ?? '';
@@ -168,7 +244,7 @@ const hasExpandableTopMenu = mobileNavigation.length > 1;
       })
       .filter(Boolean);
 
-    if (sectionMap.length === 0) return;
+    const hasSectionMap = sectionMap.length > 0;
 
     const uniqueSections = [];
     const seenSections = new Set();
@@ -181,13 +257,14 @@ const hasExpandableTopMenu = mobileNavigation.length > 1;
     });
 
     let lastActiveHref = null;
+    let pendingActiveHref = null;
     let ticking = false;
 
     const setActiveByHref = (activeHref) => {
       if (!activeHref) return;
       const changed = lastActiveHref !== activeHref;
 
-      sectionMap.forEach(({ link, href }) => {
+      hashLinkMap.forEach(({ link, href }) => {
         const isActive = href === activeHref;
         link.classList.toggle('is-active', isActive);
         if (isActive) {
@@ -198,7 +275,7 @@ const hasExpandableTopMenu = mobileNavigation.length > 1;
       });
 
       if (changed) {
-        sectionMap
+        hashLinkMap
           .filter((item) => item.href === activeHref)
           .forEach((item) => {
             item.link.classList.remove('just-activated');
@@ -211,14 +288,44 @@ const hasExpandableTopMenu = mobileNavigation.length > 1;
       lastActiveHref = activeHref;
     };
 
+    const getHeaderSpyOffset = () => {
+      const headerHeight = headerEl?.getBoundingClientRect().height ?? 0;
+      return headerHeight + 8;
+    };
+
+    const hasReachedPendingSection = (marker, orderedSections, targetHref) => {
+      const targetIndex = orderedSections.findIndex((item) => item.href === targetHref);
+      if (targetIndex === -1) return null;
+
+      const target = orderedSections[targetIndex];
+      const next = orderedSections[targetIndex + 1];
+      const nextTop = next ? next.top : Number.POSITIVE_INFINITY;
+
+      return marker >= target.top && marker < nextTop;
+    };
+
     const getActiveByScroll = () => {
-      const marker = window.scrollY + 160;
+      if (!hasSectionMap) return;
+
+      const marker = window.scrollY + getHeaderSpyOffset();
       const orderedSections = [...uniqueSections]
         .map((item) => ({
           ...item,
           top: item.section.getBoundingClientRect().top + window.scrollY,
         }))
         .sort((a, b) => a.top - b.top);
+
+      if (pendingActiveHref) {
+        const reachedPending = hasReachedPendingSection(marker, orderedSections, pendingActiveHref);
+        if (reachedPending === null) {
+          pendingActiveHref = null;
+        } else if (!reachedPending) {
+          setActiveByHref(pendingActiveHref);
+          return;
+        } else {
+          pendingActiveHref = null;
+        }
+      }
 
       let active = orderedSections[0];
 
@@ -233,12 +340,8 @@ const hasExpandableTopMenu = mobileNavigation.length > 1;
         }
       }
 
-      const reachedBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 2;
-      if (reachedBottom) {
-        active = orderedSections[orderedSections.length - 1];
-      }
-
       setActiveByHref(active?.href);
+
     };
 
     const onScroll = () => {
@@ -249,9 +352,7 @@ const hasExpandableTopMenu = mobileNavigation.length > 1;
 
         if (headerEl) {
           const currentY = window.scrollY;
-          const scrollingDown = currentY > lastScrollY;
-          const shouldHide = scrollingDown && currentY > 120 && !headerEl.classList.contains('menu-open');
-          headerEl.classList.toggle('header-hidden', shouldHide);
+          headerEl.classList.remove('header-hidden');
           lastScrollY = currentY;
         }
 
@@ -259,26 +360,34 @@ const hasExpandableTopMenu = mobileNavigation.length > 1;
       });
     };
 
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
+    if (hasSectionMap) {
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll);
+    }
 
     links.forEach((link) => {
       link.addEventListener('click', () => {
         const href = link.getAttribute('href') ?? '';
         if (href.startsWith('#')) {
+          const hasTargetSection = uniqueSections.some((item) => item.href === href);
+          pendingActiveHref = hasTargetSection ? href : null;
           setActiveByHref(href);
+        } else {
+          const pathname = normalizePathnameFromHref(href);
+          if (pathname) {
+            setActiveByPathname(pathname);
+          }
         }
 
-        if (headerEl?.classList.contains('menu-open')) {
-          headerEl.classList.remove('menu-open');
-          menuToggle?.setAttribute('aria-expanded', 'false');
-          menuToggle?.setAttribute('aria-label', 'Deschide meniul principal');
-          syncTopMenuBodyClass(false);
-        }
       });
     });
 
-    getActiveByScroll();
+    const currentPathname = window.location.pathname.replace(/\/$/, '') || '/';
+    setActiveByPathname(currentPathname);
+
+    if (hasSectionMap) {
+      getActiveByScroll();
+    }
   };
 
   if (document.readyState === 'loading') {

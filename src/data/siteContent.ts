@@ -23,14 +23,10 @@ export const siteContent = {
   },
   navigation: [
     { href: '#acasa', label: 'Acasă' },
-    { href: '#noutati', label: 'Noutăți' },
-    { href: '#video', label: 'Video' },
-    { href: '#aparitii-tv', label: 'Apariții TV' },
+    { href: '/comunitatea-noastra', label: 'Noutăți' },
     { href: '#servicii', label: 'Servicii' },
     { href: '#membri', label: 'Membri' },
-    { href: '#galerie', label: 'Galerie' },
     { href: '#faq', label: 'FAQ' },
-    { href: '#momente-reale', label: 'Povestea noastră rămâne în ecouri și imagini' },
     { href: '#contact', label: 'Contact' },
   ],
   hero: {

@@ -1,0 +1,180 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import siteContent from '../../data/siteContent.json';
+
+const { seo } = siteContent;
+---
+
+<BaseLayout
+  title={`Colaborator Saxofon | ${seo.title}`}
+  description="Prezentare colaborator saxofon pentru momente speciale live în cadrul evenimentelor."
+>
+  <section class="collab-page" aria-labelledby="collab-title">
+    <div class="collab-inner">
+
+      <a href="/#membri" class="collab-back" aria-label="Înapoi la secțiunea Membri">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+        Membri
+      </a>
+
+      <header class="collab-header">
+        <span class="kicker">Colaboratori</span>
+        <h1 id="collab-title" class="section-title" style="margin-top:0.75rem">Saxofon &mdash; colaborator special</h1>
+        <p class="section-copy" style="max-width:52ch">
+          Invitat pentru intervenții live cu timbru cald și expresiv &mdash;
+          potrivit pentru dansul mirilor, momente elegante și seturi de petrecere cu energie.
+        </p>
+      </header>
+
+      <div class="collab-grid">
+
+        <div class="collab-card collab-card-main">
+          <div class="collab-sax-icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+          </div>
+          <h2 class="collab-card-title">Ce aduce în program</h2>
+          <ul class="collab-list">
+            <li><span class="collab-list-dot" aria-hidden="true"></span>Intervenții live pe intro-uri și tranziții muzicale.</li>
+            <li><span class="collab-list-dot" aria-hidden="true"></span>Pasaje melodice pentru momente romantice și premium.</li>
+            <li><span class="collab-list-dot" aria-hidden="true"></span>Sincronizare cu formația pentru un flow muzical unitar.</li>
+            <li><span class="collab-list-dot" aria-hidden="true"></span>Repertoriu flexibil: jazz, pop, românească, chill &amp; party.</li>
+          </ul>
+        </div>
+
+        <div class="collab-card">
+          <h2 class="collab-card-title">Momente recomandate</h2>
+          <div class="collab-moments">
+            <span class="collab-moment-pill"><span aria-hidden="true">💍</span> Dansul mirilor</span>
+            <span class="collab-moment-pill"><span aria-hidden="true">🍷</span> Cocktail reception</span>
+            <span class="collab-moment-pill"><span aria-hidden="true">✨</span> Intrare nași</span>
+            <span class="collab-moment-pill"><span aria-hidden="true">🎉</span> Petrecere premium</span>
+            <span class="collab-moment-pill"><span aria-hidden="true">🏢</span> Gale corporate</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="collab-ctas">
+        <a href="/#membri" class="btn-outline">Echipa formației</a>
+        <a href="/#contact" class="btn-solid">Rezervă o dată</a>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .collab-page {
+    padding: clamp(4rem, 8vw, 7rem) 1.5rem;
+  }
+  .collab-inner {
+    max-width: 52rem;
+    margin-inline: auto;
+  }
+  .collab-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 160ms ease;
+    margin-bottom: 2rem;
+  }
+  .collab-back:hover { color: var(--gold); }
+  .collab-header { margin-bottom: 2.5rem; }
+  .collab-grid {
+    display: grid;
+    gap: 1rem;
+  }
+  @media (min-width: 640px) {
+    .collab-grid { grid-template-columns: 1fr 1fr; }
+  }
+  .collab-card {
+    border: 1px solid var(--line);
+    border-radius: 1.5rem;
+    padding: 1.75rem;
+    background: var(--surface);
+    transition: border-color 220ms ease, box-shadow 220ms ease;
+  }
+  .collab-card:hover {
+    border-color: rgba(245,166,35,0.45);
+    box-shadow: 0 18px 40px rgba(245,166,35,0.1);
+  }
+  .collab-card-main { display: flex; flex-direction: column; gap: 1rem; }
+  .collab-sax-icon {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.875rem;
+    background: rgba(245,166,35,0.12);
+    border: 1px solid rgba(245,166,35,0.25);
+    display: grid;
+    place-items: center;
+    color: var(--gold);
+  }
+  .collab-card-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--title);
+    margin: 0;
+  }
+  .collab-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .collab-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--body);
+  }
+  .collab-list-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+    flex-shrink: 0;
+    margin-top: 0.52rem;
+  }
+  .collab-moments {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin-top: 0.75rem;
+  }
+  .collab-moment-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: 1px solid var(--line);
+    border-radius: 9999px;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--body);
+    background: var(--glass);
+    transition: border-color 180ms ease, color 180ms ease;
+  }
+  .collab-moment-pill:hover {
+    border-color: rgba(245,166,35,0.45);
+    color: var(--gold);
+  }
+  .collab-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+</style>

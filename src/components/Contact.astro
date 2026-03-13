@@ -28,7 +28,7 @@
     >
       <div class="grid gap-4 sm:grid-cols-2">
         <div class="space-y-1.5">
-          <label for="name" class="text-xs font-medium text-slate-700">
+          <label for="name" class="text-xs font-medium" style="color: var(--body);">
             Nume
           </label>
           <input
@@ -39,7 +39,8 @@
             aria-required="true"
             aria-invalid="false"
             autocomplete="name"
-            class="w-full rounded-xl border border-slate-200/80 bg-white/80 px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-pastel-purple focus:ring-2 focus:ring-pastel-purple/60"
+            class="w-full rounded-xl border px-3 py-2 text-sm shadow-sm outline-none transition placeholder:opacity-50 focus:ring-2"
+            style="border-color: var(--line); background: rgba(255,255,255,0.05); color: var(--title); focus:border-color: var(--accent-gold);"
             placeholder="Numele tău"
           />
         </div>

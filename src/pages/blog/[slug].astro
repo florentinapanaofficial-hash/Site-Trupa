@@ -1,0 +1,383 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import blogPostsRaw from '../../data/blogPosts.json';
+
+interface ContentBlock {
+  type: string;
+  text?: string;
+  src?: string;
+  caption?: string;
+}
+
+interface Post {
+  slug: string;
+  category: string;
+  categoryAccent: string;
+  title: string;
+  excerpt: string;
+  coverEmoji: string;
+  coverImage: string;
+  readTime: string;
+  date: string;
+  author: string;
+  content: ContentBlock[];
+}
+
+export const prerender = true;
+
+const allPosts = blogPostsRaw as unknown as Post[];
+
+export function getStaticPaths() {
+  return (blogPostsRaw as unknown as Post[]).map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props as { post: Post };
+
+const formatDate = (d: string) =>
+  new Date(d).toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' });
+
+const accentColorMap: Record<string, string> = {
+  rose: 'var(--rose)',
+  gold: 'var(--gold)',
+  teal: 'var(--teal)',
+};
+
+const heroBgMap: Record<string, string> = {
+  rose: 'rgba(232,50,90,0.42)',
+  gold: 'rgba(245,166,35,0.40)',
+  teal: 'rgba(11,188,214,0.40)',
+};
+
+const accentColor = accentColorMap[post.categoryAccent] ?? 'var(--gold)';
+const heroBg = heroBgMap[post.categoryAccent] ?? 'rgba(245,166,35,0.40)';
+
+const prevPost = allPosts[allPosts.findIndex((p) => p.slug === post.slug) - 1];
+const nextPost = allPosts[allPosts.findIndex((p) => p.slug === post.slug) + 1];
+---
+
+<BaseLayout title={`${post.title} | Blog`} description={post.excerpt}>
+  <div class="bp-page">
+
+    {/* ── Hero ── */}
+    <div class="bp-hero" style={`--hero-glow: ${heroBg};`}>
+      <div class="bp-hero-bg-emoji" aria-hidden="true">{post.coverEmoji}</div>
+      <div class="bp-hero-inner">
+        <a href="/comunitatea-noastra#blog" class="bp-back">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+          Publicații
+        </a>
+        <span
+          class="bp-cat"
+          style={`color:${accentColor}; border-color:${accentColor}; background:rgba(0,0,0,0.25);`}
+        >
+          {post.category}
+        </span>
+        <h1 class="bp-title">{post.title}</h1>
+        <p class="bp-lead">{post.excerpt}</p>
+        <div class="bp-meta">
+          <span>✍ {post.author}</span>
+          <span class="bp-sep" aria-hidden="true">·</span>
+          <span>{formatDate(post.date)}</span>
+          <span class="bp-sep" aria-hidden="true">·</span>
+          <span>{post.readTime} citire</span>
+        </div>
+      </div>
+    </div>
+
+    {/* ── Conținut articol ── */}
+    <article class="bp-article" aria-label={post.title}>
+      {post.content.map((block) => {
+        if (block.type === 'heading') {
+          return <h2 class="bp-h2">{block.text}</h2>;
+        }
+        if (block.type === 'paragraph') {
+          return <p class="bp-p">{block.text}</p>;
+        }
+        if (block.type === 'image') {
+          return (
+            <figure class="bp-figure">
+              {block.src ? (
+                <img
+                  src={block.src}
+                  alt={block.caption ?? ''}
+                  class="bp-img"
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : (
+                <div class="bp-img-placeholder" aria-hidden="true">
+                  <span class="bp-img-placeholder-emoji">{post.coverEmoji}</span>
+                  <span class="bp-img-placeholder-hint">Adaugă o fotografie în câmpul src</span>
+                </div>
+              )}
+              {block.caption && (
+                <figcaption class="bp-figcaption">{block.caption}</figcaption>
+              )}
+            </figure>
+          );
+        }
+        return null;
+      })}
+    </article>
+
+    {/* ── Navigare între articole ── */}
+    {(prevPost || nextPost) && (
+      <nav class="bp-nav" aria-label="Navigare articole">
+        <div class="bp-nav-inner">
+          {prevPost ? (
+            <a href={`/blog/${prevPost.slug}`} class="bp-nav-link bp-nav-link--prev">
+              <span class="bp-nav-dir">← Anterior</span>
+              <span class="bp-nav-post-title">{prevPost.title}</span>
+            </a>
+          ) : <div></div>}
+          {nextPost && (
+            <a href={`/blog/${nextPost.slug}`} class="bp-nav-link bp-nav-link--next">
+              <span class="bp-nav-dir">Următor →</span>
+              <span class="bp-nav-post-title">{nextPost.title}</span>
+            </a>
+          )}
+        </div>
+      </nav>
+    )}
+
+    {/* ── CTA ── */}
+    <div class="bp-cta">
+      <p class="bp-cta-label">Pregătești un eveniment special?</p>
+      <h2 class="bp-cta-title">Contactează-ne pentru o ofertă personalizată</h2>
+      <div class="bp-cta-actions">
+        <a href="/#contact" class="btn-solid">Solicită ofertă</a>
+        <a href="/comunitatea-noastra#blog" class="btn-outline">← Blog</a>
+      </div>
+    </div>
+
+  </div>
+</BaseLayout>
+
+<style>
+  .bp-page {
+    background: var(--bg-deep);
+    min-height: 100vh;
+  }
+
+  /* ── Hero ── */
+  .bp-hero {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(5rem, 10vw, 8rem) 1.5rem clamp(3.5rem, 6vw, 5.5rem);
+    background: radial-gradient(ellipse at 50% -10%, var(--hero-glow) 0%, transparent 60%);
+  }
+  .bp-hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 55%, var(--bg-deep) 100%);
+    pointer-events: none;
+  }
+  .bp-hero-bg-emoji {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 5vw;
+    font-size: clamp(8rem, 22vw, 16rem);
+    opacity: 0.055;
+    pointer-events: none;
+    user-select: none;
+    filter: blur(3px);
+  }
+  .bp-hero-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin-inline: auto;
+  }
+  .bp-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    margin-bottom: 1.75rem;
+    transition: color 160ms ease;
+  }
+  .bp-back:hover { color: var(--gold); }
+  .bp-cat {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.28rem 0.75rem;
+    border-radius: 9999px;
+    border: 1px solid;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    margin-bottom: 1.1rem;
+    backdrop-filter: blur(6px);
+  }
+  .bp-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--title);
+    line-height: 1.12;
+    margin: 0 0 1rem;
+  }
+  .bp-lead {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--body);
+    margin: 0 0 1.5rem;
+    max-width: 58ch;
+  }
+  .bp-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.83rem;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .bp-sep { opacity: 0.4; }
+
+  /* ── Article ── */
+  .bp-article {
+    max-width: 720px;
+    margin-inline: auto;
+    padding: 3.5rem 1.5rem 3rem;
+  }
+  .bp-h2 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin: 2.5rem 0 0.85rem;
+    padding-bottom: 0.55rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .bp-h2:first-child { margin-top: 0; }
+  .bp-p {
+    font-size: 1.02rem;
+    line-height: 1.82;
+    color: var(--body);
+    margin: 0 0 1.35rem;
+  }
+  .bp-figure {
+    margin: 2.5rem 0;
+    border-radius: 1.25rem;
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+  .bp-img {
+    width: 100%;
+    max-height: 26rem;
+    object-fit: cover;
+    display: block;
+  }
+  .bp-img-placeholder {
+    aspect-ratio: 16/9;
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+  .bp-img-placeholder-emoji { font-size: 3.5rem; opacity: 0.3; }
+  .bp-img-placeholder-hint {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-style: italic;
+  }
+  .bp-figcaption {
+    padding: 0.7rem 1.1rem;
+    font-size: 0.84rem;
+    color: var(--muted);
+    font-style: italic;
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+    margin: 0;
+  }
+
+  /* ── Nav articole ── */
+  .bp-nav {
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .bp-nav-inner {
+    max-width: 720px;
+    margin-inline: auto;
+    padding: 1.75rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .bp-nav-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    max-width: 240px;
+    text-decoration: none;
+    transition: color 160ms ease;
+  }
+  .bp-nav-link--next { text-align: right; }
+  .bp-nav-dir {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .bp-nav-post-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--title);
+    line-height: 1.3;
+    transition: color 160ms ease;
+  }
+  .bp-nav-link:hover .bp-nav-post-title { color: var(--gold); }
+  .bp-nav-link:hover .bp-nav-dir { color: var(--gold); }
+
+  /* ── CTA ── */
+  .bp-cta {
+    max-width: 720px;
+    margin-inline: auto;
+    padding: 3.5rem 1.5rem 5rem;
+    text-align: center;
+  }
+  .bp-cta-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 0.5rem;
+  }
+  .bp-cta-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(1.4rem, 3vw, 2.1rem);
+    font-weight: 700;
+    color: var(--title);
+    margin: 0 0 1.75rem;
+  }
+  .bp-cta-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+    justify-content: center;
+  }
+</style>

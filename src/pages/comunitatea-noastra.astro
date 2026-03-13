@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import siteContent from '../data/siteContent.json';
 import communityPosts from '../data/communityPosts.json';
+import blogPosts from '../data/blogPosts.json';
 import { query as dbQuery } from '../lib/db.js';
 
 export const prerender = false;
@@ -70,36 +71,19 @@ const adminFeedPosts = (communityPosts ?? [])
 
 const feedPosts = adminFeedPosts.length > 0 ? adminFeedPosts : fallbackFeedPosts;
 
-const editorialCards = [
-  {
-    category: 'Istorie',
-    title: 'Rădăcini lăutărești în România',
-    excerpt: 'Spațiu editorial pentru articole despre originile și evoluția tarafurilor românești.',
-    readTime: '6 min',
-    href: '#',
-  },
-  {
-    category: 'Genuri',
-    title: 'Diferențe între hore, sârbe și geamparale',
-    excerpt: 'Loc dedicat textelor despre ritmuri, specific regional și context cultural.',
-    readTime: '5 min',
-    href: '#',
-  },
-  {
-    category: 'Vlog',
-    title: 'Din culisele unui eveniment live',
-    excerpt: 'Secțiune pentru materiale vlog și publicații despre pregătirea show-ului.',
-    readTime: '4 min',
-    href: '#',
-  },
-  {
-    category: 'Educație muzicală',
-    title: 'Cum alegi repertoriul potrivit pe momente',
-    excerpt: 'Rubrică utilă pentru clienți: dansul mirilor, momente tradiționale și final de seară.',
-    readTime: '7 min',
-    href: '#',
-  },
-];
+const formatDate = (d: string) =>
+  new Date(d).toLocaleDateString('ro-RO', { day: 'numeric', month: 'short', year: 'numeric' });
+
+const accentBgMap: Record<string, string> = {
+  rose: 'rgba(232,50,90,0.22)',
+  gold: 'rgba(245,166,35,0.22)',
+  teal: 'rgba(11,188,214,0.2)',
+};
+const accentColorMap: Record<string, string> = {
+  rose: 'var(--rose)',
+  gold: 'var(--gold)',
+  teal: 'var(--teal)',
+};
 
 let galleryPhotos: Array<{
   id: number;
@@ -320,32 +304,49 @@ const pageDescription = 'Distribuie videoclipurile preferate, interacționează 
         </div>
       </section>
 
-      <aside class="community-editorial-column min-w-0 md:max-w-full md:min-w-[420px]" aria-label="Publicații muzicale">
-        <section class="community-editorial-wrap rounded-2xl border border-white/20 bg-[#0f1733d9] p-4 sm:p-5">
-          <p class="text-xs font-extrabold uppercase tracking-wider text-cyan-100">Rubrică editorială</p>
-          <h2 class="mt-2 text-lg font-extrabold text-white">Universul Muzicii în Cuvinte de Poveste</h2>
-          <p class="mt-2 text-sm leading-relaxed text-white/80">
-            Zonă dedicată publicațiilor tale: vlog, articole despre muzică, genuri muzicale, istoria lăutarilor și povești din culise.
-          </p>
+      <aside id="blog" class="community-editorial-column min-w-0" aria-label="Publicații și Vlog">
+        <div class="blog-aside-header">
+          <p class="blog-aside-kicker">Publicații &amp; Vlog</p>
+          <h2 class="blog-aside-title">Articole &amp; povești</h2>
+          <p class="blog-aside-sub">Muzică, culise și ghiduri utile pentru evenimentul tău — scrise de noi, pentru tine.</p>
+        </div>
 
-          <div class="mt-4 grid gap-3">
-            {editorialCards.map((card) => (
-              <article class="editorial-card rounded-xl border border-white/20 bg-white/5 p-3">
-                <div class="flex items-center justify-between gap-2">
-                  <span class="rounded-full border border-white/20 bg-white/10 px-2 py-1 text-[10px] font-extrabold uppercase tracking-wider text-lime-100">{card.category}</span>
-                  <span class="text-[11px] font-semibold uppercase tracking-wider text-white/70">{card.readTime}</span>
+        <div class="blog-list">
+          {(blogPosts as any[]).map((post) => {
+            const bg = accentBgMap[post.categoryAccent] ?? 'rgba(245,166,35,0.22)';
+            const color = accentColorMap[post.categoryAccent] ?? 'var(--gold)';
+            return (
+              <a href={`/blog/${post.slug}`} class="blog-card">
+                <div
+                  class="blog-card-thumb"
+                  aria-hidden="true"
+                  style={`background: radial-gradient(ellipse at 50% 50%, ${bg} 0%, var(--bg-mid) 100%);`}
+                >
+                  <span>{post.coverEmoji}</span>
                 </div>
-                <h3 class="mt-2 text-sm font-extrabold text-white">{card.title}</h3>
-                <p class="mt-1 text-xs leading-relaxed text-white/80">{card.excerpt}</p>
-                <a href={card.href} class="editorial-link mt-2 inline-flex text-xs font-extrabold uppercase tracking-wider text-cyan-100">Editezi tu articolul</a>
-              </article>
-            ))}
-          </div>
+                <div class="blog-card-text">
+                  <div class="blog-card-top">
+                    <span
+                      class="blog-cat-pill"
+                      style={`color:${color}; border-color:${color}; background:${bg};`}
+                    >
+                      {post.category}
+                    </span>
+                    <span class="blog-card-time">{post.readTime}</span>
+                  </div>
+                  <p class="blog-card-title">{post.title}</p>
+                  <p class="blog-card-excerpt">{post.excerpt}</p>
+                  <span class="blog-card-date">{formatDate(post.date)}</span>
+                </div>
+              </a>
+            );
+          })}
+        </div>
 
-          <p class="mt-4 rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-xs font-semibold text-white/85">
-            Pont: poți transforma această rubrică într-un blog complet cu pagini dedicate pentru fiecare articol.
-          </p>
-        </section>
+        <a href={`/blog/${(blogPosts as any[])[0].slug}`} class="blog-aside-cta">
+          Citește ultimul articol
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+        </a>
       </aside>
     </div>
   </section>
@@ -836,8 +837,8 @@ const pageDescription = 'Distribuie videoclipurile preferate, interacționează 
       border-radius: 1.35rem;
       padding: 1rem;
       background:
-        radial-gradient(120% 110% at 0% 0%, #5eeeff1f 0%, transparent 68%),
-        #0f1733d8;
+        radial-gradient(120% 110% at 0% 0%, rgba(245,166,35,0.08) 0%, transparent 68%),
+        rgba(20,10,32,0.88);
     }
 
     .community-feed {
@@ -851,27 +852,124 @@ const pageDescription = 'Distribuie videoclipurile preferate, interacționează 
       grid-template-columns: minmax(0, 1fr);
     }
 
-    .community-editorial-wrap {
-      box-shadow: 0 14px 32px rgba(8, 9, 18, 0.44);
+    /* Blog aside */
+    .blog-aside-header { margin-bottom: 1.25rem; }
+    .blog-aside-kicker {
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin: 0 0 0.3rem;
     }
-
-    .editorial-card {
-      transition: transform 160ms ease, border-color 160ms ease, background-color 160ms ease;
+    .blog-aside-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--title);
+      margin: 0 0 0.3rem;
     }
-
-    .editorial-card:hover {
-      transform: translateY(-1px);
-      border-color: rgba(142, 219, 255, 0.6);
-      background: rgba(94, 238, 255, 0.08);
+    .blog-aside-sub {
+      font-size: 0.84rem;
+      color: var(--muted);
+      margin: 0;
+      line-height: 1.55;
     }
-
-    .editorial-link {
+    .blog-list { display: grid; gap: 0.85rem; }
+    .blog-card {
+      display: grid;
+      grid-template-columns: 4.5rem 1fr;
+      gap: 0.85rem;
+      border: 1px solid var(--line);
+      border-radius: 1.25rem;
+      padding: 0.85rem;
+      background: var(--surface);
       text-decoration: none;
+      transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
     }
-
-    .editorial-link:hover {
-      color: #e6f9ff;
+    .blog-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(245,166,35,0.45);
+      box-shadow: 0 16px 36px rgba(245,166,35,0.1);
     }
+    .blog-card-thumb {
+      border-radius: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.65rem;
+      aspect-ratio: 1/1;
+      align-self: start;
+      flex-shrink: 0;
+    }
+    .blog-card-text {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      min-width: 0;
+    }
+    .blog-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.4rem;
+    }
+    .blog-cat-pill {
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.18rem 0.5rem;
+      border-radius: 9999px;
+      border: 1px solid;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .blog-card-time {
+      font-size: 0.67rem;
+      font-weight: 600;
+      color: var(--muted);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .blog-card-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--title);
+      margin: 0;
+      line-height: 1.3;
+    }
+    .blog-card-excerpt {
+      font-size: 0.76rem;
+      color: var(--body);
+      line-height: 1.5;
+      margin: 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .blog-card-date {
+      font-size: 0.67rem;
+      color: var(--muted);
+      font-weight: 600;
+      margin-top: 0.1rem;
+    }
+    .blog-aside-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 1.25rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--gold);
+      text-decoration: none;
+      transition: color 160ms ease, gap 160ms ease;
+    }
+    .blog-aside-cta:hover { color: var(--title); gap: 0.65rem; }
 
     .community-toolbar {
       box-shadow: 0 14px 28px rgba(3, 10, 30, 0.28);

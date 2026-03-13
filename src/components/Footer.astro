@@ -3,9 +3,10 @@ import siteContent from '../data/siteContent.json';
 
 const year = new Date().getFullYear();
 const { brand, contact } = siteContent;
+const isHomePage = Astro.url.pathname === '/';
 ---
 
-<footer class="border-t border-white/20 bg-ink text-white/90">
+<footer class="border-t border-white/10 bg-[#0C080F] text-white/90">
   <div class="section-container grid gap-4 py-8 text-sm md:grid-cols-3 md:items-center">
     <div class="inline-flex items-center gap-3">
       <img
@@ -15,17 +16,17 @@ const { brand, contact } = siteContent;
         loading="lazy"
         decoding="async"
       />
-      <p>© {year} {brand.name}. Toate drepturile rezervate.</p>
+      <p style="color:var(--muted)">© {year} {brand.name}. Toate drepturile rezervate.</p>
     </div>
 
-    <a href="#acasa" class="justify-self-start text-white transition hover:text-lime-200 md:justify-self-center">
+    <a href={isHomePage ? '#acasa' : '/#acasa'} class="justify-self-start transition hover:text-[#F5A623] md:justify-self-center" style="color: var(--body);">
       Înapoi sus
     </a>
 
-    <div class="justify-self-start text-white/90 md:justify-self-end">
-      <a href={`mailto:${contact.email}`} class="transition hover:text-cyan-200">{contact.email}</a>
-      <span aria-hidden="true"> | </span>
-      <a href={`tel:${contact.phoneRaw}`} class="transition hover:text-cyan-200">{contact.phoneDisplay}</a>
+    <div class="justify-self-start md:justify-self-end" style="color: var(--body);">
+      <a href={`mailto:${contact.email}`} class="transition hover:text-[#F5A623]">{contact.email}</a>
+      <span aria-hidden="true" style="color:var(--muted)"> | </span>
+      <a href={`tel:${contact.phoneRaw}`} class="transition hover:text-[#F5A623]">{contact.phoneDisplay}</a>
     </div>
   </div>
 </footer>
