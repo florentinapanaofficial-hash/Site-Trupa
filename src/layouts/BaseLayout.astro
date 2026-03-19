@@ -1,6 +1,7 @@
 ---
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import SkyBackground from '../components/SkyBackground.astro';
 import siteContent from '../data/siteContent.json';
 import '../styles/globals.css';
 
@@ -8,30 +9,58 @@ interface Props {
   title: string;
   description: string;
   ogImage?: string;
+  ogType?: string;
 }
 
-const { title, description, ogImage = '/images/og-placeholder.png' } = Astro.props as Props;
+const { title, description, ogType = 'website' } = Astro.props as Props;
 
-const site = Astro.site?.toString().replace(/\/$/, '') ?? '';
-const canonical =
-  site && Astro.url
-    ? new URL(Astro.url.pathname, site).toString()
-    : Astro.url?.href ?? '';
+const SITE_FALLBACK = 'https://florentinapanaofficial.ro';
+const site = Astro.site?.toString().replace(/\/$/, '') ?? SITE_FALLBACK;
+const canonical = new URL(Astro.url.pathname, site).toString();
+
+// OG image: transformă calea relativă în URL absolut
+// TODO: creează fișierul fizic public/images/og-default-1200x630.jpg (1200×630px)
+const rawOgImage = Astro.props.ogImage ?? '/images/og-default-1200x630.jpg';
+const ogImage = rawOgImage.startsWith('http') ? rawOgImage : `${site}${rawOgImage}`;
+
+const ga4Id = import.meta.env.PUBLIC_GA4_ID;
 
 const { navigation } = siteContent;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': ['MusicGroup', 'LocalBusiness'],
+  name: siteContent.brand.name,
+  description: siteContent.seo.description,
+  url: site || '',
+  telephone: siteContent.contact.phoneRaw,
+  email: siteContent.contact.email,
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Pitești',
+    addressRegion: 'Argeș',
+    addressCountry: 'RO',
+  },
+  sameAs: [
+    siteContent.socialLinks?.youtube,
+    siteContent.socialLinks?.facebook,
+    siteContent.socialLinks?.instagram,
+  ].filter(Boolean),
+};
+
 const isHomePage = Astro.url.pathname === '/';
 const sectionLink = (anchor: string) => (isHomePage ? anchor : `/${anchor}`);
 
 const sideMenuTopItems = [
-  { href: sectionLink('#video'), label: 'Galerie Video' },
-  { href: '/aparitii-tv', label: 'Galerie Video Apariții TV' },
-  { href: '/galerie-foto', label: 'Galerie Foto' },
-  { href: '/momente-cu-mirii', label: 'Momente cu mirii' },
+  { href: '/', label: 'Acasă', color: 'cyan' },
+  { href: '/galerie-video', label: 'Galerie Video', color: 'cyan' },
+  { href: '/galerie-foto', label: 'Galerie Foto', color: 'cyan' },
+  { href: '/#membri', label: 'Membri', color: 'cyan' },
+  { href: '/despre', label: 'Despre', color: 'cyan' },
+  { href: '/contact', label: 'Contact', color: 'cyan' },
 ];
 
-const sideMenuBottomItems = [
-  { href: '/comunitatea-noastra', label: 'Comunitatea noastră' },
-];
+const sideMenuBottomItems = [];
 ---
 
 <!DOCTYPE html>
@@ -45,34 +74,52 @@ const sideMenuBottomItems = [
     <meta name="theme-color" content="#0c0f1f" />
     {canonical && <link rel="canonical" href={canonical} />}
 
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     {canonical && <meta property="og:url" content={canonical} />}
     <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="ro_RO" />
+    <meta property="og:site_name" content={siteContent.brand.name} />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
+    <link rel="icon" type="image/svg+xml" href="/images/logo-fp-stage.svg" />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
     <slot name="head" />
+    {ga4Id && (
+      <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${ga4Id}`}></script>
+    )}
+    {ga4Id && (
+      <script define:vars={{ ga4Id }}>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', ga4Id);
+      </script>
+    )}
   </head>
   <body class="page-shell">
     <a href="#continut" class="skip-link">Sari la conținut</a>
+    <SkyBackground />
     <Header />
 
     <div class="layout-content-shell">
       <aside class="left-side-menu" aria-label="Acces rapid">
         {sideMenuTopItems.map((item) => (
-          <a href={item.href} class="left-side-link" data-nav-link>{item.label}</a>
+          <a href={item.href} class={`left-side-link nav-btn-${item.color}`} data-nav-link>{item.label}</a>
         ))}
 
         {sideMenuBottomItems.map((item) => (
-          <a href={item.href} class="left-side-link" data-nav-link>{item.label}</a>
+          <a href={item.href} class={`left-side-link nav-btn-${item.color}`} data-nav-link>{item.label}</a>
         ))}
       </aside>
 
-      <main id="continut" class="flex-1 min-w-0 pt-24 sm:pt-28">
+      <main id="continut" class="flex-1 min-w-0 pt-40 sm:pt-44">
         <slot />
       </main>
     </div>
@@ -101,6 +148,82 @@ const sideMenuBottomItems = [
         window.addEventListener('scroll', onScroll, { passive: true });
         window.addEventListener('resize', updateScrollProgress);
         updateScrollProgress();
+      })();
+    </script>
+
+    <script is:inline>
+      // Scroll spy sidebar — activare buton la derulare
+      (() => {
+        const menu = document.querySelector('.left-side-menu');
+        if (!menu) return;
+        const links = Array.from(menu.querySelectorAll('.left-side-link'));
+
+        // Mapare explicită: id secțiune din homepage → href buton sidebar
+        const sectionToHref = {
+          'acasa':   '/',
+          'video':   '/galerie-video',
+          'membri':  '/#membri',
+          'galerie': '/galerie-foto',
+        };
+
+        function setActive(href) {
+          menu.classList.remove('has-active');
+          links.forEach(l => l.classList.remove('is-active'));
+          const match = links.find(l => l.getAttribute('href') === href);
+          if (match) {
+            match.classList.add('is-active');
+            menu.classList.add('has-active');
+          }
+        }
+
+        // Potrivire inițială după pathname
+        function currentHref() {
+          const path = location.pathname.replace(/\/$/, '') || '/';
+          const hash = location.hash;
+          const full = path + hash;
+          if (links.some(l => l.getAttribute('href') === full)) return full;
+          if (links.some(l => l.getAttribute('href') === path)) return path;
+          if (path === '' || path === '/') return '/';
+          return path;
+        }
+
+        setActive(currentHref());
+
+        links.forEach(l => {
+          l.addEventListener('click', () => {
+            setTimeout(() => setActive(l.getAttribute('href')), 80);
+          });
+        });
+
+        // Scroll spy: observer activ în banda de 15%–25% de sus a viewport-ului
+        // → butonul se aprinde când secțiunea intră în zona vizuală principală
+        const sections = document.querySelectorAll('section[id]');
+        if (!sections.length) return;
+
+        const obs = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            const id = entry.target.id;
+            const path = location.pathname.replace(/\/$/, '') || '/';
+
+            if (path === '/') {
+              // Homepage: folosim harta secțiune → buton sidebar
+              const href = sectionToHref[id];
+              if (href) setActive(href);
+            } else {
+              // Subpagini: potrivire după path+#id
+              const anchorHref = path + '#' + id;
+              if (links.some(l => l.getAttribute('href') === anchorHref)) {
+                setActive(anchorHref);
+              }
+            }
+          });
+        }, {
+          rootMargin: '-15% 0px -75% 0px',
+          threshold: 0,
+        });
+
+        sections.forEach(s => obs.observe(s));
       })();
     </script>
   </body>

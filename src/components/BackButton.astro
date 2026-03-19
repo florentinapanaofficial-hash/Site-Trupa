@@ -1,0 +1,64 @@
+---
+interface Props {
+  href?: string;
+  label?: string;
+}
+
+const { href = '/', label = 'Înapoi' } = Astro.props;
+---
+
+<a href={href} class="back-btn" aria-label={`Înapoi — ${label}`} onclick="history.length > 1 ? (history.back(), event.preventDefault()) : null">
+  <svg class="back-arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M19 12H5M12 5l-7 7 7 7"/>
+  </svg>
+</a>
+
+<style>
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 9999px;
+    border: 1.5px solid rgba(120, 200, 255, 0.35);
+    background: rgba(80, 180, 255, 0.07);
+    text-decoration: none;
+    transition: background 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+  }
+
+  .back-btn:hover {
+    background: rgba(100, 200, 255, 0.15);
+    border-color: rgba(160, 220, 255, 0.65);
+    box-shadow: 0 0 14px rgba(100, 200, 255, 0.3);
+  }
+
+  .back-arrow {
+    color: transparent;
+    stroke: url(#pearl-grad);
+    animation: arrow-nudge 1.8s ease-in-out infinite;
+    filter: drop-shadow(0 0 4px rgba(140, 220, 255, 0.55));
+  }
+
+  .back-btn:hover .back-arrow {
+    animation: none;
+    filter: drop-shadow(0 0 7px rgba(180, 235, 255, 0.8));
+  }
+
+  @keyframes arrow-nudge {
+    0%, 100% { transform: translateX(0); }
+    40%       { transform: translateX(-5px); }
+    65%       { transform: translateX(-2px); }
+  }
+</style>
+
+<!-- gradient SVG defs injectate o singură dată în DOM -->
+<svg width="0" height="0" style="position:absolute;overflow:hidden" aria-hidden="true">
+  <defs>
+    <linearGradient id="pearl-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#b8e8ff"/>
+      <stop offset="45%"  stop-color="#7ecfff"/>
+      <stop offset="100%" stop-color="#c2f0ff"/>
+    </linearGradient>
+  </defs>
+</svg>

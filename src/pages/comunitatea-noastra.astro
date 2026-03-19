@@ -2,12 +2,13 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import siteContent from '../data/siteContent.json';
 import communityPosts from '../data/communityPosts.json';
+import BackButton from '../components/BackButton.astro';
 import blogPosts from '../data/blogPosts.json';
 import { query as dbQuery } from '../lib/db.js';
 
 export const prerender = false;
 
-const { brand, seo, videos, tvAppearances, contact } = siteContent;
+const { brand, seo, videos, tvAppearances, contact, realMoments } = siteContent;
 
 const getYoutubeId = (url: string) => {
   const match = url.match(/(?:v=|youtu\.be\/)([^&?/]+)/);
@@ -50,7 +51,7 @@ const fallbackFeedPosts = [
     .filter(Boolean),
 ];
 
-const adminFeedPosts = (communityPosts ?? [])
+const adminFeedPosts = ((communityPosts as any).items ?? [])
   .map((item, index) => {
     const imageUrl = typeof item.imageUrl === 'string' ? item.imageUrl.trim() : '';
     const youtubeId = getYoutubeId(item.youtubeUrl ?? '');
@@ -111,26 +112,48 @@ const pageDescription = 'Distribuie videoclipurile preferate, interacționează 
 
 <BaseLayout title={pageTitle} description={pageDescription} ogImage={seo.ogImage}>
   <section class="section-container pt-8 pb-6 sm:pt-10">
+    <div class="mb-6"><BackButton href="/" label="Acasă" /></div>
     <header class="section-head mx-auto text-center">
-      <p class="kicker">Comunitatea noastră</p>
-      <h1 class="section-title">Feed social activ</h1>
+      <p class="kicker">Formația Florentina Pană</p>
+      <h1 class="section-title">Recenzii și Testimoniale | Formația Florentina Pană</h1>
       <p class="section-copy">
-        Scroll ca pe Facebook: fiecare postare are videoclip, text, like, comentarii și distribuire în social media.
+        Fiecare nuntă e o poveste unică. Iată ce spun cuplurile care ne-au încredințat cele mai frumoase momente din viața lor.
       </p>
     </header>
-
-    <div class="community-feed-intro mt-6 rounded-3xl border border-white/20 bg-white/10 p-5 sm:p-6">
-      <p class="text-sm font-semibold uppercase tracking-wider text-cyan-100">Obiectiv comunitate</p>
-      <p class="mt-2 text-sm leading-relaxed text-white/80">
-        Fiecare share contează. Distribuie postările, lasă comentarii și ajută-ne să creștem comunitatea pentru sezonul 2026-2027.
-      </p>
-      <p class="mt-3 text-xs font-semibold uppercase tracking-wider text-lime-100">
-        Administrare rapidă: editezi postările în fișierul src/data/communityPosts.json (model în src/data/communityPosts.template.json).
-      </p>
-    </div>
   </section>
 
   <section class="section-container pb-16 sm:pb-20">
+    <!-- ─── Testimoniale ─────────────────────────────────────────────── -->
+    <div class="testimonials-wrap mx-auto mb-14 max-w-5xl">
+      <div class="testimonials-head mb-8 text-center">
+        <p class="kicker mx-auto">Ce spun ei</p>
+        <h2 class="section-title text-2xl md:text-3xl">Cuvintele lor valorează mai mult decât orice reclamă</h2>
+      </div>
+      <div class="testimonials-grid">
+        {realMoments.events.map((event) => {
+          const accentColor = (event as any).accentColor ?? '#f5a623';
+          const blogSlug = (event as any).blogSlug ?? '';
+          const initials = event.couple.split('&').map((n: string) => n.trim()[0] ?? '').join('');
+          return (
+            <article class="testimonial-card" style={`--tc:${accentColor}`}>
+              <div class="tc-stars" aria-label="5 stele din 5">★★★★★</div>
+              <blockquote class="tc-quote">{event.coupleQuote}</blockquote>
+              <footer class="tc-footer">
+                <div class="tc-avatar" aria-hidden="true">{initials}</div>
+                <div class="tc-meta">
+                  <p class="tc-name">{event.couple}</p>
+                  <p class="tc-location">{event.city} &bull; {event.date}</p>
+                </div>
+                {blogSlug && (
+                  <a class="tc-blog-link" href={`/blog/${blogSlug}`}>Povestea lor →</a>
+                )}
+              </footer>
+            </article>
+          );
+        })}
+      </div>
+    </div>
+    <!-- ─────────────────────────────────────────────────────────────── -->
     <section class="community-gallery-wrap mx-auto mb-6 max-w-5xl rounded-2xl border border-white/20 bg-[#120a27d6] p-4 sm:p-5">
       <div class="flex items-center justify-between gap-3">
         <h2 class="text-lg font-extrabold text-white">Galerie Foto Comunitate</h2>
@@ -152,158 +175,11 @@ const pageDescription = 'Distribuie videoclipurile preferate, interacționează 
           ))}
         </div>
       ) : (
-        <p class="mt-3 text-sm text-white/90">Nu există poze în galerie momentan. Încarcă prima imagine din zona de administrator.</p>
+        <p class="mt-3 text-sm text-white/90">Nu există poze în galerie momentan.</p>
       )}
     </section>
 
-    <section class="admin-upload-panel mx-auto mb-4 max-w-3xl rounded-2xl border border-white/20 bg-[#140a2fe3] p-4 backdrop-blur">
-      <p class="text-sm font-extrabold uppercase tracking-wider text-lime-100">Administrator: încărcare foto postare</p>
-      <p class="mt-1 text-xs text-white/90">Drag & drop o imagine sau selectează fișierul. Imaginea este optimizată automat (max 1200px, WebP).</p>
-
-      <form class="mt-3 grid gap-3" data-admin-upload-form>
-        <input id="admin-photo-input" type="file" name="photo" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" class="hidden" />
-
-        <label class="grid gap-1 text-xs font-semibold uppercase tracking-wider text-white/90">
-          Titlu fotografie
-          <input data-upload-title class="input-glass" type="text" maxlength="180" placeholder="Ex: Public în delir la final de seară" required />
-        </label>
-
-        <div class="community-dropzone" data-dropzone role="button" tabindex="0" aria-label="Dropzone încărcare foto">
-          <p class="text-sm font-bold text-white">Trage fotografia aici</p>
-          <p class="mt-1 text-xs text-white/90">sau apasă pentru selectare (JPG, PNG, WebP, max 5MB)</p>
-        </div>
-
-        <img data-upload-preview class="community-upload-preview hidden" alt="Previzualizare fotografie" />
-
-        <div class="flex flex-wrap gap-2">
-          <button type="button" class="btn-outline" data-dropzone-trigger>Selectează fișier</button>
-          <button type="submit" class="btn-solid" data-upload-submit>Optimizează și încarcă</button>
-        </div>
-
-        <p class="hidden rounded-lg border px-3 py-2 text-xs font-semibold" data-upload-status role="status" aria-live="polite"></p>
-
-        <label class="grid gap-1 text-xs font-semibold uppercase tracking-wider text-white/90">
-          URL imagine încărcată
-          <input data-upload-url class="input-glass" type="text" readonly placeholder="Va apărea aici după upload" />
-        </label>
-      </form>
-    </section>
-
-    <div class="community-main-layout mx-auto max-w-7xl gap-5 grid grid-cols-1 md:grid-cols-[0.8fr_1.7fr]">
-      <section class="community-feed-column min-w-0 md:max-w-md">
-        <div class="community-toolbar sticky top-24 z-20 mb-4 grid gap-3 rounded-2xl border border-white/20 bg-[#0a1433de] p-3 backdrop-blur sm:grid-cols-[1fr_auto] sm:items-center">
-          <div class="flex items-center gap-3">
-            <div class="community-avatar" aria-hidden="true">FP</div>
-            <label class="w-full" for="new-community-post">
-              <span class="sr-only">Creare postare</span>
-              <input
-                id="new-community-post"
-                type="text"
-                class="input-glass w-full"
-                placeholder="Ce vrei să postezi astăzi în comunitate?"
-                readonly
-              />
-            </label>
-          </div>
-
-          <div class="flex flex-wrap gap-2">
-            <button type="button" class="btn-outline" data-create-post-demo>Publică postare</button>
-            <select class="input-glass min-w-48" data-feed-sort aria-label="Sortează feed-ul comunității">
-              <option value="newest" selected>Cele mai noi</option>
-              <option value="top">Cele mai apreciate</option>
-            </select>
-            <div class="community-filter-wrap flex flex-wrap gap-2" role="group" aria-label="Filtrează postările comunității">
-              <button type="button" class="community-filter-btn is-active" data-feed-filter="all" aria-pressed="true">Toate</button>
-              <button type="button" class="community-filter-btn" data-feed-filter="gallery" aria-pressed="false">Galerie Video</button>
-              <button type="button" class="community-filter-btn" data-feed-filter="tv" aria-pressed="false">Apariții TV</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="community-feed grid w-full max-w-none gap-4">
-      {feedPosts.map((item, index) => {
-        const mediaUrl = item.youtubeUrl || item.imageUrl || '';
-
-        return (
-        <article
-          class="community-post glass-card"
-          data-social-card
-          data-video-id={item.id}
-          data-feed-order={index + 1}
-          data-feed-type={getFeedType(item.source)}
-        >
-          <header class="community-post-head flex items-center gap-3">
-            <div class="community-avatar" aria-hidden="true">FP</div>
-            <div>
-              <p class="text-sm font-extrabold text-white">{brand.name}</p>
-              <p class="text-xs font-semibold text-white/85">{item.source} • {item.publishedLabel}</p>
-            </div>
-            {index === 0 && <span class="community-pinned">Postare recomandată</span>}
-          </header>
-
-          <h2 class="mt-3 text-base font-extrabold text-white">{item.title}</h2>
-          <p class="mt-2 text-sm leading-relaxed text-white/80">{item.caption}</p>
-
-          {item.youtubeId ? (
-            <iframe
-              class="community-video mt-4 aspect-video w-full rounded-xl"
-              src={`https://www.youtube.com/embed/${item.youtubeId}`}
-              title={item.title}
-              loading="lazy"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              referrerpolicy="strict-origin-when-cross-origin"
-              allowfullscreen
-            />
-          ) : item.imageUrl ? (
-            <img class="community-video community-photo mt-4 w-full rounded-xl" src={item.imageUrl} alt={item.title} loading="lazy" />
-          ) : null}
-
-          <div class="mt-4 flex items-center justify-between gap-3 border-b border-white/15 pb-3 text-xs font-semibold text-white/85">
-            <p><span data-like-count>0</span> aprecieri</p>
-            <p><span data-comment-count>0</span> comentarii</p>
-          </div>
-
-          <div class="community-post-actions mt-3 flex flex-wrap gap-2">
-            <button type="button" class="community-action-btn" data-like-button>Like</button>
-            {mediaUrl && (
-              <a
-                href={mediaUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="community-action-btn"
-              >
-                {item.youtubeId ? 'Vezi pe YouTube' : 'Vezi fotografia'}
-              </a>
-            )}
-            <button type="button" class="community-action-btn" data-share-facebook={mediaUrl}>Distribuie Facebook</button>
-            <button type="button" class="community-action-btn" data-share-whatsapp={mediaUrl}>Distribuie WhatsApp</button>
-            <button type="button" class="community-action-btn" data-copy-link={mediaUrl}>Copiază link postare</button>
-          </div>
-
-          <a
-            href={buildWhatsAppCta(mediaUrl || 'https://landing-ul-meu.example.com/comunitatea-noastra')}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="community-whatsapp-cta mt-3"
-          >
-            Cere ofertă pe WhatsApp pentru acest tip de moment
-          </a>
-
-          <form class="mt-4 grid gap-2" data-comment-form>
-            <label class="sr-only" for={`name-${item.id}`}>Nume</label>
-            <input id={`name-${item.id}`} name="name" type="text" class="input-glass" maxlength="60" placeholder="Numele tău" required />
-            <label class="sr-only" for={`comment-${item.id}`}>Comentariu</label>
-            <textarea id={`comment-${item.id}`} name="comment" class="input-glass min-h-24 resize-y" minlength="3" maxlength="360" placeholder="Scrie un comentariu la această postare" required></textarea>
-            <button type="submit" class="btn-solid justify-center">Publică comentariul</button>
-          </form>
-
-          <div class="community-comments mt-4" data-comment-list aria-live="polite"></div>
-        </article>
-        );
-      })}
-        </div>
-      </section>
-
+    <div class="mx-auto max-w-5xl">
       <aside id="blog" class="community-editorial-column min-w-0" aria-label="Publicații și Vlog">
         <div class="blog-aside-header">
           <p class="blog-aside-kicker">Publicații &amp; Vlog</p>
@@ -312,7 +188,7 @@ const pageDescription = 'Distribuie videoclipurile preferate, interacționează 
         </div>
 
         <div class="blog-list">
-          {(blogPosts as any[]).map((post) => {
+          {((blogPosts as any).items as any[]).map((post) => {
             const bg = accentBgMap[post.categoryAccent] ?? 'rgba(245,166,35,0.22)';
             const color = accentColorMap[post.categoryAccent] ?? 'var(--gold)';
             return (
@@ -343,12 +219,32 @@ const pageDescription = 'Distribuie videoclipurile preferate, interacționează 
           })}
         </div>
 
-        <a href={`/blog/${(blogPosts as any[])[0].slug}`} class="blog-aside-cta">
+        <a href={`/blog/${((blogPosts as any).items as any[])[0]?.slug ?? ''}`} class="blog-aside-cta">
           Citește ultimul articol
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
         </a>
       </aside>
     </div>
+
+    <!-- ─── CTA rezervare ────────────────────────────────────────────── -->
+    <div class="ctab-wrap mx-auto mt-14 max-w-3xl">
+      <p class="ctab-kicker">Sezonul 2026–2027</p>
+      <h2 class="ctab-title">Vrei să faci parte din familia noastră?</h2>
+      <p class="ctab-sub">Locurile se ocupă rapid. Contactează-ne acum și asigură-ți data dorită.</p>
+      <div class="ctab-actions">
+        <a
+          href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Bună! Vreau să rezerv o dată pentru evenimentul meu cu Formația Florentina Pană.')}`}
+          class="ctab-btn ctab-btn--wa"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Scrie pe WhatsApp
+        </a>
+        <a href="/contact" class="ctab-btn ctab-btn--outline">Formular contact →</a>
+      </div>
+    </div>
+    <!-- ─────────────────────────────────────────────────────────────── -->
   </section>
 
   <script>
@@ -1171,6 +1067,187 @@ const pageDescription = 'Distribuie videoclipurile preferate, interacționează 
       display: none;
     }
 
+    /* ─── Testimoniale ───────────────────────────────────────────────── */
+    .testimonials-grid {
+      display: grid;
+      gap: 1.25rem;
+      grid-template-columns: 1fr;
+    }
+
+    @media (min-width: 600px) {
+      .testimonials-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .testimonial-card {
+      position: relative;
+      border-radius: 1.35rem;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-left: 3px solid var(--tc, #f5a623);
+      background: rgba(18, 10, 39, 0.78);
+      backdrop-filter: blur(8px);
+      padding: 1.4rem 1.5rem 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      box-shadow: 0 12px 32px rgba(8,9,18,0.42);
+      transition: transform 220ms ease, box-shadow 220ms ease;
+    }
+
+    .testimonial-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 0 1px var(--tc) inset, 0 20px 44px rgba(8,9,18,0.48);
+    }
+
+    .tc-stars {
+      color: #f5c518;
+      font-size: 1rem;
+      letter-spacing: 0.15em;
+      line-height: 1;
+    }
+
+    .tc-quote {
+      margin: 0;
+      font-size: 0.96rem;
+      line-height: 1.65;
+      color: rgba(235,245,255,0.92);
+      font-style: italic;
+      flex: 1;
+    }
+
+    .tc-footer {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      padding-top: 0.85rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .tc-avatar {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 9999px;
+      border: 2px solid var(--tc, #f5a623);
+      background: linear-gradient(140deg, rgba(255,255,255,0.1), rgba(255,255,255,0.04));
+      display: grid;
+      place-items: center;
+      font-size: 0.72rem;
+      font-weight: 900;
+      color: var(--tc, #f5a623);
+      flex-shrink: 0;
+      letter-spacing: 0.04em;
+    }
+
+    .tc-meta { flex: 1; min-width: 0; }
+
+    .tc-name {
+      margin: 0;
+      font-weight: 800;
+      font-size: 0.9rem;
+      color: #eaf4ff;
+      line-height: 1.25;
+    }
+
+    .tc-location {
+      margin: 0.12rem 0 0;
+      font-size: 0.73rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .tc-blog-link {
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--tc, #f5a623);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: opacity 160ms ease;
+    }
+    .tc-blog-link:hover { opacity: 0.75; }
+
+    /* ─── CTA Banner ─────────────────────────────────────────────────── */
+    .ctab-wrap {
+      border-radius: 2rem;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: radial-gradient(ellipse at 50% 0%, rgba(245,166,35,0.12) 0%, rgba(18,10,39,0.92) 65%);
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      box-shadow: 0 20px 56px rgba(8,9,18,0.52);
+    }
+
+    .ctab-kicker {
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin: 0 0 0.6rem;
+    }
+
+    .ctab-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(1.5rem, 4vw, 2.1rem);
+      font-weight: 700;
+      color: var(--title);
+      margin: 0 0 0.75rem;
+      line-height: 1.2;
+    }
+
+    .ctab-sub {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.65);
+      margin: 0 0 1.5rem;
+      line-height: 1.6;
+    }
+
+    .ctab-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
+    }
+
+    .ctab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      min-height: 48px;
+      transition: transform 160ms ease, filter 160ms ease, box-shadow 160ms ease;
+    }
+    .ctab-btn:hover { transform: translateY(-2px); }
+
+    .ctab-btn--wa {
+      background: linear-gradient(135deg, #2fdc81 0%, #1cbf6a 100%);
+      color: #062315;
+      border: 1px solid rgba(122,255,181,0.55);
+      box-shadow: 0 8px 24px rgba(28,191,106,0.3);
+    }
+    .ctab-btn--wa:hover {
+      filter: brightness(1.06) saturate(1.08);
+      box-shadow: 0 12px 32px rgba(28,191,106,0.45);
+    }
+
+    .ctab-btn--outline {
+      background: rgba(255,255,255,0.06);
+      color: rgba(235,245,255,0.9);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .ctab-btn--outline:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.4);
+    }
+
     .community-comments {
       display: grid;
       gap: 0.45rem;
@@ -1199,8 +1276,9 @@ const pageDescription = 'Distribuie videoclipurile preferate, interacționează 
 
     @media (min-width: 1024px) {
       .community-main-layout {
-        grid-template-columns: minmax(0, 1.22fr) minmax(0, 0.78fr);
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
         column-gap: 1rem;
+        align-items: start;
       }
 
       .community-feed {
@@ -1216,9 +1294,31 @@ const pageDescription = 'Distribuie videoclipurile preferate, interacționează 
         border-radius: 0.75rem;
       }
 
+      /* Coloana feed — scroll independent */
+      .community-feed-column {
+        position: sticky;
+        top: 11rem;
+        max-height: calc(100vh - 12rem);
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255,255,255,0.15) transparent;
+        padding-right: 0.3rem;
+      }
+
+      /* Coloana editorial — scroll independent */
       .community-editorial-column {
         position: sticky;
-        top: 6rem;
+        top: 11rem;
+        max-height: calc(100vh - 12rem);
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255,255,255,0.15) transparent;
+        padding-right: 0.3rem;
+      }
+
+      /* Toolbar fix în capul coloanei feed (nu mai e nevoie de sticky) */
+      .community-toolbar {
+        position: static !important;
       }
     }
   </style>

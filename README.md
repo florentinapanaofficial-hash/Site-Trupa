@@ -2,6 +2,12 @@
 
 Landing page modern pentru trupa live, construit cu Astro 4 si TailwindCSS 3. Include SEO on-page (meta + OG + Twitter), JSON-LD, sitemap si robots.txt.
 
+## TODO înainte de deploy în producție
+
+- [ ] **Imagine OG**: creează `public/images/og-default-1200x630.jpg` (dimensiune exactă 1200×630px) și actualizează `src/data/siteContent.json` → `seo.ogImage` cu calea `/images/og-default-1200x630.jpg`
+- [ ] **GA4**: copiază `.env.example` în `.env` și completează `PUBLIC_GA4_ID=G-XXXXXXXXXX` cu ID-ul real din Google Analytics
+- [ ] **`@astrojs/sitemap`**: menține versiunea `3.1.6` — versiunile 3.5+ cer Astro 5 (hook `astro:routes:resolved` inexistent în Astro 4)
+
 ## Cerințe
 
 - Node.js 18+ (recomandat 20+)

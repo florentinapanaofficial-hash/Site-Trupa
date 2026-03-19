@@ -1,0 +1,528 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import siteContent from '../data/siteContent.json';
+import BackButton from '../components/BackButton.astro';
+
+const { seo, contact, brand, services, repertoire } = siteContent;
+const hasBandPhoto = typeof (brand as any).bandPhoto === 'string' && (brand as any).bandPhoto.trim() !== '';
+---
+
+<BaseLayout
+  title={`Despre noi | ${brand.name}`}
+  description="Despre Formația Florentina Pană — poveste, servicii, repertoriu și întrebări frecvente."
+>
+  <section class="section-container py-16">
+    <div class="mb-8"><BackButton href="/" label="Acasă" /></div>
+
+    {/* ── Foto panoramică trupă ── */}
+    <div class="dp-band-photo-wrap">
+      {hasBandPhoto ? (
+        <img
+          src={(brand as any).bandPhoto}
+          alt="Formația Florentina Pană — foto de grup"
+          class="dp-band-photo"
+          loading="eager"
+          decoding="async"
+        />
+      ) : (
+        <div class="dp-band-photo-placeholder" aria-label="Spațiu rezervat pentru poza panoramică a trupei">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><circle cx="8.5" cy="10" r="1.5"/><path d="m21 15-5-5L5 20"/></svg>
+          <p class="dp-band-photo-label">Foto panoramică trupă — în curând</p>
+          <p class="dp-band-photo-hint">Adaugă <code>"bandPhoto": "/images/trupa.jpg"</code> în <code>src/data/siteContent.json</code></p>
+        </div>
+      )}
+    </div>
+
+    {/* ── Despre noi ── */}
+    <header class="dp-intro-block mb-14">
+      <div class="dp-intro-left">
+        <p class="kicker">Povestea noastră</p>
+        <h1 class="section-title">Despre Formația Florentina Pană</h1>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <a href={`tel:${contact.phoneRaw}`} class="btn-solid">Sună acum</a>
+          <a href="/contact" class="btn-outline">Rezervă o dată</a>
+        </div>
+      </div>
+      <div class="dp-intro-right">
+        <p class="dp-intro-lead">
+          Formația <strong class="dp-intro-name">Florentina Pană</strong> {(brand as any).aboutIntro}
+        </p>
+        <p class="dp-intro-body">{(brand as any).aboutIntro2}</p>
+      </div>
+    </header>
+
+    {/* ── Servicii ── */}
+    <div class="dp-block">
+      <div class="dp-label-row">
+        <span class="dp-kicker-chip">Ce oferim</span>
+        <h2 class="dp-h2">Servicii muzicale live</h2>
+      </div>
+      <div class="dp-grid-4">
+        {(services as any[]).map((svc) => (
+          <button
+            type="button"
+            class="dp-card dp-card--clickable"
+            data-card-title={svc.title}
+            data-card-icon={svc.icon || ''}
+            data-card-details={svc.details || ''}
+            aria-label={`Detalii despre ${svc.title}`}
+          >
+            <div class="dp-icon" aria-hidden="true">{svc.icon}</div>
+            <h3 class="dp-card-title">{svc.title}</h3>
+            <p class="dp-card-desc">{svc.description}</p>
+            <span class="dp-card-more" aria-hidden="true">Detalii →</span>
+          </button>
+        ))}
+      </div>
+    </div>
+
+    {/* ── Repertoriu ── */}
+    <div class="dp-block">
+      <div class="dp-label-row">
+        <span class="dp-kicker-chip">Ce cântăm</span>
+        <h2 class="dp-h2">Repertoriu muzical</h2>
+      </div>
+      <div class="dp-grid-4">
+        {(repertoire as any[]).map((rep) => (
+          <button
+            type="button"
+            class="dp-card dp-card--clickable"
+            data-card-title={rep.label}
+            data-card-icon={rep.icon || ''}
+            data-card-details={rep.details || ''}
+            aria-label={`Detalii repertoriu: ${rep.label}`}
+          >
+            <div class="dp-icon" aria-hidden="true">{rep.icon}</div>
+            <h3 class="dp-card-title">{rep.label}</h3>
+            <span class="dp-card-more" aria-hidden="true">Vezi piese →</span>
+          </button>
+        ))}
+      </div>
+    </div>
+
+    {/* ── FAQ ── */}
+    <div class="dp-block" id="faq">
+      <div class="dp-label-row">
+        <span class="dp-kicker-chip">FAQ</span>
+        <h2 class="dp-h2">Întrebări frecvente</h2>
+      </div>
+      <div class="faq-list" role="list">
+        <details class="faq-item" role="listitem">
+          <summary class="faq-question">
+            <span>Vă deplasați în toată România?</span>
+            <span class="faq-chevron" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+            </span>
+          </summary>
+          <p class="faq-answer">Da, ne deplasăm oriunde în România. Costurile de transport sunt incluse sau negociate separat, în funcție de distanță.</p>
+        </details>
+        <details class="faq-item" role="listitem">
+          <summary class="faq-question">
+            <span>Putem personaliza repertoriul?</span>
+            <span class="faq-chevron" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+            </span>
+          </summary>
+          <p class="faq-answer">Desigur. Adaptăm programul muzical în funcție de preferințele voastre — trimiteți-ne lista de piese favorite la rezervare.</p>
+        </details>
+        <details class="faq-item" role="listitem">
+          <summary class="faq-question">
+            <span>Cu cât timp înainte trebuie să rezervăm?</span>
+            <span class="faq-chevron" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+            </span>
+          </summary>
+          <p class="faq-answer">Recomandăm să ne contactați cu cel puțin 3-6 luni înainte pentru evenimente mari (nunți, botezuri). Pentru corporate sau concerte mai mici, 4-6 săptămâni sunt suficiente.</p>
+        </details>
+        <details class="faq-item" role="listitem">
+          <summary class="faq-question">
+            <span>Aveți echipament propriu de sonorizare?</span>
+            <span class="faq-chevron" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+            </span>
+          </summary>
+          <p class="faq-answer">Da, dispunem de echipament profesional complet — sistem de sunet, lumini și tot ce este necesar pentru un show de calitate.</p>
+        </details>
+        <details class="faq-item" role="listitem">
+          <summary class="faq-question">
+            <span>Care este durata unui program live?</span>
+            <span class="faq-chevron" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+            </span>
+          </summary>
+          <p class="faq-answer">Un program standard cuprinde 4-6 ore de muzică live cu pauze, adaptat la tipul și durata evenimentului vostru.</p>
+        </details>
+      </div>
+    </div>
+
+    <div class="mt-12 flex flex-wrap justify-center gap-4">
+      <a href="/contact" class="btn-solid">Rezervă acum</a>
+      <a href="/galerie-video" class="btn-outline">Galerie video</a>
+    </div>
+  </section>
+
+  {/* ────────────────────────────────────────────
+      MODAL DETALII CARD
+  ──────────────────────────────────────────── */}
+  <div id="dp-card-modal" role="dialog" aria-modal="true" aria-labelledby="dp-modal-title" hidden>
+    <div class="dp-modal-backdrop" id="dp-modal-backdrop"></div>
+    <div class="dp-modal-dialog">
+      <div class="dp-modal-head">
+        <span class="dp-modal-icon" id="dp-modal-icon" aria-hidden="true"></span>
+        <h2 class="dp-modal-title" id="dp-modal-title"></h2>
+        <button type="button" class="dp-modal-close" id="dp-modal-close" aria-label="Închide">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="dp-modal-body" id="dp-modal-body"></div>
+    </div>
+  </div>
+
+</BaseLayout>
+
+<style>
+  /* ── Intro two-col ── */
+  .dp-intro-block {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 3rem 4rem;
+    align-items: center;
+    max-width: 72rem;
+    margin-inline: auto;
+  }
+  .dp-intro-left {
+    /* title + CTAs */
+  }
+  .dp-intro-right {
+    border-left: 2px solid rgba(245, 166, 35, 0.3);
+    padding-left: 2.25rem;
+  }
+  .dp-intro-lead {
+    font-size: clamp(1rem, 2vw, 1.15rem);
+    line-height: 1.8;
+    color: #ffffff;
+    margin: 0 0 0.9rem;
+  }
+  .dp-intro-name {
+    color: var(--gold);
+    font-weight: 700;
+  }
+  .dp-intro-body {
+    font-size: clamp(0.95rem, 1.8vw, 1.05rem);
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.82);
+    margin: 0;
+  }
+  @media (max-width: 768px) {
+    .dp-intro-block {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    .dp-intro-right {
+      border-left: none;
+      border-top: 2px solid rgba(245, 166, 35, 0.3);
+      padding-left: 0;
+      padding-top: 1.75rem;
+    }
+  }
+
+  /* ── Foto panoramică trupă ── */
+  .dp-band-photo-wrap {
+    margin-bottom: 3.5rem;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.10);
+    box-shadow: 0 24px 64px rgba(0,0,0,0.55);
+  }
+  .dp-band-photo {
+    width: 100%;
+    aspect-ratio: 21 / 7;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+  }
+  .dp-band-photo-placeholder {
+    width: 100%;
+    aspect-ratio: 21 / 7;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    background: linear-gradient(135deg, rgba(14,20,50,0.95), rgba(6,12,28,0.97));
+    border: 2px dashed rgba(245,166,35,0.25);
+    border-radius: 1.5rem;
+    color: rgba(255,255,255,0.35);
+    text-align: center;
+    padding: 2rem;
+  }
+  .dp-band-photo-label {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(0.85rem, 2vw, 1.1rem);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: rgba(245,166,35,0.55);
+    margin: 0;
+  }
+  .dp-band-photo-hint {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.3);
+    margin: 0;
+  }
+  .dp-band-photo-hint code {
+    background: rgba(255,255,255,0.07);
+    border-radius: 4px;
+    padding: 0.1em 0.3em;
+    font-size: 0.68rem;
+  }
+
+  /* ── Carduri clickabile ── */
+  button.dp-card {
+    width: 100%;
+    text-align: center;
+    cursor: pointer;
+    font-family: inherit;
+    position: relative;
+  }
+  .dp-card--clickable:hover {
+    transform: translateY(-4px);
+    border-color: rgba(245,166,35,0.4);
+    box-shadow: 0 18px 42px rgba(0,0,0,0.4);
+  }
+  .dp-card--clickable:focus-visible {
+    outline: 2px solid rgba(245,166,35,0.7);
+    outline-offset: 3px;
+  }
+  .dp-card-more {
+    display: inline-block;
+    margin-top: 0.8rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0.75;
+    transition: opacity 160ms ease;
+  }
+  .dp-card--clickable:hover .dp-card-more { opacity: 1; }
+
+  /* ── Modal detalii ── */
+  #dp-card-modal {
+    position: fixed; inset: 0; z-index: 9990;
+    display: flex; align-items: center; justify-content: center;
+    padding: 1rem;
+  }
+  #dp-card-modal[hidden] { display: none; }
+  .dp-modal-backdrop {
+    position: absolute; inset: 0;
+    background: rgba(4,6,18,0.88);
+    backdrop-filter: blur(8px);
+    cursor: pointer;
+  }
+  .dp-modal-dialog {
+    position: relative; z-index: 1;
+    width: 100%; max-width: 580px; max-height: 88vh;
+    overflow-y: auto;
+    background: linear-gradient(160deg, #0d1631, #080d20);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 1.5rem;
+    padding: 2rem;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.7);
+    animation: dpModalIn 260ms cubic-bezier(0.22,1,0.36,1);
+  }
+  @keyframes dpModalIn {
+    from { opacity: 0; transform: translateY(24px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .dp-modal-head {
+    display: flex; align-items: flex-start; gap: 0.9rem;
+    margin-bottom: 1.4rem;
+  }
+  .dp-modal-icon {
+    font-size: 2rem;
+    line-height: 1;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+  .dp-modal-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #F1E5AC;
+    margin: 0;
+    flex: 1;
+  }
+  .dp-modal-close {
+    flex-shrink: 0;
+    display: grid; place-items: center;
+    width: 2.2rem; height: 2.2rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(255,255,255,0.18);
+    background: rgba(255,255,255,0.07);
+    color: #fff;
+    cursor: pointer;
+    transition: background 160ms ease;
+  }
+  .dp-modal-close:hover { background: rgba(255,255,255,0.15); }
+  .dp-modal-body {
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: rgba(220, 208, 192, 0.95);
+    white-space: pre-line;
+  }
+  .dp-modal-body strong {
+    color: #F1E5AC;
+    font-weight: 600;
+  }
+
+  .dp-block {
+    margin-top: 4rem;
+    scroll-margin-top: 5rem;
+  }
+  .dp-label-row {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: 1.75rem;
+    flex-wrap: wrap;
+  }
+  .dp-kicker-chip {
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold, #f5a623);
+    border: 1px solid rgba(245, 166, 35, 0.35);
+    background: rgba(245, 166, 35, 0.08);
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    white-space: nowrap;
+  }
+  .dp-h2 {
+    font-size: clamp(1.25rem, 3vw, 1.75rem);
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+  }
+  .dp-grid-4 {
+    display: grid;
+    gap: 1.1rem;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+  .dp-card {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1.25rem;
+    padding: 1.75rem 1.4rem;
+    background: rgb(6, 12, 28);
+    text-align: center;
+    transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+  }
+  .dp-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(245, 166, 35, 0.3);
+    box-shadow: 0 14px 36px rgba(0,0,0,0.35);
+  }
+  .dp-icon {
+    font-size: 2.2rem;
+    display: block;
+    margin-bottom: 0.85rem;
+  }
+  .dp-card-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #F1E5AC;
+    margin: 0 0 0.5rem;
+  }
+  .dp-card-desc {
+    font-size: 0.93rem;
+    line-height: 1.65;
+    color: rgba(220, 208, 192, 0.95);
+    margin: 0;
+  }
+
+  /* FAQ */
+  .faq-list { display: flex; flex-direction: column; gap: 0.65rem; max-width: 52rem; }
+  .faq-item {
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 1rem;
+    background: rgb(6, 12, 28);
+    overflow: hidden;
+    transition: border-color 200ms ease;
+  }
+  .faq-item[open] { border-color: rgba(245,166,35,0.35); }
+  .faq-question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.05rem 1.2rem;
+    cursor: pointer;
+    list-style: none;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    color: var(--title);
+    user-select: none;
+  }
+  .faq-question::-webkit-details-marker { display: none; }
+  .faq-chevron { flex-shrink: 0; color: #F1E5AC; transition: transform 240ms ease; }
+  .faq-item[open] .faq-chevron { transform: rotate(180deg); }
+  .faq-answer {
+    padding: 0.85rem 1.2rem 1.05rem;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: rgba(220, 208, 192, 0.95);
+    margin: 0;
+    border-top: 1px solid rgba(255,255,255,0.07);
+  }
+</style>
+
+<script>
+  // ── Modal detalii carduri ──
+  (function () {
+    const modal    = document.getElementById('dp-card-modal') as HTMLElement | null;
+    const backdrop = document.getElementById('dp-modal-backdrop') as HTMLElement | null;
+    const closeBtn = document.getElementById('dp-modal-close') as HTMLButtonElement | null;
+    const titleEl  = document.getElementById('dp-modal-title') as HTMLElement | null;
+    const iconEl   = document.getElementById('dp-modal-icon') as HTMLElement | null;
+    const bodyEl   = document.getElementById('dp-modal-body') as HTMLElement | null;
+
+    if (!modal || !titleEl || !bodyEl) return;
+
+    function openModal(title: string, icon: string, details: string) {
+      titleEl!.textContent = title;
+      if (iconEl) iconEl.textContent = icon;
+      bodyEl!.textContent = details || 'Nicio descriere adăugată încă.';
+      modal!.hidden = false;
+      document.body.style.overflow = 'hidden';
+      closeBtn?.focus();
+    }
+
+    function closeModal() {
+      modal!.hidden = true;
+      document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll<HTMLButtonElement>('button.dp-card[data-card-title]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        openModal(
+          btn.dataset.cardTitle   || '',
+          btn.dataset.cardIcon    || '',
+          btn.dataset.cardDetails || ''
+        );
+      });
+    });
+
+    backdrop?.addEventListener('click', closeModal);
+    closeBtn?.addEventListener('click', closeModal);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !modal!.hidden) closeModal();
+    });
+  })();
+</script>

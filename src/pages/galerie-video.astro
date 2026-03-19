@@ -1,0 +1,230 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import siteContent from '../data/siteContent.json';
+import BackButton from '../components/BackButton.astro';
+
+const { seo, brand } = siteContent;
+const slugify = (value: string) =>
+  value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+const videoSlug = (video: { title: string; youtubeId: string }) => {
+  const baseSlug = slugify(video.title);
+  return `${baseSlug}-${video.youtubeId.toLowerCase()}`;
+};
+
+const sections = [
+  {
+    id: 'populara',
+    title: 'Live Muzică Populară',
+    category: 'petrecere',
+    kicker: 'Tradiție & energie',
+  },
+  {
+    id: 'usoara',
+    title: 'Muzică Ușoară / Toate Genurile',
+    category: 'usoara-diverse',
+    kicker: 'Melodii de suflet',
+  },
+  {
+    id: 'tineret',
+    title: 'Muzică pentru Tineret / Manele',
+    category: 'tineret-manele',
+    kicker: 'Vibe de petrecere',
+  },
+  {
+    id: 'instrumentala',
+    title: 'Muzică Instrumentală',
+    category: 'instrumentala',
+    kicker: 'Sunete pure',
+  },
+  {
+    id: 'dans-miri',
+    title: 'Dansul Mirilor',
+    category: 'dans-miri',
+    kicker: 'Momentul magic',
+  },
+];
+
+const videosByCategory = (cat: string) =>
+  siteContent.videos.filter((v) => v.category === cat);
+---
+
+<BaseLayout
+  title={`Galerie Video | ${brand.name}`}
+  description="Galerie video cu momente live din repertoriul Formației Florentina Pană. Muzică populară, muzică ușoară și muzică de tineret/manele."
+>
+  <section class="section-container py-16">
+    <div class="mb-8"><BackButton href="/" label="Acasă" /></div>
+    <header class="section-head mx-auto text-center">
+      <p class="kicker">Galerie Video</p>
+      <h1 class="section-title">Galerie Video Muzică Live | Formația Florentina Pană</h1>
+      <p class="section-copy">
+        Trei capitole muzicale, o singură formație. Alege un clip și bucură-te de energia live a Formației Florentina Pană.
+      </p>
+    </header>
+
+    {sections.map((section) => {
+      const videos = videosByCategory(section.category);
+      return (
+        <div class="section-block" id={section.id}>
+          <div class="section-label-row">
+            <span class="section-kicker-chip">{section.kicker}</span>
+            <h2 class="section-h2">{section.title}</h2>
+          </div>
+
+          {videos.length === 0 ? (
+            <p class="empty-note">Clipuri în curând. Revino pentru actualizări.</p>
+          ) : (
+            <div class="video-grid">
+              {videos.map((video) => {
+                const slug = videoSlug(video);
+                const thumb = `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`;
+                return (
+                  <a href={`/video/${slug}`} class="video-card" title={video.title}>
+                    <div class="thumb-shell">
+                      <img
+                        src={thumb}
+                        alt={video.title}
+                        class="thumb-img"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                      <div class="thumb-overlay" aria-hidden="true">
+                        <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                          <circle cx="12" cy="12" r="12" fill="rgba(0,0,0,0.55)" />
+                          <polygon points="10,8 18,12 10,16" fill="white" />
+                        </svg>
+                      </div>
+                    </div>
+                    <p class="video-title">{video.title}</p>
+                  </a>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      );
+    })}
+
+    <div class="mt-12 flex justify-center">
+      <a href="/aparitii-tv" class="btn-outline">Vezi și apariții TV</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .section-block {
+    margin-top: 4rem;
+    scroll-margin-top: 5rem;
+  }
+
+  .section-label-row {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .section-kicker-chip {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold, #f5a623);
+    border: 1px solid rgba(245, 166, 35, 0.35);
+    background: rgba(245, 166, 35, 0.08);
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    white-space: nowrap;
+  }
+
+  .section-h2 {
+    font-size: clamp(1.25rem, 3vw, 1.75rem);
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+  }
+
+  .video-grid {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+
+  .video-card {
+    display: block;
+    border-radius: 1rem;
+    overflow: hidden;
+    border: 1px solid var(--line, rgba(255,255,255,0.1));
+    background: var(--surface, rgba(255,255,255,0.04));
+    text-decoration: none;
+    transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+  }
+
+  .video-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 45px rgba(245, 166, 35, 0.18);
+    border-color: rgba(245, 166, 35, 0.45);
+  }
+
+  .thumb-shell {
+    position: relative;
+    aspect-ratio: 16/9;
+    overflow: hidden;
+    background: #0e0e1a;
+  }
+
+  .thumb-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 320ms ease;
+  }
+
+  .video-card:hover .thumb-img {
+    transform: scale(1.04);
+  }
+
+  .thumb-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 220ms ease;
+  }
+
+  .video-card:hover .thumb-overlay {
+    opacity: 1;
+  }
+
+  .play-icon {
+    width: 3rem;
+    height: 3rem;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.6));
+  }
+
+  .video-title {
+    padding: 0.75rem 1rem 0.85rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #e0ecff;
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .empty-note {
+    color: var(--muted, rgba(255,255,255,0.45));
+    font-size: 0.9rem;
+    font-style: italic;
+    padding: 1rem 0;
+  }
+</style>

@@ -2,7 +2,16 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import siteContent from '../data/siteContent.json';
 
-const { seo, contact, team, videos, gallery } = siteContent;
+const { seo, contact, team, videos, gallery, faq } = siteContent;
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: (faq as Array<{ question: string; answer: string }>).map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: { '@type': 'Answer', text: item.answer },
+  })),
+};
 const hasRealPhoto = (imageUrl) => typeof imageUrl === 'string' && imageUrl.trim() !== '' && !imageUrl.includes('placehold.co');
 const hasRealGalleryImage = (imageUrl) =>
   typeof imageUrl === 'string' && imageUrl.trim() !== '' && !imageUrl.includes('placehold.co');
@@ -19,11 +28,16 @@ const homepageVideos = (videos || [])
 ---
 
 <BaseLayout title={seo.title} description={seo.description} ogImage={seo.ogImage}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  </Fragment>
 
   {/* ═══════════════════════════════════════════
       HERO — Scenă, titlu mare, CTA-uri
   ═══════════════════════════════════════════ */}
   <section id="acasa" class="hero-stage" aria-label="Secțiunea principală">
+    <div class="astral-orb" aria-hidden="true"></div>
+    <div class="hero-stars" aria-hidden="true"></div>
     <div class="hero-stage-inner">
 
       <span class="kicker-badge" aria-hidden="true">
@@ -32,7 +46,7 @@ const homepageVideos = (videos || [])
       </span>
 
       <h1 class="hero-title-xl">
-        Formația<br/>
+        <span class="hero-kicker-text">Formația</span><br/>
         <span class="hero-title-gold">Florentina Pană</span>
       </h1>
 
@@ -46,9 +60,13 @@ const homepageVideos = (videos || [])
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.62 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.6a16 16 0 0 0 6.07 6.07l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>
           Sună acum
         </a>
-        <a href="#video" class="btn-outline">
+        <a href="/galerie-video" class="btn-outline">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          Vezi videoclipuri
+          Galerie video
+        </a>
+        <a href="https://wa.me/40767369658?text=Bun%C4%83%20ziua!%20A%C8%99%20dori%20s%C4%83%20rezerv%20Forma%C8%9Bia%20Florentina%20Pan%C4%83%20pentru%20evenimentul%20meu." class="btn-outline" target="_blank" rel="noopener noreferrer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.556 4.122 1.528 5.854L0 24l6.335-1.508A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.8 9.8 0 0 1-4.964-1.342l-.356-.211-3.765.896.953-3.671-.232-.376A9.785 9.785 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
+          Rezervă pe WhatsApp
         </a>
       </div>
 
@@ -84,7 +102,7 @@ const homepageVideos = (videos || [])
       </header>
 
       {homepageVideos.length > 0 ? (
-        <div class="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
           {homepageVideos.map((item) => (
             <article class="video-concert-card">
               <div class="video-concert-frame">
@@ -108,191 +126,7 @@ const homepageVideos = (videos || [])
       )}
 
       <div class="mt-10 text-center">
-        <a href="/video" class="btn-outline">Toate videoclipurile</a>
-      </div>
-    </div>
-  </section>
-
-  {/* ═══════════════════════════════════════════
-      DESPRE NOI
-  ═══════════════════════════════════════════ */}
-  <section id="despre" class="concert-section-alt">
-    <div class="concert-section-inner grid md:grid-cols-2 gap-14 items-center">
-      <div class="space-y-6">
-        <span class="section-kicker-pill">Povestea noastră</span>
-        <h2 class="section-title" style="text-align:left">Despre noi</h2>
-
-        <p style="color:var(--body); line-height:1.75">
-          Formația <strong style="color:var(--gold)">Florentina Pană</strong> este o trupă de muzică live
-          cu experiență vastă în evenimente private, nunți, botezuri și petreceri corporate.
-          Punem accent pe energie, emoție și profesionalism, oferind un spectacol complet
-          care ridică publicul în picioare.
-        </p>
-        <p style="color:var(--muted); line-height:1.75">
-          Repertoriul acoperă muzică populară românească, ușoară, cover-uri internaționale,
-          muzică de petrecere și momente speciale personalizate pentru fiecare eveniment.
-        </p>
-
-        <a href="#contact" class="btn-solid" style="display:inline-flex">Rezervă o dată</a>
-      </div>
-
-      {/* Imagine / placeholder formație */}
-      <div class="despre-photo-frame" aria-label="Fotografie formație">
-        <div class="despre-photo-inner">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" style="color:var(--gold); opacity:0.5"><path d="m9 18 6-6-6-6"/></svg>
-          <p style="color:var(--muted); font-size:0.85rem; margin-top:0.5rem">Foto formație — în curând</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  {/* ═══════════════════════════════════════════
-      SERVICII
-  ═══════════════════════════════════════════ */}
-  <section id="servicii" class="concert-section">
-    <div class="concert-section-inner">
-      <header class="section-head text-center mx-auto">
-        <span class="section-kicker-pill">Ce oferim</span>
-        <h2 class="section-title">Servicii muzicale live</h2>
-        <p class="section-copy mx-auto" style="max-width:52ch">
-          Pachete complete, adaptate la orice tip de eveniment.
-        </p>
-      </header>
-
-      <div class="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <article class="service-card">
-          <div class="service-icon" aria-hidden="true">💍</div>
-          <h3 class="service-title">Nuntă</h3>
-          <p class="service-desc">Program complet de la primire până la petrecere, momente speciale și atmosferă garantată.</p>
-        </article>
-        <article class="service-card">
-          <div class="service-icon" aria-hidden="true">🍼</div>
-          <h3 class="service-title">Botez</h3>
-          <p class="service-desc">Muzică live caldă, repertoriu special, emoție autentică pentru cel mai important prim pas.</p>
-        </article>
-        <article class="service-card">
-          <div class="service-icon" aria-hidden="true">🏢</div>
-          <h3 class="service-title">Corporate</h3>
-          <p class="service-desc">Show profesionist, rafinat, perfect pentru gale, team-building-uri și lansări de produse.</p>
-        </article>
-        <article class="service-card">
-          <div class="service-icon" aria-hidden="true">🎸</div>
-          <h3 class="service-title">Concert</h3>
-          <p class="service-desc">Set-uri complete de concert live, cu repertoriu adaptat publicului și logistică proprie.</p>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  {/* ═══════════════════════════════════════════
-      MEMBRI
-  ═══════════════════════════════════════════ */}
-  <section id="membri" class="concert-section-alt">
-    <div class="concert-section-inner">
-      <header class="section-head text-center mx-auto">
-        <span class="section-kicker-pill">Echipa</span>
-        <h2 class="section-title">Membrii formației</h2>
-        <p class="section-copy mx-auto" style="max-width:52ch">
-          Soliști vocali, instrumentiști și colaboratori speciali — o echipă completă pentru evenimente memorabile.
-        </p>
-      </header>
-
-      {/* Grid carduri principale */}
-      <div class="members-cards-grid">
-        {team.vocalists.map((member) => (
-          <article class="member-card member-card--gold">
-            <div class="member-card-photo">
-              {hasRealPhoto(member.image) ? (
-                <img src={member.image} alt={`Portret ${member.name}`} loading="lazy" decoding="async" />
-              ) : (
-                <div class="member-card-initials member-card-initials--gold" aria-hidden="true">
-                  {getInitials(member.name)}
-                </div>
-              )}
-              <span class="member-card-badge member-card-badge--gold">Solistă vocală</span>
-            </div>
-            <div class="member-card-body">
-              <h3 class="member-card-name">{member.name}</h3>
-              <p class="member-card-role member-card-role--gold">{member.role}</p>
-              <p class="member-card-bio">{member.description}</p>
-            </div>
-          </article>
-        ))}
-        {team.instrumentalists.map((member) => (
-          <article class="member-card member-card--teal">
-            <div class="member-card-photo">
-              {hasRealPhoto(member.image) ? (
-                <img src={member.image} alt={`Portret ${member.name}`} loading="lazy" decoding="async" />
-              ) : (
-                <div class="member-card-initials member-card-initials--teal" aria-hidden="true">
-                  {getInitials(member.name)}
-                </div>
-              )}
-              <span class="member-card-badge member-card-badge--teal">Instrumentist</span>
-            </div>
-            <div class="member-card-body">
-              <h3 class="member-card-name">{member.name}</h3>
-              <p class="member-card-role member-card-role--teal">{member.role}</p>
-              <p class="member-card-bio">{member.description}</p>
-            </div>
-          </article>
-        ))}
-        {team.collaborators.map((member) => (
-          <article class="member-card member-card--rose">
-            <div class="member-card-photo">
-              <div class="member-card-initials member-card-initials--rose" aria-hidden="true">
-                {member.instrument === 'Saxofon' ? '🎷' : '🥁'}
-              </div>
-              <span class="member-card-badge member-card-badge--rose">Colaborator invitat</span>
-            </div>
-            <div class="member-card-body">
-              <h3 class="member-card-name">{member.name}</h3>
-              <p class="member-card-role member-card-role--rose">{member.role}</p>
-              <p class="member-card-bio">{member.description}</p>
-              {member.instrument === 'Saxofon' && (
-                <a href="/colaboratori/saxofon" class="member-card-link">Prezentare completă →</a>
-              )}
-            </div>
-          </article>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  {/* ═══════════════════════════════════════════
-      REPERTORIU
-  ═══════════════════════════════════════════ */}
-  <section id="repertoriu" class="concert-section">
-    <div class="concert-section-inner">
-      <header class="section-head text-center mx-auto">
-        <span class="section-kicker-pill">Ce cântăm</span>
-        <h2 class="section-title">Repertoriu muzical</h2>
-        <p class="section-copy mx-auto" style="max-width:52ch">
-          Un mix echilibrat care acoperă toate gusturile — de la tradițional la internațional.
-        </p>
-      </header>
-
-      <div class="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div class="repertoire-card">
-          <span class="repertoire-icon" aria-hidden="true">🎻</span>
-          <h3 class="repertoire-title">Muzică populară</h3>
-          <p class="repertoire-desc">Folclor autentic românesc, interpretări vii și pasionale.</p>
-        </div>
-        <div class="repertoire-card">
-          <span class="repertoire-icon" aria-hidden="true">🌍</span>
-          <h3 class="repertoire-title">Cover-uri internaționale</h3>
-          <p class="repertoire-desc">Hiturile momentului și clasicii evergreen în aranjamente live.</p>
-        </div>
-        <div class="repertoire-card">
-          <span class="repertoire-icon" aria-hidden="true">🎵</span>
-          <h3 class="repertoire-title">Muzică ușoară</h3>
-          <p class="repertoire-desc">Povești muzicale românești interpretate cu suflet.</p>
-        </div>
-        <div class="repertoire-card">
-          <span class="repertoire-icon" aria-hidden="true">🎉</span>
-          <h3 class="repertoire-title">Muzică de petrecere</h3>
-          <p class="repertoire-desc">Energy nonstop — ritmuri care țin publicul pe ringul de dans.</p>
-        </div>
+        <a href="/galerie-video" class="btn-outline">Toate videoclipurile</a>
       </div>
     </div>
   </section>
@@ -338,726 +172,918 @@ const homepageVideos = (videos || [])
   </section>
 
   {/* ═══════════════════════════════════════════
-      FAQ
+      MEMBRI
   ═══════════════════════════════════════════ */}
-  <section id="faq" class="concert-section">
-    <div class="concert-section-inner" style="max-width:52rem">
+  <section id="membri" class="concert-section-alt">
+    <div class="concert-section-inner">
       <header class="section-head text-center mx-auto">
-        <span class="section-kicker-pill">FAQ</span>
-        <h2 class="section-title">Întrebări frecvente</h2>
+        <span class="section-kicker-pill">Echipa</span>
+        <h2 class="section-title">Membrii formației</h2>
+        <p class="section-copy mx-auto" style="max-width:52ch">
+          Soliști vocali, instrumentiști și colaboratori speciali — o echipă completă pentru evenimente memorabile.
+        </p>
       </header>
 
-      <div class="mt-12 faq-list" role="list">
-
-        <details class="faq-item" role="listitem">
-          <summary class="faq-question">
-            <span>Vă deplasați în toată România?</span>
-            <span class="faq-chevron" aria-hidden="true">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
-            </span>
-          </summary>
-          <p class="faq-answer">Da, ne deplasăm oriunde în România. Costurile de transport sunt incluse sau negociate separat, în funcție de distanță.</p>
-        </details>
-
-        <details class="faq-item" role="listitem">
-          <summary class="faq-question">
-            <span>Putem personaliza repertoriul?</span>
-            <span class="faq-chevron" aria-hidden="true">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
-            </span>
-          </summary>
-          <p class="faq-answer">Desigur. Adaptăm programul muzical în funcție de preferințele voastre — trimiteți-ne lista de piese favorite la rezervare.</p>
-        </details>
-
-        <details class="faq-item" role="listitem">
-          <summary class="faq-question">
-            <span>Cu cât timp înainte trebuie să rezervăm?</span>
-            <span class="faq-chevron" aria-hidden="true">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
-            </span>
-          </summary>
-          <p class="faq-answer">Recomandăm să ne contactați cu cel puțin 3-6 luni înainte pentru evenimente mari (nunți, botezuri). Pentru corporate sau concerte mai mici, 4-6 săptămâni sunt suficiente.</p>
-        </details>
-
-        <details class="faq-item" role="listitem">
-          <summary class="faq-question">
-            <span>Aveți echipament propriu de sonorizare?</span>
-            <span class="faq-chevron" aria-hidden="true">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
-            </span>
-          </summary>
-          <p class="faq-answer">Da, dispunem de echipament profesional complet — sistem de sunet, lumini și tot ce este necesar pentru un show de calitate.</p>
-        </details>
-
-        <details class="faq-item" role="listitem">
-          <summary class="faq-question">
-            <span>Care este durata unui program live?</span>
-            <span class="faq-chevron" aria-hidden="true">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
-            </span>
-          </summary>
-          <p class="faq-answer">Un program standard cuprinde 4-6 ore de muzică live cu pauze, adaptat la tipul și durata evenimentului vostru.</p>
-        </details>
-
+      {/* Grid carduri principale */}
+      <div class="members-cards-grid">
+        {team.vocalists.map((member) => (
+          <article class="member-card member-card--gold">
+            <button
+              type="button"
+              class="member-card-photo member-card-photo--clickable"
+              data-member-name={member.name}
+              data-member-role={member.role}
+              data-member-photos={JSON.stringify((member as any).photos || [])}
+              aria-label={`Deschide galeria foto pentru ${member.name}`}
+            >
+              {hasRealPhoto(member.image) ? (
+                <img src={member.image} alt={`Portret ${member.name}`} loading="lazy" decoding="async" />
+              ) : (
+                <div class="member-card-initials member-card-initials--gold" aria-hidden="true">
+                  {getInitials(member.name)}
+                </div>
+              )}
+              <span class="member-card-badge member-card-badge--gold">Solistă vocală</span>
+              <span class="member-card-photo-overlay" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                <span>Galerie foto</span>
+              </span>
+            </button>
+            <div class="member-card-body">
+              <h3 class="member-card-name">{member.name}</h3>
+              <p class="member-card-role member-card-role--gold">{member.role}</p>
+              <p class="member-card-bio">{member.description}</p>
+            </div>
+          </article>
+        ))}
+        {team.instrumentalists.map((member) => (
+          <article class="member-card member-card--teal">
+            <button
+              type="button"
+              class="member-card-photo member-card-photo--clickable"
+              data-member-name={member.name}
+              data-member-role={member.role}
+              data-member-photos={JSON.stringify((member as any).photos || [])}
+              aria-label={`Deschide galeria foto pentru ${member.name}`}
+            >
+              {hasRealPhoto(member.image) ? (
+                <img src={member.image} alt={`Portret ${member.name}`} loading="lazy" decoding="async" />
+              ) : (
+                <div class="member-card-initials member-card-initials--teal" aria-hidden="true">
+                  {getInitials(member.name)}
+                </div>
+              )}
+              <span class="member-card-badge member-card-badge--teal">Instrumentist</span>
+              <span class="member-card-photo-overlay" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                <span>Galerie foto</span>
+              </span>
+            </button>
+            <div class="member-card-body">
+              <h3 class="member-card-name">{member.name}</h3>
+              <p class="member-card-role member-card-role--teal">{member.role}</p>
+              <p class="member-card-bio">{member.description}</p>
+            </div>
+          </article>
+        ))}
+        {team.collaborators.map((member) => (
+          <article class="member-card member-card--rose">
+            <div class="member-card-photo">
+              <div class="member-card-initials member-card-initials--rose" aria-hidden="true">
+                {member.instrument === 'Saxofon' ? '🎷' : '🎵'}
+              </div>
+              <span class="member-card-badge member-card-badge--rose">Colaborator invitat</span>
+            </div>
+            <div class="member-card-body">
+              <h3 class="member-card-name">{member.name}</h3>
+              <p class="member-card-role member-card-role--rose">{member.role}</p>
+              <p class="member-card-bio">{member.description}</p>
+              {member.instrument === 'Saxofon' && (
+                <a href="/colaboratori/saxofon" class="member-card-link">Prezentare completă →</a>
+              )}
+              {member.instrument === 'Țambal' && (
+                <a href="/colaboratori/tambal" class="member-card-link">Prezentare completă →</a>
+              )}
+            </div>
+          </article>
+        ))}
       </div>
     </div>
   </section>
 
   {/* ═══════════════════════════════════════════
-      CONTACT
+      LIGHTBOX GALERIE MEMBRI
   ═══════════════════════════════════════════ */}
-  <section id="contact" class="concert-section-alt">
-    <div class="concert-section-inner grid md:grid-cols-2 gap-14 items-start">
-
-      {/* Info contact */}
-      <div class="space-y-8">
+  <div id="member-gallery-modal" role="dialog" aria-modal="true" aria-labelledby="member-gallery-title" hidden>
+    <div class="mgl-backdrop" id="member-gallery-backdrop"></div>
+    <div class="mgl-dialog">
+      <div class="mgl-header">
         <div>
-          <span class="section-kicker-pill">Scrie-ne</span>
-          <h2 class="section-title" style="text-align:left; margin-top:0.75rem">Hai să discutăm</h2>
-          <p class="section-copy" style="margin-top:0.6rem">
-            Suntem gata să facem evenimentul tău de neuitat. Trimite-ne un mesaj și îți răspundem în maxim 24h.
-          </p>
+          <p class="mgl-kicker">Galerie foto</p>
+          <h2 class="mgl-title" id="member-gallery-title"></h2>
+          <p class="mgl-role" id="member-gallery-role"></p>
         </div>
-
-        <div class="contact-info-list">
-          <a href={`tel:${contact.phoneRaw}`} class="contact-info-row" aria-label={`Sună la ${contact.phoneDisplay}`}>
-            <span class="contact-info-icon" aria-hidden="true">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.62 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.6a16 16 0 0 0 6.07 6.07l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>
-            </span>
-            <div>
-              <span class="contact-info-label">Telefon</span>
-              <span class="contact-info-value">{contact.phoneDisplay}</span>
-            </div>
-          </a>
-
-          <a href={`mailto:${contact.email}`} class="contact-info-row" aria-label={`Trimite email la ${contact.email}`}>
-            <span class="contact-info-icon" aria-hidden="true">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-            </span>
-            <div>
-              <span class="contact-info-label">Email</span>
-              <span class="contact-info-value">{contact.email}</span>
-            </div>
-          </a>
-        </div>
+        <button type="button" class="mgl-close" id="member-gallery-close" aria-label="Închide galeria">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
       </div>
-
-      {/* Formular */}
-      <form
-        class="contact-form"
-        action="/api/comentarii"
-        method="POST"
-        name="contact-formatie"
-        aria-label="Formular de contact"
-      >
-        <div class="contact-form-grid">
-          <div class="contact-field">
-            <label for="cf-name" class="contact-label">Nume complet <span aria-hidden="true" style="color:var(--rose)">*</span></label>
-            <input id="cf-name" name="name" type="text" required autocomplete="name"
-              placeholder="Ex: Maria Ionescu" class="input-glass w-full" />
-          </div>
-
-          <div class="contact-field">
-            <label for="cf-phone" class="contact-label">Telefon <span aria-hidden="true" style="color:var(--rose)">*</span></label>
-            <input id="cf-phone" name="phone" type="tel" required autocomplete="tel"
-              placeholder="07xx xxx xxx" class="input-glass w-full" />
-          </div>
-
-          <div class="contact-field contact-field-full">
-            <label for="cf-email" class="contact-label">Email</label>
-            <input id="cf-email" name="email" type="email" autocomplete="email"
-              placeholder="email@exemplu.ro" class="input-glass w-full" />
-          </div>
-
-          <div class="contact-field contact-field-full">
-            <label for="cf-event" class="contact-label">Tipul evenimentului <span aria-hidden="true" style="color:var(--rose)">*</span></label>
-            <select id="cf-event" name="eventType" required class="input-glass w-full">
-              <option value="" disabled selected>Selectează...</option>
-              <option value="nunta">Nuntă</option>
-              <option value="botez">Botez</option>
-              <option value="corporate">Eveniment corporate</option>
-              <option value="concert">Concert</option>
-              <option value="altul">Alt tip de eveniment</option>
-            </select>
-          </div>
-
-          <div class="contact-field contact-field-full">
-            <label for="cf-date" class="contact-label">Data evenimentului (aproximativ)</label>
-            <input id="cf-date" name="eventDate" type="date" class="input-glass w-full" />
-          </div>
-
-          <div class="contact-field contact-field-full">
-            <label for="cf-message" class="contact-label">Mesaj <span aria-hidden="true" style="color:var(--rose)">*</span></label>
-            <textarea id="cf-message" name="message" required rows="4"
-              placeholder="Spune-ne despre evenimentul tău, locație, număr de invitați..." class="input-glass w-full" style="resize:vertical;min-height:96px"></textarea>
-          </div>
-        </div>
-
-        <div class="mt-6">
-          <button type="submit" class="btn-solid w-full" style="justify-content:center">
-            Trimite mesajul
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
-          </button>
-        </div>
-
-        <p style="font-size:0.75rem; color:var(--muted); margin-top:0.75rem; text-align:center">
-          Câmpurile marcate cu <span style="color:var(--rose)">*</span> sunt obligatorii. Răspundem în maxim 24h.
-        </p>
-      </form>
-
+      <div class="mgl-grid" id="member-gallery-grid"></div>
+      <div class="mgl-fullscreen-overlay" id="mgl-fullscreen-overlay" hidden>
+        <button type="button" class="mgl-fs-close" id="mgl-fs-close" aria-label="Închide imaginea">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+        <button type="button" class="mgl-fs-nav mgl-fs-prev" id="mgl-fs-prev" aria-label="Înapoi">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <img class="mgl-fs-img" id="mgl-fs-img" src="" alt="" />
+        <button type="button" class="mgl-fs-nav mgl-fs-next" id="mgl-fs-next" aria-label="Înainte">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+      </div>
     </div>
-  </section>
+  </div>
 
 </BaseLayout>
 
+<script>
+  // ── Lightbox galerie membri ──
+  (function () {
+    const modal       = document.getElementById('member-gallery-modal') as HTMLElement | null;
+    const backdrop    = document.getElementById('member-gallery-backdrop') as HTMLElement | null;
+    const closeBtn    = document.getElementById('member-gallery-close') as HTMLButtonElement | null;
+    const titleEl     = document.getElementById('member-gallery-title') as HTMLElement | null;
+    const roleEl      = document.getElementById('member-gallery-role') as HTMLElement | null;
+    const gridEl      = document.getElementById('member-gallery-grid') as HTMLElement | null;
+    const fsOverlay   = document.getElementById('mgl-fullscreen-overlay') as HTMLElement | null;
+    const fsImg       = document.getElementById('mgl-fs-img') as HTMLImageElement | null;
+    const fsClose     = document.getElementById('mgl-fs-close') as HTMLButtonElement | null;
+    const fsPrev      = document.getElementById('mgl-fs-prev') as HTMLButtonElement | null;
+    const fsNext      = document.getElementById('mgl-fs-next') as HTMLButtonElement | null;
+
+    if (!modal || !gridEl || !titleEl || !roleEl) return;
+
+    let currentPhotos: string[] = [];
+    let currentFsIndex = 0;
+
+    function openModal(name: string, role: string, photos: string[]) {
+      titleEl!.textContent = name;
+      roleEl!.textContent  = role;
+      gridEl!.innerHTML    = '';
+
+      photos.forEach((src, i) => {
+        const cell = document.createElement('div');
+        cell.className = 'mgl-cell';
+
+        if (src && src.trim()) {
+          const img = document.createElement('img');
+          img.src     = src.trim();
+          img.alt     = `${name} — foto ${i + 1}`;
+          img.loading = 'lazy';
+          cell.appendChild(img);
+          cell.addEventListener('click', () => openFullscreen(photos.filter(p => p.trim()), i));
+        } else {
+          cell.className += ' mgl-cell-empty';
+          cell.setAttribute('aria-label', `Slot foto ${i + 1} — în curând`);
+          cell.innerHTML = `
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" style="opacity:.35"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+            <span>Foto în curând</span>`;
+        }
+
+        gridEl!.appendChild(cell);
+      });
+
+      modal!.hidden = false;
+      document.body.style.overflow = 'hidden';
+      closeBtn?.focus();
+    }
+
+    function closeModal() {
+      modal!.hidden = true;
+      document.body.style.overflow = '';
+    }
+
+    function openFullscreen(photos: string[], startIndex: number) {
+      if (!photos.length || !fsOverlay || !fsImg) return;
+      currentPhotos   = photos;
+      currentFsIndex  = startIndex;
+      updateFsImage();
+      fsOverlay.hidden = false;
+    }
+
+    function closeFsOverlay() {
+      if (fsOverlay) fsOverlay.hidden = true;
+    }
+
+    function updateFsImage() {
+      if (!fsImg) return;
+      fsImg.src = currentPhotos[currentFsIndex];
+      fsImg.alt = `Foto ${currentFsIndex + 1} din ${currentPhotos.length}`;
+      if (fsPrev) fsPrev.style.display = currentFsIndex > 0 ? '' : 'none';
+      if (fsNext) fsNext.style.display = currentFsIndex < currentPhotos.length - 1 ? '' : 'none';
+    }
+
+    // Attach click on all member photo buttons
+    document.querySelectorAll<HTMLButtonElement>('button.member-card-photo[data-member-name]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const name   = btn.dataset.memberName   || '';
+        const role   = btn.dataset.memberRole   || '';
+        const photos = JSON.parse(btn.dataset.memberPhotos || '[]') as string[];
+        openModal(name, role, photos);
+      });
+    });
+
+    backdrop?.addEventListener('click', closeModal);
+    closeBtn?.addEventListener('click', closeModal);
+    fsClose?.addEventListener('click',  closeFsOverlay);
+    fsPrev?.addEventListener('click',   () => { currentFsIndex--; updateFsImage(); });
+    fsNext?.addEventListener('click',   () => { currentFsIndex++; updateFsImage(); });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') { closeFsOverlay(); if (!modal!.hidden) closeModal(); }
+      if (fsOverlay && !fsOverlay.hidden) {
+        if (e.key === 'ArrowLeft'  && currentFsIndex > 0) { currentFsIndex--; updateFsImage(); }
+        if (e.key === 'ArrowRight' && currentFsIndex < currentPhotos.length - 1) { currentFsIndex++; updateFsImage(); }
+      }
+    });
+  })();
+
+  // Corp astral — apare ocazional, nu în fiecare ciclu
+  (function () {
+    const orb = document.querySelector<HTMLElement>('.astral-orb');
+    if (!orb) return;
+
+    // Pornire după o pauză inițială aleatorie (8–20s), apoi din când în când
+    function scheduleNextTraversal() {
+      // Pauză între traversări: 12–35 secunde
+      const delay = 12000 + Math.random() * 23000;
+      setTimeout(() => {
+        orb.classList.remove('is-traveling');
+        // Re-flow forțat, altfel animația nu repornește
+        void orb.offsetWidth;
+        orb.classList.add('is-traveling');
+
+        // Curăță clasa la finalul animației și programează urmă
+        const onEnd = () => {
+          orb.classList.remove('is-traveling');
+          orb.removeEventListener('animationend', onEnd);
+          scheduleNextTraversal();
+        };
+        orb.addEventListener('animationend', onEnd);
+      }, delay);
+    }
+
+    // Prima apariție după 6–14s de la încărcarea paginii
+    const firstDelay = 6000 + Math.random() * 8000;
+    setTimeout(() => scheduleNextTraversal(), firstDelay);
+  })();
+
+  // Stele ocazionale sus-stânga și sus-dreapta
+  (function () {
+    const container = document.querySelector<HTMLElement>('.hero-stars');
+    if (!container) return;
+
+    // Zonele de spawn: stânga sus și dreapta sus
+    const zones = [
+      { x: () => 4 + Math.random() * 18, y: () => 4 + Math.random() * 22 },   // sus-stânga
+      { x: () => 78 + Math.random() * 18, y: () => 4 + Math.random() * 22 },  // sus-dreapta
+    ];
+
+    function spawnStar() {
+      const zone = zones[Math.floor(Math.random() * zones.length)];
+      const star = document.createElement('span');
+      star.className = 'hero-star';
+
+      // Dimensiune aleatorie — mai mari
+      const size = 10 + Math.random() * 14;
+      const x = zone.x();
+      const y = zone.y();
+      const dur = 2.2 + Math.random() * 1.6;
+
+      star.style.left = x + '%';
+      star.style.top  = y + '%';
+      star.style.width  = size + 'px';
+      star.style.height = size + 'px';
+      star.style.animationDuration = dur + 's';
+
+      container.appendChild(star);
+      star.addEventListener('animationend', () => star.remove(), { once: true });
+    }
+
+    function scheduleStar() {
+      // Între 1 și 4 stele pe rafală, cu mici întârzieri între ele
+      const count = 1 + Math.floor(Math.random() * 3);
+      for (let i = 0; i < count; i++) {
+        setTimeout(spawnStar, i * (300 + Math.random() * 400));
+      }
+      // Pauză până la următoarea rafală: 5–18s
+      const next = 5000 + Math.random() * 13000;
+      setTimeout(scheduleStar, next);
+    }
+
+    // Prima rafală după 3–7s
+    setTimeout(scheduleStar, 3000 + Math.random() * 4000);
+  })();
+</script>
+
 <style>
-  /* ── Hero ── */
+  /* ════════════════════════════════════════════════════════════════
+     TIPOGRAFIE — import Cormorant Garamond (Serif subțire, elegant)
+  ════════════════════════════════════════════════════════════════ */
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap');
+
+  /* ════════════════════════════════════════════════════════════════
+     HTML / BODY — transparent peste cerul Sirius
+  ════════════════════════════════════════════════════════════════ */
+  html, body {
+    background: transparent !important;
+    background-color: transparent !important;
+    margin: 0; padding: 0; overflow-x: hidden;
+  }
+
+  /* ════════════════════════════════════════════════════════════════
+     HERO STAGE — pagina de bun-venit, transparentă complet
+  ════════════════════════════════════════════════════════════════ */
   .hero-stage {
     position: relative;
-    padding: clamp(5rem, 14vw, 10rem) 1.5rem clamp(4rem, 10vw, 8rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: clamp(2rem, 4vw, 3rem) clamp(1rem, 3vw, 2rem);
     text-align: center;
-    overflow: hidden;
+    background: transparent;
   }
+
+  /* ════════════════════════════════════════════════════════════════
+     CARDUL DE CRISTAL — singurul backdrop-filter din pagină
+  ════════════════════════════════════════════════════════════════ */
   .hero-stage-inner {
-    max-width: 72rem;
+    max-width: 680px;
+    width: 100%;
     margin-inline: auto;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1.25rem;
+    gap: 0.85rem;
   }
+
+  /* ════════════════════════════════════════════════════════════════
+     TIPOGRAFIE HERO
+  ════════════════════════════════════════════════════════════════ */
+  /* Kicker badge */
   .kicker-badge {
     display: inline-flex;
     align-items: center;
-    gap: 0.45rem;
-    border: 1px solid rgba(232, 50, 90, 0.5);
+    gap: 0.4rem;
+    border: 1px solid rgba(241, 229, 172, 0.25);
     border-radius: 9999px;
-    padding: 0.35rem 0.9rem;
-    font-size: 0.72rem;
+    padding: 0.3rem 0.85rem;
+    font-size: 0.66rem;
     font-weight: 700;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: #F8B4C8;
-    background: rgba(232, 50, 90, 0.12);
+    color: rgba(241, 229, 172, 0.60);
+    background: rgba(241, 229, 172, 0.05);
   }
+
+  /* Titlul principal */
   .hero-title-xl {
     margin: 0;
-    font-family: 'Oswald', sans-serif;
-    font-weight: 700;
-    font-size: clamp(2.8rem, 8vw, 6rem);
-    line-height: 1.0;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-    color: var(--title);
+    line-height: 1.1;
+    text-align: center;
   }
+
+  /* "FORMAȚIA" — mic, alb perlat, espaciament maxim */
+  .hero-kicker-text {
+    display: block;
+    font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.1rem, 2.8vw, 1.9rem);
+    font-weight: 500;
+    font-style: italic;
+    letter-spacing: 0.18em;
+    text-transform: none;
+    background: linear-gradient(
+      105deg,
+      #ffe8b0 0%,
+      #ffffff 30%,
+      #fff5d0 55%,
+      #ffffff 75%,
+      #ffe8b0 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter:
+      drop-shadow(0 0 5px rgba(255,255,255,0.8))
+      drop-shadow(0 0 14px rgba(255,220,120,0.6))
+      drop-shadow(0 1px 0 rgba(0,0,0,0.9))
+      drop-shadow(0 3px 8px rgba(0,0,0,0.75));
+    margin-bottom: 0.05rem;
+  }
+
+  /* "Florentina Pană" — Curcubeu strălucitor */
   .hero-title-gold {
     display: block;
-    color: var(--gold);
-    text-shadow: 0 0 40px rgba(245, 166, 35, 0.5);
+    font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+    font-weight: 600;
+    font-size: clamp(2.2rem, 6vw, 4.4rem);
+    letter-spacing: 0.06em;
+    text-transform: none;
+    line-height: 1.0;
+    position: relative;
+    /* Alb dominant cu curcubeu subtil */
+    background: linear-gradient(
+      105deg,
+      #ffffff  0%,
+      #ffe0e0  10%,
+      #ffffff  22%,
+      #fff8c0  32%,
+      #ffffff  44%,
+      #d0ffe8  56%,
+      #ffffff  66%,
+      #d0eeff  78%,
+      #ffffff  88%,
+      #f0d0ff  95%,
+      #ffffff  100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter:
+      drop-shadow(0 0 6px rgba(255,255,255,0.85))
+      drop-shadow(0 0 12px rgba(200,180,255,0.6))
+      drop-shadow(0 2px 0 rgba(0,0,0,0.95))
+      drop-shadow(0 4px 0 rgba(0,0,0,0.85))
+      drop-shadow(0 5px 10px rgba(0,0,0,0.85));
+    animation: rainbow-flow 6s ease-in-out infinite;
   }
+
+  @keyframes rainbow-flow {
+    0%   {
+      background-position: 0% center;
+      filter: drop-shadow(0 0 5px rgba(255,107,107,.8)) drop-shadow(0 0 10px rgba(255,107,107,.5)) drop-shadow(0 2px 0 rgba(0,0,0,.95)) drop-shadow(0 4px 0 rgba(0,0,0,.85)) drop-shadow(0 5px 10px rgba(0,0,0,.85));
+    }
+    25% {
+      background-position: 50% center;
+      filter: drop-shadow(0 0 5px rgba(255,235,100,.9)) drop-shadow(0 0 10px rgba(255,200,60,.55)) drop-shadow(0 2px 0 rgba(0,0,0,.95)) drop-shadow(0 4px 0 rgba(0,0,0,.85)) drop-shadow(0 5px 10px rgba(0,0,0,.85));
+    }
+    50%  {
+      background-position: 100% center;
+      filter: drop-shadow(0 0 5px rgba(105,219,124,.85)) drop-shadow(0 0 10px rgba(79,195,247,.55)) drop-shadow(0 2px 0 rgba(0,0,0,.95)) drop-shadow(0 4px 0 rgba(0,0,0,.85)) drop-shadow(0 5px 10px rgba(0,0,0,.85));
+    }
+    75% {
+      background-position: 150% center;
+      filter: drop-shadow(0 0 5px rgba(204,93,232,.85)) drop-shadow(0 0 10px rgba(150,80,255,.55)) drop-shadow(0 2px 0 rgba(0,0,0,.95)) drop-shadow(0 4px 0 rgba(0,0,0,.85)) drop-shadow(0 5px 10px rgba(0,0,0,.85));
+    }
+    100% {
+      background-position: 200% center;
+      filter: drop-shadow(0 0 5px rgba(255,107,107,.8)) drop-shadow(0 0 10px rgba(255,107,107,.5)) drop-shadow(0 2px 0 rgba(0,0,0,.95)) drop-shadow(0 4px 0 rgba(0,0,0,.85)) drop-shadow(0 5px 10px rgba(0,0,0,.85));
+    }
+  }
+
+  /* ════════════════════════════════════════════════════════════════
+     STELE OCAZIONALE — sus-stânga și sus-dreapta
+  ════════════════════════════════════════════════════════════════ */
+  .hero-stars {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+    overflow: visible;
+  }
+
+  .hero-star {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ffffff 0%, #fff8a0 30%, #ffd700 60%, transparent 80%);
+    box-shadow:
+      0 0 6px 3px rgba(255, 250, 180, 1),
+      0 0 18px 7px rgba(255, 220, 60, 0.8),
+      0 0 40px 14px rgba(255, 190, 0, 0.45);
+    opacity: 0;
+    animation-name: star-rise;
+    animation-timing-function: ease-out;
+    animation-fill-mode: forwards;
+  }
+
+  @keyframes star-rise {
+    0%   { opacity: 0;   transform: scale(0.4) translateY(0px);    }
+    12%  { opacity: 1;   transform: scale(1.6) translateY(-6px);   }
+    35%  { opacity: 0.9; transform: scale(1.2) translateY(-18px);  }
+    65%  { opacity: 0.6; transform: scale(0.7) translateY(-42px);  }
+    100% { opacity: 0;   transform: scale(0.15) translateY(-90px); }
+  }
+
+  /* ════════════════════════════════════════════════════════════════
+     CORP ASTRAL — sferă etereală care traversează cardul ocazional
+  ════════════════════════════════════════════════════════════════ */
+  .astral-orb {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: inherit;
+    z-index: 0;
+  }
+
+  .astral-orb::before {
+    content: '';
+    position: absolute;
+    width: clamp(120px, 22vw, 220px);
+    height: clamp(120px, 22vw, 220px);
+    border-radius: 50%;
+    background: radial-gradient(
+      circle at 40% 40%,
+      rgba(200, 160, 255, 0.55) 0%,
+      rgba(130, 80, 255, 0.28) 35%,
+      rgba(60, 20, 180, 0.12) 60%,
+      transparent 80%
+    );
+    filter: blur(18px);
+    opacity: 0;
+    top: 50%;
+    left: -30%;
+    transform: translateY(-50%);
+    will-change: transform, opacity;
+  }
+
+  /* Clasa adăugată prin JS când orbul este activ */
+  .astral-orb.is-traveling::before {
+    animation: orb-travel 4.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  }
+
+  @keyframes orb-travel {
+    0%   { left: -30%;  top: 60%;  opacity: 0;    transform: translateY(-50%) scale(0.7); }
+    8%   { opacity: 1; }
+    30%  { top: 35%; }
+    55%  { top: 55%; }
+    80%  { top: 30%;  opacity: 0.85; }
+    92%  { opacity: 0.3; }
+    100% { left: 125%; top: 45%;  opacity: 0;    transform: translateY(-50%) scale(1.1); }
+  }
+
+  /* Lead text */
   .hero-lead {
-    max-width: 52ch;
+    max-width: 46ch;
     margin: 0;
-    font-size: clamp(1rem, 2vw, 1.15rem);
-    line-height: 1.7;
-    color: var(--body);
+    font-size: clamp(0.78rem, 1.5vw, 0.9rem);
+    line-height: 1.6;
+    color: rgba(200, 220, 255, 0.62);
+    text-align: center;
   }
+
+  /* ════════════════════════════════════════════════════════════════
+     CTA-URI HERO — outline transparent, bordură auriu șampanie
+  ════════════════════════════════════════════════════════════════ */
   .hero-ctas {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 0.85rem;
-    margin-top: 0.5rem;
+    gap: 0.75rem;
   }
+  .hero-ctas .btn-solid,
+  .hero-ctas .btn-outline {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.55rem 1.4rem;
+    border-radius: 0.5rem;
+    min-height: 38px;
+    background: transparent;
+    border: 1px solid rgba(241, 229, 172, 0.35);
+    color: rgba(241, 229, 172, 0.80);
+    box-shadow: none;
+    animation: none;
+    text-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    transition: background 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+  }
+  .hero-ctas .btn-solid:hover,
+  .hero-ctas .btn-outline:hover {
+    background: rgba(241, 229, 172, 0.08);
+    border-color: rgba(241, 229, 172, 0.65);
+    color: #F1E5AC;
+  }
+
+  /* ════════════════════════════════════════════════════════════════
+     STAT PILLS
+  ════════════════════════════════════════════════════════════════ */
   .hero-stats {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 0.75rem;
-    margin-top: 1rem;
+    gap: 0.65rem;
   }
   .hero-stat-pill {
     display: flex;
     flex-direction: column;
     align-items: center;
-    border: 1px solid rgba(245, 166, 35, 0.2);
-    border-radius: 1rem;
-    padding: 0.6rem 1.2rem;
-    background: rgba(245, 166, 35, 0.06);
-    min-width: 80px;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 0.85rem;
+    padding: 0.35rem 0.85rem;
+    background: rgba(255, 255, 255, 0.05);
+    min-width: 60px;
   }
   .hero-stat-num {
     font-family: 'Oswald', sans-serif;
-    font-size: 1.5rem;
+    font-size: 1.1rem;
     font-weight: 700;
-    color: var(--gold);
+    color: #F1E5AC;
     line-height: 1;
   }
   .hero-stat-label {
-    font-size: 0.68rem;
+    font-size: 0.58rem;
     font-weight: 600;
-    letter-spacing: 0.07em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--muted);
-    margin-top: 0.2rem;
+    margin-top: 0.12rem;
   }
 
-  /* ── Sections ── */
+  /* ════════════════════════════════════════════════════════════════
+     SECȚIUNI — fundal opac solid (fără niciun backdrop-filter)
+  ════════════════════════════════════════════════════════════════ */
   .concert-section {
-    padding: clamp(4rem, 8vw, 7rem) 1.5rem;
-    border-top: 1px solid var(--line);
+    padding: clamp(3.5rem, 7vw, 6rem) clamp(1.5rem, 4vw, 3rem);
   }
   .concert-section-alt {
-    padding: clamp(4rem, 8vw, 7rem) 1.5rem;
-    border-top: 1px solid var(--line);
-    background: rgba(255, 255, 255, 0.015);
+    padding: clamp(3.5rem, 7vw, 6rem) clamp(1.5rem, 4vw, 3rem);
   }
   .concert-section-inner {
     max-width: 72rem;
     margin-inline: auto;
   }
+  .section-head { max-width: 52ch; }
   .section-kicker-pill {
     display: inline-flex;
     align-items: center;
-    border: 1px solid rgba(245, 166, 35, 0.35);
+    border: 1px solid rgba(241, 229, 172, 0.28);
     border-radius: 9999px;
-    padding: 0.3rem 0.75rem;
-    font-size: 0.68rem;
+    padding: 0.28rem 0.72rem;
+    font-size: 0.66rem;
     font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--gold);
-    background: rgba(245, 166, 35, 0.08);
+    color: #F1E5AC;
+    background: rgba(241, 229, 172, 0.06);
+  }
+  .section-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--title);
+    margin: 0.6rem 0 0;
+    text-align: center;
+  }
+  .section-copy {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--body);
+    margin: 0.65rem auto 0;
   }
 
-  /* ── Video cards ── */
+  /* ── Video ── */
   .video-concert-card {
-    border: 1px solid var(--line);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 1.25rem;
     overflow: hidden;
-    background: var(--surface);
-    transition: transform 220ms ease, box-shadow 220ms ease;
+    min-width: 0;
+    background: rgb(6, 12, 28);
+    transition: box-shadow 220ms ease, border-color 220ms ease;
   }
   .video-concert-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 40px rgba(245, 166, 35, 0.14);
+    border-color: rgba(241, 229, 172, 0.28);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
   }
-  .video-concert-frame {
-    position: relative;
-    aspect-ratio: 16/9;
-  }
+  .video-concert-frame { position: relative; aspect-ratio: 16 / 9; }
   .video-concert-frame iframe {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    border: 0;
+    position: absolute; inset: 0; width: 100%; height: 100%; border: 0;
   }
   .video-concert-label {
     padding: 0.75rem 1rem;
-    font-size: 0.88rem;
-    font-weight: 600;
-    color: var(--title);
-    margin: 0;
-    border-top: 1px solid var(--line);
-  }
-
-  /* ── Despre ── */
-  .despre-photo-frame {
-    border: 1px solid var(--line);
-    border-radius: 2rem;
-    overflow: hidden;
-    background:
-      radial-gradient(120% 140% at 0% 0%, rgba(245, 166, 35, 0.10) 0%, transparent 60%),
-      radial-gradient(100% 120% at 100% 100%, rgba(232, 50, 90, 0.09) 0%, transparent 60%),
-      var(--surface);
-    min-height: 280px;
-    display: grid;
-    place-items: center;
-  }
-  .despre-photo-inner {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  /* ── Servicii ── */
-  .service-card {
-    border: 1px solid var(--line);
-    border-radius: 1.5rem;
-    padding: 2rem 1.5rem;
-    background: var(--surface);
-    transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
-    text-align: center;
-  }
-  .service-card:hover {
-    transform: translateY(-5px);
-    border-color: rgba(245, 166, 35, 0.5);
-    box-shadow: 0 20px 44px rgba(245, 166, 35, 0.14);
-  }
-  .service-icon {
-    font-size: 2.8rem;
-    display: block;
-    margin-bottom: 1rem;
-    filter: drop-shadow(0 0 12px rgba(245, 166, 35, 0.4));
-  }
-  .service-title {
-    font-family: 'Oswald', sans-serif;
-    font-size: 1.25rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin: 0 0 0.6rem;
-  }
-  .service-desc {
-    font-size: 0.88rem;
-    line-height: 1.65;
-    color: var(--body);
-    margin: 0;
+    font-size: 0.86rem; font-weight: 600; color: var(--title); margin: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
   }
 
   /* ── Membri ── */
   .members-cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-    justify-content: center;
-    gap: 1.25rem;
-    margin-top: 3rem;
+    grid-template-columns: 1fr;
+    gap: 1.25rem; margin-top: 3rem;
+  }
+  @media (min-width: 500px) {
+    .members-cards-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 960px) {
+    .members-cards-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
   }
   .member-card {
-    border-radius: 1.5rem;
-    overflow: hidden;
-    border: 1px solid var(--line);
-    background: var(--surface);
-    transition: transform 300ms ease, box-shadow 300ms ease, border-color 300ms ease;
+    border-radius: 1.5rem; overflow: hidden;
+    min-width: 0;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgb(6, 12, 28);
+    transition: box-shadow 300ms ease, border-color 300ms ease;
   }
-  .member-card:hover { transform: translateY(-7px); }
-  .member-card--gold:hover {
-    border-color: rgba(245,166,35,0.5);
-    box-shadow: 0 28px 52px rgba(245,166,35,0.13);
-  }
-  .member-card--teal:hover {
-    border-color: rgba(11,188,214,0.5);
-    box-shadow: 0 28px 52px rgba(11,188,214,0.11);
-  }
-  .member-card--rose:hover {
-    border-color: rgba(232,50,90,0.5);
-    box-shadow: 0 28px 52px rgba(232,50,90,0.13);
-  }
+  .member-card--gold:hover { border-color: rgba(241,229,172,0.40); box-shadow: 0 24px 48px rgba(241,229,172,0.09); }
+  .member-card--teal:hover  { border-color: rgba(11,188,214,0.40);  box-shadow: 0 24px 48px rgba(11,188,214,0.09);  }
+  .member-card--rose:hover  { border-color: rgba(232,50,90,0.40);   box-shadow: 0 24px 48px rgba(232,50,90,0.09);   }
   .member-card-photo {
-    position: relative;
-    aspect-ratio: 1 / 1;
-    overflow: hidden;
-    background: var(--bg-mid);
+    position: relative; aspect-ratio: 1; overflow: hidden; background: var(--bg-mid);
   }
   .member-card-photo img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
+    width: 100%; height: 100%; object-fit: cover; display: block;
     transition: transform 400ms ease;
   }
-  .member-card:hover .member-card-photo img { transform: scale(1.06); }
+  .member-card:hover .member-card-photo img { transform: scale(1.05); }
   .member-card-photo::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to bottom, transparent 38%, rgba(12,8,15,0.72) 100%);
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(to bottom, transparent 40%, rgba(6,12,28,0.72) 100%);
     pointer-events: none;
   }
   .member-card-initials {
-    width: 100%;
-    height: 100%;
-    display: grid;
-    place-items: center;
+    width: 100%; height: 100%; display: grid; place-items: center;
     font-family: 'Oswald', sans-serif;
-    font-size: clamp(2.8rem, 6vw, 4rem);
-    font-weight: 700;
-    letter-spacing: 0.05em;
+    font-size: clamp(2.6rem, 6vw, 3.8rem); font-weight: 700; letter-spacing: 0.05em;
   }
-  .member-card-initials--gold {
-    color: var(--gold);
-    background: radial-gradient(ellipse at 50% 60%, rgba(245,166,35,0.16) 0%, rgba(232,50,90,0.07) 60%, transparent 100%);
-  }
-  .member-card-initials--teal {
-    color: var(--teal);
-    background: radial-gradient(ellipse at 50% 60%, rgba(11,188,214,0.16) 0%, rgba(245,166,35,0.07) 60%, transparent 100%);
-  }
-  .member-card-initials--rose {
-    font-size: clamp(3rem, 7vw, 4.5rem);
-    background: radial-gradient(ellipse at 50% 60%, rgba(232,50,90,0.16) 0%, rgba(245,166,35,0.07) 60%, transparent 100%);
-  }
+  .member-card-initials--gold { color: var(--gold); background: radial-gradient(ellipse at 50% 60%, rgba(241,229,172,0.12) 0%, transparent 70%); }
+  .member-card-initials--teal { color: var(--teal); background: radial-gradient(ellipse at 50% 60%, rgba(11,188,214,0.12) 0%, transparent 70%); }
+  .member-card-initials--rose { color: var(--rose); background: radial-gradient(ellipse at 50% 60%, rgba(232,50,90,0.12) 0%, transparent 70%); font-size: clamp(2.8rem, 7vw, 4.2rem); }
   .member-card-badge {
-    position: absolute;
-    bottom: 0.75rem;
-    left: 0.75rem;
-    z-index: 1;
-    padding: 0.22rem 0.65rem;
-    border-radius: 9999px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    backdrop-filter: blur(8px);
+    position: absolute; bottom: 0.65rem; left: 0.65rem; z-index: 1;
+    padding: 0.2rem 0.6rem; border-radius: 9999px;
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
     border: 1px solid currentColor;
   }
-  .member-card-badge--gold { background: rgba(245,166,35,0.18); color: var(--gold); }
-  .member-card-badge--teal { background: rgba(11,188,214,0.18); color: var(--teal); }
-  .member-card-badge--rose { background: rgba(232,50,90,0.18); color: var(--rose); }
-  .member-card-body {
-    padding: 1.25rem 1.25rem 1.5rem;
-  }
-  .member-card--gold .member-card-body { border-top: 2px solid rgba(245,166,35,0.4); }
-  .member-card--teal .member-card-body { border-top: 2px solid rgba(11,188,214,0.35); }
-  .member-card--rose .member-card-body { border-top: 2px solid rgba(232,50,90,0.4); }
+  .member-card-badge--gold { background: rgba(241,229,172,0.14); color: var(--gold); }
+  .member-card-badge--teal { background: rgba(11,188,214,0.14);  color: var(--teal); }
+  .member-card-badge--rose { background: rgba(232,50,90,0.14);   color: var(--rose); }
+  .member-card-body { padding: 1.1rem 1.1rem 1.4rem; }
+  .member-card--gold .member-card-body { border-top: 2px solid rgba(241,229,172,0.30); }
+  .member-card--teal .member-card-body { border-top: 2px solid rgba(11,188,214,0.28); }
+  .member-card--rose .member-card-body { border-top: 2px solid rgba(232,50,90,0.30); }
   .member-card-name {
-    font-family: 'Oswald', sans-serif;
-    font-size: 1.3rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    color: var(--title);
-    margin: 0 0 0.2rem;
+    font-family: 'Oswald', sans-serif; font-size: 1.2rem; font-weight: 700;
+    letter-spacing: 0.04em; color: var(--title); margin: 0 0 0.2rem;
   }
   .member-card-role {
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin: 0 0 0.75rem;
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; margin: 0 0 0.7rem;
   }
   .member-card-role--gold { color: var(--gold); }
   .member-card-role--teal { color: var(--teal); }
   .member-card-role--rose { color: var(--rose); }
+  .member-card-bio  { font-size: 0.83rem; line-height: 1.65; color: var(--body); margin: 0; }
   .member-card-link {
-    display: inline-block;
-    margin-top: 0.75rem;
-    font-size: 0.78rem;
-    font-weight: 700;
-    color: var(--rose);
-    text-decoration: none;
-    letter-spacing: 0.04em;
+    display: inline-block; margin-top: 0.65rem;
+    font-size: 0.76rem; font-weight: 700; color: var(--rose);
+    text-decoration: none; letter-spacing: 0.04em;
     transition: color 160ms ease;
   }
-  .member-card-link:hover { color: var(--gold); }
-  .member-card-bio {
-    font-size: 0.85rem;
-    line-height: 1.65;
-    color: var(--body);
-    margin: 0;
-  }
-  /* Colaboratori strip */
-  .collabs-strip { margin-top: 2.5rem; }
-  .collabs-strip-label {
-    font-family: 'Oswald', sans-serif;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin: 0 0 0.85rem;
-  }
-  .collabs-strip-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-  }
-  .collab-chip {
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
-    border: 1px solid var(--line);
-    border-radius: 1rem;
-    padding: 0.7rem 1rem;
-    background: var(--surface);
-    text-decoration: none;
-    transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
-  }
-  .collab-chip:hover { transform: translateY(-2px); border-color: rgba(232,50,90,0.45); background: rgba(232,50,90,0.06); }
-  .collab-chip--cta { border-color: rgba(232,50,90,0.28); }
-  .collab-chip--cta:hover { border-color: rgba(245,166,35,0.5); background: rgba(245,166,35,0.07); }
-  .collab-chip-icon { font-size: 1.25rem; flex-shrink: 0; }
-  .collab-chip-name { font-size: 0.85rem; font-weight: 700; color: var(--title); margin: 0; }
-  .collab-chip-desc { font-size: 0.77rem; color: var(--muted); margin: 0.1rem 0 0; }
+  .member-card-link:hover { color: #F1E5AC; }
 
-  /* ── Repertoriu ── */
-  .repertoire-card {
-    border: 1px solid var(--line);
-    border-radius: 1.25rem;
-    padding: 1.75rem 1.25rem;
-    background: var(--surface);
-    text-align: center;
-    transition: transform 220ms ease, border-color 220ms ease;
+  /* ── Member card photo clickable ── */
+  button.member-card-photo {
+    width: 100%; border: none; padding: 0; cursor: pointer;
+    display: block; text-align: left;
   }
-  .repertoire-card:hover {
-    transform: translateY(-4px);
-    border-color: rgba(245, 166, 35, 0.4);
+  .member-card-photo--clickable:hover .member-card-photo-overlay { opacity: 1; }
+  .member-card-photo-overlay {
+    position: absolute; inset: 0; z-index: 2;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.4rem;
+    background: rgba(6, 12, 28, 0.62);
+    color: #fff; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    opacity: 0; transition: opacity 260ms ease;
   }
-  .repertoire-icon {
-    font-size: 2.2rem;
-    display: block;
-    margin-bottom: 0.85rem;
+  .member-card-photo-overlay svg { filter: drop-shadow(0 1px 4px rgba(0,0,0,0.5)); }
+
+  /* ── Lightbox galerie membri ── */
+  #member-gallery-modal {
+    position: fixed; inset: 0; z-index: 9990;
+    display: flex; align-items: center; justify-content: center;
+    padding: 1rem;
   }
-  .repertoire-title {
-    font-family: 'Oswald', sans-serif;
-    font-size: 1.05rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--title);
-    margin: 0 0 0.5rem;
+  #member-gallery-modal[hidden] { display: none; }
+  .mgl-backdrop {
+    position: absolute; inset: 0;
+    background: rgba(4, 6, 18, 0.88);
+    backdrop-filter: blur(8px);
+    cursor: pointer;
   }
-  .repertoire-desc {
-    font-size: 0.84rem;
-    color: var(--body);
-    line-height: 1.6;
-    margin: 0;
+  .mgl-dialog {
+    position: relative; z-index: 1;
+    width: 100%; max-width: 760px; max-height: 90vh;
+    overflow-y: auto;
+    background: linear-gradient(160deg, #0d1631, #080d20);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 1.5rem;
+    padding: 1.8rem;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.7);
+    animation: mglSlideIn 280ms cubic-bezier(0.22,1,0.36,1);
   }
+  @keyframes mglSlideIn {
+    from { opacity: 0; transform: translateY(28px) scale(0.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .mgl-header {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
+    margin-bottom: 1.4rem;
+  }
+  .mgl-kicker {
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--gold); margin: 0 0 0.3rem;
+  }
+  .mgl-title {
+    font-family: 'Oswald', sans-serif; font-size: 1.5rem; font-weight: 700;
+    color: #fff; margin: 0 0 0.2rem; letter-spacing: 0.04em;
+  }
+  .mgl-role {
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--teal); margin: 0;
+  }
+  .mgl-close {
+    flex-shrink: 0; display: grid; place-items: center;
+    width: 2.2rem; height: 2.2rem; border-radius: 9999px;
+    border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.07);
+    color: #fff; cursor: pointer; transition: background 160ms ease, border-color 160ms ease;
+  }
+  .mgl-close:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.38); }
+  .mgl-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;
+  }
+  @media (max-width: 520px) { .mgl-grid { grid-template-columns: repeat(2, 1fr); } }
+  .mgl-cell {
+    aspect-ratio: 1; border-radius: 0.75rem; overflow: hidden;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09);
+    cursor: pointer; position: relative;
+    transition: transform 200ms ease, border-color 200ms ease;
+  }
+  .mgl-cell:hover { transform: scale(1.03); border-color: rgba(241,229,172,0.4); }
+  .mgl-cell img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .mgl-cell-empty {
+    width: 100%; height: 100%; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 0.4rem;
+    color: rgba(255,255,255,0.2); font-size: 0.65rem; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase; cursor: default;
+  }
+  /* Fullscreen preview */
+  .mgl-fullscreen-overlay {
+    position: fixed; inset: 0; z-index: 10000;
+    background: rgba(2, 4, 14, 0.96);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .mgl-fullscreen-overlay[hidden] { display: none; }
+  .mgl-fs-img {
+    max-width: min(90vw, 900px); max-height: min(85vh, 800px);
+    object-fit: contain; border-radius: 0.75rem;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+  }
+  .mgl-fs-close {
+    position: absolute; top: 1.2rem; right: 1.2rem;
+    display: grid; place-items: center;
+    width: 2.5rem; height: 2.5rem; border-radius: 9999px;
+    border: 1px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.1);
+    color: #fff; cursor: pointer; transition: background 160ms ease;
+  }
+  .mgl-fs-close:hover { background: rgba(255,255,255,0.2); }
+  .mgl-fs-nav {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    display: grid; place-items: center;
+    width: 3rem; height: 3rem; border-radius: 9999px;
+    border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08);
+    color: #fff; cursor: pointer; transition: background 160ms ease;
+  }
+  .mgl-fs-nav:hover { background: rgba(255,255,255,0.18); }
+  .mgl-fs-prev { left: 1rem; }
+  .mgl-fs-next { right: 1rem; }
 
   /* ── Galerie ── */
   .gallery-concert-card {
-    border: 1px solid var(--line);
-    border-radius: 1.25rem;
-    overflow: hidden;
-    aspect-ratio: 4/3;
-    transition: transform 220ms ease, box-shadow 220ms ease;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1.15rem; overflow: hidden; aspect-ratio: 4 / 3;
+    min-width: 0;
+    transition: box-shadow 220ms ease, border-color 220ms ease;
   }
   .gallery-concert-card:hover {
-    transform: scale(1.02);
-    box-shadow: 0 16px 36px rgba(245, 166, 35, 0.18);
+    border-color: rgba(241, 229, 172, 0.22);
+    box-shadow: 0 8px 28px rgba(241, 229, 172, 0.12);
   }
-  .gallery-concert-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
+  .gallery-concert-img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .gallery-concert-placeholder {
-    border: 1px solid var(--line);
-    border-radius: 1.25rem;
-    aspect-ratio: 4/3;
-    background: var(--surface);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.6rem;
-    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 1.15rem;
+    aspect-ratio: 4 / 3; background: rgb(6, 12, 28);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 0.55rem; padding: 1rem;
   }
-  .gallery-placeholder-label {
-    font-size: 0.8rem;
-    color: var(--muted);
-    text-align: center;
-    margin: 0;
-  }
+  .gallery-placeholder-label { font-size: 0.78rem; color: var(--muted); text-align: center; margin: 0; }
 
-  /* ── FAQ ── */
-  .faq-list { display: flex; flex-direction: column; gap: 0.75rem; }
-  .faq-item {
-    border: 1px solid var(--line);
-    border-radius: 1rem;
-    background: var(--surface);
-    overflow: hidden;
-    transition: border-color 200ms ease;
-  }
-  .faq-item[open] { border-color: rgba(245, 166, 35, 0.45); }
-  .faq-question {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    padding: 1.1rem 1.25rem;
-    cursor: pointer;
-    list-style: none;
-    font-family: 'Oswald', sans-serif;
-    font-size: 1.05rem;
-    font-weight: 600;
-    letter-spacing: 0.03em;
-    color: var(--title);
-    user-select: none;
-  }
-  .faq-question::-webkit-details-marker { display: none; }
-  .faq-chevron {
-    flex-shrink: 0;
-    color: var(--gold);
-    transition: transform 240ms ease;
-  }
-  .faq-item[open] .faq-chevron { transform: rotate(180deg); }
-  .faq-answer {
-    padding: 0 1.25rem 1.1rem;
-    font-size: 0.92rem;
-    line-height: 1.7;
-    color: var(--body);
-    margin: 0;
-    border-top: 1px solid var(--line);
-    padding-top: 0.9rem;
-  }
-
-  /* ── Contact ── */
-  .contact-info-list { display: flex; flex-direction: column; gap: 0.75rem; }
-  .contact-info-row {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    border: 1px solid var(--line);
-    border-radius: 1rem;
-    padding: 0.85rem 1.1rem;
-    background: var(--surface);
-    text-decoration: none;
-    transition: border-color 200ms ease, background 200ms ease;
-  }
-  .contact-info-row:hover {
-    border-color: rgba(245, 166, 35, 0.45);
-    background: rgba(245, 166, 35, 0.05);
-  }
-  .contact-info-icon {
-    width: 2.4rem;
-    height: 2.4rem;
-    border-radius: 0.6rem;
-    background: rgba(245, 166, 35, 0.12);
-    display: grid;
-    place-items: center;
-    color: var(--gold);
-    flex-shrink: 0;
-  }
-  .contact-info-label {
-    display: block;
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-  .contact-info-value {
-    display: block;
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--title);
-    margin-top: 0.1rem;
-  }
-  .contact-form {
-    border: 1px solid var(--line);
-    border-radius: 1.5rem;
-    padding: 1.75rem;
-    background: var(--surface);
-  }
-  .contact-form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-  }
-  .contact-field { display: flex; flex-direction: column; gap: 0.35rem; }
-  .contact-field-full { grid-column: 1 / -1; }
-  .contact-label {
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-    color: var(--body);
-  }
-  @media (max-width: 480px) {
-    .contact-form-grid { grid-template-columns: 1fr; }
-    .contact-field-full { grid-column: 1; }
-  }
 </style>

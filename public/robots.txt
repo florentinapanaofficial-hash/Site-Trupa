@@ -2,6 +2,7 @@ User-agent: *
 Allow: /
 Allow: /video/
 Disallow: /api/
+Disallow: /admin/
 
-Sitemap: https://landing-ul-meu.example.com/sitemap-index.xml
+Sitemap: https://florentinapanaofficial.ro/sitemap-index.xml
 

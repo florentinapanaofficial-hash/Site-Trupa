@@ -1,0 +1,59 @@
+---
+/**
+ * SkyBackground.astro — Cer albastru 2D cu nori CSS
+ * Fără Three.js / WebGL → zero blocking, animații CSS pe GPU (transform only)
+ */
+---
+
+<style is:global>
+  html,
+  body,
+  .page-shell,
+  .layout-content-shell,
+  main,
+  #continut {
+    background:       transparent !important;
+    background-color: transparent !important;
+    background-image: none        !important;
+  }
+
+  body::before,
+  body::after {
+    display:   none !important;
+    opacity:   0    !important;
+    animation: none !important;
+  }
+
+  /* ── Cer albastru — fundal fix ──────────────────────────── */
+  #sky-bg-2d {
+    position:       fixed;
+    inset:          0;
+    z-index:        -1;
+    pointer-events: none;
+    overflow:       hidden;
+    background: linear-gradient(
+      180deg,
+      #0b1e5e  0%,
+      #1346a8 30%,
+      #2272d4 65%,
+      #4f9edf 100%
+    );
+  }
+
+  /* ── Vignettă subtilă la margini ───────────────────────── */
+  #sky-vignette {
+    position:       fixed;
+    inset:          0;
+    z-index:        0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 130% 80% at 50% 100%, rgba(0,8,28,.40) 0%, transparent 62%),
+      radial-gradient(ellipse 80%  60% at 50%   0%, rgba(0,8,28,.22) 0%, transparent 55%);
+  }
+
+</style>
+
+<!-- Cer albastru 2D — fără JS -->
+<div id="sky-bg-2d" aria-hidden="true"></div>
+
+<div id="sky-vignette" aria-hidden="true"></div>

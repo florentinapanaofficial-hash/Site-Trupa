@@ -1,9 +1,10 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import siteContent from '../data/siteContent.json';
+import BackButton from '../components/BackButton.astro';
 import { query as dbQuery } from '../lib/db.js';
 
-const { seo, realMoments } = siteContent;
+const { seo, realMoments, brand } = siteContent;
 const isDevelopment = import.meta.env.DEV;
 
 export const prerender = false;
@@ -80,13 +81,17 @@ const paddedAlbumPhotos =
       })), ...demoPhotos];
 
 const albumPhotos = paddedAlbumPhotos.slice(0, 60);
+
+
 ---
 
-<BaseLayout title={`Povestea noastră rămâne în ecouri și imagini | ${seo.title}`} description="Galerie completă cu poze ale mirilor și trupei, cu upload drag-and-drop și redimensionare automată.">
-  <section class="section-container py-16" id="momente-reale">
+<BaseLayout title={`Momente cu mirii | ${brand.name}`} description="Galerie completă cu poze ale mirilor și trupei. Caută după eveniment, cuplu sau locație.">
+  <!-- Overlay cer la apus — inutilă în afara dialogului, mutată înăuntru -->
+  <section class="section-container pt-6 pb-16" id="momente-reale">
+    <div class="mb-4"><BackButton href="/" label="Acasă" /></div>
     <header class="section-head mx-auto text-center">
       <p class="kicker mx-auto">Galerie specială</p>
-      <h1 class="section-title">Povestea noastră rămâne în ecouri și imagini</h1>
+      <h1 class="section-title">Momente cu Mirii | Formația Florentina Pană</h1>
       <p class="section-copy">Album în format landscape, cu pagini stânga-dreapta ca o foaie A4 pe orizontală, ideal pentru cadre largi cu mirii și trupa.</p>
     </header>
 
@@ -94,136 +99,75 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
       <span class="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-cyan-100">
         {hasDbMomentPhotos ? `${dbMomentPhotos.length}+` : realMoments.stats.events} cadre
       </span>
-      <span class="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-lime-100">
-        Upload drag and drop
-      </span>
     </div>
 
-    <section class="mx-auto mt-6 max-w-3xl rounded-2xl border border-white/20 bg-[#120722de] p-4 backdrop-blur">
-      <div class="flex flex-wrap items-end gap-3">
-        <label class="form-label m-0 flex-1 min-w-[220px]">
-          Caută în galerie
-          <input
-            class="input-glass"
-            type="search"
-            data-album-search-input
-            placeholder="Ex: Pitești, nuntă, Andreea și Florin"
-            maxlength="120"
-          />
-        </label>
-        <button type="button" class="btn-solid" data-album-search-button>Caută</button>
-        <button type="button" class="btn-outline" data-album-search-clear>Resetează</button>
-      </div>
-      <p class="mt-2 text-xs font-semibold text-white/80" data-album-search-result>Se afișează toate fotografiile.</p>
-    </section>
+    <!-- ─── Couple Cards ────────────────────────────────────────────── -->
+    <div class="couple-cards-section">
+      <header class="couple-cards-section-head">
+        <p class="kicker mx-auto">Poveștile lor</p>
+        <h2 class="section-title text-2xl md:text-3xl">Momentele care ne-au umplut inima</h2>
+      </header>
 
-    <section class="mx-auto mt-6 max-w-3xl rounded-2xl border border-white/20 bg-[#140a2fe3] p-4 backdrop-blur">
-      <div class="flex flex-wrap items-center justify-between gap-2">
-        <h2 class="text-sm font-extrabold uppercase tracking-[0.08em] text-white">Upload poze miri + trupă</h2>
-        <span class="rounded-full border border-white/25 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white/90">
-          Redimensionare automată
-        </span>
-      </div>
+      <div class="couple-cards-grid">
+        {realMoments.events.map((event) => {
+          return (
+            <article
+              class="couple-card"
+              data-couple-search={`${event.couple} ${event.city} ${event.date}`.toLowerCase()}
+              style={`--cc:${(event as any).accentColor ?? '#f5a623'};--cc-glow:${(event as any).accentGlow ?? 'rgba(245,166,35,0.28)'}`}
+            >
+              {/* Etaj 1 — fotografia (click → lightbox cu petale + cer) */}
+              <button
+                type="button"
+                class="cc-photo"
+                data-lightbox-src={event.image}
+                data-lightbox-alt={event.couple}
+                data-lightbox-caption={`${event.couple} \u2022 ${event.city} \u2022 ${event.date}`}
+                data-lightbox-audio={event.audioUrl ?? ''}
+                data-lightbox-quote={event.coupleQuote ?? ''}
+                aria-label={`Deschide fotografia ${event.couple}`}
+              >
+                <img src={event.image} alt={event.couple} loading="eager" decoding="async" />
+                <div class="cc-name-overlay">
+                  <span class="cc-name">{event.couple}</span>
+                  <span class="cc-meta">{event.city} &bull; {event.date}</span>
+                </div>
+              </button>
 
-      <form class="mt-3 grid gap-3" data-home-gallery-upload-form>
-        <label class="form-label">
-          Titlu fotografie
-          <input
-            class="input-glass"
-            type="text"
-            name="title"
-            data-home-gallery-title
-            placeholder="Ex: Mirii + formația - Pitești"
-            minlength="2"
-            maxlength="180"
-            required
-          />
-        </label>
-
-        <input id="home-gallery-photo-input" name="photo" type="file" accept="image/png,image/jpeg,image/webp" class="hidden" />
-        <input id="home-gallery-audio-input" name="audio" type="file" accept="audio/mpeg,.mp3" class="hidden" />
-
-        <div
-          class="rounded-xl border-2 border-dashed border-fuchsia-300/70 bg-fuchsia-500/10 p-4 text-center transition-all duration-200"
-          data-home-gallery-dropzone
-          role="button"
-          tabindex="0"
-          aria-label="Dropzone încărcare foto"
-        >
-          <p class="text-sm font-semibold text-white">Trage poza aici sau apasă pentru selecție</p>
-          <p class="mt-1 text-xs text-white/90">Formate acceptate: JPG, PNG, WebP, max 5MB</p>
-          <img data-home-gallery-preview class="mx-auto mt-3 hidden max-h-40 rounded-xl border border-white/20" alt="Preview fotografie" />
-        </div>
-
-        <div
-          class="rounded-xl border-2 border-dashed border-cyan-300/70 bg-cyan-500/10 p-4 text-center transition-all duration-200"
-          data-home-audio-dropzone
-          role="button"
-          tabindex="0"
-          aria-label="Dropzone încărcare audio MP3"
-        >
-          <p class="text-sm font-semibold text-white">Trage MP3-ul testimonial aici sau apasă pentru selecție</p>
-          <p class="mt-1 text-xs text-white/90">Opțional, dar recomandat pentru personalizare foto. Format: MP3, max 4MB</p>
-          <p class="mt-2 text-xs font-semibold text-cyan-100" data-home-audio-file-name>Nu ai selectat audio.</p>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-3">
-          <button type="button" class="btn-outline" data-home-gallery-dropzone-trigger>Selectează fișier</button>
-          <button type="button" class="btn-outline" data-home-audio-dropzone-trigger>Selectează MP3</button>
-          <button type="submit" class="btn-solid" data-home-gallery-submit>Optimizează și încarcă</button>
-        </div>
-
-        <input class="input-glass" type="text" readonly placeholder="URL imagine încărcată" data-home-gallery-url />
-
-        <p class="hidden rounded-xl border px-3 py-2 text-xs" data-home-gallery-status aria-live="polite"></p>
-      </form>
-    </section>
-
-    <div
-      class="cinematic-album-wrap mt-10"
-      data-home-gallery-grid
-      data-home-gallery-source={hasDbMomentPhotos ? 'db' : 'fallback'}
-      data-album-photos={JSON.stringify(albumPhotos)}
-    >
-      <div class="cinematic-album" role="region" aria-label="Album virtual cinematic">
-        <div class="album-spine" aria-hidden="true"></div>
-        <div class="album-flip-sheet" aria-hidden="true"></div>
-
-        <article class="album-page album-page-left" data-album-page-left>
-        </article>
-
-        <article class="album-page album-page-right" data-album-page-right>
-        </article>
-      </div>
-
-      <div class="album-controls" aria-label="Navigare album">
-        <button type="button" class="album-nav-btn" data-album-prev aria-label="Pagina anterioară">Pagina anterioară</button>
-        <p class="album-page-indicator" data-album-indicator>Pagina 1</p>
-        <button type="button" class="album-nav-btn" data-album-next aria-label="Pagina următoare">Pagina următoare</button>
-        <button type="button" class="album-sound-btn" data-album-sound-toggle aria-pressed="true" aria-label="Comută sunetul de întoarcere pagină">Sunet flip: ON</button>
+              {/* Etaj 2 — citat + link blog + link Dans Miri */}
+              <div class="cc-footer">
+                {event.coupleQuote && <p class="cc-quote">{event.coupleQuote}</p>}
+                <div class="cc-links">
+                  {(event as any).blogSlug && (
+                    <a class="cc-link" href={`/blog/${(event as any).blogSlug}`}>
+                      Citește povestea lor &rarr;
+                    </a>
+                  )}
+                  <a class="cc-link cc-link--dance" href="/galerie-video#dans-miri">
+                    Dansul Mirilor &rarr;
+                  </a>
+                </div>
+              </div>
+            </article>
+          );
+        })}
       </div>
     </div>
-
-    <p class="mt-5 text-xs font-semibold uppercase tracking-wider text-white/85">{realMoments.consentNote}</p>
+    <!-- ─────────────────────────────────────────────────────────────── -->
 
     <dialog id="photo-lightbox" class="photo-lightbox cinematic-lightbox">
+      <!-- Cer la apus — înăuntrul dialogului, vizibil în top-layer -->
+      <div id="sunset-overlay" aria-hidden="true"></div>
       <canvas id="lightbox-fireworks" class="lightbox-fireworks-canvas" aria-hidden="true"></canvas>
       <button type="button" class="lightbox-close-btn" data-lightbox-close aria-label="Închide galeria">✕</button>
       <div class="lightbox-stage">
         <button type="button" class="lightbox-nav-btn lightbox-nav-prev" data-lightbox-prev aria-label="Fotografia anterioară" disabled>&#8249;</button>
         <div class="lightbox-image-shell">
-          <div class="lightbox-image-frame">
-            <img id="photo-lightbox-image" src="" alt="" class="lightbox-image" />
-          </div>
+          <img id="photo-lightbox-image" src="" alt="" class="lightbox-image" />
         </div>
         <button type="button" class="lightbox-nav-btn lightbox-nav-next" data-lightbox-next aria-label="Fotografia următoare" disabled>&#8250;</button>
       </div>
       <p id="photo-lightbox-caption" class="lightbox-caption"></p>
-      <div class="lightbox-frame-selector" aria-label="Alege stilul ramei">
-        <button type="button" class="lightbox-frame-btn is-active" data-frame-theme-button="gold">Auriu</button>
-        <button type="button" class="lightbox-frame-btn" data-frame-theme-button="silver">Argintiu</button>
-        <button type="button" class="lightbox-frame-btn" data-frame-theme-button="wood">Lemn</button>
-      </div>
       <div class="lightbox-size-selector" aria-label="Alege dimensiunea imaginii">
         <button type="button" class="lightbox-size-btn" data-lightbox-size-toggle>Preset: Normal</button>
       </div>
@@ -263,29 +207,19 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
     const lightboxAudioNote = document.getElementById('photo-lightbox-audio-note');
     const lightboxQuote = document.getElementById('photo-lightbox-quote');
     const rootElement = document.documentElement;
-    const frameThemeButtons = Array.from(document.querySelectorAll('[data-frame-theme-button]'));
     const lightboxDemoSoundButton = document.querySelector('[data-lightbox-demo-sound]');
     const lightboxSizeToggleButton = document.querySelector('[data-lightbox-size-toggle]');
 
     const albumRoot = document.querySelector('[data-home-gallery-grid]');
-    const albumLeftPage = document.querySelector('[data-album-page-left]');
-    const albumRightPage = document.querySelector('[data-album-page-right]');
-    const cinematicAlbum = document.querySelector('.cinematic-album');
+    const filmStripTrack = /** @type {HTMLElement|null} */ (document.querySelector('[data-film-strip-track]'));
     const albumPrevButton = document.querySelector('[data-album-prev]');
     const albumNextButton = document.querySelector('[data-album-next]');
     const albumIndicator = document.querySelector('[data-album-indicator]');
-    const albumSoundToggle = document.querySelector('[data-album-sound-toggle]');
     const albumSearchInput = document.querySelector('[data-album-search-input]');
     const albumSearchButton = document.querySelector('[data-album-search-button]');
     const albumSearchClearButton = document.querySelector('[data-album-search-clear]');
     const albumSearchResult = document.querySelector('[data-album-search-result]');
 
-    const photosPerPage = 1;
-    const photosPerSpread = photosPerPage * 2;
-    const pageTurnDurationMs = 950;
-    const pageTurnMidpointMs = Math.round(pageTurnDurationMs * 0.5);
-    const soundStorageKey = 'fp-album-sound-enabled';
-    const frameThemeStorageKey = 'fp-lightbox-frame-theme';
     const sizePresetStorageKey = 'fp-lightbox-size-preset';
     const rawAlbumPhotos = albumRoot?.getAttribute('data-album-photos') ?? '[]';
     let allAlbumPhotos = [];
@@ -300,35 +234,13 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
       albumPhotos = [];
     }
 
-    let currentSpread = 0;
-    let isTurningPage = false;
-    let soundEnabled = window.localStorage.getItem(soundStorageKey) !== '0';
+    let activePhotoIndex = 0;
     let currentSearchTerm = '';
     let searchDebounceTimer = null;
-    let currentFrameTheme = window.localStorage.getItem(frameThemeStorageKey) || 'gold';
     let currentSizePreset = window.localStorage.getItem(sizePresetStorageKey) || 'normal';
     let isClosingLightbox = false;
     let currentLightboxIndex = -1;
     let savedScrollY = 0;
-
-    const syncFrameThemeUi = () => {
-      if (!(lightbox instanceof HTMLElement)) return;
-
-      lightbox.setAttribute('data-frame-theme', currentFrameTheme);
-      frameThemeButtons.forEach((button) => {
-        if (!(button instanceof HTMLButtonElement)) return;
-
-        const isActive = button.getAttribute('data-frame-theme-button') === currentFrameTheme;
-        button.classList.toggle('is-active', isActive);
-        button.setAttribute('aria-pressed', String(isActive));
-      });
-    };
-
-    if (!['gold', 'silver', 'wood'].includes(currentFrameTheme)) {
-      currentFrameTheme = 'gold';
-    }
-
-    syncFrameThemeUi();
 
     if (!['normal', 'large'].includes(currentSizePreset)) {
       currentSizePreset = 'normal';
@@ -347,15 +259,6 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
 
     syncSizePresetUi();
 
-    const updateSoundToggleUi = () => {
-      if (!(albumSoundToggle instanceof HTMLButtonElement)) return;
-
-      albumSoundToggle.textContent = soundEnabled ? 'Sunet flip: ON' : 'Sunet flip: OFF';
-      albumSoundToggle.setAttribute('aria-pressed', String(soundEnabled));
-    };
-
-    updateSoundToggleUi();
-
     if (lightboxAudio instanceof HTMLAudioElement) {
       lightboxAudio.addEventListener('error', () => {
         lightboxAudio.classList.add('hidden');
@@ -364,51 +267,6 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
         }
       });
     }
-
-    const playPageFlipSound = () => {
-      if (!soundEnabled) return;
-
-      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContextClass) return;
-
-      const audioContext = new AudioContextClass();
-      const masterGain = audioContext.createGain();
-      masterGain.gain.setValueAtTime(0.75, audioContext.currentTime);
-      masterGain.connect(audioContext.destination);
-
-      const firstOsc = audioContext.createOscillator();
-      const firstGain = audioContext.createGain();
-      firstOsc.type = 'triangle';
-      firstOsc.frequency.setValueAtTime(520, audioContext.currentTime);
-      firstOsc.frequency.exponentialRampToValueAtTime(165, audioContext.currentTime + 0.21);
-      firstGain.gain.setValueAtTime(0.0001, audioContext.currentTime);
-      firstGain.gain.exponentialRampToValueAtTime(0.028, audioContext.currentTime + 0.03);
-      firstGain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.22);
-
-      const secondOsc = audioContext.createOscillator();
-      const secondGain = audioContext.createGain();
-      secondOsc.type = 'sine';
-      secondOsc.frequency.setValueAtTime(760, audioContext.currentTime + 0.09);
-      secondOsc.frequency.exponentialRampToValueAtTime(240, audioContext.currentTime + 0.28);
-      secondGain.gain.setValueAtTime(0.0001, audioContext.currentTime);
-      secondGain.gain.exponentialRampToValueAtTime(0.016, audioContext.currentTime + 0.12);
-      secondGain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.3);
-
-      firstOsc.connect(firstGain);
-      secondOsc.connect(secondGain);
-      firstGain.connect(masterGain);
-      secondGain.connect(masterGain);
-
-      firstOsc.start(audioContext.currentTime);
-      firstOsc.stop(audioContext.currentTime + 0.24);
-
-      secondOsc.start(audioContext.currentTime + 0.09);
-      secondOsc.stop(audioContext.currentTime + 0.32);
-
-      window.setTimeout(() => {
-        audioContext.close().catch(() => {});
-      }, 420);
-    };
 
     const playDemoSound = () => {
       const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -463,6 +321,9 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
       document.body.style.top = `-${savedScrollY}px`;
       rootElement.classList.add('lightbox-open-lock');
       document.body.classList.add('lightbox-open-lock');
+      // Cer la apus — fade in overlay
+      const overlay = /** @type {HTMLElement|null} */ (document.getElementById('sunset-overlay'));
+      if (overlay) overlay.style.opacity = '1';
     };
 
     const unlockPageScrollForLightbox = () => {
@@ -470,156 +331,243 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
       document.body.classList.remove('lightbox-open-lock');
       document.body.style.top = '';
       window.scrollTo({ top: savedScrollY, behavior: 'instant' });
+      // Revenire la cer albastru
+      const overlay = /** @type {HTMLElement|null} */ (document.getElementById('sunset-overlay'));
+      if (overlay) overlay.style.opacity = '0';
     };
 
-    // ── Fireworks Engine ─────────────────────────────────────────────────────
-    const fireworksCanvas = /** @type {HTMLCanvasElement|null} */ (document.getElementById('lightbox-fireworks'));
-    let fwRafId = null;
-    let fwLastLaunch = 0;
-    const fwPalette = [
-      '#F5A623', '#FFD54F', '#FFF8C5',
-      '#E8325A', '#FF6090', '#FFB3C6',
-      '#0BBCD6', '#4DD0E1', '#B2F0FA',
-      '#CE93D8', '#B39DDB', '#ffffff',
-      '#FFAB40', '#FF7043', '#FFD700',
-    ];
+    // ── Petale Canvas 2D — generate programatic (bezier + gradient) ─────────
+    const petalsCanvas = /** @type {HTMLCanvasElement|null} */ (document.getElementById('lightbox-fireworks'));
+    let ptRafId    = null;
+    const ptPetals = [];
+    const PT_MAX   = 55;
 
-    class FwParticle {
-      constructor(x, y, vx, vy, color, size) {
-        this.x = x; this.y = y;
-        this.vx = vx; this.vy = vy;
-        this.color = color;
-        this.size = size;
-        this.life = 1;
-        this.decay = 0.012 + Math.random() * 0.018;
-        this.gravity = 0.09 + Math.random() * 0.05;
+    /**
+     * Pre-renderează 4 variante de petală de trandafir pe câte un canvas mic.
+     * Forma: curbe bezier care dau un oval alungit cu vârf, ca o petală reală.
+     */
+    const ptVariants = (() => {
+      // [culoare bază R,G,B], highlight, vârf închis
+      const defs = [
+        { base: [210, 25, 55],  hi: [255, 160, 175] },  // roșu aprins
+        { base: [185, 10, 40],  hi: [240, 130, 150] },  // roșu închis
+        { base: [230, 60, 90],  hi: [255, 190, 205] },  // roz-roșu
+        { base: [200, 30, 65],  hi: [250, 150, 165] },  // roșu mediu
+      ];
+      return defs.map(({ base: [r, g, b], hi: [hr, hg, hb] }) => {
+        const oc  = document.createElement('canvas');
+        oc.width  = 72;
+        oc.height = 108;
+        const c   = oc.getContext('2d');
+        if (!c) return oc;
+
+        // Centru canvas: (36, 54)
+        c.save();
+        c.translate(36, 54);
+
+        // ── Forma petalei: oval alungit cu vârf spre sus ──────────────────
+        c.beginPath();
+        c.moveTo(0, -50);                           // vârf sus
+        c.bezierCurveTo( 32, -38,  36,  8,  18, 36);  // dreapta
+        c.bezierCurveTo(  8,  50,  -8,  50, -18, 36);  // baza
+        c.bezierCurveTo(-36,   8, -32, -38,   0, -50); // stânga
+        c.closePath();
+
+        // Gradient radial: centru luminos → margini închise
+        const grd = c.createRadialGradient(-4, -18, 4, 2, 5, 52);
+        grd.addColorStop(0,    `rgba(${Math.min(r+55,255)}, ${Math.min(g+70,255)}, ${Math.min(b+75,255)}, 1)`);
+        grd.addColorStop(0.45, `rgba(${r}, ${g}, ${b}, 0.97)`);
+        grd.addColorStop(1,    `rgba(${Math.max(r-45,0)}, ${Math.max(g-10,0)}, ${Math.max(b-10,0)}, 0.65)`);
+        c.fillStyle = grd;
+        c.fill();
+
+        // Vene subtile (linie de la vârf la bază)
+        c.beginPath();
+        c.moveTo(0, -46);
+        c.bezierCurveTo(2, 0, 1, 28, 0, 38);
+        c.strokeStyle = `rgba(${Math.max(r-30,0)}, ${Math.max(g-5,0)}, ${Math.max(b-5,0)}, 0.28)`;
+        c.lineWidth   = 1.2;
+        c.stroke();
+
+        // Highlight — reflexie lumină în stânga-sus
+        c.beginPath();
+        c.moveTo(0, -50);
+        c.bezierCurveTo(-22, -38, -26, -8, -14, 14);
+        c.bezierCurveTo( -8,  24,  -2, 22,   0, 14);
+        c.bezierCurveTo(  6,   2,   4, -30,   0, -50);
+        c.closePath();
+        c.fillStyle = `rgba(${hr}, ${hg}, ${hb}, 0.22)`;
+        c.fill();
+
+        c.restore();
+        return oc;
+      });
+    })();
+
+    // ── Vânt global — oscilează lent + rafale bruște ─────────────────────
+    let ptWindT   = Math.random() * 100;
+    let ptWindX   = 0;   // curent de fond (lent, sinusoidal)
+    let ptGustX   = 0;   // rafală bruscă
+    let ptGustDec = 0;   // decay-ul rafalei
+
+    class Petal2D {
+      constructor(cW, cH) {
+        this.x       = Math.random() * cW;
+        this.y       = -30 - Math.random() * 80;
+        this.cH      = cH;
+        this.variant = ptVariants[Math.floor(Math.random() * ptVariants.length)];
+        this.tilt    = Math.random() * Math.PI * 2;
+        this.angle   = Math.random() * Math.PI * 2;
+        this.swayT   = Math.random() * Math.PI * 2;
+        this.turbT   = Math.floor(Math.random() * 40);
+        this.spin    = (Math.random() - 0.5) * 0.008;
+        this.vx      = (Math.random() - 0.5) * 0.15;
+        this.vy      = 0.12 + Math.random() * 0.10;
+
+        // ── Personalitate: 0 = rapid, 1 = plutitor, 2 = prins de curenți ──
+        const t = Math.random();
+        if (t < 0.30) {
+          // ── LENT ─────────────────────────────────────────────────────────
+          this.pType    = 0;
+          this.w        = 18 + Math.random() * 12;
+          this.gravity  = 0.008 + Math.random() * 0.004;
+          this.dragBase = 0.018 + Math.random() * 0.008;
+          this.dragFace = 0.022 + Math.random() * 0.010;
+          this.tiltF    = 0.006 + Math.random() * 0.008;
+          this.swayA    = 3  + Math.random() * 4;
+          this.swayF    = 0.004 + Math.random() * 0.003;
+          this.windSens = 0.04 + Math.random() * 0.04;
+          this.alpha    = 0.82 + Math.random() * 0.18;
+        } else if (t < 0.65) {
+          // ── FOARTE LENT / PLUTITOR ────────────────────────────────────────
+          this.pType    = 1;
+          this.w        = 26 + Math.random() * 16;
+          this.gravity  = 0.004 + Math.random() * 0.003;
+          this.dragBase = 0.040 + Math.random() * 0.018;
+          this.dragFace = 0.055 + Math.random() * 0.020;
+          this.tiltF    = 0.003 + Math.random() * 0.004;
+          this.swayA    = 6 + Math.random() * 8;
+          this.swayF    = 0.002 + Math.random() * 0.002;
+          this.windSens = 0.10 + Math.random() * 0.08;
+          this.alpha    = 0.70 + Math.random() * 0.22;
+        } else {
+          // ── MEDIU LENT ───────────────────────────────────────────────────
+          this.pType    = 2;
+          this.w        = 22 + Math.random() * 14;
+          this.gravity  = 0.006 + Math.random() * 0.004;
+          this.dragBase = 0.028 + Math.random() * 0.010;
+          this.dragFace = 0.038 + Math.random() * 0.014;
+          this.tiltF    = 0.005 + Math.random() * 0.006;
+          this.swayA    = 4 + Math.random() * 6;
+          this.swayF    = 0.003 + Math.random() * 0.003;
+          this.windSens = 0.08 + Math.random() * 0.06;
+          this.alpha    = 0.75 + Math.random() * 0.25;
+        }
+
+        this.h = this.w * (1.40 + Math.random() * 0.40);
       }
+
       update() {
-        this.x += this.vx;
-        this.y += this.vy;
+        const face = Math.abs(Math.cos(this.tilt));
+
+        // Drag multiplicativ
+        const dragCoeff = this.dragBase + face * face * this.dragFace;
         this.vy += this.gravity;
-        this.vx *= 0.97;
-        this.life -= this.decay;
-      }
-      draw(ctx) {
-        ctx.globalAlpha = Math.max(0, this.life);
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, Math.max(0.1, this.size * this.life), 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
+        this.vy *= (1 - dragCoeff);
+        this.vy  = Math.max(0.10, this.vy);
 
-    class FwRocket {
-      constructor(x, canvasHeight) {
-        this.x = x;
-        this.y = canvasHeight + 5;
-        this.vx = (Math.random() - 0.5) * 2.5;
-        this.vy = -(10 + Math.random() * 7);
-        this.color = fwPalette[Math.floor(Math.random() * fwPalette.length)];
-        this.targetY = canvasHeight * (0.08 + Math.random() * 0.38);
-        this.exploded = false;
-        this.trail = [];
-      }
-      update(particles) {
-        this.x += this.vx;
+        // Balans sinusoidal propriu
+        this.swayT += this.swayF;
+        const sway = Math.sin(this.swayT) * this.swayA * this.swayF * (0.4 + face * 0.9);
+
+        // Micro-turbulență minimă
+        this.turbT++;
+        let turbX = 0;
+        if (this.turbT > 90 + Math.random() * 60) {
+          turbX = (Math.random() - 0.5) * 0.3 * face;
+          this.turbT = 0;
+        }
+
+        // Vânt global + rafală, ponderate de sensibilitatea petlalei
+        const windEffect = (ptWindX + ptGustX) * this.windSens * (0.6 + face * 0.7);
+
+        this.x += this.vx + sway + turbX + windEffect;
         this.y += this.vy;
-        this.vy += 0.25;
-        this.trail.push({ x: this.x, y: this.y });
-        if (this.trail.length > 14) this.trail.shift();
-        if (this.vy >= 0 || this.y <= this.targetY) {
-          this._explode(particles);
-          this.exploded = true;
-        }
+
+        // Tilt — fără minim forțat, lasă petalele să se miște lin
+        const tiltAccel = (1.0 - face) * 0.001;
+        this.tiltF = Math.min(this.tiltF + tiltAccel * (Math.random() - 0.5), 0.012);
+        this.tilt += this.tiltF;
+
+        this.angle += this.spin * 0.3;
+
+        return this.y < this.cH + 40;
       }
-      _explode(particles) {
-        const count = 60 + Math.floor(Math.random() * 55);
-        const accent = fwPalette[Math.floor(Math.random() * fwPalette.length)];
-        for (let i = 0; i < count; i++) {
-          const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.22;
-          const speed = 1.5 + Math.random() * 4.5;
-          const color = Math.random() < 0.55 ? this.color : accent;
-          particles.push(new FwParticle(
-            this.x, this.y,
-            Math.cos(angle) * speed,
-            Math.sin(angle) * speed,
-            color,
-            1.8 + Math.random() * 2.2,
-          ));
-        }
-        for (let i = 0; i < 20; i++) {
-          const angle = Math.random() * Math.PI * 2;
-          const speed = 0.4 + Math.random() * 2;
-          particles.push(new FwParticle(
-            this.x, this.y,
-            Math.cos(angle) * speed,
-            Math.sin(angle) * speed,
-            '#FFD700', 1,
-          ));
-        }
-      }
+
       draw(ctx) {
-        for (let i = 0; i < this.trail.length; i++) {
-          const t = this.trail[i];
-          ctx.globalAlpha = (i / this.trail.length) * 0.65;
-          ctx.fillStyle = this.color;
-          ctx.beginPath();
-          ctx.arc(t.x, t.y, 2.2, 0, Math.PI * 2);
-          ctx.fill();
-        }
-        ctx.globalAlpha = 1;
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
-        ctx.fill();
+        if (!this.variant) return;
+        const face   = Math.abs(Math.cos(this.tilt));
+        const scaleY = Math.max(0.06, face);
+        ctx.save();
+        ctx.globalAlpha = this.alpha * (0.62 + 0.38 * face);
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.angle);
+        ctx.drawImage(this.variant, -this.w / 2, -(this.h * scaleY) / 2, this.w, this.h * scaleY);
+        ctx.restore();
       }
     }
 
-    let fwRockets = [];
-    let fwParticles = [];
-
-    const runFwFrame = (timestamp) => {
-      if (!fireworksCanvas) return;
-      const ctx = fireworksCanvas.getContext('2d');
+    const ptFrame = (ts) => {
+      if (!petalsCanvas) return;
+      const ctx = petalsCanvas.getContext('2d');
       if (!ctx) return;
-      ctx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
-      if (timestamp - fwLastLaunch > 650 + Math.random() * 700) {
-        fwLastLaunch = timestamp;
-        fwRockets.push(new FwRocket(fireworksCanvas.width * (0.1 + Math.random() * 0.8), fireworksCanvas.height));
-        if (Math.random() < 0.4) {
-          fwRockets.push(new FwRocket(fireworksCanvas.width * (0.1 + Math.random() * 0.8), fireworksCanvas.height));
-        }
+      ctx.clearRect(0, 0, petalsCanvas.width, petalsCanvas.height);
+
+      // ── Actualizează vântul global ──────────────────────────────────────
+      ptWindT += 0.0006;
+      // Curent de fond: foarte slab și lent
+      ptWindX = Math.sin(ptWindT * 0.3) * 0.08 + Math.sin(ptWindT * 0.7) * 0.04;
+      // Fără rafale bruște
+      ptGustX = 0;
+
+      // Generează petale noi — ritm constant și vizibil
+      if (ptPetals.length < PT_MAX && Math.random() < 0.55) {
+        ptPetals.push(new Petal2D(petalsCanvas.width, petalsCanvas.height));
       }
-      fwRockets = fwRockets.filter((r) => !r.exploded);
-      fwRockets.forEach((r) => { r.update(fwParticles); r.draw(ctx); });
-      fwParticles = fwParticles.filter((p) => p.life > 0);
-      fwParticles.forEach((p) => { p.update(); p.draw(ctx); });
-      ctx.globalAlpha = 1;
-      fwRafId = requestAnimationFrame(runFwFrame);
+
+      for (let i = ptPetals.length - 1; i >= 0; i--) {
+        const alive = ptPetals[i].update();
+        ptPetals[i].draw(ctx);
+        if (!alive) ptPetals.splice(i, 1);
+      }
+
+      ptRafId = requestAnimationFrame(ptFrame);
     };
 
-    const startFireworks = () => {
-      if (!fireworksCanvas) return;
+    const startPetals = () => {
+      if (!petalsCanvas) return;
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-      fireworksCanvas.width = window.innerWidth;
-      fireworksCanvas.height = window.innerHeight;
-      fwRockets = [];
-      fwParticles = [];
-      fwLastLaunch = 0;
-      if (fwRafId) cancelAnimationFrame(fwRafId);
-      fwRafId = requestAnimationFrame(runFwFrame);
+      stopPetals();
+      petalsCanvas.width  = window.innerWidth;
+      petalsCanvas.height = window.innerHeight;
+      // Pre-populează imediat — petale distribuite pe tot ecranul la deschidere
+      for (let i = 0; i < 30; i++) {
+        const p = new Petal2D(petalsCanvas.width, petalsCanvas.height);
+        p.y = (Math.random() - 0.1) * petalsCanvas.height;
+        ptPetals.push(p);
+      }
+      ptRafId = requestAnimationFrame(ptFrame);
     };
 
-    const stopFireworks = () => {
-      if (fwRafId) { cancelAnimationFrame(fwRafId); fwRafId = null; }
-      if (fireworksCanvas) {
-        const ctx = fireworksCanvas.getContext('2d');
-        ctx?.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+    const stopPetals = () => {
+      if (ptRafId) { cancelAnimationFrame(ptRafId); ptRafId = null; }
+      ptPetals.length = 0;
+      if (petalsCanvas) {
+        const ctx = petalsCanvas.getContext('2d');
+        ctx?.clearRect(0, 0, petalsCanvas.width, petalsCanvas.height);
       }
-      fwRockets = [];
-      fwParticles = [];
     };
-    // ── End Fireworks ─────────────────────────────────────────────────────────
+    // ── End Petale ────────────────────────────────────────────────────────────
 
     const lbNavPrev = /** @type {HTMLButtonElement|null} */ (document.querySelector('[data-lightbox-prev]'));
     const lbNavNext = /** @type {HTMLButtonElement|null} */ (document.querySelector('[data-lightbox-next]'));
@@ -733,7 +681,7 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
       lightbox.classList.remove('is-closing');
       lockPageScrollForLightbox();
       lightbox.showModal();
-      startFireworks();
+      startPetals();
     };
 
     const createAlbumCard = (photo, animationDelay = 0) => {
@@ -804,6 +752,31 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
       albumSearchResult.textContent = `Rezultate pentru „${currentSearchTerm}”: ${albumPhotos.length}`;
     };
 
+    const coupleCards = /** @type {HTMLElement[]} */ ([...document.querySelectorAll('.couple-card')]);
+    const coupleCardsSection = /** @type {HTMLElement|null} */ (document.querySelector('.couple-cards-section'));
+
+    // Click pe fotografia unui cuplu → deschide lightbox cu petale + cer
+    document.querySelector('.couple-cards-grid')?.addEventListener('click', (event) => {
+      const btn = event.target instanceof Element
+        ? event.target.closest('[data-lightbox-src].cc-photo')
+        : null;
+      if (!(btn instanceof HTMLElement)) return;
+      openLightboxFromTrigger(btn);
+    });
+
+    const filterCoupleCards = (needle) => {
+      let visibleCount = 0;
+      coupleCards.forEach((card) => {
+        const haystack = normalizeSearchText(card.getAttribute('data-couple-search') ?? '');
+        const match = !needle || haystack.includes(needle);
+        card.style.display = match ? '' : 'none';
+        if (match) visibleCount++;
+      });
+      if (coupleCardsSection instanceof HTMLElement) {
+        coupleCardsSection.style.display = visibleCount === 0 ? 'none' : '';
+      }
+    };
+
     const applyAlbumSearch = () => {
       const needle = normalizeSearchText(currentSearchTerm);
 
@@ -817,74 +790,97 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
         });
       }
 
-      currentSpread = 0;
-      renderSpread('next');
+      filterCoupleCards(needle);
+      activePhotoIndex = 0;
+      renderFilmStrip();
       updateSearchResultText();
     };
 
-    const totalSpreads = () => Math.max(1, Math.ceil(albumPhotos.length / photosPerSpread));
+    // ── Film strip ────────────────────────────────────────────────────────────
+    const THUMB_W = 210;
+    const THUMB_GAP = 12;
 
-    const updateAlbumControls = () => {
-      const spreads = totalSpreads();
-
-      if (albumIndicator) {
-        if (albumPhotos.length === 0) {
-          albumIndicator.textContent = 'Nu există rezultate pentru filtrul curent';
-          return;
-        }
-
-        albumIndicator.textContent = `Pagini ${currentSpread * 2 + 1}-${Math.min(currentSpread * 2 + 2, spreads * 2)} din ${spreads * 2}`;
-      }
-
-      if (albumPrevButton instanceof HTMLButtonElement) {
-        albumPrevButton.disabled = currentSpread <= 0 || isTurningPage;
-      }
-
-      if (albumNextButton instanceof HTMLButtonElement) {
-        albumNextButton.disabled = currentSpread >= spreads - 1 || isTurningPage;
-      }
-    };
-
-    const renderSpread = (direction = 'next') => {
-      if (!(albumLeftPage instanceof HTMLElement) || !(albumRightPage instanceof HTMLElement)) return;
-
-      const start = currentSpread * photosPerSpread;
-      const leftPhotos = albumPhotos.slice(start, start + photosPerPage);
-      const rightPhotos = albumPhotos.slice(start + photosPerPage, start + photosPerSpread);
-
-      albumLeftPage.classList.remove('is-flipping-forward', 'is-flipping-backward');
-      albumRightPage.classList.remove('is-flipping-forward', 'is-flipping-backward');
-
-      if (direction === 'next') {
-        albumRightPage.classList.add('is-flipping-forward');
-      } else if (direction === 'prev') {
-        albumLeftPage.classList.add('is-flipping-backward');
-      }
-
-      albumLeftPage.innerHTML = '';
-      albumRightPage.innerHTML = '';
+    const renderFilmStrip = () => {
+      if (!filmStripTrack) return;
+      filmStripTrack.innerHTML = '';
 
       if (albumPhotos.length === 0) {
         const empty = document.createElement('p');
-        empty.className = 'm-auto max-w-xs rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-center text-sm font-semibold text-white/90';
+        empty.className = 'film-empty-msg';
         empty.textContent = 'Nu am găsit fotografii pentru această căutare.';
-        albumLeftPage.appendChild(empty);
-        updateAlbumControls();
+        filmStripTrack.appendChild(empty);
+        updateStripIndicator();
+        updateStripNavButtons();
         return;
       }
 
-      leftPhotos.forEach((photo, index) => {
-        albumLeftPage.appendChild(createAlbumCard(photo, index * 70));
+      albumPhotos.forEach((photo, i) => {
+        const item = document.createElement('div');
+        item.className = 'film-thumb' + (i === activePhotoIndex ? ' film-thumb--active' : '');
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'film-thumb-btn';
+        btn.style.borderRadius = '16px';
+        btn.setAttribute('data-film-idx', String(i));
+        btn.setAttribute('data-lightbox-src', String(photo.image ?? ''));
+        btn.setAttribute('data-lightbox-alt', String(photo.title ?? 'Fotografie eveniment'));
+        btn.setAttribute('data-lightbox-caption', String(photo.caption ?? ''));
+        btn.setAttribute('data-lightbox-audio', String(photo.audio ?? ''));
+        btn.setAttribute('data-lightbox-quote', String(photo.quote ?? ''));
+        btn.setAttribute('aria-label', String(photo.title ?? 'Fotografie eveniment'));
+
+        const img = document.createElement('img');
+        img.src = String(photo.image ?? '');
+        img.alt = String(photo.title ?? '');
+        img.loading = i < 8 ? 'eager' : 'lazy';
+        img.className = 'film-thumb-img';
+        img.style.borderRadius = '14px';
+        img.draggable = false;
+        btn.appendChild(img);
+
+        if (i === activePhotoIndex) {
+          const pill = document.createElement('span');
+          pill.className = 'film-active-open-hint';
+          pill.setAttribute('aria-hidden', 'true');
+          pill.textContent = '▶ Deschide';
+          btn.appendChild(pill);
+        }
+
+        item.appendChild(btn);
+        filmStripTrack.appendChild(item);
       });
 
-      rightPhotos.forEach((photo, index) => {
-        albumRightPage.appendChild(createAlbumCard(photo, (index + photosPerPage) * 70));
-      });
-
-      updateAlbumControls();
+      scrollToActive(false);
+      updateStripIndicator();
+      updateStripNavButtons();
     };
 
-    renderSpread('next');
+    const scrollToActive = (animated = true) => {
+      const outer = filmStripTrack?.parentElement;
+      if (!outer || !filmStripTrack) return;
+      const outerW = outer.clientWidth;
+      const itemW = THUMB_W + THUMB_GAP;
+      const activeMidX = activePhotoIndex * itemW + THUMB_W / 2;
+      const scrollLeft = activeMidX - outerW / 2;
+      filmStripTrack.style.transition = animated ? 'transform 440ms cubic-bezier(0.22,1,0.36,1)' : 'none';
+      filmStripTrack.style.transform = `translateX(${-Math.max(0, scrollLeft)}px)`;
+    };
+
+    const updateStripIndicator = () => {
+      if (albumIndicator) {
+        albumIndicator.textContent = albumPhotos.length > 0
+          ? `${activePhotoIndex + 1} / ${albumPhotos.length}`
+          : '—';
+      }
+    };
+
+    const updateStripNavButtons = () => {
+      if (albumPrevButton instanceof HTMLButtonElement) albumPrevButton.disabled = activePhotoIndex <= 0;
+      if (albumNextButton instanceof HTMLButtonElement) albumNextButton.disabled = activePhotoIndex >= albumPhotos.length - 1;
+    };
+
+    renderFilmStrip();
     updateSearchResultText();
 
     const runSearchFromInput = () => {
@@ -920,58 +916,29 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
       applyAlbumSearch();
     });
 
-    const turnAlbumPage = (direction, onHalfTurn) => {
-      if (!(cinematicAlbum instanceof HTMLElement) || isTurningPage) return;
-
-      isTurningPage = true;
-      updateAlbumControls();
-      playPageFlipSound();
-
-      cinematicAlbum.classList.remove('is-turning-next', 'is-turning-prev');
-      cinematicAlbum.classList.add(direction === 'next' ? 'is-turning-next' : 'is-turning-prev');
-
-      if (albumRoot instanceof HTMLElement) {
-        albumRoot.classList.add('is-turning');
-      }
-
-      window.setTimeout(() => {
-        onHalfTurn();
-      }, pageTurnMidpointMs);
-
-      window.setTimeout(() => {
-        cinematicAlbum.classList.remove('is-turning-next', 'is-turning-prev');
-        albumRoot?.classList.remove('is-turning');
-        isTurningPage = false;
-        updateAlbumControls();
-      }, pageTurnDurationMs);
-    };
-
-    albumSoundToggle?.addEventListener('click', () => {
-      soundEnabled = !soundEnabled;
-      window.localStorage.setItem(soundStorageKey, soundEnabled ? '1' : '0');
-      updateSoundToggleUi();
-    });
-
     albumPrevButton?.addEventListener('click', () => {
-      if (currentSpread <= 0) return;
-      turnAlbumPage('prev', () => {
-        currentSpread -= 1;
-        renderSpread('prev');
-      });
+      if (activePhotoIndex <= 0) return;
+      activePhotoIndex -= 1;
+      renderFilmStrip();
     });
 
     albumNextButton?.addEventListener('click', () => {
-      if (currentSpread >= totalSpreads() - 1) return;
-      turnAlbumPage('next', () => {
-        currentSpread += 1;
-        renderSpread('next');
-      });
+      if (activePhotoIndex >= albumPhotos.length - 1) return;
+      activePhotoIndex += 1;
+      renderFilmStrip();
     });
 
     albumRoot?.addEventListener('click', (event) => {
-      const trigger = event.target instanceof Element ? event.target.closest('[data-lightbox-src]') : null;
-      if (!trigger) return;
-      openLightboxFromTrigger(trigger);
+      const btn = event.target instanceof Element ? event.target.closest('[data-film-idx]') : null;
+      if (!btn) return;
+      const idx = parseInt(btn.getAttribute('data-film-idx') ?? '-1', 10);
+      if (isNaN(idx) || idx < 0 || idx >= albumPhotos.length) return;
+      if (idx === activePhotoIndex) {
+        openLightboxFromTrigger(btn);
+      } else {
+        activePhotoIndex = idx;
+        renderFilmStrip();
+      }
     });
 
     if (lightbox && lightboxImage && lightboxCaption) {
@@ -990,21 +957,9 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
         syncSizePresetUi();
       });
 
-      frameThemeButtons.forEach((button) => {
-        if (!(button instanceof HTMLButtonElement)) return;
-
-        button.addEventListener('click', () => {
-          const theme = button.getAttribute('data-frame-theme-button') || 'gold';
-          currentFrameTheme = theme;
-          window.localStorage.setItem(frameThemeStorageKey, currentFrameTheme);
-          syncFrameThemeUi();
-        });
-      });
-
       lightbox.addEventListener('click', (event) => {
         const target = event.target instanceof Element ? event.target : null;
         if (
-          target?.closest('.lightbox-frame-selector') ||
           target?.closest('.lightbox-size-selector') ||
           target?.closest('.lightbox-demo-sound-wrap') ||
           target?.closest('.lightbox-audio-wrap') ||
@@ -1035,7 +990,7 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
       lightbox.addEventListener('close', () => {
         isClosingLightbox = false;
         lightbox.classList.remove('is-closing');
-        stopFireworks();
+        stopPetals();
         unlockPageScrollForLightbox();
 
         // Animate album back into view after lightbox closes
@@ -1375,8 +1330,8 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
             albumPhotos.unshift(newPhoto);
           }
 
-          currentSpread = 0;
-          renderSpread('next');
+          activePhotoIndex = 0;
+          renderFilmStrip();
           updateSearchResultText();
         }
 
@@ -1391,93 +1346,502 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
         }
       }
     });
+
+    // ── Muzică romantică de fundal ────────────────────────────────────────────
+    (function () {
+      const bgSection = document.getElementById('momente-reale');
+      if (!bgSection) return;
+
+      // Creează butonul direct pe body (evită orice stacking context)
+      const bgFab = document.createElement('button');
+      bgFab.id = 'bg-music-fab';
+      bgFab.className = 'bg-music-fab';
+      bgFab.type = 'button';
+      bgFab.setAttribute('aria-pressed', 'false');
+      bgFab.setAttribute('aria-label', 'Muzică romantică de fundal');
+      bgFab.innerHTML = '<span class="bg-music-note" aria-hidden="true">♪</span><span class="bg-music-label">Muzică</span>';
+      document.body.appendChild(bgFab);
+
+      const BG_BPM = 58;
+      const BG_BEAT = 60 / BG_BPM;
+
+      // Progresie romantică Am-F-C-G, 3 voci: [bass, middle, melody]
+      const BG_VOICES = [
+        [110.00, 164.81, 440.00], // Am beat 1
+        [110.00, 220.00, 523.25], // Am beat 2
+        [110.00, 261.63, 659.25], // Am beat 3
+        [110.00, 220.00, 523.25], // Am beat 4
+        [ 87.31, 130.81, 349.23], // F  beat 1
+        [ 87.31, 174.61, 440.00], // F  beat 2
+        [ 87.31, 220.00, 523.25], // F  beat 3
+        [ 87.31, 174.61, 440.00], // F  beat 4
+        [130.81, 196.00, 523.25], // C  beat 1
+        [130.81, 261.63, 659.25], // C  beat 2
+        [130.81, 329.63, 784.00], // C  beat 3
+        [130.81, 261.63, 659.25], // C  beat 4
+        [ 98.00, 146.83, 392.00], // G  beat 1
+        [ 98.00, 196.00, 493.88], // G  beat 2
+        [ 98.00, 246.94, 587.33], // G  beat 3
+        [ 98.00, 196.00, 493.88], // G  beat 4
+      ];
+
+      let bgCtx = null;
+      let bgMaster = null;
+      let bgDelay = null;
+      let bgPlaying = false;
+      let bgNextTime = 0;
+      let bgBeatIdx = 0;
+      let bgLoopTimer = null;
+      let bgSectionVisible = false;
+      let bgStartedOnce = false;
+
+      const bgPlayNote = (freq, startT, dur, vel) => {
+        if (!bgCtx || !bgMaster) return;
+        const osc  = bgCtx.createOscillator();
+        const osc2 = bgCtx.createOscillator();
+        const gain = bgCtx.createGain();
+        const filt = bgCtx.createBiquadFilter();
+        osc.type  = 'sine';     osc.frequency.setValueAtTime(freq,      startT);
+        osc2.type = 'triangle'; osc2.frequency.setValueAtTime(freq * 2, startT);
+        filt.type = 'lowpass';
+        filt.frequency.setValueAtTime(2400, startT);
+        filt.frequency.exponentialRampToValueAtTime(700, startT + dur);
+        gain.gain.setValueAtTime(0.0001, startT);
+        gain.gain.exponentialRampToValueAtTime(vel, startT + 0.05);
+        gain.gain.setValueAtTime(vel, startT + dur * 0.5);
+        gain.gain.exponentialRampToValueAtTime(0.0001, startT + dur);
+        osc.connect(filt); osc2.connect(filt);
+        filt.connect(gain);
+        gain.connect(bgMaster);
+        if (bgDelay) gain.connect(bgDelay);
+        osc.start(startT);  osc.stop(startT + dur + 0.12);
+        osc2.start(startT); osc2.stop(startT + dur + 0.12);
+      };
+
+      const bgSchedule = () => {
+        if (!bgPlaying || !bgCtx) return;
+        while (bgNextTime < bgCtx.currentTime + 4.0) {
+          const voices = BG_VOICES[bgBeatIdx % BG_VOICES.length];
+          const t = bgNextTime;
+          // Arpeggio staggerat: bass → middle → melody (60ms apart)
+          bgPlayNote(voices[0], t,        BG_BEAT * 0.88, 0.052);
+          bgPlayNote(voices[1], t + 0.06, BG_BEAT * 0.78, 0.036);
+          bgPlayNote(voices[2], t + 0.12, BG_BEAT * 0.72, 0.062);
+          bgNextTime += BG_BEAT;
+          bgBeatIdx++;
+        }
+        bgLoopTimer = window.setTimeout(bgSchedule, 300);
+      };
+
+      const bgInit = () => {
+        if (bgCtx) return true;
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return false;
+        bgCtx = new AC();
+        bgMaster = bgCtx.createGain();
+        bgMaster.gain.setValueAtTime(0.0001, bgCtx.currentTime);
+        // Delay pentru profunzime (efect reverb simplu)
+        bgDelay = bgCtx.createDelay(2);
+        const bgFb  = bgCtx.createGain();
+        const bgDry = bgCtx.createGain();
+        bgDelay.delayTime.value = 0.42;
+        bgFb.gain.value  = 0.22;
+        bgDry.gain.value = 0.18;
+        bgDelay.connect(bgFb);
+        bgFb.connect(bgDelay);
+        bgDelay.connect(bgDry);
+        bgDry.connect(bgMaster);
+        bgMaster.connect(bgCtx.destination);
+        return true;
+      };
+
+      const bgStart = () => {
+        if (!bgInit()) return;
+        if (bgCtx.state === 'suspended') bgCtx.resume().catch(() => {});
+        if (bgPlaying) return;
+        bgPlaying = true;
+        bgStartedOnce = true;
+        bgNextTime = bgCtx.currentTime + 0.3;
+        bgSchedule();
+        bgMaster.gain.cancelScheduledValues(bgCtx.currentTime);
+        bgMaster.gain.setValueAtTime(0.0001, bgCtx.currentTime);
+        bgMaster.gain.linearRampToValueAtTime(0.46, bgCtx.currentTime + 3);
+        bgUpdateFab();
+      };
+
+      const bgStop = () => {
+        if (!bgPlaying) return;
+        bgPlaying = false;
+        if (bgLoopTimer) { window.clearTimeout(bgLoopTimer); bgLoopTimer = null; }
+        if (bgMaster && bgCtx) {
+          bgMaster.gain.cancelScheduledValues(bgCtx.currentTime);
+          bgMaster.gain.setValueAtTime(bgMaster.gain.value, bgCtx.currentTime);
+          bgMaster.gain.linearRampToValueAtTime(0.0001, bgCtx.currentTime + 2);
+        }
+        bgUpdateFab();
+      };
+
+      const bgUpdateFab = () => {
+        bgFab.setAttribute('aria-pressed', String(bgPlaying));
+        bgFab.classList.toggle('is-playing', bgPlaying);
+        const lbl = bgFab.querySelector('.bg-music-label');
+        if (lbl) lbl.textContent = bgPlaying ? 'Pauză' : 'Muzică';
+      };
+
+      bgFab.addEventListener('click', () => { if (bgPlaying) bgStop(); else bgStart(); });
+      bgFab.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); bgFab.click(); }
+      });
+
+      // Arată/ascunde FAB și pornire automată la prima interacțiune
+      const bgObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          bgSectionVisible = entry.isIntersecting;
+          if (entry.isIntersecting) {
+            bgFab.classList.add('is-visible');
+            if (!bgStartedOnce) {
+              window.setTimeout(() => { if (bgSectionVisible) bgStart(); }, 900);
+            }
+          } else {
+            bgFab.classList.remove('is-visible');
+            if (bgPlaying) bgStop();
+          }
+        });
+      }, { threshold: 0.05 });
+      bgObserver.observe(bgSection);
+
+      // Pornire automată la primul click/touch pe pagină dacă secțiunea e vizibilă
+      const bgOnFirst = () => { if (bgSectionVisible && !bgStartedOnce) bgStart(); };
+      document.addEventListener('click',    bgOnFirst, { once: true });
+      document.addEventListener('touchend', bgOnFirst, { once: true });
+    })();
   </script>
 
-  <style>
-    .cinematic-album-wrap {
-      perspective: 2400px;
-      max-width: min(97vw, 1500px);
-      margin-inline: auto;
-      filter: drop-shadow(0 52px 60px rgba(0,0,0,0.68)) drop-shadow(0 12px 22px rgba(0,0,0,0.46));
+  <style is:global>
+    /* ── Import Cormorant Garamond — titluri serif elegante ──────────────── */
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&display=swap');
+
+    /* ─── Couple Cards — card unic vertical per cuplu ────────────────── */
+    .couple-cards-section {
+      margin-top: 2rem;
+      margin-bottom: 3rem;
     }
 
-    .cinematic-album {
-      position: relative;
+    .couple-cards-section-head {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    .couple-cards-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0;
-      border-radius: 4px 14px 14px 4px;
-      background:
-        linear-gradient(165deg, #3b1f0c 0%, #241208 25%, #1a0c06 55%, #2c1709 80%, #3a1e0b 100%);
-      padding: 1.6rem 1.8rem 1.6rem 2.2rem;
-      box-shadow:
-        inset 3px 0 8px rgba(0,0,0,0.7),
-        inset -1px 0 4px rgba(255,220,150,0.04),
-        0 0 0 3px rgba(60,30,10,0.9),
-        0 0 0 5px rgba(100,55,20,0.4);
-      transform: rotateX(3.5deg) rotateY(-1.2deg);
-      transform-style: preserve-3d;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      max-width: 1280px;
+      margin: 0 auto;
+      align-items: start;
+    }
+
+    /* Cardul — bloc simplu vertical, fără flexbox */
+    .couple-card {
+      display: block;
+      border: 2.5px solid var(--cc, #f5a623);
+      border-radius: 18px;
       overflow: hidden;
-      transition: filter 220ms ease;
+      box-shadow: 0 4px 36px var(--cc-glow, rgba(245,166,35,0.20));
+      transition: box-shadow 0.35s ease, transform 0.35s ease;
+      background: rgba(8,12,36,0.55);
+    }
+    .couple-card:hover {
+      box-shadow: 0 10px 60px var(--cc-glow, rgba(245,166,35,0.42));
+      transform: translateY(-4px);
     }
 
-    .cinematic-album-wrap.is-turning .cinematic-album {
-      filter: saturate(1.08) contrast(1.04);
-      animation: album-rock 950ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    /* Etaj 1 — fotografia (button lightbox trigger) */
+    .cc-photo {
+      display: block;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1.5px solid var(--cc, #f5a623);
+      width: 100%;
+      padding: 0;
+      margin: 0;
+      background: none;
+      border-radius: 0;
+      cursor: pointer;
+      -webkit-appearance: none;
+      appearance: none;
     }
-
-    .album-spine {
-      position: absolute;
-      left: 50%;
-      top: 0;
-      bottom: 0;
-      width: 5px;
-      background: linear-gradient(90deg,
-        rgba(0,0,0,0.65) 0%,
-        rgba(160,100,45,0.55) 30%,
-        rgba(230,175,95,0.7) 50%,
-        rgba(160,100,45,0.55) 70%,
-        rgba(0,0,0,0.65) 100%);
-      box-shadow: -4px 0 14px rgba(0,0,0,0.55), 4px 0 14px rgba(0,0,0,0.55);
-      transform: translateX(-2.5px) translateZ(14px);
-      pointer-events: none;
+    .cc-photo:focus-visible {
+      outline: 2px solid var(--cc, #f5a623);
+      outline-offset: -2px;
     }
-
-    .album-flip-sheet {
-      position: absolute;
-      top: 0.72rem;
-      bottom: 0.72rem;
-      width: calc(50% - 0.36rem);
-      border-radius: 0.95rem;
-      pointer-events: none;
-      opacity: 0;
-      z-index: 8;
-      backface-visibility: hidden;
-      background:
-        linear-gradient(100deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.04) 40%, rgba(5, 6, 18, 0.4) 100%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.03) 100%);
-      box-shadow: 0 16px 34px rgba(0, 0, 0, 0.4);
-      will-change: transform, opacity;
+    .cc-photo img {
+      display: block;
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+      transition: transform 0.55s ease;
     }
-
-    .album-flip-sheet::after {
-      content: '';
+    .couple-card:hover .cc-photo img {
+      transform: scale(1.04);
+    }
+    .cc-name-overlay {
       position: absolute;
       inset: 0;
-      border-radius: inherit;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      background: linear-gradient(to top, rgba(5,8,28,0.92) 0%, transparent 55%);
+      padding: 0.7rem 1rem;
+      pointer-events: none;
+    }
+    .cc-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #FFF8EE;
+      line-height: 1.15;
+      letter-spacing: 0.02em;
+    }
+    .cc-meta {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--cc, #f5a623);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-top: 0.2rem;
+    }
+
+    /* Etaj 3 — footer */
+    .cc-footer {
+      display: block;
+      padding: 0.9rem 1.1rem 1rem;
+    }
+    .cc-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1rem;
+      margin-top: 0.4rem;
+    }
+    .cc-quote {
+      display: block;
+      margin: 0 0 0.5rem;
+      font-style: italic;
+      font-size: 0.82rem;
+      color: rgba(220,208,192,0.80);
+      line-height: 1.6;
+    }
+    .cc-link {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--cc, #f5a623);
+      text-decoration: none;
+      padding-bottom: 1px;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s, opacity 0.2s;
+    }
+    .cc-link--dance {
+      color: rgba(255, 220, 160, 0.85);
+    }
+    .cc-link:hover {
+      opacity: 0.78;
+      border-bottom-color: var(--cc, #f5a623);
+    }
+    .cc-link--dance:hover {
+      border-bottom-color: rgba(255, 220, 160, 0.85);
+    }
+    /* ──────────────────────────────────────────────────────────────────── */
+
+    /* Override section-title — Serif mătase, Auriu Șampanie, relief 3D */
+    .section-title {
+      font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif !important;
+      font-weight: 300 !important;
+      font-size: clamp(2rem, 5vw, 3.6rem) !important;
+      color: #F1E5AC !important;
+      text-transform: none !important;
+      letter-spacing: 0.03em !important;
+      line-height: 1.15 !important;
+      text-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.70),
+        0 3px 12px rgba(241, 229, 172, 0.22),
+        0 6px 28px rgba(0, 0, 0, 0.45);
+    }
+
+    /* ── Sunset overlay — înăuntrul dialogului, z-index sub restul ── */
+    #sunset-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
       opacity: 0;
-      background: linear-gradient(110deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.38) 45%, rgba(255, 255, 255, 0) 78%);
-      transform: translateX(-85%);
+      transition: opacity 1.4s ease;
+      background: linear-gradient(
+        180deg,
+        #0d0620  0%,
+        #2a0a3a 12%,
+        #5c1a2e 28%,
+        #a03020 45%,
+        #d4501a 58%,
+        #e8820a 70%,
+        #f0a830 80%,
+        #f5c84a 90%,
+        #fde68a 100%
+      );
     }
 
-    .cinematic-album.is-turning-next .album-flip-sheet {
-      left: calc(50% + 0.18rem);
-      transform-origin: left center;
-      animation: page-sheet-next 950ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    /* Secțiunea principală — complet transparentă peste cerul normal */
+    #momente-reale,
+    .section-container {
+      background: transparent !important;
+      background-color: transparent !important;
     }
 
-    .cinematic-album.is-turning-next .album-flip-sheet::after {
-      animation: flip-glint 950ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    /* Panouri de sticlă mată — cristal cu blur */
+    .page-glass-panel {
+      backdrop-filter: blur(30px) saturate(1.3) !important;
+      -webkit-backdrop-filter: blur(30px) saturate(1.3) !important;
+      background: rgba(255, 255, 255, 0.05) !important;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.10),
+        0 4px 24px rgba(0, 0, 0, 0.22);
+    }
+
+    /* ── Film strip ──────────────────────────────────────────────────────── */
+    .film-strip-wrap {
+      max-width: min(97vw, 1500px);
+      margin-inline: auto;
+    }
+
+    .film-strip-viewport {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      position: relative;
+      overflow: hidden;
+      padding-block: 0.5rem;
+    }
+
+    .film-strip-track-outer {
+      flex: 1 1 auto;
+      overflow: hidden;
+      position: relative;
+      min-width: 0;
+    }
+
+    .film-strip-track {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      will-change: transform;
+      padding-block: 1rem;
+    }
+
+    .film-thumb {
+      flex-shrink: 0;
+      width: 210px;
+      opacity: 0.55;
+      transition: opacity 320ms ease;
+    }
+
+    .film-thumb--active {
+      opacity: 1;
+      z-index: 2;
+    }
+
+    .film-thumb-btn {
+      display: block;
+      width: 100%;
+      position: relative;
+      cursor: pointer;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 2.5px solid transparent;
+      padding: 0;
+      background: transparent;
+      transition: border-color 250ms ease, box-shadow 250ms ease;
+    }
+
+    .film-thumb--active .film-thumb-btn {
+      border-color: #F5A623;
+      box-shadow: 0 0 26px rgba(245,166,35,0.65), 0 8px 28px rgba(0,0,0,0.55);
+    }
+
+    .film-thumb-img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      display: block;
+      border-radius: 14px;
+    }
+
+    .film-active-open-hint {
+      position: absolute;
+      bottom: 0.4rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(245, 166, 35, 0.92);
+      color: #0C080F;
+      border-radius: 9999px;
+      padding: 0.18rem 0.6rem;
+      font-size: 0.6rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .film-strip-arrow {
+      flex-shrink: 0;
+      width: 2.8rem;
+      height: 2.8rem;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,0.22);
+      background: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.8);
+      font-size: 2rem;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 160ms ease, border-color 160ms ease, opacity 160ms ease;
+      z-index: 3;
+    }
+
+    .film-strip-arrow:hover:not(:disabled) {
+      background: rgba(245,166,35,0.22);
+      border-color: rgba(245,166,35,0.6);
+      color: #F5A623;
+    }
+
+    .film-strip-arrow:disabled {
+      opacity: 0.22;
+      cursor: not-allowed;
+    }
+
+    .film-strip-controls {
+      margin-top: 0.3rem;
+      text-align: center;
+    }
+
+    .film-strip-indicator {
+      margin: 0;
+      color: rgba(233,244,255,0.75);
+      font-size: 0.64rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .film-empty-msg {
+      padding: 1.5rem;
+      color: rgba(255,255,255,0.6);
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-align: center;
     }
 
     .cinematic-album.is-turning-prev .album-flip-sheet {
@@ -1486,218 +1850,16 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
       animation: page-sheet-prev 950ms cubic-bezier(0.2, 0.7, 0.2, 1);
     }
 
-    .cinematic-album.is-turning-prev .album-flip-sheet::after {
-      animation: flip-glint 950ms cubic-bezier(0.2, 0.7, 0.2, 1);
-    }
-
-    .album-page {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 0.5rem;
-      align-content: start;
-      border-radius: 2px;
-      border: none;
-      background: linear-gradient(160deg, #fdf8ef 0%, #faf3e4 45%, #f8eed8 100%);
-      padding: 0.6rem;
-      transition: filter 220ms ease;
-      box-shadow: inset 0 0 30px rgba(180,140,80,0.1);
-    }
-
-    .cinematic-album-wrap.is-turning .album-page {
-      filter: blur(0.9px);
-    }
-
-    .album-page-left {
-      transform: rotateY(5deg) translateZ(2px);
-      transform-origin: right center;
-      box-shadow: 4px 0 18px rgba(0,0,0,0.4), inset -8px 0 20px rgba(0,0,0,0.1);
-    }
-
-    .album-page-right {
-      transform: rotateY(-5deg) translateZ(2px);
-      transform-origin: left center;
-      box-shadow: -4px 0 18px rgba(0,0,0,0.4), inset 8px 0 20px rgba(0,0,0,0.1);
-    }
-
-    .album-page.is-flipping-forward {
-      animation: page-turn-forward 950ms cubic-bezier(0.2, 0.7, 0.2, 1);
-    }
-
-    .album-page.is-flipping-backward {
-      animation: page-turn-backward 950ms cubic-bezier(0.2, 0.7, 0.2, 1);
-    }
-
-    .album-photo-frame {
-      display: grid;
-      gap: 0;
-      position: relative;
-    }
-
-    .moment-photo-trigger {
-      position: relative;
-      display: block;
-      width: 100%;
-      cursor: zoom-in;
-      overflow: hidden;
-      border-radius: 2px;
-      padding: 0;
-      background: transparent;
-      border: none;
-    }
-
-    .album-photo-overlay {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 1.4rem 0.75rem 0.55rem;
-      background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.45) 55%, transparent 100%);
-      display: flex;
-      flex-direction: column;
-      gap: 0.15rem;
-      opacity: 0;
-      transition: opacity 240ms ease;
-      pointer-events: none;
-    }
-
-    .moment-photo-trigger:hover .album-photo-overlay,
-    .moment-photo-trigger:focus-visible .album-photo-overlay {
-      opacity: 1;
-    }
-
-    .album-photo-overlay-title {
-      margin: 0;
-      font-family: 'Oswald', sans-serif;
-      font-weight: 700;
-      font-size: clamp(0.72rem, 1.3vw, 0.9rem);
-      color: #fff;
-      line-height: 1.2;
-      text-shadow: 0 1px 5px rgba(0,0,0,0.9);
-    }
-
-    .album-photo-overlay-meta {
-      font-size: clamp(0.58rem, 1vw, 0.68rem);
-      color: rgba(255,255,255,0.85);
-      font-weight: 600;
-      letter-spacing: 0.03em;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-    }
-
-    .album-audio-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.2em;
-      background: rgba(245, 166, 35, 0.92);
-      color: #0C080F;
-      border-radius: 9999px;
-      padding: 0.15rem 0.52rem;
-      font-size: 0.58rem;
-      font-weight: 800;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      margin-top: 0.22rem;
-      width: fit-content;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.4);
-    }
-
-    .album-photo {
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      border-radius: 0;
-      border: none;
-      object-fit: cover;
-      box-shadow:
-        0 3px 10px rgba(0,0,0,0.38),
-        0 1px 2px rgba(0,0,0,0.22),
-        inset 0 0 0 1px rgba(255,255,255,0.1);
-      transition: transform 200ms ease, box-shadow 200ms ease;
-      display: block;
-    }
-
-    .moment-photo-trigger:hover .album-photo {
-      transform: scale(1.025);
-      box-shadow:
-        0 8px 22px rgba(0,0,0,0.52),
-        0 1px 2px rgba(0,0,0,0.3),
-        inset 0 0 0 1px rgba(255,255,255,0.18);
-    }
-
-    .album-photo-label {
-      margin: 0;
-      font-size: 0.66rem;
-      line-height: 1.3;
-      color: #eaf2ff;
-      font-weight: 700;
-      text-align: center;
-      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.65);
-    }
-
-    .album-controls {
-      margin-top: 0.55rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.6rem;
-      flex-wrap: wrap;
-    }
-
-    .album-nav-btn {
-      border: 1px solid #ffffff3a;
-      border-radius: 9999px;
-      background: #ffffff12;
-      color: #f4f8ff;
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      padding: 0.42rem 0.7rem;
-      transition: background 180ms ease, opacity 180ms ease;
-    }
-
-    .album-nav-btn:hover {
-      background: #ffffff1e;
-    }
-
-    .album-nav-btn:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
-
-    .album-sound-btn {
-      border: 1px solid #ffffff36;
-      border-radius: 9999px;
-      background: #101529d4;
-      color: #eff6ff;
-      font-size: 0.68rem;
-      font-weight: 800;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      padding: 0.42rem 0.66rem;
-      transition: background 180ms ease, border-color 180ms ease;
-    }
-
-    .album-sound-btn:hover {
-      background: #171e3ad4;
-      border-color: #ffffff52;
-    }
-
-    .album-page-indicator {
-      margin: 0;
-      min-width: 9rem;
-      text-align: center;
-      color: #e9f4ff;
-      font-size: 0.64rem;
-      font-weight: 700;
-      letter-spacing: 0.07em;
-      text-transform: uppercase;
+    .film-strip-wrap.album-is-returning {
+      animation: albumReturn 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
     }
 
     .cinematic-lightbox {
-      --lightbox-shell-height-desktop: min(54vh, calc(100dvh - 22rem));
-      --lightbox-image-max-height-desktop: min(49vh, calc(100dvh - 24rem));
-      --lightbox-image-max-width-desktop: min(92vw, 1100px);
-      --lightbox-shell-height-mobile: min(44vh, calc(100dvh - 22rem));
-      --lightbox-image-max-height-mobile: min(39vh, calc(100dvh - 24rem));
+      --lightbox-shell-height-desktop: min(72vh, calc(100dvh - 14rem));
+      --lightbox-image-max-height-desktop: min(68vh, calc(100dvh - 16rem));
+      --lightbox-image-max-width-desktop: min(96vw, 1300px);
+      --lightbox-shell-height-mobile: min(58vh, calc(100dvh - 16rem));
+      --lightbox-image-max-height-mobile: min(54vh, calc(100dvh - 18rem));
       position: fixed;
       inset: 0;
       margin: 0;
@@ -1708,7 +1870,7 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
       border: 0;
       border-radius: 0;
       padding: 4.5rem 1.2rem 1.5rem;
-      background: linear-gradient(180deg, rgba(3, 6, 17, 0.98), rgba(9, 12, 29, 0.98));
+      background: transparent;
       overflow-x: hidden;
       overflow-y: auto;
     }
@@ -1722,11 +1884,11 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
     }
 
     .cinematic-lightbox[data-size-preset='large'] {
-      --lightbox-shell-height-desktop: min(57vh, calc(100dvh - 19rem));
-      --lightbox-image-max-height-desktop: min(52vh, calc(100dvh - 21rem));
-      --lightbox-image-max-width-desktop: min(93vw, 1160px);
-      --lightbox-shell-height-mobile: min(47vh, calc(100dvh - 20rem));
-      --lightbox-image-max-height-mobile: min(42vh, calc(100dvh - 22rem));
+      --lightbox-shell-height-desktop: min(76vh, calc(100dvh - 11rem));
+      --lightbox-image-max-height-desktop: min(72vh, calc(100dvh - 13rem));
+      --lightbox-image-max-width-desktop: min(97vw, 1380px);
+      --lightbox-shell-height-mobile: min(62vh, calc(100dvh - 13rem));
+      --lightbox-image-max-height-mobile: min(58vh, calc(100dvh - 15rem));
     }
 
     :global(html.lightbox-open-lock) {
@@ -1741,7 +1903,7 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
     }
 
     .cinematic-lightbox::backdrop {
-      background: rgba(2, 4, 12, 0.92);
+      background: rgba(2, 4, 12, 0.97);
       backdrop-filter: blur(4px);
     }
 
@@ -1828,7 +1990,6 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
 
     .lightbox-close,
     .lightbox-caption,
-    .lightbox-frame-selector,
     .lightbox-demo-sound-wrap,
     .lightbox-audio-wrap,
     .lightbox-quote,
@@ -1844,63 +2005,7 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
       z-index: 1;
       width: 100%;
       height: 100%;
-    }
-
-
-
-    .lightbox-image-frame {
-      position: relative;
-      border-radius: 0.5rem;
-      padding: 1.15rem;
-      background:
-        repeating-linear-gradient(
-          93deg,
-          transparent 0,
-          transparent 3px,
-          rgba(0, 0, 0, 0.04) 3px,
-          rgba(0, 0, 0, 0.04) 4px
-        ),
-        linear-gradient(
-          135deg,
-          rgba(255, 245, 196, 0.96) 0%,
-          rgba(224, 172, 68, 0.94) 14%,
-          rgba(160, 112, 36, 0.92) 30%,
-          rgba(218, 165, 62, 0.92) 48%,
-          rgba(148, 106, 32, 0.92) 64%,
-          rgba(224, 178, 72, 0.94) 80%,
-          rgba(255, 248, 200, 0.96) 100%
-        ),
-        radial-gradient(120% 140% at 10% 6%, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0) 50%);
-      box-shadow:
-        inset 0 2px 6px rgba(255, 230, 140, 0.35),
-        inset 0 -2px 6px rgba(80, 50, 10, 0.4),
-        0 0 0 1px rgba(130, 90, 18, 0.65),
-        0 0 0 3px rgba(240, 200, 100, 0.42),
-        0 0 0 5px rgba(90, 58, 10, 0.5),
-        0 28px 64px rgba(0, 0, 0, 0.68),
-        0 8px 22px rgba(0, 0, 0, 0.42),
-        0 0 44px rgba(200, 148, 44, 0.22);
-      overflow: hidden;
-    }
-
-    .lightbox-image-frame::before {
-      content: '';
-      position: absolute;
-      inset: 0.7rem;
-      border-radius: 0.18rem;
-      border: 1px solid rgba(255, 250, 220, 0.7);
-      pointer-events: none;
-      box-shadow: inset 0 0 0 1px rgba(110, 72, 12, 0.2);
-    }
-
-    .lightbox-image-frame::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      background: linear-gradient(115deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0) 42%);
-      mix-blend-mode: screen;
-      pointer-events: none;
+      background: transparent;
     }
 
     .cinematic-lightbox[open] .lightbox-image-shell {
@@ -1910,12 +2015,15 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
     .cinematic-lightbox .lightbox-image {
       max-height: var(--lightbox-image-max-height-desktop);
       width: auto;
-      max-width: calc(var(--lightbox-image-max-width-desktop) - 2.8rem);
-      border-radius: 0.18rem;
+      max-width: var(--lightbox-image-max-width-desktop);
+      border-radius: 1.5rem;
       object-fit: contain;
       background: #0b1024;
       border: none;
       display: block;
+      box-shadow: 0 36px 80px rgba(0,0,0,0.85), 0 10px 28px rgba(0,0,0,0.55);
+      transform: perspective(1200px) rotateX(3deg);
+      transform-origin: top center;
     }
 
     .lightbox-audio-wrap {
@@ -2009,15 +2117,6 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
       border-color: rgba(255, 255, 255, 0.62);
     }
 
-    .lightbox-frame-selector {
-      margin: 0.35rem auto 0;
-      width: min(92vw, 560px);
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 0.45rem;
-    }
-
     .lightbox-size-selector {
       margin: 0.3rem auto 0;
       width: min(92vw, 560px);
@@ -2040,66 +2139,6 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
     .lightbox-size-btn:hover {
       background: rgba(255, 255, 255, 0.16);
       border-color: rgba(255, 255, 255, 0.5);
-    }
-
-    .lightbox-frame-btn {
-      border: 1px solid rgba(255, 255, 255, 0.32);
-      border-radius: 9999px;
-      background: rgba(255, 255, 255, 0.08);
-      color: #eef5ff;
-      font-size: 0.68rem;
-      font-weight: 800;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      padding: 0.34rem 0.62rem;
-      transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
-    }
-
-    .lightbox-frame-btn:hover {
-      background: rgba(255, 255, 255, 0.16);
-      border-color: rgba(255, 255, 255, 0.5);
-    }
-
-    .lightbox-frame-btn.is-active {
-      background: rgba(255, 255, 255, 0.24);
-      border-color: rgba(255, 255, 255, 0.72);
-      transform: translateY(-1px);
-    }
-
-    .cinematic-lightbox[data-frame-theme='silver'] .lightbox-image-frame {
-      background:
-        linear-gradient(130deg, rgba(227, 233, 242, 0.93) 0%, rgba(163, 176, 198, 0.9) 34%, rgba(111, 121, 141, 0.9) 68%, rgba(224, 232, 242, 0.93) 100%),
-        radial-gradient(120% 140% at 12% 8%, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 56%);
-      box-shadow:
-        0 0 0 1px rgba(225, 234, 248, 0.52),
-        0 16px 44px rgba(0, 0, 0, 0.56),
-        0 0 30px rgba(162, 186, 218, 0.24);
-    }
-
-    .cinematic-lightbox[data-frame-theme='silver'] .lightbox-image-frame::before {
-      border-color: rgba(241, 247, 255, 0.68);
-    }
-
-    .cinematic-lightbox[data-frame-theme='silver'] .lightbox-image {
-      border-color: rgba(238, 246, 255, 0.58);
-    }
-
-    .cinematic-lightbox[data-frame-theme='wood'] .lightbox-image-frame {
-      background:
-        linear-gradient(135deg, rgba(120, 82, 47, 0.96) 0%, rgba(84, 55, 31, 0.95) 40%, rgba(58, 38, 25, 0.96) 72%, rgba(132, 90, 52, 0.95) 100%),
-        radial-gradient(120% 140% at 12% 8%, rgba(255, 233, 184, 0.2) 0%, rgba(255, 255, 255, 0) 58%);
-      box-shadow:
-        0 0 0 1px rgba(196, 151, 99, 0.35),
-        0 16px 44px rgba(0, 0, 0, 0.62),
-        0 0 22px rgba(95, 62, 36, 0.35);
-    }
-
-    .cinematic-lightbox[data-frame-theme='wood'] .lightbox-image-frame::before {
-      border-color: rgba(223, 180, 126, 0.45);
-    }
-
-    .cinematic-lightbox[data-frame-theme='wood'] .lightbox-image {
-      border-color: rgba(229, 194, 149, 0.48);
     }
 
     .lightbox-audio-note {
@@ -2170,102 +2209,6 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
       to { opacity: 1; transform: none; }
     }
 
-    .cinematic-album-wrap.album-is-returning {
-      animation: albumReturn 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
-    }
-
-    @keyframes page-turn-forward {
-      from {
-        transform: rotateY(-5deg) translateZ(2px);
-      }
-      50% {
-        transform: rotateY(-30deg) translateZ(6px);
-      }
-      to {
-        transform: rotateY(-5deg) translateZ(2px);
-      }
-    }
-
-    @keyframes page-turn-backward {
-      from {
-        transform: rotateY(5deg) translateZ(2px);
-      }
-      50% {
-        transform: rotateY(30deg) translateZ(6px);
-      }
-      to {
-        transform: rotateY(5deg) translateZ(2px);
-      }
-    }
-
-    @keyframes page-sheet-next {
-      0% {
-        opacity: 0;
-        transform: perspective(1800px) rotateY(0deg) translateX(0);
-      }
-      8% {
-        opacity: 1;
-      }
-      50% {
-        opacity: 1;
-        transform: perspective(1800px) rotateY(-108deg) translateX(-10%) scaleX(0.9);
-      }
-      100% {
-        opacity: 0;
-        transform: perspective(1800px) rotateY(-180deg) translateX(-62%) scaleX(0.55);
-      }
-    }
-
-    @keyframes page-sheet-prev {
-      0% {
-        opacity: 0;
-        transform: perspective(1800px) rotateY(0deg) translateX(0);
-      }
-      8% {
-        opacity: 1;
-      }
-      50% {
-        opacity: 1;
-        transform: perspective(1800px) rotateY(108deg) translateX(10%) scaleX(0.9);
-      }
-      100% {
-        opacity: 0;
-        transform: perspective(1800px) rotateY(180deg) translateX(62%) scaleX(0.55);
-      }
-    }
-
-    @keyframes album-rock {
-      0% {
-        transform: rotateX(3.5deg) rotateY(-1.2deg);
-      }
-      30% {
-        transform: rotateX(5deg) rotateY(-3deg) rotateZ(-0.3deg);
-      }
-      65% {
-        transform: rotateX(4deg) rotateY(0.4deg) rotateZ(0.2deg);
-      }
-      100% {
-        transform: rotateX(3.5deg) rotateY(-1.2deg);
-      }
-    }
-
-    @keyframes flip-glint {
-      0% {
-        opacity: 0;
-        transform: translateX(-85%);
-      }
-      16% {
-        opacity: 0.8;
-      }
-      70% {
-        opacity: 0.55;
-      }
-      100% {
-        opacity: 0;
-        transform: translateX(110%);
-      }
-    }
-
     .gallery-stage-fade {
       opacity: 0;
       transform: translateY(12px);
@@ -2301,56 +2244,28 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
         height: var(--lightbox-shell-height-mobile);
       }
 
-      .lightbox-image-frame {
-        padding: 0.72rem;
-        border-radius: 0.38rem;
-      }
-
       .cinematic-lightbox {
         padding-top: 3.5rem;
       }
 
       .cinematic-lightbox .lightbox-image {
         max-height: var(--lightbox-image-max-height-mobile);
-        max-width: calc(var(--lightbox-image-max-width-desktop) - 2rem);
+        max-width: var(--lightbox-image-max-width-desktop);
       }
 
-      .cinematic-album {
-        grid-template-columns: 1fr;
-        transform: none;
-        padding: 1rem;
-        border-radius: 8px;
+      .film-thumb {
+        width: 160px;
       }
 
-      .album-spine {
-        display: none;
+      .film-strip-arrow {
+        width: 2.2rem;
+        height: 2.2rem;
+        font-size: 1.5rem;
       }
+    }
 
-      .album-flip-sheet {
-        display: none;
-      }
-
-      .album-page-left,
-      .album-page-right {
-        transform: none;
-        box-shadow: none;
-      }
-
-      .album-page-indicator {
-        min-width: 8.5rem;
-      }
-
-      .cinematic-album-wrap {
-        max-height: none;
-      }
-
-      .album-page {
-        min-height: clamp(10.5rem, 30vh, 15rem);
-      }
-
-      .album-photo {
-        max-height: clamp(8rem, 26vh, 12rem);
-      }
+    @media (prefers-reduced-motion: reduce) {
+      .bg-music-fab.is-playing .bg-music-note { animation: none; }
     }
   </style>
 </BaseLayout>

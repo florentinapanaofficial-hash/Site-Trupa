@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import DOMPurify from 'isomorphic-dompurify';
 import { query } from '../../lib/db.js';
+import { checkOrigin } from '../../lib/cors.js';
 
 export const prerender = false;
 
@@ -15,7 +16,10 @@ type ComentariuPayload = {
   comentariu?: string;
 };
 
-function jsonResponse(data: unknown, status = 200): Response {
+function jsonResponse(data: unknown, status = 200, corsOrigin: string | null = null): Response {
+  const corsHeaders: Record<string, string> = corsOrigin !== null
+    ? { 'Access-Control-Allow-Origin': corsOrigin, 'Vary': 'Origin' }
+    : {};
   return new Response(JSON.stringify(data), {
     status,
     headers: {
@@ -24,6 +28,7 @@ function jsonResponse(data: unknown, status = 200): Response {
       'X-Content-Type-Options': 'nosniff',
       'Referrer-Policy': 'no-referrer',
       'Content-Security-Policy': "default-src 'none'; frame-ancestors 'none'; base-uri 'none'",
+      ...corsHeaders,
     },
   });
 }
@@ -71,18 +76,46 @@ function parsePostId(value: unknown): number | null {
   return parsed;
 }
 
+export const OPTIONS: APIRoute = ({ request }) => {
+  const cors = checkOrigin(request);
+  if (!cors.allowed) {
+    return new Response(JSON.stringify({ error: 'Origin not allowed' }), {
+      status: 403,
+      headers: { 'Content-Type': 'application/json; charset=utf-8' },
+    });
+  }
+  return new Response(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': cors.origin ?? '',
+      'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Max-Age': '86400',
+      'Vary': 'Origin',
+    },
+  });
+};
+
 export const POST: APIRoute = async ({ request }) => {
+  const cors = checkOrigin(request);
+  if (!cors.allowed) {
+    return new Response(JSON.stringify({ error: 'Origin not allowed' }), {
+      status: 403,
+      headers: { 'Content-Type': 'application/json; charset=utf-8' },
+    });
+  }
+
   let payload: Partial<ComentariuPayload>;
 
   const ip = resolveClientIp(request);
   if (isRateLimited(ip)) {
-    return jsonResponse({ error: 'Prea multe comentarii. Incearca din nou peste un minut.' }, 429);
+    return jsonResponse({ error: 'Prea multe comentarii. Incearca din nou peste un minut.' }, 429, cors.origin);
   }
 
   try {
     payload = (await request.json()) as Partial<ComentariuPayload>;
   } catch {
-    return jsonResponse({ error: 'Body JSON invalid.' }, 400);
+    return jsonResponse({ error: 'Body JSON invalid.' }, 400, cors.origin);
   }
 
   const postId = parsePostId(payload.post_id);
@@ -97,11 +130,11 @@ export const POST: APIRoute = async ({ request }) => {
   }).trim();
 
   if (!postId || !numeUtilizator) {
-    return jsonResponse({ error: 'Campurile post_id si nume_utilizator sunt obligatorii.' }, 400);
+    return jsonResponse({ error: 'Campurile post_id si nume_utilizator sunt obligatorii.' }, 400, cors.origin);
   }
 
   if (textComentariu.length === 0 || textComentariu.length > 500) {
-    return jsonResponse({ error: 'Comentariul nu poate fi gol si nu poate depasi 500 caractere.' }, 400);
+    return jsonResponse({ error: 'Comentariul nu poate fi gol si nu poate depasi 500 caractere.' }, 400, cors.origin);
   }
 
   try {
@@ -110,18 +143,26 @@ export const POST: APIRoute = async ({ request }) => {
       [postId, numeUtilizator, textComentariu],
     );
 
-    return jsonResponse({ success: true }, 201);
+    return jsonResponse({ success: true }, 201, cors.origin);
   } catch (error) {
     console.error('Eroare la salvarea comentariului:', error);
-    return jsonResponse({ error: 'Eroare interna la salvarea comentariului.' }, 500);
+    return jsonResponse({ error: 'Eroare interna la salvarea comentariului.' }, 500, cors.origin);
   }
 };
 
-export const GET: APIRoute = async ({ url }) => {
+export const GET: APIRoute = async ({ url, request }) => {
+  const cors = checkOrigin(request);
+  if (!cors.allowed) {
+    return new Response(JSON.stringify({ error: 'Origin not allowed' }), {
+      status: 403,
+      headers: { 'Content-Type': 'application/json; charset=utf-8' },
+    });
+  }
+
   const postId = parsePostId(url.searchParams.get('post_id'));
 
   if (!postId) {
-    return jsonResponse({ error: 'Parametrul post_id este obligatoriu si trebuie sa fie numar intreg pozitiv.' }, 400);
+    return jsonResponse({ error: 'Parametrul post_id este obligatoriu si trebuie sa fie numar intreg pozitiv.' }, 400, cors.origin);
   }
 
   try {
@@ -139,9 +180,9 @@ export const GET: APIRoute = async ({ url }) => {
       data: string;
     }>;
 
-    return jsonResponse({ comments: rows }, 200);
+    return jsonResponse({ comments: rows }, 200, cors.origin);
   } catch (error) {
     console.error('Eroare la citirea comentariilor:', error);
-    return jsonResponse({ error: 'Eroare interna la citirea comentariilor.' }, 500);
+    return jsonResponse({ error: 'Eroare interna la citirea comentariilor.' }, 500, cors.origin);
   }
 };

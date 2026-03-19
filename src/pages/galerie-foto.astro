@@ -1,19 +1,23 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import siteContent from '../data/siteContent.json';
+import BackButton from '../components/BackButton.astro';
 
-const { seo, gallery } = siteContent;
+const { seo, gallery, brand } = siteContent;
 ---
 
-<BaseLayout title={`Galerie Foto | ${seo.title}`} description="Galerie foto cu momente din evenimentele Formației Florentina Pană.">
+<BaseLayout title={`Galerie Foto | ${brand.name}`} description="Galerie foto cu momente din evenimentele Formației Florentina Pană.">
   <section class="section-container py-16">
+    <div class="mb-8"><BackButton href="/" label="Acasă" /></div>
     <header class="section-head mx-auto text-center">
       <p class="kicker">Galerie Foto</p>
-      <h1 class="section-title">Cadre din evenimente reale</h1>
+      <h1 class="section-title">Galerie Foto Nunți și Evenimente | Formația Florentina Pană</h1>
       <p class="section-copy">Selectăm constant fotografii reprezentative pentru atmosferă, energie și eleganță.</p>
     </header>
 
-    <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    <h2 class="mt-8 text-xl font-bold text-white/80">Fotografii din nunți, botezuri și evenimente corporate</h2>
+
+    <div class="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {gallery.map((item) => (
         item.image ? (
           <article class="gallery-img-card">

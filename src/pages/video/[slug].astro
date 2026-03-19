@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import siteContent from '../../data/siteContent.json';
+import BackButton from '../../components/BackButton.astro';
 
 export function getStaticPaths() {
   const slugify = (value: string) =>
@@ -35,10 +36,30 @@ const pageTitle = `${video.title} | Video live | Formația Florentina Pană`;
 const pageDescription = `Urmărește ${video.title}, moment live din repertoriul Formația Florentina Pană. Vezi clipul complet și distribuie pagina.`;
 const ogImage = `https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`;
 const youtubeUrl = video.youtubeUrl ?? `https://www.youtube.com/watch?v=${video.youtubeId}`;
+
+const videoJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'VideoObject',
+  name: video.title,
+  description: pageDescription,
+  thumbnailUrl: ogImage,
+  embedUrl: `https://www.youtube.com/embed/${video.youtubeId}`,
+  contentUrl: youtubeUrl,
+  publisher: {
+    '@type': 'Organization',
+    name: siteContent.brand.name,
+    url: 'https://florentinapanaofficial.ro',
+  },
+};
 ---
 
-<BaseLayout title={pageTitle} description={pageDescription} ogImage={ogImage}>
+<BaseLayout title={pageTitle} description={pageDescription} ogImage={ogImage} ogType="video.other">
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(videoJsonLd)} />
+  </Fragment>
   <section class="section-container py-16">
+    <div class="mb-8"><BackButton href="/galerie-video" label="Galerie Video" /></div>
+
     <header class="section-head mx-auto text-center">
       <p class="kicker">Video individual</p>
       <h1 class="section-title">{video.title}</h1>

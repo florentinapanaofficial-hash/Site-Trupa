@@ -1,0 +1,179 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import blogPostsRaw from '../../data/blogPosts.json';
+import siteContent from '../../data/siteContent.json';
+import BackButton from '../../components/BackButton.astro';
+
+const { seo, brand } = siteContent;
+
+const posts = [...((blogPostsRaw as any).items ?? [])].sort(
+  (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+);
+
+const accentClass: Record<string, string> = {
+  gold:   'accent-gold',
+  rose:   'accent-rose',
+  cyan:   'accent-cyan',
+  violet: 'accent-violet',
+  teal:   'accent-teal',
+  lime:   'accent-lime',
+};
+
+function formatDate(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString('ro-RO', {
+    day: 'numeric', month: 'long', year: 'numeric',
+  });
+}
+---
+
+<BaseLayout title={`Noutăți | ${brand.name}`} description="Articole, povești din culise și noutăți despre Formația Florentina Pană.">
+
+  <div class="page-section">
+    <div class="section-inner">
+
+      <div class="mb-6"><BackButton href="/" label="Acasă" /></div>
+      <div class="section-head" style="margin-bottom:2.5rem">
+        <span class="section-pill">Blog</span>
+        <h1 class="section-title">Blog Muzică Live | Formația Florentina Pană</h1>
+        <p class="section-lead" style="color:#ffffff">Articole, povești din culise și sfaturi pentru nunți și evenimente cu muzică live.</p>
+      </div>
+
+      {posts.length === 0 ? (
+        <div class="empty-state">
+          <p>Niciun articol publicat momentan.</p>
+        </div>
+      ) : (
+        <div class="blog-grid">
+          {posts.map((post) => (
+            <a href={`/blog/${post.slug}`} class="blog-card" aria-label={`Citește: ${post.title}`}>
+              <div class="blog-card-cover">
+                {post.coverImage ? (
+                  <img src={post.coverImage} alt={post.title} loading="lazy" decoding="async" />
+                ) : (
+                  <span class="blog-card-emoji" aria-hidden="true">{post.coverEmoji || '📝'}</span>
+                )}
+              </div>
+              <div class="blog-card-body">
+                <div class="blog-card-meta">
+                  <span class={`blog-category ${accentClass[post.categoryAccent] ?? ''}`}>{post.category}</span>
+                  <span class="blog-read-time">{post.readTime}</span>
+                </div>
+                <h2 class="blog-card-title">{post.title}</h2>
+                <p class="blog-card-excerpt">{post.excerpt}</p>
+                <time class="blog-card-date" datetime={post.date}>{formatDate(post.date)}</time>
+              </div>
+            </a>
+          ))}
+        </div>
+      )}
+
+    </div>
+  </div>
+
+</BaseLayout>
+
+<style>
+  .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+    gap: 1.75rem;
+  }
+
+  .blog-card {
+    display: flex;
+    flex-direction: column;
+    border-radius: 1.1rem;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(12px);
+    text-decoration: none;
+    color: inherit;
+    transition: transform 200ms ease, box-shadow 200ms ease;
+  }
+
+  .blog-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.38);
+  }
+
+  .blog-card-cover {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .blog-card-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .blog-card-emoji {
+    font-size: 3.5rem;
+    line-height: 1;
+  }
+
+  .blog-card-body {
+    padding: 1.25rem 1.4rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    flex: 1;
+  }
+
+  .blog-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .blog-category {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.65rem;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+  }
+  .blog-category.accent-gold   { background: rgba(245,166,35,.22);  color: #ffd166; }
+  .blog-category.accent-rose   { background: rgba(255,70,120,.22);  color: #ff94b8; }
+  .blog-category.accent-cyan   { background: rgba(6,214,255,.22);   color: #7ef8ff; }
+  .blog-category.accent-violet { background: rgba(167,100,255,.22); color: #d8a8ff; }
+  .blog-category.accent-teal   { background: rgba(20,220,180,.22);  color: #6effd8; }
+  .blog-category.accent-lime   { background: rgba(140,240,50,.22);  color: #c8ff60; }
+
+  .blog-read-time {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .blog-card-title {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: #ffffff;
+    line-height: 1.25;
+    margin: 0;
+  }
+
+  .blog-card-excerpt {
+    font-size: 0.88rem;
+    color: rgba(255, 255, 255, 0.72);
+    line-height: 1.6;
+    margin: 0;
+    flex: 1;
+  }
+
+  .blog-card-date {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.42);
+    margin-top: auto;
+  }
+</style>

@@ -2,8 +2,8 @@ import { readFile } from 'node:fs/promises';
 import { isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import '@astrojs/internal-helpers/path';
-import { A as AstroError, N as NoImageMetadata, F as FailedToFetchRemoteImageDimensions, c as ExpectedImageOptions, E as ExpectedImage, d as ExpectedNotESMImage, e as InvalidImageService, f as createAstro, g as createComponent, h as ImageMissingAlt, m as maybeRenderHead, i as addAttribute, s as spreadAttributes, r as renderTemplate } from '../chunks/astro/server_hiwJrkZg.mjs';
-import { r as resolveSrc, i as isRemoteImage, a as isCoreRemotePath, b as isESMImportedImage, c as isLocalService, D as DEFAULT_HASH_PROPS, d as isRemoteAllowed } from '../chunks/astro/assets-service_Bc_0m3Pb.mjs';
+import { A as AstroError, N as NoImageMetadata, F as FailedToFetchRemoteImageDimensions, c as ExpectedImageOptions, E as ExpectedImage, d as ExpectedNotESMImage, e as InvalidImageService, f as createAstro, g as createComponent, h as ImageMissingAlt, m as maybeRenderHead, i as addAttribute, s as spreadAttributes, r as renderTemplate } from '../chunks/astro/server_CJG6WAvb.mjs';
+import { r as resolveSrc, i as isRemoteImage, a as isCoreRemotePath, b as isESMImportedImage, c as isLocalService, D as DEFAULT_HASH_PROPS, d as isRemoteAllowed } from '../chunks/astro/assets-service_Cdk2Npf0.mjs';
 import 'clsx';
 import * as mime from 'mrmime';
 export { renderers } from '../renderers.mjs';
@@ -846,7 +846,7 @@ async function getConfiguredImageService() {
   if (!globalThis?.astroAsset?.imageService) {
     const { default: service } = await import(
       // @ts-expect-error
-      '../chunks/astro/assets-service_Bc_0m3Pb.mjs'
+      '../chunks/astro/assets-service_Cdk2Npf0.mjs'
     ).then(n => n.s).catch((e) => {
       const error = new AstroError(InvalidImageService);
       error.cause = e;
@@ -932,7 +932,7 @@ async function getImage$1(options, imageConfig) {
   };
 }
 
-const $$Astro$1 = createAstro("https://landing-ul-meu.example.com");
+const $$Astro$1 = createAstro("https://florentinapanaofficial.ro");
 const $$Image = createComponent(async ($$result, $$props, $$slots) => {
   const Astro2 = $$result.createAstro($$Astro$1, $$props, $$slots);
   Astro2.self = $$Image;
@@ -954,7 +954,7 @@ const $$Image = createComponent(async ($$result, $$props, $$slots) => {
   return renderTemplate`${maybeRenderHead()}<img${addAttribute(image.src, "src")}${spreadAttributes(additionalAttributes)}${spreadAttributes(image.attributes)}>`;
 }, "D:/landing-ul meu/node_modules/astro/components/Image.astro", void 0);
 
-const $$Astro = createAstro("https://landing-ul-meu.example.com");
+const $$Astro = createAstro("https://florentinapanaofficial.ro");
 const $$Picture = createComponent(async ($$result, $$props, $$slots) => {
   const Astro2 = $$result.createAstro($$Astro, $$props, $$slots);
   Astro2.self = $$Picture;

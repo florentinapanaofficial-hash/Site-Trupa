@@ -72,7 +72,7 @@ const hasExpandableTopMenu = mobileNavigation.length > 1;
 
       <!-- YouTube — roșu brand oficial -->
       <a href={socialLinks.youtube}
-        class="inline-grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl transition-all duration-200 hover:-translate-y-1 hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+        class="inline-grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl transition-opacity duration-200 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
         style="background:#FF0000;box-shadow:0 2px 14px rgba(255,0,0,0.55),0 1px 3px rgba(0,0,0,0.35);"
         target="_blank" rel="noopener noreferrer" aria-label="Deschide YouTube">
         <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" role="img" aria-hidden="true">
@@ -83,7 +83,7 @@ const hasExpandableTopMenu = mobileNavigation.length > 1;
 
       <!-- Facebook — albastru brand oficial -->
       <a href={socialLinks.facebook}
-        class="inline-grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl transition-all duration-200 hover:-translate-y-1 hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+        class="inline-grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl transition-opacity duration-200 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
         style="background:#1877F2;box-shadow:0 2px 14px rgba(24,119,242,0.55),0 1px 3px rgba(0,0,0,0.35);"
         target="_blank" rel="noopener noreferrer" aria-label="Deschide Facebook">
         <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" role="img" aria-hidden="true">
@@ -93,7 +93,7 @@ const hasExpandableTopMenu = mobileNavigation.length > 1;
 
       <!-- Instagram — gradient brand oficial -->
       <a href={socialLinks.instagram}
-        class="inline-grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl transition-all duration-200 hover:-translate-y-1 hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+        class="inline-grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl transition-opacity duration-200 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
         style="background:radial-gradient(circle at 30% 110%,#ffd676 0%,#f46f30 25%,#e1306c 55%,#833ab4 80%,#405de6 100%);box-shadow:0 2px 14px rgba(225,48,108,0.55),0 1px 3px rgba(0,0,0,0.35);"
         target="_blank" rel="noopener noreferrer" aria-label="Deschide Instagram">
         <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" role="img" aria-hidden="true">
@@ -105,8 +105,8 @@ const hasExpandableTopMenu = mobileNavigation.length > 1;
 
       <!-- TikTok — negru brand + efect neon cyan/roșu -->
       <a href={socialLinks.tiktok}
-        class="inline-grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl transition-all duration-200 hover:-translate-y-1 hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
-        style="background:#010101;box-shadow:0 2px 14px rgba(254,44,85,0.45),0 1px 3px rgba(0,0,0,0.5);"
+        class="inline-grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl transition-opacity duration-200 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+        style="background:#010101;border:1.5px solid rgba(255,255,255,0.55);box-shadow:0 2px 14px rgba(254,44,85,0.45),0 1px 3px rgba(0,0,0,0.5);"
         target="_blank" rel="noopener noreferrer" aria-label="Deschide TikTok">
         <svg viewBox="0 0 24 24" class="h-5 w-5" role="img" aria-hidden="true" fill="none">
           <!-- strat cyan (umbra stânga-sus) -->
@@ -124,12 +124,12 @@ const hasExpandableTopMenu = mobileNavigation.length > 1;
     <div id="top-menu-panel" class="top-menu-panel" data-top-menu-panel>
       <nav class="no-scrollbar section-container flex min-w-0 items-center justify-start gap-4 overflow-x-auto pb-3 text-sm font-medium text-white/90 xl:justify-center" aria-label="Navigație principală">
         {desktopNavigation.map((item) => (
-          <a href={item.href} class="nav-link nav-link-desktop" data-nav-link>
+          <a href={item.href} class={`left-side-link nav-link-desktop${item.color ? ` nav-btn-${item.color}` : ''}`} data-nav-link>
             <span class="nav-label">{item.label}</span>
           </a>
         ))}
         {mobileNavigation.map((item) => (
-          <a href={item.href} class="nav-link nav-link-mobile" data-nav-link>
+          <a href={item.href} class={`left-side-link nav-link-mobile${item.color ? ` nav-btn-${item.color}` : ''}`} data-nav-link>
             <span class="nav-label">{item.label}</span>
           </a>
         ))}
@@ -152,13 +152,25 @@ const hasExpandableTopMenu = mobileNavigation.length > 1;
 
     syncTopMenuBodyClass(false);
 
+    // Restaurează starea meniului din sesiune anterioară (navigare între pagini)
+    const MENU_KEY = 'top-menu-open';
+    const wasOpen = sessionStorage.getItem(MENU_KEY) === 'true';
+
     if (headerEl && menuToggle) {
+      if (wasOpen) {
+        headerEl.classList.add('menu-open');
+        menuToggle.setAttribute('aria-expanded', 'true');
+        menuToggle.setAttribute('aria-label', 'Închide meniul principal');
+        syncTopMenuBodyClass(true);
+      }
+
       menuToggle.addEventListener('click', () => {
         const willOpen = !headerEl.classList.contains('menu-open');
         headerEl.classList.toggle('menu-open', willOpen);
         menuToggle.setAttribute('aria-expanded', String(willOpen));
         menuToggle.setAttribute('aria-label', willOpen ? 'Închide meniul principal' : 'Deschide meniul principal');
         syncTopMenuBodyClass(willOpen);
+        sessionStorage.setItem(MENU_KEY, String(willOpen));
       });
 
       window.addEventListener('keydown', (event) => {
@@ -169,6 +181,7 @@ const hasExpandableTopMenu = mobileNavigation.length > 1;
         menuToggle.setAttribute('aria-expanded', 'false');
         menuToggle.setAttribute('aria-label', 'Deschide meniul principal');
         syncTopMenuBodyClass(false);
+        sessionStorage.setItem(MENU_KEY, 'false');
       });
 
       window.addEventListener('resize', () => {
@@ -177,7 +190,7 @@ const hasExpandableTopMenu = mobileNavigation.length > 1;
       });
     }
 
-    const links = Array.from(document.querySelectorAll('[data-nav-link]'));
+    const links = Array.from(document.querySelectorAll('#top-menu-panel [data-nav-link]'));
     if (links.length === 0) return;
 
     const normalizePathnameFromHref = (href) => {
@@ -232,6 +245,13 @@ const hasExpandableTopMenu = mobileNavigation.length > 1;
           item.link.removeAttribute('aria-current');
         }
       });
+
+      // has-active pe containerul nav din top-menu-panel
+      const topNav = document.querySelector('#top-menu-panel nav');
+      if (topNav) {
+        const anyActive = routeLinkMap.some((item) => item.pathname === pathname);
+        topNav.classList.toggle('has-active', anyActive);
+      }
     };
 
     const sectionMap = links
@@ -286,6 +306,10 @@ const hasExpandableTopMenu = mobileNavigation.length > 1;
       }
 
       lastActiveHref = activeHref;
+
+      // has-active pe containerul nav din top-menu-panel
+      const topNav = document.querySelector('#top-menu-panel nav');
+      if (topNav) topNav.classList.toggle('has-active', Boolean(activeHref));
     };
 
     const getHeaderSpyOffset = () => {
@@ -368,6 +392,7 @@ const hasExpandableTopMenu = mobileNavigation.length > 1;
     links.forEach((link) => {
       link.addEventListener('click', () => {
         const href = link.getAttribute('href') ?? '';
+
         if (href.startsWith('#')) {
           const hasTargetSection = uniqueSections.some((item) => item.href === href);
           pendingActiveHref = hasTargetSection ? href : null;

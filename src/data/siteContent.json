@@ -2,7 +2,10 @@
   "brand": {
     "short": "FP",
     "name": "Formația Florentina Pană",
-    "tagline": "Muzică live pentru evenimente care rămân în memorie."
+    "tagline": "Muzică live pentru evenimente care rămân în memorie.",
+    "bandPhoto": "",
+    "aboutIntro": "Formația Florentina Pană este o trupă de muzică live cu experiență vastă în evenimente private, nunți, botezuri și petreceri corporate. Punem accent pe energie, emoție și profesionalism, oferind un spectacol complet care ridică publicul în picioare.",
+    "aboutIntro2": "Repertoriul acoperă muzică populară românească, ușoară, cover-uri internaționale, muzică de petrecere și momente speciale personalizate pentru fiecare eveniment."
   },
   "seo": {
     "title": "Formația Florentina Pană | Muzică live pentru nunți și evenimente",
@@ -22,28 +25,19 @@
   },
   "navigation": [
     {
-      "href": "#acasa",
-      "label": "Acasă"
+      "href": "/momente-cu-mirii",
+      "label": "Momente cu mirii",
+      "color": "cyan"
     },
     {
       "href": "/comunitatea-noastra",
-      "label": "Noutăți"
+      "label": "Comunitatea noastră",
+      "color": "cyan"
     },
     {
-      "href": "#servicii",
-      "label": "Servicii"
-    },
-    {
-      "href": "#membri",
-      "label": "Membri"
-    },
-    {
-      "href": "#faq",
-      "label": "FAQ"
-    },
-    {
-      "href": "#contact",
-      "label": "Contact"
+      "href": "/aparitii-tv",
+      "label": "Apariții TV",
+      "color": "cyan"
     }
   ],
   "hero": {
@@ -94,6 +88,72 @@
       "youtubeId": "FyrQQqFMZvg",
       "youtubeUrl": "https://www.youtube.com/watch?v=FyrQQqFMZvg",
       "category": "usoara-diverse"
+    },
+    {
+      "title": "Muzică ușoară - voce și instrumente",
+      "youtubeId": "GRwVkbUGVPs",
+      "youtubeUrl": "https://www.youtube.com/watch?v=GRwVkbUGVPs",
+      "category": "usoara-diverse"
+    },
+    {
+      "title": "Tineret - moment live manele",
+      "youtubeId": "HQfVn98caic",
+      "youtubeUrl": "https://www.youtube.com/watch?v=HQfVn98caic",
+      "category": "tineret-manele"
+    },
+    {
+      "title": "Tineret - energie și atmosferă",
+      "youtubeId": "7MQIWMj_W0g",
+      "youtubeUrl": "https://www.youtube.com/watch?v=7MQIWMj_W0g",
+      "category": "tineret-manele"
+    },
+    {
+      "title": "Tineret - show live complet",
+      "youtubeId": "aDB9Aa9cFLY",
+      "youtubeUrl": "https://www.youtube.com/watch?v=aDB9Aa9cFLY",
+      "category": "tineret-manele"
+    },
+    {
+      "title": "Muzică instrumentală - moment live",
+      "youtubeId": "FyrQQqFMZvg",
+      "youtubeUrl": "https://www.youtube.com/watch?v=FyrQQqFMZvg",
+      "category": "instrumentala"
+    },
+    {
+      "title": "Muzică instrumentală - recital",
+      "youtubeId": "OSrEJczdKuw",
+      "youtubeUrl": "https://www.youtube.com/watch?v=OSrEJczdKuw",
+      "category": "instrumentala"
+    },
+    {
+      "title": "Muzică instrumentală - atmosferă",
+      "youtubeId": "LSd5N1AmiFg",
+      "youtubeUrl": "https://www.youtube.com/watch?v=LSd5N1AmiFg",
+      "category": "instrumentala"
+    },
+    {
+      "title": "Dansul Mirilor - Andreea & Radu",
+      "youtubeId": "HQfVn98caic",
+      "youtubeUrl": "https://www.youtube.com/watch?v=HQfVn98caic",
+      "category": "dans-miri"
+    },
+    {
+      "title": "Dansul Mirilor - Bianca & Mihai",
+      "youtubeId": "7MQIWMj_W0g",
+      "youtubeUrl": "https://www.youtube.com/watch?v=7MQIWMj_W0g",
+      "category": "dans-miri"
+    },
+    {
+      "title": "Dansul Mirilor - Ioana & Cătălin",
+      "youtubeId": "GRwVkbUGVPs",
+      "youtubeUrl": "https://www.youtube.com/watch?v=GRwVkbUGVPs",
+      "category": "dans-miri"
+    },
+    {
+      "title": "Dansul Mirilor - Alina & Ștefan",
+      "youtubeId": "xdcdjAtxZlA",
+      "youtubeUrl": "https://www.youtube.com/watch?v=xdcdjAtxZlA",
+      "category": "dans-miri"
     }
   ],
   "videoAdmin": {
@@ -112,6 +172,14 @@
       {
         "id": "tineret-manele",
         "title": "Tineret"
+      },
+      {
+        "id": "instrumentala",
+        "title": "Muzică Instrumentală"
+      },
+      {
+        "id": "dans-miri",
+        "title": "Dansul Mirilor"
       }
     ]
   },
@@ -130,7 +198,10 @@
         "image": "https://placehold.co/1600x900/1a234a/eef6ff?text=Andreea+%26+Radu",
         "audioUrl": "",
         "youtubeUrl": "https://www.youtube.com/watch?v=HQfVn98caic",
-        "coupleQuote": "\"A fost exact cum ne-am dorit: tradiție, eleganță și o atmosferă incredibilă pe ringul de dans.\""
+        "coupleQuote": "\"A fost exact cum ne-am dorit: tradiție, eleganță și o atmosferă incredibilă pe ringul de dans.\"",
+        "accentColor": "#e8325a",
+        "accentGlow": "rgba(232,50,90,0.35)",
+        "blogSlug": "andreea-si-radu-povestea-lor"
       },
       {
         "title": "Eveniment Bianca & Mihai",
@@ -140,7 +211,10 @@
         "image": "https://placehold.co/1600x900/202b5a/eef6ff?text=Bianca+%26+Mihai",
         "audioUrl": "",
         "youtubeUrl": "https://www.youtube.com/watch?v=7MQIWMj_W0g",
-        "coupleQuote": "\"Invitații au dansat toată noaptea. Formația a avut energie, profesionalism și comunicare perfectă.\""
+        "coupleQuote": "\"Invitații au dansat toată noaptea. Formația a avut energie, profesionalism și comunicare perfectă.\"",
+        "accentColor": "#f5a623",
+        "accentGlow": "rgba(245,166,35,0.35)",
+        "blogSlug": "bianca-si-mihai-povestea-lor"
       },
       {
         "title": "Eveniment Ioana & Cătălin",
@@ -150,7 +224,10 @@
         "image": "https://placehold.co/1600x900/26336b/eef6ff?text=Ioana+%26+C%C4%83t%C4%83lin",
         "audioUrl": "",
         "youtubeUrl": "https://www.youtube.com/watch?v=GRwVkbUGVPs",
-        "coupleQuote": "\"Ne-au ascultat toate dorințele muzicale și au creat o atmosferă premium de la început până la final.\""
+        "coupleQuote": "\"Ne-au ascultat toate dorințele muzicale și au creat o atmosferă premium de la început până la final.\"",
+        "accentColor": "#0bbcd6",
+        "accentGlow": "rgba(11,188,214,0.30)",
+        "blogSlug": "ioana-si-catalin-povestea-lor"
       },
       {
         "title": "Eveniment Alina & Ștefan",
@@ -160,7 +237,10 @@
         "image": "https://placehold.co/1600x900/2b3878/eef6ff?text=Alina+%26+%C8%98tefan",
         "audioUrl": "",
         "youtubeUrl": "https://www.youtube.com/watch?v=HQfVn98caic",
-        "coupleQuote": "\"O echipă de nota 10! Au ridicat sala în picioare și au făcut din seara noastră o amintire de neuitat.\""
+        "coupleQuote": "\"O echipă de nota 10! Au ridicat sala în picioare și au făcut din seara noastră o amintire de neuitat.\"",
+        "accentColor": "#a855f7",
+        "accentGlow": "rgba(168,85,247,0.30)",
+        "blogSlug": "alina-si-stefan-povestea-lor"
       }
     ]
   },
@@ -231,32 +311,48 @@
   ],
   "services": [
     {
-      "title": "Nunți",
-      "description": "Program complet pe momente-cheie, de la primirea invitaților până la final."
+      "icon": "💍",
+      "title": "Nuntă",
+      "description": "Program complet de la primire până la petrecere, momente speciale și atmosferă garantată.",
+      "details": "Oferim un program complet pentru nunta voastră: primirea invitaților, cina, dansul mirilor, momente dedicate părinților, dansul la tăierea tortului și petrecerea de noapte. Colaborăm cu cuplul înainte de eveniment pentru a personaliza fiecare moment muzical. Durata standard: 6-8 ore cu pauze."
     },
     {
-      "title": "Botezuri",
-      "description": "Atmosferă caldă și repertoriu echilibrat pentru invitați de toate vârstele."
+      "icon": "🍼",
+      "title": "Botez",
+      "description": "Muzică live caldă, repertoriu special, emoție autentică pentru cel mai important prim pas.",
+      "details": "Creăm o atmosferă festivă și emoționantă potrivită pentru botez: muzică ușoară, piese populare &amp; romanțe pentru generații mai în vârstă și ritmuri moderne pentru tineri. Repertoriul este echilibrat pentru invitați de toate vârstele. Durata standard: 4-6 ore."
     },
     {
+      "icon": "🏢",
       "title": "Corporate",
-      "description": "Setlist premium și prezență scenică profesionistă pentru evenimente business."
+      "description": "Show profesionist, rafinat, perfect pentru gale, team-building-uri și lansări de produse.",
+      "details": "Adaptăm setul muzical complet pentru evenimente business: gale de premiere, seri de team-building, lansări de produse sau petreceri de Crăciun. Muzică de fundal elegantă în timpul serii, moment live de show, repertoriu rafinat cu hituri cunoscute."
+    },
+    {
+      "icon": "🎸",
+      "title": "Concert",
+      "description": "Set-uri complete de concert live, cu repertoriu adaptat publicului și logistică proprie.",
+      "details": "Putem susține concerte autonome sau deschideri de eveniment: set complet de 2-3 ore, echipament propriu de sunet și lumină, coregrafie scenică adaptată. Repertoriu dinamic cu hituri românești și internaționale, moment de public interaction și final energetic."
     }
   ],
   "repertoire": [
     {
+      "icon": "🎶",
       "label": "Pop românesc și internațional",
       "details": "Repertoriu reprezentativ (12 piese):\n1. Holograf - Ti-am dat un inel\n2. Voltaj - 20\n3. Vama - Perfect fără tine\n4. Andra - Iubirea schimbă tot\n5. Smiley - Acasă\n6. Carla's Dreams - Sub pielea mea\n7. Whitney Houston - I Wanna Dance with Somebody\n8. ABBA - Dancing Queen\n9. George Michael - Careless Whisper\n10. Adele - Rolling in the Deep\n11. Bruno Mars - Just the Way You Are\n12. Ed Sheeran - Perfect"
     },
     {
+      "icon": "🎧",
       "label": "Dance și hituri actuale",
       "details": "Repertoriu reprezentativ (12 piese):\n1. Dua Lipa - Dance The Night\n2. The Weeknd - Blinding Lights\n3. Calvin Harris & Ellie Goulding - Miracle\n4. David Guetta & Bebe Rexha - I'm Good (Blue)\n5. Ava Max - Kings & Queens\n6. Minelli - Rampampam\n7. INNA - Up\n8. Alok, Sigala & Ellie Goulding - All By Myself\n9. Shakira & Bizarrap - Bzrp Music Sessions, Vol. 53\n10. Rema - Calm Down\n11. Jax Jones & MNEK - Where Did You Go?\n12. Purple Disco Machine & Sophie and the Giants - Hypnotized"
     },
     {
+      "icon": "🎻",
       "label": "Muzică de petrecere",
       "details": "Repertoriu reprezentativ (12 piese):\n1. Ia-ți mireasă ziua bună\n2. Ia-ți mireasă rămas bun\n3. Cârligu' Mare\n4. Hora din Moldova\n5. Sârba lui Pompieru\n6. Ciuleandra\n7. Trandafir de la Moldova\n8. Foaie verde 5 chiperi\n9. M-a făcut mama oltean\n10. La Chilia-n port\n11. Hai lume la joc\n12. Azi e nuntă noastră"
     },
     {
+      "icon": "💫",
       "label": "Momente speciale personalizate",
       "details": "Repertoriu reprezentativ (10 piese):\n1. Christina Perri - A Thousand Years (dansul mirilor)\n2. Ed Sheeran - Perfect (dansul mirilor)\n3. Elvis Presley - Can't Help Falling in Love (dans lent)\n4. Etta James - At Last (moment romantic)\n5. Celine Dion - The Power of Love (intrare elegantă)\n6. Queen - Don't Stop Me Now (moment tort)\n7. Pharrell Williams - Happy (moment surpriză)\n8. Bruno Mars - Marry You (intrare invitați)\n9. Coldplay - A Sky Full of Stars (final energetic)\n10. Andra - Iubirea schimbă tot (moment dedicat familiei)"
     }
@@ -267,13 +363,29 @@
         "name": "Florentina Pană",
         "role": "Interpretă de muzică populară și ușoară",
         "description": "Voce cu timbru cald, prezență scenică elegantă și repertoriu construit pe dinamica evenimentului. Coordonează momentele-cheie astfel încât invitații să rămână conectați de la început până la final.",
-        "image": "https://placehold.co/400x400/112245/e9f5ff?text=Florentina+Pan%C4%83"
+        "image": "https://placehold.co/400x400/112245/e9f5ff?text=Florentina+Pan%C4%83",
+        "photos": [
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ]
       },
       {
         "name": "Cătălin Matei",
         "role": "Interpret de Muzică Populară de Petrecere",
         "description": "Voce puternică și energie de petrecere autentică. Interacționează natural cu publicul și ridică atmosfera în momentele de dans și tradiție.",
-        "image": "https://placehold.co/400x400/1b2c52/e9f5ff?text=C%C4%83t%C4%83lin+Matei"
+        "image": "https://placehold.co/400x400/1b2c52/e9f5ff?text=C%C4%83t%C4%83lin+Matei",
+        "photos": [
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ]
       }
     ],
     "instrumentalists": [
@@ -281,19 +393,43 @@
         "name": "Oprea Marian",
         "role": "Solist instrumentist - Vioară",
         "description": "Intervenții melodice expresive, potrivite pentru intrări speciale, dansul mirilor și momente emoționale cu impact artistic.",
-        "image": "https://placehold.co/400x400/1a1f3a/f4fff0?text=Oprea+Marian"
+        "image": "https://placehold.co/400x400/1a1f3a/f4fff0?text=Oprea+Marian",
+        "photos": [
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ]
       },
       {
         "name": "Cristian Ograbek",
         "role": "Solist instrumentist - Acordeon",
         "description": "Sunet vibrant și ritm de petrecere, cu acompaniament versatil pentru hore, sârbe și momente live cu public implicat.",
-        "image": "https://placehold.co/400x400/202850/f4fff0?text=Cristian+Ograbek"
+        "image": "https://placehold.co/400x400/202850/f4fff0?text=Cristian+Ograbek",
+        "photos": [
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ]
       },
       {
         "name": "Claudiu Pană",
         "role": "Solist instrumentist - Orgă",
         "description": "Aranjamente moderne și control armonic excelent, asigurând tranziții fluide între genuri și un sound unitar pentru întregul program.",
-        "image": "https://placehold.co/400x400/252f5f/f4fff0?text=Claudiu+Pan%C4%83"
+        "image": "https://placehold.co/400x400/252f5f/f4fff0?text=Claudiu+Pan%C4%83",
+        "photos": [
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ]
       }
     ],
     "collaborators": [

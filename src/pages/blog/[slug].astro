@@ -1,6 +1,8 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import blogPostsRaw from '../../data/blogPosts.json';
+import BackButton from '../../components/BackButton.astro';
+import siteContent from '../../data/siteContent.json';
 
 interface ContentBlock {
   type: string;
@@ -25,10 +27,10 @@ interface Post {
 
 export const prerender = true;
 
-const allPosts = blogPostsRaw as unknown as Post[];
+const allPosts = (blogPostsRaw as any).items as unknown as Post[];
 
 export function getStaticPaths() {
-  return (blogPostsRaw as unknown as Post[]).map((post) => ({
+  return ((blogPostsRaw as any).items as unknown as Post[]).map((post) => ({
     params: { slug: post.slug },
     props: { post },
   }));
@@ -56,19 +58,46 @@ const heroBg = heroBgMap[post.categoryAccent] ?? 'rgba(245,166,35,0.40)';
 
 const prevPost = allPosts[allPosts.findIndex((p) => p.slug === post.slug) - 1];
 const nextPost = allPosts[allPosts.findIndex((p) => p.slug === post.slug) + 1];
+
+const siteBase = 'https://florentinapanaofficial.ro';
+const postCanonical = `${siteBase}/blog/${post.slug}`;
+const postOgImage = post.coverImage?.startsWith('http')
+  ? post.coverImage
+  : post.coverImage
+    ? `${siteBase}${post.coverImage}`
+    : `${siteBase}/images/og-default-1200x630.jpg`;
+
+const articleJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: post.title,
+  description: post.excerpt,
+  image: postOgImage,
+  author: { '@type': 'Person', name: post.author },
+  datePublished: post.date,
+  mainEntityOfPage: { '@type': 'WebPage', '@id': postCanonical },
+  publisher: { '@type': 'Organization', name: siteContent.brand.name, url: siteBase },
+};
 ---
 
-<BaseLayout title={`${post.title} | Blog`} description={post.excerpt}>
+<BaseLayout
+  title={`${post.title} | ${siteContent.brand.name}`}
+  description={post.excerpt}
+  ogImage={post.coverImage || undefined}
+  ogType="article"
+>
+  <Fragment slot="head">
+    <meta property="article:published_time" content={post.date} />
+    <meta property="article:author" content={post.author} />
+    <script type="application/ld+json" set:html={JSON.stringify(articleJsonLd)} />
+  </Fragment>
   <div class="bp-page">
 
     {/* ── Hero ── */}
     <div class="bp-hero" style={`--hero-glow: ${heroBg};`}>
       <div class="bp-hero-bg-emoji" aria-hidden="true">{post.coverEmoji}</div>
       <div class="bp-hero-inner">
-        <a href="/comunitatea-noastra#blog" class="bp-back">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
-          Publicații
-        </a>
+        <BackButton href="/blog" label="Noutăți" />
         <span
           class="bp-cat"
           style={`color:${accentColor}; border-color:${accentColor}; background:rgba(0,0,0,0.25);`}

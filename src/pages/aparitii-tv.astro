@@ -1,8 +1,9 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import siteContent from '../data/siteContent.json';
+import BackButton from '../components/BackButton.astro';
 
-const { seo, tvAppearances } = siteContent;
+const { seo, tvAppearances, brand } = siteContent;
 
 const getYoutubeId = (url: string) => {
   const match = url.match(/(?:v=|youtu\.be\/)([^&?/]+)/);
@@ -10,15 +11,18 @@ const getYoutubeId = (url: string) => {
 };
 ---
 
-<BaseLayout title={`Apariții TV | ${seo.title}`} description="Galerie video cu apariții TV ale Formației Florentina Pană.">
+<BaseLayout title={`Apariții TV | ${brand.name}`} description="Galerie video cu apariții TV ale Formației Florentina Pană.">
   <section class="section-container py-16">
+    <div class="mb-8"><BackButton href="/" label="Acasă" /></div>
     <header class="section-head mx-auto text-center">
       <p class="kicker">Credibilitate</p>
-      <h1 class="section-title">Galerie Video Apariții TV</h1>
+      <h1 class="section-title">Apariții TV | Formația Florentina Pană</h1>
       <p class="section-copy">Selecție video cu momente din apariții TV, grupate în format card.</p>
     </header>
 
-    <div class="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+    <h2 class="mt-8 text-xl font-bold text-white/80">Clipuri video din emisiuni și gale TV</h2>
+
+    <div class="mt-4 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
       {tvAppearances.map((item, index) => {
         const youtubeId = getYoutubeId(item.videoUrl);
 
@@ -28,7 +32,7 @@ const getYoutubeId = (url: string) => {
               <iframe
                 class="aspect-video w-full rounded-xl"
                 src={`https://www.youtube.com/embed/${youtubeId}`}
-                title={`Apariție TV ${index + 1}`}
+                title={item.show || `Apariție TV ${index + 1}`}
                 loading="lazy"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 referrerpolicy="strict-origin-when-cross-origin"

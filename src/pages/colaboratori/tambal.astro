@@ -1,0 +1,289 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import siteContent from '../../data/siteContent.json';
+import BackButton from '../../components/BackButton.astro';
+
+const { seo, brand } = siteContent;
+const personJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Lăutar la Ȝambal',
+  jobTitle: 'Lăutar la Ȝambal',
+  worksFor: { '@type': 'Organization', name: brand.name },
+};
+---
+
+<BaseLayout
+  title={`Colaborator Ȝambal | ${brand.name}`}
+  description="Prezentare colaborator Ȝambal pentru momente speciale live în cadrul evenimentelor."
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(personJsonLd)} />
+  </Fragment>
+  <section class="collab-page" aria-labelledby="collab-title">
+    <div class="collab-inner">
+
+      <BackButton href="/#membri" label="Membri" />
+
+      <header class="collab-header">
+        <span class="kicker">Colaboratori</span>
+        <h1 id="collab-title" class="section-title" style="margin-top:0.75rem">Lăutar la Țambal pentru nunți și evenimente | Formația Florentina Pană</h1>
+        <p class="section-copy" style="max-width:52ch">
+          Invitat pentru momente de folclor autentic și hore tradiționale &mdash;
+          sunet vibrant și textură ritmică inconfundabilă care aduc atmosfera specifică petrecerilor românești.
+        </p>
+      </header>
+
+      <div class="collab-grid">
+
+        <div class="collab-card collab-card-main">
+          <div class="collab-icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"/>
+            </svg>
+          </div>
+          <h2 class="collab-card-title">Ce aduce în program</h2>
+          <ul class="collab-list">
+            <li><span class="collab-list-dot" aria-hidden="true"></span>Sunet tradițional românesc autentic, inconfundabil.</li>
+            <li><span class="collab-list-dot" aria-hidden="true"></span>Hore și sârbe cu energie maximă pe ringul de dans.</li>
+            <li><span class="collab-list-dot" aria-hidden="true"></span>Momente live solo sau alături de întreaga formație.</li>
+            <li><span class="collab-list-dot" aria-hidden="true"></span>Repertoriu folcloric flexibil adaptat la fiecare eveniment.</li>
+          </ul>
+        </div>
+
+        <div class="collab-card">
+          <h2 class="collab-card-title">Momente recomandate</h2>
+          <div class="collab-moments">
+            <span class="collab-moment-pill"><span aria-hidden="true">🎊</span> Hore tradiționale</span>
+            <span class="collab-moment-pill"><span aria-hidden="true">💃</span> Sârba miresei</span>
+            <span class="collab-moment-pill"><span aria-hidden="true">🌾</span> Momente folclorice</span>
+            <span class="collab-moment-pill"><span aria-hidden="true">🎉</span> Petrecere populară</span>
+            <span class="collab-moment-pill"><span aria-hidden="true">👴</span> Pentru invitații speciali</span>
+          </div>
+        </div>
+
+      </div>
+
+      {/* ── Videoclipuri ── */}
+      <div class="collab-videos">
+        <h2 class="collab-videos-title">Videoclipuri</h2>
+        <div class="collab-videos-grid">
+
+          <div class="collab-video-card">
+            {/* TODO: înlocuiește YOUTUBE_ID_1 cu ID-ul real */}
+            <div class="collab-video-frame">
+              <iframe
+                src="https://www.youtube.com/embed/YOUTUBE_ID_1"
+                title="Videoclip țambal 1"
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+              ></iframe>
+            </div>
+            <p class="collab-video-label">Titlu videoclip 1</p>
+          </div>
+
+          <div class="collab-video-card">
+            {/* TODO: înlocuiește YOUTUBE_ID_2 cu ID-ul real */}
+            <div class="collab-video-frame">
+              <iframe
+                src="https://www.youtube.com/embed/YOUTUBE_ID_2"
+                title="Videoclip țambal 2"
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+              ></iframe>
+            </div>
+            <p class="collab-video-label">Titlu videoclip 2</p>
+          </div>
+
+          <div class="collab-video-card">
+            {/* TODO: înlocuiește YOUTUBE_ID_3 cu ID-ul real */}
+            <div class="collab-video-frame">
+              <iframe
+                src="https://www.youtube.com/embed/YOUTUBE_ID_3"
+                title="Videoclip țambal 3"
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+              ></iframe>
+            </div>
+            <p class="collab-video-label">Titlu videoclip 3</p>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="collab-ctas">
+        <a href="/#membri" class="btn-outline">Echipa formației</a>
+        <a href="/#contact" class="btn-solid">Rezervă o dată</a>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .collab-page {
+    padding: clamp(4rem, 8vw, 7rem) 1.5rem;
+  }
+  .collab-inner {
+    max-width: 52rem;
+    margin-inline: auto;
+  }
+  .collab-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 160ms ease;
+    margin-bottom: 2rem;
+  }
+  .collab-back:hover { color: var(--gold); }
+  .collab-header { margin-bottom: 2.5rem; }
+  .collab-grid {
+    display: grid;
+    gap: 1rem;
+  }
+  @media (min-width: 640px) {
+    .collab-grid { grid-template-columns: 1fr 1fr; }
+  }
+  .collab-card {
+    border: 1px solid var(--line);
+    border-radius: 1.5rem;
+    padding: 1.75rem;
+    background: var(--surface);
+    transition: border-color 220ms ease, box-shadow 220ms ease;
+  }
+  .collab-card:hover {
+    border-color: rgba(245,166,35,0.45);
+    box-shadow: 0 18px 40px rgba(245,166,35,0.1);
+  }
+  .collab-card-main { display: flex; flex-direction: column; gap: 1rem; }
+  .collab-icon {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.875rem;
+    background: rgba(245,166,35,0.12);
+    border: 1px solid rgba(245,166,35,0.25);
+    display: grid;
+    place-items: center;
+    color: var(--gold);
+  }
+  .collab-card-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--title);
+    margin: 0;
+  }
+  .collab-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .collab-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--body);
+  }
+  .collab-list-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+    flex-shrink: 0;
+    margin-top: 0.52rem;
+  }
+  .collab-moments {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin-top: 0.75rem;
+  }
+  .collab-moment-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: 1px solid var(--line);
+    border-radius: 9999px;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--body);
+    background: var(--glass);
+    transition: border-color 180ms ease, color 180ms ease;
+  }
+  .collab-moment-pill:hover {
+    border-color: rgba(245,166,35,0.45);
+    color: var(--gold);
+  }
+  .collab-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+  .collab-videos {
+    margin-top: 2.5rem;
+  }
+  .collab-videos-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--title);
+    margin: 0 0 1.25rem;
+  }
+  .collab-videos-grid {
+    display: grid;
+    gap: 1rem;
+  }
+  @media (min-width: 640px) {
+    .collab-videos-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  .collab-video-card {
+    border: 1px solid var(--line);
+    border-radius: 1.25rem;
+    overflow: hidden;
+    background: var(--surface);
+    transition: transform 220ms ease, box-shadow 220ms ease;
+  }
+  .collab-video-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 32px rgba(245,166,35,0.12);
+  }
+  .collab-video-frame {
+    position: relative;
+    aspect-ratio: 16/9;
+  }
+  .collab-video-frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+  .collab-video-label {
+    padding: 0.65rem 1rem;
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: var(--title);
+    margin: 0;
+    border-top: 1px solid var(--line);
+  }
+</style>
