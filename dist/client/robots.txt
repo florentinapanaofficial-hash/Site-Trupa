@@ -1,8 +1,0 @@
-User-agent: *
-Allow: /
-Allow: /video/
-Disallow: /api/
-Disallow: /admin/
-
-Sitemap: https://florentinapanaofficial.ro/sitemap-index.xml
-
