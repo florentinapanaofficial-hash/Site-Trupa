@@ -108,6 +108,15 @@ const sideMenuBottomItems = [];
     <SkyBackground />
     <Header />
 
+    <!-- ══ MOBIL: nav plutitor (ascuns pe desktop via CSS) ══ -->
+    <nav class="mob-nav" aria-label="Navigare mobilă">
+      <div class="mob-nav-track">
+        {sideMenuTopItems.map((item) => (
+          <a href={item.href} class="mob-nav-btn" data-mb={item.href}>{item.label}</a>
+        ))}
+      </div>
+    </nav>
+
     <div class="layout-content-shell">
       <aside class="left-side-menu" aria-label="Acces rapid">
         {sideMenuTopItems.map((item) => (
@@ -224,6 +233,83 @@ const sideMenuBottomItems = [];
         });
 
         sections.forEach(s => obs.observe(s));
+      })();
+    </script>
+
+    <!-- ══ MOBIL: săgeți hint swipe (ascunse pe desktop via CSS) ══ -->
+    <div class="mob-swipe-hints" aria-hidden="true">
+      <button type="button" class="mob-arrow mob-arrow--prev" id="mob-arrow-prev" aria-label="Secțiunea anterioară">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+      <button type="button" class="mob-arrow mob-arrow--next" id="mob-arrow-next" aria-label="Secțiunea următoare">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+    </div>
+
+    <script is:inline>
+      /* ── Mobil swipe controller — rulează doar pe ≤767px ── */
+      (function () {
+        if (!window.matchMedia('(max-width: 767px)').matches) return;
+
+        var main = document.getElementById('continut');
+        if (!main) return;
+
+        var slides = Array.from(main.querySelectorAll(':scope > section'));
+        if (!slides.length) return;
+
+        var navBtns = Array.from(document.querySelectorAll('[data-mb]'));
+        var arrowPrev = document.getElementById('mob-arrow-prev');
+        var arrowNext = document.getElementById('mob-arrow-next');
+        var n = slides.length;
+        var current = 0;
+
+        function slideTo(idx) {
+          if (idx < 0 || idx >= n) return;
+          current = idx;
+          main.scrollTo({ left: idx * window.innerWidth, behavior: 'smooth' });
+          repaint();
+        }
+
+        function repaint() {
+          var sectionId = (slides[current] && slides[current].id) || '';
+          navBtns.forEach(function (btn) {
+            var href = btn.getAttribute('data-mb') || '';
+            var hash = href.includes('#') ? href.split('#').pop() : null;
+            var isHome = (href === '/' || href === '') && current === 0 && !sectionId;
+            var isAnchor = hash && sectionId === hash;
+            btn.classList.toggle('is-active', !!(isHome || isAnchor));
+          });
+          if (arrowPrev) arrowPrev.classList.toggle('is-hidden', current === 0);
+          if (arrowNext) arrowNext.classList.toggle('is-hidden', current === n - 1);
+        }
+
+        if (arrowPrev) arrowPrev.addEventListener('click', function () { slideTo(current - 1); });
+        if (arrowNext) arrowNext.addEventListener('click', function () { slideTo(current + 1); });
+
+        navBtns.forEach(function (btn) {
+          btn.addEventListener('click', function (e) {
+            var href = btn.getAttribute('data-mb') || '';
+            if (!href.includes('#')) return; /* lasă navigarea normală spre alte pagini */
+            var hash = href.split('#').pop();
+            var sec = hash ? document.getElementById(hash) : null;
+            if (!sec) return;
+            var idx = slides.indexOf(sec);
+            if (idx !== -1) { e.preventDefault(); slideTo(idx); }
+          });
+        });
+
+        /* Urmărește scroll-ul manual al utilizatorului */
+        var rafId;
+        main.addEventListener('scroll', function () {
+          cancelAnimationFrame(rafId);
+          rafId = requestAnimationFrame(function () {
+            var idx = Math.round(main.scrollLeft / window.innerWidth);
+            idx = Math.max(0, Math.min(n - 1, idx));
+            if (idx !== current) { current = idx; repaint(); }
+          });
+        }, { passive: true });
+
+        repaint();
       })();
     </script>
   </body>

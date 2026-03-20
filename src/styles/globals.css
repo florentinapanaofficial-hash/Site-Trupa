@@ -2861,3 +2861,223 @@ details>summary::-webkit-details-marker {
     scroll-behavior: auto !important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBIL — SWIPE LAYOUT  (≤ 767px)
+   Desktop rămâne complet neschimbat. Toate regulile de mai jos
+   sunt exclusiv pentru ecrane mici (telefon / tabletă mică).
+═══════════════════════════════════════════════════════════════ */
+
+/* Elementele noi sunt invizibile pe desktop */
+.mob-nav,
+.mob-swipe-hints {
+  display: none;
+}
+
+@media (max-width: 767px) {
+
+  /* ── 1. Dispare header-ul negru fix ── */
+  .top-header {
+    display: none !important;
+  }
+
+  /* ── 2. Dispare meniul lateral clasic ── */
+  .left-side-menu {
+    display: none !important;
+  }
+
+  /* ── 3. Layout shell — fără padding lateral, block simplu ── */
+  .layout-content-shell {
+    display: block !important;
+    padding-inline: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* ── 4. Body shell — overflow intern permis ── */
+  .page-shell {
+    overflow-x: hidden !important;
+  }
+
+  /* ── 5. Main = container orizontal cu scroll-snap ── */
+  main#continut {
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: scroll !important;
+    overflow-y: hidden !important;
+    scroll-snap-type: x mandatory !important;
+    overscroll-behavior-x: contain !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    border-radius: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: transparent !important;
+    isolation: auto !important;
+  }
+
+  main#continut::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  /* ── 6. Fiecare <section> = un slide ── */
+  main#continut>section {
+    flex: 0 0 100vw !important;
+    width: 100vw !important;
+    min-width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100dvh !important;
+    min-height: unset !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    overscroll-behavior-y: contain !important;
+    scroll-snap-align: start !important;
+    scroll-snap-stop: always !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-sizing: border-box !important;
+    /* spațiu sus: nav plutitor (~3.5rem) + puțin aer */
+    padding-top: 4rem !important;
+    padding-bottom: 1rem !important;
+    padding-left: 2.8rem !important;
+    /* spațiu pentru săgeata stânga */
+    padding-right: 2.8rem !important;
+    /* spațiu pentru săgeata dreapta */
+  }
+
+  main#continut>section::-webkit-scrollbar {
+    width: 0 !important;
+  }
+
+  /* ── 7. Nav plutitor sus ── */
+  .mob-nav {
+    display: block !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    background: linear-gradient(180deg,
+        rgba(4, 6, 18, 0.97) 0%,
+        rgba(4, 6, 18, 0.91) 84%,
+        transparent 100%);
+    backdrop-filter: blur(16px) saturate(1.2);
+    -webkit-backdrop-filter: blur(16px) saturate(1.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0.5rem 0.65rem 0.6rem;
+  }
+
+  .mob-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mob-nav-track {
+    display: flex;
+    gap: 0.44rem;
+    width: max-content;
+    align-items: center;
+  }
+
+  .mob-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    text-decoration: none;
+    border-radius: 9999px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    padding: 0.34rem 0.82rem;
+    min-height: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.07);
+    color: rgba(255, 255, 255, 0.65);
+    transition:
+      background 200ms ease,
+      border-color 200ms ease,
+      color 200ms ease,
+      box-shadow 200ms ease;
+  }
+
+  .mob-nav-btn.is-active {
+    background: rgba(6, 214, 255, 0.16);
+    border-color: rgba(6, 214, 255, 0.60);
+    color: #7ef8ff;
+    box-shadow:
+      0 0 14px rgba(6, 214, 255, 0.32),
+      inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  }
+
+  /* ── 8. Săgeți swipe stânga / dreapta ── */
+  .mob-swipe-hints {
+    display: block !important;
+    pointer-events: none;
+  }
+
+  .mob-arrow {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 6rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.07);
+    color: rgba(255, 255, 255, 0.50);
+    cursor: pointer;
+    pointer-events: auto;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    transition:
+      opacity 300ms ease,
+      background 200ms ease,
+      color 200ms ease;
+  }
+
+  .mob-arrow--prev {
+    left: 0;
+    border-left: none;
+    border-radius: 0 1.25rem 1.25rem 0;
+  }
+
+  .mob-arrow--next {
+    right: 0;
+    border-right: none;
+    border-radius: 1.25rem 0 0 1.25rem;
+  }
+
+  .mob-arrow.is-hidden {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  .mob-arrow:hover,
+  .mob-arrow:focus-visible {
+    background: rgba(6, 214, 255, 0.14);
+    color: rgba(126, 248, 255, 0.9);
+  }
+
+  /* ── 9. Footer compact pe mobil ── */
+  footer {
+    min-height: auto !important;
+    padding-block: 1rem !important;
+  }
+}
