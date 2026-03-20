@@ -122,7 +122,7 @@ const mobileNavAllItems = [
       </script>
     )}
   </head>
-  <body class="page-shell">
+  <body class={`page-shell${isHomePage ? ' is-homepage' : ''}`}>
     <a href="#continut" class="skip-link">Sari la conținut</a>
     <SkyBackground />
     <Header />
@@ -316,7 +316,7 @@ const mobileNavAllItems = [
     </div>
 
     <script is:inline>
-      /* ── Mobil swipe controller — rulează doar pe ≤767px ── */
+      /* ── Mobil swipe/scroll controller — rulează doar pe ≤767px ── */
       (function () {
         if (!window.matchMedia('(max-width: 767px)').matches) return;
 
@@ -332,8 +332,9 @@ const mobileNavAllItems = [
         var n = slides.length;
         var current = 0;
 
-        /* ── Map: id secțiune → href buton nav ──
-           Acoperă atât homepage (slide-uri) cât și subpagini (1 singur slide) */
+        var isHomepage = document.body.classList.contains('is-homepage');
+
+        /* ── Map: id secțiune → href buton nav ── */
         var sectionToNav = {
           'acasa':            '/',
           'video':            '/galerie-video',
@@ -358,7 +359,6 @@ const mobileNavAllItems = [
             btn.classList.toggle('is-active', href === activeHref);
           });
 
-          /* Scroll nav ca butonul activ să fie vizibil */
           var activeBtn = navBtns.find(function (b) {
             return b.getAttribute('data-mb') === activeHref;
           });
@@ -373,34 +373,86 @@ const mobileNavAllItems = [
           }
         }
 
-        function repaint() {
+        /* ════════════════════════════════════════════════════════
+           HOMEPAGE: scroll vertical — IntersectionObserver pe secțiuni
+        ════════════════════════════════════════════════════════ */
+        if (isHomepage) {
+          /* Activare inițială */
+          setActiveHref('/');
+
+          var lastActiveId = '';
+          var mobObs = new IntersectionObserver(function (entries) {
+            var best = null;
+            var bestRatio = -1;
+            entries.forEach(function (entry) {
+              if (entry.intersectionRatio > bestRatio) {
+                bestRatio = entry.intersectionRatio;
+                best = entry;
+              }
+            });
+            if (!best || !best.isIntersecting) return;
+            var id = best.target.id;
+            if (id === lastActiveId) return;
+            lastActiveId = id;
+            var href = sectionToNav[id];
+            if (href) setActiveHref(href);
+          }, {
+            rootMargin: '-8% 0px -45% 0px',
+            threshold: [0, 0.1, 0.25, 0.5],
+          });
+
+          slides.forEach(function (s) { mobObs.observe(s); });
+
+          /* Click pe butonul cu # → smooth scroll la secțiunea respectivă */
+          navBtns.forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+              var href = btn.getAttribute('data-mb') || '';
+              var targetId = null;
+              if (href === '/') { targetId = 'acasa'; }
+              else if (href.includes('#')) { targetId = href.split('#').pop(); }
+              else {
+                /* Buton fără # → navigare normală spre altă pagină */
+                return;
+              }
+              var sec = targetId ? document.getElementById(targetId) : null;
+              if (sec) {
+                e.preventDefault();
+                sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+            });
+          });
+
+          return; /* Nu mai rulăm codul de swipe orizontal */
+        }
+
+        /* ════════════════════════════════════════════════════════
+           ALTE PAGINI: swipe orizontal (comportament existent)
+        ════════════════════════════════════════════════════════ */
+        var n2 = slides.length;
+
+        function repaintSwipe() {
           var section = slides[current];
           var sectionId = (section && section.id) || '';
           var pathname = location.pathname.replace(/\/$/, '') || '/';
 
-          /* Pe subpagini (un singur slide) activăm după pathname */
           if (pathname !== '/') {
             setActiveHref(pathname);
           } else {
-            /* Homepage: activăm după id-ul secțiunii curente */
             var activeHref = sectionToNav[sectionId] || '/';
             setActiveHref(activeHref);
           }
 
           if (arrowPrev) arrowPrev.classList.toggle('is-hidden', current === 0);
-          if (arrowNext) arrowNext.classList.toggle('is-hidden', current === n - 1);
+          if (arrowNext) arrowNext.classList.toggle('is-hidden', current === n2 - 1);
         }
 
-        /* slideWidth: latimea unui slide = latimea vizibila a containerului (fara scrollbar)
-           Folosim clientWidth in loc de window.innerWidth pentru a evita decalajul cauzat
-           de scrollbar-ul documentului (pe Android, 100vw != clientWidth) */
         function slideWidth() { return main.clientWidth || window.innerWidth; }
 
         function slideTo(idx) {
-          if (idx < 0 || idx >= n) return;
+          if (idx < 0 || idx >= n2) return;
           current = idx;
           main.scrollTo({ left: idx * slideWidth(), behavior: 'smooth' });
-          repaint();
+          repaintSwipe();
         }
 
         if (arrowPrev) arrowPrev.addEventListener('click', function () { slideTo(current - 1); });
@@ -409,7 +461,6 @@ const mobileNavAllItems = [
         navBtns.forEach(function (btn) {
           btn.addEventListener('click', function (e) {
             var href = btn.getAttribute('data-mb') || '';
-            /* Linkuri cu # pe homepage → scroll la slide */
             if (href.includes('#') && location.pathname.replace(/\/$/, '') === '') {
               var hash = href.split('#').pop();
               var sec = hash ? document.getElementById(hash) : null;
@@ -418,39 +469,33 @@ const mobileNavAllItems = [
                 if (idx !== -1) { e.preventDefault(); slideTo(idx); return; }
               }
             }
-            /* Buton "/" pe homepage → slide 0 */
             if (href === '/' && location.pathname === '/') {
               e.preventDefault();
               slideTo(0);
               return;
             }
-            /* Altfel: navigare normală spre altă pagină */
           });
         });
 
-        /* Urmărește scroll-ul manual — live, pe fiecare frame */
         var rafId;
         main.addEventListener('scroll', function () {
           cancelAnimationFrame(rafId);
           rafId = requestAnimationFrame(function () {
             var sw = slideWidth();
             var idx = sw > 0 ? Math.round(main.scrollLeft / sw) : 0;
-            idx = Math.max(0, Math.min(n - 1, idx));
-            if (idx !== current) { current = idx; repaint(); }
+            idx = Math.max(0, Math.min(n2 - 1, idx));
+            if (idx !== current) { current = idx; repaintSwipe(); }
           });
         }, { passive: true });
 
-        /* scrollend — se declanșează DUPĂ ce snap-ul s-a stabilizat
-           (mai fiabil ca scroll pe Android / Samsung Internet) */
         main.addEventListener('scrollend', function () {
           var sw = slideWidth();
           var idx = sw > 0 ? Math.round(main.scrollLeft / sw) : 0;
-          current = Math.max(0, Math.min(n - 1, idx));
-          repaint();
+          current = Math.max(0, Math.min(n2 - 1, idx));
+          repaintSwipe();
         }, { passive: true });
 
-        /* Repaint inițial — amânat un frame ca layout-ul să fie calculat */
-        requestAnimationFrame(repaint);
+        requestAnimationFrame(repaintSwipe);
       })();
     </script>
   </body>

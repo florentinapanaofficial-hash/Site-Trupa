@@ -3116,4 +3116,44 @@ details>summary::-webkit-details-marker {
     min-height: auto !important;
     padding-block: 1rem !important;
   }
+
+  /* ══════════════════════════════════════════════════════════════
+     HOMEPAGE MOBIL — scroll vertical continuu (nu swipe orizontal)
+     Pe homepage, cele 4 secțiuni curg una sub alta ca pe desktop.
+     Săgețile orizontale dispar — navigăm cu scroll normal în sus/jos.
+  ══════════════════════════════════════════════════════════════ */
+  body.is-homepage main#continut {
+    display: block !important;
+    flex-direction: unset !important;
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+    scroll-snap-type: none !important;
+    overscroll-behavior-x: auto !important;
+    height: auto !important;
+    min-height: unset !important;
+  }
+
+  body.is-homepage main#continut>section {
+    flex: unset !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 100dvh !important;
+    overflow-y: visible !important;
+    scroll-snap-align: none !important;
+    scroll-snap-stop: unset !important;
+    touch-action: pan-y !important;
+    padding-top: 3rem !important;
+    padding-bottom: 4rem !important;
+  }
+
+  body.is-homepage main#continut>section#acasa.hero-stage {
+    min-height: 100dvh !important;
+    justify-content: center !important;
+    padding-top: 4rem !important;
+  }
+
+  /* Ascunde săgețile prev/next pe homepage — nu mai e swipe orizontal */
+  body.is-homepage .mob-arrow {
+    display: none !important;
+  }
 }
