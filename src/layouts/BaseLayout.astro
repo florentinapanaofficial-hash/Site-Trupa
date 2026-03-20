@@ -374,14 +374,13 @@ const mobileNavAllItems = [
         }
 
         /* ════════════════════════════════════════════════════════
-           HOMEPAGE: scroll vertical în main — IntersectionObserver cu root:main
+           HOMEPAGE: body scrollează vertical — IntersectionObserver față de viewport
         ════════════════════════════════════════════════════════ */
         if (isHomepage) {
-          /* Activare inițială */
           setActiveHref('/');
 
-          var lastActiveId = '';
-          var mobObs = new IntersectionObserver(function (entries) {
+          var lastHpId = '';
+          var hpObs = new IntersectionObserver(function (entries) {
             var best = null;
             var bestRatio = -1;
             entries.forEach(function (entry) {
@@ -392,39 +391,38 @@ const mobileNavAllItems = [
             });
             if (!best || !best.isIntersecting) return;
             var id = best.target.id;
-            if (id === lastActiveId) return;
-            lastActiveId = id;
+            if (id === lastHpId) return;
+            lastHpId = id;
             var href = sectionToNav[id];
             if (href) setActiveHref(href);
           }, {
-            root: main,                         /* observă față de containerul main, nu viewport */
-            rootMargin: '-8% 0px -45% 0px',
+            root: null,                    /* viewport — body este scroll container */
+            rootMargin: '-10% 0px -50% 0px',
             threshold: [0, 0.1, 0.25, 0.5],
           });
 
-          slides.forEach(function (s) { mobObs.observe(s); });
+          slides.forEach(function (s) { hpObs.observe(s); });
 
-          /* Click pe buton → scroll vertical la secțiunea din main */
+          /* Click pe buton → window.scrollTo la secțiunea corectă */
           navBtns.forEach(function (btn) {
             btn.addEventListener('click', function (e) {
               var href = btn.getAttribute('data-mb') || '';
               var targetId = null;
               if (href === '/') { targetId = 'acasa'; }
               else if (href.includes('#')) { targetId = href.split('#').pop(); }
-              else {
-                /* Buton fără # → navigare normală spre altă pagină */
-                return;
-              }
+              else { return; /* altă pagină — navigare normală */ }
               var sec = targetId ? document.getElementById(targetId) : null;
               if (sec) {
                 e.preventDefault();
-                /* Scroll în containerul main (nu window) */
-                main.scrollTo({ top: sec.offsetTop, behavior: 'smooth' });
+                var navEl = document.querySelector('.mob-nav');
+                var navH = navEl ? navEl.offsetHeight : 44;
+                var top = sec.getBoundingClientRect().top + window.pageYOffset - navH;
+                window.scrollTo({ top: top, behavior: 'smooth' });
               }
             });
           });
 
-          return; /* Nu mai rulăm codul de swipe orizontal */
+          return; /* Homepage gata — nu rulăm swipe orizontal */
         }
 
         /* ════════════════════════════════════════════════════════
@@ -495,6 +493,14 @@ const mobileNavAllItems = [
           var idx = sw > 0 ? Math.round(main.scrollLeft / sw) : 0;
           current = Math.max(0, Math.min(n2 - 1, idx));
           repaintSwipe();
+        }, { passive: true });
+
+        /* La rotire telefon — re-snap la slide-ul curent cu noile dimensiuni */
+        window.addEventListener('resize', function () {
+          requestAnimationFrame(function () {
+            main.scrollLeft = current * slideWidth();
+            repaintSwipe();
+          });
         }, { passive: true });
 
         requestAnimationFrame(repaintSwipe);

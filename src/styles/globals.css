@@ -3118,23 +3118,20 @@ details>summary::-webkit-details-marker {
   }
 
   /* ══════════════════════════════════════════════════════════════
-     HOMEPAGE MOBIL — scroll VERTICAL în containerul main
-     main rămâne height:100dvh dar scrollează pe Y în loc de X.
-     Secțiunile curg una sub alta. Săgețile orizontale dispar.
+     HOMEPAGE MOBIL — body scrollează vertical normal
+     main = simplu block cu înălțime auto, scrollul real e al lui body (window).
+     Rotirea telefonului funcționează corect automat.
   ══════════════════════════════════════════════════════════════ */
   body.is-homepage main#continut {
     display: block !important;
     flex-direction: unset !important;
     overflow-x: hidden !important;
-    overflow-y: auto !important;
-    /* scroll vertical intern */
+    overflow-y: visible !important;
+    /* height auto → body preia scrollul */
     scroll-snap-type: none !important;
-    overscroll-behavior-y: contain !important;
-    overscroll-behavior-x: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    height: 100dvh !important;
-    /* containerul rămâne fix, scrollează intern */
-    min-height: 100dvh !important;
+    height: auto !important;
+    min-height: unset !important;
+    width: 100% !important;
   }
 
   body.is-homepage main#continut>section {
@@ -3142,8 +3139,8 @@ details>summary::-webkit-details-marker {
     width: 100% !important;
     height: auto !important;
     min-height: 100dvh !important;
-    overflow-y: visible !important;
     overflow-x: hidden !important;
+    overflow-y: visible !important;
     scroll-snap-align: none !important;
     scroll-snap-stop: unset !important;
     touch-action: pan-y !important;
@@ -3152,12 +3149,11 @@ details>summary::-webkit-details-marker {
   }
 
   body.is-homepage main#continut>section#acasa.hero-stage {
-    min-height: 100dvh !important;
     justify-content: flex-start !important;
     padding-top: 3.8rem !important;
   }
 
-  /* Ascunde săgețile prev/next pe homepage */
+  /* Săgețile orizontale nu au sens pe homepage */
   body.is-homepage .mob-arrow {
     display: none !important;
   }
