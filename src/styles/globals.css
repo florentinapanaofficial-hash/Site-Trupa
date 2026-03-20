@@ -2941,20 +2941,22 @@ details>summary::-webkit-details-marker {
     overflow-y: auto !important;
     overflow-x: hidden !important;
     overscroll-behavior-y: contain !important;
-    /* pan-x pan-y: permite AMBELE directii —
-       vertical in sectiune, orizontal pe parent (swipe intre slide-uri).
-       pan-y singur ar bloca swipe-ul orizontal catre parent spre ultimele sectiuni. */
     touch-action: pan-x pan-y !important;
     scroll-snap-align: start !important;
     scroll-snap-stop: always !important;
     margin: 0 !important;
     border-radius: 0 !important;
     box-sizing: border-box !important;
-    /* 2.9rem = exact cât înălțimea nav-ului fix + 2px respiro */
     padding-top: 2.9rem !important;
     padding-bottom: 5rem !important;
     padding-left: 1.4rem !important;
     padding-right: 1.4rem !important;
+  }
+
+  /* ── Hero Acasă — conținut aliniat sus, nu centrat vertical ── */
+  main#continut>section#acasa.hero-stage {
+    justify-content: flex-start !important;
+    padding-top: 3.8rem !important;
   }
 
   main#continut>section::-webkit-scrollbar {
