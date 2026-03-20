@@ -371,7 +371,7 @@ const mobileNavAllItems = [
           });
         });
 
-        /* Urmărește scroll-ul manual al utilizatorului */
+        /* Urmărește scroll-ul manual — live, pe fiecare frame */
         var rafId;
         main.addEventListener('scroll', function () {
           cancelAnimationFrame(rafId);
@@ -383,7 +383,17 @@ const mobileNavAllItems = [
           });
         }, { passive: true });
 
-        repaint();
+        /* scrollend — se declanșează DUPĂ ce snap-ul s-a stabilizat
+           (mai fiabil ca scroll pe Android / Samsung Internet) */
+        main.addEventListener('scrollend', function () {
+          var sw = slideWidth();
+          var idx = sw > 0 ? Math.round(main.scrollLeft / sw) : 0;
+          current = Math.max(0, Math.min(n - 1, idx));
+          repaint();
+        }, { passive: true });
+
+        /* Repaint inițial — amânat un frame ca layout-ul să fie calculat */
+        requestAnimationFrame(repaint);
       })();
     </script>
   </body>
