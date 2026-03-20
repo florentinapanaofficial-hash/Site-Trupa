@@ -61,6 +61,18 @@ const sideMenuTopItems = [
 ];
 
 const sideMenuBottomItems = [];
+
+// Linkuri extra din navigation (cele din header desktop care nu sunt deja în sidebar)
+const sideHrefs = new Set(sideMenuTopItems.map(i => i.href));
+const extraNavItems = navigation
+  .map(item => ({ href: item.href.startsWith('/') || item.href.startsWith('#') || item.href.startsWith('http') ? item.href : `/${item.href}`, label: item.label }))
+  .filter(item => !sideHrefs.has(item.href));
+
+// Lista completă pentru nav-ul mobil
+const mobileNavAllItems = [
+  ...sideMenuTopItems,
+  ...extraNavItems,
+];
 ---
 
 <!DOCTYPE html>
@@ -111,7 +123,7 @@ const sideMenuBottomItems = [];
     <!-- ══ MOBIL: nav plutitor (ascuns pe desktop via CSS) ══ -->
     <nav class="mob-nav" aria-label="Navigare mobilă">
       <div class="mob-nav-track">
-        {sideMenuTopItems.map((item) => (
+        {mobileNavAllItems.map((item) => (
           <a href={item.href} class="mob-nav-btn" data-mb={item.href}>{item.label}</a>
         ))}
       </div>

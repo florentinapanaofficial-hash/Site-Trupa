@@ -2939,18 +2939,21 @@ details>summary::-webkit-details-marker {
     overflow-y: auto !important;
     overflow-x: hidden !important;
     overscroll-behavior-y: contain !important;
+    /* pan-y: permite scroll vertical in interiorul slide-ului
+       fara a bloca swipe-ul orizontal al containerului parent */
+    touch-action: pan-y !important;
     scroll-snap-align: start !important;
     scroll-snap-stop: always !important;
     margin: 0 !important;
     border-radius: 0 !important;
     box-sizing: border-box !important;
-    /* spațiu sus: nav plutitor (~3.5rem) + puțin aer */
     padding-top: 4rem !important;
-    padding-bottom: 1rem !important;
+    /* padding-bottom mare — sectiunile cu continut lung (galerie video etc.)
+       sa poata fi scrollate pana la capat fara ca ultimele elemente sa fie
+       acoperite de sagetile fixe */
+    padding-bottom: 5rem !important;
     padding-left: 2.8rem !important;
-    /* spațiu pentru săgeata stânga */
     padding-right: 2.8rem !important;
-    /* spațiu pentru săgeata dreapta */
   }
 
   main#continut>section::-webkit-scrollbar {
