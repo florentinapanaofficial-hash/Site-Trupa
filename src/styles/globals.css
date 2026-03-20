@@ -2950,13 +2950,11 @@ details>summary::-webkit-details-marker {
     margin: 0 !important;
     border-radius: 0 !important;
     box-sizing: border-box !important;
-    padding-top: 4rem !important;
-    /* padding-bottom mare — sectiunile cu continut lung (galerie video etc.)
-       sa poata fi scrollate pana la capat fara ca ultimele elemente sa fie
-       acoperite de sagetile fixe */
+    /* 2.9rem = exact cât înălțimea nav-ului fix + 2px respiro */
+    padding-top: 2.9rem !important;
     padding-bottom: 5rem !important;
-    padding-left: 2.8rem !important;
-    padding-right: 2.8rem !important;
+    padding-left: 1.4rem !important;
+    padding-right: 1.4rem !important;
   }
 
   main#continut>section::-webkit-scrollbar {
@@ -2983,7 +2981,7 @@ details>summary::-webkit-details-marker {
     backdrop-filter: blur(16px) saturate(1.2);
     -webkit-backdrop-filter: blur(16px) saturate(1.2);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 0.5rem 0.65rem 0.6rem;
+    padding: 0.35rem 0.65rem 0.4rem;
   }
 
   .mob-nav::-webkit-scrollbar {
@@ -3009,8 +3007,8 @@ details>summary::-webkit-details-marker {
     font-weight: 600;
     letter-spacing: 0.07em;
     text-transform: uppercase;
-    padding: 0.34rem 0.82rem;
-    min-height: 32px;
+    padding: 0.28rem 0.75rem;
+    min-height: 28px;
     border: 1px solid rgba(255, 255, 255, 0.14);
     background: rgba(255, 255, 255, 0.07);
     color: rgba(255, 255, 255, 0.65);
@@ -3028,6 +3026,35 @@ details>summary::-webkit-details-marker {
     box-shadow:
       0 0 14px rgba(6, 214, 255, 0.32),
       inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  }
+
+  /* ── Separator nav / social ── */
+  .mob-nav-sep {
+    display: inline-block;
+    width: 1px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.18);
+    margin: 0 0.2rem;
+    flex-shrink: 0;
+    align-self: center;
+  }
+
+  /* ── Iconițe social în nav mobil ── */
+  .mob-social-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 0.55rem;
+    text-decoration: none;
+    transition: opacity 200ms ease, transform 150ms ease;
+  }
+
+  .mob-social-btn:active {
+    opacity: 0.75;
+    transform: scale(0.92);
   }
 
   /* ── 8. Săgeți swipe stânga / dreapta ── */

@@ -27,6 +27,13 @@ const ga4Id = import.meta.env.PUBLIC_GA4_ID;
 
 const { navigation } = siteContent;
 
+const socialLinks = {
+  youtube:   siteContent.socialLinks?.youtube   || '',
+  facebook:  siteContent.socialLinks?.facebook  || '',
+  instagram: siteContent.socialLinks?.instagram || '',
+  tiktok:    siteContent.socialLinks?.tiktok    || '',
+};
+
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': ['MusicGroup', 'LocalBusiness'],
@@ -126,6 +133,48 @@ const mobileNavAllItems = [
         {mobileNavAllItems.map((item) => (
           <a href={item.href} class="mob-nav-btn" data-mb={item.href}>{item.label}</a>
         ))}
+
+        <!-- Separator -->
+        <span class="mob-nav-sep" aria-hidden="true"></span>
+
+        <!-- Social icons -->
+        {socialLinks.youtube && (
+          <a href={socialLinks.youtube} class="mob-social-btn" target="_blank" rel="noopener noreferrer" aria-label="YouTube"
+            style="background:#FF0000;box-shadow:0 1px 8px rgba(255,0,0,0.55);">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">
+              <rect x="2" y="6" width="20" height="13" rx="4" fill="#fff"/>
+              <polygon points="9.5,9.5 9.5,15.5 16.5,12.5" fill="#FF0000"/>
+            </svg>
+          </a>
+        )}
+        {socialLinks.facebook && (
+          <a href={socialLinks.facebook} class="mob-social-btn" target="_blank" rel="noopener noreferrer" aria-label="Facebook"
+            style="background:#1877F2;box-shadow:0 1px 8px rgba(24,119,242,0.55);">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">
+              <path d="M13.5 21V14.3H16l.4-2.85H13.5V9.7c0-.82.38-1.2 1.38-1.2H16.5V5.85C16.05 5.77 15.1 5.7 14 5.7c-2.65 0-4.05 1.4-4.05 4.15v1.6H8v2.85h1.95V21H13.5z" fill="#fff"/>
+            </svg>
+          </a>
+        )}
+        {socialLinks.instagram && (
+          <a href={socialLinks.instagram} class="mob-social-btn" target="_blank" rel="noopener noreferrer" aria-label="Instagram"
+            style="background:radial-gradient(circle at 30% 110%,#ffd676 0%,#f46f30 25%,#e1306c 55%,#833ab4 80%,#405de6 100%);box-shadow:0 1px 8px rgba(225,48,108,0.55);">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">
+              <rect x="2.5" y="2.5" width="19" height="19" rx="5.5" stroke="#fff" stroke-width="2.1"/>
+              <circle cx="12" cy="12" r="4.3" stroke="#fff" stroke-width="2"/>
+              <circle cx="17.5" cy="6.6" r="1.4" fill="#fff"/>
+            </svg>
+          </a>
+        )}
+        {socialLinks.tiktok && (
+          <a href={socialLinks.tiktok} class="mob-social-btn" target="_blank" rel="noopener noreferrer" aria-label="TikTok"
+            style="background:#010101;border:1.5px solid rgba(255,255,255,0.45);box-shadow:0 1px 8px rgba(254,44,85,0.45);">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">
+              <path transform="translate(-0.5,-0.4)" d="M16.5 3h-2.3v11.6a2.8 2.8 0 0 1-2.8 2.8 2.8 2.8 0 0 1-2.8-2.8 2.8 2.8 0 0 1 2.8-2.8c.3 0 .55.05.8.12V9.45a6.2 6.2 0 0 0-.8-.05 6.1 6.1 0 0 0-6.1 6.1 6.1 6.1 0 0 0 6.1 6.1 6.1 6.1 0 0 0 6.1-6.1V8.35a8.5 8.5 0 0 0 4.8 1.5V7.3a6.1 6.1 0 0 1-4.5-4.3h-.3z" fill="#25f4ee"/>
+              <path transform="translate(0.5,0.4)" d="M16.5 3h-2.3v11.6a2.8 2.8 0 0 1-2.8 2.8 2.8 2.8 0 0 1-2.8-2.8 2.8 2.8 0 0 1 2.8-2.8c.3 0 .55.05.8.12V9.45a6.2 6.2 0 0 0-.8-.05 6.1 6.1 0 0 0-6.1 6.1 6.1 6.1 0 0 0 6.1 6.1 6.1 6.1 0 0 0 6.1-6.1V8.35a8.5 8.5 0 0 0 4.8 1.5V7.3a6.1 6.1 0 0 1-4.5-4.3h-.3z" fill="#fe2c55"/>
+              <path d="M16.5 3h-2.3v11.6a2.8 2.8 0 0 1-2.8 2.8 2.8 2.8 0 0 1-2.8-2.8 2.8 2.8 0 0 1 2.8-2.8c.3 0 .55.05.8.12V9.45a6.2 6.2 0 0 0-.8-.05 6.1 6.1 0 0 0-6.1 6.1 6.1 6.1 0 0 0 6.1 6.1 6.1 6.1 0 0 0 6.1-6.1V8.35a8.5 8.5 0 0 0 4.8 1.5V7.3a6.1 6.1 0 0 1-4.5-4.3h-.3z" fill="#fff"/>
+            </svg>
+          </a>
+        )}
       </div>
     </nav>
 
