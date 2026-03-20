@@ -232,8 +232,8 @@ const mobileNavAllItems = [
         const sectionToHref = {
           'acasa':   '/',
           'video':   '/galerie-video',
-          'membri':  '/#membri',
           'galerie': '/galerie-foto',
+          'membri':  '/#membri',
         };
 
         function setActive(href) {
@@ -265,32 +265,40 @@ const mobileNavAllItems = [
           });
         });
 
-        // Scroll spy: observer activ în banda de 15%–25% de sus a viewport-ului
-        // → butonul se aprinde când secțiunea intră în zona vizuală principală
+        // Scroll spy: secțiunea care ocupă cel mai mult din jumătatea superioară
+        // a viewport-ului devine activă. Bandă largă → declanșare fiabilă.
         const sections = document.querySelectorAll('section[id]');
         if (!sections.length) return;
 
-        const obs = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (!entry.isIntersecting) return;
-            const id = entry.target.id;
-            const path = location.pathname.replace(/\/$/, '') || '/';
+        // Folosim mai mulți observatori cu threshold-uri diferite pentru precizie mai bună
+        let lastActiveId = '';
 
-            if (path === '/') {
-              // Homepage: folosim harta secțiune → buton sidebar
-              const href = sectionToHref[id];
-              if (href) setActive(href);
-            } else {
-              // Subpagini: potrivire după path+#id
-              const anchorHref = path + '#' + id;
-              if (links.some(l => l.getAttribute('href') === anchorHref)) {
-                setActive(anchorHref);
-              }
+        const obs = new IntersectionObserver((entries) => {
+          let best = null;
+          let bestRatio = -1;
+          entries.forEach(entry => {
+            if (entry.intersectionRatio > bestRatio) {
+              bestRatio = entry.intersectionRatio;
+              best = entry;
             }
           });
+          if (!best || !best.isIntersecting) return;
+          const id = best.target.id;
+          if (id === lastActiveId) return;
+          lastActiveId = id;
+          const path = location.pathname.replace(/\/$/, '') || '/';
+          if (path === '/') {
+            const href = sectionToHref[id];
+            if (href) setActive(href);
+          } else {
+            const anchorHref = path + '#' + id;
+            if (links.some(l => l.getAttribute('href') === anchorHref)) {
+              setActive(anchorHref);
+            }
+          }
         }, {
-          rootMargin: '-15% 0px -75% 0px',
-          threshold: 0,
+          rootMargin: '-8% 0px -45% 0px',
+          threshold: [0, 0.1, 0.25, 0.5],
         });
 
         sections.forEach(s => obs.observe(s));
