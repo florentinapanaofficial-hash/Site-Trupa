@@ -374,7 +374,7 @@ const mobileNavAllItems = [
         }
 
         /* ════════════════════════════════════════════════════════
-           HOMEPAGE: scroll vertical — IntersectionObserver pe secțiuni
+           HOMEPAGE: scroll vertical în main — IntersectionObserver cu root:main
         ════════════════════════════════════════════════════════ */
         if (isHomepage) {
           /* Activare inițială */
@@ -397,13 +397,14 @@ const mobileNavAllItems = [
             var href = sectionToNav[id];
             if (href) setActiveHref(href);
           }, {
+            root: main,                         /* observă față de containerul main, nu viewport */
             rootMargin: '-8% 0px -45% 0px',
             threshold: [0, 0.1, 0.25, 0.5],
           });
 
           slides.forEach(function (s) { mobObs.observe(s); });
 
-          /* Click pe butonul cu # → smooth scroll la secțiunea respectivă */
+          /* Click pe buton → scroll vertical la secțiunea din main */
           navBtns.forEach(function (btn) {
             btn.addEventListener('click', function (e) {
               var href = btn.getAttribute('data-mb') || '';
@@ -417,7 +418,8 @@ const mobileNavAllItems = [
               var sec = targetId ? document.getElementById(targetId) : null;
               if (sec) {
                 e.preventDefault();
-                sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                /* Scroll în containerul main (nu window) */
+                main.scrollTo({ top: sec.offsetTop, behavior: 'smooth' });
               }
             });
           });

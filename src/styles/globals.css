@@ -3118,19 +3118,23 @@ details>summary::-webkit-details-marker {
   }
 
   /* ══════════════════════════════════════════════════════════════
-     HOMEPAGE MOBIL — scroll vertical continuu (nu swipe orizontal)
-     Pe homepage, cele 4 secțiuni curg una sub alta ca pe desktop.
-     Săgețile orizontale dispar — navigăm cu scroll normal în sus/jos.
+     HOMEPAGE MOBIL — scroll VERTICAL în containerul main
+     main rămâne height:100dvh dar scrollează pe Y în loc de X.
+     Secțiunile curg una sub alta. Săgețile orizontale dispar.
   ══════════════════════════════════════════════════════════════ */
   body.is-homepage main#continut {
     display: block !important;
     flex-direction: unset !important;
-    overflow-x: visible !important;
-    overflow-y: visible !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    /* scroll vertical intern */
     scroll-snap-type: none !important;
+    overscroll-behavior-y: contain !important;
     overscroll-behavior-x: auto !important;
-    height: auto !important;
-    min-height: unset !important;
+    -webkit-overflow-scrolling: touch !important;
+    height: 100dvh !important;
+    /* containerul rămâne fix, scrollează intern */
+    min-height: 100dvh !important;
   }
 
   body.is-homepage main#continut>section {
@@ -3139,6 +3143,7 @@ details>summary::-webkit-details-marker {
     height: auto !important;
     min-height: 100dvh !important;
     overflow-y: visible !important;
+    overflow-x: hidden !important;
     scroll-snap-align: none !important;
     scroll-snap-stop: unset !important;
     touch-action: pan-y !important;
@@ -3148,11 +3153,11 @@ details>summary::-webkit-details-marker {
 
   body.is-homepage main#continut>section#acasa.hero-stage {
     min-height: 100dvh !important;
-    justify-content: center !important;
-    padding-top: 4rem !important;
+    justify-content: flex-start !important;
+    padding-top: 3.8rem !important;
   }
 
-  /* Ascunde săgețile prev/next pe homepage — nu mai e swipe orizontal */
+  /* Ascunde săgețile prev/next pe homepage */
   body.is-homepage .mob-arrow {
     display: none !important;
   }
