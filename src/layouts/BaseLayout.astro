@@ -275,24 +275,75 @@ const mobileNavAllItems = [
         var n = slides.length;
         var current = 0;
 
-        function slideTo(idx) {
-          if (idx < 0 || idx >= n) return;
-          current = idx;
-          main.scrollTo({ left: idx * window.innerWidth, behavior: 'smooth' });
-          repaint();
+        /* ── Map: id secțiune → href buton nav ──
+           Acoperă atât homepage (slide-uri) cât și subpagini (1 singur slide) */
+        var sectionToNav = {
+          'acasa':            '/',
+          'video':            '/galerie-video',
+          'galerie':          '/galerie-foto',
+          'membri':           '/#membri',
+          'about':            '/despre',
+          'despre':           '/despre',
+          'contact':          '/contact',
+          'momente-cu-mirii': '/momente-cu-mirii',
+          'comunitate':       '/comunitatea-noastra',
+          'comunitatea':      '/comunitatea-noastra',
+          'aparitii-tv':      '/aparitii-tv',
+          'aparitii':         '/aparitii-tv',
+          'galerie-foto':     '/galerie-foto',
+          'galerie-video':    '/galerie-video',
+        };
+
+        /* ── Setează butonul activ și scrollează nav-ul să-l arate ── */
+        function setActiveHref(activeHref) {
+          navBtns.forEach(function (btn) {
+            var href = btn.getAttribute('data-mb') || '';
+            btn.classList.toggle('is-active', href === activeHref);
+          });
+
+          /* Scroll nav ca butonul activ să fie vizibil */
+          var activeBtn = navBtns.find(function (b) {
+            return b.getAttribute('data-mb') === activeHref;
+          });
+          if (activeBtn) {
+            var nav = document.querySelector('.mob-nav');
+            if (nav) {
+              var btnLeft = activeBtn.offsetLeft;
+              var btnWidth = activeBtn.offsetWidth;
+              var navWidth = nav.offsetWidth;
+              nav.scrollTo({ left: btnLeft - (navWidth / 2) + (btnWidth / 2), behavior: 'smooth' });
+            }
+          }
         }
 
         function repaint() {
-          var sectionId = (slides[current] && slides[current].id) || '';
-          navBtns.forEach(function (btn) {
-            var href = btn.getAttribute('data-mb') || '';
-            var hash = href.includes('#') ? href.split('#').pop() : null;
-            var isHome = (href === '/' || href === '') && current === 0 && !sectionId;
-            var isAnchor = hash && sectionId === hash;
-            btn.classList.toggle('is-active', !!(isHome || isAnchor));
-          });
+          var section = slides[current];
+          var sectionId = (section && section.id) || '';
+          var pathname = location.pathname.replace(/\/$/, '') || '/';
+
+          /* Pe subpagini (un singur slide) activăm după pathname */
+          if (pathname !== '/') {
+            setActiveHref(pathname);
+          } else {
+            /* Homepage: activăm după id-ul secțiunii curente */
+            var activeHref = sectionToNav[sectionId] || '/';
+            setActiveHref(activeHref);
+          }
+
           if (arrowPrev) arrowPrev.classList.toggle('is-hidden', current === 0);
           if (arrowNext) arrowNext.classList.toggle('is-hidden', current === n - 1);
+        }
+
+        /* slideWidth: latimea unui slide = latimea vizibila a containerului (fara scrollbar)
+           Folosim clientWidth in loc de window.innerWidth pentru a evita decalajul cauzat
+           de scrollbar-ul documentului (pe Android, 100vw != clientWidth) */
+        function slideWidth() { return main.clientWidth || window.innerWidth; }
+
+        function slideTo(idx) {
+          if (idx < 0 || idx >= n) return;
+          current = idx;
+          main.scrollTo({ left: idx * slideWidth(), behavior: 'smooth' });
+          repaint();
         }
 
         if (arrowPrev) arrowPrev.addEventListener('click', function () { slideTo(current - 1); });
@@ -301,12 +352,22 @@ const mobileNavAllItems = [
         navBtns.forEach(function (btn) {
           btn.addEventListener('click', function (e) {
             var href = btn.getAttribute('data-mb') || '';
-            if (!href.includes('#')) return; /* lasă navigarea normală spre alte pagini */
-            var hash = href.split('#').pop();
-            var sec = hash ? document.getElementById(hash) : null;
-            if (!sec) return;
-            var idx = slides.indexOf(sec);
-            if (idx !== -1) { e.preventDefault(); slideTo(idx); }
+            /* Linkuri cu # pe homepage → scroll la slide */
+            if (href.includes('#') && location.pathname.replace(/\/$/, '') === '') {
+              var hash = href.split('#').pop();
+              var sec = hash ? document.getElementById(hash) : null;
+              if (sec) {
+                var idx = slides.indexOf(sec);
+                if (idx !== -1) { e.preventDefault(); slideTo(idx); return; }
+              }
+            }
+            /* Buton "/" pe homepage → slide 0 */
+            if (href === '/' && location.pathname === '/') {
+              e.preventDefault();
+              slideTo(0);
+              return;
+            }
+            /* Altfel: navigare normală spre altă pagină */
           });
         });
 
@@ -315,7 +376,8 @@ const mobileNavAllItems = [
         main.addEventListener('scroll', function () {
           cancelAnimationFrame(rafId);
           rafId = requestAnimationFrame(function () {
-            var idx = Math.round(main.scrollLeft / window.innerWidth);
+            var sw = slideWidth();
+            var idx = sw > 0 ? Math.round(main.scrollLeft / sw) : 0;
             idx = Math.max(0, Math.min(n - 1, idx));
             if (idx !== current) { current = idx; repaint(); }
           });

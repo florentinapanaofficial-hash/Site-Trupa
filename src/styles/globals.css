@@ -2911,8 +2911,10 @@ details>summary::-webkit-details-marker {
     -ms-overflow-style: none !important;
     padding: 0 !important;
     margin: 0 !important;
-    width: 100vw !important;
-    max-width: 100vw !important;
+    /* 100% in loc de 100vw — evitam diferenta de scrollbar (vw include scrollbar pe Android)
+       care ar produce padding asimetric stanga/dreapta */
+    width: 100% !important;
+    max-width: 100% !important;
     height: 100dvh !important;
     min-height: 100dvh !important;
     border-radius: 0 !important;
@@ -2930,18 +2932,19 @@ details>summary::-webkit-details-marker {
 
   /* ── 6. Fiecare <section> = un slide ── */
   main#continut>section {
-    flex: 0 0 100vw !important;
-    width: 100vw !important;
-    min-width: 100vw !important;
-    max-width: 100vw !important;
+    flex: 0 0 100% !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
     height: 100dvh !important;
     min-height: unset !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
     overscroll-behavior-y: contain !important;
-    /* pan-y: permite scroll vertical in interiorul slide-ului
-       fara a bloca swipe-ul orizontal al containerului parent */
-    touch-action: pan-y !important;
+    /* pan-x pan-y: permite AMBELE directii —
+       vertical in sectiune, orizontal pe parent (swipe intre slide-uri).
+       pan-y singur ar bloca swipe-ul orizontal catre parent spre ultimele sectiuni. */
+    touch-action: pan-x pan-y !important;
     scroll-snap-align: start !important;
     scroll-snap-stop: always !important;
     margin: 0 !important;
@@ -2972,6 +2975,7 @@ details>summary::-webkit-details-marker {
     overflow-y: hidden;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
     background: linear-gradient(180deg,
         rgba(4, 6, 18, 0.97) 0%,
         rgba(4, 6, 18, 0.91) 84%,
