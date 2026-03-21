@@ -316,9 +316,9 @@ const mobileNavAllItems = [
     </div>
 
     <script is:inline>
-      /* ── Mobil swipe/scroll controller — rulează doar pe ≤767px ── */
+      /* ── Mobil swipe/scroll controller — rulează pe ≤1023px (telefon + tabletă) ── */
       (function () {
-        if (!window.matchMedia('(max-width: 767px)').matches) return;
+        if (!window.matchMedia('(max-width: 1023px)').matches) return;
 
         var main = document.getElementById('continut');
         if (!main) return;
@@ -374,34 +374,37 @@ const mobileNavAllItems = [
         }
 
         /* ════════════════════════════════════════════════════════
-           HOMEPAGE: body scrollează vertical — IntersectionObserver față de viewport
+           HOMEPAGE: body scrollează vertical — scroll listener pe poziție reală
+           (IntersectionObserver are bug la scroll-up: batchul de entries alege
+           greșit câștigătorul; scroll+offsetTop e infailibil în ambele direcții)
         ════════════════════════════════════════════════════════ */
         if (isHomepage) {
           setActiveHref('/');
 
-          var lastHpId = '';
-          var hpObs = new IntersectionObserver(function (entries) {
-            var best = null;
-            var bestRatio = -1;
-            entries.forEach(function (entry) {
-              if (entry.intersectionRatio > bestRatio) {
-                bestRatio = entry.intersectionRatio;
-                best = entry;
-              }
+          function updateActiveSection() {
+            var navEl = document.querySelector('.mob-nav');
+            var navH = navEl ? navEl.offsetHeight : 44;
+            var scrollY = window.scrollY || window.pageYOffset;
+            /* Pragul: 35% din înălțimea vizibilă sub nav */
+            var threshold = scrollY + navH + (window.innerHeight - navH) * 0.35;
+            /* Ultima secțiune al cărei offsetTop ≤ prag — aceea e "în vedere" */
+            var active = null;
+            slides.forEach(function (s) {
+              if (s.offsetTop <= threshold) active = s;
             });
-            if (!best || !best.isIntersecting) return;
-            var id = best.target.id;
-            if (id === lastHpId) return;
-            lastHpId = id;
-            var href = sectionToNav[id];
-            if (href) setActiveHref(href);
-          }, {
-            root: null,                    /* viewport — body este scroll container */
-            rootMargin: '-10% 0px -50% 0px',
-            threshold: [0, 0.1, 0.25, 0.5],
-          });
+            if (active) {
+              var href = sectionToNav[active.id] || '/';
+              setActiveHref(href);
+            }
+          }
 
-          slides.forEach(function (s) { hpObs.observe(s); });
+          var hpScrollRaf;
+          window.addEventListener('scroll', function () {
+            cancelAnimationFrame(hpScrollRaf);
+            hpScrollRaf = requestAnimationFrame(updateActiveSection);
+          }, { passive: true });
+
+          updateActiveSection(); /* rulează odată la încărcare */
 
           /* Click pe buton → window.scrollTo la secțiunea corectă */
           navBtns.forEach(function (btn) {
@@ -426,30 +429,64 @@ const mobileNavAllItems = [
         }
 
         /* ════════════════════════════════════════════════════════
-           ALTE PAGINI: swipe orizontal (comportament existent)
+           ALTE PAGINI: swipe orizontal + navigare între pagini
+           Fiecare pagină are o singură secțiune → swipe-ul navighează
+           la pagina următoare / anterioară din ordinea nav-ului.
         ════════════════════════════════════════════════════════ */
         var n2 = slides.length;
 
+        /* Ordinea paginilor pentru navigare stânga/dreapta — aceeași cu nav-ul mobil */
+        var pageOrder = [
+          '/',
+          '/galerie-video',
+          '/galerie-foto',
+          '/despre',
+          '/contact',
+          '/momente-cu-mirii',
+          '/comunitatea-noastra',
+          '/aparitii-tv',
+        ];
+        var currentPath = location.pathname.replace(/\/$/, '') || '/';
+        var pageIdx = pageOrder.indexOf(currentPath);
+
+        /* Tranziție rapidă la pagina adiacentă */
+        function navigatePage(url) {
+          main.style.transition = 'opacity 0.18s ease';
+          main.style.opacity = '0';
+          setTimeout(function () { window.location.href = url; }, 180);
+        }
+
         function repaintSwipe() {
-          var section = slides[current];
-          var sectionId = (section && section.id) || '';
           var pathname = location.pathname.replace(/\/$/, '') || '/';
+          setActiveHref(pathname !== '/' ? pathname : '/');
 
-          if (pathname !== '/') {
-            setActiveHref(pathname);
-          } else {
-            var activeHref = sectionToNav[sectionId] || '/';
-            setActiveHref(activeHref);
-          }
+          /* Săgeata prev: există slide anterior SAU pagină anterioară */
+          var hasPrev = current > 0 || pageIdx > 0;
+          /* Săgeata next: există slide următor SAU pagină următoare */
+          var hasNext = current < n2 - 1 || (pageIdx !== -1 && pageIdx < pageOrder.length - 1);
 
-          if (arrowPrev) arrowPrev.classList.toggle('is-hidden', current === 0);
-          if (arrowNext) arrowNext.classList.toggle('is-hidden', current === n2 - 1);
+          if (arrowPrev) arrowPrev.classList.toggle('is-hidden', !hasPrev);
+          if (arrowNext) arrowNext.classList.toggle('is-hidden', !hasNext);
         }
 
         function slideWidth() { return main.clientWidth || window.innerWidth; }
 
         function slideTo(idx) {
-          if (idx < 0 || idx >= n2) return;
+          /* Înainte de primul slide → pagina anterioară */
+          if (idx < 0) {
+            if (pageIdx > 0) { navigatePage(pageOrder[pageIdx - 1]); }
+            else { main.scrollTo({ left: 0, behavior: 'smooth' }); }
+            return;
+          }
+          /* După ultimul slide → pagina următoare */
+          if (idx >= n2) {
+            if (pageIdx !== -1 && pageIdx < pageOrder.length - 1) {
+              navigatePage(pageOrder[pageIdx + 1]);
+            } else {
+              main.scrollTo({ left: (n2 - 1) * slideWidth(), behavior: 'smooth' });
+            }
+            return;
+          }
           current = idx;
           main.scrollTo({ left: idx * slideWidth(), behavior: 'smooth' });
           repaintSwipe();
@@ -458,25 +495,71 @@ const mobileNavAllItems = [
         if (arrowPrev) arrowPrev.addEventListener('click', function () { slideTo(current - 1); });
         if (arrowNext) arrowNext.addEventListener('click', function () { slideTo(current + 1); });
 
-        navBtns.forEach(function (btn) {
-          btn.addEventListener('click', function (e) {
-            var href = btn.getAttribute('data-mb') || '';
-            if (href.includes('#') && location.pathname.replace(/\/$/, '') === '') {
-              var hash = href.split('#').pop();
-              var sec = hash ? document.getElementById(hash) : null;
-              if (sec) {
-                var idx = slides.indexOf(sec);
-                if (idx !== -1) { e.preventDefault(); slideTo(idx); return; }
-              }
-            }
-            if (href === '/' && location.pathname === '/') {
-              e.preventDefault();
-              slideTo(0);
-              return;
-            }
-          });
-        });
+        /* ════════════════════════════════════════════════════════
+           TOUCH SWIPE — listener pe document (nu pe main/slides).
+           Ascultăm pe document ca să prindem și swipe-urile care
+           pornesc de pe săgețile fixate pe margini (care nu sunt
+           copii ale lui main și nu propagă la main).
+           touch-action:pan-y pe secțiuni → browserul scrollează
+           vertical nativ; gestul orizontal e preluat de JS.
+           lockVertical() dezactivează temporar overflow-y pe
+           secțiunea curentă pentru iOS Safari (care altfel ignoră
+           preventDefault după ce a angajat scroll vertical).
+        ════════════════════════════════════════════════════════ */
+        var tStartX = 0, tStartY = 0, tAxis = null, tScrollStart = 0;
+        var tLocked = false;
 
+        function lockVertical() {
+          if (tLocked) return;
+          tLocked = true;
+          var sec = slides[current];
+          if (sec) sec.style.overflowY = 'hidden';
+        }
+
+        function unlockVertical() {
+          if (!tLocked) return;
+          tLocked = false;
+          var sec = slides[current];
+          if (sec) sec.style.overflowY = '';
+        }
+
+        function onTouchStart(e) {
+          tStartX = e.touches[0].clientX;
+          tStartY = e.touches[0].clientY;
+          tScrollStart = main.scrollLeft;
+          tAxis = null;
+        }
+
+        function onTouchMove(e) {
+          if (!e.touches.length) return;
+          var dx = e.touches[0].clientX - tStartX;
+          var dy = e.touches[0].clientY - tStartY;
+          if (!tAxis && (Math.abs(dx) > 6 || Math.abs(dy) > 6)) {
+            tAxis = Math.abs(dx) >= Math.abs(dy) ? 'x' : 'y';
+          }
+          if (tAxis === 'x') {
+            lockVertical();
+            e.preventDefault();
+            main.scrollLeft = tScrollStart - dx;
+          }
+        }
+
+        function onTouchEnd(e) {
+          unlockVertical();
+          if (tAxis !== 'x') return;
+          var dx = e.changedTouches[0].clientX - tStartX;
+          var threshold = 45;
+          if (dx < -threshold) slideTo(current + 1);
+          else if (dx > threshold) slideTo(current - 1);
+          else slideTo(current); /* snap înapoi */
+        }
+
+        /* document — prinde orice touch, inclusiv de pe săgețile fixe */
+        document.addEventListener('touchstart', onTouchStart, { passive: true });
+        document.addEventListener('touchmove',  onTouchMove,  { passive: false });
+        document.addEventListener('touchend',   onTouchEnd,   { passive: true });
+
+        /* Scroll intern al main (când sunt mai multe slide-uri pe pagină) */
         var rafId;
         main.addEventListener('scroll', function () {
           cancelAnimationFrame(rafId);
@@ -503,7 +586,16 @@ const mobileNavAllItems = [
           });
         }, { passive: true });
 
-        requestAnimationFrame(repaintSwipe);
+        requestAnimationFrame(function () {
+          repaintSwipe();
+          /* Hint animat — săgeată dreapta pulsează la prima vizită */
+          if (arrowNext && !arrowNext.classList.contains('is-hidden')) {
+            arrowNext.classList.add('hint-pulse');
+            arrowNext.addEventListener('animationend', function () {
+              arrowNext.classList.remove('hint-pulse');
+            }, { once: true });
+          }
+        });
       })();
     </script>
   </body>

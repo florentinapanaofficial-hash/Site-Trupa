@@ -537,6 +537,19 @@ html::-webkit-scrollbar {
   width: 18px;
 }
 
+/* Pe mobil nu afișăm scrollbar-ul custom de 18px — prea lat și creează
+   confuzie vizuală (apare al doilea scrollbar lângă cel nativ) */
+@media (max-width: 767px) {
+  html {
+    scrollbar-width: none;
+  }
+
+  html::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+  }
+}
+
 html::-webkit-scrollbar-track {
   border-left: 2px solid #95a6c84f;
   border-right: 2px solid #d9e6ff33;
@@ -2874,7 +2887,7 @@ details>summary::-webkit-details-marker {
   display: none;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
 
   /* ── 1. Dispare header-ul negru fix ── */
   .top-header {
@@ -2896,6 +2909,13 @@ details>summary::-webkit-details-marker {
   /* ── 4. Body shell — overflow intern permis ── */
   .page-shell {
     overflow-x: hidden !important;
+  }
+
+  /* Pe paginile non-homepage (swipe orizontal), previne accesul vertical la footer
+     prin scroll body — conflict pe iOS Safari < 16.
+     Homepage-ul nu este afectat: body rămâne scroll container normal. */
+  .page-shell:not(.is-homepage) {
+    overflow-y: hidden !important;
   }
 
   /* ── 5. Main = container orizontal cu scroll-snap ── */
@@ -2941,13 +2961,19 @@ details>summary::-webkit-details-marker {
     overflow-y: auto !important;
     overflow-x: hidden !important;
     overscroll-behavior-y: contain !important;
-    touch-action: pan-x pan-y !important;
+    -webkit-overflow-scrolling: touch !important;
+    /* pan-y: browserul gestionțează scroll vertical nativ în secțiune;
+       gestul orizontal rămâne disponibil pentru JS (nu e revendicat de browser) */
+    touch-action: pan-y !important;
     scroll-snap-align: start !important;
-    scroll-snap-stop: always !important;
+    /* normal (în loc de always) — permite swipe rapid fără blocare forțată */
+    scroll-snap-stop: normal !important;
     margin: 0 !important;
     border-radius: 0 !important;
     box-sizing: border-box !important;
-    padding-top: 2.9rem !important;
+    /* max() garantează clearance minim de 44px față de mob-nav
+       chiar și la font-size mic (accessibility settings) */
+    padding-top: max(2.9rem, 44px) !important;
     padding-bottom: 5rem !important;
     padding-left: 1.4rem !important;
     padding-right: 1.4rem !important;
@@ -3105,6 +3131,32 @@ details>summary::-webkit-details-marker {
     pointer-events: none !important;
   }
 
+  /* Hint animat — pulsare săgeată dreapta la prima vizită */
+  @keyframes arrowBounceRight {
+    0% {
+      transform: translateY(-50%) translateX(0);
+    }
+
+    35% {
+      transform: translateY(-50%) translateX(-6px);
+    }
+
+    65% {
+      transform: translateY(-50%) translateX(-2px);
+    }
+
+    100% {
+      transform: translateY(-50%) translateX(0);
+    }
+  }
+
+  .mob-arrow--next.hint-pulse {
+    animation: arrowBounceRight 1s ease 1.2s 3 both;
+    background: rgba(6, 214, 255, 0.18) !important;
+    color: rgba(126, 248, 255, 0.95) !important;
+    border-color: rgba(6, 214, 255, 0.45) !important;
+  }
+
   .mob-arrow:hover,
   .mob-arrow:focus-visible {
     background: rgba(6, 214, 255, 0.14);
@@ -3125,9 +3177,12 @@ details>summary::-webkit-details-marker {
   body.is-homepage main#continut {
     display: block !important;
     flex-direction: unset !important;
-    overflow-x: hidden !important;
-    overflow-y: visible !important;
-    /* height auto → body preia scrollul */
+    /* IMPORTANT: overflow trebuie să fie visible pe AMBELE axe.
+       CSS quirk: overflow-x:hidden + overflow-y:visible pe același element
+       face ca browserul să convertească automat visible → auto,
+       creând un al doilea container de scroll (al doilea scrollbar). */
+    overflow: visible !important;
+    /* height auto → body/window preia scrollul (nu main#continut) */
     scroll-snap-type: none !important;
     height: auto !important;
     min-height: unset !important;
@@ -3139,12 +3194,14 @@ details>summary::-webkit-details-marker {
     width: 100% !important;
     height: auto !important;
     min-height: 100dvh !important;
-    overflow-x: hidden !important;
+    /* clip în loc de hidden — nu creează scroll context, deci nu declanșează
+       conversie overflow-y:visible→auto și nu adaugă scrollbar parazit */
+    overflow-x: clip !important;
     overflow-y: visible !important;
     scroll-snap-align: none !important;
     scroll-snap-stop: unset !important;
     touch-action: pan-y !important;
-    padding-top: 3rem !important;
+    padding-top: max(3rem, 44px) !important;
     padding-bottom: 4rem !important;
   }
 

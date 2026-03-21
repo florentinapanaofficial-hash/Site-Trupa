@@ -3,6 +3,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import siteContent from '../data/siteContent.json';
 
 const { seo, contact, team, videos, gallery, faq } = siteContent;
+const socialLinks = {
+  youtube:   siteContent.socialLinks?.youtube   || '',
+  facebook:  siteContent.socialLinks?.facebook  || '',
+  instagram: siteContent.socialLinks?.instagram || '',
+  tiktok:    siteContent.socialLinks?.tiktok    || '',
+};
 const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -45,6 +51,18 @@ const homepageVideos = (videos || [])
         Muzică live — România
       </span>
 
+      {/* Card foto — vizibil doar pe mobil, colțuri rotunjite */}
+      <div class="hero-photo-card">
+        <img
+          src="/images/hero-photo.jpg"
+          alt="Formația Florentina Pană"
+          class="hero-photo-img"
+          loading="eager"
+          width="320"
+          height="213"
+        />
+      </div>
+
       <h1 class="hero-title-xl">
         <span class="hero-kicker-text">Formația</span><br/>
         <span class="hero-title-gold">Florentina Pană</span>
@@ -83,6 +101,67 @@ const homepageVideos = (videos || [])
         <div class="hero-stat-pill">
           <span class="hero-stat-num">100%</span>
           <span class="hero-stat-label">live</span>
+        </div>
+      </div>
+
+      {/* Social media icons — vizibile doar pe mobil, umplu spațiul gol */}
+      <div class="hero-social-row" aria-label="Rețele sociale">
+        <span class="hero-social-label">Urmărește-ne</span>
+        <div class="hero-social-icons">
+          {socialLinks.youtube && (
+            <a href={socialLinks.youtube} class="hero-social-btn hero-social-btn--yt"
+              target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <rect x="2" y="6" width="20" height="13" rx="4" fill="#fff"/>
+                <polygon points="9.5,9.5 9.5,15.5 16.5,12.5" fill="#FF0000"/>
+              </svg>
+              <span>YouTube</span>
+            </a>
+          )}
+          {socialLinks.facebook && (
+            <a href={socialLinks.facebook} class="hero-social-btn hero-social-btn--fb"
+              target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <rect width="24" height="24" rx="5" fill="#1877F2"/>
+                <path d="M13.5 21V14.3H16l.4-2.85H13.5V9.7c0-.82.38-1.2 1.38-1.2H16.5V5.85C16.05 5.77 15.1 5.7 14 5.7c-2.65 0-4.05 1.4-4.05 4.15v1.6H8v2.85h1.95V21H13.5z" fill="#fff"/>
+              </svg>
+              <span>Facebook</span>
+            </a>
+          )}
+          {socialLinks.instagram && (
+            <a href={socialLinks.instagram} class="hero-social-btn hero-social-btn--ig"
+              target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <rect width="24" height="24" rx="5.5"
+                  fill="url(#ig-grad-hero)"/>
+                <defs>
+                  <radialGradient id="ig-grad-hero" cx="30%" cy="110%" r="140%">
+                    <stop offset="0%" stop-color="#ffd676"/>
+                    <stop offset="25%" stop-color="#f46f30"/>
+                    <stop offset="55%" stop-color="#e1306c"/>
+                    <stop offset="80%" stop-color="#833ab4"/>
+                    <stop offset="100%" stop-color="#405de6"/>
+                  </radialGradient>
+                </defs>
+                <rect x="2.5" y="2.5" width="19" height="19" rx="5" stroke="#fff" stroke-width="2"/>
+                <circle cx="12" cy="12" r="4.3" stroke="#fff" stroke-width="2"/>
+                <circle cx="17.5" cy="6.6" r="1.4" fill="#fff"/>
+              </svg>
+              <span>Instagram</span>
+            </a>
+          )}
+          {socialLinks.tiktok && (
+            <a href={socialLinks.tiktok} class="hero-social-btn hero-social-btn--tt"
+              target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <rect width="24" height="24" rx="5" fill="#010101"/>
+                <path transform="translate(-0.5,-0.4)" d="M16.5 3h-2.3v11.6a2.8 2.8 0 0 1-2.8 2.8 2.8 2.8 0 0 1-2.8-2.8 2.8 2.8 0 0 1 2.8-2.8c.3 0 .55.05.8.12V9.45a6.2 6.2 0 0 0-.8-.05 6.1 6.1 0 0 0-6.1 6.1 6.1 6.1 0 0 0 6.1 6.1 6.1 6.1 0 0 0 6.1-6.1V8.35a8.5 8.5 0 0 0 4.8 1.5V7.3a6.1 6.1 0 0 1-4.5-4.3h-.3z" fill="#25f4ee"/>
+                <path transform="translate(0.5,0.4)" d="M16.5 3h-2.3v11.6a2.8 2.8 0 0 1-2.8 2.8 2.8 2.8 0 0 1-2.8-2.8 2.8 2.8 0 0 1 2.8-2.8c.3 0 .55.05.8.12V9.45a6.2 6.2 0 0 0-.8-.05 6.1 6.1 0 0 0-6.1 6.1 6.1 6.1 0 0 0 6.1 6.1 6.1 6.1 0 0 0 6.1-6.1V8.35a8.5 8.5 0 0 0 4.8 1.5V7.3a6.1 6.1 0 0 1-4.5-4.3h-.3z" fill="#fe2c55"/>
+                <path d="M16.5 3h-2.3v11.6a2.8 2.8 0 0 1-2.8 2.8 2.8 2.8 0 0 1-2.8-2.8 2.8 2.8 0 0 1 2.8-2.8c.3 0 .55.05.8.12V9.45a6.2 6.2 0 0 0-.8-.05 6.1 6.1 0 0 0-6.1 6.1 6.1 6.1 0 0 0 6.1 6.1 6.1 6.1 0 0 0 6.1-6.1V8.35a8.5 8.5 0 0 0 4.8 1.5V7.3a6.1 6.1 0 0 1-4.5-4.3h-.3z" fill="#fff"/>
+              </svg>
+              <span>TikTok</span>
+            </a>
+          )}
         </div>
       </div>
     </div>
@@ -802,6 +881,129 @@ const homepageVideos = (videos || [])
     text-transform: uppercase;
     color: var(--muted);
     margin-top: 0.12rem;
+  }
+
+  /* ════════════════════════════════════════════════════════════════
+     HERO PHOTO CARD — doar mobil (≤ 767px)
+  ════════════════════════════════════════════════════════════════ */
+  .hero-photo-card {
+    display: none; /* ascuns pe desktop */
+  }
+
+  @media (max-width: 767px) {
+    .hero-photo-card {
+      display: block;
+      width: 88%;
+      max-width: 300px;
+      margin: 0.9rem auto 0.25rem;
+      border-radius: 1.25rem;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 1.5px rgba(212, 175, 55, 0.30),
+        0 10px 36px rgba(0, 0, 0, 0.60);
+      aspect-ratio: 3 / 2;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .hero-photo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 1.25rem;
+      display: block;
+    }
+  }
+
+  /* ════════════════════════════════════════════════════════════════
+     SOCIAL MEDIA ROW — doar mobil (≤ 767px)
+  ════════════════════════════════════════════════════════════════ */
+  .hero-social-row {
+    display: none; /* ascuns pe desktop */
+  }
+
+  @media (max-width: 767px) {
+    .hero-social-row {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+      width: 100%;
+    }
+
+    .hero-social-label {
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(241, 229, 172, 0.40);
+    }
+
+    .hero-social-icons {
+      display: flex;
+      gap: 0.85rem;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-social-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      text-decoration: none;
+      transition: transform 160ms ease, opacity 160ms ease;
+    }
+
+    .hero-social-btn:active {
+      transform: scale(0.90);
+      opacity: 0.75;
+    }
+
+    .hero-social-btn svg {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      /* Umbră colorată specifică fiecărei rețele */
+    }
+
+    .hero-social-btn span {
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.55);
+    }
+
+    /* YouTube */
+    .hero-social-btn--yt svg {
+      background: #FF0000;
+      box-shadow: 0 4px 18px rgba(255, 0, 0, 0.55), 0 2px 6px rgba(0,0,0,0.4);
+    }
+    .hero-social-btn--yt:hover svg { box-shadow: 0 6px 24px rgba(255, 0, 0, 0.75); }
+    .hero-social-btn--yt span { color: rgba(255, 140, 140, 0.80); }
+
+    /* Facebook */
+    .hero-social-btn--fb svg {
+      box-shadow: 0 4px 18px rgba(24, 119, 242, 0.55), 0 2px 6px rgba(0,0,0,0.4);
+    }
+    .hero-social-btn--fb:hover svg { box-shadow: 0 6px 24px rgba(24, 119, 242, 0.75); }
+    .hero-social-btn--fb span { color: rgba(120, 180, 255, 0.80); }
+
+    /* Instagram */
+    .hero-social-btn--ig svg {
+      box-shadow: 0 4px 18px rgba(225, 48, 108, 0.55), 0 2px 6px rgba(0,0,0,0.4);
+    }
+    .hero-social-btn--ig:hover svg { box-shadow: 0 6px 24px rgba(225, 48, 108, 0.75); }
+    .hero-social-btn--ig span { color: rgba(255, 160, 200, 0.80); }
+
+    /* TikTok */
+    .hero-social-btn--tt svg {
+      border: 1.5px solid rgba(255,255,255,0.20);
+      box-shadow: 0 4px 18px rgba(254, 44, 85, 0.45), 0 2px 6px rgba(0,0,0,0.5);
+    }
+    .hero-social-btn--tt:hover svg { box-shadow: 0 6px 24px rgba(254, 44, 85, 0.65); }
+    .hero-social-btn--tt span { color: rgba(255, 200, 210, 0.80); }
   }
 
   /* ════════════════════════════════════════════════════════════════
