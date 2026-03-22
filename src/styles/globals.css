@@ -537,9 +537,10 @@ html::-webkit-scrollbar {
   width: 18px;
 }
 
-/* Pe mobil nu afișăm scrollbar-ul custom de 18px — prea lat și creează
-   confuzie vizuală (apare al doilea scrollbar lângă cel nativ) */
-@media (max-width: 767px) {
+/* Pe mobil/tabletă nu afișăm scrollbar-ul custom de 18px:
+   ≤1023px = swipe layout activ → body nu scrollează, scrollbar-ul e irelevant
+   și apare ca artifact vizual pe unele browsere. */
+@media (max-width: 1023px) {
   html {
     scrollbar-width: none;
   }
@@ -3002,6 +3003,8 @@ details>summary::-webkit-details-marker {
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
     touch-action: pan-x;
+    overscroll-behavior-x: contain;
+    /* previne propagarea scroll-ului nav la container */
     background: linear-gradient(180deg,
         rgba(4, 6, 18, 0.97) 0%,
         rgba(4, 6, 18, 0.91) 84%,
@@ -3210,8 +3213,12 @@ details>summary::-webkit-details-marker {
     padding-top: 3.8rem !important;
   }
 
-  /* Săgețile orizontale nu au sens pe homepage */
-  body.is-homepage .mob-arrow {
+  /* Pe homepage: doar săgeata next (→) e vizibilă — navigare la pagina următoare */
+  body.is-homepage .mob-arrow--prev {
     display: none !important;
+  }
+
+  body.is-homepage .mob-arrow--next {
+    display: flex !important;
   }
 }

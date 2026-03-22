@@ -425,7 +425,69 @@ const mobileNavAllItems = [
             });
           });
 
-          return; /* Homepage gata — nu rulăm swipe orizontal */
+          /* ── Swipe orizontal pe homepage → navighează la pagina adiacentă ── */
+          var hpPageOrder = [
+            '/',
+            '/galerie-video',
+            '/galerie-foto',
+            '/despre',
+            '/contact',
+            '/momente-cu-mirii',
+            '/comunitatea-noastra',
+            '/aparitii-tv',
+          ];
+          var hpCurrentPath = location.pathname.replace(/\/$/, '') || '/';
+          var hpPageIdx = hpPageOrder.indexOf(hpCurrentPath);
+
+          function hpNavigatePage(url) {
+            main.style.transition = 'opacity 0.18s ease';
+            main.style.opacity = '0';
+            setTimeout(function () { window.location.href = url; }, 180);
+          }
+
+          var hpTX = 0, hpTY = 0, hpSkipTouch = false;
+
+          function hpHandleSwipeEnd(endX, endY) {
+            var dx = endX - hpTX;
+            var dy = endY - hpTY;
+            if (Math.abs(dx) < 50) return;
+            if (Math.abs(dy) > Math.abs(dx)) return;
+            if (dx < 0 && hpPageIdx < hpPageOrder.length - 1) {
+              hpNavigatePage(hpPageOrder[hpPageIdx + 1]);
+            } else if (dx > 0 && hpPageIdx > 0) {
+              hpNavigatePage(hpPageOrder[hpPageIdx - 1]);
+            }
+          }
+
+          /* Touch */
+          document.addEventListener('touchstart', function (e) {
+            if (e.target.closest && e.target.closest('.mob-nav')) {
+              hpSkipTouch = true; return;
+            }
+            hpSkipTouch = false;
+            hpTX = e.touches[0].clientX;
+            hpTY = e.touches[0].clientY;
+          }, { passive: true });
+
+          document.addEventListener('touchend', function (e) {
+            if (hpSkipTouch) { hpSkipTouch = false; return; }
+            hpHandleSwipeEnd(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+          }, { passive: true });
+
+          /* Mouse drag */
+          var hpMouseDown = false;
+          document.addEventListener('mousedown', function (e) {
+            hpMouseDown = true;
+            hpTX = e.clientX;
+            hpTY = e.clientY;
+          });
+          document.addEventListener('mouseup', function (e) {
+            if (!hpMouseDown) return;
+            hpMouseDown = false;
+            hpHandleSwipeEnd(e.clientX, e.clientY);
+          });
+
+          return; /* Homepage gata */
         }
 
         /* ════════════════════════════════════════════════════════
@@ -524,6 +586,9 @@ const mobileNavAllItems = [
         }
 
         function onTouchStart(e) {
+          if (e.target.closest && e.target.closest('.mob-nav')) {
+            tAxis = 'skip'; return;
+          }
           tStartX = e.touches[0].clientX;
           tStartY = e.touches[0].clientY;
           tScrollStart = main.scrollLeft;
@@ -531,6 +596,7 @@ const mobileNavAllItems = [
         }
 
         function onTouchMove(e) {
+          if (tAxis === 'skip') return;
           if (!e.touches.length) return;
           var dx = e.touches[0].clientX - tStartX;
           var dy = e.touches[0].clientY - tStartY;
@@ -545,6 +611,7 @@ const mobileNavAllItems = [
         }
 
         function onTouchEnd(e) {
+          if (tAxis === 'skip') { tAxis = null; return; }
           unlockVertical();
           if (tAxis !== 'x') return;
           var dx = e.changedTouches[0].clientX - tStartX;
