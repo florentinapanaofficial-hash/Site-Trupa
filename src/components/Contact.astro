@@ -15,9 +15,9 @@
         Completează formularul de mai jos și vei primi un răspuns cu idei concrete de
         structură, conținut și estimare de timp pentru landing page-ul tău.
       </p>
-      <ul class="mt-4 space-y-2 text-sm text-slate-600">
+      <ul class="mt-4 space-y-2 text-sm" style="color: var(--body);">
         <li>• Răspuns în cel mult 1–2 zile lucrătoare.</li>
-        <li>• Fără spam, doar discuții legate de proiect.</li>
+        <li>• Fără spam, doar discuții legate de eveniment.</li>
       </ul>
     </div>
 
@@ -45,7 +45,7 @@
           />
         </div>
         <div class="space-y-1.5">
-          <label for="email" class="text-xs font-medium text-slate-700">
+          <label for="email" class="text-xs font-medium" style="color: var(--body);">
             Email
           </label>
           <input
@@ -56,28 +56,30 @@
             aria-required="true"
             aria-invalid="false"
             autocomplete="email"
-            class="w-full rounded-xl border border-slate-200/80 bg-white/80 px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-pastel-purple focus:ring-2 focus:ring-pastel-purple/60"
+            class="w-full rounded-xl border px-3 py-2 text-sm shadow-sm outline-none transition placeholder:opacity-50 focus:ring-2"
+            style="border-color: var(--line); background: rgba(255,255,255,0.05); color: var(--title);"
             placeholder="tu@exemplu.com"
           />
         </div>
       </div>
 
       <div class="space-y-1.5">
-        <label for="subject" class="text-xs font-medium text-slate-700">
+        <label for="subject" class="text-xs font-medium" style="color: var(--body);">
           Subiect
         </label>
         <input
           id="subject"
           name="subject"
           type="text"
-          class="w-full rounded-xl border border-slate-200/80 bg-white/80 px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-pastel-purple focus:ring-2 focus:ring-pastel-purple/60"
-          placeholder="Landing page pentru produsul X"
+          class="w-full rounded-xl border px-3 py-2 text-sm shadow-sm outline-none transition placeholder:opacity-50 focus:ring-2"
+          style="border-color: var(--line); background: rgba(255,255,255,0.05); color: var(--title);"
+          placeholder="Eveniment, nuntă, petrecere..."
         />
       </div>
 
       <div class="space-y-1.5">
-        <label for="message" class="text-xs font-medium text-slate-700">
-          Detalii despre proiect
+        <label for="message" class="text-xs font-medium" style="color: var(--body);">
+          Detalii despre eveniment
         </label>
         <textarea
           id="message"
@@ -86,8 +88,9 @@
           aria-required="true"
           aria-invalid="false"
           rows={4}
-          class="w-full resize-none rounded-xl border border-slate-200/80 bg-white/80 px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-pastel-purple focus:ring-2 focus:ring-pastel-purple/60"
-          placeholder="Descrie pe scurt obiectivul landing page-ului, publicul țintă și termenul dorit."
+          class="w-full resize-none rounded-xl border px-3 py-2 text-sm shadow-sm outline-none transition placeholder:opacity-50 focus:ring-2"
+          style="border-color: var(--line); background: rgba(255,255,255,0.05); color: var(--title);"
+          placeholder="Data, locația, tipul evenimentului și orice alte detalii relevante."
         />
       </div>
 
@@ -95,7 +98,7 @@
         Trimite mesajul
       </button>
 
-      <p class="text-[11px] leading-relaxed text-slate-500">
+      <p class="text-[11px] leading-relaxed" style="color: var(--muted);">
         Trimițând acest formular, ești de acord ca datele tale să fie folosite pentru a
         răspunde la mesaj. Nu vor fi partajate cu terți.
       </p>

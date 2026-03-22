@@ -3,30 +3,34 @@ type Testimonial = {
   name: string;
   role: string;
   quote: string;
-  colorClass: string;
+  avatarStyle: string;
+  initials: string;
 };
 
 const testimonials: Testimonial[] = [
   {
-    name: 'Andreea M.',
-    role: 'Fondator startup',
+    name: 'Familia Popescu',
+    role: 'Nuntă — Iași, 2024',
     quote:
-      'Landing page-ul a fost gata rapid, iar scorul de performanță este excelent. Am observat o creștere clară a conversiilor.',
-    colorClass: 'bg-purple-200',
+      'Formația a creat o atmosferă de neuitat. Toți invitații au dansat până dimineața. Recomandăm cu căldură!',
+    avatarStyle: 'background: linear-gradient(135deg, #F5A623, #FFD700); box-shadow: 0 4px 14px rgba(245,166,35,0.45);',
+    initials: 'FP',
   },
   {
-    name: 'Mihai C.',
-    role: 'Consultant marketing',
+    name: 'Familia Ionescu',
+    role: 'Nuntă — Cluj-Napoca, 2024',
     quote:
-      'Structura clară, textul ușor de parcurs și viteza de încărcare fac diferența. SEO-ul este deja configurat corect.',
-    colorClass: 'bg-pink-200',
+      'Profesionalism desăvârșit. Muzica live a făcut diferența față de un DJ. Momentele cu mirii au fost emoționante.',
+    avatarStyle: 'background: linear-gradient(135deg, #0BBCD6, #06d6ff); box-shadow: 0 4px 14px rgba(11,188,214,0.45);',
+    initials: 'FI',
   },
   {
-    name: 'Ioana R.',
-    role: 'Freelancer digital',
+    name: 'Ana & Cristian',
+    role: 'Petrecere privată — București, 2025',
     quote:
-      'Îmi place mult paleta pastel și animațiile discrete. Site-ul arată profesionist fără să fie încărcat.',
-    colorClass: 'bg-blue-200',
+      'Au cântat toate piesele dorite de noi și au improvizat superb. Oaspeții au rămas uimiți de calitatea sunetului.',
+    avatarStyle: 'background: linear-gradient(135deg, #E8325A, #ff6b8a); box-shadow: 0 4px 14px rgba(232,50,90,0.45);',
+    initials: 'AC',
   },
 ];
 ---
@@ -46,9 +50,10 @@ const testimonials: Testimonial[] = [
       <figure class="card-soft flex h-full flex-col gap-4 p-5 sm:p-6 animate-fade-up">
         <div class="flex items-center gap-3">
           <div
-            class={`h-12 w-12 shrink-0 rounded-full ${item.colorClass}`}
+            class="h-12 w-12 shrink-0 rounded-full inline-flex items-center justify-center text-sm font-bold text-white"
+            style={item.avatarStyle}
             aria-hidden="true"
-          />
+          >{item.initials}</div>
           <figcaption class="space-y-0.5">
             <div class="text-sm font-semibold" style="color: var(--title);">{item.name}</div>
             <div class="text-xs" style="color: var(--body); opacity: 0.7;">{item.role}</div>

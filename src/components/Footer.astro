@@ -3,6 +3,12 @@ import siteContent from '../data/siteContent.json';
 
 const year = new Date().getFullYear();
 const { brand, contact } = siteContent;
+const socialLinks = {
+  youtube: siteContent.socialLinks?.youtube || 'https://www.youtube.com/',
+  facebook: siteContent.socialLinks?.facebook || 'https://www.facebook.com/',
+  instagram: siteContent.socialLinks?.instagram || 'https://www.instagram.com/',
+  tiktok: siteContent.socialLinks?.tiktok || 'https://www.tiktok.com/',
+};
 const isHomePage = Astro.url.pathname === '/';
 ---
 
@@ -19,9 +25,48 @@ const isHomePage = Astro.url.pathname === '/';
       <p style="color:var(--muted)">© {year} {brand.name}. Toate drepturile rezervate.</p>
     </div>
 
-    <a href={isHomePage ? '#acasa' : '/#acasa'} class="justify-self-start transition hover:text-[#F5A623] md:justify-self-center" style="color: var(--body);">
-      Înapoi sus
-    </a>
+    <div class="flex flex-col items-start gap-3 md:items-center">
+      <a href={isHomePage ? '#acasa' : '/#acasa'} class="transition hover:text-[#F5A623]" style="color: var(--body);">
+        Înapoi sus
+      </a>
+      <div class="flex items-center gap-2">
+        <a href={socialLinks.youtube}
+          class="inline-grid h-8 w-8 place-items-center rounded-lg transition-opacity hover:opacity-80"
+          style="background:#FF0000;box-shadow:0 2px 10px rgba(255,0,0,0.50);"
+          target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+          <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" aria-hidden="true">
+            <rect x="2" y="6" width="20" height="13" rx="4" fill="#fff"/>
+            <polygon points="9.5,9.5 9.5,15.5 16.5,12.5" fill="#FF0000"/>
+          </svg>
+        </a>
+        <a href={socialLinks.facebook}
+          class="inline-grid h-8 w-8 place-items-center rounded-lg transition-opacity hover:opacity-80"
+          style="background:#1877F2;box-shadow:0 2px 10px rgba(24,119,242,0.50);"
+          target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+          <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" aria-hidden="true">
+            <path d="M13.5 21V14.3H16l.4-2.85H13.5V9.7c0-.82.38-1.2 1.38-1.2H16.5V5.85C16.05 5.77 15.1 5.7 14 5.7c-2.65 0-4.05 1.4-4.05 4.15v1.6H8v2.85h1.95V21H13.5z" fill="#fff"/>
+          </svg>
+        </a>
+        <a href={socialLinks.instagram}
+          class="inline-grid h-8 w-8 place-items-center rounded-lg transition-opacity hover:opacity-80"
+          style="background:radial-gradient(circle at 30% 110%,#ffd676 0%,#f46f30 25%,#e1306c 55%,#833ab4 80%,#405de6 100%);box-shadow:0 2px 10px rgba(225,48,108,0.50);"
+          target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" aria-hidden="true">
+            <rect x="2.5" y="2.5" width="19" height="19" rx="5.5" stroke="#fff" stroke-width="2.1"/>
+            <circle cx="12" cy="12" r="4.2" stroke="#fff" stroke-width="2"/>
+            <circle cx="17.2" cy="6.8" r="1.1" fill="#fff"/>
+          </svg>
+        </a>
+        <a href={socialLinks.tiktok}
+          class="inline-grid h-8 w-8 place-items-center rounded-lg transition-opacity hover:opacity-80"
+          style="background:#010101;box-shadow:0 2px 10px rgba(0,0,0,0.60);"
+          target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+          <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" aria-hidden="true">
+            <path d="M16.5 3h-2.8v11.8a2.7 2.7 0 1 1-2.7-2.7c.25 0 .49.03.72.09V9.3a5.5 5.5 0 1 0 4.78 5.5V8.5a7.9 7.9 0 0 0 4.6 1.47V7.18A4.62 4.62 0 0 1 16.5 3z" fill="#fff"/>
+          </svg>
+        </a>
+      </div>
+    </div>
 
     <div class="justify-self-start md:justify-self-end" style="color: var(--body);">
       <a href={`mailto:${contact.email}`} class="transition hover:text-[#F5A623]">{contact.email}</a>
