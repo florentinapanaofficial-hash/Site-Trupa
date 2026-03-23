@@ -2,6 +2,7 @@
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import SkyBackground from '../components/SkyBackground.astro';
+import CookieBanner from '../components/CookieBanner.astro';
 import siteContent from '../data/siteContent.json';
 import { sanitizeUrl } from '../lib/sanitize-url';
 import '../styles/globals.css';
@@ -116,23 +117,8 @@ const mobileNavAllItems = [
     <link rel="icon" type="image/svg+xml" href="/images/logo-fp-stage.svg" />
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
     <slot name="head" />
-    {ga4Id && (
-      <link rel="preconnect" href="https://www.googletagmanager.com" />
-    )}
-    {ga4Id && (
-      <link rel="dns-prefetch" href="https://www.google-analytics.com" />
-    )}
-    {ga4Id && (
-      <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${ga4Id}`}></script>
-    )}
-    {ga4Id && (
-      <script define:vars={{ ga4Id }}>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', ga4Id);
-      </script>
-    )}
+    {/* GA4 NU se încarcă în <head> — se injectează dinamic DUPĂ consimțământul
+        utilizatorului prin CookieBanner, conform Rec. 30 & 32 RGPD / ePrivacy */}
   </head>
   <body class={`page-shell${isHomePage ? ' is-homepage' : ''}`}>
     <a href="#continut" class="skip-link">Sari la conținut</a>
@@ -206,6 +192,9 @@ const mobileNavAllItems = [
       </main>
     </div>
     <Footer />
+
+    {/* Banner consimțământ cookie – GA4 pornit doar după accept */}
+    <CookieBanner ga4Id={ga4Id} />
 
     <script is:inline>
       (() => {

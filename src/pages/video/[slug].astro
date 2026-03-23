@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import siteContent from '../../data/siteContent.json';
 import BackButton from '../../components/BackButton.astro';
 import { sanitizeUrl } from '../../lib/sanitize-url';
+import YoutubeEmbed from '../../components/YoutubeEmbed.astro';
 
 export function getStaticPaths() {
   const slugify = (value: string) =>
@@ -71,15 +72,7 @@ const videoJsonLd = {
 
     <article class="glass-card mx-auto mt-8 max-w-4xl">
       <div class="video-embed-shell">
-        <iframe
-          class="aspect-video w-full rounded-xl"
-          src={`https://www.youtube.com/embed/${video.youtubeId}`}
-          title={video.title}
-          loading="lazy"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          referrerpolicy="strict-origin-when-cross-origin"
-          allowfullscreen
-        />
+        <YoutubeEmbed youtubeId={video.youtubeId} title={video.title} class="rounded-xl" />
         <div class="video-embed-overlay" aria-hidden="true"></div>
       </div>
 

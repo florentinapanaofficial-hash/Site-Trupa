@@ -1,0 +1,246 @@
+---
+/**
+ * CookieBanner.astro
+ * ──────────────────────────────────────────────────────────────────
+ * Banner consimțământ cookie-uri – conformitate GDPR/ePrivacy
+ *
+ * Temeiul legal:
+ *   • Rec. 30 & 32 RGPD + Directiva ePrivacy 2002/58/CE (art. 5 alin. 3)
+ *   • Cookie-urile non-esențiale (ex. Google Analytics) nu se pot instala
+ *     ÎNAINTE de obținerea consimțământului prealabil al utilizatorului.
+ *
+ * Comportament:
+ *   – Prima vizită: banner vizibil; GA4 NU se încarcă.
+ *   – „Acceptă": salvează 'granted' în localStorage; GA4 se injectează dinamic.
+ *   – „Refuz":    salvează 'denied'  în localStorage; GA4 nu se încarcă niciodată.
+ *   – Vizite ulterioare: se citește localStorage → GA4 pornit sau omis fără banner.
+ *
+ * Consimțământul se stochează în localStorage (nu cookie) pentru a nu crea
+ * un cookie înainte de consimțământ — localStorage nu este reglementat de
+ * Directiva ePrivacy în același mod cu cookie-urile.
+ */
+
+interface Props {
+  ga4Id?: string;
+}
+
+const { ga4Id } = Astro.props;
+---
+
+<!-- Banner cookie – ascuns implicit; JS îl afișează dacă nu există consimțământ -->
+<div
+  id="cookie-banner"
+  role="dialog"
+  aria-modal="false"
+  aria-label="Consimțământ cookie-uri"
+  aria-describedby="cookie-banner-desc"
+  class="cookie-banner"
+  hidden
+>
+  <div class="cookie-banner__inner">
+    <p id="cookie-banner-desc" class="cookie-banner__text">
+      Folosim <strong>cookie-uri de analiză</strong> (Google Analytics) pentru a înțelege
+      cum este utilizat site-ul. Cookie-urile <em>strict necesare</em> funcționează fără
+      consimțământ. Celelalte sunt activate <strong>doar după acordul tău explicit</strong>,
+      conform <abbr title="Regulamentul General privind Protecția Datelor">RGPD</abbr>
+      și Directivei ePrivacy.
+      <a href="/politica-confidentialitate" class="cookie-banner__link" target="_blank" rel="noopener noreferrer">
+        Politică de confidențialitate
+      </a>
+    </p>
+    <div class="cookie-banner__actions">
+      <button id="cookie-refuse" type="button" class="cookie-btn cookie-btn--refuse">
+        Refuz
+      </button>
+      <button id="cookie-accept" type="button" class="cookie-btn cookie-btn--accept">
+        Acceptă cookie-urile
+      </button>
+    </div>
+  </div>
+</div>
+
+<script define:vars={{ ga4Id }}>
+  (function () {
+    var STORAGE_KEY = 'cookie_consent'; // valori: 'granted' | 'denied'
+    var banner = document.getElementById('cookie-banner');
+    var btnAccept = document.getElementById('cookie-accept');
+    var btnRefuse = document.getElementById('cookie-refuse');
+
+    /** Injectează dinamic scripturile GA4 în <head> */
+    function loadGA4() {
+      if (!ga4Id) return;
+
+      // Preconnect – adăugat abia după consimțământ
+      var pc = document.createElement('link');
+      pc.rel = 'preconnect';
+      pc.href = 'https://www.googletagmanager.com';
+      document.head.appendChild(pc);
+
+      var dns = document.createElement('link');
+      dns.rel = 'dns-prefetch';
+      dns.href = 'https://www.google-analytics.com';
+      document.head.appendChild(dns);
+
+      // Script principal GA4
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=' + ga4Id;
+      document.head.appendChild(s);
+
+      // Inițializare gtag
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = function () { window.dataLayer.push(arguments); };
+      window.gtag('js', new Date());
+      window.gtag('config', ga4Id);
+    }
+
+    function hideBanner() {
+      if (banner) {
+        banner.hidden = true;
+        banner.setAttribute('aria-hidden', 'true');
+      }
+    }
+
+    // ── Verifică consimțământul existent la încărcarea paginii ──
+    var consent = null;
+    try {
+      consent = localStorage.getItem(STORAGE_KEY);
+    } catch (_) { /* localStorage indisponibil (ex. mod privat strict) */ }
+
+    if (consent === 'granted') {
+      loadGA4();
+    } else if (consent === 'denied') {
+      // consimțământ refuzat – nu se face nimic
+    } else {
+      // Niciun consimțământ înregistrat – afișăm bannerul
+      if (banner) {
+        banner.hidden = false;
+        banner.removeAttribute('hidden');
+      }
+    }
+
+    // ── Butoane ──
+    if (btnAccept) {
+      btnAccept.addEventListener('click', function () {
+        try { localStorage.setItem(STORAGE_KEY, 'granted'); } catch (_) {}
+        hideBanner();
+        loadGA4();
+        // Notifică componentele YoutubeEmbed și altele care ascultă
+        window.dispatchEvent(new CustomEvent('cookie:granted'));
+      });
+    }
+
+    if (btnRefuse) {
+      btnRefuse.addEventListener('click', function () {
+        try { localStorage.setItem(STORAGE_KEY, 'denied'); } catch (_) {}
+        hideBanner();
+      });
+    }
+  })();
+</script>
+
+<style>
+  .cookie-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 9998;
+    background: rgba(10, 13, 28, 0.97);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1rem 1.5rem;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.5);
+  }
+
+  .cookie-banner[hidden] {
+    display: none;
+  }
+
+  .cookie-banner__inner {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .cookie-banner__text {
+    flex: 1 1 300px;
+    font-size: 0.85rem;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+  }
+
+  .cookie-banner__text strong {
+    color: #fff;
+  }
+
+  .cookie-banner__text em {
+    font-style: normal;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .cookie-banner__link {
+    color: #7dd3fc;
+    text-decoration: underline;
+    margin-left: 0.3em;
+    white-space: nowrap;
+  }
+
+  .cookie-banner__link:hover {
+    color: #38bdf8;
+  }
+
+  .cookie-banner__actions {
+    display: flex;
+    gap: 0.6rem;
+    flex-shrink: 0;
+  }
+
+  .cookie-btn {
+    padding: 0.5rem 1.1rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: opacity 0.15s, background 0.15s;
+  }
+
+  .cookie-btn--refuse {
+    background: transparent;
+    border-color: rgba(255, 255, 255, 0.25);
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  .cookie-btn--refuse:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+  }
+
+  .cookie-btn--accept {
+    background: #4f46e5;
+    color: #fff;
+    border-color: #4f46e5;
+  }
+
+  .cookie-btn--accept:hover {
+    background: #4338ca;
+    border-color: #4338ca;
+  }
+
+  @media (max-width: 540px) {
+    .cookie-banner__inner {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .cookie-banner__actions {
+      justify-content: flex-end;
+    }
+  }
+</style>

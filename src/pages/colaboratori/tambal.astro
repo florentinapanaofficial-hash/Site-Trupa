@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import YoutubeEmbed from '../../components/YoutubeEmbed.astro';
 import siteContent from '../../data/siteContent.json';
 import BackButton from '../../components/BackButton.astro';
 
@@ -72,13 +73,7 @@ const personJsonLd = {
           <div class="collab-video-card">
             {/* TODO: înlocuiește YOUTUBE_ID_1 cu ID-ul real */}
             <div class="collab-video-frame">
-              <iframe
-                src="https://www.youtube.com/embed/YOUTUBE_ID_1"
-                title="Videoclip țambal 1"
-                loading="lazy"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen
-              ></iframe>
+              <YoutubeEmbed youtubeId="YOUTUBE_ID_1" title="Videoclip țambal 1" />
             </div>
             <p class="collab-video-label">Titlu videoclip 1</p>
           </div>
@@ -86,13 +81,7 @@ const personJsonLd = {
           <div class="collab-video-card">
             {/* TODO: înlocuiește YOUTUBE_ID_2 cu ID-ul real */}
             <div class="collab-video-frame">
-              <iframe
-                src="https://www.youtube.com/embed/YOUTUBE_ID_2"
-                title="Videoclip țambal 2"
-                loading="lazy"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen
-              ></iframe>
+              <YoutubeEmbed youtubeId="YOUTUBE_ID_2" title="Videoclip țambal 2" />
             </div>
             <p class="collab-video-label">Titlu videoclip 2</p>
           </div>
@@ -100,13 +89,7 @@ const personJsonLd = {
           <div class="collab-video-card">
             {/* TODO: înlocuiește YOUTUBE_ID_3 cu ID-ul real */}
             <div class="collab-video-frame">
-              <iframe
-                src="https://www.youtube.com/embed/YOUTUBE_ID_3"
-                title="Videoclip țambal 3"
-                loading="lazy"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen
-              ></iframe>
+              <YoutubeEmbed youtubeId="YOUTUBE_ID_3" title="Videoclip țambal 3" />
             </div>
             <p class="collab-video-label">Titlu videoclip 3</p>
           </div>
@@ -271,7 +254,8 @@ const personJsonLd = {
     position: relative;
     aspect-ratio: 16/9;
   }
-  .collab-video-frame iframe {
+  .collab-video-frame iframe,
+  .collab-video-frame .yt-gate {
     position: absolute;
     inset: 0;
     width: 100%;

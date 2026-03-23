@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import siteContent from '../data/siteContent.json';
 import BackButton from '../components/BackButton.astro';
 import { sanitizeUrl } from '../lib/sanitize-url';
+import YoutubeEmbed from '../components/YoutubeEmbed.astro';
 
 const { seo, tvAppearances, brand } = siteContent;
 
@@ -30,15 +31,7 @@ const getYoutubeId = (url: string) => {
         return (
           <article class="glass-card group h-full transition-all duration-300 hover:-translate-y-1 hover:border-[rgba(245,166,35,0.5)] hover:shadow-[0_20px_45px_rgba(245,166,35,0.16)]">
             {youtubeId ? (
-              <iframe
-                class="aspect-video w-full rounded-xl"
-                src={`https://www.youtube.com/embed/${youtubeId}`}
-                title={item.show || `Apariție TV ${index + 1}`}
-                loading="lazy"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                referrerpolicy="strict-origin-when-cross-origin"
-                allowfullscreen
-              />
+              <YoutubeEmbed youtubeId={youtubeId} title={item.show || `Apariție TV ${index + 1}`} class="rounded-xl" />
             ) : (
               <div class="grid aspect-video w-full place-items-center rounded-xl border border-white/20 bg-white/10 text-xs font-semibold text-white/90">
                 Link YouTube invalid

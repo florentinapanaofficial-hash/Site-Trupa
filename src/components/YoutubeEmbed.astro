@@ -1,0 +1,263 @@
+---
+/**
+ * YoutubeEmbed.astro
+ * ──────────────────────────────────────────────────────────────────
+ * Embed YouTube cu poartă de consimțământ GDPR
+ *
+ * Temeiul legal:
+ *   • Rec. 30 & 32 RGPD + Directiva ePrivacy 2002/58/CE, art. 5 alin. 3
+ *   • Cookie-urile YouTube (VISITOR_PRIVACY_METADATA, VISITOR_INFO1_LIVE)
+ *     sunt instalate de iframe-ul YouTube LA ÎNCĂRCARE, înainte ca
+ *     utilizatorul să apese play — deci necesită consimțământ PREALABIL.
+ *
+ * Comportament:
+ *   – Înainte de consimțământ: afișează thumbnail (img.youtube.com,
+ *     fără cookie-uri) + overlay cu două opțiuni.
+ *   – După „Acceptă cookie-urile" (CookieBanner) → toate embed-urile
+ *     de pe pagină se activează automat (event cookie:granted).
+ *   – Butonul „Acceptă și vizionează" per video → activează consimțământul
+ *     global și deschide acel video specific.
+ *   – Dacă consimțământul e deja „granted" în localStorage → iframe
+ *     se injectează imediat la încărcarea paginii, fără banner.
+ *
+ * Utilizare:
+ *   <YoutubeEmbed youtubeId="aDB9Aa9cFLY" title="Titlul videoclipului" />
+ *
+ *   Cu clase Tailwind pe wrapper (ex. pentru aspect-video w-full):
+ *   <YoutubeEmbed youtubeId="..." title="..." class="aspect-video w-full rounded-xl" />
+ *
+ * Notă: folosim youtube-nocookie.com (Privacy Enhanced Mode) ca strat
+ * suplimentar — dar consimțământul rămâne OBLIGATORIU indiferent de domeniu.
+ */
+
+interface Props {
+  youtubeId: string;
+  title: string;
+  class?: string;
+}
+
+const { youtubeId, title, class: className = '' } = Astro.props;
+
+const thumb = `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
+const embedSrc = `https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0`;
+const ytLink = `https://www.youtube.com/watch?v=${youtubeId}`;
+---
+
+<div
+  class={`yt-gate${className ? ' ' + className : ''}`}
+  data-yt-id={youtubeId}
+  data-yt-title={title}
+  data-yt-src={embedSrc}
+  role="figure"
+  aria-label={title}
+>
+  <!-- ─── Placeholder: thumbnail + overlay de consimțământ ─── -->
+  <!-- img.youtube.com NU setează cookie-uri — folosit în siguranță înainte de consimțământ -->
+  <div class="yt-gate__placeholder">
+    <img
+      class="yt-gate__thumb"
+      src={thumb}
+      alt={`Previzualizare: ${title}`}
+      loading="lazy"
+      decoding="async"
+      onerror="this.style.display='none'"
+    />
+    <div class="yt-gate__consent" role="group" aria-label="Consimțământ cookie-uri YouTube">
+      <!-- Iconiță play -->
+      <div class="yt-gate__play-icon" aria-hidden="true">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+          <circle cx="24" cy="24" r="23" fill="rgba(0,0,0,0.65)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+          <polygon points="19,15 37,24 19,33" fill="white"/>
+        </svg>
+      </div>
+
+      <p class="yt-gate__msg">
+        <strong>Cookie-uri YouTube</strong><br>
+        Vizionarea activează cookie-uri de urmărire<br>
+        (<code>VISITOR_INFO1_LIVE</code>, <code>VISITOR_PRIVACY_METADATA</code>).
+      </p>
+
+      <button class="yt-gate__btn-accept" type="button">
+        Acceptă și vizionează
+      </button>
+
+      <a
+        href={ytLink}
+        class="yt-gate__btn-yt"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Deschide pe YouTube ↗
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  /**
+   * Scriptul este un modul Astro — deduplificat automat: rulează O SINGURĂ DATĂ
+   * pe pagină, indiferent de câte instanțe <YoutubeEmbed> există.
+   */
+
+  /** Înlocuiește placeholder-ul cu iframe-ul real YouTube */
+  function activateGate(gate: Element) {
+    if (gate.querySelector('iframe')) return; // deja activat
+
+    const src = gate.getAttribute('data-yt-src');
+    const title = gate.getAttribute('data-yt-title') ?? '';
+    if (!src) return;
+
+    const placeholder = gate.querySelector('.yt-gate__placeholder');
+    if (placeholder) placeholder.remove();
+
+    const iframe = document.createElement('iframe');
+    iframe.src = src;
+    iframe.title = title;
+    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+    iframe.setAttribute('allowfullscreen', '');
+    iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+    iframe.setAttribute('loading', 'lazy');
+    iframe.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:0;';
+    gate.appendChild(iframe);
+  }
+
+  /** Activează TOATE embed-urile de pe pagină */
+  function activateAllGates() {
+    document.querySelectorAll('.yt-gate').forEach(activateGate);
+  }
+
+  // ── La încărcarea paginii: verifică consimțământul deja acordat ──
+  try {
+    if (localStorage.getItem('cookie_consent') === 'granted') {
+      activateAllGates();
+    }
+  } catch (_) { /* localStorage indisponibil */ }
+
+  // ── Reacționează la acceptarea din CookieBanner ──
+  window.addEventListener('cookie:granted', activateAllGates);
+
+  // ── Butonul „Acceptă și vizionează" per video (delegare de eveniment) ──
+  document.addEventListener('click', (e: Event) => {
+    const btn = (e.target as Element).closest?.('.yt-gate__btn-accept');
+    if (!btn) return;
+    try { localStorage.setItem('cookie_consent', 'granted'); } catch (_) {}
+    window.dispatchEvent(new CustomEvent('cookie:granted'));
+  });
+</script>
+
+<style>
+  /* ── Wrapper ─────────────────────────────────────────────── */
+  .yt-gate {
+    position: relative;
+    overflow: hidden;
+    display: block;
+    /* Asigurăm aspect-ratio 16/9 când nu e furnizat din exterior */
+    aspect-ratio: 16 / 9;
+    background: #0a0d1c;
+  }
+
+  /* Asigurăm că iframe-ul generat de JS umple tot spațiul */
+  .yt-gate > iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  /* ── Placeholder ─────────────────────────────────────────── */
+  .yt-gate__placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .yt-gate__thumb {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.45) blur(1px);
+  }
+
+  /* ── Overlay de consimțământ ─────────────────────────────── */
+  .yt-gate__consent {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 1rem 1.2rem;
+    text-align: center;
+    max-width: 92%;
+  }
+
+  .yt-gate__play-icon {
+    margin-bottom: 0.2rem;
+    opacity: 0.9;
+  }
+
+  .yt-gate__msg {
+    font-size: 0.72rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.82);
+    margin: 0;
+  }
+
+  .yt-gate__msg strong {
+    color: #fff;
+    font-size: 0.8rem;
+  }
+
+  .yt-gate__msg code {
+    font-size: 0.7rem;
+    color: #7dd3fc;
+    background: rgba(125, 211, 252, 0.1);
+    padding: 0.1em 0.3em;
+    border-radius: 3px;
+  }
+
+  .yt-gate__btn-accept {
+    background: #4f46e5;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.45rem 1rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+
+  .yt-gate__btn-accept:hover {
+    background: #4338ca;
+  }
+
+  .yt-gate__btn-yt {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: underline;
+    white-space: nowrap;
+  }
+
+  .yt-gate__btn-yt:hover {
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  /* ── Dimensiuni reduse pe carduri mici ───────────────────── */
+  @media (max-width: 400px) {
+    .yt-gate__consent {
+      padding: 0.6rem 0.8rem;
+      gap: 0.4rem;
+    }
+    .yt-gate__play-icon svg {
+      width: 36px;
+      height: 36px;
+    }
+  }
+</style>
