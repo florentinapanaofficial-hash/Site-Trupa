@@ -69,10 +69,15 @@ const isHomePage = Astro.url.pathname === '/';
       </div>
     </div>
 
-    <div class="justify-self-start md:justify-self-end" style="color: var(--body);">
+    <div class="justify-self-start md:justify-self-end text-right" style="color: var(--body);">
       <a href={`mailto:${contact.email}`} class="transition hover:text-[#F5A623]">{contact.email}</a>
       <span aria-hidden="true" style="color:var(--muted)"> | </span>
       <a href={`tel:${contact.phoneRaw}`} class="transition hover:text-[#F5A623]">{contact.phoneDisplay}</a>
+      <div class="mt-2 flex flex-wrap justify-end gap-x-3 gap-y-1" style="font-size:0.75rem;color:var(--muted);">
+        <a href="/politica-confidentialitate" class="transition hover:text-white/80">Politică confidențialitate</a>
+        <span aria-hidden="true">·</span>
+        <a href="/politica-cookie" class="transition hover:text-white/80">Politică cookie</a>
+      </div>
     </div>
   </div>
 </footer>

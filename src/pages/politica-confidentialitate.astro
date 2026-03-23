@@ -1,0 +1,288 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BackButton from '../components/BackButton.astro';
+
+const lastUpdated = '24 martie 2026';
+---
+
+<BaseLayout
+  title="Politică de confidențialitate | Formația Florentina Pană"
+  description="Politica de confidențialitate a Formației Florentina Pană. Află cum sunt prelucrate datele tale personale, drepturile tale și cum ne poți contacta."
+>
+  <section class="section-container py-16 max-w-3xl mx-auto">
+    <div class="mb-8"><BackButton href="/" label="Acasă" /></div>
+
+    <header class="mb-10">
+      <p class="kicker">RGPD · Art. 13</p>
+      <h1 class="section-title">Politică de confidențialitate</h1>
+      <p class="section-copy">Ultima actualizare: <time datetime="2026-03-24">{lastUpdated}</time></p>
+    </header>
+
+    <div class="prose-policy">
+
+      <!-- 1. Operatorul -->
+      <h2>1. Identitatea operatorului de date</h2>
+      <p>
+        <strong>Formația Florentina Pană</strong> (denumit în continuare „Operatorul")<br />
+        Sediu: Pitești, județul Argeș, România<br />
+        Email: <a href="mailto:florentinapanaofficial@gmail.com">florentinapanaofficial@gmail.com</a><br />
+        Telefon: <a href="tel:+40767369658">0767 369 658</a>
+      </p>
+      <p>
+        Operatorul nu are obligația legală de a desemna un Responsabil cu Protecția Datelor (DPO),
+        dar poate fi contactat direct la adresa de email de mai sus pentru orice solicitare GDPR.
+      </p>
+
+      <!-- 2. Datele colectate -->
+      <h2>2. Ce date personale colectăm</h2>
+      <p>Colectăm datele pe care ni le furnizezi în mod direct, prin formularul de contact:</p>
+      <ul>
+        <li><strong>Nume și prenume</strong> — pentru identificare</li>
+        <li><strong>Număr de telefon</strong> — pentru comunicare în legătură cu solicitarea</li>
+        <li><strong>Adresă de email</strong> — pentru comunicare în legătură cu solicitarea</li>
+        <li><strong>Tip eveniment, dată, mesaj</strong> — pentru pregătirea ofertei personalizate</li>
+      </ul>
+      <p>
+        Nu colectăm date sensibile (date medicale, etnice, politice etc.) și nu solicităm
+        date ale minorilor.
+      </p>
+      <p>
+        De asemenea, utilizăm cookie-uri tehnice și, cu consimțământul tău, cookie-uri de analiză
+        (Google Analytics) și cookie-uri terțe (YouTube). Detalii complete în
+        <a href="/politica-cookie">Politica de cookie-uri</a>.
+      </p>
+
+      <!-- 3. Scopul și temeiul legal -->
+      <h2>3. Scopul prelucrării și temeiul legal</h2>
+      <table class="policy-table">
+        <thead>
+          <tr>
+            <th>Scop</th>
+            <th>Temei legal (RGPD)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Răspuns la solicitarea de rezervare / ofertare</td>
+            <td>Art. 6 alin. (1) lit. (b) — executarea unui contract sau măsuri precontractuale</td>
+          </tr>
+          <tr>
+            <td>Înregistrarea consimțământului la formular</td>
+            <td>Art. 6 alin. (1) lit. (c) — obligație legală (dovada consimțământului, Art. 7 RGPD)</td>
+          </tr>
+          <tr>
+            <td>Analiză statistică a traficului (Google Analytics)</td>
+            <td>Art. 6 alin. (1) lit. (a) — consimțământul tău explicit prin bannerul cookie</td>
+          </tr>
+          <tr>
+            <td>Vizionare videoclipuri YouTube (embed)</td>
+            <td>Art. 6 alin. (1) lit. (a) — consimțământul tău explicit prin bannerul cookie sau butonul individual</td>
+          </tr>
+          <tr>
+            <td>Comunicare prin WhatsApp (redirect)</td>
+            <td>Art. 6 alin. (1) lit. (a) — consimțământul tău explicit înainte de redirecționare</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- 4. Destinatari -->
+      <h2>4. Destinatari și transferuri</h2>
+      <p>Datele tale pot fi accesate de:</p>
+      <ul>
+        <li>
+          <strong>Netlify Inc.</strong> (SUA) — furnizor de hosting și procesare formulare.
+          Transferul datelor în afara UE se face în baza Clauzelor Contractuale Standard
+          ale Comisiei Europene.
+        </li>
+        <li>
+          <strong>Google LLC</strong> — numai dacă ai acceptat cookie-urile de analiză; date
+          anonimizate despre comportamentul de navigare. Politică:
+          <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">policies.google.com/privacy</a>.
+        </li>
+        <li>
+          <strong>Google LLC / YouTube</strong> — numai dacă ai acceptat cookie-urile YouTube;
+          date despre vizionare.
+        </li>
+        <li>
+          <strong>Meta Platforms Ireland Ltd.</strong> — numai dacă alegi să ne contactezi
+          prin WhatsApp; datele sunt prelucrate conform politicii Meta.
+        </li>
+      </ul>
+      <p>Nu vindem, nu închiriem și nu transferăm datele tale altor terțe părți.</p>
+
+      <!-- 5. Perioada de retenție -->
+      <h2>5. Perioada de retenție</h2>
+      <table class="policy-table">
+        <thead>
+          <tr>
+            <th>Categorie de date</th>
+            <th>Perioadă</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Date din formularul de contact / rezervare</td>
+            <td>Maxim 2 ani de la ultima comunicare sau până la retragerea consimțământului</td>
+          </tr>
+          <tr>
+            <td>Înregistrări consimțământ GDPR</td>
+            <td>3 ani (obligație de dovadă conform Art. 7 RGPD)</td>
+          </tr>
+          <tr>
+            <td>Date de analiză (Google Analytics)</td>
+            <td>14 luni (setare implicită Google Analytics 4)</td>
+          </tr>
+          <tr>
+            <td>Cookie-uri tehnice (sesiune)</td>
+            <td>Durata sesiunii de browser</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- 6. Drepturile tale -->
+      <h2>6. Drepturile tale conform RGPD</h2>
+      <p>Ai dreptul de a:</p>
+      <ul>
+        <li><strong>Acces (Art. 15)</strong> — să știi ce date deținem despre tine</li>
+        <li><strong>Rectificare (Art. 16)</strong> — să corectezi datele incorecte</li>
+        <li><strong>Ștergere / „dreptul de a fi uitat" (Art. 17)</strong> — să ceri ștergerea datelor</li>
+        <li><strong>Restricționarea prelucrării (Art. 18)</strong> — să blochezi temporar prelucrarea</li>
+        <li><strong>Portabilitate (Art. 20)</strong> — să primești datele tale într-un format structurat</li>
+        <li><strong>Opoziție (Art. 21)</strong> — să te opui prelucrării bazate pe interes legitim</li>
+        <li>
+          <strong>Retragerea consimțământului (Art. 7 alin. 3)</strong> — în orice moment,
+          fără a afecta legalitatea prelucrării anterioare. Pentru cookie-uri, poți retrage
+          consimțământul ștergând datele din localStorage-ul browserului (cheia
+          <code>cookie_consent</code>).
+        </li>
+        <li>
+          <strong>Plângere la autoritatea de supraveghere (Art. 77)</strong> — poți contacta
+          <a href="https://www.dataprotection.ro" target="_blank" rel="noopener noreferrer">ANSPDCP</a>
+          (Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal),
+          B-dul G-ral. Gheorghe Magheru 28-30, sector 1, București.
+        </li>
+      </ul>
+      <p>
+        Pentru exercitarea oricărui drept, trimite o cerere la:
+        <a href="mailto:florentinapanaofficial@gmail.com">florentinapanaofficial@gmail.com</a>.
+        Vom răspunde în termen de 30 de zile (Art. 12 RGPD).
+      </p>
+
+      <!-- 7. Securitate -->
+      <h2>7. Securitatea datelor</h2>
+      <p>
+        Aplicăm măsuri tehnice și organizatorice pentru protejarea datelor: comunicare HTTPS,
+        parametrizarea interogărilor de bază de date, hașarea IP-urilor, rate limiting pe
+        endpoint-urile API. Nu stocăm parole sau date de card.
+      </p>
+
+      <!-- 8. Modificări -->
+      <h2>8. Modificări ale politicii</h2>
+      <p>
+        Ne rezervăm dreptul de a actualiza această politică. Ultima versiune va fi publicată
+        întotdeauna pe această pagină, cu data actualizării. Utilizarea continuă a site-ului
+        după publicarea modificărilor constituie acceptarea acestora.
+      </p>
+
+      <!-- 9. Contact -->
+      <h2>9. Contact GDPR</h2>
+      <p>
+        Pentru orice întrebare sau solicitare legată de datele personale:<br />
+        Email: <a href="mailto:florentinapanaofficial@gmail.com">florentinapanaofficial@gmail.com</a><br />
+        Telefon: <a href="tel:+40767369658">0767 369 658</a><br />
+        Adresă poștală: Pitești, Argeș, România
+      </p>
+
+      <hr class="policy-hr" />
+      <p class="policy-links">
+        Vezi și:
+        <a href="/politica-cookie">Politica de cookie-uri</a> ·
+        <a href="/contact">Formular contact</a>
+      </p>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .prose-policy {
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.7;
+    font-size: 0.93rem;
+  }
+
+  .prose-policy h2 {
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-top: 2.2rem;
+    margin-bottom: 0.6rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .prose-policy p {
+    margin-bottom: 0.9rem;
+  }
+
+  .prose-policy ul {
+    list-style: disc;
+    padding-left: 1.4rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .prose-policy ul li {
+    margin-bottom: 0.35rem;
+  }
+
+  .prose-policy a {
+    color: #7dd3fc;
+    text-decoration: underline;
+  }
+
+  .prose-policy a:hover {
+    color: #38bdf8;
+  }
+
+  .prose-policy code {
+    background: rgba(125, 211, 252, 0.1);
+    color: #7dd3fc;
+    padding: 0.1em 0.4em;
+    border-radius: 3px;
+    font-size: 0.85em;
+  }
+
+  .policy-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.84rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .policy-table th {
+    text-align: left;
+    padding: 0.5rem 0.8rem;
+    background: rgba(255, 255, 255, 0.07);
+    color: #fff;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .policy-table td {
+    padding: 0.5rem 0.8rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.8);
+    vertical-align: top;
+  }
+
+  .policy-hr {
+    border: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 2rem 0 1rem;
+  }
+
+  .policy-links {
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.55);
+  }
+</style>

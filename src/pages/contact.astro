@@ -112,9 +112,29 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
             </label>
           </div>
 
+          <label class="gdpr-form-label" for="gdpr-form-consent">
+            <input
+              type="checkbox"
+              id="gdpr-form-consent"
+              name="gdpr-consent"
+              value="da"
+              class="gdpr-form-checkbox"
+              required
+              aria-required="true"
+            />
+            <span>
+              Am citit și sunt de acord cu
+              <a href="/politica-confidentialitate" class="gdpr-form-link" target="_blank" rel="noopener noreferrer">Politica de confidențialitate</a>.
+              Sunt de acord să fiu contactat(ă) în legătură cu solicitarea de rezervare.
+              <span aria-hidden="true" style="color:rgba(255,120,120,0.9)"> *</span>
+            </span>
+          </label>
+
           <button type="submit" class="btn-solid btn-compact mt-3 w-full justify-center">Trimite solicitarea</button>
-          <p class="mt-2 text-[11px] leading-relaxed text-white/85">
-            Prin trimitere ești de acord să te contactăm pentru ofertă. Nu trimitem mesaje promoționale fără acord.
+          <p class="mt-2 text-[11px] leading-relaxed text-white/60">
+            Datele sunt prelucrate conform
+            <a href="/politica-confidentialitate" class="gdpr-form-link">Politicii de confidențialitate</a>.
+            Nu trimitem mesaje promoționale fără acord separat.
           </p>
         </form>
       </div>
@@ -192,6 +212,35 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
 
     .contact-compact .form-label {
       font-size: 0.74rem;
+    }
+
+    .gdpr-form-label {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.55rem;
+      margin-top: 0.75rem;
+      font-size: 0.74rem;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.82);
+      cursor: pointer;
+    }
+
+    .gdpr-form-checkbox {
+      flex-shrink: 0;
+      margin-top: 0.15rem;
+      width: 1rem;
+      height: 1rem;
+      accent-color: #4f46e5;
+      cursor: pointer;
+    }
+
+    .gdpr-form-link {
+      color: #7dd3fc;
+      text-decoration: underline;
+    }
+
+    .gdpr-form-link:hover {
+      color: #38bdf8;
     }
 
     .contact-compact .input-glass {

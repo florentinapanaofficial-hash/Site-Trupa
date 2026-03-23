@@ -1,0 +1,329 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BackButton from '../components/BackButton.astro';
+
+const lastUpdated = '24 martie 2026';
+---
+
+<BaseLayout
+  title="Politică cookie-uri | Formația Florentina Pană"
+  description="Lista completă a cookie-urilor utilizate pe florentinapanaofficial.ro: cookie-uri tehnice, Google Analytics și YouTube."
+>
+  <section class="section-container py-16 max-w-3xl mx-auto">
+    <div class="mb-8"><BackButton href="/" label="Acasă" /></div>
+
+    <header class="mb-10">
+      <p class="kicker">ePrivacy · RGPD</p>
+      <h1 class="section-title">Politică de cookie-uri</h1>
+      <p class="section-copy">Ultima actualizare: <time datetime="2026-03-24">{lastUpdated}</time></p>
+    </header>
+
+    <div class="prose-policy">
+
+      <h2>Ce sunt cookie-urile?</h2>
+      <p>
+        Cookie-urile sunt fișiere text mici stocate în browserul tău când vizitezi un site web.
+        Ele ajută la funcționarea site-ului, memorarea preferințelor sau colectarea de statistici.
+        Dreptul aplicabil: <strong>Directiva ePrivacy 2002/58/CE</strong>, Art. 5 alin. (3) și
+        <strong>RGPD</strong> (Rec. 30 &amp; 32) — cookie-urile non-esențiale necesită
+        consimțământul prealabil al utilizatorului.
+      </p>
+
+      <h2>Cum gestionăm consimțământul</h2>
+      <p>
+        La prima vizită pe site afișăm un <strong>banner de consimțământ</strong> cu opțiuni
+        clare: <em>„Acceptă cookie-urile"</em> sau <em>„Refuz"</em>.
+        Cookie-urile non-esențiale (analiză, YouTube) sunt blocate până la acceptare.
+        Alegerea ta este salvată în <code>localStorage</code> (cheia <code>cookie_consent</code>)
+        — aceasta nu este un cookie HTTP și nu necesită consimțământ separat.
+        Poți revoca consimțământul în orice moment ștergând datele din localStorage
+        (ex.: Developer Tools → Application → Local Storage → florentinapanaofficial.ro →
+        șterge cheia <code>cookie_consent</code>).
+      </p>
+
+      <!-- ──────────────────────────────── -->
+      <h2>1. Cookie-uri strict necesare</h2>
+      <p>
+        Aceste cookie-uri sunt esențiale pentru funcționarea site-ului și nu necesită consimțământ
+        (Considerentul 25 al Directivei ePrivacy).
+      </p>
+
+      <table class="policy-table">
+        <thead>
+          <tr>
+            <th>Nume</th>
+            <th>Furnizor</th>
+            <th>Scop</th>
+            <th>Expirare</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>__cf_bm</code></td>
+            <td>Cloudflare / Netlify</td>
+            <td>Protecție anti-bot, gestionare trafic CDN</td>
+            <td>30 minute</td>
+          </tr>
+          <tr>
+            <td>Cookie-uri de sesiune Netlify</td>
+            <td>Netlify Inc.</td>
+            <td>Procesare formulare, protecție CSRF</td>
+            <td>Sesiune</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="policy-note">
+        <strong>Notă:</strong> Stocăm preferința ta de consimțământ în
+        <code>localStorage.cookie_consent</code> — aceasta este stocată local în browserul tău,
+        nu pe serverele noastre, și nu este un cookie HTTP.
+      </p>
+
+      <!-- ──────────────────────────────── -->
+      <h2>2. Cookie-uri de analiză (Google Analytics 4)</h2>
+      <p>
+        Aceste cookie-uri sunt activate <strong>numai după consimțământul tău explicit</strong>.
+        Culeg date anonimizate despre comportamentul de navigare pentru a îmbunătăți site-ul.
+      </p>
+      <p>
+        <strong>Furnizor:</strong> Google LLC (SUA) ·
+        <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Politică de confidențialitate Google</a>
+      </p>
+
+      <table class="policy-table">
+        <thead>
+          <tr>
+            <th>Nume</th>
+            <th>Scop</th>
+            <th>Expirare</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>_ga</code></td>
+            <td>Identificator unic de utilizator pentru statistici Google Analytics</td>
+            <td>2 ani</td>
+          </tr>
+          <tr>
+            <td><code>_ga_&lt;ID&gt;</code></td>
+            <td>Stare sesiune GA4</td>
+            <td>2 ani</td>
+          </tr>
+          <tr>
+            <td><code>_gid</code></td>
+            <td>Identificator sesiune zilnic</td>
+            <td>24 ore</td>
+          </tr>
+          <tr>
+            <td><code>_gat</code></td>
+            <td>Limitarea frecvenței cererilor către Google Analytics</td>
+            <td>1 minut</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- ──────────────────────────────── -->
+      <h2>3. Cookie-uri YouTube</h2>
+      <p>
+        Paginile noastre conțin videoclipuri YouTube integrate (embed). Aceste videoclipuri sunt
+        <strong>blocate implicit</strong> — afișăm un placeholder cu thumbnail până la
+        consimțământul tău. După acceptare (bannerul de cookie-uri sau butonul individual
+        „Acceptă și vizionează"), playerul YouTube este activat și instalează cookie-uri pe
+        dispozitivul tău.
+      </p>
+      <p>
+        Embed-urile utilizează domeniul <code>youtube-nocookie.com</code> (Privacy Enhanced Mode),
+        care reduce urmărirea, dar nu o elimină complet — consimțământul rămâne necesar conform
+        ePrivacy.
+      </p>
+      <p>
+        <strong>Furnizor:</strong> Google LLC / YouTube (SUA) ·
+        <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Politică de confidențialitate YouTube</a>
+      </p>
+
+      <table class="policy-table">
+        <thead>
+          <tr>
+            <th>Nume</th>
+            <th>Scop</th>
+            <th>Expirare</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>VISITOR_INFO1_LIVE</code></td>
+            <td>Estimarea lățimii de bandă și preferințe player YouTube</td>
+            <td>6 luni</td>
+          </tr>
+          <tr>
+            <td><code>VISITOR_PRIVACY_METADATA</code></td>
+            <td>Stocarea preferințelor de confidențialitate ale vizitatorului în YouTube</td>
+            <td>6 luni</td>
+          </tr>
+          <tr>
+            <td><code>YSC</code></td>
+            <td>Sesiune YouTube — urmărire vizionări în sesiunea curentă</td>
+            <td>Sesiune</td>
+          </tr>
+          <tr>
+            <td><code>GPS</code></td>
+            <td>Înregistrare localizare pe dispozitive mobile</td>
+            <td>30 minute</td>
+          </tr>
+          <tr>
+            <td><code>PREF</code></td>
+            <td>Preferințe player YouTube (volum, calitate, subtitrări)</td>
+            <td>8 luni</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>
+        <strong>Pagini afectate:</strong> pagina principală, Galerie Video, pagini individuale
+        video, Apariții TV, pagini colaboratori.
+      </p>
+
+      <!-- ──────────────────────────────── -->
+      <h2>4. Cookie-uri rețele sociale (linkuri externe)</h2>
+      <p>
+        Site-ul conține linkuri externe către profilurile noastre de pe Facebook, Instagram și
+        TikTok. Aceste linkuri <strong>nu instalează cookie-uri</strong> pe site-ul nostru —
+        cookie-urile acestor platforme sunt instalate pe domeniile lor proprii, la momentul în
+        care alegi să le accesezi.
+      </p>
+      <ul>
+        <li>
+          <strong>Facebook / Meta</strong> —
+          <a href="https://www.facebook.com/privacy/explanation" target="_blank" rel="noopener noreferrer">Politică de date Facebook</a>
+        </li>
+        <li>
+          <strong>Instagram / Meta</strong> —
+          <a href="https://privacycenter.instagram.com/policy" target="_blank" rel="noopener noreferrer">Centrul de confidențialitate Instagram</a>
+        </li>
+        <li>
+          <strong>TikTok</strong> —
+          <a href="https://www.tiktok.com/legal/page/eea/privacy-policy/ro-RO" target="_blank" rel="noopener noreferrer">Politică de confidențialitate TikTok</a>
+        </li>
+      </ul>
+
+      <!-- ──────────────────────────────── -->
+      <h2>5. Cum poți controla cookie-urile</h2>
+      <p>Ai mai multe opțiuni de control:</p>
+      <ul>
+        <li>
+          <strong>Bannerul nostru</strong> — la fiecare vizită fără consimțământ înregistrat,
+          afișăm bannerul de consimțământ.
+        </li>
+        <li>
+          <strong>Setările browserului</strong> — poți bloca sau șterge cookie-uri din setările
+          browserului (Chrome, Firefox, Safari, Edge etc.).
+        </li>
+        <li>
+          <strong>Optare din GA</strong> —
+          <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener noreferrer">Google Analytics Opt-out Add-on</a>.
+        </li>
+        <li>
+          <strong>Retragere consimțământ localStorage</strong> — Developer Tools → Application →
+          Local Storage → florentinapanaofficial.ro → șterge cheia <code>cookie_consent</code>.
+        </li>
+      </ul>
+
+      <hr class="policy-hr" />
+      <p class="policy-links">
+        Vezi și:
+        <a href="/politica-confidentialitate">Politică de confidențialitate</a> ·
+        <a href="/contact">Contact / Solicitări GDPR</a>
+      </p>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .prose-policy {
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.7;
+    font-size: 0.93rem;
+  }
+
+  .prose-policy h2 {
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-top: 2.2rem;
+    margin-bottom: 0.6rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .prose-policy p {
+    margin-bottom: 0.9rem;
+  }
+
+  .prose-policy ul {
+    list-style: disc;
+    padding-left: 1.4rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .prose-policy ul li {
+    margin-bottom: 0.35rem;
+  }
+
+  .prose-policy a {
+    color: #7dd3fc;
+    text-decoration: underline;
+  }
+
+  .prose-policy a:hover {
+    color: #38bdf8;
+  }
+
+  .prose-policy code {
+    background: rgba(125, 211, 252, 0.1);
+    color: #7dd3fc;
+    padding: 0.1em 0.4em;
+    border-radius: 3px;
+    font-size: 0.85em;
+  }
+
+  .policy-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.83rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .policy-table th {
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    background: rgba(255, 255, 255, 0.07);
+    color: #fff;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .policy-table td {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.8);
+    vertical-align: top;
+  }
+
+  .policy-note {
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-style: italic;
+    margin-top: -0.5rem;
+  }
+
+  .policy-hr {
+    border: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 2rem 0 1rem;
+  }
+
+  .policy-links {
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.55);
+  }
+</style>
