@@ -55,18 +55,16 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
         </div>
 
         <form
+          id="form-rezervare"
           class="form-shell"
           name="rezervare-rapida"
           method="POST"
-          data-netlify="true"
-          netlify-honeypot="bot-field"
-          action="/contact?trimis=rezervare#contact"
+          novalidate
         >
-          <input type="hidden" name="form-name" value="rezervare-rapida" />
           <p class="hidden" aria-hidden="true">
             <label>
               Nu completa acest câmp dacă ești om:
-              <input name="bot-field" />
+              <input name="bot-field" autocomplete="off" tabindex="-1" />
             </label>
           </p>
           <h2 class="text-sm font-extrabold text-white">Rezervare rapidă</h2>
@@ -168,13 +166,58 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
       });
     }
 
-    const ga4Form = document.querySelector('form[name="rezervare-rapida"]');
-    if (ga4Form) {
-      ga4Form.addEventListener('submit', () => {
+    const form = document.getElementById('form-rezervare') as HTMLFormElement | null;
+    if (form) {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // GA4 tracking
         if (typeof (window as Window & { gtag?: (...args: unknown[]) => void }).gtag === 'function') {
           (window as Window & { gtag?: (...args: unknown[]) => void }).gtag!(
             'event', 'generate_lead', { event_category: 'contact' },
           );
+        }
+
+        const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement | null;
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Se trimite...';
+        }
+
+        if (feedbackEl) {
+          feedbackEl.classList.add('hidden');
+          feedbackEl.textContent = '';
+        }
+
+        try {
+          const res = await fetch('/api/rezervare', {
+            method: 'POST',
+            body: new FormData(form),
+          });
+
+          const json = await res.json() as { ok?: boolean; error?: string };
+
+          if (res.ok && json.ok) {
+            window.location.href = '/contact?trimis=rezervare#contact';
+          } else {
+            if (feedbackEl) {
+              feedbackEl.textContent = json.error ?? 'Eroare la trimitere. Încearcă din nou.';
+              feedbackEl.classList.remove('hidden');
+              feedbackEl.style.borderColor = 'rgba(255,100,100,0.35)';
+              feedbackEl.style.background = 'rgba(255,50,50,0.1)';
+              feedbackEl.style.color = '#fca5a5';
+            }
+          }
+        } catch {
+          if (feedbackEl) {
+            feedbackEl.textContent = 'Eroare de rețea. Verifică conexiunea și încearcă din nou.';
+            feedbackEl.classList.remove('hidden');
+          }
+        } finally {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Trimite solicitarea';
+          }
         }
       });
     }

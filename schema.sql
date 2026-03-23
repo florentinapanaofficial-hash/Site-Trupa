@@ -31,3 +31,16 @@ CREATE TABLE IF NOT EXISTS gallery (
   PRIMARY KEY (id),
   INDEX idx_gallery_data_upload (data_upload)
 ) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS rezervari (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  nume VARCHAR(90) NOT NULL,
+  telefon VARCHAR(20) NOT NULL,
+  eveniment VARCHAR(50) NOT NULL,
+  data_eveniment DATE NOT NULL,
+  mesaj TEXT DEFAULT NULL,
+  gdpr_consent TINYINT(1) NOT NULL DEFAULT 1,
+  creat_la TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  INDEX idx_rezervari_creat_la (creat_la)
+) ENGINE=InnoDB;
