@@ -92,6 +92,10 @@ const mobileNavAllItems = [
     <meta name="description" content={description} />
     <meta name="robots" content="index,follow,max-image-preview:large" />
     <meta name="theme-color" content="#0c0f1f" />
+    <meta name="author" content="Formația Florentina Pană" />
+    <!-- SEO local: județ Argeș, codul ISO RO-AG recunoscut de Google Maps -->
+    <meta name="geo.region" content="RO-AG" />
+    <meta name="geo.placename" content="Pitești, Argeș" />
     {canonical && <link rel="canonical" href={canonical} />}
 
     <meta property="og:type" content={ogType} />
@@ -99,6 +103,7 @@ const mobileNavAllItems = [
     <meta property="og:description" content={description} />
     {canonical && <meta property="og:url" content={canonical} />}
     <meta property="og:image" content={ogImage} />
+    <meta property="og:image:alt" content={`${title} – Formația Florentina Pană`} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:locale" content="ro_RO" />
@@ -111,6 +116,12 @@ const mobileNavAllItems = [
     <link rel="icon" type="image/svg+xml" href="/images/logo-fp-stage.svg" />
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
     <slot name="head" />
+    {ga4Id && (
+      <link rel="preconnect" href="https://www.googletagmanager.com" />
+    )}
+    {ga4Id && (
+      <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+    )}
     {ga4Id && (
       <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${ga4Id}`}></script>
     )}
