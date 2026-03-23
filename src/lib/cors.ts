@@ -5,7 +5,7 @@
  * and always includes the canonical production domain as a hard fallback.
  */
 
-const FALLBACK_ORIGIN = 'https://florentinapanaofficial.ro';
+const FALLBACK_ORIGIN = 'https://www.florentinapanaofficial.ro';
 
 function normalise(raw: string | undefined): string | null {
     if (!raw) return null;

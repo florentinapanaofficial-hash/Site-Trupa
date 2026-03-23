@@ -4,5 +4,5 @@ Allow: /video/
 Disallow: /api/
 Disallow: /admin/
 
-Sitemap: https://florentinapanaofficial.ro/sitemap-index.xml
+Sitemap: https://www.florentinapanaofficial.ro/sitemap-index.xml
 

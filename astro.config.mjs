@@ -3,7 +3,7 @@ import node from '@astrojs/node';
 import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
 
-const siteUrl = process.env.SITE_URL || 'https://florentinapanaofficial.ro';
+const siteUrl = process.env.SITE_URL || 'https://www.florentinapanaofficial.ro';
 
 export default defineConfig({
   site: siteUrl,
