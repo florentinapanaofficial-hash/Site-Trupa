@@ -3,6 +3,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import SkyBackground from '../components/SkyBackground.astro';
 import siteContent from '../data/siteContent.json';
+import { sanitizeUrl } from '../lib/sanitize-url';
 import '../styles/globals.css';
 
 interface Props {
@@ -28,10 +29,10 @@ const ga4Id = import.meta.env.PUBLIC_GA4_ID;
 const { navigation } = siteContent;
 
 const socialLinks = {
-  youtube:   siteContent.socialLinks?.youtube   || '',
-  facebook:  siteContent.socialLinks?.facebook  || '',
-  instagram: siteContent.socialLinks?.instagram || '',
-  tiktok:    siteContent.socialLinks?.tiktok    || '',
+  youtube:   sanitizeUrl(siteContent.socialLinks?.youtube),
+  facebook:  sanitizeUrl(siteContent.socialLinks?.facebook),
+  instagram: sanitizeUrl(siteContent.socialLinks?.instagram),
+  tiktok:    sanitizeUrl(siteContent.socialLinks?.tiktok),
 };
 
 const jsonLd = {

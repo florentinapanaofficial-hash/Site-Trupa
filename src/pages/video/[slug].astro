@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import siteContent from '../../data/siteContent.json';
 import BackButton from '../../components/BackButton.astro';
+import { sanitizeUrl } from '../../lib/sanitize-url';
 
 export function getStaticPaths() {
   const slugify = (value: string) =>
@@ -35,7 +36,7 @@ const { video } = Astro.props as {
 const pageTitle = `${video.title} | Video live | Formația Florentina Pană`;
 const pageDescription = `Urmărește ${video.title}, moment live din repertoriul Formația Florentina Pană. Vezi clipul complet și distribuie pagina.`;
 const ogImage = `https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`;
-const youtubeUrl = video.youtubeUrl ?? `https://www.youtube.com/watch?v=${video.youtubeId}`;
+const youtubeUrl = sanitizeUrl(video.youtubeUrl ?? `https://www.youtube.com/watch?v=${video.youtubeId}`);
 
 const videoJsonLd = {
   '@context': 'https://schema.org',

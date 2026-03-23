@@ -1,13 +1,14 @@
 ---
 import siteContent from '../data/siteContent.json';
+import { sanitizeUrl } from '../lib/sanitize-url';
 
 const year = new Date().getFullYear();
 const { brand, contact } = siteContent;
 const socialLinks = {
-  youtube: siteContent.socialLinks?.youtube || 'https://www.youtube.com/',
-  facebook: siteContent.socialLinks?.facebook || 'https://www.facebook.com/',
-  instagram: siteContent.socialLinks?.instagram || 'https://www.instagram.com/',
-  tiktok: siteContent.socialLinks?.tiktok || 'https://www.tiktok.com/',
+  youtube: sanitizeUrl(siteContent.socialLinks?.youtube, 'https://www.youtube.com/'),
+  facebook: sanitizeUrl(siteContent.socialLinks?.facebook, 'https://www.facebook.com/'),
+  instagram: sanitizeUrl(siteContent.socialLinks?.instagram, 'https://www.instagram.com/'),
+  tiktok: sanitizeUrl(siteContent.socialLinks?.tiktok, 'https://www.tiktok.com/'),
 };
 const isHomePage = Astro.url.pathname === '/';
 ---
