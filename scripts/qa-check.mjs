@@ -38,8 +38,8 @@ t('JSON-LD @type Article', blog.includes('"Article"'));
 t('Article publisher', blog.includes('"publisher"'));
 
 console.log('\n=== 3) VIDEO PAGE ===');
-t('og:type=video.other', vid.includes('og:type" content="video.other"'));
-t('og:image=YouTube thumbnail', vid.includes('img.youtube.com'));
+t('og:type=video.other', vid === 'video.other');
+t('og:image=YouTube thumbnail', vid.startsWith('https://img.youtube.com'));
 t('JSON-LD VideoObject', vid.includes('VideoObject'));
 t('VideoObject embedUrl', vid.includes('embedUrl'));
 
