@@ -1,0 +1,56 @@
+[
+    {
+        "_titlu": "Exemplu 1 – Consimțământ WhatsApp salvat cu succes (log server-side stdout)",
+        "_nota": "Acesta este formatul JSON emis de console.log() din /api/consent. Colectat în fișiere de log sau agregator (PM2 logs, Datadog, Graylog, Splunk etc.).",
+        "eveniment": "gdpr_consimtamant_salvat",
+        "timestamp": "2026-03-23T14:32:11.047Z",
+        "tip_consimtamant": "whatsapp_redirect",
+        "canal": "whatsapp",
+        "ip_hint": "5a3f***",
+        "_nota_ip": "Primii 4 octeți hex ai hash-ului SHA-256 – suficient pentru corelație în debug, fără a expune IP-ul",
+        "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.3 Mobile/15E148 Safari/604.1",
+        "referer": "https://www.florentinapanaofficial.ro/contact",
+        "versiune_politica": "1.0",
+        "status": "SUCCESS"
+    },
+    {
+        "_titlu": "Exemplu 2 – Eroare DB la salvare (log server-side stderr)",
+        "_nota": "Emis de blocul catch din /api/consent – conține detalii tehnice DOAR în log, nu în răspunsul HTTP.",
+        "eveniment": "gdpr_consimtamant_eroare",
+        "timestamp": "2026-03-23T14:33:05.221Z",
+        "eroare": "ER_ACCESS_DENIED_ERROR: Access denied for user 'app'@'localhost'",
+        "tip": "whatsapp_redirect",
+        "canal": "whatsapp",
+        "ip_hint": "b1e9***",
+        "timestamp_log": "2026-03-23T14:33:05.219Z",
+        "status": "ERROR"
+    },
+    {
+        "_titlu": "Exemplu 3 – Cerere respinsă (rate limit) – logată implicit de middleware/proxy",
+        "_nota": "Dacă folosiți un reverse proxy (Nginx, Caddy), acesta logează cererea respinsă cu status 429.",
+        "eveniment": "gdpr_rate_limit",
+        "timestamp": "2026-03-23T14:34:00.001Z",
+        "metoda": "POST",
+        "cale": "/api/consent",
+        "status_http": 429,
+        "ip_hint": "5a3f***",
+        "user_agent": "python-requests/2.31.0",
+        "_nota_ua": "UA atipic – posibil script automatizat; rate limiting a blocat cererea corect",
+        "status": "BLOCKED"
+    },
+    {
+        "_titlu": "Exemplu 4 – Înregistrare salvată în DB (rând MySQL / document MongoDB)",
+        "_nota": "Aceasta este structura rândului din tabelul gdpr_consimtamant / colecția MongoDB.",
+        "id": 42,
+        "tip_consimtamant": "whatsapp_redirect",
+        "canal": "whatsapp",
+        "ip_hash": "3a7fd28e4b2c91f0e5b6a8d4c7e2f1a9b3d5e6c8a1f2b4d7e9c0a3f5b8d2e4c6",
+        "_nota_ip_hash": "SHA-256 complet al IP-ului + salt – stocat în DB; 64 caractere hex",
+        "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/122.0.0.0 Safari/537.36",
+        "referer": "https://www.florentinapanaofficial.ro/contact",
+        "data_consimtamant": "2026-03-23T14:32:11.000Z",
+        "versiune_politica": "1.0",
+        "sters_la": null,
+        "_nota_sters_la": "null = consimțământ activ; valoare = soft-deleted (Art. 17 RGPD)"
+    }
+]

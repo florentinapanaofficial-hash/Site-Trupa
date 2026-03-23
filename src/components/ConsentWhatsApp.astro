@@ -1,0 +1,333 @@
+---
+/**
+ * ConsentWhatsApp.astro
+ * ──────────────────────────────────────────────────────────────────
+ * Componentă GDPR – redirect WhatsApp cu consimțământ explicit
+ *
+ * Cerință legală:
+ *   • Art. 7 RGPD – consimțământul trebuie să fie liber, specific,
+ *     informat, neechivoc și documentat (checkbox NEPRE-BIFAT).
+ *   • Art. 13 RGPD – informare transparentă înainte de acțiune.
+ *
+ * Utilizare în pagini Astro:
+ *   ---
+ *   import ConsentWhatsApp from '../components/ConsentWhatsApp.astro';
+ *   ---
+ *   <ConsentWhatsApp
+ *     numarTelefon="40767369658"
+ *     mesajPrecompletat="Bună ziua, doresc informații."
+ *     textButon="Contactează pe WhatsApp"
+ *   />
+ */
+
+interface Props {
+  /** Număr telefon în format internațional fără + (ex: "40712345678") */
+  numarTelefon: string;
+  /** Text pre-completat în WhatsApp – va fi URL-encoded automat */
+  mesajPrecompletat?: string;
+  /** Eticheta butonului */
+  textButon?: string;
+}
+
+const {
+  numarTelefon,
+  mesajPrecompletat = "Bună ziua, doresc informații suplimentare.",
+  textButon = "Contactează pe WhatsApp",
+} = Astro.props;
+
+// Construim URL-ul wa.me cu mesajul pre-completat
+const mesajEncoded = encodeURIComponent(mesajPrecompletat);
+const waUrl = `https://wa.me/${numarTelefon}?text=${mesajEncoded}`;
+---
+
+<div
+  class="gdpr-whatsapp-wrapper"
+  role="region"
+  aria-label="Contact WhatsApp – consimțământ GDPR"
+>
+  <!-- ─────────────────────────────────────────────────────────
+       Panoul de informare și consimțământ
+       ───────────────────────────────────────────────────────── -->
+  <div id="gdpr-consent-panel" class="gdpr-panel">
+
+    <!-- Informare succintă – Art. 13 RGPD -->
+    <p class="gdpr-info-text">
+      Prin apăsarea butonului de mai jos vei fi redirecționat(ă) către
+      <strong>WhatsApp</strong>. Datele tale (numărul de telefon) vor fi
+      prelucrate de <strong>Meta Platforms Ireland Ltd.</strong> conform
+      propriei politici de confidențialitate. Noi înregistrăm doar
+      consimțământul tău, conform Art.&nbsp;7 RGPD.
+    </p>
+
+    <!-- ─────────────────────────────────────────────────────
+         Checkbox NEPRE-BIFAT – obligatoriu Art. 7 alin. 2 RGPD
+         „consimțământul nu se poate prezuma" → nu pre-bifăm
+         ───────────────────────────────────────────────────── -->
+    <label class="gdpr-checkbox-label" for="gdpr-agree">
+      <input
+        type="checkbox"
+        id="gdpr-agree"
+        name="gdpr-agree"
+        class="gdpr-checkbox"
+        aria-required="true"
+        aria-describedby="gdpr-checkbox-desc"
+      />
+      <span id="gdpr-checkbox-desc">
+        Am citit și sunt de acord cu
+        <a
+          href="/politica-confidentialitate"
+          class="gdpr-link"
+          target="_blank"
+          rel="noopener noreferrer"
+        >Politica de confidențialitate</a>
+        și înțeleg că apăsând butonul datele mele vor fi transmise
+        către WhatsApp / Meta.
+      </span>
+    </label>
+
+    <!-- Mesaj de eroare – ascuns implicit, afișat la click fără bifă -->
+    <p
+      id="gdpr-error-msg"
+      class="gdpr-error"
+      role="alert"
+      aria-live="polite"
+      hidden
+    >
+      ⚠ Te rugăm să bifezi caseta de consimțământ înainte de a continua.
+    </p>
+
+    <!-- Butonul principal de acțiune -->
+    <button
+      id="gdpr-whatsapp-btn"
+      type="button"
+      class="gdpr-btn-whatsapp"
+      data-wa-url={waUrl}
+      aria-label={textButon}
+    >
+      <!-- SVG WhatsApp inline – fără cereri externe -->
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        width="20"
+        height="20"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+      </svg>
+      {textButon}
+    </button>
+
+    <!-- Link retragere consimțământ – Art. 7 alin. 3 RGPD -->
+    <p class="gdpr-retragere-text">
+      Poți retrage sau gestiona consimțimentele tale oricând scriind la
+      <a href="mailto:florentinapanaofficial@gmail.com" class="gdpr-link">
+        florentinapanaofficial@gmail.com
+      </a>.
+    </p>
+  </div>
+</div>
+
+<style>
+  /* ─────────────────────────────────────────────────────────────
+     Stiluri componentă ConsentWhatsApp
+     ───────────────────────────────────────────────────────────── */
+  .gdpr-whatsapp-wrapper {
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  .gdpr-panel {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+  }
+
+  .gdpr-info-text {
+    font-size: 0.8125rem;
+    color: var(--body, #94a3b8);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .gdpr-checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+    font-size: 0.8125rem;
+    color: var(--body, #94a3b8);
+    cursor: pointer;
+    line-height: 1.6;
+  }
+
+  /* Dimensiune explicită pentru accesibilitate touch (min 44x44px target) */
+  .gdpr-checkbox {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    margin-top: 2px;
+    accent-color: #25d366;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .gdpr-link {
+    color: #25d366;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: opacity 0.15s ease;
+  }
+
+  .gdpr-link:hover {
+    opacity: 0.8;
+  }
+
+  .gdpr-error {
+    font-size: 0.75rem;
+    color: #f87171;
+    margin: 0;
+    padding: 0.25rem 0;
+  }
+
+  .gdpr-btn-whatsapp {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background-color: #25d366;
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    padding: 0.6875rem 1.5rem;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+  }
+
+  .gdpr-btn-whatsapp:hover:not(:disabled) {
+    background-color: #1ebe5d;
+  }
+
+  .gdpr-btn-whatsapp:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .gdpr-retragere-text {
+    font-size: 0.6875rem;
+    color: var(--body, #94a3b8);
+    opacity: 0.7;
+    margin: 0;
+    text-align: center;
+  }
+</style>
+
+<script>
+  /**
+   * Logică client-side GDPR WhatsApp Consent
+   *
+   * Flux:
+   *   1. Utilizatorul bifează checkbox-ul (nepre-bifat implicit)
+   *   2. La click pe buton, se validează bifa
+   *   3. Se trimite POST /api/consent cu consimțământul la server
+   *   4. La răspuns 200, se face redirect la wa.me
+   *   5. La eroare, se afișează mesaj și se re-activează butonul
+   *
+   * Securitate:
+   *   • Header X-Requested-With → protecție CSRF simplă
+   *   • credentials: "same-origin" → include cookie-uri sesiune
+   *   • Butonul se dezactivează la click → previne submitere dublă
+   */
+  (function () {
+    "use strict";
+
+    const btn      = document.getElementById("gdpr-whatsapp-btn") as HTMLButtonElement | null;
+    const checkbox = document.getElementById("gdpr-agree") as HTMLInputElement | null;
+    const errorMsg = document.getElementById("gdpr-error-msg") as HTMLParagraphElement | null;
+
+    if (!btn || !checkbox || !errorMsg) return;
+
+    // SVG WhatsApp pentru resetarea butonului după eroare
+    const SVG_WA =
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"` +
+      ` width="20" height="20" aria-hidden="true" focusable="false">` +
+      `<path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15` +
+      `-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475` +
+      `-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52` +
+      `-.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207` +
+      `-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372` +
+      `-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2` +
+      ` 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085` +
+      ` 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347` +
+      `m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648` +
+      `-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0` +
+      ` 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884` +
+      `-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157` +
+      ` 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0` +
+      ` 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0` +
+      ` 00-3.48-8.413z"/></svg>`;
+
+    btn.addEventListener("click", async function handleConsentClick() {
+      // ── Pasul 1: Validare checkbox ──────────────────────────────
+      if (!checkbox.checked) {
+        errorMsg.hidden = false;
+        checkbox.focus();
+        return;
+      }
+      errorMsg.hidden = true;
+
+      // ── Pasul 2: Dezactivare buton (previne dublu-clic) ─────────
+      btn.disabled = true;
+      btn.textContent = "Se procesează…";
+
+      try {
+        // ── Pasul 3: POST consimțământ la server ───────────────────
+        // Consimțământul TREBUIE salvat înainte de redirect (Art. 7 RGPD)
+        const response = await fetch("/api/consent", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            // Header custom → browserele nu îl trimit automat din formulare HTML
+            // → protecție CSRF simplă (nu înlocuiește token CSRF pentru acțiuni critice)
+            "X-Requested-With": "XMLHttpRequest",
+          },
+          body: JSON.stringify({
+            tip_consimtamant: "whatsapp_redirect",
+            canal: "whatsapp",
+            // NU includem date personale suplimentare (principiu minimizare – Art. 5 RGPD)
+          }),
+          // Include cookie-uri de sesiune pentru same-origin
+          credentials: "same-origin",
+        });
+
+        if (!response.ok) {
+          const data = await response.json().catch(() => ({}));
+          throw new Error((data as { eroare?: string }).eroare ?? `HTTP ${response.status}`);
+        }
+
+        // ── Pasul 4: Redirect la WhatsApp după confirmare server ───
+        const waUrl = btn.dataset.waUrl;
+        if (waUrl) {
+          window.location.href = waUrl;
+        }
+
+      } catch (err) {
+        // ── Pasul 5: Gestionare eroare ─────────────────────────────
+        errorMsg.textContent = "⚠ A apărut o eroare. Te rugăm să încerci din nou.";
+        errorMsg.hidden = false;
+        btn.disabled = false;
+        btn.innerHTML = `${SVG_WA} Contactează pe WhatsApp`;
+
+        // Log client-side (fără date personale)
+        console.error("[GDPR] Eroare la salvarea consimțământului:", err instanceof Error ? err.message : "eroare necunoscută");
+      }
+    });
+  })();
+</script>
