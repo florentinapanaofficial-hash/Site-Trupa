@@ -77,8 +77,32 @@ const isHomePage = Astro.url.pathname === '/';
         <a href="/politica-confidentialitate" class="transition hover:text-white/80">Politică confidențialitate</a>
         <span aria-hidden="true">·</span>
         <a href="/politica-cookie" class="transition hover:text-white/80">Politică cookie</a>
+        <span aria-hidden="true">·</span>
+        <button
+          id="cookie-prefs-btn"
+          type="button"
+          class="transition hover:text-white/80 cursor-pointer"
+          style="background:none;border:0;padding:0;font-size:inherit;color:inherit;"
+          aria-label="Gestionează preferințele de cookie-uri"
+        >Preferințe cookie</button>
       </div>
     </div>
   </div>
 </footer>
+
+<script>
+  (function () {
+    var btn = document.getElementById('cookie-prefs-btn');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      try { localStorage.removeItem('cookie_consent'); } catch (_) {}
+      var banner = document.getElementById('cookie-banner');
+      if (banner) {
+        banner.hidden = false;
+        banner.removeAttribute('hidden');
+        banner.removeAttribute('aria-hidden');
+      }
+    });
+  })();
+</script>
 

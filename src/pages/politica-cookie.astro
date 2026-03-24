@@ -36,9 +36,9 @@ const lastUpdated = '24 martie 2026';
         Cookie-urile non-esențiale (analiză, YouTube) sunt blocate până la acceptare.
         Alegerea ta este salvată în <code>localStorage</code> (cheia <code>cookie_consent</code>)
         — aceasta nu este un cookie HTTP și nu necesită consimțământ separat.
-        Poți revoca consimțământul în orice moment ștergând datele din localStorage
-        (ex.: Developer Tools → Application → Local Storage → florentinapanaofficial.ro →
-        șterge cheia <code>cookie_consent</code>).
+        Poți revoca consimțământul în orice moment apăsând butonul
+        <strong>„Preferințe cookie"</strong> din subsolul oricărei pagini a site-ului —
+        acesta șterge preferința salvată și reafișează bannerul de consimțământ.
       </p>
 
       <!-- ──────────────────────────────── -->
@@ -101,12 +101,12 @@ const lastUpdated = '24 martie 2026';
           <tr>
             <td><code>_ga</code></td>
             <td>Identificator unic de utilizator pentru statistici Google Analytics</td>
-            <td>2 ani</td>
+            <td>2 ani (cookie în browser)</td>
           </tr>
           <tr>
             <td><code>_ga_&lt;ID&gt;</code></td>
             <td>Stare sesiune GA4</td>
-            <td>2 ani</td>
+            <td>2 ani (cookie în browser)</td>
           </tr>
           <tr>
             <td><code>_gid</code></td>
@@ -120,6 +120,12 @@ const lastUpdated = '24 martie 2026';
           </tr>
         </tbody>
       </table>
+      <p class="policy-note">
+        <strong>Notă:</strong> Cookie-urile <code>_ga</code> și <code>_ga_&lt;ID&gt;</code>
+        sunt stocate în browser timp de 2 ani, însă durata de retenție a datelor configurată
+        în contul Google Analytics 4 este de <strong>14 luni</strong> — după acest interval,
+        datele de utilizare sunt șterse de pe serverele Google.
+      </p>
 
       <!-- ──────────────────────────────── -->
       <h2>3. Cookie-uri YouTube</h2>
@@ -222,8 +228,9 @@ const lastUpdated = '24 martie 2026';
           <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener noreferrer">Google Analytics Opt-out Add-on</a>.
         </li>
         <li>
-          <strong>Retragere consimțământ localStorage</strong> — Developer Tools → Application →
-          Local Storage → florentinapanaofficial.ro → șterge cheia <code>cookie_consent</code>.
+          <strong>Retragere consimțământ</strong> — apasă butonul
+          <strong>„Preferințe cookie"</strong> din subsolul oricărei pagini a site-ului;
+          acesta șterge preferința salvată și reafișează bannerul de consimțământ.
         </li>
       </ul>
 
