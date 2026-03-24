@@ -55,6 +55,7 @@ const homepageVideos = (videos || [])
       </span>
 
       {/* Card foto — vizibil doar pe mobil, colțuri rotunjite */}
+      {/* TODO: înlocuiește hero-photo.jpg cu poza reală după ședința foto */}
       <div class="hero-photo-card">
         <img
           src="/images/hero-photo.jpg"
@@ -63,6 +64,7 @@ const homepageVideos = (videos || [])
           loading="eager"
           width="320"
           height="213"
+          onerror="this.style.display='none';this.parentElement.classList.add('hero-photo-card--placeholder')"
         />
       </div>
 
