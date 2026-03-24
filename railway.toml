@@ -3,8 +3,10 @@ builder = "nixpacks"
 buildCommand = "npm run build"
 
 [deploy]
-startCommand = "node ./dist/server/entry.mjs"
+# HOST=0.0.0.0 → acceptă conexiuni externe (nu doar localhost)
+# PORT=$PORT   → Railway injectează portul dinamic; Astro standalone îl citește din env
+startCommand = "HOST=0.0.0.0 PORT=$PORT node ./dist/server/entry.mjs"
 healthcheckPath = "/"
-healthcheckTimeout = 30
+healthcheckTimeout = 60
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
