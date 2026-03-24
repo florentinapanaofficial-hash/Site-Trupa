@@ -49,5 +49,31 @@ export const onRequest = defineMiddleware(async (context, next) => {
         response.headers.set('X-Robots-Tag', 'noindex, nofollow');
     }
 
+    // ── Cache-Control headers (Railway + AWS CloudFront) ──────────────────
+    // /_astro/* → fișiere cu hash content (Astro build) → 1 an, immutable
+    if (pathname.startsWith('/_astro/')) {
+        response.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
+    }
+    // /images/, /fonts/ → fișiere statice → 7 zile + stale-while-revalidate
+    else if (pathname.startsWith('/images/') || pathname.startsWith('/fonts/')) {
+        response.headers.set('Cache-Control', 'public, max-age=604800, stale-while-revalidate=86400');
+    }
+    // robots.txt, sitemap → 1 zi
+    else if (
+        pathname === '/robots.txt' ||
+        pathname === '/sitemap.xml' ||
+        pathname === '/sitemap-index.xml'
+    ) {
+        response.headers.set('Cache-Control', 'public, max-age=86400');
+    }
+    // API → niciodată în cache (date dinamice, GDPR)
+    else if (pathname.startsWith('/api/')) {
+        response.headers.set('Cache-Control', 'no-store');
+    }
+    // Pagini HTML → revalidare la fiecare vizită (SSR cu conținut dinamic)
+    else {
+        response.headers.set('Cache-Control', 'public, max-age=0, must-revalidate');
+    }
+
     return response;
 });
