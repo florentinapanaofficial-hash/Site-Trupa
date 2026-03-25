@@ -495,7 +495,15 @@
       "rol": "Solistă Vocală",
       "specialitate": "Muzică Populară și Ușoară",
       "experienta": "20+ ani experiență",
-      "bio": "Voce cu timbru cald și prezență scenică elegantă, Florentina Pană interpretează muzică populară și ușoară cu emoție autentică. Cu peste 20 de ani de experiență pe scenele din România, coordonează momentele-cheie ale evenimentelor astfel încât invitații să rămână conectați de la început până la final.",
+      "citat": "Muzica nu se cântă — se simte. Fiecare eveniment are sufletul lui, și noi îl purtăm pe scenă.",
+      "bio": "Voce cu timbru cald și prezență scenică elegantă, Florentina Pană interpretează muzică populară și ușoară cu emoție autentică. Cu peste 20 de ani de experiență pe scenele din România, coordonează momentele-cheie ale evenimentelor astfel încât invitații să rămână conectați de la început până la final. A colaborat cu orchestre renumite și a interpretat pe scene din toată țara, aducând de fiecare dată acea combinație unică de profesionalism și căldură umană care transformă un eveniment în amintire.",
+      "taguri": [
+        "Muzică Populară",
+        "Muzică Ușoară",
+        "Nuntă",
+        "Botez",
+        "Corporate"
+      ],
       "categorie": "solisti",
       "imagine": ""
     },
@@ -504,7 +512,14 @@
       "rol": "Solist Vocal",
       "specialitate": "Muzică Populară de Petrecere",
       "experienta": "Experiență vastă",
-      "bio": "Cătălin Matei impresionează prin voce puternică și energie de petrecere autentică. Interpret de muzică populară de petrecere, interacționează natural cu publicul și ridică atmosfera în momentele de dans și tradiție.",
+      "citat": "Când publicul ridică mâinile și dansează, știu că am făcut treabă bună.",
+      "bio": "Cătălin Matei impresionează prin voce puternică și energie de petrecere autentică. Interpret de muzică populară de petrecere, interacționează natural cu publicul și ridică atmosfera în momentele de dans și tradiție. Cu un repertoriu bogat și o prezență scenică dinamică, Cătălin știe să citească sala și să adapteze momentul astfel încât energia să rămână la maximum pe toată durata evenimentului.",
+      "taguri": [
+        "Muzică de Petrecere",
+        "Populară",
+        "Dans",
+        "Tradiție"
+      ],
       "categorie": "solisti",
       "imagine": ""
     },
@@ -513,7 +528,13 @@
       "rol": "Instrumentist",
       "specialitate": "Orgă",
       "experienta": "",
-      "bio": "Claudiu Pană asigură fundația muzicală a formației prin aranjamente complexe la orgă. Experiența sa vastă în muzică populară românească garantează un acompaniament impecabil pentru orice tip de eveniment.",
+      "citat": "Orga este fundația pe care restul formației construiește. Fiecare aranjament este o arhitectură sonoră.",
+      "bio": "Claudiu Pană asigură fundația muzicală a formației prin aranjamente complexe la orgă. Experiența sa vastă în muzică populară românească garantează un acompaniament impecabil pentru orice tip de eveniment. Cunoașterea profundă a repertoriului tradițional și modern îi permite să se adapteze instantaneu la orice solicitare artistică, asigurând coeziunea sonoră a întregii formații.",
+      "taguri": [
+        "Orgă",
+        "Acompaniament",
+        "Aranjamente Muzicale"
+      ],
       "categorie": "instrumentisti",
       "imagine": ""
     },
@@ -522,7 +543,14 @@
       "rol": "Instrumentist",
       "specialitate": "Vioară",
       "experienta": "",
-      "bio": "Marian Oprea aduce profunzime și emoție prin interpretarea la vioară. Intervențiile sale melodice expresive sunt potrivite pentru intrări speciale, dansul mirilor și momente cu impact artistic.",
+      "citat": "Vioara vorbește acolo unde cuvintele nu ajung. Îi dau publicului ceea ce nu pot descrie.",
+      "bio": "Marian Oprea aduce profunzime și emoție prin interpretarea la vioară. Intervențiile sale melodice expresive sunt potrivite pentru intrări speciale, dansul mirilor și momente cu impact artistic. Tehnica sa desăvârșită și sensibilitatea muzicală transformă fiecare intervenție solo într-un moment de neuitat, ridicând nivelul emoțional al oricărui eveniment.",
+      "taguri": [
+        "Vioară",
+        "Dansul Mirilor",
+        "Momente Speciale",
+        "Solo"
+      ],
       "categorie": "instrumentisti",
       "imagine": ""
     },
@@ -531,7 +559,13 @@
       "rol": "Instrumentist",
       "specialitate": "Acordeon",
       "experienta": "",
-      "bio": "Cristian Ograbek completează sunetul formației cu acordeonul, instrument emblematic al muzicii populare românești. Tehnica sa rafinată adaugă căldură și autenticitate fiecărui moment muzical.",
+      "citat": "Acordeonul are suflet. Îl simți în piept, nu doar în urechi.",
+      "bio": "Cristian Ograbek completează sunetul formației cu acordeonul, instrument emblematic al muzicii populare românești. Tehnica sa rafinată adaugă căldură și autenticitate fiecărui moment muzical. Prezent pe zeci de scene din județul Argeș și din toată România, Cristian aduce cu fiecare apariție acea savoare specifică muzicii tradiționale care conectează generații diferite în aceeași bucurie a petrecerii.",
+      "taguri": [
+        "Acordeon",
+        "Muzică Tradițională",
+        "Autenticitate"
+      ],
       "categorie": "instrumentisti",
       "imagine": ""
     }
