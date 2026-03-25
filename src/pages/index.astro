@@ -840,6 +840,9 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
   /* Conținut story-card: umple înălțimea cardului → centrare verticală garantată */
   .hp-card--story .hp-card-content {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
   /* Card 2 — Rezervă acum */
