@@ -3,144 +3,202 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import siteContent from '../data/siteContent.json';
 import BackButton from '../components/BackButton.astro';
 
-const { brand, team } = siteContent;
-const vocalists = (team as any)?.vocalists ?? [];
-const instrumentalists = (team as any)?.instrumentalists ?? [];
-const collaborators = (team as any)?.collaborators ?? [];
+const { brand, membri } = siteContent as any;
+const allMembri: any[] = membri ?? [];
+const solisti      = allMembri.filter((m) => m.categorie === 'solisti');
+const instrumentisti = allMembri.filter((m) => m.categorie === 'instrumentisti');
+
+function initiale(name: string): string {
+  return name.split(' ').filter(Boolean).map((w) => w[0]).join('').slice(0, 2).toUpperCase();
+}
 ---
 
 <BaseLayout
-  title={`Membrii formației | ${brand.name}`}
-  description={`Cunoaște echipa Formației Florentina Pană — vocaliști, instrumentiști și colaboratori invitați.`}
+  title="Membrii Formației Florentina Pană | Muzicieni Profesioniști Pitești"
+  description="Cunoaște echipa formației Florentina Pană — soliști vocali și instrumentiști cu experiență de peste 20 ani pe scenele din România. Disponibili pentru nunți, botezuri și evenimente corporate."
 >
-  <section class="mb-section section-container py-16">
-    <div class="mb-8"><BackButton href="/" label="Acasă" /></div>
+  <section class="mb-page">
+    <div class="mb-back"><BackButton href="/" label="Acasă" /></div>
 
-    <div class="mb-header">
+    <header class="mb-header">
       <span class="mb-kicker">Echipa noastră</span>
       <h1 class="mb-title">Membrii Formației</h1>
       <p class="mb-lead">Muzicieni profesioniști cu experiență pe sute de scene din România</p>
+    </header>
+
+    {/* ── SOLIȘTI VOCALI ── */}
+    <div class="mb-section-block">
+      <div class="mb-divider">
+        <span class="mb-divider-label">Soliști Vocali</span>
+      </div>
+      <div class="mb-list">
+        {solisti.map((m: any, i: number) => (
+          <div class="mb-member-block">
+            <article class="mb-card">
+              <div class="mb-photo-col">
+                {m.imagine && m.imagine.trim() !== '' ? (
+                  <img
+                    src={m.imagine}
+                    alt={`${m.nume} - ${m.rol} - Formația Florentina Pană`}
+                    class="mb-photo-img"
+                    loading="lazy"
+                    decoding="async"
+                    width="360"
+                    height="480"
+                  />
+                ) : (
+                  <div class="mb-photo-placeholder" aria-hidden="true">
+                    <span class="mb-initials">{initiale(m.nume)}</span>
+                  </div>
+                )}
+              </div>
+              <div class="mb-info-col">
+                <h2 class="mb-name">{m.nume}</h2>
+                <div class="mb-badges">
+                  <span class="mb-badge mb-badge--rol">{m.rol}</span>
+                  <span class="mb-badge mb-badge--spec">{m.specialitate}</span>
+                </div>
+                {m.experienta && m.experienta.trim() !== '' && (
+                  <p class="mb-exp">⭐ {m.experienta}</p>
+                )}
+                <div class="mb-gallery" aria-label={`Galerie foto ${m.nume}`}>
+                  <div class="mb-gallery-ph" aria-hidden="true"><span>📷</span><small>Foto în curând</small></div>
+                  <div class="mb-gallery-ph" aria-hidden="true"><span>📷</span><small>Foto în curând</small></div>
+                  <div class="mb-gallery-ph" aria-hidden="true"><span>📷</span><small>Foto în curând</small></div>
+                </div>
+              </div>
+            </article>
+            <button
+              class="mb-bio-ribbon"
+              type="button"
+              aria-expanded="false"
+              aria-controls={`bio-s${i}`}
+            >
+              <span class="mb-bio-icon" aria-hidden="true">📖</span>
+              <span>BIOGRAFIE — Află mai multe</span>
+              <span class="mb-bio-arrow" aria-hidden="true">▾</span>
+            </button>
+            <div class="mb-bio-panel" id={`bio-s${i}`} aria-hidden="true">
+              <p class="mb-bio-text">{m.bio}</p>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
 
-    {/* ── Vocaliști ── */}
-    {vocalists.length > 0 && (
-      <div class="mb-group">
-        <h2 class="mb-group-title">Vocaliști</h2>
-        <div class="mb-grid">
-          {vocalists.map((member: any) => (
-            <div class="mb-card">
-              <div class="mb-photo-wrap">
-                {member.image && member.image.trim() !== '' ? (
+    {/* ── INSTRUMENTIȘTI ── */}
+    <div class="mb-section-block">
+      <div class="mb-divider">
+        <span class="mb-divider-label">Instrumentiști</span>
+      </div>
+      <div class="mb-list">
+        {instrumentisti.map((m: any, i: number) => (
+          <div class="mb-member-block">
+            <article class="mb-card">
+              <div class="mb-photo-col">
+                {m.imagine && m.imagine.trim() !== '' ? (
                   <img
-                    src={member.image}
-                    alt={member.name}
-                    class="mb-photo"
+                    src={m.imagine}
+                    alt={`${m.nume} - ${m.rol} - ${m.specialitate} - Formația Florentina Pană`}
+                    class="mb-photo-img"
                     loading="lazy"
                     decoding="async"
-                    width="400"
-                    height="400"
+                    width="360"
+                    height="480"
                   />
                 ) : (
-                  <div class="mb-photo mb-photo--placeholder" aria-hidden="true">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                  <div class="mb-photo-placeholder" aria-hidden="true">
+                    <span class="mb-initials">{initiale(m.nume)}</span>
                   </div>
                 )}
               </div>
-              <div class="mb-info">
-                <span class="mb-name">{member.name}</span>
-                <span class="mb-role">{member.role}</span>
-                {member.description && (
-                  <p class="mb-desc">{member.description}</p>
-                )}
+              <div class="mb-info-col">
+                <h2 class="mb-name">{m.nume}</h2>
+                <div class="mb-badges">
+                  <span class="mb-badge mb-badge--rol">{m.rol}</span>
+                  <span class="mb-badge mb-badge--spec">{m.specialitate}</span>
+                </div>
+                <div class="mb-gallery" aria-label={`Galerie foto ${m.nume}`}>
+                  <div class="mb-gallery-ph" aria-hidden="true"><span>📷</span><small>Foto în curând</small></div>
+                  <div class="mb-gallery-ph" aria-hidden="true"><span>📷</span><small>Foto în curând</small></div>
+                  <div class="mb-gallery-ph" aria-hidden="true"><span>📷</span><small>Foto în curând</small></div>
+                </div>
               </div>
+            </article>
+            <button
+              class="mb-bio-ribbon"
+              type="button"
+              aria-expanded="false"
+              aria-controls={`bio-in${i}`}
+            >
+              <span class="mb-bio-icon" aria-hidden="true">📖</span>
+              <span>BIOGRAFIE — Află mai multe</span>
+              <span class="mb-bio-arrow" aria-hidden="true">▾</span>
+            </button>
+            <div class="mb-bio-panel" id={`bio-in${i}`} aria-hidden="true">
+              <p class="mb-bio-text">{m.bio}</p>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
-    )}
+    </div>
 
-    {/* ── Instrumentiști ── */}
-    {instrumentalists.length > 0 && (
-      <div class="mb-group">
-        <h2 class="mb-group-title">Instrumentiști</h2>
-        <div class="mb-grid">
-          {instrumentalists.map((member: any) => (
-            <div class="mb-card">
-              <div class="mb-photo-wrap">
-                {member.image && member.image.trim() !== '' ? (
-                  <img
-                    src={member.image}
-                    alt={member.name}
-                    class="mb-photo"
-                    loading="lazy"
-                    decoding="async"
-                    width="400"
-                    height="400"
-                  />
-                ) : (
-                  <div class="mb-photo mb-photo--placeholder" aria-hidden="true">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-                  </div>
-                )}
-              </div>
-              <div class="mb-info">
-                <span class="mb-name">{member.name}</span>
-                <span class="mb-role">{member.role}</span>
-                {member.description && (
-                  <p class="mb-desc">{member.description}</p>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
+    {/* ── COLABORATORI ── */}
+    <div class="mb-section-block">
+      <div class="mb-divider">
+        <span class="mb-divider-label">Colaboratori</span>
       </div>
-    )}
-
-    {/* ── Colaboratori ── */}
-    {collaborators.length > 0 && (
-      <div class="mb-group">
-        <h2 class="mb-group-title">Colaboratori invitați</h2>
-        <div class="mb-grid mb-grid--collab">
-          {collaborators.map((member: any) => (
-            <div class="mb-card">
-              <div class="mb-photo-wrap">
-                {member.image && member.image.trim() !== '' ? (
-                  <img
-                    src={member.image}
-                    alt={member.name}
-                    class="mb-photo"
-                    loading="lazy"
-                    decoding="async"
-                    width="400"
-                    height="400"
-                  />
-                ) : (
-                  <div class="mb-photo mb-photo--placeholder" aria-hidden="true">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-                  </div>
-                )}
-              </div>
-              <div class="mb-info">
-                <span class="mb-name">{member.name}</span>
-                <span class="mb-role">{member.role}</span>
-                {member.description && (
-                  <p class="mb-desc">{member.description}</p>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
+      <div class="mb-collab-soon">
+        <span class="mb-collab-icon" aria-hidden="true">🎵</span>
+        <p class="mb-collab-text">Colaboratori speciali — <strong>În curând...</strong></p>
+        <p class="mb-collab-sub">Saxofonist, Trompetist și alți colaboratori de excepție</p>
       </div>
-    )}
+    </div>
 
   </section>
 </BaseLayout>
 
+<script>
+  document.querySelectorAll<HTMLElement>('.mb-member-block').forEach((block) => {
+    const ribbon = block.querySelector<HTMLButtonElement>('.mb-bio-ribbon');
+    const panel  = block.querySelector<HTMLElement>('.mb-bio-panel');
+    if (!ribbon || !panel) return;
+
+    let clickOpen = false;
+
+    const setOpen = (open: boolean) => {
+      block.classList.toggle('is-open', open);
+      ribbon.setAttribute('aria-expanded', String(open));
+      panel.setAttribute('aria-hidden', String(!open));
+    };
+
+    // Click: toggle pe orice dispozitiv
+    ribbon.addEventListener('click', () => {
+      clickOpen = !clickOpen;
+      setOpen(clickOpen);
+    });
+
+    // Hover: doar pe dispozitive cu pointer precis (desktop)
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      block.addEventListener('mouseenter', () => setOpen(true));
+      block.addEventListener('mouseleave', () => {
+        if (!clickOpen) setOpen(false);
+      });
+    }
+  });
+</script>
+
 <style>
-  .mb-section {
-    max-width: 72rem;
+  /* ── Page container ── */
+  .mb-page {
+    padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 3vw, 2.5rem) clamp(2rem, 5vw, 4rem);
+    max-width: 900px;
+    margin-inline: auto;
   }
 
+  .mb-back { margin-bottom: 1.5rem; }
+
+  /* ── Header ── */
   .mb-header {
     text-align: center;
     margin-bottom: clamp(2.5rem, 5vw, 4rem);
@@ -151,10 +209,10 @@ const collaborators = (team as any)?.collaborators ?? [];
     font-family: 'Oswald', sans-serif;
     font-size: 0.63rem;
     font-weight: 700;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: rgba(241, 229, 172, 0.52);
-    margin-bottom: 0.6rem;
+    color: rgba(241, 229, 172, 0.55);
+    margin-bottom: 0.55rem;
   }
 
   .mb-title {
@@ -175,119 +233,311 @@ const collaborators = (team as any)?.collaborators ?? [];
     line-height: 1.6;
   }
 
-  .mb-group {
-    margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  /* ── Section blocks ── */
+  .mb-section-block { margin-bottom: clamp(3rem, 6vw, 5rem); }
+
+  /* ── Divider / section title ── */
+  .mb-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
   }
 
-  .mb-group-title {
+  .mb-divider::before,
+  .mb-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(0, 200, 255, 0.20);
+  }
+
+  .mb-divider-label {
     font-family: 'Oswald', sans-serif;
-    font-size: 1rem;
+    font-size: 0.75rem;
     font-weight: 700;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: rgba(241, 229, 172, 0.60);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    padding-bottom: 0.65rem;
-    margin-bottom: 1.5rem;
+    color: rgba(0, 200, 255, 0.72);
+    white-space: nowrap;
   }
 
-  .mb-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 1.5rem;
-  }
-
-  .mb-grid--collab {
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  }
-
-  .mb-card {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.10);
-    border-radius: 1.25rem;
-    overflow: hidden;
+  /* ── Member list — vertical stack ── */
+  .mb-list {
     display: flex;
     flex-direction: column;
-    transition: border-color 250ms ease, box-shadow 250ms ease, transform 250ms ease;
+    gap: 2rem;
   }
 
-  .mb-card:hover {
-    border-color: rgba(160, 90, 255, 0.40);
-    box-shadow: 0 12px 36px rgba(100, 40, 200, 0.20);
-    transform: translateY(-3px);
+  /* ── Member block (card + ribbon + bio panel) ── */
+  .mb-member-block {
+    border-radius: 1.25rem;
   }
 
-  .mb-photo-wrap {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    overflow: hidden;
+  /* ── Card — 2 coloane desktop ── */
+  .mb-card {
+    display: grid;
+    grid-template-columns: 40% 60%;
     background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-bottom: none;
+    border-radius: 1.25rem 1.25rem 0 0;
+    overflow: hidden;
+    transition:
+      transform 300ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 300ms ease,
+      border-color 300ms ease;
   }
 
-  .mb-photo {
+  .mb-member-block:hover .mb-card,
+  .mb-member-block.is-open .mb-card {
+    transform: translateY(-4px);
+    border-color: rgba(0, 200, 255, 0.40);
+    box-shadow:
+      0 0 0 1px rgba(0, 200, 255, 0.22),
+      0 0 28px rgba(0, 200, 255, 0.14),
+      0 12px 40px rgba(0, 80, 160, 0.28);
+  }
+
+  /* ── Photo column ── */
+  .mb-photo-col {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(160deg, #0f2545 0%, #142f5a 60%, #0a1a35 100%);
+    min-height: 280px;
+  }
+
+  .mb-photo-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center top;
     display: block;
-    transition: transform 350ms ease;
+    transition: transform 400ms ease;
   }
 
-  .mb-card:hover .mb-photo {
-    transform: scale(1.05);
+  .mb-member-block:hover .mb-photo-img {
+    transform: scale(1.06);
   }
 
-  .mb-photo--placeholder {
+  .mb-photo-placeholder {
     width: 100%;
     height: 100%;
+    min-height: 280px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: rgba(255, 255, 255, 0.18);
+    background: linear-gradient(135deg, #0f2545 0%, #1d3f78 45%, #0f2545 100%);
   }
 
-  .mb-info {
-    padding: 1.2rem 1.35rem 1.4rem;
+  .mb-initials {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    background: linear-gradient(135deg, #e8c85b 0%, #ffeaa0 50%, #e8c85b 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: brightness(1.2);
+  }
+
+  /* ── Info column ── */
+  .mb-info-col {
+    padding: 1.5rem 1.5rem 1.25rem 1.25rem;
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
-    flex: 1;
+    gap: 0.75rem;
   }
 
   .mb-name {
     font-family: 'Oswald', sans-serif;
-    font-size: 1.1rem;
+    font-size: clamp(1.3rem, 2.5vw, 1.75rem);
     font-weight: 700;
     letter-spacing: 0.03em;
     color: #fff;
-    line-height: 1.2;
-  }
-
-  .mb-role {
-    font-size: 0.68rem;
-    font-weight: 600;
-    letter-spacing: 0.10em;
-    text-transform: uppercase;
-    color: rgba(241, 229, 172, 0.55);
-    margin-bottom: 0.35rem;
-  }
-
-  .mb-desc {
-    font-size: 0.86rem;
-    color: rgba(200, 215, 240, 0.65);
-    line-height: 1.6;
+    line-height: 1.15;
     margin: 0;
   }
 
-  @media (max-width: 640px) {
-    .mb-grid {
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-    }
+  .mb-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
   }
 
-  @media (max-width: 400px) {
-    .mb-grid {
+  .mb-badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    padding: 0.25em 0.75em;
+    border-radius: 9999px;
+    line-height: 1.4;
+  }
+
+  .mb-badge--rol {
+    background: rgba(0, 200, 255, 0.12);
+    color: rgba(0, 220, 255, 0.90);
+    border: 1px solid rgba(0, 200, 255, 0.28);
+  }
+
+  .mb-badge--spec {
+    background: rgba(232, 200, 91, 0.10);
+    color: rgba(241, 229, 172, 0.85);
+    border: 1px solid rgba(241, 229, 172, 0.18);
+  }
+
+  .mb-exp {
+    font-size: 0.78rem;
+    color: rgba(200, 215, 240, 0.62);
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  /* ── Mini gallery (3 placeholders 16/9) ── */
+  .mb-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.4rem;
+    margin-top: auto;
+  }
+
+  .mb-gallery-ph {
+    aspect-ratio: 16 / 9;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 0.45rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.18rem;
+    color: rgba(255, 255, 255, 0.22);
+  }
+
+  .mb-gallery-ph span { font-size: 0.85rem; line-height: 1; }
+  .mb-gallery-ph small {
+    font-size: 0.48rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  /* ── Bio ribbon ── */
+  .mb-bio-ribbon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    width: 100%;
+    padding: 0.6rem 1.25rem;
+    background: rgba(0, 200, 255, 0.05);
+    border: 1px solid rgba(0, 200, 255, 0.15);
+    border-top: none;
+    border-radius: 0;
+    color: rgba(0, 200, 255, 0.75);
+    font-size: 0.63rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 250ms ease, color 250ms ease;
+  }
+
+  .mb-bio-ribbon:hover,
+  .mb-member-block:hover .mb-bio-ribbon {
+    background: rgba(0, 200, 255, 0.10);
+    color: rgba(0, 230, 255, 1);
+  }
+
+  .mb-bio-arrow {
+    display: inline-block;
+    transition: transform 0.35s ease;
+    font-style: normal;
+  }
+
+  .mb-member-block.is-open .mb-bio-arrow {
+    transform: rotate(180deg);
+  }
+
+  /* ── Bio panel ── */
+  .mb-bio-panel {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    background: rgba(0, 8, 28, 0.60);
+    border: 1px solid rgba(0, 200, 255, 0.15);
+    border-top: none;
+    border-radius: 0 0 1.25rem 1.25rem;
+    padding: 0 1.5rem;
+    transition:
+      max-height 0.4s ease,
+      opacity 0.3s ease,
+      padding 0.3s ease;
+  }
+
+  .mb-member-block.is-open .mb-bio-panel {
+    max-height: 400px;
+    opacity: 1;
+    padding: 1.25rem 1.5rem 1.5rem;
+  }
+
+  .mb-bio-text {
+    font-size: 0.91rem;
+    line-height: 1.74;
+    color: rgba(210, 225, 245, 0.85);
+    margin: 0;
+  }
+
+  /* ── Colaboratori — în curând ── */
+  .mb-collab-soon {
+    text-align: center;
+    padding: 3rem 2rem;
+    border: 1px dashed rgba(0, 200, 255, 0.18);
+    border-radius: 1.25rem;
+    background: rgba(0, 200, 255, 0.025);
+  }
+
+  .mb-collab-icon {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 0.75rem;
+  }
+
+  .mb-collab-text {
+    font-size: 1rem;
+    color: rgba(200, 215, 240, 0.75);
+    margin: 0 0 0.35rem;
+  }
+
+  .mb-collab-text strong { color: rgba(241, 229, 172, 0.85); }
+
+  .mb-collab-sub {
+    font-size: 0.80rem;
+    color: rgba(200, 215, 240, 0.42);
+    margin: 0;
+  }
+
+  /* ── Mobile ── */
+  @media (max-width: 640px) {
+    .mb-card {
       grid-template-columns: 1fr;
+    }
+
+    .mb-photo-col {
+      aspect-ratio: 4 / 3;
+      min-height: unset;
+    }
+
+    .mb-photo-placeholder {
+      min-height: unset;
+    }
+
+    .mb-info-col {
+      padding: 1.25rem;
     }
   }
 </style>
