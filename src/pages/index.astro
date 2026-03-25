@@ -736,31 +736,27 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     max-width: none !important;
     margin: 0 !important;
     border-radius: 0 !important;
-    min-height: calc(100vh - 10rem) !important; /* 10rem = pt-40 pe main */
-    /* Padding simetric — lasă justify-content: center să centreze corect */
-    padding-top: clamp(2rem, 4vw, 3rem) !important;
-    padding-bottom: clamp(2rem, 4vw, 3rem) !important;
+    /* min-height bazat pe conținut, nu 100vh — evită spațiul gol de jos */
+    min-height: auto !important;
+    padding-top: clamp(3rem, 6vw, 5rem) !important;
+    /* padding-bottom generós — creează spațiu pentru fade și tranziție spre carduri */
+    padding-bottom: clamp(5rem, 10vw, 8rem) !important;
     position: relative;
     overflow: hidden;
   }
 
-  @media (min-width: 640px) {
-    .hero-fullscreen {
-      min-height: calc(100vh - 11rem) !important; /* sm:pt-44 = 11rem */
-    }
-  }
-
-  /* Gradient fade la baza hero-ului — tranziție spre fundalul paginii */
+  /* Gradient fade la baza hero-ului — tranziție complet fluidă */
   .hero-fade-bottom {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    height: 10rem;
+    height: 14rem;
     background: linear-gradient(to bottom,
       transparent 0%,
-      rgba(12, 8, 15, 0.40) 30%,
-      rgba(12, 8, 15, 0.80) 65%,
+      rgba(12, 8, 15, 0.25) 20%,
+      rgba(12, 8, 15, 0.60) 50%,
+      rgba(12, 8, 15, 0.90) 75%,
       #0C080F 100%
     );
     pointer-events: none;
@@ -775,9 +771,15 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     /* Side-by-side implicit — stivuit doar pe ecrane foarte mici */
     grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
-    padding: 1rem clamp(0.75rem, 3vw, 1.5rem) clamp(2.5rem, 6vw, 4rem);
+    /* margin-top negativ: cardurile urcă sub fade-ul hero-ului */
+    margin-top: -3rem;
+    padding: 0 clamp(0.75rem, 3vw, 1.5rem) clamp(2.5rem, 6vw, 4rem);
     max-width: 72rem;
     margin-inline: auto;
+    /* Suprascriem margin-inline auto cu un shorthand explicit */
+    margin: -3rem auto clamp(2.5rem, 6vw, 4rem);
+    position: relative;
+    z-index: 4;
   }
 
   @media (max-width: 540px) {
@@ -819,16 +821,16 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
   /* Card 1 — Povestea noastră */
   .hp-card--story {
     background:
-      radial-gradient(ellipse 70% 60% at 15% 80%, rgba(120, 50, 200, 0.30) 0%, transparent 65%),
-      radial-gradient(ellipse 50% 40% at 85% 20%, rgba(60, 20, 130, 0.24) 0%, transparent 60%),
-      linear-gradient(150deg, #0a0816 0%, #16102a 40%, #0a0818 100%);
-    border: 1px solid rgba(160, 90, 255, 0.22);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+      radial-gradient(ellipse at 70% 30%, #3d1a6e 0%, #1a0a3d 55%, #0a0520 100%);
+    border: 1px solid rgba(160, 90, 255, 0.30);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45),
+                inset 0 1px 0 rgba(200, 140, 255, 0.12);
   }
 
   .hp-card--story:hover {
-    border-color: rgba(160, 90, 255, 0.50);
-    box-shadow: 0 20px 52px rgba(120, 50, 200, 0.22), 0 4px 16px rgba(0, 0, 0, 0.4);
+    border-color: rgba(180, 110, 255, 0.60);
+    box-shadow: 0 20px 56px rgba(100, 40, 200, 0.35), 0 4px 16px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(200, 140, 255, 0.20);
   }
 
   /* Card 2 — Rezervă acum */
@@ -864,9 +866,9 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     z-index: 3;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
-    gap: 0.5rem;
-    padding: 1.75rem 1.85rem;
+    justify-content: center;
+    gap: 0.55rem;
+    padding: 2.25rem 2rem;
     width: 100%;
   }
 
