@@ -738,8 +738,8 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     border-radius: 0 !important;
     /* min-height bazat pe conținut, nu 100vh — evită spațiul gol de jos */
     min-height: auto !important;
-    /* padding-top >= 4.5rem → badge vizibil sub header fix (~4rem înălțime) */
-    padding-top: clamp(4.5rem, 7vw, 6rem) !important;
+    /* padding-top >= 5rem → text "Formația" + badge vizibil sub header fix (~4rem înălțime) */
+    padding-top: clamp(5rem, 7vw, 6.5rem) !important;
     /* padding-bottom EGAL cu overlap-ul highlights (-5rem) → nicio bandă expusă */
     padding-bottom: 5rem !important;
     position: relative;
@@ -774,8 +774,8 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     gap: 1.5rem;
     /* margin-top negativ: cardurile urcă sub fade-ul hero-ului */
     margin-top: -5rem;
-    padding: 0 clamp(0.75rem, 3vw, 1.5rem) clamp(2.5rem, 6vw, 4rem);
-    max-width: 72rem;
+    padding: 2rem;
+    max-width: 900px;
     margin-inline: auto;
     /* Suprascriem margin-inline auto cu un shorthand explicit */
     margin: -5rem auto clamp(2.5rem, 6vw, 4rem);
@@ -821,9 +821,10 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
 
   /* Card 1 — Povestea noastră */
   .hp-card--story {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    min-height: 280px;
     background:
       radial-gradient(ellipse at 70% 30%, #3d1a6e 0%, #1a0a3d 55%, #0a0520 100%);
     border: 1px solid rgba(160, 90, 255, 0.30);
