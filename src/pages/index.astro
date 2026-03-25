@@ -178,7 +178,9 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
       </div>
     </a>
 
-    <a href="/contact" class="hp-card hp-card--book">
+    <div class="hp-card hp-card--book">
+      {/* Stretched link acoperă tot cardul — navigare spre /contact */}
+      <a href="/contact" class="hp-card-link" aria-label="Rezervă acum — pagina de contact"></a>
       <div class="hp-card-overlay" aria-hidden="true"></div>
       <div class="hp-card-content">
         <span class="hp-card-kicker">Disponibilitate</span>
@@ -199,7 +201,7 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
         </span>
       </div>
-    </a>
+    </div>
 
   </section>
 
@@ -735,7 +737,9 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     margin: 0 !important;
     border-radius: 0 !important;
     min-height: calc(100vh - 10rem) !important; /* 10rem = pt-40 pe main */
-    padding-bottom: 7rem !important;
+    /* Padding simetric — lasă justify-content: center să centreze corect */
+    padding-top: clamp(2rem, 4vw, 3rem) !important;
+    padding-bottom: clamp(2rem, 4vw, 3rem) !important;
     position: relative;
     overflow: hidden;
   }
@@ -746,17 +750,18 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     }
   }
 
-  /* Gradient fade la baza hero-ului */
+  /* Gradient fade la baza hero-ului — tranziție spre fundalul paginii */
   .hero-fade-bottom {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    height: 9rem;
+    height: 10rem;
     background: linear-gradient(to bottom,
       transparent 0%,
-      rgba(12, 8, 15, 0.55) 45%,
-      var(--bg-deep, #0C080F) 100%
+      rgba(12, 8, 15, 0.40) 30%,
+      rgba(12, 8, 15, 0.80) 65%,
+      #0C080F 100%
     );
     pointer-events: none;
     z-index: 3;
@@ -767,23 +772,32 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
   ════════════════════════════════════════════════════════════════ */
   .hp-highlights {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.1rem;
+    /* Side-by-side implicit — stivuit doar pe ecrane foarte mici */
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
     padding: 1rem clamp(0.75rem, 3vw, 1.5rem) clamp(2.5rem, 6vw, 4rem);
     max-width: 72rem;
     margin-inline: auto;
   }
 
-  @media (min-width: 768px) {
+  @media (max-width: 540px) {
     .hp-highlights {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1.25rem;
+      grid-template-columns: 1fr;
+      gap: 1rem;
     }
+  }
+
+  /* Stretched link — acoperă întreg cardul, navigare la URL-ul cardului */
+  .hp-card-link {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border-radius: inherit;
   }
 
   .hp-card {
     position: relative;
-    min-height: 280px;
+    min-height: 300px;
     border-radius: 1.5rem;
     overflow: hidden;
     display: flex;
@@ -795,7 +809,7 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
   }
 
   @media (min-width: 1024px) {
-    .hp-card { min-height: 320px; }
+    .hp-card { min-height: 340px; }
   }
 
   .hp-card:hover {
@@ -846,7 +860,8 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
 
   .hp-card-content {
     position: relative;
-    z-index: 2;
+    /* z-index: 3 — deasupra hp-card-link (z:2) și hp-card-overlay (z:1) */
+    z-index: 3;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
@@ -901,6 +916,9 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     text-decoration: none;
     width: fit-content;
     margin-top: 0.2rem;
+    /* z-index: 4 — clickabil deasupra stretched link-ului (z:2) */
+    position: relative;
+    z-index: 4;
     transition: background 180ms ease, border-color 180ms ease, color 180ms ease;
   }
 
