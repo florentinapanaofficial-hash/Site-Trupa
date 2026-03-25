@@ -310,12 +310,12 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
         #0a1628 100%);
   }
 
-  /* Overlay întunecat — contrast text pe fundalul hero-card */
+  /* Overlay întunecat redus — doar umbră subtilă pentru adâncime */
   .hero-stage::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.35);
+    background: rgba(0, 0, 0, 0.10);
     pointer-events: none;
     z-index: 1;
     border-radius: inherit;
@@ -391,22 +391,21 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     position: relative;
     background: linear-gradient(
       135deg,
-      #c8a84b 0%,
-      #f5d98b 30%,
-      #fff8dc 50%,
-      #f5d98b 70%,
-      #c8a84b 100%
+      #e8c85b 0%,
+      #ffeaa0 30%,
+      #ffffff 50%,
+      #ffeaa0 70%,
+      #e8c85b 100%
     );
     background-size: 200% auto;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     filter:
-      drop-shadow(0 0 8px rgba(245, 200, 80, 0.70))
-      drop-shadow(0 0 20px rgba(200, 150, 40, 0.45))
-      drop-shadow(0 2px 0 rgba(0,0,0,0.95))
-      drop-shadow(0 4px 0 rgba(0,0,0,0.85))
-      drop-shadow(0 5px 12px rgba(0,0,0,0.80));
+      drop-shadow(0 0 12px rgba(255, 220, 100, 0.80))
+      drop-shadow(0 0 30px rgba(255, 200, 50, 0.50))
+      drop-shadow(0 2px 0 rgba(0,0,0,0.80))
+      drop-shadow(0 4px 8px rgba(0,0,0,0.60));
     animation: shimmer 3s linear infinite;
   }
 
@@ -502,7 +501,8 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     margin: 0;
     font-size: clamp(0.78rem, 1.5vw, 0.9rem);
     line-height: 1.6;
-    color: rgba(255, 255, 255, 0.92);
+    color: #ffffff;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.60);
     text-align: center;
   }
 
@@ -537,7 +537,7 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.80);
+    color: rgba(255, 255, 255, 0.85);
     margin-top: 0.12rem;
   }
 
