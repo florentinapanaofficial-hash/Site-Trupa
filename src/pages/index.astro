@@ -2,10 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import siteContent from '../data/siteContent.json';
 
-const { seo, contact, faq, team } = siteContent;
-const vocalists = (team as any)?.vocalists ?? [];
-const instrumentalists = (team as any)?.instrumentalists ?? [];
-const allMembers = [...vocalists, ...instrumentalists];
+const { seo, contact, faq } = siteContent;
 import { sanitizeUrl } from '../lib/sanitize-url';
 
 const socialLinks = {
@@ -206,49 +203,6 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
       </div>
     </div>
 
-  </section>
-
-  {/* ═══════════════════════════════════════════
-      MEMBRI — Echipa formației
-  ═══════════════════════════════════════════ */}
-  <section id="membri" class="hp-team" aria-label="Membrii formației">
-    <div class="hp-team-inner">
-      <div class="hp-team-header">
-        <span class="hp-team-kicker">Echipa noastră</span>
-        <h2 class="hp-team-title">Membrii Formației</h2>
-        <p class="hp-team-lead">Muzicieni profesioniști cu experiență pe sute de scene din România</p>
-      </div>
-      <div class="hp-team-grid">
-        {allMembers.map((member: any) => (
-          <div class="hp-member-card">
-            <div class="hp-member-photo-wrap">
-              {member.image && member.image.trim() !== '' ? (
-                <img
-                  src={member.image}
-                  alt={member.name}
-                  class="hp-member-photo"
-                  loading="lazy"
-                  decoding="async"
-                  width="200"
-                  height="200"
-                />
-              ) : (
-                <div class="hp-member-photo hp-member-photo--placeholder" aria-hidden="true">
-                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-                </div>
-              )}
-            </div>
-            <div class="hp-member-info">
-              <span class="hp-member-name">{member.name}</span>
-              <span class="hp-member-role">{member.role}</span>
-              {member.description && (
-                <p class="hp-member-desc">{member.description}</p>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
   </section>
 
 </BaseLayout>
@@ -1019,138 +973,6 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
   .hp-card--book:hover .hp-card-cta {
     color: var(--teal, #0BBCD6);
     gap: 0.6rem;
-  }
-
-  /* ════════════════════════════════════════════════════════════════
-     SECȚIUNEA MEMBRI
-  ════════════════════════════════════════════════════════════════ */
-  .hp-team {
-    padding: clamp(3rem, 6vw, 5rem) clamp(0.75rem, 3vw, 1.5rem);
-    max-width: 72rem;
-    margin-inline: auto;
-  }
-
-  .hp-team-header {
-    text-align: center;
-    margin-bottom: clamp(2rem, 4vw, 3rem);
-  }
-
-  .hp-team-kicker {
-    display: block;
-    font-family: 'Oswald', sans-serif;
-    font-size: 0.63rem;
-    font-weight: 700;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: rgba(241, 229, 172, 0.52);
-    margin-bottom: 0.5rem;
-  }
-
-  .hp-team-title {
-    font-family: 'Oswald', sans-serif;
-    font-size: clamp(1.8rem, 4vw, 2.8rem);
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    color: #fff;
-    margin: 0 0 0.75rem;
-    line-height: 1.1;
-  }
-
-  .hp-team-lead {
-    font-size: 0.9rem;
-    color: rgba(200, 210, 230, 0.65);
-    margin: 0 auto;
-    max-width: 45ch;
-    line-height: 1.6;
-  }
-
-  .hp-team-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 1.5rem;
-  }
-
-  .hp-member-card {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.10);
-    border-radius: 1.25rem;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    transition: border-color 250ms ease, box-shadow 250ms ease, transform 250ms ease;
-  }
-
-  .hp-member-card:hover {
-    border-color: rgba(160, 90, 255, 0.40);
-    box-shadow: 0 12px 36px rgba(100, 40, 200, 0.20);
-    transform: translateY(-3px);
-  }
-
-  .hp-member-photo-wrap {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    overflow: hidden;
-    background: rgba(255, 255, 255, 0.04);
-  }
-
-  .hp-member-photo {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    transition: transform 350ms ease;
-  }
-
-  .hp-member-card:hover .hp-member-photo {
-    transform: scale(1.05);
-  }
-
-  .hp-member-photo--placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: rgba(255, 255, 255, 0.20);
-  }
-
-  .hp-member-info {
-    padding: 1.1rem 1.25rem 1.25rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    flex: 1;
-  }
-
-  .hp-member-name {
-    font-family: 'Oswald', sans-serif;
-    font-size: 1.05rem;
-    font-weight: 700;
-    letter-spacing: 0.03em;
-    color: #fff;
-    line-height: 1.2;
-  }
-
-  .hp-member-role {
-    font-size: 0.70rem;
-    font-weight: 600;
-    letter-spacing: 0.10em;
-    text-transform: uppercase;
-    color: rgba(241, 229, 172, 0.55);
-    margin-bottom: 0.3rem;
-  }
-
-  .hp-member-desc {
-    font-size: 0.82rem;
-    color: rgba(200, 215, 240, 0.62);
-    line-height: 1.55;
-    margin: 0;
-  }
-
-  @media (max-width: 540px) {
-    .hp-team-grid {
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-    }
-    .hp-member-desc { display: none; }
   }
 
 </style>
