@@ -31,7 +31,7 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
   {/* ═══════════════════════════════════════════
       HERO — Scenă, titlu mare, CTA-uri
   ═══════════════════════════════════════════ */}
-  <section id="acasa" class="hero-stage hero-fullscreen" aria-label="Secțiunea principală">
+  <section id="acasa" class="hero-stage hero-fullscreen hp-hero-wrap" aria-label="Secțiunea principală">
     <div class="astral-orb" aria-hidden="true"></div>
     <div class="hero-stars" aria-hidden="true"></div>
     <div class="hero-stage-inner">
@@ -327,7 +327,7 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     align-items: center;
     gap: 0.5rem;
     position: relative;
-    z-index: 2;
+    z-index: 5;  /* deasupra fade-bottom (z:1), stelelor (z:2) și orbului (z:0) */
   }
 
   /* ════════════════════════════════════════════════════════════════
@@ -686,7 +686,19 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     overflow: hidden;
   }
 
-  /* Gradient fade la baza hero-ului — tranziție complet fluidă */
+  /* ════════════════════════════════════════════════════════════════
+     HP-HERO-WRAP — container vizual simetric cu .hp-highlights
+     Aceeași lățime max 900px, aceleași margini laterale auto,
+     același border-radius 1.5rem. Clasa marcă simetria vizuală
+     dintre hero și secțiunea de highlights.
+  ════════════════════════════════════════════════════════════════ */
+  .hp-hero-wrap {
+    max-width: 900px;        /* identic cu .hp-highlights */
+    margin-inline: auto;     /* centrat orizontal */
+    border-radius: 1.5rem;   /* identic cu .hp-highlights (card rounding) */
+  }
+
+  /* Gradient fade la baza hero-ului — sub conținut, nu deasupra */
   .hero-fade-bottom {
     position: absolute;
     bottom: 0;
@@ -701,7 +713,7 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
       rgba(12, 8, 15, 0) 100%
     );
     pointer-events: none;
-    z-index: 3;
+    z-index: 1;  /* SUB conținutul text (z-index: 5) */
   }
 
   /* ════════════════════════════════════════════════════════════════
