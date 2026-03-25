@@ -351,8 +351,9 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     font-weight: 700;
     letter-spacing: 0.15em;
     text-transform: uppercase;
-    color: rgba(241, 229, 172, 0.60);
-    background: rgba(241, 229, 172, 0.05);
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.35);
   }
 
   /* Titlul principal */
@@ -362,7 +363,7 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     text-align: center;
   }
 
-  /* "FORMAȚIA" — mic, alb perlat, espaciament maxim */
+  /* "FORMAȚIA" — italic, alb clar */
   .hero-kicker-text {
     display: block;
     font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
@@ -371,85 +372,47 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     font-style: italic;
     letter-spacing: 0.18em;
     text-transform: none;
-    background: linear-gradient(
-      105deg,
-      #ffe8b0 0%,
-      #ffffff 30%,
-      #fff5d0 55%,
-      #ffffff 75%,
-      #ffe8b0 100%
-    );
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter:
-      drop-shadow(0 0 5px rgba(255,255,255,0.8))
-      drop-shadow(0 0 14px rgba(255,220,120,0.6))
-      drop-shadow(0 1px 0 rgba(0,0,0,0.9))
-      drop-shadow(0 3px 8px rgba(0,0,0,0.75));
+    color: rgba(255, 255, 255, 0.90);
+    text-shadow:
+      0 0 12px rgba(255, 220, 120, 0.55),
+      0 2px 6px rgba(0, 0, 0, 0.80);
     margin-bottom: 0.05rem;
   }
 
-  /* "Florentina Pană" — Curcubeu strălucitor */
+  /* "Florentina Pană" — Hollywood gold shimmer */
   .hero-title-gold {
     display: block;
     font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
     font-weight: 600;
-    font-size: clamp(2.2rem, 6vw, 4.4rem);
+    font-size: clamp(2.4rem, 6.5vw, 4.8rem);
     letter-spacing: 0.06em;
     text-transform: none;
     line-height: 1.0;
     position: relative;
-    /* Alb dominant cu curcubeu subtil */
     background: linear-gradient(
-      105deg,
-      #ffffff  0%,
-      #ffe0e0  10%,
-      #ffffff  22%,
-      #fff8c0  32%,
-      #ffffff  44%,
-      #d0ffe8  56%,
-      #ffffff  66%,
-      #d0eeff  78%,
-      #ffffff  88%,
-      #f0d0ff  95%,
-      #ffffff  100%
+      135deg,
+      #c8a84b 0%,
+      #f5d98b 30%,
+      #fff8dc 50%,
+      #f5d98b 70%,
+      #c8a84b 100%
     );
     background-size: 200% auto;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     filter:
-      drop-shadow(0 0 6px rgba(255,255,255,0.85))
-      drop-shadow(0 0 12px rgba(200,180,255,0.6))
+      drop-shadow(0 0 8px rgba(245, 200, 80, 0.70))
+      drop-shadow(0 0 20px rgba(200, 150, 40, 0.45))
       drop-shadow(0 2px 0 rgba(0,0,0,0.95))
       drop-shadow(0 4px 0 rgba(0,0,0,0.85))
-      drop-shadow(0 5px 10px rgba(0,0,0,0.85));
-    animation: rainbow-flow 6s ease-in-out infinite;
+      drop-shadow(0 5px 12px rgba(0,0,0,0.80));
+    animation: shimmer 3s linear infinite;
   }
 
-  @keyframes rainbow-flow {
-    0%   {
-      background-position: 0% center;
-      filter: drop-shadow(0 0 5px rgba(255,107,107,.8)) drop-shadow(0 0 10px rgba(255,107,107,.5)) drop-shadow(0 2px 0 rgba(0,0,0,.95)) drop-shadow(0 4px 0 rgba(0,0,0,.85)) drop-shadow(0 5px 10px rgba(0,0,0,.85));
-    }
-    25% {
-      background-position: 50% center;
-      filter: drop-shadow(0 0 5px rgba(255,235,100,.9)) drop-shadow(0 0 10px rgba(255,200,60,.55)) drop-shadow(0 2px 0 rgba(0,0,0,.95)) drop-shadow(0 4px 0 rgba(0,0,0,.85)) drop-shadow(0 5px 10px rgba(0,0,0,.85));
-    }
-    50%  {
-      background-position: 100% center;
-      filter: drop-shadow(0 0 5px rgba(105,219,124,.85)) drop-shadow(0 0 10px rgba(79,195,247,.55)) drop-shadow(0 2px 0 rgba(0,0,0,.95)) drop-shadow(0 4px 0 rgba(0,0,0,.85)) drop-shadow(0 5px 10px rgba(0,0,0,.85));
-    }
-    75% {
-      background-position: 150% center;
-      filter: drop-shadow(0 0 5px rgba(204,93,232,.85)) drop-shadow(0 0 10px rgba(150,80,255,.55)) drop-shadow(0 2px 0 rgba(0,0,0,.95)) drop-shadow(0 4px 0 rgba(0,0,0,.85)) drop-shadow(0 5px 10px rgba(0,0,0,.85));
-    }
-    100% {
-      background-position: 200% center;
-      filter: drop-shadow(0 0 5px rgba(255,107,107,.8)) drop-shadow(0 0 10px rgba(255,107,107,.5)) drop-shadow(0 2px 0 rgba(0,0,0,.95)) drop-shadow(0 4px 0 rgba(0,0,0,.85)) drop-shadow(0 5px 10px rgba(0,0,0,.85));
-    }
+  @keyframes shimmer {
+    0%   { background-position: 0% center; }
+    100% { background-position: 200% center; }
   }
 
   /* ════════════════════════════════════════════════════════════════
@@ -574,7 +537,7 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.75);
+    color: rgba(255, 255, 255, 0.80);
     margin-top: 0.12rem;
   }
 
