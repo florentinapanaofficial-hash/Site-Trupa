@@ -539,7 +539,7 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     margin: 0;
     font-size: clamp(0.78rem, 1.5vw, 0.9rem);
     line-height: 1.6;
-    color: rgba(255, 255, 255, 0.90);
+    color: rgba(255, 255, 255, 0.92);
     text-align: center;
   }
 
@@ -574,7 +574,7 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.70);
+    color: rgba(255, 255, 255, 0.75);
     margin-top: 0.12rem;
   }
 
@@ -720,8 +720,8 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     min-height: auto !important;
     /* padding-top >= 4rem → text "Formația" + badge vizibil sub header fix (~4rem înălțime) */
     padding-top: clamp(4rem, 5vw, 4.5rem) !important;
-    /* padding-bottom EGAL cu overlap-ul highlights (-5rem) → nicio bandă expusă */
-    padding-bottom: 4rem !important;
+    /* padding-bottom redus — fără spațiu gol sub statistici */
+    padding-bottom: 2rem !important;
     position: relative;
     overflow: hidden;
   }
