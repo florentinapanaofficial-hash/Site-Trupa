@@ -509,6 +509,9 @@ body.mobile-menu-open .left-side-menu {
   #continut {
     width: min(100%, 1290px);
     margin-inline: auto;
+    /* Compensare vizuală: sidebar (10.6rem) + gap (0.7rem) = 11.3rem offset stânga.
+       padding-right egal centrează conținutul față de lățimea totală a viewport-ului. */
+    padding-right: calc(10.6rem + 0.7rem);
   }
 
   .left-side-menu {
