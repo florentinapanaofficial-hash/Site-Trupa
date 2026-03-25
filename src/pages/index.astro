@@ -751,7 +751,7 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     bottom: 0;
     left: 0;
     right: 0;
-    height: 14rem;
+    height: 20rem;
     background: linear-gradient(to bottom,
       transparent 0%,
       rgba(12, 8, 15, 0.25) 20%,
@@ -772,12 +772,12 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
     /* margin-top negativ: cardurile urcă sub fade-ul hero-ului */
-    margin-top: -3rem;
+    margin-top: -5rem;
     padding: 0 clamp(0.75rem, 3vw, 1.5rem) clamp(2.5rem, 6vw, 4rem);
     max-width: 72rem;
     margin-inline: auto;
     /* Suprascriem margin-inline auto cu un shorthand explicit */
-    margin: -3rem auto clamp(2.5rem, 6vw, 4rem);
+    margin: -5rem auto clamp(2.5rem, 6vw, 4rem);
     position: relative;
     z-index: 4;
   }
@@ -820,6 +820,10 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
 
   /* Card 1 — Povestea noastră */
   .hp-card--story {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 2.5rem;
     background:
       radial-gradient(ellipse at 70% 30%, #3d1a6e 0%, #1a0a3d 55%, #0a0520 100%);
     border: 1px solid rgba(160, 90, 255, 0.30);
