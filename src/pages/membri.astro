@@ -3,10 +3,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import siteContent from '../data/siteContent.json';
 import BackButton from '../components/BackButton.astro';
 
-const { membri } = siteContent as any;
+const { membri, colaboratori: colaboratoriData } = siteContent as any;
 const allMembri: any[] = membri ?? [];
 const solisti        = allMembri.filter((m: any) => m.categorie === 'solisti');
 const instrumentisti = allMembri.filter((m: any) => m.categorie === 'instrumentisti');
+const colaboratori: any[] = colaboratoriData ?? [];
 
 function initiale(name: string): string {
   return name.split(' ').filter(Boolean).map((w) => w[0]).join('').slice(0, 2).toUpperCase();
@@ -208,11 +209,88 @@ function initiale(name: string): string {
       <h2 class="mem-sec-title" id="sec-colab">Colaboratori</h2>
       <div class="mem-sec-line" aria-hidden="true"></div>
     </div>
-    <div class="mem-collab-soon">
-      <span class="mem-collab-icon" aria-hidden="true">🎵</span>
-      <p class="mem-collab-title">Secțiune în curând</p>
-      <p class="mem-collab-sub">Colaboratori speciali — saxofonist, trompetist și alți artiști de excepție</p>
-    </div>
+    {colaboratori.map((m: any, i: number) => (
+      <div class="member-card-wrap" data-index={i}>
+        <article class="member-card">
+          <!-- FOTO -->
+          <div class="mc-photo-col">
+            {m.imagine && m.imagine.trim() !== '' ? (
+              <img
+                src={m.imagine}
+                alt={`${m.nume} - ${m.specialitate} - Formația Florentina Pană Pitești`}
+                class="mc-photo-img"
+                loading="lazy"
+                decoding="async"
+                width="400"
+                height="800"
+              />
+            ) : (
+              <div class="mc-photo-ph" aria-hidden="true">
+                <span class="mc-initials">{initiale(m.nume)}</span>
+                <span class="mc-ph-label">Foto în curând</span>
+              </div>
+            )}
+          </div>
+
+          <!-- CONȚINUT -->
+          <div class="mc-content-col">
+            <span class="mc-cat-badge mc-cat-badge--colab">Colaborator</span>
+            <h3 class="mc-name">{m.nume}</h3>
+            <p class="mc-spec">{m.specialitate}</p>
+            {m.experienta && m.experienta.trim() !== '' && (
+              <p class="mc-exp">⭐ {m.experienta}</p>
+            )}
+
+            <!-- Galerie placeholder -->
+            <div class="mc-gallery" role="list" aria-label={`Galerie foto ${m.nume}`}>
+              {[1,2,3,4,5,6].map((n) => (
+                <div
+                  class="mc-gallery-ph gallery-thumb"
+                  role="listitem"
+                  data-fx={String(n)}
+                  data-src={`https://placehold.co/800x600/0f2545/e8c85b?text=${encodeURIComponent(m.nume)}`}
+                  data-alt={`${m.nume} la eveniment - Formația Florentina Pană`}
+                  tabindex="0"
+                  title="Click pentru previzualizare"
+                >
+                  <span class="mc-gal-icon" aria-hidden="true">📷</span>
+                  <small class="mc-gal-label">{m.nume} la eveniment</small>
+                  <span class="mc-gal-overlay" aria-hidden="true">🔍</span>
+                </div>
+              ))}
+            </div>
+
+            <!-- Buton BIO circular -->
+            <button
+              class="bio-btn"
+              type="button"
+              aria-expanded="false"
+              aria-controls={`bio-panel-co${i}`}
+              aria-label={`Biografie ${m.nume}`}
+            >
+              <span class="bio-btn-text">BIO</span>
+            </button>
+          </div>
+        </article>
+
+        <!-- Panel biografie -->
+        <div class="bio-panel" id={`bio-panel-co${i}`} aria-hidden="true">
+          {m.citat && (
+            <blockquote class="bio-quote">
+              <p>{m.citat}</p>
+            </blockquote>
+          )}
+          <p class="bio-text">{m.bio}</p>
+          {m.taguri && m.taguri.length > 0 && (
+            <div class="bio-tags" aria-label="Specializări">
+              {m.taguri.map((tag: string) => (
+                <span class="bio-tag">{tag}</span>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    ))}
   </section>
 
   <!-- ═══ GALLERY POPUP OVERLAY ═══ -->
@@ -484,6 +562,12 @@ function initiale(name: string): string {
     border: 1px solid rgba(0, 200, 255, 0.25);
   }
 
+  .mc-cat-badge--colab {
+    background: rgba(168, 85, 247, 0.12);
+    color: rgba(210, 160, 255, 0.92);
+    border: 1px solid rgba(168, 85, 247, 0.28);
+  }
+
   /* Nume */
   .mc-name {
     font-family: 'Oswald', sans-serif;
@@ -701,37 +785,7 @@ function initiale(name: string): string {
     border: 1px solid rgba(0, 200, 255, 0.20);
   }
 
-  /* ══════════════════════════════════════════
-     COLABORATORI — în curând
-  ══════════════════════════════════════════ */
-  .mem-collab-soon {
-    text-align: center;
-    padding: 3rem 2rem;
-    border: 1px dashed rgba(0, 200, 255, 0.16);
-    border-radius: 1.25rem;
-    background: rgba(0, 200, 255, 0.018);
-  }
 
-  .mem-collab-icon {
-    font-size: 2.2rem;
-    display: block;
-    margin-bottom: 0.75rem;
-  }
-
-  .mem-collab-title {
-    font-family: 'Oswald', sans-serif;
-    font-size: 1.1rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    color: rgba(241, 229, 172, 0.80);
-    margin: 0 0 0.4rem;
-  }
-
-  .mem-collab-sub {
-    font-size: 0.80rem;
-    color: rgba(200, 215, 240, 0.40);
-    margin: 0;
-  }
 
   /* ══════════════════════════════════════════
      TABLETĂ (600–767px): 2 coloane, foto 30%

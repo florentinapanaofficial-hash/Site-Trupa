@@ -569,5 +569,53 @@
       "categorie": "instrumentisti",
       "imagine": ""
     }
+  ],
+  "colaboratori": [
+    {
+      "nume": "Alexia Țircomnicu",
+      "rol": "Colaborator",
+      "specialitate": "Solistă Ușoară & Manele",
+      "experienta": "Experiență vastă",
+      "citat": "Muzica nu are granițe — eu cânt cu sufletul pentru fiecare public.",
+      "bio": "Alexia Țircomnicu aduce o energie aparte în colaborările cu Formația Florentina Pană. Cu o voce expresivă și versatilă, interpretează cu același profesionalism atât muzică ușoară cât și manele, adaptându-se perfect atmosferei fiecărui eveniment. Prezența sa scenică captivantă și interacțiunea naturală cu publicul o transformă într-un asset valoros pentru orice petrecere memorabilă.",
+      "taguri": [
+        "Muzică Ușoară",
+        "Manele",
+        "Nunți",
+        "Petreceri",
+        "Colaborator"
+      ],
+      "imagine": ""
+    },
+    {
+      "nume": "Nume în curând",
+      "rol": "Colaborator",
+      "specialitate": "Saxofon",
+      "experienta": "",
+      "citat": "Saxofonul vorbește acolo unde cuvintele nu mai ajung.",
+      "bio": "Un saxofonist talentat care completează sunetul formației cu melodii calde și expresive. Detalii în curând.",
+      "taguri": [
+        "Saxofon",
+        "Muzică Instrumentală",
+        "Colaborator"
+      ],
+      "imagine": ""
+    },
+    {
+      "nume": "Florin Ograbek",
+      "rol": "Colaborator",
+      "specialitate": "Țambal",
+      "experienta": "Experiență vastă",
+      "citat": "Țambalul e sufletul petrecerii românești — eu îl fac să cânte.",
+      "bio": "Florin Ograbek aduce în colaborările cu Formația Florentina Pană sunetul unic și inconfundabil al țambalului. Instrument emblematic al muzicii tradiționale românești, țambalul său creează momente de magie sonoră care rămân în amintirea oricărui eveniment. Tehnica sa rafinată și sensibilitatea muzicală îl recomandă ca unul dintre cei mai apreciați instrumentiști colaboratori din zonă.",
+      "taguri": [
+        "Țambal",
+        "Muzică Tradițională",
+        "Colaborator",
+        "Nunți",
+        "Botezuri"
+      ],
+      "imagine": ""
+    }
   ]
 }
