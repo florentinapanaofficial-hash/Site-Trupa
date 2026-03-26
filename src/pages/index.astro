@@ -716,6 +716,26 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     /* fundal: gradientul navy vine din #continut>#acasa (globals.css) */
   }
 
+  /* Pe mobile mic: reduce padding suplimentar — secțiunea are deja 1.4rem */
+  @media (max-width: 480px) {
+    .hp-hero-wrap {
+      padding-inline: 0.75rem;
+    }
+  }
+
+  @media (max-width: 374px) {
+    .hp-hero-wrap {
+      padding-inline: 0.25rem;
+    }
+    .hero-title-gold {
+      font-size: clamp(2rem, 8vw, 3rem);
+    }
+    .kicker-badge {
+      font-size: 0.7rem;
+      padding: 0.25rem 0.6rem;
+    }
+  }
+
   /* Gradient fade la baza hero-ului — sub conținut, nu deasupra */
   .hero-fade-bottom {
     position: absolute;
@@ -753,10 +773,12 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     z-index: 4;
   }
 
-  @media (max-width: 540px) {
+  @media (max-width: 767px) {
     .hp-highlights {
       grid-template-columns: 1fr;
       gap: 1rem;
+      padding: 1rem;
+      margin-top: -3rem;
     }
   }
 

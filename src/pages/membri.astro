@@ -734,9 +734,21 @@ function initiale(name: string): string {
   }
 
   /* ══════════════════════════════════════════
-     MOBILE
+     TABLETĂ (600–767px): 2 coloane, foto 30%
   ══════════════════════════════════════════ */
-  @media (max-width: 640px) {
+  @media (min-width: 600px) and (max-width: 767px) {
+    .member-card {
+      grid-template-columns: 30% 1fr;
+    }
+    .mc-photo-col {
+      min-height: 240px;
+    }
+  }
+
+  /* ══════════════════════════════════════════
+     MOBIL (<600px)
+  ══════════════════════════════════════════ */
+  @media (max-width: 599px) {
     .member-card {
       grid-template-columns: 1fr;
     }
@@ -755,11 +767,15 @@ function initiale(name: string): string {
       padding: 1.25rem 1rem 1.25rem 1rem;
     }
 
+    .mc-gallery-ph {
+      min-height: 44px;
+    }
+
     .bio-btn {
       bottom: 0.75rem;
       right: 0.75rem;
-      width: 46px;
-      height: 46px;
+      width: 56px;
+      height: 56px;
     }
   }
 
@@ -881,4 +897,18 @@ function initiale(name: string): string {
   .fx-splat-out   { animation: fx-splat-out   0.25s ease-in both; }
   .fx-spindrop-in { animation: fx-spindrop-in 0.45s cubic-bezier(.22,.68,0,1.36) both; }
   .fx-spindrop-out{ animation: fx-spindrop-out 0.25s ease-in both; }
+
+  /* ══════════════════════════════════════════
+     POPUP GALERIE — mobile sizing
+  ══════════════════════════════════════════ */
+  @media (max-width: 767px) {
+    #gallery-popup-inner {
+      max-width: 95vw;
+      max-height: 70vh;
+    }
+    #gallery-popup-img {
+      max-width: 95vw;
+      max-height: 70vh;
+    }
+  }
 </style>
