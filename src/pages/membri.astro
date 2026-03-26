@@ -464,7 +464,18 @@ function initiale(name: string): string {
       border-color 300ms ease;
   }
 
-  .member-card-wrap:hover .member-card,
+  /* hover doar pe dispozitive cu pointer precis — evită sticky-hover pe touch */
+  @media (hover: hover) and (pointer: fine) {
+    .member-card-wrap:hover .member-card {
+      transform: translateY(-4px);
+      border-color: rgba(0, 200, 255, 0.40);
+      box-shadow:
+        0 0 0 1px rgba(0, 200, 255, 0.22),
+        0 0 28px rgba(0, 200, 255, 0.14),
+        0 12px 40px rgba(0, 80, 160, 0.30);
+    }
+  }
+
   .member-card-wrap:focus-within .member-card {
     transform: translateY(-4px);
     border-color: rgba(0, 200, 255, 0.40);
@@ -737,10 +748,16 @@ function initiale(name: string): string {
   }
 
   .bio-panel.open {
-    max-height: 600px;
+    max-height: 1000px;
     opacity: 1;
     transform: scaleY(1) translateY(0);
     padding: 1.5rem 1.75rem 2rem;
+  }
+
+  @media (max-width: 599px) {
+    .bio-panel.open {
+      padding: 1.25rem 1.25rem 1.5rem;
+    }
   }
 
   /* Citat */
@@ -797,6 +814,10 @@ function initiale(name: string): string {
     .mc-photo-col {
       min-height: 240px;
     }
+    /* placeholder trebuie să urmeze aceeași înălțime */
+    .mc-photo-ph {
+      min-height: 240px;
+    }
   }
 
   /* ══════════════════════════════════════════
@@ -818,7 +839,9 @@ function initiale(name: string): string {
     }
 
     .mc-content-col {
-      padding: 1.25rem 1rem 1.25rem 1rem;
+      /* dreapta: 56px buton + 0.75rem offset + 0.5rem gap = ~4.5rem
+         jos:    56px buton + 0.75rem offset + 0.5rem gap = ~5rem  */
+      padding: 1.25rem 4.5rem 5rem 1rem;
     }
 
     .mc-gallery-ph {

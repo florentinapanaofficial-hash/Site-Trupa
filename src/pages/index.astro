@@ -692,14 +692,15 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
       border-color 300ms ease;
   }
 
-  /* Hover pe cardul hero — identic cu .hp-card:hover */
-  .hero-fullscreen:hover {
-    transform: scale(1.02);
-    /* Neon intensificat pe hover */
-    box-shadow:
-      0 0 0 1.5px rgba(0, 200, 255, 0.6),
-      0 0 30px rgba(0, 200, 255, 0.3),
-      0 0 80px rgba(0, 150, 255, 0.15);
+  /* Hover pe cardul hero — doar pe dispozitive cu pointer precis */
+  @media (hover: hover) and (pointer: fine) {
+    .hero-fullscreen:hover {
+      transform: scale(1.02);
+      box-shadow:
+        0 0 0 1.5px rgba(0, 200, 255, 0.6),
+        0 0 30px rgba(0, 200, 255, 0.3),
+        0 0 80px rgba(0, 150, 255, 0.15);
+    }
   }
 
   /* ════════════════════════════════════════════════════════════════
@@ -780,6 +781,26 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
       padding: 1rem;
       margin-top: -3rem;
     }
+
+    /* Reduce card min-height când stivuite — evită spațiu alb excesiv */
+    .hp-card {
+      min-height: 240px;
+    }
+
+    .hp-card--story {
+      min-height: 220px;
+    }
+
+    /* Padding mai strâns în card-content pe mobil */
+    .hp-card-content {
+      padding: 1.75rem 1.5rem;
+      gap: 0.45rem;
+    }
+
+    /* Titlu card proporțional pe ecran mic */
+    .hp-card-title {
+      font-size: clamp(1.5rem, 5.5vw, 1.9rem);
+    }
   }
 
   /* Stretched link — acoperă întreg cardul, navigare la URL-ul cardului */
@@ -807,8 +828,11 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     .hp-card { min-height: 340px; }
   }
 
-  .hp-card:hover {
-    transform: scale(1.02);
+  /* hover doar pe dispozitive cu pointer precis — evită sticky-hover pe touch */
+  @media (hover: hover) and (pointer: fine) {
+    .hp-card:hover {
+      transform: scale(1.02);
+    }
   }
 
   /* Card 1 — Povestea noastră */
@@ -824,10 +848,12 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
                 inset 0 1px 0 rgba(200, 140, 255, 0.12);
   }
 
-  .hp-card--story:hover {
-    border-color: rgba(180, 110, 255, 0.60);
-    box-shadow: 0 20px 56px rgba(100, 40, 200, 0.35), 0 4px 16px rgba(0, 0, 0, 0.5),
-                inset 0 1px 0 rgba(200, 140, 255, 0.20);
+  @media (hover: hover) and (pointer: fine) {
+    .hp-card--story:hover {
+      border-color: rgba(180, 110, 255, 0.60);
+      box-shadow: 0 20px 56px rgba(100, 40, 200, 0.35), 0 4px 16px rgba(0, 0, 0, 0.5),
+                  inset 0 1px 0 rgba(200, 140, 255, 0.20);
+    }
   }
 
   /* Conținut story-card: umple înălțimea cardului → centrare verticală garantată */
@@ -848,9 +874,11 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
   }
 
-  .hp-card--book:hover {
-    border-color: rgba(11, 188, 214, 0.52);
-    box-shadow: 0 20px 52px rgba(11, 188, 214, 0.18), 0 4px 16px rgba(0, 0, 0, 0.4);
+  @media (hover: hover) and (pointer: fine) {
+    .hp-card--book:hover {
+      border-color: rgba(11, 188, 214, 0.52);
+      box-shadow: 0 20px 52px rgba(11, 188, 214, 0.18), 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
   }
 
   .hp-card-overlay {

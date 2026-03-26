@@ -1,80 +1,701 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import siteContent from '../data/siteContent.json';
 import BackButton from '../components/BackButton.astro';
 
-const { seo, gallery, brand } = siteContent;
+/* ── Date galerie: 12 poze placeholder cu categorii SEO ── */
+const photos = [
+  { alt: "Moment dans miri — Nuntă Pitești",                cat: "nunti",      grad: "radial-gradient(ellipse at 30% 60%, #1a0a3d 0%, #0f0820 100%)" },
+  { alt: "Hora mare — Formația Florentina Pană",             cat: "nunti",      grad: "radial-gradient(ellipse at 70% 40%, #0f2545 0%, #0a1628 100%)" },
+  { alt: "Band setup — Lumini scenă elegantă",               cat: "evenimente", grad: "radial-gradient(ellipse at 50% 80%, #142040 0%, #080e1e 100%)" },
+  { alt: "Bucuria nașilor — Botez tradițional Argeș",        cat: "botezuri",   grad: "radial-gradient(ellipse at 40% 30%, #1c1040 0%, #0c0818 100%)" },
+  { alt: "Sârba la nuntă — Energie pe ring",                 cat: "nunti",      grad: "radial-gradient(ellipse at 60% 70%, #162850 0%, #0a1428 100%)" },
+  { alt: "Eveniment corporate — Gală premium",               cat: "corporate",  grad: "radial-gradient(ellipse at 80% 50%, #0d1e38 0%, #060d1a 100%)" },
+  { alt: "Moment emoțional — Tortul mirilor",                cat: "nunti",      grad: "radial-gradient(ellipse at 35% 55%, #200e45 0%, #0e0824 100%)" },
+  { alt: "Mic prinț — Botez în familia Pană",                cat: "botezuri",   grad: "radial-gradient(ellipse at 55% 35%, #142048 0%, #0a1020 100%)" },
+  { alt: "Team-building muzical — Corporate Pitești",        cat: "corporate",  grad: "radial-gradient(ellipse at 45% 65%, #0f1a35 0%, #080e1e 100%)" },
+  { alt: "Invitați în dans — Petrecere de neuitat",          cat: "evenimente", grad: "radial-gradient(ellipse at 65% 45%, #1a1040 0%, #0c0820 100%)" },
+  { alt: "Solo vioară — Dansul mirilor la nuntă",            cat: "nunti",      grad: "radial-gradient(ellipse at 30% 40%, #162550 0%, #0a1428 100%)" },
+  { alt: "Scenă completă — Concert live Formația Florentina Pană", cat: "evenimente", grad: "radial-gradient(ellipse at 50% 50%, #121838 0%, #080e1e 100%)" },
+];
+
+const heights = [280, 200, 320];
+const categories = [
+  { id: "toate",      label: "Toate" },
+  { id: "nunti",      label: "Nunți" },
+  { id: "botezuri",   label: "Botezuri" },
+  { id: "corporate",  label: "Corporate" },
+  { id: "evenimente", label: "Evenimente" },
+];
 ---
 
-<BaseLayout title={`Galerie Foto | ${brand.name}`} description="Galerie foto cu momente din evenimentele Formației Florentina Pană.">
-  <section class="section-container py-16">
-    <div class="mb-8"><BackButton href="/" label="Acasă" /></div>
-    <header class="section-head mx-auto text-center">
-      <p class="kicker">Galerie Foto</p>
-      <h1 class="section-title">Galerie Foto Nunți și Evenimente | Formația Florentina Pană</h1>
-      <p class="section-copy">Selectăm constant fotografii reprezentative pentru atmosferă, energie și eleganță.</p>
+<BaseLayout
+  title="Galerie Foto Nunți și Evenimente | Formația Florentina Pană Pitești"
+  description="Fotografii din nunțile, botezurile și evenimentele corporate animate de Formația Florentina Pană. Momente de dans, energie și emoție surprinse pe scenele din Pitești și toată România."
+>
+  <section class="gal-page" aria-label="Galerie foto">
+
+    <!-- Back -->
+    <div class="gal-back"><BackButton href="/" label="Acasă" /></div>
+
+    <!-- ═══ HEADER ═══ -->
+    <header class="gal-header">
+      <span class="gal-badge">Galerie Foto</span>
+      <h1 class="gal-title">Momente din evenimentele noastre</h1>
+      <p class="gal-subtitle">Fotografii din nunți, botezuri și evenimente corporate</p>
     </header>
 
-    <h2 class="mt-8 text-xl font-bold text-white/80">Fotografii din nunți, botezuri și evenimente corporate</h2>
+    <!-- ═══ FILTRE ═══ -->
+    <nav class="gal-filters" aria-label="Filtrează galeria">
+      {categories.map((c) => (
+        <button
+          class={`gal-filter-btn ${c.id === 'toate' ? 'active' : ''}`}
+          type="button"
+          data-filter={c.id}
+          aria-pressed={c.id === 'toate' ? 'true' : 'false'}
+        >
+          {c.label}
+        </button>
+      ))}
+    </nav>
 
-    <div class="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-      {gallery.map((item) => (
-        item.image ? (
-          <article class="gallery-img-card">
-            <img src={item.image} alt={item.alt} class="gallery-img" loading="lazy" decoding="async" />
-          </article>
-        ) : (
-          <article class="gallery-placeholder-card" role="img" aria-label={item.alt}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" style="color:var(--gold);opacity:0.45"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
-            <span class="gallery-placeholder-text">{item.alt}</span>
-          </article>
-        )
+    <!-- ═══ GRID MASONRY ═══ -->
+    <div class="gal-masonry" role="list" aria-label="Galerie fotografii">
+      {photos.map((p, i) => (
+        <figure
+          class="gal-item"
+          role="listitem"
+          data-category={p.cat}
+          data-fx={String((i % 6) + 1)}
+          data-index={i}
+          tabindex="0"
+          style={`background: ${p.grad}; height: ${heights[i % 3]}px;`}
+        >
+          {/* Iconița cameră SVG */}
+          <svg class="gal-cam-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <rect width="18" height="14" x="3" y="6" rx="2"/>
+            <circle cx="12" cy="13" r="3.5"/>
+            <path d="M7 6 8.5 3h7L17 6"/>
+          </svg>
+          <figcaption class="gal-caption">{p.alt}</figcaption>
+          {/* Hover overlay */}
+          <div class="gal-hover" aria-hidden="true">
+            <svg class="gal-zoom-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/>
+              <path d="M11 8v6M8 11h6"/>
+            </svg>
+            <span class="gal-hover-text">Click pentru previzualizare</span>
+          </div>
+        </figure>
       ))}
     </div>
 
-    <div class="mt-10 flex justify-center">
-      <a href="/comunitatea-noastra#galerie" class="btn-outline">Galeria extinsă din comunitate</a>
+    <!-- ═══ BUTON ÎNCARCĂ MAI MULTE ═══ -->
+    <div class="gal-load-wrap">
+      <button class="gal-load-btn" type="button" disabled title="Poze în curând">
+        Încarcă mai multe
+        <span class="gal-load-tooltip">Poze în curând</span>
+      </button>
     </div>
+
+    <!-- ═══ LIGHTBOX ═══ -->
+    <div id="gal-lightbox" role="dialog" aria-modal="true" aria-label="Previzualizare fotografie">
+      <div class="lb-counter" aria-live="polite"></div>
+      <button class="lb-close" type="button" aria-label="Închide">&times;</button>
+      <button class="lb-prev" type="button" aria-label="Fotografia anterioară">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <button class="lb-next" type="button" aria-label="Fotografia următoare">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg>
+      </button>
+      <div class="lb-img-wrap">
+        <img id="lb-img" src="" alt="" />
+      </div>
+    </div>
+
   </section>
 </BaseLayout>
 
+<!-- ═══════════════════════════════════════════
+     SCRIPT — Filtre, Lightbox, Swipe, Keyboard
+═══════════════════════════════════════════ -->
+<script>
+  // ── Filtre ──
+  const filterBtns = document.querySelectorAll<HTMLButtonElement>('.gal-filter-btn');
+  const items = document.querySelectorAll<HTMLElement>('.gal-item');
+
+  filterBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach((b) => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
+      btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
+      const cat = btn.dataset.filter;
+      items.forEach((item) => {
+        const match = cat === 'toate' || item.dataset.category === cat;
+        item.style.opacity = '0';
+        setTimeout(() => {
+          item.style.display = match ? '' : 'none';
+          if (match) requestAnimationFrame(() => { item.style.opacity = '1'; });
+        }, 180);
+      });
+    });
+  });
+
+  // ── Lightbox ──
+  const lb = document.getElementById('gal-lightbox')!;
+  const lbImg = document.getElementById('lb-img') as HTMLImageElement;
+  const lbCounter = lb.querySelector<HTMLElement>('.lb-counter')!;
+  const lbClose = lb.querySelector<HTMLButtonElement>('.lb-close')!;
+  const lbPrev = lb.querySelector<HTMLButtonElement>('.lb-prev')!;
+  const lbNext = lb.querySelector<HTMLButtonElement>('.lb-next')!;
+
+  const fxMap: Record<string, { enter: string; leave: string }> = {
+    '1': { enter: 'fx-pop-in',      leave: 'fx-pop-out'      },
+    '2': { enter: 'fx-warp-in',     leave: 'fx-warp-out'     },
+    '3': { enter: 'fx-rubber-in',   leave: 'fx-rubber-out'   },
+    '4': { enter: 'fx-flip-in',     leave: 'fx-flip-out'     },
+    '5': { enter: 'fx-splat-in',    leave: 'fx-splat-out'    },
+    '6': { enter: 'fx-spindrop-in', leave: 'fx-spindrop-out' },
+  };
+
+  function getVisibleItems(): HTMLElement[] {
+    return Array.from(items).filter((it) => it.style.display !== 'none');
+  }
+
+  let currentIdx = 0;
+  let currentFx = '1';
+
+  function clearFx() {
+    lbImg.classList.remove(...Object.values(fxMap).flatMap((v) => [v.enter, v.leave]));
+  }
+
+  function showPhoto(idx: number) {
+    const visible = getVisibleItems();
+    if (idx < 0 || idx >= visible.length) return;
+    currentIdx = idx;
+    const item = visible[idx];
+    const fx = item.dataset.fx ?? '1';
+    currentFx = fx;
+    const anim = fxMap[fx] ?? fxMap['1'];
+    const src = `https://placehold.co/1200x800/0f2545/e8c85b?text=${encodeURIComponent(item.querySelector('figcaption')?.textContent ?? 'Foto')}`;
+    const alt = item.querySelector('figcaption')?.textContent ?? '';
+    lbImg.src = src;
+    lbImg.alt = alt;
+    lbCounter.textContent = `${idx + 1} / ${visible.length}`;
+    clearFx();
+    lbImg.classList.add(anim.enter);
+  }
+
+  function openLightbox(idx: number) {
+    lb.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    showPhoto(idx);
+  }
+
+  function closeLightbox() {
+    const anim = fxMap[currentFx] ?? fxMap['1'];
+    clearFx();
+    lbImg.classList.add(anim.leave);
+    lbImg.addEventListener('animationend', () => {
+      lb.classList.remove('active');
+      document.body.style.overflow = '';
+      lbImg.src = '';
+      lbImg.alt = '';
+      clearFx();
+    }, { once: true });
+  }
+
+  function navPrev() {
+    const visible = getVisibleItems();
+    const next = (currentIdx - 1 + visible.length) % visible.length;
+    clearFx();
+    showPhoto(next);
+  }
+
+  function navNext() {
+    const visible = getVisibleItems();
+    const next = (currentIdx + 1) % visible.length;
+    clearFx();
+    showPhoto(next);
+  }
+
+  // Click pe item → deschide lightbox
+  items.forEach((item) => {
+    item.addEventListener('click', () => {
+      const visible = getVisibleItems();
+      const idx = visible.indexOf(item);
+      if (idx >= 0) openLightbox(idx);
+    });
+    item.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const visible = getVisibleItems();
+        const idx = visible.indexOf(item as HTMLElement);
+        if (idx >= 0) openLightbox(idx);
+      }
+    });
+  });
+
+  lbClose.addEventListener('click', closeLightbox);
+  lbPrev.addEventListener('click', (e) => { e.stopPropagation(); navPrev(); });
+  lbNext.addEventListener('click', (e) => { e.stopPropagation(); navNext(); });
+
+  // Click pe fundal → închide
+  lb.addEventListener('click', (e) => {
+    if (e.target === lb || (e.target as HTMLElement).classList.contains('lb-img-wrap')) closeLightbox();
+  });
+
+  // Keyboard
+  document.addEventListener('keydown', (e) => {
+    if (!lb.classList.contains('active')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') navPrev();
+    if (e.key === 'ArrowRight') navNext();
+  });
+
+  // ── Swipe touch pe mobile ──
+  let touchStartX = 0;
+  let touchEndX = 0;
+
+  lb.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+  lb.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    const diff = touchStartX - touchEndX;
+    if (Math.abs(diff) > 50) {
+      diff > 0 ? navNext() : navPrev();
+    }
+  }, { passive: true });
+</script>
+
+<!-- ═══════════════════════════════════════════
+     STYLES
+═══════════════════════════════════════════ -->
 <style>
-  .gallery-img-card {
-    aspect-ratio: 4/3;
-    border-radius: 1.25rem;
-    overflow: hidden;
-    border: 1px solid var(--line);
-    transition: transform 220ms ease, box-shadow 220ms ease;
+  /* ══════════════════════════════════════════
+     PAGINĂ
+  ══════════════════════════════════════════ */
+  .gal-page {
+    padding: clamp(1.5rem, 3vw, 2.5rem) clamp(1rem, 3vw, 2rem);
+    max-width: 960px;
+    margin-inline: auto;
   }
-  .gallery-img-card:hover {
-    transform: scale(1.02);
-    box-shadow: 0 16px 36px rgba(245,166,35,0.16);
+
+  .gal-back {
+    margin-bottom: 1.5rem;
   }
-  .gallery-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
+
+  /* ══════════════════════════════════════════
+     HEADER
+  ══════════════════════════════════════════ */
+  .gal-header {
+    text-align: center;
+    margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
   }
-  .gallery-placeholder-card {
-    aspect-ratio: 4/3;
-    border-radius: 1.25rem;
-    border: 1px dashed var(--line);
-    background: var(--surface);
+
+  .gal-badge {
+    display: inline-block;
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    padding: 0.28em 0.85em;
+    border-radius: 9999px;
+    background: rgba(0, 200, 255, 0.08);
+    color: rgba(0, 220, 255, 0.85);
+    border: 1px solid rgba(0, 200, 255, 0.22);
+    margin-bottom: 0.85rem;
+  }
+
+  .gal-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: #ffffff;
+    margin: 0 0 0.5rem;
+    line-height: 1.15;
+  }
+
+  .gal-subtitle {
+    font-size: 0.88rem;
+    color: rgba(180, 200, 235, 0.60);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  /* ══════════════════════════════════════════
+     FILTRE
+  ══════════════════════════════════════════ */
+  .gal-filters {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: clamp(1.5rem, 3vw, 2rem);
+  }
+
+  .gal-filter-btn {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    padding: 0.45em 1.1em;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: transparent;
+    color: rgba(200, 215, 240, 0.65);
+    cursor: pointer;
+    transition: background 200ms ease, color 200ms ease, border-color 200ms ease;
+  }
+
+  .gal-filter-btn:hover {
+    border-color: rgba(0, 200, 255, 0.35);
+    color: rgba(0, 220, 255, 0.90);
+  }
+
+  .gal-filter-btn.active {
+    background: linear-gradient(135deg, #00c8ff 0%, #0066ff 100%);
+    color: #ffffff;
+    border-color: transparent;
+  }
+
+  /* ══════════════════════════════════════════
+     MASONRY GRID
+  ══════════════════════════════════════════ */
+  .gal-masonry {
+    columns: 3;
+    column-gap: 1rem;
+  }
+
+  @media (max-width: 767px) and (min-width: 480px) {
+    .gal-masonry { columns: 2; }
+  }
+
+  @media (max-width: 479px) {
+    .gal-masonry { columns: 1; }
+  }
+
+  /* ══════════════════════════════════════════
+     ITEM (FIGURE)
+  ══════════════════════════════════════════ */
+  .gal-item {
+    display: inline-block;
+    width: 100%;
+    margin: 0 0 1rem;
+    break-inside: avoid;
+    border-radius: 1rem;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: opacity 300ms ease, border-color 300ms ease, box-shadow 300ms ease;
+  }
+
+  .gal-item:focus-visible {
+    outline: 2px solid rgba(0, 200, 255, 0.60);
+    outline-offset: 2px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .gal-item:hover {
+      border-color: rgba(0, 200, 255, 0.40);
+      box-shadow: 0 0 18px rgba(0, 200, 255, 0.18), 0 8px 24px rgba(0, 60, 120, 0.25);
+    }
+  }
+
+  /* Conținut centrat interior */
+  .gal-item {
+    display: inline-flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 0.6rem;
-    padding: 1rem;
-    transition: border-color 220ms ease;
   }
-  .gallery-placeholder-card:hover {
-    border-color: rgba(245,166,35,0.4);
+
+  .gal-cam-icon {
+    width: 32px;
+    height: 32px;
+    color: rgba(232, 200, 91, 0.40);
   }
-  .gallery-placeholder-text {
-    font-size: 0.8rem;
-    color: var(--muted);
+
+  .gal-caption {
+    font-size: 0.68rem;
+    letter-spacing: 0.04em;
+    color: rgba(200, 215, 240, 0.35);
     text-align: center;
+    padding: 0 1rem;
+    line-height: 1.4;
+  }
+
+  /* Hover overlay */
+  .gal-hover {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    background: rgba(0, 30, 60, 0.55);
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity 220ms ease;
+    pointer-events: none;
+  }
+
+  .gal-item:hover .gal-hover,
+  .gal-item:focus .gal-hover {
+    opacity: 1;
+  }
+
+  .gal-zoom-icon {
+    width: 28px;
+    height: 28px;
+    color: rgba(0, 220, 255, 0.85);
+  }
+
+  .gal-hover-text {
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(0, 220, 255, 0.75);
+  }
+
+  /* ══════════════════════════════════════════
+     BUTON ÎNCARCĂ MAI MULTE
+  ══════════════════════════════════════════ */
+  .gal-load-wrap {
+    display: flex;
+    justify-content: center;
+    margin-top: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  .gal-load-btn {
+    position: relative;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    padding: 0.65em 1.8em;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.04);
+    color: rgba(200, 215, 240, 0.45);
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  .gal-load-tooltip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    padding: 0.3em 0.75em;
+    border-radius: 0.4rem;
+    background: rgba(0, 0, 0, 0.85);
+    color: rgba(0, 220, 255, 0.80);
+    border: 1px solid rgba(0, 200, 255, 0.22);
+  }
+
+  .gal-load-btn:hover .gal-load-tooltip {
+    display: block;
+  }
+
+  /* ══════════════════════════════════════════
+     LIGHTBOX
+  ══════════════════════════════════════════ */
+  #gal-lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9000;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.88);
+    backdrop-filter: blur(8px);
+  }
+
+  #gal-lightbox.active {
+    display: flex;
+  }
+
+  .lb-img-wrap {
+    max-width: 90vw;
+    max-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #lb-img {
+    display: block;
+    max-width: 90vw;
+    max-height: 80vh;
+    border-radius: 0.75rem;
+    box-shadow: 0 0 60px rgba(0, 0, 0, 0.8), 0 0 20px rgba(232, 200, 91, 0.25);
+    border: 1px solid rgba(232, 200, 91, 0.3);
+    object-fit: contain;
+  }
+
+  /* Counter */
+  .lb-counter {
+    position: absolute;
+    top: 1.25rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: rgba(255, 255, 255, 0.55);
+    z-index: 10;
+  }
+
+  /* Close */
+  .lb-close {
+    position: absolute;
+    top: 1rem;
+    right: 1.25rem;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.06);
+    color: #ffffff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: background 200ms ease, border-color 200ms ease;
+  }
+
+  .lb-close:hover {
+    background: rgba(255, 60, 80, 0.18);
+    border-color: rgba(255, 60, 80, 0.45);
+  }
+
+  /* Nav prev/next */
+  .lb-prev, .lb-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: background 200ms ease, border-color 200ms ease;
+  }
+
+  .lb-prev { left: 1rem; }
+  .lb-next { right: 1rem; }
+
+  .lb-prev:hover, .lb-next:hover {
+    background: rgba(0, 200, 255, 0.12);
+    border-color: rgba(0, 200, 255, 0.40);
+  }
+
+  .lb-prev svg, .lb-next svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* ══════════════════════════════════════════
+     FX ANIMAȚII (identice cu membri.astro)
+  ══════════════════════════════════════════ */
+  @keyframes fx-pop-in {
+    0%   { transform: scale(0.5);  opacity: 0; }
+    70%  { transform: scale(1.06); opacity: 1; }
+    100% { transform: scale(1);    opacity: 1; }
+  }
+  @keyframes fx-pop-out {
+    0%   { transform: scale(1);   opacity: 1; }
+    100% { transform: scale(0.5); opacity: 0; }
+  }
+  @keyframes fx-warp-in {
+    0%   { transform: scaleX(0.1) scaleY(2.5); opacity: 0; }
+    60%  { transform: scaleX(1.05) scaleY(0.97); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes fx-warp-out {
+    0%   { transform: scale(1); opacity: 1; }
+    100% { transform: scaleX(0.1) scaleY(2.5); opacity: 0; }
+  }
+  @keyframes fx-rubber-in {
+    0%   { transform: scale(1);           opacity: 0; }
+    30%  { transform: scaleX(1.25) scaleY(0.75); opacity: 1; }
+    50%  { transform: scaleX(0.85) scaleY(1.15); }
+    70%  { transform: scaleX(1.05) scaleY(0.95); }
+    100% { transform: scale(1); }
+  }
+  @keyframes fx-rubber-out {
+    0%   { transform: scale(1);           opacity: 1; }
+    30%  { transform: scaleX(1.25) scaleY(0.75); }
+    100% { transform: scale(0.1); opacity: 0; }
+  }
+  @keyframes fx-flip-in {
+    0%   { transform: perspective(600px) rotateY(-90deg); opacity: 0; }
+    70%  { transform: perspective(600px) rotateY(8deg);  opacity: 1; }
+    100% { transform: perspective(600px) rotateY(0deg);  opacity: 1; }
+  }
+  @keyframes fx-flip-out {
+    0%   { transform: perspective(600px) rotateY(0deg);   opacity: 1; }
+    100% { transform: perspective(600px) rotateY(90deg);  opacity: 0; }
+  }
+  @keyframes fx-splat-in {
+    0%   { transform: scale(2.5); opacity: 0; filter: blur(12px); }
+    60%  { transform: scale(0.95); opacity: 1; filter: blur(0); }
+    100% { transform: scale(1); opacity: 1; filter: blur(0); }
+  }
+  @keyframes fx-splat-out {
+    0%   { transform: scale(1);   opacity: 1; filter: blur(0); }
+    100% { transform: scale(2.5); opacity: 0; filter: blur(12px); }
+  }
+  @keyframes fx-spindrop-in {
+    0%   { transform: rotate(-180deg) scale(0); opacity: 0; }
+    70%  { transform: rotate(10deg) scale(1.04); opacity: 1; }
+    100% { transform: rotate(0deg) scale(1); opacity: 1; }
+  }
+  @keyframes fx-spindrop-out {
+    0%   { transform: rotate(0deg) scale(1); opacity: 1; }
+    100% { transform: rotate(180deg) scale(0); opacity: 0; }
+  }
+
+  .fx-pop-in      { animation: fx-pop-in      0.35s cubic-bezier(.22,.68,0,1.36) both; }
+  .fx-pop-out     { animation: fx-pop-out     0.25s ease-in both; }
+  .fx-warp-in     { animation: fx-warp-in     0.40s cubic-bezier(.22,.68,0,1.2)  both; }
+  .fx-warp-out    { animation: fx-warp-out    0.25s ease-in both; }
+  .fx-rubber-in   { animation: fx-rubber-in   0.50s ease both; }
+  .fx-rubber-out  { animation: fx-rubber-out  0.25s ease-in both; }
+  .fx-flip-in     { animation: fx-flip-in     0.40s ease both; }
+  .fx-flip-out    { animation: fx-flip-out    0.25s ease-in both; }
+  .fx-splat-in    { animation: fx-splat-in    0.45s cubic-bezier(.22,.68,0,1.2)  both; }
+  .fx-splat-out   { animation: fx-splat-out   0.25s ease-in both; }
+  .fx-spindrop-in { animation: fx-spindrop-in 0.45s cubic-bezier(.22,.68,0,1.36) both; }
+  .fx-spindrop-out{ animation: fx-spindrop-out 0.25s ease-in both; }
+
+  /* ══════════════════════════════════════════
+     MOBILE — lightbox nav mai strâns
+  ══════════════════════════════════════════ */
+  @media (max-width: 599px) {
+    .lb-prev { left: 0.5rem; width: 38px; height: 38px; }
+    .lb-next { right: 0.5rem; width: 38px; height: 38px; }
+    .lb-close { top: 0.75rem; right: 0.75rem; width: 38px; height: 38px; }
+    .lb-counter { top: 0.85rem; font-size: 0.68rem; }
   }
 </style>
