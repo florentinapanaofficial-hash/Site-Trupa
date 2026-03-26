@@ -217,12 +217,24 @@ const hasBandPhoto = typeof (brand as any).bandPhoto === 'string' && (brand as a
     .dp-intro-block {
       grid-template-columns: 1fr;
       gap: 2rem;
+      text-align: center;
+    }
+    .dp-intro-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .dp-intro-left .btn-solid,
+    .dp-intro-left .btn-outline {
+      width: 100%;
+      justify-content: center;
     }
     .dp-intro-right {
       border-left: none;
       border-top: 2px solid rgba(245, 166, 35, 0.3);
       padding-left: 0;
       padding-top: 1.75rem;
+      text-align: left;
     }
   }
 

@@ -2948,9 +2948,9 @@ details>summary::-webkit-details-marker {
     margin: 0 !important;
     border-radius: 0 !important;
     box-sizing: border-box !important;
-    /* max() garantează clearance minim de 44px față de mob-nav
+    /* max() garantează clearance minim față de mob-nav (~57px)
        chiar și la font-size mic (accessibility settings) */
-    padding-top: max(2.9rem, 44px) !important;
+    padding-top: max(3.75rem, 60px) !important;
     padding-bottom: 5rem !important;
     padding-left: 1.4rem !important;
     padding-right: 1.4rem !important;
@@ -3180,7 +3180,7 @@ details>summary::-webkit-details-marker {
     scroll-snap-align: none !important;
     scroll-snap-stop: unset !important;
     touch-action: pan-y !important;
-    padding-top: max(3rem, 44px) !important;
+    padding-top: max(3.75rem, 60px) !important;
     padding-bottom: 4rem !important;
   }
 
