@@ -42,6 +42,7 @@ const jsonLd = {
   name: siteContent.brand.name,
   description: siteContent.seo.description,
   url: site || '',
+  logo: `${site}/images/logo-fp-stage.svg`,
   telephone: siteContent.contact.phoneRaw,
   email: siteContent.contact.email,
   address: {
@@ -55,6 +56,16 @@ const jsonLd = {
     siteContent.socialLinks?.facebook,
     siteContent.socialLinks?.instagram,
   ].filter(Boolean),
+  genre: ['Muzică populară', 'Muzică de petrecere', 'Muzică live', 'Muzică ușoară'],
+  performerIn: {
+    '@type': 'MusicEvent',
+    name: 'Nunți, botezuri și evenimente corporate',
+  },
+  foundingDate: '2014',
+  areaServed: {
+    '@type': 'Country',
+    name: 'România',
+  },
 };
 
 const isHomePage = Astro.url.pathname === '/';
@@ -114,6 +125,8 @@ const mobileNavAllItems = [
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
+    <!-- [DE_COMPLETAT] Înlocuiește @florentinapana cu contul real X/Twitter -->
+    <meta name="twitter:site" content="@florentinapana" />
     <!-- Fonturi Google — doar Inter + Oswald (singurele folosite în CSS)
          Cormorant Garamond și Playfair Display eliminate: zero utilizări font-family în cod -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

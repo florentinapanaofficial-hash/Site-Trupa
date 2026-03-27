@@ -15,7 +15,7 @@
         Completează formularul de mai jos și vei primi un răspuns cu idei concrete de
         structură, conținut și estimare de timp pentru landing page-ul tău.
       </p>
-      <ul class="mt-4 space-y-2 text-sm" style="color: var(--body);">
+      <ul class="mt-4 space-y-2 text-sm text-body">
         <li>• Răspuns în cel mult 1–2 zile lucrătoare.</li>
         <li>• Fără spam, doar discuții legate de eveniment.</li>
       </ul>
@@ -28,7 +28,7 @@
     >
       <div class="grid gap-4 sm:grid-cols-2">
         <div class="space-y-1.5">
-          <label for="name" class="text-xs font-medium" style="color: var(--body);">
+          <label for="name" class="text-xs font-medium text-body">
             Nume
           </label>
           <input
@@ -39,13 +39,12 @@
             aria-required="true"
             aria-invalid="false"
             autocomplete="name"
-            class="w-full rounded-xl border px-3 py-2 text-sm shadow-sm outline-none transition placeholder:opacity-50 focus:ring-2"
-            style="border-color: var(--line); background: rgba(255,255,255,0.05); color: var(--title); focus:border-color: var(--accent-gold);"
+            class="w-full rounded-xl border px-3 py-2 text-sm shadow-sm outline-none transition placeholder:opacity-50 focus:ring-2 form-input-theme"
             placeholder="Numele tău"
           />
         </div>
         <div class="space-y-1.5">
-          <label for="email" class="text-xs font-medium" style="color: var(--body);">
+          <label for="email" class="text-xs font-medium text-body">
             Email
           </label>
           <input
@@ -56,29 +55,27 @@
             aria-required="true"
             aria-invalid="false"
             autocomplete="email"
-            class="w-full rounded-xl border px-3 py-2 text-sm shadow-sm outline-none transition placeholder:opacity-50 focus:ring-2"
-            style="border-color: var(--line); background: rgba(255,255,255,0.05); color: var(--title);"
+            class="w-full rounded-xl border px-3 py-2 text-sm shadow-sm outline-none transition placeholder:opacity-50 focus:ring-2 form-input-theme"
             placeholder="tu@exemplu.com"
           />
         </div>
       </div>
 
       <div class="space-y-1.5">
-        <label for="subject" class="text-xs font-medium" style="color: var(--body);">
+        <label for="subject" class="text-xs font-medium text-body">
           Subiect
         </label>
         <input
           id="subject"
           name="subject"
           type="text"
-          class="w-full rounded-xl border px-3 py-2 text-sm shadow-sm outline-none transition placeholder:opacity-50 focus:ring-2"
-          style="border-color: var(--line); background: rgba(255,255,255,0.05); color: var(--title);"
+          class="w-full rounded-xl border px-3 py-2 text-sm shadow-sm outline-none transition placeholder:opacity-50 focus:ring-2 form-input-theme"
           placeholder="Eveniment, nuntă, petrecere..."
         />
       </div>
 
       <div class="space-y-1.5">
-        <label for="message" class="text-xs font-medium" style="color: var(--body);">
+        <label for="message" class="text-xs font-medium text-body">
           Detalii despre eveniment
         </label>
         <textarea
@@ -88,8 +85,7 @@
           aria-required="true"
           aria-invalid="false"
           rows={4}
-          class="w-full resize-none rounded-xl border px-3 py-2 text-sm shadow-sm outline-none transition placeholder:opacity-50 focus:ring-2"
-          style="border-color: var(--line); background: rgba(255,255,255,0.05); color: var(--title);"
+          class="w-full resize-none rounded-xl border px-3 py-2 text-sm shadow-sm outline-none transition placeholder:opacity-50 focus:ring-2 form-input-theme"
           placeholder="Data, locația, tipul evenimentului și orice alte detalii relevante."
         />
       </div>
@@ -98,7 +94,7 @@
         Trimite mesajul
       </button>
 
-      <p class="text-[11px] leading-relaxed" style="color: var(--muted);">
+      <p class="text-[11px] leading-relaxed text-muted-theme">
         Trimițând acest formular, ești de acord ca datele tale să fie folosite pentru a
         răspunde la mesaj. Nu vor fi partajate cu terți.
       </p>

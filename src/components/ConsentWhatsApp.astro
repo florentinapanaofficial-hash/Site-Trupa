@@ -122,12 +122,21 @@ const waUrl = `https://wa.me/${numarTelefon}?text=${mesajEncoded}`;
     <!-- Link retragere consimțământ – Art. 7 alin. 3 RGPD -->
     <p class="gdpr-retragere-text">
       Poți retrage sau gestiona consimțimentele tale oricând scriind la
-      <a href="mailto:florentinapanaofficial@gmail.com" class="gdpr-link">
-        florentinapanaofficial@gmail.com
-      </a>.
+      <span id="consent-email-js" class="gdpr-link"></span>.
     </p>
   </div>
 </div>
+
+<script>
+  (function () {
+    var el = document.getElementById('consent-email-js');
+    if (!el) return;
+    var u = 'florentinapanaofficial';
+    var d = 'gmail.com';
+    var addr = u + '@' + d;
+    el.innerHTML = '<a href="mai' + 'lto:' + addr + '" class="gdpr-link">' + addr + '</a>';
+  })();
+</script>
 
 <style>
   /* ─────────────────────────────────────────────────────────────

@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import siteContent from '../data/siteContent.json';
 
 const { seo, contact, faq } = siteContent;
+const faqItems = faq as Array<{ question: string; answer: string }>;
 import { sanitizeUrl } from '../lib/sanitize-url';
 
 const socialLinks = {
@@ -14,7 +15,7 @@ const socialLinks = {
 const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
-  mainEntity: (faq as Array<{ question: string; answer: string }>).map((item) => ({
+  mainEntity: faqItems.map((item) => ({
     '@type': 'Question',
     name: item.question,
     acceptedAnswer: { '@type': 'Answer', text: item.answer },
@@ -143,6 +144,130 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
       </div>
     </div>
     <div class="hero-fade-bottom" aria-hidden="true"></div>
+  </section>
+
+  {/* ═══════════════════════════════════════════
+      DESPRE FORMAȚIE — text SEO + H3 subtitluri
+  ═══════════════════════════════════════════ */}
+  <section id="despre-formatie" class="hp-seo-section" aria-label="Despre formația noastră">
+    <h2 class="hp-seo-title">Despre formația noastră</h2>
+
+    <div class="hp-seo-grid">
+      <div class="hp-seo-block">
+        <h3 class="hp-seo-subtitle">Experiență pe scenă din 2014</h3>
+        <p class="hp-seo-text">
+          Formația Florentina Pană activează pe piața evenimentelor din România de peste 10 ani.
+          Am început în Pitești, județul Argeș, iar astăzi ne deplasăm în toată țara pentru nunți,
+          botezuri, aniversări și evenimente corporate. Fiecare spectacol este un show complet:
+          soliști vocali cu experiență, instrumentiști profesioniști, sonorizare de calitate și
+          un program muzical adaptat momentului.
+        </p>
+      </div>
+      <div class="hp-seo-block">
+        <h3 class="hp-seo-subtitle">Repertoriu divers și personalizat</h3>
+        <p class="hp-seo-text">
+          Repertoriul nostru acoperă muzică populară românească, muzică ușoară, hituri
+          pop românești și internaționale, dance, muzică de petrecere și momente speciale
+          personalizate. De la dansul mirilor și valsul de deschidere până la ora de
+          petrecere și momentele tradiționale — ne adaptăm stilului și dorințelor fiecărui cuplu.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {/* ═══════════════════════════════════════════
+      DE CE SĂ NE ALEGEȚI — beneficii + H3
+  ═══════════════════════════════════════════ */}
+  <section id="de-ce-noi" class="hp-seo-section" aria-label="De ce să ne alegeți">
+    <h2 class="hp-seo-title">De ce să ne alegeți</h2>
+
+    <div class="hp-seo-grid">
+      <div class="hp-seo-block">
+        <h3 class="hp-seo-subtitle">Profesionalism și punctualitate</h3>
+        <p class="hp-seo-text">
+          Comunicăm transparent din prima discuție, respectăm orarul convenit și venim
+          pregătiți la fiecare eveniment. Echipamentul nostru de sunet și lumini este
+          verificat înainte de orice spectacol, iar artiștii repetă programul stabilit
+          cu fiecare client în parte.
+        </p>
+      </div>
+      <div class="hp-seo-block">
+        <h3 class="hp-seo-subtitle">Program muzical adaptat evenimentului</h3>
+        <p class="hp-seo-text">
+          Nu avem un program standard pe care îl repetăm la fiecare nuntă. Stabilim
+          împreună lista de piese, momentele speciale și ritmul serii. Fie că preferați
+          muzică populară autentică, hituri moderne sau un mix echilibrat — programul
+          muzical este construit în jurul viziunii voastre.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {/* ═══════════════════════════════════════════
+      TIPURI DE EVENIMENTE — servicii + H3
+  ═══════════════════════════════════════════ */}
+  <section id="tipuri-evenimente" class="hp-seo-section" aria-label="Tipuri de evenimente">
+    <h2 class="hp-seo-title">Tipuri de evenimente</h2>
+
+    <div class="hp-seo-grid hp-seo-grid--3">
+      <div class="hp-seo-block">
+        <h3 class="hp-seo-subtitle">Muzică live pentru nunți</h3>
+        <p class="hp-seo-text">
+          Program complet de nuntă: primirea invitaților, cina, dansul mirilor,
+          momente dedicate părinților și petrecerea de noapte. Colaborăm cu
+          fiecare cuplu pentru a crea o atmosferă unică.
+        </p>
+      </div>
+      <div class="hp-seo-block">
+        <h3 class="hp-seo-subtitle">Animație botezuri și aniversări</h3>
+        <p class="hp-seo-text">
+          Muzică live caldă, piese populare și romanțe pentru generațiile mai în vârstă,
+          ritmuri moderne pentru tineri. Repertoriul este echilibrat pentru invitați
+          de toate vârstele.
+        </p>
+      </div>
+      <div class="hp-seo-block">
+        <h3 class="hp-seo-subtitle">Evenimente corporate și private</h3>
+        <p class="hp-seo-text">
+          Show profesionist pentru gale de premiere, seri de team-building, lansări
+          de produse sau petreceri de Crăciun. Muzică de fundal elegantă în timpul
+          cinei, moment live de show și repertoriu rafinat.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {/* ═══════════════════════════════════════════
+      FAQ — Întrebări frecvente (vizibile pe pagină)
+  ═══════════════════════════════════════════ */}
+  <section id="intrebari-frecvente" class="hp-seo-section" aria-label="Întrebări frecvente">
+    <h2 class="hp-seo-title">Întrebări frecvente</h2>
+
+    <div class="hp-faq-list">
+      {faqItems.map((item) => (
+        <details class="hp-faq-item">
+          <summary class="hp-faq-question">
+            <h3 class="hp-faq-q-text">{item.question}</h3>
+            <svg class="hp-faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </summary>
+          <p class="hp-faq-answer">{item.answer}</p>
+        </details>
+      ))}
+      <details class="hp-faq-item">
+        <summary class="hp-faq-question">
+          <h3 class="hp-faq-q-text">Oferiți și sonorizare proprie?</h3>
+          <svg class="hp-faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </summary>
+        <p class="hp-faq-answer">Da, dispunem de echipament profesional de sunet și lumini, inclus în oferta noastră pentru un spectacol complet.</p>
+      </details>
+      <details class="hp-faq-item">
+        <summary class="hp-faq-question">
+          <h3 class="hp-faq-q-text">Cum putem rezerva formația?</h3>
+          <svg class="hp-faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </summary>
+        <p class="hp-faq-answer">Ne puteți contacta telefonic la 0767 369 658, pe WhatsApp sau prin formularul de contact de pe site. Verificăm disponibilitatea și revenim cu o ofertă personalizată.</p>
+      </details>
+    </div>
   </section>
 
   {/* ═══════════════════════════════════════════
@@ -994,6 +1119,129 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
   .hp-card--book:hover .hp-card-cta {
     color: var(--teal, #0BBCD6);
     gap: 0.6rem;
+  }
+
+  /* ════════════════════════════════════════════════════════════════
+     SEO CONTENT SECTIONS — Despre, De ce noi, Evenimente, FAQ
+  ════════════════════════════════════════════════════════════════ */
+  .hp-seo-section {
+    max-width: 900px;
+    margin-inline: auto;
+    padding: clamp(2rem, 4vw, 3rem) 2rem;
+  }
+
+  .hp-seo-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(1.4rem, 2.8vw, 1.8rem);
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    color: #fff;
+    margin: 0 0 1.2rem;
+    line-height: 1.2;
+  }
+
+  .hp-seo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  .hp-seo-grid--3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: 767px) {
+    .hp-seo-grid,
+    .hp-seo-grid--3 {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    .hp-seo-section {
+      padding-inline: 1rem;
+    }
+  }
+
+  .hp-seo-block {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1rem;
+    padding: 1.25rem 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .hp-seo-subtitle {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(0.95rem, 1.6vw, 1.1rem);
+    font-weight: 600;
+    color: rgba(241, 229, 172, 0.85);
+    margin: 0 0 0.6rem;
+    line-height: 1.3;
+  }
+
+  .hp-seo-text {
+    font-size: 0.88rem;
+    line-height: 1.7;
+    color: rgba(200, 210, 230, 0.72);
+    margin: 0;
+  }
+
+  /* FAQ */
+  .hp-faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .hp-faq-item {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1rem;
+    padding: 0;
+    background: rgba(255, 255, 255, 0.03);
+    overflow: hidden;
+  }
+
+  .hp-faq-item[open] {
+    border-color: rgba(241, 229, 172, 0.20);
+  }
+
+  .hp-faq-question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .hp-faq-question::-webkit-details-marker {
+    display: none;
+  }
+
+  .hp-faq-q-text {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(0.92rem, 1.5vw, 1.05rem);
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.90);
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .hp-faq-chevron {
+    flex-shrink: 0;
+    color: rgba(241, 229, 172, 0.50);
+    transition: transform 200ms ease;
+  }
+
+  .hp-faq-item[open] .hp-faq-chevron {
+    transform: rotate(180deg);
+  }
+
+  .hp-faq-answer {
+    padding: 0 1.5rem 1.25rem;
+    margin: 0;
+    font-size: 0.88rem;
+    line-height: 1.7;
+    color: rgba(200, 210, 230, 0.72);
   }
 
 </style>

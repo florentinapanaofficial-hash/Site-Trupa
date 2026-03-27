@@ -2,6 +2,55 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Utility classes for theme colors (replace inline styles) ── */
+.text-title {
+  color: var(--title);
+}
+
+.text-body {
+  color: var(--body);
+}
+
+.text-muted-theme {
+  color: var(--muted);
+}
+
+.form-input-theme {
+  border-color: var(--line);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--title);
+}
+
+.social-btn-yt {
+  background: #FF0000;
+  box-shadow: 0 2px 10px rgba(255, 0, 0, 0.50);
+}
+
+.social-btn-fb {
+  background: #1877F2;
+  box-shadow: 0 2px 10px rgba(24, 119, 242, 0.50);
+}
+
+.social-btn-ig {
+  background: radial-gradient(circle at 30% 110%, #ffd676 0%, #f46f30 25%, #e1306c 55%, #833ab4 80%, #405de6 100%);
+  box-shadow: 0 2px 10px rgba(225, 48, 108, 0.50);
+}
+
+.social-btn-tt {
+  background: #010101;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.60);
+}
+
+.feature-icon-gradient {
+  background: linear-gradient(135deg, #F5A623 0%, #FFD700 50%, #0BBCD6 100%);
+  box-shadow: 0 4px 14px rgba(245, 166, 35, 0.35);
+}
+
+.text-body-dim {
+  color: var(--body);
+  opacity: 0.7;
+}
+
 /* ── Hero photo placeholder (temporar până vin pozele de la ședința foto) ── */
 .hero-photo-card--placeholder {
   background: linear-gradient(135deg, #1a0a2e 0%, #2d1060 50%, #0f0c2a 100%);
