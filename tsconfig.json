@@ -2,10 +2,11 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": [
+        "src/*"
+      ]
     },
     "jsx": "preserve",
-    "jsxImportSource": "react",
     "moduleResolution": "bundler",
     "module": "esnext",
     "target": "esnext",
@@ -13,8 +14,11 @@
     "noEmit": true,
     "strict": true,
     "skipLibCheck": true,
-    "types": ["astro/client"]
+    "types": [
+      "astro/client"
+    ]
   },
-  "include": ["src/**/*"]
+  "include": [
+    "src/**/*"
+  ]
 }
-

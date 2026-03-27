@@ -27,6 +27,14 @@ export const onRequest = defineMiddleware(async (context, next) => {
         return Response.redirect(url.toString(), 301);
     }
 
+    // Redirect /index.html, /index.php → / (SEO: evită conținut duplicat)
+    const { pathname } = context.url;
+    if (pathname === '/index.html' || pathname === '/index.php') {
+        const clean = new URL(context.request.url);
+        clean.pathname = '/';
+        return Response.redirect(clean.toString(), 301);
+    }
+
     const response = await next();
 
     // Aplică security headers pe toate răspunsurile
@@ -44,7 +52,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
 
     // Blochează indexarea rutelor interne de către crawlere
-    const { pathname } = context.url;
     if (pathname.startsWith('/api/') || pathname.startsWith('/admin/')) {
         response.headers.set('X-Robots-Tag', 'noindex, nofollow');
     }

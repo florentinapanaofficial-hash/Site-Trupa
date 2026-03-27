@@ -20,9 +20,16 @@ export default defineConfig({
     }),
     sitemap({
       customPages: [
-        `${siteUrl}/comunitatea-noastra`,
-        `${siteUrl}/momente-cu-mirii`,
+        `${siteUrl}/comunitatea-noastra/`,
+        `${siteUrl}/momente-cu-mirii/`,
       ],
+      filter: (page) => {
+        // Elimină duplicatele fără trailing slash generate de customPages
+        const withoutSlash = page.replace(/\/$/, '');
+        const withSlash = withoutSlash + '/';
+        // Păstrează doar versiunea cu trailing slash
+        return page.endsWith('/');
+      },
     }),
   ],
 });
