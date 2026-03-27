@@ -7,7 +7,14 @@ const { membri, colaboratori: colaboratoriData } = siteContent as any;
 const allMembri: any[] = membri ?? [];
 const solisti        = allMembri.filter((m: any) => m.categorie === 'solisti');
 const instrumentisti = allMembri.filter((m: any) => m.categorie === 'instrumentisti');
-const colaboratori: any[] = colaboratoriData ?? [];
+const colaboratori: any[] = (colaboratoriData ?? []).filter(
+  (c: any) => c.nume && !c.nume.toLowerCase().includes('în curând')
+);
+
+/** Verifică dacă un membru are galerie foto reală (array non-gol). */
+function areGalerieFoto(m: any): boolean {
+  return Array.isArray(m.galpisFoto) && m.galpisFoto.length > 0;
+}
 
 function initiale(name: string): string {
   return name.split(' ').filter(Boolean).map((w) => w[0]).join('').slice(0, 2).toUpperCase();
@@ -57,24 +64,32 @@ function initiale(name: string): string {
               <p class="mc-exp">⭐ {m.experienta}</p>
             )}
 
-            <!-- Galerie placeholder -->
-            <div class="mc-gallery" role="list" aria-label={`Galerie foto ${m.nume}`}>
-              {[1,2,3,4,5,6].map((n) => (
-                <div
-                  class="mc-gallery-ph gallery-thumb"
-                  role="listitem"
-                  data-fx={String(n)}
-                  data-src={`https://placehold.co/800x600/0f2545/e8c85b?text=${encodeURIComponent(m.nume)}`}
-                  data-alt={`${m.nume} la eveniment - Formația Florentina Pană`}
-                  tabindex="0"
-                  title="Click pentru previzualizare"
-                >
-                  <span class="mc-gal-icon" aria-hidden="true">📷</span>
-                  <small class="mc-gal-label">{m.nume} la eveniment</small>
-                  <span class="mc-gal-overlay" aria-hidden="true">🔍</span>
+            <!-- Galerie foto -->
+            {areGalerieFoto(m) ? (
+              <div class="mc-gallery" role="list" aria-label={`Galerie foto ${m.nume}`}>
+                {m.galpisFoto.slice(0, 6).map((foto: any, n: number) => (
+                  <div
+                    class="mc-gallery-ph gallery-thumb"
+                    role="listitem"
+                    data-fx={String((n % 6) + 1)}
+                    data-src={foto.src}
+                    data-alt={foto.alt ?? `${m.nume} la eveniment - Formația Florentina Pană`}
+                    tabindex="0"
+                    title="Click pentru previzualizare"
+                  >
+                    <img src={foto.src} alt={foto.alt ?? `${m.nume} la eveniment`} class="mc-gal-thumb-img" loading="lazy" />
+                    <span class="mc-gal-overlay" aria-hidden="true">🔍</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div class="mc-gallery mc-gallery--soon" aria-label="Galerie foto în curând">
+                <div class="mc-gallery-coming">
+                  <span class="mc-gal-icon" aria-hidden="true">📸</span>
+                  <small class="mc-gal-soon-label">Galerie foto în curând</small>
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
 
             <!-- Buton BIO circular -->
             <button
@@ -148,24 +163,32 @@ function initiale(name: string): string {
             <h3 class="mc-name">{m.nume}</h3>
             <p class="mc-spec">{m.specialitate}</p>
 
-            <!-- Galerie placeholder -->
-            <div class="mc-gallery" role="list" aria-label={`Galerie foto ${m.nume}`}>
-              {[1,2,3,4,5,6].map((n) => (
-                <div
-                  class="mc-gallery-ph gallery-thumb"
-                  role="listitem"
-                  data-fx={String(n)}
-                  data-src={`https://placehold.co/800x600/0f2545/e8c85b?text=${encodeURIComponent(m.nume)}`}
-                  data-alt={`${m.nume} la eveniment - Formația Florentina Pană`}
-                  tabindex="0"
-                  title="Click pentru previzualizare"
-                >
-                  <span class="mc-gal-icon" aria-hidden="true">📷</span>
-                  <small class="mc-gal-label">{m.nume} la eveniment</small>
-                  <span class="mc-gal-overlay" aria-hidden="true">🔍</span>
+            <!-- Galerie foto -->
+            {areGalerieFoto(m) ? (
+              <div class="mc-gallery" role="list" aria-label={`Galerie foto ${m.nume}`}>
+                {m.galpisFoto.slice(0, 6).map((foto: any, n: number) => (
+                  <div
+                    class="mc-gallery-ph gallery-thumb"
+                    role="listitem"
+                    data-fx={String((n % 6) + 1)}
+                    data-src={foto.src}
+                    data-alt={foto.alt ?? `${m.nume} la eveniment - Formația Florentina Pană`}
+                    tabindex="0"
+                    title="Click pentru previzualizare"
+                  >
+                    <img src={foto.src} alt={foto.alt ?? `${m.nume} la eveniment`} class="mc-gal-thumb-img" loading="lazy" />
+                    <span class="mc-gal-overlay" aria-hidden="true">🔍</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div class="mc-gallery mc-gallery--soon" aria-label="Galerie foto în curând">
+                <div class="mc-gallery-coming">
+                  <span class="mc-gal-icon" aria-hidden="true">📸</span>
+                  <small class="mc-gal-soon-label">Galerie foto în curând</small>
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
 
             <!-- Buton BIO circular -->
             <button
@@ -241,24 +264,32 @@ function initiale(name: string): string {
               <p class="mc-exp">⭐ {m.experienta}</p>
             )}
 
-            <!-- Galerie placeholder -->
-            <div class="mc-gallery" role="list" aria-label={`Galerie foto ${m.nume}`}>
-              {[1,2,3,4,5,6].map((n) => (
-                <div
-                  class="mc-gallery-ph gallery-thumb"
-                  role="listitem"
-                  data-fx={String(n)}
-                  data-src={`https://placehold.co/800x600/0f2545/e8c85b?text=${encodeURIComponent(m.nume)}`}
-                  data-alt={`${m.nume} la eveniment - Formația Florentina Pană`}
-                  tabindex="0"
-                  title="Click pentru previzualizare"
-                >
-                  <span class="mc-gal-icon" aria-hidden="true">📷</span>
-                  <small class="mc-gal-label">{m.nume} la eveniment</small>
-                  <span class="mc-gal-overlay" aria-hidden="true">🔍</span>
+            <!-- Galerie foto -->
+            {areGalerieFoto(m) ? (
+              <div class="mc-gallery" role="list" aria-label={`Galerie foto ${m.nume}`}>
+                {m.galpisFoto.slice(0, 6).map((foto: any, n: number) => (
+                  <div
+                    class="mc-gallery-ph gallery-thumb"
+                    role="listitem"
+                    data-fx={String((n % 6) + 1)}
+                    data-src={foto.src}
+                    data-alt={foto.alt ?? `${m.nume} la eveniment - Formația Florentina Pană`}
+                    tabindex="0"
+                    title="Click pentru previzualizare"
+                  >
+                    <img src={foto.src} alt={foto.alt ?? `${m.nume} la eveniment`} class="mc-gal-thumb-img" loading="lazy" />
+                    <span class="mc-gal-overlay" aria-hidden="true">🔍</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div class="mc-gallery mc-gallery--soon" aria-label="Galerie foto în curând">
+                <div class="mc-gallery-coming">
+                  <span class="mc-gal-icon" aria-hidden="true">📸</span>
+                  <small class="mc-gal-soon-label">Galerie foto în curând</small>
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
 
             <!-- Buton BIO circular -->
             <button
@@ -665,6 +696,40 @@ function initiale(name: string): string {
   .mc-gallery-ph:hover .mc-gal-overlay,
   .mc-gallery-ph:focus .mc-gal-overlay {
     opacity: 1;
+  }
+
+  /* ── Thumbnail real image ── */
+  .mc-gal-thumb-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: inherit;
+  }
+
+  /* ── Galerie "în curând" ── */
+  .mc-gallery--soon {
+    display: flex;
+    grid-template-columns: unset;
+  }
+
+  .mc-gallery-coming {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1rem;
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px dashed rgba(255, 255, 255, 0.08);
+    border-radius: 0.5rem;
+  }
+
+  .mc-gal-soon-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.25);
   }
 
   /* ══════════════════════════════════════════
