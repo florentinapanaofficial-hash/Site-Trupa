@@ -2,28 +2,15 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BackButton from '../components/BackButton.astro';
 
-/* ── Date galerie: 12 poze placeholder cu categorii SEO ── */
+/* ── Date galerie: doar poze de la evenimente ── */
+const base = "/images/Galerie Foto Site";
 const photos = [
-  { alt: "Moment dans miri — Nuntă Pitești",                cat: "nunti",      grad: "radial-gradient(ellipse at 30% 60%, #1a0a3d 0%, #0f0820 100%)" },
-  { alt: "Hora mare — Formația Florentina Pană",             cat: "nunti",      grad: "radial-gradient(ellipse at 70% 40%, #0f2545 0%, #0a1628 100%)" },
-  { alt: "Band setup — Lumini scenă elegantă",               cat: "evenimente", grad: "radial-gradient(ellipse at 50% 80%, #142040 0%, #080e1e 100%)" },
-  { alt: "Bucuria nașilor — Botez tradițional Argeș",        cat: "botezuri",   grad: "radial-gradient(ellipse at 40% 30%, #1c1040 0%, #0c0818 100%)" },
-  { alt: "Sârba la nuntă — Energie pe ring",                 cat: "nunti",      grad: "radial-gradient(ellipse at 60% 70%, #162850 0%, #0a1428 100%)" },
-  { alt: "Eveniment corporate — Gală premium",               cat: "corporate",  grad: "radial-gradient(ellipse at 80% 50%, #0d1e38 0%, #060d1a 100%)" },
-  { alt: "Moment emoțional — Tortul mirilor",                cat: "nunti",      grad: "radial-gradient(ellipse at 35% 55%, #200e45 0%, #0e0824 100%)" },
-  { alt: "Mic prinț — Botez în familia Pană",                cat: "botezuri",   grad: "radial-gradient(ellipse at 55% 35%, #142048 0%, #0a1020 100%)" },
-  { alt: "Team-building muzical — Corporate Pitești",        cat: "corporate",  grad: "radial-gradient(ellipse at 45% 65%, #0f1a35 0%, #080e1e 100%)" },
-  { alt: "Invitați în dans — Petrecere de neuitat",          cat: "evenimente", grad: "radial-gradient(ellipse at 65% 45%, #1a1040 0%, #0c0820 100%)" },
-  { alt: "Solo vioară — Dansul mirilor la nuntă",            cat: "nunti",      grad: "radial-gradient(ellipse at 30% 40%, #162550 0%, #0a1428 100%)" },
-  { alt: "Scenă completă — Concert live Formația Florentina Pană", cat: "evenimente", grad: "radial-gradient(ellipse at 50% 50%, #121838 0%, #080e1e 100%)" },
+  { src: `${base}/Galerie Evenimente 1.jpg`, alt: "Eveniment live — Formația Florentina Pană",  cat: "evenimente" },
+  { src: `${base}/Galerie Evenimente 2.jpg`, alt: "Eveniment special — scenă completă",         cat: "evenimente" },
 ];
 
-const heights = [280, 200, 320];
 const categories = [
   { id: "toate",      label: "Toate" },
-  { id: "nunti",      label: "Nunți" },
-  { id: "botezuri",   label: "Botezuri" },
-  { id: "corporate",  label: "Corporate" },
   { id: "evenimente", label: "Evenimente" },
 ];
 ---
@@ -67,15 +54,16 @@ const categories = [
           data-category={p.cat}
           data-fx={String((i % 6) + 1)}
           data-index={i}
+          data-src={p.src}
           tabindex="0"
-          style={`background: ${p.grad}; height: ${heights[i % 3]}px;`}
         >
-          {/* Iconița cameră SVG */}
-          <svg class="gal-cam-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-            <rect width="18" height="14" x="3" y="6" rx="2"/>
-            <circle cx="12" cy="13" r="3.5"/>
-            <path d="M7 6 8.5 3h7L17 6"/>
-          </svg>
+          <img
+            src={p.src}
+            alt={p.alt}
+            class="gal-photo-img"
+            loading="lazy"
+            decoding="async"
+          />
           <figcaption class="gal-caption">{p.alt}</figcaption>
           {/* Hover overlay */}
           <div class="gal-hover" aria-hidden="true">
@@ -89,13 +77,7 @@ const categories = [
       ))}
     </div>
 
-    <!-- ═══ BUTON ÎNCARCĂ MAI MULTE ═══ -->
-    <div class="gal-load-wrap">
-      <button class="gal-load-btn" type="button" disabled title="Poze în curând">
-        Încarcă mai multe
-        <span class="gal-load-tooltip">Poze în curând</span>
-      </button>
-    </div>
+
 
     <!-- ═══ LIGHTBOX ═══ -->
     <div id="gal-lightbox" role="dialog" aria-modal="true" aria-label="Previzualizare fotografie">
@@ -176,7 +158,7 @@ const categories = [
     const fx = item.dataset.fx ?? '1';
     currentFx = fx;
     const anim = fxMap[fx] ?? fxMap['1'];
-    const src = `https://placehold.co/1200x800/0f2545/e8c85b?text=${encodeURIComponent(item.querySelector('figcaption')?.textContent ?? 'Foto')}`;
+    const src = item.dataset.src ?? '';
     const alt = item.querySelector('figcaption')?.textContent ?? '';
     lbImg.src = src;
     lbImg.alt = alt;
@@ -409,22 +391,35 @@ const categories = [
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.6rem;
+    gap: 0;
   }
 
-  .gal-cam-icon {
-    width: 32px;
-    height: 32px;
-    color: rgba(232, 200, 91, 0.40);
+  .gal-photo-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    border-radius: 1rem;
   }
 
   .gal-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
     font-size: 0.68rem;
     letter-spacing: 0.04em;
-    color: rgba(200, 215, 240, 0.35);
+    color: rgba(255, 255, 255, 0.85);
     text-align: center;
-    padding: 0 1rem;
+    padding: 1.5rem 1rem 0.6rem;
     line-height: 1.4;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+    opacity: 0;
+    transition: opacity 300ms ease;
+  }
+
+  .gal-item:hover .gal-caption {
+    opacity: 1;
   }
 
   /* Hover overlay */

@@ -505,8 +505,77 @@
         "Corporate"
       ],
       "categorie": "solisti",
-      "imagine": "",
-      "galpisFoto": []
+      "imagine": "/images/Galerie Foto Site/Florentina Pan%C4%83 1.jpg",
+      "galpisFoto": [
+        {
+          "src": "/images/Galerie Foto Site/Florentina Pan%C4%83 1.jpg",
+          "alt": "Florentina Pană — Solistă vocală"
+        },
+        {
+          "src": "/images/Galerie Foto Site/Florentina Pan%C4%83 2.jpg",
+          "alt": "Florentina Pană la eveniment"
+        },
+        {
+          "src": "/images/Galerie Foto Site/Florentina Pan%C4%83 3.jpg",
+          "alt": "Florentina Pană pe scenă"
+        },
+        {
+          "src": "/images/Galerie Foto Site/Florentina Pan%C4%83 4.jpg",
+          "alt": "Florentina Pană — concert live"
+        },
+        {
+          "src": "/images/Galerie Foto Site/Florentina Pan%C4%83 5.jpg",
+          "alt": "Florentina Pană — nuntă"
+        },
+        {
+          "src": "/images/Galerie Foto Site/Florentina Pan%C4%83 6.jpg",
+          "alt": "Florentina Pană interpretând"
+        },
+        {
+          "src": "/images/Galerie Foto Site/Florentina Pan%C4%83 7.jpg",
+          "alt": "Florentina Pană — moment artistic"
+        },
+        {
+          "src": "/images/Galerie Foto Site/Florentina Pan%C4%83 8.jpg",
+          "alt": "Florentina Pană — petrecere"
+        },
+        {
+          "src": "/images/Galerie Foto Site/Florentina Pan%C4%83 09.jpg",
+          "alt": "Florentina Pană — prezență scenică"
+        },
+        {
+          "src": "/images/Galerie Foto Site/Florentina Pan%C4%83 10.jpg",
+          "alt": "Florentina Pană — sesiune foto"
+        },
+        {
+          "src": "/images/Galerie Foto Site/Florentina Pan%C4%83 11.jpg",
+          "alt": "Florentina Pană — portret"
+        },
+        {
+          "src": "/images/Galerie Foto Site/Florentina Pan%C4%83 12.jpg",
+          "alt": "Florentina Pană — la scenă"
+        },
+        {
+          "src": "/images/Galerie Foto Site/Galerie Foto Claudiu & Florentina Pan%C4%83 5.jpg",
+          "alt": "Florentina Pană — concert"
+        },
+        {
+          "src": "/images/Galerie Foto Site/Galerie Foto Claudiu & Florentina Pan%C4%83 6.jpg",
+          "alt": "Florentina Pană — petrecere"
+        },
+        {
+          "src": "/images/Galerie Foto Site/Galerie Foto Claudiu & Florentina Pan%C4%83 7.jpg",
+          "alt": "Florentina Pană — dans"
+        },
+        {
+          "src": "/images/Galerie Foto Site/Galerie Foto Claudiu & Florentina Pan%C4%83 8.jpg",
+          "alt": "Florentina Pană — moment"
+        },
+        {
+          "src": "/images/Galerie Foto Site/IMG_9895.jpg",
+          "alt": "Florentina Pană — eveniment"
+        }
+      ]
     },
     {
       "nume": "Cătălin Matei",
@@ -538,8 +607,41 @@
         "Aranjamente Muzicale"
       ],
       "categorie": "instrumentisti",
-      "imagine": "",
-      "galpisFoto": []
+      "imagine": "/images/Galerie Foto Site/Claudiu 1.jpg",
+      "galpisFoto": [
+        {
+          "src": "/images/Galerie Foto Site/Claudiu 1.jpg",
+          "alt": "Claudiu Pană — Orgă"
+        },
+        {
+          "src": "/images/Galerie Foto Site/Claudiu 2.jpg",
+          "alt": "Claudiu Pană la orgă"
+        },
+        {
+          "src": "/images/Galerie Foto Site/Claudiu 3.jpg",
+          "alt": "Claudiu Pană — eveniment"
+        },
+        {
+          "src": "/images/Galerie Foto Site/Claudiu 4.jpg",
+          "alt": "Claudiu Pană pe scenă"
+        },
+        {
+          "src": "/images/Galerie Foto Site/Claudiu 5.jpg",
+          "alt": "Claudiu Pană — concert"
+        },
+        {
+          "src": "/images/Galerie Foto Site/Galerie Foto Claudiu & Florentina Pan%C4%83 2.jpg",
+          "alt": "Claudiu Pană — nuntă"
+        },
+        {
+          "src": "/images/Galerie Foto Site/Galerie Foto Claudiu & Florentina Pan%C4%83 3.jpg",
+          "alt": "Claudiu Pană — pe scenă"
+        },
+        {
+          "src": "/images/Galerie Foto Site/Galerie Foto Claudiu & Florentina Pan%C4%83 4.jpg",
+          "alt": "Claudiu Pană — eveniment"
+        }
+      ]
     },
     {
       "nume": "Marian Oprea",
