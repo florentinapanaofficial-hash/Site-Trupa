@@ -5,7 +5,7 @@ buildCommand = "npm run build"
 [deploy]
 # HOST=0.0.0.0 → acceptă conexiuni externe (nu doar localhost)
 # PORT=$PORT   → Railway injectează portul dinamic; Astro standalone îl citește din env
-startCommand = "HOST=0.0.0.0 PORT=$PORT node ./dist/server/entry.mjs"
+startCommand = "HOST=0.0.0.0 PORT=$PORT node server.mjs"
 healthcheckPath = "/"
 healthcheckTimeout = 60
 restartPolicyType = "on_failure"
