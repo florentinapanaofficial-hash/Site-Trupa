@@ -86,6 +86,11 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
 ---
 
 <BaseLayout title={`Momente cu mirii | ${brand.name}`} description="Galerie completă cu poze ale mirilor și trupei. Caută după eveniment, cuplu sau locație.">
+  <Fragment slot="head">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&display=swap" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&display=swap" /></noscript>
+  </Fragment>
   <!-- Overlay cer la apus — inutilă în afara dialogului, mutată înăuntru -->
   <section class="section-container pt-6 pb-16" id="momente-reale">
     <div class="mb-4"><BackButton href="/" label="Acasă" /></div>
@@ -1518,8 +1523,7 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
   </script>
 
   <style is:global>
-    /* ── Import Cormorant Garamond — titluri serif elegante ──────────────── */
-    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&display=swap');
+    /* Cormorant Garamond se încarcă async via <link preload> în <head> */
 
     /* ─── Couple Cards — card unic vertical per cuplu ────────────────── */
     .couple-cards-section {

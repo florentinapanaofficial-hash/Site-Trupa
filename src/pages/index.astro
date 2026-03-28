@@ -1,6 +1,8 @@
 ---
+import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import siteContent from '../data/siteContent.json';
+import heroImg from '../assets/card-1-panoramica.jpg';
 
 const { seo, contact, faq } = siteContent;
 const faqItems = faq as Array<{ question: string; answer: string }>;
@@ -27,6 +29,9 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
 <BaseLayout title={seo.title} description={seo.description} ogImage={seo.ogImage}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" /></noscript>
   </Fragment>
 
   {/* ═══════════════════════════════════════════
@@ -44,13 +49,14 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
 
       {/* Card foto — vizibil doar pe mobil, colțuri rotunjite */}
       <div class="hero-photo-card">
-        <img
-          src="/images/Galerie Foto Site/Card 1 panoramica.jpg"
+        <Image
+          src={heroImg}
           alt="Formația Florentina Pană"
           class="hero-photo-img"
+          format="webp"
+          width={320}
+          height={213}
           loading="eager"
-          width="320"
-          height="213"
         />
       </div>
 
@@ -395,10 +401,7 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
 </script>
 
 <style>
-  /* ════════════════════════════════════════════════════════════════
-     TIPOGRAFIE — import Cormorant Garamond (Serif subțire, elegant)
-  ════════════════════════════════════════════════════════════════ */
-  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap');
+  /* Cormorant Garamond se încarcă async via <link preload> în <head> */
 
   /* ════════════════════════════════════════════════════════════════
      HTML / BODY — transparent peste cerul Sirius
