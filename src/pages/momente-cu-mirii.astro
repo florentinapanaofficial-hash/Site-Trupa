@@ -1536,6 +1536,36 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
   <style is:global>
     /* Cormorant Garamond se încarcă async via <link preload> în <head> */
 
+    /* ─── Lightbox base (mutat din globals.css — folosit doar pe această pagină) ── */
+    .photo-lightbox {
+      border: 1px solid #ffffff2f;
+      border-radius: 1rem;
+      background: #0c132be8;
+      padding: 0.9rem;
+      max-width: min(92vw, 980px);
+    }
+    .photo-lightbox::backdrop {
+      background: rgba(3, 7, 18, 0.82);
+      backdrop-filter: blur(4px);
+    }
+    .lightbox-image {
+      margin-top: 4rem;
+      width: 100%;
+      max-width: 1200px;
+      height: auto;
+      max-height: 82vh;
+      aspect-ratio: 16/7;
+      object-fit: cover;
+      border-radius: 1.6rem;
+      border: 2px solid #ffffff44;
+    }
+    .lightbox-caption {
+      margin: 0.6rem 0 0;
+      font-size: 0.8rem;
+      color: #dce9ff;
+      font-weight: 600;
+    }
+
     /* ─── Couple Cards — card unic vertical per cuplu ────────────────── */
     .couple-cards-section {
       margin-top: 2rem;
