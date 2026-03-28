@@ -3,14 +3,16 @@ import { handler as ssrHandler } from './dist/server/entry.mjs';
 import sirv from 'sirv';
 import compression from 'compression';
 
-// ── Compression (gzip/brotli) for all responses ──
+// ── Compression for SSR responses (static files use pre-built .gz/.br via sirv) ──
 const compress = compression({ threshold: 256 });
 
-// ── Static file serving (CSS, JS, images from dist/client) ──
+// ── Static file serving — pre-compressed .gz/.br files served automatically ──
 const serve = sirv('dist/client', {
     etag: true,
     gzip: true,
     brotli: true,
+    maxAge: 0,
+    immutable: false,
     setHeaders(res, pathname) {
         // /_astro/* → hashed assets → 1 year immutable
         if (pathname.startsWith('/_astro/')) {
@@ -58,9 +60,9 @@ const server = createServer((req, res) => {
         res.setHeader(key, value);
     }
 
-    // Compression → static files → SSR handler
-    compress(req, res, () => {
-        serve(req, res, () => {
+    // Static files first (pre-compressed via sirv), SSR with gzip fallback
+    serve(req, res, () => {
+        compress(req, res, () => {
             ssrHandler(req, res);
         });
     });
