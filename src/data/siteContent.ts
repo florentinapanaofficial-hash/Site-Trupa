@@ -96,7 +96,7 @@ export const siteContent = {
         couple: 'Andreea & Radu',
         city: 'Pitești',
         date: 'Septembrie 2025',
-        image: 'https://placehold.co/900x1200/1a234a/eef6ff?text=Andreea+%26+Radu',
+        image: '',
         youtubeUrl: 'https://www.youtube.com/watch?v=HQfVn98caic',
         coupleQuote:
           '"A fost exact cum ne-am dorit: tradiție, eleganță și o atmosferă incredibilă pe ringul de dans."',
@@ -106,7 +106,7 @@ export const siteContent = {
         couple: 'Bianca & Mihai',
         city: 'Curtea de Argeș',
         date: 'Iulie 2025',
-        image: 'https://placehold.co/1200x900/202b5a/eef6ff?text=Bianca+%26+Mihai',
+        image: '',
         youtubeUrl: 'https://www.youtube.com/watch?v=7MQIWMj_W0g',
         coupleQuote:
           '"Invitații au dansat toată noaptea. Formația a avut energie, profesionalism și comunicare perfectă."',
@@ -116,7 +116,7 @@ export const siteContent = {
         couple: 'Ioana & Cătălin',
         city: 'București',
         date: 'Iunie 2025',
-        image: 'https://placehold.co/900x1200/26336b/eef6ff?text=Ioana+%26+C%C4%83t%C4%83lin',
+        image: '',
         youtubeUrl: 'https://www.youtube.com/watch?v=GRwVkbUGVPs',
         coupleQuote:
           '"Ne-au ascultat toate dorințele muzicale și au creat o atmosferă premium de la început până la final."',
@@ -126,7 +126,7 @@ export const siteContent = {
         couple: 'Alina & Ștefan',
         city: 'Brașov',
         date: 'Mai 2025',
-        image: 'https://placehold.co/1200x900/2b3878/eef6ff?text=Alina+%26+%C8%98tefan',
+        image: '',
         youtubeUrl: 'https://www.youtube.com/watch?v=HQfVn98caic',
         coupleQuote:
           '"O echipă de nota 10! Au ridicat sala în picioare și au făcut din seara noastră o amintire de neuitat."',
@@ -248,14 +248,14 @@ export const siteContent = {
         role: 'Interpretă de muzică populară și ușoară',
         description:
           'Voce cu timbru cald, prezență scenică elegantă și repertoriu construit pe dinamica evenimentului. Coordonează momentele-cheie astfel încât invitații să rămână conectați de la început până la final.',
-        image: 'https://placehold.co/400x400/112245/e9f5ff?text=Florentina+Pan%C4%83',
+        image: '',
       },
       {
         name: 'Cătălin Matei',
         role: 'Interpret de Muzică Populară de Petrecere',
         description:
           'Voce puternică și energie de petrecere autentică. Interacționează natural cu publicul și ridică atmosfera în momentele de dans și tradiție.',
-        image: 'https://placehold.co/400x400/1b2c52/e9f5ff?text=C%C4%83t%C4%83lin+Matei',
+        image: '',
       },
     ],
     instrumentalists: [
@@ -263,19 +263,19 @@ export const siteContent = {
         name: 'Oprea Marian',
         role: 'Solist instrumentist - Vioară',
         description: 'Intervenții melodice expresive, potrivite pentru intrări speciale, dansul mirilor și momente emoționale cu impact artistic.',
-        image: 'https://placehold.co/400x400/1a1f3a/f4fff0?text=Oprea+Marian',
+        image: '',
       },
       {
         name: 'Cristian Ograbek',
         role: 'Solist instrumentist - Acordeon',
         description: 'Sunet vibrant și ritm de petrecere, cu acompaniament versatil pentru hore, sârbe și momente live cu public implicat.',
-        image: 'https://placehold.co/400x400/202850/f4fff0?text=Cristian+Ograbek',
+        image: '',
       },
       {
         name: 'Claudiu Pană',
         role: 'Solist instrumentist - Orgă',
         description: 'Aranjamente moderne și control armonic excelent, asigurând tranziții fluide între genuri și un sound unitar pentru întregul program.',
-        image: 'https://placehold.co/400x400/252f5f/f4fff0?text=Claudiu+Pan%C4%83',
+        image: '',
       },
     ],
     collaborators: [

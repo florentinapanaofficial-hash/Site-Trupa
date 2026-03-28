@@ -122,22 +122,33 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
               style={`--cc:${(event as any).accentColor ?? '#f5a623'};--cc-glow:${(event as any).accentGlow ?? 'rgba(245,166,35,0.28)'}`}
             >
               {/* Etaj 1 — fotografia (click → lightbox cu petale + cer) */}
-              <button
-                type="button"
-                class="cc-photo"
-                data-lightbox-src={event.image}
-                data-lightbox-alt={event.couple}
-                data-lightbox-caption={`${event.couple} \u2022 ${event.city} \u2022 ${event.date}`}
-                data-lightbox-audio={event.audioUrl ?? ''}
-                data-lightbox-quote={event.coupleQuote ?? ''}
-                aria-label={`Deschide fotografia ${event.couple}`}
-              >
-                <img src={event.image} alt={event.couple} loading="eager" decoding="async" />
-                <div class="cc-name-overlay">
-                  <span class="cc-name">{event.couple}</span>
-                  <span class="cc-meta">{event.city} &bull; {event.date}</span>
+              {event.image && event.image.trim() !== '' ? (
+                <button
+                  type="button"
+                  class="cc-photo"
+                  data-lightbox-src={event.image}
+                  data-lightbox-alt={event.couple}
+                  data-lightbox-caption={`${event.couple} \u2022 ${event.city} \u2022 ${event.date}`}
+                  data-lightbox-audio={event.audioUrl ?? ''}
+                  data-lightbox-quote={event.coupleQuote ?? ''}
+                  aria-label={`Deschide fotografia ${event.couple}`}
+                >
+                  <img src={event.image} alt={event.couple} loading="eager" decoding="async" />
+                  <div class="cc-name-overlay">
+                    <span class="cc-name">{event.couple}</span>
+                    <span class="cc-meta">{event.city} &bull; {event.date}</span>
+                  </div>
+                </button>
+              ) : (
+                <div class="cc-photo cc-photo--placeholder" aria-label={event.couple}>
+                  <div class="cc-ph-initials">{event.couple.split(' & ').map(n => n[0]).join('&')}</div>
+                  <span class="cc-ph-label">Foto în curând</span>
+                  <div class="cc-name-overlay">
+                    <span class="cc-name">{event.couple}</span>
+                    <span class="cc-meta">{event.city} &bull; {event.date}</span>
+                  </div>
                 </div>
-              </button>
+              )}
 
               {/* Etaj 2 — citat + link blog + link Dans Miri */}
               <div class="cc-footer">
@@ -1587,6 +1598,31 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
     }
     .couple-card:hover .cc-photo img {
       transform: scale(1.04);
+    }
+    .cc-photo--placeholder {
+      aspect-ratio: 16 / 9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      background: linear-gradient(135deg, rgba(var(--cc-r, 245), var(--cc-g, 166), var(--cc-b, 35), 0.15), rgba(15,18,42,0.92));
+      border-bottom: 1.5px solid var(--cc, #f5a623);
+      cursor: default;
+    }
+    .cc-ph-initials {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--cc, #f5a623);
+      opacity: 0.7;
+    }
+    .cc-ph-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.45);
     }
     .cc-name-overlay {
       position: absolute;
