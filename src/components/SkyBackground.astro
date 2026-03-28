@@ -6,7 +6,15 @@
 ---
 
 <style is:global>
-  html,
+  /* html primește culoarea cea mai întunecată din gradientul cerului
+     pentru ca Lighthouse/axe-core să vadă un fundal solid la root.
+     Vizual nu se schimbă nimic — #sky-bg-2d acoperă totul.          */
+  html {
+    background:       #0b1e5e !important;
+    background-color: #0b1e5e !important;
+    background-image: none    !important;
+  }
+
   body,
   .page-shell,
   .layout-content-shell,
