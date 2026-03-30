@@ -182,6 +182,22 @@ const mobileNavAllItems = [
     </div>
 
     <script is:inline src="/js/mobile-swipe.js" defer></script>
+
+    <!-- Calculează înălțimea mob-nav și sincronizează --mob-nav-h -->
+    <script is:inline>
+    (function(){
+      if(!window.matchMedia('(max-width:1023px)').matches) return;
+      function sync(){
+        var nav=document.querySelector('.mob-nav');
+        if(!nav) return;
+        var h=nav.offsetHeight;
+        if(h>0) document.documentElement.style.setProperty('--mob-nav-h',h+'px');
+      }
+      // Rulează la load + resize (menu-ul se poate re-wrapa)
+      if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',sync);}else{sync();}
+      window.addEventListener('resize',sync,{passive:true});
+    })();
+    </script>
   </body>
 </html>
 

@@ -2345,9 +2345,9 @@ details:focus-visible {
     margin: 0 !important;
     border-radius: 0 !important;
     box-sizing: border-box !important;
-    /* max() garantează clearance minim față de mob-nav (~96px, 2 rânduri butoane mari)
-       chiar și la font-size mic (accessibility settings) */
-    padding-top: max(6.5rem, 104px) !important;
+    /* --mob-nav-h este calculat dinamic în BaseLayout (JS) pentru a acoperi
+       meniul pe 2–3 rânduri; fallback generos pentru 3 rânduri (~140px). */
+    padding-top: calc(var(--mob-nav-h, 140px) + 0.75rem) !important;
     padding-bottom: 5rem !important;
     padding-left: 1.4rem !important;
     padding-right: 1.4rem !important;
@@ -2356,7 +2356,7 @@ details:focus-visible {
   /* ── Hero Acasă — conținut aliniat sus, nu centrat vertical ── */
   main#continut>section#acasa.hero-stage {
     justify-content: flex-start !important;
-    padding-top: 5rem !important;
+    padding-top: calc(var(--mob-nav-h, 140px) + 0.5rem) !important;
   }
 
   main#continut>section::-webkit-scrollbar {
@@ -2539,13 +2539,13 @@ details:focus-visible {
     scroll-snap-align: none !important;
     scroll-snap-stop: unset !important;
     touch-action: pan-y !important;
-    padding-top: max(5rem, 80px) !important;
+    padding-top: calc(var(--mob-nav-h, 140px) + 0.75rem) !important;
     padding-bottom: 4rem !important;
   }
 
   body.is-homepage main#continut>section#acasa.hero-stage {
     justify-content: flex-start !important;
-    padding-top: 5rem !important;
+    padding-top: calc(var(--mob-nav-h, 140px) + 0.5rem) !important;
   }
 
   /* Secțiunile SEO pe homepage — nu forța min-height 100dvh, doar cât conținut au */

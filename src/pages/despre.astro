@@ -215,7 +215,7 @@ const hasBandPhoto = typeof (brand as any).bandPhoto === 'string' && (brand as a
     color: rgba(255, 255, 255, 0.82);
     margin: 0;
   }
-  @media (max-width: 768px) {
+  @media (max-width: 767px) {
     .dp-intro-block {
       grid-template-columns: 1fr;
       gap: 2rem;
@@ -252,8 +252,16 @@ const hasBandPhoto = typeof (brand as any).bandPhoto === 'string' && (brand as a
     width: 100%;
     aspect-ratio: 21 / 7;
     object-fit: cover;
-    object-position: center 20%;
+    object-position: top;
     display: block;
+  }
+  @media (max-width: 767px) {
+    .dp-band-photo {
+      aspect-ratio: 4 / 3;
+    }
+    .dp-band-photo-placeholder {
+      aspect-ratio: 4 / 3;
+    }
   }
   .dp-band-photo-placeholder {
     width: 100%;

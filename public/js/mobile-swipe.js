@@ -5,6 +5,16 @@
     var main = document.getElementById('continut');
     if (!main) return;
 
+    /* ── bfcache fix: când browser-ul restaurează pagina din back-forward cache,
+         inline styles (opacity:0, transition) sunt păstrate → conținut invizibil.
+         pageshow.persisted === true indică restaurare din bfcache. ── */
+    window.addEventListener('pageshow', function (e) {
+        if (e.persisted) {
+            main.style.opacity = '';
+            main.style.transition = '';
+        }
+    });
+
     var slides = Array.from(main.querySelectorAll(':scope > section'));
     if (!slides.length) return;
 
