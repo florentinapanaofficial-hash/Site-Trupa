@@ -89,6 +89,28 @@ function initiale(name: string): string {
                     title="Click pentru previzualizare"
                   >
                     <img src={foto.src} alt={foto.alt ?? `${m.nume} la eveniment`} class="mc-gal-thumb-img" loading="lazy" width="300" height="200" />
+                    <span class="mc-gal-overlay" aria-hidden="true">🔍</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div class="mc-gallery mc-gallery--soon" aria-label="Galerie foto în curând">
+                <div class="mc-gallery-coming">
+                  <span class="mc-gal-icon" aria-hidden="true">📸</span>
+                  <small class="mc-gal-soon-label">Galerie foto în curând</small>
+                </div>
+              </div>
+            )}
+
+            <!-- Buton BIO circular -->
+            <button
+              class="bio-btn"
+              type="button"
+              aria-expanded="false"
+              aria-controls={`bio-panel-s${i}`}
+              aria-label={`Biografie ${m.nume}`}
+            >
+              <span class="bio-btn-text">BIO</span>
             </button>
           </div>
         </article>
