@@ -2285,11 +2285,11 @@ details:focus-visible {
     overflow-x: hidden !important;
   }
 
-  /* Pe paginile non-homepage (swipe orizontal), previne accesul vertical la footer
-     prin scroll body — conflict pe iOS Safari < 16.
-     Homepage-ul nu este afectat: body rămâne scroll container normal. */
+  /* Pe paginile non-homepage (swipe orizontal), clip în loc de hidden:
+     previne accesul vertical la footer dar nu blochează pull-to-refresh
+     (clip nu creează scroll container → nu interferează cu overscroll). */
   .page-shell:not(.is-homepage) {
-    overflow-y: hidden !important;
+    overflow-y: clip !important;
   }
 
   /* ── 5. Main = container orizontal cu scroll-snap ── */
@@ -2334,7 +2334,7 @@ details:focus-visible {
     min-height: unset !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
-    overscroll-behavior-y: contain !important;
+    overscroll-behavior-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
     /* pan-y: browserul gestionțează scroll vertical nativ în secțiune;
        gestul orizontal rămâne disponibil pentru JS (nu e revendicat de browser) */
