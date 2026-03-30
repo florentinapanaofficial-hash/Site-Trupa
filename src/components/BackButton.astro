@@ -7,58 +7,69 @@ interface Props {
 const { href = '/', label = 'Înapoi' } = Astro.props;
 ---
 
-<a href={href} class="back-btn" aria-label={`Înapoi — ${label}`} onclick="history.length > 1 ? (history.back(), event.preventDefault()) : null">
-  <svg class="back-arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+<a href={href} class="back-btn" aria-label={`Înapoi — ${label}`} data-back-href={href}>
+  <svg class="back-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
     <path d="M19 12H5M12 5l-7 7 7 7"/>
   </svg>
+  <span class="back-label">{label}</span>
 </a>
 
 <style>
   .back-btn {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    width: 2.4rem;
-    height: 2.4rem;
+    gap: 0.45rem;
+    padding: 0.45rem 1rem 0.45rem 0.65rem;
     border-radius: 9999px;
     border: 1.5px solid rgba(120, 200, 255, 0.35);
     background: rgba(80, 180, 255, 0.07);
     text-decoration: none;
-    transition: background 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+    color: rgba(180, 225, 255, 0.92);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    transition: background 220ms ease, border-color 220ms ease, box-shadow 220ms ease, color 220ms ease;
   }
 
-  .back-btn:hover {
+  .back-btn:hover,
+  .back-btn:active {
     background: rgba(100, 200, 255, 0.15);
     border-color: rgba(160, 220, 255, 0.65);
     box-shadow: 0 0 14px rgba(100, 200, 255, 0.3);
+    color: #fff;
+  }
+
+  .back-btn:active {
+    transform: scale(0.96);
   }
 
   .back-arrow {
-    color: transparent;
-    stroke: url(#pearl-grad);
-    animation: arrow-nudge 1.8s ease-in-out infinite;
-    filter: drop-shadow(0 0 4px rgba(140, 220, 255, 0.55));
+    flex-shrink: 0;
+    color: rgba(160, 220, 255, 0.85);
+    transition: transform 200ms ease;
   }
 
   .back-btn:hover .back-arrow {
-    animation: none;
-    filter: drop-shadow(0 0 7px rgba(180, 235, 255, 0.8));
+    transform: translateX(-3px);
   }
 
-  @keyframes arrow-nudge {
-    0%, 100% { transform: translateX(0); }
-    40%       { transform: translateX(-5px); }
-    65%       { transform: translateX(-2px); }
+  .back-label {
+    white-space: nowrap;
   }
 </style>
 
-<!-- gradient SVG defs injectate o singură dată în DOM -->
-<svg width="0" height="0" style="position:absolute;overflow:hidden" aria-hidden="true">
-  <defs>
-    <linearGradient id="pearl-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%"   stop-color="#b8e8ff"/>
-      <stop offset="45%"  stop-color="#7ecfff"/>
-      <stop offset="100%" stop-color="#c2f0ff"/>
-    </linearGradient>
-  </defs>
-</svg>
+<script>
+  document.addEventListener('click', function (e) {
+    var btn = (e.target as HTMLElement).closest?.('.back-btn');
+    if (!btn) return;
+    var fallback = btn.getAttribute('data-back-href') || '/';
+    // Only use history.back() if we have real in-site history
+    if (document.referrer && document.referrer.includes(location.hostname) && history.length > 1) {
+      e.preventDefault();
+      history.back();
+    }
+    // Otherwise follow the href naturally (fallback link)
+  });
+</script>

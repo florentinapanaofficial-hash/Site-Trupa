@@ -131,10 +131,12 @@ const articleJsonLd = {
               {block.src ? (
                 <img
                   src={block.src}
-                  alt={block.caption ?? ''}
+                  alt={block.caption || `Ilustrație pentru articolul ${post.title}`}
                   class="bp-img"
                   loading="lazy"
                   decoding="async"
+                  width="800"
+                  height="450"
                 />
               ) : (
                 <div class="bp-img-placeholder" aria-hidden="true">

@@ -25,6 +25,17 @@ function initiale(name: string): string {
   title="Membrii Formației Florentina Pană | Muzicieni Profesioniști Pitești România"
   description="Cunoaște echipa formației Florentina Pană — soliști vocali și instrumentiști cu experiență de peste 20 ani pe scenele din România. Disponibili pentru nunți, botezuri și evenimente corporate în Pitești și toată țara."
 >
+  <div class="mb-6 px-4 pt-6">
+    <BackButton href="/" label="Acasă" />
+  </div>
+
+  <!-- ═══ HEADER PAGINĂ ═══ -->
+  <header class="section-head mx-auto text-center mb-10 pt-8">
+    <p class="kicker">Echipa noastră</p>
+    <h1 class="section-title">Membrii Formației Florentina Pană</h1>
+    <p class="section-copy">Soliști vocali, instrumentiști și colaboratori cu experiență de peste 10 ani pe scenele din România.</p>
+  </header>
+
   <!-- ═══ SOLIȘTI VOCALI ═══ -->
   <section class="mem-section" aria-labelledby="sec-solisti">
     <div class="mem-sec-head">
@@ -77,29 +88,7 @@ function initiale(name: string): string {
                     tabindex="0"
                     title="Click pentru previzualizare"
                   >
-                    <img src={foto.src} alt={foto.alt ?? `${m.nume} la eveniment`} class="mc-gal-thumb-img" loading="lazy" />
-                    <span class="mc-gal-overlay" aria-hidden="true">🔍</span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div class="mc-gallery mc-gallery--soon" aria-label="Galerie foto în curând">
-                <div class="mc-gallery-coming">
-                  <span class="mc-gal-icon" aria-hidden="true">📸</span>
-                  <small class="mc-gal-soon-label">Galerie foto în curând</small>
-                </div>
-              </div>
-            )}
-
-            <!-- Buton BIO circular -->
-            <button
-              class="bio-btn"
-              type="button"
-              aria-expanded="false"
-              aria-controls={`bio-panel-s${i}`}
-              aria-label={`Biografie ${m.nume}`}
-            >
-              <span class="bio-btn-text">BIO</span>
+                    <img src={foto.src} alt={foto.alt ?? `${m.nume} la eveniment`} class="mc-gal-thumb-img" loading="lazy" width="300" height="200" />
             </button>
           </div>
         </article>
@@ -176,7 +165,7 @@ function initiale(name: string): string {
                     tabindex="0"
                     title="Click pentru previzualizare"
                   >
-                    <img src={foto.src} alt={foto.alt ?? `${m.nume} la eveniment`} class="mc-gal-thumb-img" loading="lazy" />
+                    <img src={foto.src} alt={foto.alt ?? `${m.nume} la eveniment`} class="mc-gal-thumb-img" loading="lazy" width="300" height="200" />
                     <span class="mc-gal-overlay" aria-hidden="true">🔍</span>
                   </div>
                 ))}
@@ -277,7 +266,7 @@ function initiale(name: string): string {
                     tabindex="0"
                     title="Click pentru previzualizare"
                   >
-                    <img src={foto.src} alt={foto.alt ?? `${m.nume} la eveniment`} class="mc-gal-thumb-img" loading="lazy" />
+                    <img src={foto.src} alt={foto.alt ?? `${m.nume} la eveniment`} class="mc-gal-thumb-img" loading="lazy" width="300" height="200" />
                     <span class="mc-gal-overlay" aria-hidden="true">🔍</span>
                   </div>
                 ))}

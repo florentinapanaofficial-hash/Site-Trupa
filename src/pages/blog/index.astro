@@ -26,7 +26,7 @@ function formatDate(dateStr: string): string {
 }
 ---
 
-<BaseLayout title={`Noutăți | ${brand.name}`} description="Articole, povești din culise și noutăți despre Formația Florentina Pană.">
+<BaseLayout title={`Blog și Noutăți | ${brand.name}`} description="Articole, povesti din culise și sfaturi pentru nunți și evenimente cu muzică live de la Formația Florentina Pană.">
 
   <div class="page-section">
     <div class="section-inner">
@@ -34,7 +34,7 @@ function formatDate(dateStr: string): string {
       <div class="mb-6"><BackButton href="/" label="Acasă" /></div>
       <div class="section-head" style="margin-bottom:2.5rem">
         <span class="section-pill">Blog</span>
-        <h1 class="section-title">Blog Muzică Live | Formația Florentina Pană</h1>
+        <h1 class="section-title">Noutăți și Articole despre Muzică Live</h1>
         <p class="section-lead" style="color:#ffffff">Articole, povești din culise și sfaturi pentru nunți și evenimente cu muzică live.</p>
       </div>
 
@@ -48,7 +48,7 @@ function formatDate(dateStr: string): string {
             <a href={`/blog/${post.slug}`} class="blog-card" aria-label={`Citește: ${post.title}`}>
               <div class="blog-card-cover">
                 {post.coverImage ? (
-                  <img src={post.coverImage} alt={post.title} loading="lazy" decoding="async" />
+                  <img src={post.coverImage} alt={post.title} loading="lazy" decoding="async" width="640" height="360" />
                 ) : (
                   <span class="blog-card-emoji" aria-hidden="true">{post.coverEmoji || '📝'}</span>
                 )}

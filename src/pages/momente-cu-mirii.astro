@@ -85,7 +85,7 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
 
 ---
 
-<BaseLayout title={`Momente cu mirii | ${brand.name}`} description="Galerie completă cu poze ale mirilor și trupei. Caută după eveniment, cuplu sau locație.">
+<BaseLayout title={`Momente cu Mirii — Album Foto | ${brand.name}`} description="Album foto cu mirii și trupa la nunți. Fotografii speciale în format landscape din cele mai frumoase momente ale evenimentelor animate de Formația Florentina Pană.">
   <Fragment slot="head">
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&display=swap" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&display=swap" media="print" onload="this.media='all'" />
@@ -96,7 +96,7 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
     <div class="mb-4"><BackButton href="/" label="Acasă" /></div>
     <header class="section-head mx-auto text-center">
       <p class="kicker mx-auto">Galerie specială</p>
-      <h1 class="section-title">Momente cu Mirii | Formația Florentina Pană</h1>
+      <h1 class="section-title">Momente Speciale cu Mirii și Trupa</h1>
       <p class="section-copy">Album în format landscape, cu pagini stânga-dreapta ca o foaie A4 pe orizontală, ideal pentru cadre largi cu mirii și trupa.</p>
     </header>
 
@@ -133,7 +133,7 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
                   data-lightbox-quote={event.coupleQuote ?? ''}
                   aria-label={`Deschide fotografia ${event.couple}`}
                 >
-                  <img src={event.image} alt={event.couple} loading="eager" decoding="async" />
+                  <img src={event.image} alt={event.couple} loading="eager" decoding="async" width="600" height="400" />
                   <div class="cc-name-overlay">
                     <span class="cc-name">{event.couple}</span>
                     <span class="cc-meta">{event.city} &bull; {event.date}</span>

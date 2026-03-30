@@ -32,6 +32,7 @@ const categories = [
     </header>
 
     <!-- ═══ FILTRE ═══ -->
+    <h2 class="sr-only">Categorii foto</h2>
     <nav class="gal-filters" aria-label="Filtrează galeria">
       {categories.map((c) => (
         <button
@@ -63,6 +64,8 @@ const categories = [
             class="gal-photo-img"
             loading="lazy"
             decoding="async"
+            width="800"
+            height="600"
           />
           <figcaption class="gal-caption">{p.alt}</figcaption>
           {/* Hover overlay */}

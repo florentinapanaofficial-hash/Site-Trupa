@@ -66,32 +66,10 @@ const personJsonLd = {
       {/* ── Videoclipuri ── */}
       <div class="collab-videos">
         <h2 class="collab-videos-title">Videoclipuri</h2>
-        <div class="collab-videos-grid">
-
-          <div class="collab-video-card">
-            <div class="collab-video-frame">
-              {/* TODO: înlocuiește YOUTUBE_ID_1 cu ID-ul real */}
-              <YoutubeEmbed youtubeId="YOUTUBE_ID_1" title="Videoclip saxofon 1" />
-            </div>
-            <p class="collab-video-label">Titlu videoclip 1</p>
-          </div>
-
-          <div class="collab-video-card">
-            {/* TODO: înlocuiește YOUTUBE_ID_2 cu ID-ul real */}
-            <div class="collab-video-frame">
-              <YoutubeEmbed youtubeId="YOUTUBE_ID_2" title="Videoclip saxofon 2" />
-            </div>
-            <p class="collab-video-label">Titlu videoclip 2</p>
-          </div>
-
-          <div class="collab-video-card">
-            {/* TODO: înlocuiește YOUTUBE_ID_3 cu ID-ul real */}
-            <div class="collab-video-frame">
-              <YoutubeEmbed youtubeId="YOUTUBE_ID_3" title="Videoclip saxofon 3" />
-            </div>
-            <p class="collab-video-label">Titlu videoclip 3</p>
-          </div>
-
+        <div class="collab-videos-coming">
+          <span class="collab-videos-icon" aria-hidden="true">🎬</span>
+          <p class="collab-videos-soon">Videoclipuri în curând</p>
+          <p class="collab-videos-hint">Pregătim clipuri demonstrative cu saxofonul live în cadrul evenimentelor noastre.</p>
         </div>
       </div>
 
@@ -229,6 +207,30 @@ const personJsonLd = {
     text-transform: uppercase;
     color: var(--title);
     margin: 0 0 1.25rem;
+  }
+  .collab-videos-coming {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 2.5rem 1.5rem;
+    border: 1px dashed var(--line);
+    border-radius: 1.25rem;
+    background: var(--surface);
+    text-align: center;
+  }
+  .collab-videos-icon { font-size: 2rem; }
+  .collab-videos-soon {
+    font-weight: 700;
+    color: var(--title);
+    font-size: 1rem;
+    margin: 0;
+  }
+  .collab-videos-hint {
+    color: var(--muted);
+    font-size: 0.85rem;
+    max-width: 36ch;
+    margin: 0;
   }
   .collab-videos-grid {
     display: grid;

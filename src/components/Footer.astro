@@ -14,6 +14,22 @@ const isHomePage = Astro.url.pathname === '/';
 ---
 
 <footer class="border-t border-white/10 bg-[#0C080F] text-white/90">
+  <!-- Navigare site — rezolvă pagini orfane -->
+  <nav class="section-container border-b border-white/10 py-6" aria-label="Hartă site">
+    <div class="flex flex-wrap justify-center gap-x-5 gap-y-2 text-xs text-white/70">
+      <a href="/despre" class="transition hover:text-[#F5A623]">Despre noi</a>
+      <a href="/membri" class="transition hover:text-[#F5A623]">Membri</a>
+      <a href="/galerie-video" class="transition hover:text-[#F5A623]">Galerie Video</a>
+      <a href="/galerie-foto" class="transition hover:text-[#F5A623]">Galerie Foto</a>
+      <a href="/blog" class="transition hover:text-[#F5A623]">Blog</a>
+      <a href="/aparitii-tv" class="transition hover:text-[#F5A623]">Apariții TV</a>
+      <a href="/momente-cu-mirii" class="transition hover:text-[#F5A623]">Momente cu mirii</a>
+      <a href="/comunitatea-noastra" class="transition hover:text-[#F5A623]">Comunitatea noastră</a>
+      <a href="/contact" class="transition hover:text-[#F5A623]">Contact</a>
+      <a href="/colaboratori/saxofon" class="transition hover:text-[#F5A623]">Saxofonist</a>
+      <a href="/colaboratori/tambal" class="transition hover:text-[#F5A623]">Țambalist</a>
+    </div>
+  </nav>
   <div class="section-container grid gap-4 py-8 text-sm md:grid-cols-3 md:items-center">
     <div class="inline-flex items-center gap-3">
       <img
@@ -22,6 +38,8 @@ const isHomePage = Astro.url.pathname === '/';
         class="h-10 w-10 rounded-xl border border-white/20 bg-white/5 p-1"
         loading="lazy"
         decoding="async"
+        width="40"
+        height="40"
       />
       <p class="text-muted-theme">© {year} {brand.name}. Toate drepturile rezervate.</p>
     </div>
