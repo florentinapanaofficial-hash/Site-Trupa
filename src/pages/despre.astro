@@ -8,8 +8,8 @@ const hasBandPhoto = typeof (brand as any).bandPhoto === 'string' && (brand as a
 ---
 
 <BaseLayout
-  title={`Despre noi | ${brand.name}`}
-  description="Despre Formația Florentina Pană — poveste, servicii, repertoriu și întrebări frecvente."
+  title={`Despre Noi — Formație Nuntă Pitești și Argeș | ${brand.name}`}
+  description="Trupă profesionistă de nuntă din Pitești, Argeș. Formația Florentina Pană oferă muzică live la nunți, botezuri și evenimente în Muntenia și toată România. Servicii, repertoriu și FAQ."
 >
   <section class="section-container py-16">
     <div class="mb-8"><BackButton href="/" label="Acasă" /></div>
@@ -19,7 +19,7 @@ const hasBandPhoto = typeof (brand as any).bandPhoto === 'string' && (brand as a
       {hasBandPhoto ? (
         <img
           src={(brand as any).bandPhoto}
-          alt="Formația Florentina Pană — foto de grup"
+          alt="Formația Florentina Pană — trupă profesionistă nuntă Pitești, Argeș"
           class="dp-band-photo"
           loading="eager"
           decoding="async"
@@ -39,7 +39,7 @@ const hasBandPhoto = typeof (brand as any).bandPhoto === 'string' && (brand as a
     <header class="dp-intro-block mb-14">
       <div class="dp-intro-left">
         <p class="kicker">Povestea noastră</p>
-        <h1 class="section-title">Despre Formația Florentina Pană</h1>
+        <h1 class="section-title">Formație Nuntă Pitești — Formația Florentina Pană</h1>
         <div class="mt-6 flex flex-wrap gap-3">
           <a href={`tel:${contact.phoneRaw}`} class="btn-solid">Sună acum</a>
           <a href="/contact" class="btn-outline">Rezervă o dată</a>
@@ -57,7 +57,7 @@ const hasBandPhoto = typeof (brand as any).bandPhoto === 'string' && (brand as a
     <div class="dp-block">
       <div class="dp-label-row">
         <span class="dp-kicker-chip">Ce oferim</span>
-        <h2 class="dp-h2">Servicii muzicale live</h2>
+        <h2 class="dp-h2">Servicii muzică live Pitești și Argeș</h2>
       </div>
       <div class="dp-grid-4">
         {(services as any[]).map((svc) => (
@@ -82,7 +82,7 @@ const hasBandPhoto = typeof (brand as any).bandPhoto === 'string' && (brand as a
     <div class="dp-block">
       <div class="dp-label-row">
         <span class="dp-kicker-chip">Ce cântăm</span>
-        <h2 class="dp-h2">Repertoriu muzical</h2>
+        <h2 class="dp-h2">Repertoriu muzical — formație nunți România</h2>
       </div>
       <div class="dp-grid-4">
         {(repertoire as any[]).map((rep) => (
@@ -252,7 +252,7 @@ const hasBandPhoto = typeof (brand as any).bandPhoto === 'string' && (brand as a
     width: 100%;
     aspect-ratio: 21 / 7;
     object-fit: cover;
-    object-position: center;
+    object-position: center 20%;
     display: block;
   }
   .dp-band-photo-placeholder {

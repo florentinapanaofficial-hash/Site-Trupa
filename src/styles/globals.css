@@ -2345,9 +2345,9 @@ details:focus-visible {
     margin: 0 !important;
     border-radius: 0 !important;
     box-sizing: border-box !important;
-    /* max() garantează clearance minim față de mob-nav (~80px, 2 rânduri)
+    /* max() garantează clearance minim față de mob-nav (~96px, 2 rânduri butoane mari)
        chiar și la font-size mic (accessibility settings) */
-    padding-top: max(5rem, 80px) !important;
+    padding-top: max(6.5rem, 104px) !important;
     padding-bottom: 5rem !important;
     padding-left: 1.4rem !important;
     padding-right: 1.4rem !important;
@@ -2379,13 +2379,13 @@ details:focus-visible {
     backdrop-filter: blur(16px) saturate(1.2);
     -webkit-backdrop-filter: blur(16px) saturate(1.2);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 0.35rem 0.5rem 0.35rem;
+    padding: 0.45rem 0.5rem 0.45rem;
   }
 
   .mob-nav-track {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.25rem;
+    gap: 0.35rem;
     justify-content: center;
     align-items: center;
   }
@@ -2398,12 +2398,12 @@ details:focus-visible {
     text-decoration: none;
     border-radius: 9999px;
     font-family: 'Oswald', sans-serif;
-    font-size: 0.52rem;
+    font-size: 0.7rem;
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    padding: 0.18rem 0.4rem;
-    min-height: 26px;
+    padding: 0.34rem 0.65rem;
+    min-height: 36px;
     border: 1px solid rgba(255, 255, 255, 0.14);
     background: rgba(255, 255, 255, 0.07);
     color: rgba(255, 255, 255, 0.65);

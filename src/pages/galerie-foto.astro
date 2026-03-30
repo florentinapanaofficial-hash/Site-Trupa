@@ -5,16 +5,16 @@ import BackButton from '../components/BackButton.astro';
 /* ── Date galerie: doar poze de la evenimente ── */
 const base = "/images/Galerie Foto Site";
 const photos = [
-  { src: `${base}/Galerie Evenimente 1.jpg`, alt: "Eveniment live — Formația Florentina Pană",  cat: "evenimente" },
-  { src: `${base}/Galerie Evenimente 2.jpg`, alt: "Eveniment special — scenă completă",         cat: "evenimente" },
+  { src: `${base}/Galerie Evenimente 1.jpg`, alt: "Formație nuntă Pitești — eveniment live cu Formația Florentina Pană",  cat: "evenimente" },
+  { src: `${base}/Galerie Evenimente 2.jpg`, alt: "Muzică live nuntă Argeș — scenă completă la eveniment",         cat: "evenimente" },
 ];
 
 
 ---
 
 <BaseLayout
-  title="Galerie Foto Nunți și Evenimente Live | Formația Florentina Pană Pitești"
-  description="Momente autentice surprinse la nunți, botezuri și evenimente live — dans, energie și emoție pe scenele din Pitești și toată România cu Formația Florentina Pană."
+  title="Galerie Foto Nunți și Evenimente Live Pitești, Argeș | Formația Florentina Pană"
+  description="Fotografii autentice de la nunți, botezuri și evenimente live în Pitești, Argeș și Muntenia. Formație nuntă Pitești — dans, energie și emoție pe scenele din toată România."
 >
   <section class="gal-page" aria-label="Galerie foto">
 
@@ -24,8 +24,8 @@ const photos = [
     <!-- ═══ HEADER ═══ -->
     <header class="gal-header">
       <span class="gal-badge">Galerie Foto</span>
-      <h1 class="gal-title">Așa Arată o Petrecere Reușită</h1>
-      <p class="gal-subtitle">Momente autentice de dans, energie și emoție, surprinse la evenimentele noastre live</p>
+      <h1 class="gal-title">Formație Nuntă Pitești — Galerie Evenimente Live</h1>
+      <p class="gal-subtitle">Momente autentice de dans, energie și emoție, surprinse la nunțile și evenimentele noastre din Argeș și toată România</p>
     </header>
 
     <!-- ═══ GRID MASONRY ═══ -->
@@ -140,7 +140,7 @@ const photos = [
       lbImg.src = '';
       lbImg.alt = '';
       closing = false;
-    }, 280);
+    }, 500);
   }
 
   function navPrev() {
@@ -322,6 +322,7 @@ const photos = [
     height: auto;
     display: block;
     object-fit: cover;
+    object-position: center 25%;
     border-radius: 1rem;
   }
 
@@ -546,13 +547,13 @@ const photos = [
   }
 
   .lb-fade-in {
-    animation: lb-fade-scale-in 0.45s cubic-bezier(.25,.46,.45,.94) both;
+    animation: lb-fade-scale-in 0.8s cubic-bezier(.25,.46,.45,.94) both;
   }
 
   /* Închidere — fade out pe tot overlay-ul */
   #gal-lightbox.lb-closing {
     opacity: 0;
-    transition: opacity 0.28s ease-out;
+    transition: opacity 0.5s ease-out;
   }
 
   /* ══════════════════════════════════════════

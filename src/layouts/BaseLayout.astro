@@ -65,25 +65,26 @@ const sectionLink = (anchor: string) => (isHomePage ? anchor : `/${anchor}`);
 
 const sideMenuTopItems = [
   { href: '/', label: 'Acasă', color: 'cyan' },
+  { href: '/despre', label: 'Despre', color: 'cyan' },
+  { href: '/membri', label: 'Membri', color: 'cyan' },
   { href: '/galerie-video', label: 'Galerie Video', color: 'cyan' },
   { href: '/galerie-foto', label: 'Galerie Foto', color: 'cyan' },
-  { href: '/membri', label: 'Membri', color: 'cyan' },
-  { href: '/despre', label: 'Despre', color: 'cyan' },
   { href: '/contact', label: 'Contact', color: 'cyan' },
 ];
 
 const sideMenuBottomItems = [];
 
-// Linkuri extra din navigation (cele din header desktop care nu sunt deja în sidebar)
-const sideHrefs = new Set(sideMenuTopItems.map(i => i.href));
-const extraNavItems = navigation
-  .map(item => ({ href: item.href.startsWith('/') || item.href.startsWith('#') || item.href.startsWith('http') ? item.href : `/${item.href}`, label: item.label }))
-  .filter(item => !sideHrefs.has(item.href));
-
-// Lista completă pentru nav-ul mobil
+// Lista completă pentru nav-ul mobil — ordine logică, corespunde cu swipe-ul stânga→dreapta
 const mobileNavAllItems = [
-  ...sideMenuTopItems,
-  ...extraNavItems,
+  { href: '/', label: 'Acasă', color: 'cyan' },
+  { href: '/despre', label: 'Despre', color: 'cyan' },
+  { href: '/membri', label: 'Membri', color: 'cyan' },
+  { href: '/galerie-video', label: 'Galerie Video', color: 'cyan' },
+  { href: '/galerie-foto', label: 'Galerie Foto', color: 'cyan' },
+  { href: '/momente-cu-mirii', label: 'Momente cu mirii', color: 'cyan' },
+  { href: '/comunitatea-noastra', label: 'Comunitatea noastră', color: 'cyan' },
+  { href: '/aparitii-tv', label: 'Apariții TV', color: 'cyan' },
+  { href: '/contact', label: 'Contact', color: 'cyan' },
 ];
 ---
 

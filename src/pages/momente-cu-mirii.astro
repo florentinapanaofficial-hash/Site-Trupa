@@ -85,7 +85,7 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
 
 ---
 
-<BaseLayout title={`Momente cu Mirii — Album Foto | ${brand.name}`} description="Album foto cu mirii și trupa la nunți. Fotografii speciale în format landscape din cele mai frumoase momente ale evenimentelor animate de Formația Florentina Pană.">
+<BaseLayout title={`Momente cu Mirii — Album Foto Nunți Pitești, Argeș | ${brand.name}`} description="Album foto cu mirii și trupa la nunți în Pitești, Argeș și Muntenia. Formație nuntă profesionistă — cele mai frumoase momente live de la evenimentele Formației Florentina Pană.">
   <Fragment slot="head">
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&display=swap" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&display=swap" media="print" onload="this.media='all'" />
@@ -96,7 +96,7 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
     <div class="mb-4"><BackButton href="/" label="Acasă" /></div>
     <header class="section-head mx-auto text-center">
       <p class="kicker mx-auto">Galerie specială</p>
-      <h1 class="section-title">Momente Speciale cu Mirii și Trupa</h1>
+      <h1 class="section-title">Momente Speciale cu Mirii — Formație Nuntă Pitești și Argeș</h1>
       <p class="section-copy">Album în format landscape, cu pagini stânga-dreapta ca o foaie A4 pe orizontală, ideal pentru cadre largi cu mirii și trupa.</p>
     </header>
 
@@ -110,7 +110,7 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
     <div class="couple-cards-section">
       <header class="couple-cards-section-head">
         <p class="kicker mx-auto">Poveștile lor</p>
-        <h2 class="section-title text-2xl md:text-3xl">Momentele care ne-au umplut inima</h2>
+        <h2 class="section-title text-2xl md:text-3xl">Poveștile care ne-au umplut inima — nunți în Argeș și România</h2>
       </header>
 
       <div class="couple-cards-grid">
@@ -1624,7 +1624,8 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
       width: 100%;
       height: auto;
       object-fit: cover;
-      transition: transform 0.55s ease;
+      object-position: center 25%;
+      transition: transform 0.8s ease;
     }
     .couple-card:hover .cc-photo img {
       transform: scale(1.04);

@@ -99,13 +99,14 @@
 
         var hpPageOrder = [
             '/',
+            '/despre',
+            '/membri',
             '/galerie-video',
             '/galerie-foto',
-            '/despre',
-            '/contact',
             '/momente-cu-mirii',
             '/comunitatea-noastra',
             '/aparitii-tv',
+            '/contact',
         ];
         var hpCurrentPath = location.pathname.replace(/\/$/, '') || '/';
         var hpPageIdx = hpPageOrder.indexOf(hpCurrentPath);
@@ -172,13 +173,14 @@
 
     var pageOrder = [
         '/',
+        '/despre',
+        '/membri',
         '/galerie-video',
         '/galerie-foto',
-        '/despre',
-        '/contact',
         '/momente-cu-mirii',
         '/comunitatea-noastra',
         '/aparitii-tv',
+        '/contact',
     ];
     var currentPath = location.pathname.replace(/\/$/, '') || '/';
     var pageIdx = pageOrder.indexOf(currentPath);

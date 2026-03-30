@@ -2,21 +2,21 @@
   "brand": {
     "short": "FP",
     "name": "Formația Florentina Pană",
-    "tagline": "Muzică live pentru evenimente care rămân în memorie.",
+    "tagline": "Formație muzică live pentru nuntă, botez și evenimente — Pitești, Argeș, toată România.",
     "bandPhoto": "/images/Galerie Foto Site/Galerie Foto Claudiu & Florentina Pan%C4%83 2.jpg",
-    "aboutIntro": "Formația Florentina Pană este o trupă de muzică live cu experiență vastă în evenimente private, nunți, botezuri și petreceri corporate. Punem accent pe energie, emoție și profesionalism, oferind un spectacol complet care ridică publicul în picioare.",
-    "aboutIntro2": "Repertoriul acoperă muzică populară românească, ușoară, cover-uri internaționale, muzică de petrecere și momente speciale personalizate pentru fiecare eveniment."
+    "aboutIntro": "este o trupă profesionistă de muzică live din Pitești, județul Argeș, cu experiență vastă în nunți, botezuri, aniversări și evenimente corporate din toată România. Punem accent pe energie, emoție și profesionalism, oferind un spectacol complet care ridică publicul în picioare.",
+    "aboutIntro2": "Repertoriul acoperă muzică populară românească, ușoară, cover-uri internaționale, muzică de petrecere și momente speciale personalizate. Suntem alegerea ideală ca formație pentru nuntă în Pitești, Argeș și întreaga zonă a Munteniei."
   },
   "seo": {
-    "title": "Formația Florentina Pană | Muzică Live Nunți",
-    "description": "Formația Florentina Pană aduce show live pentru nunți, botezuri și evenimente corporate. Repertoriu variat, artiști profesioniști și energie pe scenă.",
+    "title": "Formația Florentina Pană | Formație Nuntă Pitești, Argeș — Muzică Live România",
+    "description": "Formație nuntă Pitești și Argeș — Formația Florentina Pană oferă muzică live pentru nunți, botezuri și evenimente corporate în toată România. Trupă profesionistă cu 10+ ani experiență.",
     "ogImage": "/images/og-placeholder.png"
   },
   "contact": {
     "phoneRaw": "+40767369658",
     "phoneDisplay": "0767 369 658",
     "email": "florentinapanaofficial@gmail.com",
-    "city": "Argeș/Pitești, disponibilitate națională"
+    "city": "Pitești, Argeș — disponibilitate în toată România"
   },
   "socialLinks": {
     "youtube": "https://www.youtube.com/@FlorentinaPanaPitesti",
@@ -41,7 +41,7 @@
     }
   ],
   "hero": {
-    "kicker": "Live band | Nuntă | Botez | Corporate",
+    "kicker": "Formație nuntă Pitești | Muzică live nunți, botezuri, evenimente",
     "title": "Sunet Modern, Vibe Elegant",
     "description": "Combinăm hituri actuale, piese clasice și momente personalizate într-un spectacol viu, ritmat și memorabil pentru invitații dvs.",
     "ctaPrimary": {
@@ -451,27 +451,27 @@
   },
   "gallery": [
     {
-      "alt": "Moment live la nuntă",
+      "alt": "Formație nuntă Pitești — moment live pe scenă",
       "image": ""
     },
     {
-      "alt": "Scenă și invitați în dans",
+      "alt": "Muzică live nuntă Argeș — invitați în dans",
       "image": ""
     },
     {
-      "alt": "Band setup în lumini de scenă",
+      "alt": "Formație evenimente Pitești — setup scenă și lumini",
       "image": ""
     },
     {
-      "alt": "Atmosfera pe ringul de dans",
+      "alt": "Trupă nuntă Muntenia — ringul de dans",
       "image": ""
     },
     {
-      "alt": "Moment artistic live",
+      "alt": "Muzică live România — moment artistic la eveniment",
       "image": ""
     },
     {
-      "alt": "Public în energie maximă",
+      "alt": "Formație nuntă Argeș — public în energie maximă",
       "image": ""
     }
   ],
@@ -509,71 +509,71 @@
       "galpisFoto": [
         {
           "src": "/images/Galerie Foto Site/Florentina Pan%C4%83 1.jpg",
-          "alt": "Florentina Pană — Solistă vocală"
+          "alt": "Florentina Pană — solistă vocală formație nuntă Pitești"
         },
         {
           "src": "/images/Galerie Foto Site/Florentina Pan%C4%83 2.jpg",
-          "alt": "Florentina Pană la eveniment"
+          "alt": "Florentina Pană la eveniment live Argeș"
         },
         {
           "src": "/images/Galerie Foto Site/Florentina Pan%C4%83 3.jpg",
-          "alt": "Florentina Pană pe scenă"
+          "alt": "Florentina Pană pe scenă — muzică live nuntă"
         },
         {
           "src": "/images/Galerie Foto Site/Florentina Pan%C4%83 4.jpg",
-          "alt": "Florentina Pană — concert live"
+          "alt": "Florentina Pană — concert live formație Pitești"
         },
         {
           "src": "/images/Galerie Foto Site/Florentina Pan%C4%83 5.jpg",
-          "alt": "Florentina Pană — nuntă"
+          "alt": "Florentina Pană — muzică live la nuntă România"
         },
         {
           "src": "/images/Galerie Foto Site/Florentina Pan%C4%83 6.jpg",
-          "alt": "Florentina Pană interpretând"
+          "alt": "Florentina Pană interpretând muzică populară"
         },
         {
           "src": "/images/Galerie Foto Site/Florentina Pan%C4%83 7.jpg",
-          "alt": "Florentina Pană — moment artistic"
+          "alt": "Florentina Pană — moment artistic muzică ușoară"
         },
         {
           "src": "/images/Galerie Foto Site/Florentina Pan%C4%83 8.jpg",
-          "alt": "Florentina Pană — petrecere"
+          "alt": "Florentina Pană — petrecere live Argeș"
         },
         {
           "src": "/images/Galerie Foto Site/Florentina Pan%C4%83 09.jpg",
-          "alt": "Florentina Pană — prezență scenică"
+          "alt": "Florentina Pană — prezență scenică formație evenimente"
         },
         {
           "src": "/images/Galerie Foto Site/Florentina Pan%C4%83 10.jpg",
-          "alt": "Florentina Pană — sesiune foto"
+          "alt": "Florentina Pană — sesiune foto trupă nuntă"
         },
         {
           "src": "/images/Galerie Foto Site/Florentina Pan%C4%83 11.jpg",
-          "alt": "Florentina Pană — portret"
+          "alt": "Florentina Pană — portret solistă vocală"
         },
         {
           "src": "/images/Galerie Foto Site/Florentina Pan%C4%83 12.jpg",
-          "alt": "Florentina Pană — la scenă"
+          "alt": "Florentina Pană pe scenă la eveniment Pitești"
         },
         {
           "src": "/images/Galerie Foto Site/Galerie Foto Claudiu & Florentina Pan%C4%83 5.jpg",
-          "alt": "Florentina Pană — concert"
+          "alt": "Formația Florentina Pană — concert live nuntă Argeș"
         },
         {
           "src": "/images/Galerie Foto Site/Galerie Foto Claudiu & Florentina Pan%C4%83 6.jpg",
-          "alt": "Florentina Pană — petrecere"
+          "alt": "Formația Florentina Pană — petrecere live Pitești"
         },
         {
           "src": "/images/Galerie Foto Site/Galerie Foto Claudiu & Florentina Pan%C4%83 7.jpg",
-          "alt": "Florentina Pană — dans"
+          "alt": "Formația Florentina Pană — dans la nuntă Muntenia"
         },
         {
           "src": "/images/Galerie Foto Site/Galerie Foto Claudiu & Florentina Pan%C4%83 8.jpg",
-          "alt": "Florentina Pană — moment"
+          "alt": "Formația Florentina Pană — moment live eveniment"
         },
         {
           "src": "/images/Galerie Foto Site/IMG_9895.jpg",
-          "alt": "Florentina Pană — eveniment"
+          "alt": "Florentina Pană — eveniment muzică live România"
         }
       ]
     },
