@@ -156,6 +156,15 @@
             hpHandleSwipeEnd(e.clientX, e.clientY);
         });
 
+        /* ── Săgeți laterale pe homepage ── */
+        if (arrowPrev) arrowPrev.classList.add('is-hidden');
+        if (arrowNext && hpPageIdx < hpPageOrder.length - 1) {
+            arrowNext.classList.remove('is-hidden');
+            arrowNext.addEventListener('click', function () {
+                hpNavigatePage(hpPageOrder[hpPageIdx + 1]);
+            });
+        }
+
         return;
     }
 
