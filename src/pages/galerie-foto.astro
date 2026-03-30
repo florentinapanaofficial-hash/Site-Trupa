@@ -80,24 +80,23 @@ const categories = [
       ))}
     </div>
 
-
-
-    <!-- ═══ LIGHTBOX ═══ -->
-    <div id="gal-lightbox" role="dialog" aria-modal="true" aria-label="Previzualizare fotografie">
-      <div class="lb-counter" aria-live="polite"></div>
-      <button class="lb-close" type="button" aria-label="Închide">&times;</button>
-      <button class="lb-prev" type="button" aria-label="Fotografia anterioară">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
-      </button>
-      <button class="lb-next" type="button" aria-label="Fotografia următoare">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg>
-      </button>
-      <div class="lb-img-wrap">
-        <img id="lb-img" src="" alt="" />
-      </div>
-    </div>
-
   </section>
+
+  <!-- ═══ LIGHTBOX — în afara <section> pentru a evita problemele cu position:fixed pe mobil ═══ -->
+  <div id="gal-lightbox" role="dialog" aria-modal="true" aria-label="Previzualizare fotografie">
+    <div class="lb-counter" aria-live="polite"></div>
+    <button class="lb-close" type="button" aria-label="Închide">&times;</button>
+    <button class="lb-prev" type="button" aria-label="Fotografia anterioară">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <button class="lb-next" type="button" aria-label="Fotografia următoare">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
+    <div class="lb-img-wrap">
+      <img id="lb-img" src="" alt="" />
+    </div>
+  </div>
+
 </BaseLayout>
 
 <!-- ═══════════════════════════════════════════
@@ -173,19 +172,31 @@ const categories = [
   function openLightbox(idx: number) {
     lb.classList.add('active');
     document.body.style.overflow = 'hidden';
+    // Pe mobil, secțiunea galeriei are scroll propriu — oprim și pe ea
+    const galSection = document.querySelector<HTMLElement>('.gal-page');
+    if (galSection) galSection.style.overflow = 'hidden';
     showPhoto(idx);
+  }
+
+  function doClose() {
+    lb.classList.remove('active');
+    document.body.style.overflow = '';
+    const galSection = document.querySelector<HTMLElement>('.gal-page');
+    if (galSection) galSection.style.overflow = '';
+    lbImg.src = '';
+    lbImg.alt = '';
+    clearFx();
   }
 
   function closeLightbox() {
     const anim = fxMap[currentFx] ?? fxMap['1'];
     clearFx();
     lbImg.classList.add(anim.leave);
+    // Fallback: dacă animationend nu se declanșează, închidem forțat
+    const fallback = setTimeout(doClose, 350);
     lbImg.addEventListener('animationend', () => {
-      lb.classList.remove('active');
-      document.body.style.overflow = '';
-      lbImg.src = '';
-      lbImg.alt = '';
-      clearFx();
+      clearTimeout(fallback);
+      doClose();
     }, { once: true });
   }
 
@@ -512,11 +523,15 @@ const categories = [
   #gal-lightbox {
     display: none;
     position: fixed;
-    inset: 0;
-    z-index: 9000;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    z-index: 9999;
     align-items: center;
     justify-content: center;
-    background: rgba(0, 0, 0, 0.88);
+    background: rgba(0, 0, 0, 0.95);
     backdrop-filter: blur(8px);
   }
 

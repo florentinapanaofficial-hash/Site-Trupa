@@ -159,9 +159,9 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
                       Citește povestea lor &rarr;
                     </a>
                   )}
-                  <a class="cc-link cc-link--dance" href="/galerie-video#dans-miri">
-                    Dansul Mirilor &rarr;
-                  </a>
+                  <span class="cc-link cc-link--dance cc-link--disabled">
+                    Dansul Mirilor — în curând
+                  </span>
                 </div>
               </div>
             </article>
@@ -1721,6 +1721,13 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
     }
     .cc-link--dance:hover {
       border-bottom-color: rgba(255, 220, 160, 0.85);
+    }
+    .cc-link--disabled {
+      opacity: 0.45;
+      cursor: default;
+      pointer-events: none;
+      border-bottom: none;
+      font-style: italic;
     }
     /* ──────────────────────────────────────────────────────────────────── */
 
