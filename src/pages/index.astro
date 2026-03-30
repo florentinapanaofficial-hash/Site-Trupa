@@ -9,10 +9,10 @@ const faqItems = faq as Array<{ question: string; answer: string }>;
 import { sanitizeUrl } from '../lib/sanitize-url';
 
 const socialLinks = {
-  youtube:   sanitizeUrl(siteContent.socialLinks?.youtube),
-  facebook:  sanitizeUrl(siteContent.socialLinks?.facebook),
-  instagram: sanitizeUrl(siteContent.socialLinks?.instagram),
-  tiktok:    sanitizeUrl(siteContent.socialLinks?.tiktok),
+  youtube:   siteContent.socialLinks?.youtube ? sanitizeUrl(siteContent.socialLinks.youtube) : null,
+  facebook:  siteContent.socialLinks?.facebook ? sanitizeUrl(siteContent.socialLinks.facebook) : null,
+  instagram: siteContent.socialLinks?.instagram ? sanitizeUrl(siteContent.socialLinks.instagram) : null,
+  tiktok:    siteContent.socialLinks?.tiktok ? sanitizeUrl(siteContent.socialLinks.tiktok) : null,
 };
 const faqJsonLd = {
   '@context': 'https://schema.org',
@@ -29,17 +29,12 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
 <BaseLayout title={seo.title} description={seo.description} ogImage={seo.ogImage}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" media="print" onload="this.media='all'" />
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" /></noscript>
   </Fragment>
 
   {/* ═══════════════════════════════════════════
       HERO — Scenă, titlu mare, CTA-uri
   ═══════════════════════════════════════════ */}
   <section id="acasa" class="hero-stage hero-fullscreen hp-hero-wrap" aria-label="Secțiunea principală">
-    <div class="astral-orb" aria-hidden="true"></div>
-    <div class="hero-stars" aria-hidden="true"></div>
     <div class="hero-stage-inner">
 
       <span class="kicker-badge" aria-hidden="true">
@@ -147,7 +142,6 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
         </div>
       </div>
     </div>
-    <div class="hero-fade-bottom" aria-hidden="true"></div>
   </section>
 
   {/* ═══════════════════════════════════════════
@@ -322,90 +316,12 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
 
 </BaseLayout>
 
-<script>
-  // Corp astral — apare ocazional, nu în fiecare ciclu
-  (function () {
-    const orb = document.querySelector<HTMLElement>('.astral-orb');
-    if (!orb) return;
 
-    // Pornire după o pauză inițială aleatorie (8–20s), apoi din când în când
-    function scheduleNextTraversal() {
-      // Pauză între traversări: 12–35 secunde
-      const delay = 12000 + Math.random() * 23000;
-      setTimeout(() => {
-        orb.classList.remove('is-traveling');
-        // Re-flow forțat, altfel animația nu repornește
-        void orb.offsetWidth;
-        orb.classList.add('is-traveling');
-
-        // Curăță clasa la finalul animației și programează urmă
-        const onEnd = () => {
-          orb.classList.remove('is-traveling');
-          orb.removeEventListener('animationend', onEnd);
-          scheduleNextTraversal();
-        };
-        orb.addEventListener('animationend', onEnd);
-      }, delay);
-    }
-
-    // Prima apariție după 6–14s de la încărcarea paginii
-    const firstDelay = 6000 + Math.random() * 8000;
-    setTimeout(() => scheduleNextTraversal(), firstDelay);
-  })();
-
-  // Stele ocazionale sus-stânga și sus-dreapta
-  (function () {
-    const container = document.querySelector<HTMLElement>('.hero-stars');
-    if (!container) return;
-
-    // Zonele de spawn: stânga sus și dreapta sus
-    const zones = [
-      { x: () => 4 + Math.random() * 18, y: () => 4 + Math.random() * 22 },   // sus-stânga
-      { x: () => 78 + Math.random() * 18, y: () => 4 + Math.random() * 22 },  // sus-dreapta
-    ];
-
-    function spawnStar() {
-      const zone = zones[Math.floor(Math.random() * zones.length)];
-      const star = document.createElement('span');
-      star.className = 'hero-star';
-
-      // Dimensiune aleatorie — mai mari
-      const size = 10 + Math.random() * 14;
-      const x = zone.x();
-      const y = zone.y();
-      const dur = 2.2 + Math.random() * 1.6;
-
-      star.style.left = x + '%';
-      star.style.top  = y + '%';
-      star.style.width  = size + 'px';
-      star.style.height = size + 'px';
-      star.style.animationDuration = dur + 's';
-
-      container.appendChild(star);
-      star.addEventListener('animationend', () => star.remove(), { once: true });
-    }
-
-    function scheduleStar() {
-      // Între 1 și 4 stele pe rafală, cu mici întârzieri între ele
-      const count = 1 + Math.floor(Math.random() * 3);
-      for (let i = 0; i < count; i++) {
-        setTimeout(spawnStar, i * (300 + Math.random() * 400));
-      }
-      // Pauză până la următoarea rafală: 5–18s
-      const next = 5000 + Math.random() * 13000;
-      setTimeout(scheduleStar, next);
-    }
-
-    // Prima rafală după 3–7s
-    setTimeout(scheduleStar, 3000 + Math.random() * 4000);
-  })();
-</script>
 
 <style>
-  /* Cormorant Garamond se încarcă async via <link preload> în <head> */
 
   /* ════════════════════════════════════════════════════════════════
-     HTML / BODY — transparent peste cerul Sirius
+     HTML / BODY — transparent peste cerul din SkyBackground
   ════════════════════════════════════════════════════════════════ */
   html, body {
     background: transparent !important;
@@ -414,7 +330,7 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
   }
 
   /* ════════════════════════════════════════════════════════════════
-     HERO STAGE — pagina de bun-venit, transparentă complet
+     HERO STAGE — fundal simplu, fără efecte grele
   ════════════════════════════════════════════════════════════════ */
   .hero-stage {
     position: relative;
@@ -424,26 +340,15 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     align-items: center;
     padding: clamp(2rem, 4vw, 3rem) clamp(1rem, 3vw, 2rem);
     text-align: center;
-    background:
-      radial-gradient(ellipse at 50% 100%,
-        rgba(180, 140, 60, 0.18) 0%,
-        transparent 60%),
-      radial-gradient(ellipse at 80% 20%,
-        rgba(0, 80, 180, 0.3) 0%,
-        transparent 50%),
-      linear-gradient(160deg,
-        #0a1628 0%,
-        #0d1f3c 40%,
-        #0a1628 100%);
+    background: linear-gradient(160deg, #0a1628 0%, #0d1f3c 50%, #0a1628 100%);
   }
 
-  /* Overlay eliminat complet */
   .hero-stage::before {
     display: none;
   }
 
   /* ════════════════════════════════════════════════════════════════
-     CARDUL DE CRISTAL — singurul backdrop-filter din pagină
+     CONTAINER INTERIOR
   ════════════════════════════════════════════════════════════════ */
   .hero-stage-inner {
     max-width: 680px;
@@ -454,18 +359,17 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     align-items: center;
     gap: 0.5rem;
     position: relative;
-    z-index: 5;  /* deasupra fade-bottom (z:1), stelelor (z:2) și orbului (z:0) */
+    z-index: 5;
   }
 
   /* ════════════════════════════════════════════════════════════════
-     TIPOGRAFIE HERO
+     TIPOGRAFIE HERO — simplificată
   ════════════════════════════════════════════════════════════════ */
-  /* Kicker badge */
   .kicker-badge {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    border: 1px solid rgba(241, 229, 172, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: 9999px;
     padding: 0.3rem 0.85rem;
     font-size: 0.85rem;
@@ -474,147 +378,40 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     text-transform: uppercase;
     color: #ffffff;
     background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.35);
   }
 
-  /* Titlul principal */
   .hero-title-xl {
     margin: 0;
     line-height: 1.1;
     text-align: center;
   }
 
-  /* "FORMAȚIA" — italic, alb clar */
+  /* "FORMAȚIA" — serif italic, fără text-shadow greu */
   .hero-kicker-text {
     display: block;
-    font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+    font-family: Georgia, 'Times New Roman', serif;
     font-size: clamp(1.8rem, 3vw, 2.5rem);
     font-weight: 500;
     font-style: italic;
     letter-spacing: 0.18em;
-    text-transform: none;
     color: rgba(255, 255, 255, 0.90);
-    text-shadow:
-      0 0 12px rgba(255, 220, 120, 0.55),
-      0 2px 6px rgba(0, 0, 0, 0.80);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.60);
     margin-bottom: 0.05rem;
   }
 
-  /* "Florentina Pană" — Hollywood gold shimmer */
+  /* "Florentina Pană" — gold static, fără shimmer/filter */
   .hero-title-gold {
     display: block;
-    font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
-    font-weight: 600;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight: 700;
     font-size: clamp(2.4rem, 6.5vw, 4.8rem);
     letter-spacing: 0.06em;
-    text-transform: none;
     line-height: 1.0;
-    position: relative;
-    background: linear-gradient(
-      135deg,
-      #e8c85b 0%,
-      #ffeaa0 30%,
-      #ffffff 50%,
-      #ffeaa0 70%,
-      #e8c85b 100%
-    );
-    background-size: 200% auto;
+    background: linear-gradient(135deg, #e8c85b 0%, #ffeaa0 50%, #e8c85b 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter:
-      brightness(2.5) saturate(1.3)
-      drop-shadow(0 0 12px rgba(255, 220, 100, 0.80))
-      drop-shadow(0 0 30px rgba(255, 200, 50, 0.50))
-      drop-shadow(0 2px 0 rgba(0,0,0,0.80))
-      drop-shadow(0 4px 8px rgba(0,0,0,0.60));
-    animation: shimmer 3s linear infinite;
-  }
-
-  @keyframes shimmer {
-    0%   { background-position: 0% center; }
-    100% { background-position: 200% center; }
-  }
-
-  /* ════════════════════════════════════════════════════════════════
-     STELE OCAZIONALE — sus-stânga și sus-dreapta
-  ════════════════════════════════════════════════════════════════ */
-  .hero-stars {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 2;
-    overflow: visible;
-  }
-
-  .hero-star {
-    position: absolute;
-    border-radius: 50%;
-    background: radial-gradient(circle, #ffffff 0%, #fff8a0 30%, #ffd700 60%, transparent 80%);
-    box-shadow:
-      0 0 6px 3px rgba(255, 250, 180, 1),
-      0 0 18px 7px rgba(255, 220, 60, 0.8),
-      0 0 40px 14px rgba(255, 190, 0, 0.45);
-    opacity: 0;
-    animation-name: star-rise;
-    animation-timing-function: ease-out;
-    animation-fill-mode: forwards;
-  }
-
-  @keyframes star-rise {
-    0%   { opacity: 0;   transform: scale(0.4) translateY(0px);    }
-    12%  { opacity: 1;   transform: scale(1.6) translateY(-6px);   }
-    35%  { opacity: 0.9; transform: scale(1.2) translateY(-18px);  }
-    65%  { opacity: 0.6; transform: scale(0.7) translateY(-42px);  }
-    100% { opacity: 0;   transform: scale(0.15) translateY(-90px); }
-  }
-
-  /* ════════════════════════════════════════════════════════════════
-     CORP ASTRAL — sferă etereală care traversează cardul ocazional
-  ════════════════════════════════════════════════════════════════ */
-  .astral-orb {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    overflow: hidden;
-    border-radius: inherit;
-    z-index: 0;
-  }
-
-  .astral-orb::before {
-    content: '';
-    position: absolute;
-    width: clamp(120px, 22vw, 220px);
-    height: clamp(120px, 22vw, 220px);
-    border-radius: 50%;
-    background: radial-gradient(
-      circle at 40% 40%,
-      rgba(200, 160, 255, 0.55) 0%,
-      rgba(130, 80, 255, 0.28) 35%,
-      rgba(60, 20, 180, 0.12) 60%,
-      transparent 80%
-    );
-    filter: blur(18px);
-    opacity: 0;
-    top: 50%;
-    left: -30%;
-    transform: translateY(-50%);
-    will-change: transform, opacity;
-  }
-
-  /* Clasa adăugată prin JS când orbul este activ */
-  .astral-orb.is-traveling::before {
-    animation: orb-travel 4.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-  }
-
-  @keyframes orb-travel {
-    0%   { left: -30%;  top: 60%;  opacity: 0;    transform: translateY(-50%) scale(0.7); }
-    8%   { opacity: 1; }
-    30%  { top: 35%; }
-    55%  { top: 55%; }
-    80%  { top: 30%;  opacity: 0.85; }
-    92%  { opacity: 0.3; }
-    100% { left: 125%; top: 45%;  opacity: 0;    transform: translateY(-50%) scale(1.1); }
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.60));
   }
 
   /* Lead text */
@@ -624,7 +421,7 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     font-size: clamp(0.78rem, 1.5vw, 0.9rem);
     line-height: 1.6;
     color: #ffffff !important;
-    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.80);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.50);
     text-align: center;
   }
 
@@ -652,7 +449,7 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     font-size: 1.1rem;
     font-weight: 700;
     color: #ffffff !important;
-    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.80);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.50);
     line-height: 1;
   }
   .hero-stat-label {
@@ -661,7 +458,7 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.85) !important;
-    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.80);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.50);
     margin-top: 0.12rem;
   }
 
@@ -680,9 +477,7 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
       margin: 0.9rem auto 0.25rem;
       border-radius: 1.25rem;
       overflow: hidden;
-      box-shadow:
-        0 0 0 1.5px rgba(212, 175, 55, 0.30),
-        0 10px 36px rgba(0, 0, 0, 0.60);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.40);
       aspect-ratio: 3 / 2;
       background: rgba(255, 255, 255, 0.06);
     }
@@ -761,31 +556,27 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     /* YouTube */
     .hero-social-btn--yt svg {
       background: #FF0000;
-      box-shadow: 0 4px 18px rgba(255, 0, 0, 0.55), 0 2px 6px rgba(0,0,0,0.4);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
-    .hero-social-btn--yt:hover svg { box-shadow: 0 6px 24px rgba(255, 0, 0, 0.75); }
     .hero-social-btn--yt span { color: rgba(255, 140, 140, 0.80); }
 
     /* Facebook */
     .hero-social-btn--fb svg {
-      box-shadow: 0 4px 18px rgba(24, 119, 242, 0.55), 0 2px 6px rgba(0,0,0,0.4);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
-    .hero-social-btn--fb:hover svg { box-shadow: 0 6px 24px rgba(24, 119, 242, 0.75); }
     .hero-social-btn--fb span { color: rgba(120, 180, 255, 0.80); }
 
     /* Instagram */
     .hero-social-btn--ig svg {
-      box-shadow: 0 4px 18px rgba(225, 48, 108, 0.55), 0 2px 6px rgba(0,0,0,0.4);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
-    .hero-social-btn--ig:hover svg { box-shadow: 0 6px 24px rgba(225, 48, 108, 0.75); }
     .hero-social-btn--ig span { color: rgba(255, 160, 200, 0.80); }
 
     /* TikTok */
     .hero-social-btn--tt svg {
       border: 1.5px solid rgba(255,255,255,0.20);
-      box-shadow: 0 4px 18px rgba(254, 44, 85, 0.45), 0 2px 6px rgba(0,0,0,0.5);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
-    .hero-social-btn--tt:hover svg { box-shadow: 0 6px 24px rgba(254, 44, 85, 0.65); }
     .hero-social-btn--tt span { color: rgba(255, 200, 210, 0.80); }
   }
 
@@ -801,9 +592,8 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     margin-right: auto !important;
     border-radius: 1.5rem !important;
     box-shadow:
-      0 0 0 1.5px rgba(0, 200, 255, 0.4),
-      0 0 24px rgba(0, 200, 255, 0.15),
-      0 0 60px rgba(0, 150, 255, 0.08);
+      0 0 0 1px rgba(255, 255, 255, 0.12),
+      0 8px 24px rgba(0, 0, 0, 0.40);
     /* min-height bazat pe conținut, nu 100vh — evită spațiul gol de jos */
     min-height: auto !important;
     /* padding-top >= 4rem → text "Formația" + badge vizibil sub header fix (~4rem înălțime) */
@@ -825,9 +615,8 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     .hero-fullscreen:hover {
       transform: scale(1.02);
       box-shadow:
-        0 0 0 1.5px rgba(0, 200, 255, 0.6),
-        0 0 30px rgba(0, 200, 255, 0.3),
-        0 0 80px rgba(0, 150, 255, 0.15);
+        0 0 0 1px rgba(255, 255, 255, 0.20),
+        0 12px 32px rgba(0, 0, 0, 0.50);
     }
   }
 
@@ -863,24 +652,6 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
       font-size: 0.7rem;
       padding: 0.25rem 0.6rem;
     }
-  }
-
-  /* Gradient fade la baza hero-ului — sub conținut, nu deasupra */
-  .hero-fade-bottom {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 20rem;
-    background: linear-gradient(to bottom,
-      transparent 0%,
-      rgba(12, 8, 15, 0.20) 25%,
-      rgba(12, 8, 15, 0.55) 55%,
-      rgba(12, 8, 15, 0.85) 80%,
-      rgba(12, 8, 15, 0) 100%
-    );
-    pointer-events: none;
-    z-index: 1;  /* SUB conținutul text (z-index: 5) */
   }
 
   /* ════════════════════════════════════════════════════════════════

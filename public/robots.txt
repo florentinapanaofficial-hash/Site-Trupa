@@ -1,6 +1,4 @@
 User-agent: *
-Allow: /
-Allow: /video/
 Disallow: /api/
 Disallow: /admin/
 
