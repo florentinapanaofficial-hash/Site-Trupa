@@ -9,15 +9,12 @@ const photos = [
   { src: `${base}/Galerie Evenimente 2.jpg`, alt: "Eveniment special — scenă completă",         cat: "evenimente" },
 ];
 
-const categories = [
-  { id: "toate",      label: "Toate" },
-  { id: "evenimente", label: "Evenimente" },
-];
+
 ---
 
 <BaseLayout
-  title="Galerie Foto Nunți și Evenimente | Formația Florentina Pană Pitești"
-  description="Fotografii din nunțile, botezurile și evenimentele corporate animate de Formația Florentina Pană. Momente de dans, energie și emoție surprinse pe scenele din Pitești și toată România."
+  title="Galerie Foto Nunți și Evenimente Live | Formația Florentina Pană Pitești"
+  description="Momente autentice surprinse la nunți, botezuri și evenimente live — dans, energie și emoție pe scenele din Pitești și toată România cu Formația Florentina Pană."
 >
   <section class="gal-page" aria-label="Galerie foto">
 
@@ -27,24 +24,9 @@ const categories = [
     <!-- ═══ HEADER ═══ -->
     <header class="gal-header">
       <span class="gal-badge">Galerie Foto</span>
-      <h1 class="gal-title">Momente din evenimentele noastre</h1>
-      <p class="gal-subtitle">Fotografii din nunți, botezuri și evenimente corporate</p>
+      <h1 class="gal-title">Așa Arată o Petrecere Reușită</h1>
+      <p class="gal-subtitle">Momente autentice de dans, energie și emoție, surprinse la evenimentele noastre live</p>
     </header>
-
-    <!-- ═══ FILTRE ═══ -->
-    <h2 class="sr-only">Categorii foto</h2>
-    <nav class="gal-filters" aria-label="Filtrează galeria">
-      {categories.map((c) => (
-        <button
-          class={`gal-filter-btn ${c.id === 'toate' ? 'active' : ''}`}
-          type="button"
-          data-filter={c.id}
-          aria-pressed={c.id === 'toate' ? 'true' : 'false'}
-        >
-          {c.label}
-        </button>
-      ))}
-    </nav>
 
     <!-- ═══ GRID MASONRY ═══ -->
     <div class="gal-masonry" role="list" aria-label="Galerie fotografii">
@@ -103,26 +85,7 @@ const categories = [
      SCRIPT — Filtre, Lightbox, Swipe, Keyboard
 ═══════════════════════════════════════════ -->
 <script>
-  // ── Filtre ──
-  const filterBtns = document.querySelectorAll<HTMLButtonElement>('.gal-filter-btn');
   const items = document.querySelectorAll<HTMLElement>('.gal-item');
-
-  filterBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      filterBtns.forEach((b) => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
-      btn.classList.add('active');
-      btn.setAttribute('aria-pressed', 'true');
-      const cat = btn.dataset.filter;
-      items.forEach((item) => {
-        const match = cat === 'toate' || item.dataset.category === cat;
-        item.style.opacity = '0';
-        setTimeout(() => {
-          item.style.display = match ? '' : 'none';
-          if (match) requestAnimationFrame(() => { item.style.opacity = '1'; });
-        }, 180);
-      });
-    });
-  });
 
   // ── Lightbox ──
   const lb = document.getElementById('gal-lightbox')!;
@@ -318,42 +281,7 @@ const categories = [
     line-height: 1.5;
   }
 
-  /* ══════════════════════════════════════════
-     FILTRE
-  ══════════════════════════════════════════ */
-  .gal-filters {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-bottom: clamp(1.5rem, 3vw, 2rem);
-  }
 
-  .gal-filter-btn {
-    font-family: 'Oswald', sans-serif;
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.10em;
-    text-transform: uppercase;
-    padding: 0.45em 1.1em;
-    border-radius: 9999px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: transparent;
-    color: rgba(200, 215, 240, 0.65);
-    cursor: pointer;
-    transition: background 200ms ease, color 200ms ease, border-color 200ms ease;
-  }
-
-  .gal-filter-btn:hover {
-    border-color: rgba(0, 200, 255, 0.35);
-    color: rgba(0, 220, 255, 0.90);
-  }
-
-  .gal-filter-btn.active {
-    background: linear-gradient(135deg, #00c8ff 0%, #0066ff 100%);
-    color: #ffffff;
-    border-color: transparent;
-  }
 
   /* ══════════════════════════════════════════
      MASONRY GRID
