@@ -92,7 +92,7 @@ const mobileNavAllItems = [
 <html lang="ro" class="scroll-smooth">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="robots" content="index,follow,max-image-preview:large" />
@@ -123,7 +123,7 @@ const mobileNavAllItems = [
     <!-- Fonturi Google — doar Inter + Oswald (singurele folosite în CSS)
          Cormorant Garamond și Playfair Display eliminate: zero utilizări font-family în cod -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@300;400;500;600;700&display=swap" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@300;400;500;600;700&display=swap" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@300;400;500;600;700&display=swap" /></noscript>
@@ -183,10 +183,28 @@ const mobileNavAllItems = [
 
     <script is:inline src="/js/mobile-swipe.js" defer></script>
 
+    <!-- Oprește audio/video când utilizatorul pleacă de pe pagină -->
+    <script is:inline>
+    (function(){
+      function stopAllMedia(){
+        document.querySelectorAll('audio, video').forEach(function(el){
+          if(!el.paused){ el.pause(); el.currentTime=0; }
+        });
+        /* Oprește și iframe-urile YouTube (postMessage API) */
+        document.querySelectorAll('iframe[src*="youtube"]').forEach(function(f){
+          try{ f.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}','*'); }catch(_){}
+        });
+      }
+      document.addEventListener('visibilitychange',function(){ if(document.hidden) stopAllMedia(); });
+      window.addEventListener('pagehide', stopAllMedia);
+      window.addEventListener('beforeunload', stopAllMedia);
+    })();
+    </script>
+
     <!-- Calculează înălțimea mob-nav și sincronizează --mob-nav-h -->
     <script is:inline>
     (function(){
-      if(!window.matchMedia('(max-width:1023px)').matches) return;
+      if(!window.matchMedia('(max-width:767px)').matches) return;
       function sync(){
         var nav=document.querySelector('.mob-nav');
         if(!nav) return;

@@ -64,12 +64,20 @@ const { href = '/', label = 'Înapoi' } = Astro.props;
   document.addEventListener('click', function (e) {
     var btn = (e.target as HTMLElement).closest?.('.back-btn');
     if (!btn) return;
-    var fallback = btn.getAttribute('data-back-href') || '/';
-    // Only use history.back() if we have real in-site history
-    if (document.referrer && document.referrer.includes(location.hostname) && history.length > 1) {
+
+    // Verifică dacă utilizatorul are istoric real pe acest site
+    var hasInSiteHistory = false;
+    try {
+      var ref = document.referrer;
+      hasInSiteHistory = !!ref
+        && ref.indexOf(location.hostname) !== -1
+        && history.length > 1;
+    } catch (_) { /* referrer indisponibil */ }
+
+    if (hasInSiteHistory) {
       e.preventDefault();
       history.back();
     }
-    // Otherwise follow the href naturally (fallback link)
+    // Altfel lasă browser-ul să navigheze la href (fallback sigur)
   });
 </script>

@@ -1,6 +1,6 @@
-/* Mobil swipe/scroll controller — rulează pe ≤1023px (telefon + tabletă) */
+/* Mobil swipe/scroll controller — rulează pe ≤767px (telefon) */
 (function () {
-    if (!window.matchMedia('(max-width: 1023px)').matches) return;
+    if (!window.matchMedia('(max-width: 767px)').matches) return;
 
     var main = document.getElementById('continut');
     if (!main) return;
@@ -53,13 +53,15 @@
             return b.getAttribute('data-mb') === activeHref;
         });
         if (activeBtn) {
-            var nav = document.querySelector('.mob-nav');
-            if (nav) {
-                var btnLeft = activeBtn.offsetLeft;
-                var btnWidth = activeBtn.offsetWidth;
-                var navWidth = nav.offsetWidth;
-                nav.scrollTo({ left: btnLeft - (navWidth / 2) + (btnWidth / 2), behavior: 'smooth' });
-            }
+            requestAnimationFrame(function () {
+                var nav = document.querySelector('.mob-nav');
+                if (nav) {
+                    var btnLeft = activeBtn.offsetLeft;
+                    var btnWidth = activeBtn.offsetWidth;
+                    var navWidth = nav.offsetWidth;
+                    nav.scrollTo({ left: btnLeft - (navWidth / 2) + (btnWidth / 2), behavior: 'smooth' });
+                }
+            });
         }
     }
 

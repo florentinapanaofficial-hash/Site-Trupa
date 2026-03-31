@@ -364,10 +364,12 @@ html::-webkit-scrollbar {
   width: 18px;
 }
 
-/* Pe mobil/tabletă nu afișăm scrollbar-ul custom de 18px:
-   ≤1023px = swipe layout activ → body nu scrollează, scrollbar-ul e irelevant
-   și apare ca artifact vizual pe unele browsere. */
-@media (max-width: 1023px) {
+/* Pe mobil nu afișăm scrollbar-ul custom de 18px:
+   ≤767px = swipe layout activ → body nu scrollează, scrollbar-ul e irelevant
+   și apare ca artifact vizual pe unele browsere.
+   Breakpoint scăzut de la 1023px la 767px pentru ca "Versiunea Desktop"
+   (viewport ~980px) să primească layout-ul desktop cu header vizibil. */
+@media (max-width: 767px) {
   html {
     scrollbar-width: none;
   }
@@ -426,13 +428,15 @@ html::-webkit-scrollbar-thumb:hover {
   overflow: hidden;
   border-radius: 9999px;
   text-decoration: none;
-  font-size: 0.82rem;
+  font-size: max(0.82rem, 14px);
   font-weight: 900;
   letter-spacing: 0.07em;
   text-transform: uppercase;
   padding: 0.48rem 0.9rem;
   white-space: normal;
   line-height: 1.25;
+  min-height: 44px;
+  min-width: 44px;
   transition: transform 100ms ease, box-shadow 100ms ease;
 }
 
@@ -831,6 +835,7 @@ html::-webkit-scrollbar-thumb:hover {
 .nav-link,
 .left-side-link {
   min-height: 44px;
+  min-width: 44px;
 }
 
 .btn-solid {
@@ -947,9 +952,11 @@ details:focus-visible {
   position: relative;
   overflow: hidden;
   font-weight: 900;
-  font-size: 0.82rem;
+  font-size: max(0.82rem, 14px);
   letter-spacing: 0.07em;
   text-transform: uppercase;
+  min-height: 44px;
+  min-width: 44px;
   transition: box-shadow 100ms ease;
 }
 
@@ -1325,7 +1332,9 @@ details:focus-visible {
 /* ═══════════════════════════════════════════════════════════════
    MOBIL — SWIPE LAYOUT  (≤ 767px)
    Desktop rămâne complet neschimbat. Toate regulile de mai jos
-   sunt exclusiv pentru ecrane mici (telefon / tabletă mică).
+   sunt exclusiv pentru ecrane mici (telefon).
+   Breakpoint: 767px (nu 1023px) — "Versiunea Desktop" din browser
+   simulează ~980px, deci la 768-1023px trebuie layout desktop.
 ═══════════════════════════════════════════════════════════════ */
 
 /* Elementele noi sunt invizibile pe desktop */
@@ -1334,7 +1343,7 @@ details:focus-visible {
   display: none;
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 767px) {
 
   /* ── 1. Dispare header-ul negru fix ── */
   .top-header {
@@ -1469,12 +1478,13 @@ details:focus-visible {
     text-decoration: none;
     border-radius: 9999px;
     font-family: 'Oswald', sans-serif;
-    font-size: 0.7rem;
+    font-size: max(0.7rem, 14px);
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     padding: 0.34rem 0.65rem;
-    min-height: 36px;
+    min-height: 44px;
+    min-width: 44px;
     border: 1px solid rgba(255, 255, 255, 0.14);
     background: rgba(255, 255, 255, 0.07);
     color: rgba(255, 255, 255, 0.65);
@@ -1508,8 +1518,10 @@ details:focus-visible {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 2rem;
+    width: 2.75rem;
+    min-width: 44px;
     height: 6rem;
+    min-height: 44px;
     border: 1px solid rgba(255, 255, 255, 0.12);
     background: rgba(255, 255, 255, 0.07);
     color: rgba(255, 255, 255, 0.50);
