@@ -310,4 +310,55 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
       }
     }
   </style>
+
+  <style is:global>
+    .form-shell {
+      border: 1px solid rgba(245, 166, 35, 0.15);
+      border-radius: 1rem;
+      background: rgba(8, 16, 42, 0.85);
+      padding: 1rem;
+    }
+    .form-grid {
+      display: grid;
+      gap: 0.75rem;
+    }
+    @media (min-width: 640px) {
+      .form-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    .form-label {
+      display: grid;
+      gap: 0.35rem;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: #e0e0e0;
+    }
+    .form-label-full {
+      grid-column: 1 / -1;
+    }
+    .input-glass {
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 0.75rem;
+      background: rgba(255, 255, 255, 0.10);
+      padding: 0.6rem 0.72rem;
+      color: #ffffff;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.65);
+      font-size: 0.9rem;
+      font-family: inherit;
+      transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+    }
+    .input-glass::placeholder {
+      color: rgba(255, 255, 255, 0.45);
+      text-shadow: none;
+    }
+    .input-glass:focus-visible {
+      outline: none;
+      border-color: var(--gold);
+      background: rgba(245, 166, 35, 0.08);
+      box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.18);
+    }
+  </style>
 </BaseLayout>

@@ -94,4 +94,20 @@ const videoJsonLd = {
       </div>
     </article>
   </section>
+
+  <style is:global>
+    .video-embed-shell {
+      position: relative;
+      overflow: hidden;
+      border-radius: 0.75rem;
+      box-shadow: 0 12px 30px rgba(187, 134, 252, 0.24);
+    }
+    .video-embed-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      border-radius: 0.75rem;
+      background: linear-gradient(180deg, rgba(3, 8, 20, 0.46) 0%, rgba(3, 8, 20, 0.2) 42%, rgba(3, 8, 20, 0.5) 100%);
+    }
+  </style>
 </BaseLayout>

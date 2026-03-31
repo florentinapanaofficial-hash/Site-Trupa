@@ -1536,6 +1536,43 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
   <style is:global>
     /* Cormorant Garamond se încarcă async via <link preload> în <head> */
 
+    /* ─── Buton muzică romantică de fundal (JS-created DOM) ── */
+    .bg-music-fab {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.55rem 1rem 0.55rem 0.8rem;
+      border-radius: 9999px;
+      background: linear-gradient(135deg, rgba(14, 6, 24, 0.94), rgba(38, 12, 55, 0.94));
+      border: 1px solid rgba(232, 50, 90, 0.42);
+      box-shadow: 0 4px 22px rgba(232, 50, 90, 0.22), 0 2px 10px rgba(0, 0, 0, 0.55);
+      color: #fce4ed;
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(5rem) scale(0.8);
+      pointer-events: none;
+      transition: opacity 420ms ease, transform 420ms cubic-bezier(0.22, 1, 0.36, 1), background 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .bg-music-fab.is-visible { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+    .bg-music-fab:hover { background: linear-gradient(135deg, rgba(232, 50, 90, 0.28), rgba(180, 28, 62, 0.22)); border-color: rgba(232, 50, 90, 0.78); box-shadow: 0 6px 30px rgba(232, 50, 90, 0.38), 0 2px 10px rgba(0, 0, 0, 0.55); transform: translateY(-2px) scale(1.05); }
+    .bg-music-fab.is-playing { border-color: rgba(232, 50, 90, 0.72); box-shadow: 0 0 0 2px rgba(232, 50, 90, 0.18), 0 6px 28px rgba(232, 50, 90, 0.38), 0 2px 8px rgba(0, 0, 0, 0.5); }
+    .bg-music-note { font-size: 1.05rem; line-height: 1; flex-shrink: 0; display: inline-block; }
+    .bg-music-fab.is-playing .bg-music-note { animation: bgNoteBounce 1.8s ease-in-out infinite; }
+    @keyframes bgNoteBounce { 0%, 100% { transform: scale(1) rotate(0deg); } 30% { transform: scale(1.28) rotate(-12deg); } 70% { transform: scale(0.86) rotate(8deg); } }
+    .bg-music-label { min-width: 3.2rem; text-align: left; }
+    @media (max-width: 480px) { .bg-music-fab { bottom: 1rem; right: 1rem; font-size: 0.65rem; padding: 0.46rem 0.75rem 0.46rem 0.65rem; } }
+    @media (prefers-reduced-motion: reduce) { .bg-music-fab.is-playing .bg-music-note { animation: none; } }
+
     /* ─── Lightbox base (mutat din globals.css — folosit doar pe această pagină) ── */
     .photo-lightbox {
       border: 1px solid #ffffff2f;
