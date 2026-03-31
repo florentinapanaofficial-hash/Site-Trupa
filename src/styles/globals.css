@@ -690,17 +690,69 @@ html::-webkit-scrollbar-thumb:hover {
   padding-inline: 0.95rem;
 }
 
-.hamburger-lines {
+/* ── Hamburger Button ── */
+.hamburger-btn {
+  position: relative;
   display: inline-grid;
-  gap: 0.22rem;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 0.85rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--title);
+  font-size: 1.4rem;
+  cursor: pointer;
+  transition: background 200ms ease, border-color 200ms ease;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.hamburger-line {
-  width: 1rem;
-  height: 2px;
-  border-radius: 9999px;
-  background: currentColor;
-  transition: transform 180ms ease, opacity 180ms ease;
+.hamburger-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.hamburger-btn .hamburger-icon,
+.hamburger-btn .close-icon {
+  position: absolute;
+  transition: opacity 200ms ease, transform 200ms ease;
+  line-height: 1;
+}
+
+.hamburger-btn .close-icon {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.7);
+}
+
+.top-header.menu-open .hamburger-btn .hamburger-icon {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.7);
+}
+
+.top-header.menu-open .hamburger-btn .close-icon {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+/* ── Mobile Menu Backdrop ── */
+.mobile-menu-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 49;
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 250ms ease;
+  pointer-events: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.top-header.menu-open~.mobile-menu-backdrop {
+  display: block;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .nav-link-desktop {
@@ -731,10 +783,12 @@ html::-webkit-scrollbar-thumb:hover {
 
 #top-menu-panel nav [data-nav-link].is-active {
   filter: brightness(1.25) saturate(1.4);
+  border: 2px solid var(--teal, #0BBCD6);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.55),
     0 8px 0 var(--btn-shadow-color, #004a65),
-    0 6px 14px rgba(0, 0, 0, 0.45) !important;
+    0 6px 14px rgba(0, 0, 0, 0.45),
+    0 0 16px rgba(11, 188, 214, 0.4) !important;
   transition: opacity 350ms ease, filter 350ms ease, box-shadow 100ms ease;
 }
 
@@ -756,18 +810,6 @@ html::-webkit-scrollbar-thumb:hover {
     inset 0 1px 0 rgba(255, 255, 255, 0.45),
     0 5px 0 var(--btn-shadow-color, #333),
     0 6px 14px rgba(0, 0, 0, 0.45) !important;
-}
-
-.top-header.menu-open .hamburger-line:nth-child(1) {
-  transform: translateY(6px) rotate(45deg);
-}
-
-.top-header.menu-open .hamburger-line:nth-child(2) {
-  opacity: 0;
-}
-
-.top-header.menu-open .hamburger-line:nth-child(3) {
-  transform: translateY(-6px) rotate(-45deg);
 }
 
 /* body.top-menu-expanded #continut padding-top rules removed:
@@ -1428,8 +1470,8 @@ details:focus-visible {
     border-radius: 0 !important;
     box-sizing: border-box !important;
     /* --mob-nav-h este calculat dinamic în BaseLayout (JS) pentru a acoperi
-       meniul pe 2–3 rânduri; fallback generos pentru 3 rânduri (~140px). */
-    padding-top: calc(var(--mob-nav-h, 140px) + 0.75rem) !important;
+       meniul pe 2–3 rânduri; fallback generos pentru 3 rânduri (~160px). */
+    padding-top: calc(var(--mob-nav-h, 160px) + 1rem) !important;
     padding-bottom: 5rem !important;
     padding-left: 1.4rem !important;
     padding-right: 1.4rem !important;
@@ -1438,7 +1480,7 @@ details:focus-visible {
   /* ── Hero Acasă — conținut aliniat sus, nu centrat vertical ── */
   main#continut>section#acasa.hero-stage {
     justify-content: flex-start !important;
-    padding-top: calc(var(--mob-nav-h, 140px) + 0.5rem) !important;
+    padding-top: calc(var(--mob-nav-h, 160px) + 1rem) !important;
   }
 
   main#continut>section::-webkit-scrollbar {
@@ -1620,13 +1662,13 @@ details:focus-visible {
     scroll-snap-align: none !important;
     scroll-snap-stop: unset !important;
     touch-action: pan-y !important;
-    padding-top: calc(var(--mob-nav-h, 140px) + 0.75rem) !important;
+    padding-top: calc(var(--mob-nav-h, 160px) + 1rem) !important;
     padding-bottom: 4rem !important;
   }
 
   body.is-homepage main#continut>section#acasa.hero-stage {
     justify-content: flex-start !important;
-    padding-top: calc(var(--mob-nav-h, 140px) + 0.5rem) !important;
+    padding-top: calc(var(--mob-nav-h, 160px) + 1rem) !important;
   }
 
   /* Secțiunile SEO pe homepage — nu forța min-height 100dvh, doar cât conținut au */
@@ -1643,5 +1685,15 @@ details:focus-visible {
 
   body.is-homepage .mob-arrow--next {
     display: flex !important;
+  }
+
+  /* ── Footer global: ascuns pe mobil (navigarea e asigurată de mob-nav) ── */
+  footer.border-t {
+    display: none !important;
+  }
+
+  /* ── Săgeți swipe: ascunse când sliderul are un singur element ── */
+  .mob-swipe-hints.single-slide {
+    display: none !important;
   }
 }

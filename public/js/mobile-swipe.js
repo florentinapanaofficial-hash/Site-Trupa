@@ -21,8 +21,14 @@
     var navBtns = Array.from(document.querySelectorAll('[data-mb]'));
     var arrowPrev = document.getElementById('mob-arrow-prev');
     var arrowNext = document.getElementById('mob-arrow-next');
+    var hintsContainer = document.querySelector('.mob-swipe-hints');
     var n = slides.length;
     var current = 0;
+
+    /* Ascunde săgețile dacă sliderul are un singur element */
+    if (n <= 1 && hintsContainer) {
+        hintsContainer.classList.add('single-slide');
+    }
 
     var isHomepage = document.body.classList.contains('is-homepage');
 

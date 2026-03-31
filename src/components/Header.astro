@@ -58,18 +58,14 @@ const hasExpandableTopMenu = mobileNavigation.length > 1;
       {hasExpandableTopMenu && (
         <button
           type="button"
-          class="btn-outline top-menu-toggle"
+          class="hamburger-btn"
           data-top-menu-toggle
           aria-expanded="false"
           aria-controls="top-menu-panel"
           aria-label="Deschide meniul principal"
         >
-          <span class="hamburger-lines" aria-hidden="true">
-            <span class="hamburger-line"></span>
-            <span class="hamburger-line"></span>
-            <span class="hamburger-line"></span>
-          </span>
-          <span class="top-menu-toggle-label">Meniu</span>
+          <span class="hamburger-icon" aria-hidden="true">☰</span>
+          <span class="close-icon" aria-hidden="true">✕</span>
         </button>
       )}
 
@@ -132,6 +128,7 @@ const hasExpandableTopMenu = mobileNavigation.length > 1;
   </div>
 
   {hasExpandableTopMenu && (
+    <div class="mobile-menu-backdrop" data-menu-backdrop></div>
     <div id="top-menu-panel" class="top-menu-panel" data-top-menu-panel>
       <nav class="no-scrollbar section-container flex min-w-0 items-center justify-start gap-4 overflow-x-auto pb-3 text-sm font-medium text-white/90 xl:justify-center" aria-label="Navigație principală">
         {desktopNavigation.map((item) => (
@@ -153,8 +150,32 @@ const hasExpandableTopMenu = mobileNavigation.length > 1;
   const initScrollSpy = () => {
     const headerEl = document.querySelector('[data-top-header]');
     const menuToggle = document.querySelector('[data-top-menu-toggle]');
+    const menuBackdrop = document.querySelector('[data-menu-backdrop]');
     const isMobileViewport = () => window.matchMedia('(max-width: 767px)').matches;
     let lastScrollY = window.scrollY;
+
+    const syncTopMenuBodyClass = (isOpen) => {
+      document.body.classList.toggle('top-menu-expanded', Boolean(isOpen));
+      document.body.classList.toggle('mobile-menu-open', Boolean(isOpen) && isMobileViewport());
+    };
+
+    const closeMenu = () => {
+      if (!headerEl || !menuToggle) return;
+      headerEl.classList.remove('menu-open');
+      menuToggle.setAttribute('aria-expanded', 'false');
+      menuToggle.setAttribute('aria-label', 'Deschide meniul principal');
+      syncTopMenuBodyClass(false);
+      sessionStorage.setItem(MENU_KEY, 'false');
+    };
+
+    const openMenu = () => {
+      if (!headerEl || !menuToggle) return;
+      headerEl.classList.add('menu-open');
+      menuToggle.setAttribute('aria-expanded', 'true');
+      menuToggle.setAttribute('aria-label', 'Închide meniul principal');
+      syncTopMenuBodyClass(true);
+      sessionStorage.setItem(MENU_KEY, 'true');
+    };
 
     const syncTopMenuBodyClass = (isOpen) => {
       document.body.classList.toggle('top-menu-expanded', Boolean(isOpen));
@@ -169,30 +190,37 @@ const hasExpandableTopMenu = mobileNavigation.length > 1;
 
     if (headerEl && menuToggle) {
       if (wasOpen) {
-        headerEl.classList.add('menu-open');
-        menuToggle.setAttribute('aria-expanded', 'true');
-        menuToggle.setAttribute('aria-label', 'Închide meniul principal');
-        syncTopMenuBodyClass(true);
+        openMenu();
       }
 
       menuToggle.addEventListener('click', () => {
         const willOpen = !headerEl.classList.contains('menu-open');
-        headerEl.classList.toggle('menu-open', willOpen);
-        menuToggle.setAttribute('aria-expanded', String(willOpen));
-        menuToggle.setAttribute('aria-label', willOpen ? 'Închide meniul principal' : 'Deschide meniul principal');
-        syncTopMenuBodyClass(willOpen);
-        sessionStorage.setItem(MENU_KEY, String(willOpen));
+        if (willOpen) {
+          openMenu();
+        } else {
+          closeMenu();
+        }
+      });
+
+      // Click pe backdrop → închide meniul
+      if (menuBackdrop) {
+        menuBackdrop.addEventListener('click', closeMenu);
+      }
+
+      // Click pe orice link de navigare → închide meniul
+      const navLinks = document.querySelectorAll('#top-menu-panel [data-nav-link]');
+      navLinks.forEach((link) => {
+        link.addEventListener('click', () => {
+          if (headerEl.classList.contains('menu-open')) {
+            closeMenu();
+          }
+        });
       });
 
       window.addEventListener('keydown', (event) => {
         if (event.key !== 'Escape') return;
         if (!headerEl.classList.contains('menu-open')) return;
-
-        headerEl.classList.remove('menu-open');
-        menuToggle.setAttribute('aria-expanded', 'false');
-        menuToggle.setAttribute('aria-label', 'Deschide meniul principal');
-        syncTopMenuBodyClass(false);
-        sessionStorage.setItem(MENU_KEY, 'false');
+        closeMenu();
       });
 
       window.addEventListener('resize', () => {
