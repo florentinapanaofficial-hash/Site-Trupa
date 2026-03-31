@@ -120,13 +120,11 @@ const mobileNavAllItems = [
     <meta name="twitter:image" content={ogImage} />
     <!-- [DE_COMPLETAT] Înlocuiește @florentinapana cu contul real X/Twitter -->
     <meta name="twitter:site" content="@florentinapana" />
-    <!-- Fonturi Google — doar Inter + Oswald (singurele folosite în CSS)
-         Cormorant Garamond și Playfair Display eliminate: zero utilizări font-family în cod -->
+    <!-- Fonturi Google — Inter (400,500,600,700) + Oswald (400,600,700), latin-ext -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@300;400;500;600;700&display=swap" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@300;400;500;600;700&display=swap" media="print" onload="this.media='all'" />
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@300;400;500;600;700&display=swap" /></noscript>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@400;600;700&display=swap" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@400;600;700&display=swap" /></noscript>
     <link rel="icon" type="image/svg+xml" href="/images/logo-fp-stage.svg" />
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
     <slot name="head" />
@@ -201,21 +199,22 @@ const mobileNavAllItems = [
     })();
     </script>
 
-    <!-- Calculează înălțimea mob-nav și sincronizează --mob-nav-h -->
+    <!-- Calculează înălțimea header-ului și sincronizează --mob-nav-h -->
     <script is:inline>
     (function(){
       if(!window.matchMedia('(max-width:767px)').matches) return;
       function sync(){
-        var nav=document.querySelector('.mob-nav');
+        var nav=document.querySelector('.top-header');
         if(!nav) return;
         var h=nav.offsetHeight;
         if(h>0) document.documentElement.style.setProperty('--mob-nav-h',h+'px');
       }
-      // Rulează la load + resize (menu-ul se poate re-wrapa)
       if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',sync);}else{sync();}
       window.addEventListener('resize',sync,{passive:true});
     })();
     </script>
+
+    <!-- IntersectionObserver dezactivat — animațiile au fost scoase -->
   </body>
 </html>
 

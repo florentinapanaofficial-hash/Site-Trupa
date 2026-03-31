@@ -32,12 +32,26 @@ const normalizedNavigation = navigation.map((item) => ({
 }));
 const topNavigation = normalizedNavigation;
 const desktopNavigation = topNavigation;
+
+// Navigare completă pentru panoul hamburger mobil
+const mobileFullNavigation = [
+  { href: '/', label: 'Acasă', color: 'cyan' },
+  { href: '/despre', label: 'Despre', color: 'cyan' },
+  { href: '/membri', label: 'Membri', color: 'cyan' },
+  { href: '/galerie-video', label: 'Galerie Video', color: 'cyan' },
+  { href: '/galerie-foto', label: 'Galerie Foto', color: 'cyan' },
+  { href: '/momente-cu-mirii', label: 'Momente cu mirii', color: 'cyan' },
+  { href: '/comunitatea-noastra', label: 'Comunitatea noastră', color: 'cyan' },
+  { href: '/aparitii-tv', label: 'Apariții TV', color: 'cyan' },
+  { href: '/contact', label: 'Contact', color: 'cyan' },
+].map((item) => ({ ...item, href: normalizeNavHref(item.href) }));
+
 const mobileNavigation = topNavigation;
-const hasExpandableTopMenu = mobileNavigation.length > 1;
+const hasExpandableTopMenu = mobileFullNavigation.length > 1;
 ---
 
 <header class="top-header fixed inset-x-0 top-0 z-40 border-b border-white/20 bg-ink" data-top-header>
-  <div class="section-container flex items-center justify-between gap-3 py-3">
+  <div class="section-container header-bar flex items-center justify-between gap-3 py-3">
     <a href={isHomePage ? '#acasa' : '/#acasa'} class="inline-flex items-center gap-3" aria-label="Mergi la începutul paginii">
       <img
         src="/images/logo-fp-stage.svg"
@@ -130,13 +144,17 @@ const hasExpandableTopMenu = mobileNavigation.length > 1;
   {hasExpandableTopMenu && (
     <div class="mobile-menu-backdrop" data-menu-backdrop></div>
     <div id="top-menu-panel" class="top-menu-panel" data-top-menu-panel>
-      <nav class="no-scrollbar section-container flex min-w-0 items-center justify-start gap-4 overflow-x-auto pb-3 text-sm font-medium text-white/90 xl:justify-center" aria-label="Navigație principală">
+      <!-- Desktop: bară orizontală cu scroll -->
+      <nav class="no-scrollbar section-container nav-desktop-bar flex min-w-0 items-center justify-start gap-4 overflow-x-auto pb-3 text-sm font-medium text-white/90 xl:justify-center" aria-label="Navigație principală">
         {desktopNavigation.map((item) => (
           <a href={item.href} class={`left-side-link nav-link-desktop${item.color ? ` nav-btn-${item.color}` : ''}`} data-nav-link>
             <span class="nav-label">{item.label}</span>
           </a>
         ))}
-        {mobileNavigation.map((item) => (
+      </nav>
+      <!-- Mobil: grilă verticală cu toate paginile -->
+      <nav class="nav-mobile-grid" aria-label="Navigație mobilă">
+        {mobileFullNavigation.map((item) => (
           <a href={item.href} class={`left-side-link nav-link-mobile${item.color ? ` nav-btn-${item.color}` : ''}`} data-nav-link>
             <span class="nav-label">{item.label}</span>
           </a>
@@ -180,18 +198,29 @@ const hasExpandableTopMenu = mobileNavigation.length > 1;
 
     syncTopMenuBodyClass(false);
 
-    // Restaurează starea meniului din sesiune anterioară (navigare între pagini)
+    // Pe mobil, meniul e deschis implicit — INSTANT fără animație
     const wasOpen = sessionStorage.getItem(MENU_KEY) === 'true';
 
     if (headerEl && menuToggle) {
-      if (wasOpen) {
+      if (isMobileViewport()) {
+        headerEl.classList.add('menu-instant');
+        openMenu();
+        // Scoatem menu-instant după primul frame ca animațiile viitoare să meargă normal
+        requestAnimationFrame(() => { requestAnimationFrame(() => {
+          headerEl.classList.remove('menu-instant');
+        }); });
+      } else if (wasOpen) {
         openMenu();
       }
+
+      // Salvează scrollY la deschidere (pt scroll-close)
+      let menuOpenScrollY = window.scrollY;
 
       menuToggle.addEventListener('click', () => {
         const willOpen = !headerEl.classList.contains('menu-open');
         if (willOpen) {
           openMenu();
+          menuOpenScrollY = window.scrollY;
         } else {
           closeMenu();
         }
@@ -202,10 +231,12 @@ const hasExpandableTopMenu = mobileNavigation.length > 1;
         menuBackdrop.addEventListener('click', closeMenu);
       }
 
-      // Click pe orice link de navigare → închide meniul
+      // Click pe link desktop → închide meniul
+      // Click pe link MOBIL → NU închide meniul (butoanele rămân fixe)
       const navLinks = document.querySelectorAll('#top-menu-panel [data-nav-link]');
       navLinks.forEach((link) => {
         link.addEventListener('click', () => {
+          if (isMobileViewport()) return;          // pe mobil: meniul rămâne deschis
           if (headerEl.classList.contains('menu-open')) {
             closeMenu();
           }
@@ -222,6 +253,57 @@ const hasExpandableTopMenu = mobileNavigation.length > 1;
         if (!headerEl.classList.contains('menu-open')) return;
         syncTopMenuBodyClass(true);
       });
+
+      // ── Scroll / swipe pe mobil → închide meniul very-slow-motion ──
+      let isScrollClosing = false;
+
+      const triggerScrollClose = () => {
+        if (isScrollClosing) return;
+        if (!isMobileViewport()) return;
+        if (!headerEl.classList.contains('menu-open')) return;
+        isScrollClosing = true;
+        headerEl.classList.add('scroll-closing');
+        setTimeout(() => { closeMenu(); }, 80);
+        setTimeout(() => {
+          headerEl.classList.remove('scroll-closing');
+          isScrollClosing = false;
+        }, 1600);
+      };
+
+      // Metoda 1: window scroll — threshold absolut, nu delta
+      // Închide dacă user a scrollat >8px față de când s-a deschis meniul
+      window.addEventListener('scroll', () => {
+        if (!isMobileViewport()) return;
+        if (!headerEl.classList.contains('menu-open')) return;
+        if (window.scrollY > menuOpenScrollY + 8) {
+          triggerScrollClose();
+        }
+      }, { passive: true });
+
+      // Metoda 2: touchmove — detectează swipe-up chiar dacă pagina nu scrollează
+      let touchStartY = 0;
+      window.addEventListener('touchstart', (e) => {
+        if (e.touches.length) touchStartY = e.touches[0].clientY;
+      }, { passive: true });
+
+      window.addEventListener('touchmove', (e) => {
+        if (!isMobileViewport()) return;
+        if (!headerEl.classList.contains('menu-open')) return;
+        if (!e.touches.length) return;
+        const deltaY = touchStartY - e.touches[0].clientY;
+        if (deltaY > 8) {
+          triggerScrollClose();
+        }
+      }, { passive: true });
+
+      // Metoda 3: wheel event — unele browsere mobile emit wheel în loc de scroll
+      window.addEventListener('wheel', (e) => {
+        if (!isMobileViewport()) return;
+        if (!headerEl.classList.contains('menu-open')) return;
+        if (e.deltaY > 5) {
+          triggerScrollClose();
+        }
+      }, { passive: true });
     }
 
     const links = Array.from(document.querySelectorAll('#top-menu-panel [data-nav-link]'));

@@ -4,8 +4,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['Oswald', 'sans-serif'],
+        sans: ['Inter', 'Inter Fallback', 'system-ui', 'sans-serif'],
+        display: ['Oswald', 'Oswald Fallback', 'sans-serif'],
       },
 
       keyframes: {

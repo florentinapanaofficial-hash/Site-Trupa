@@ -30,7 +30,7 @@ function initiale(name: string): string {
   </div>
 
   <!-- ═══ HEADER PAGINĂ ═══ -->
-  <header class="section-head mx-auto text-center mb-10 pt-8">
+  <header class="section-head mx-auto text-center mb-10 pt-8 anim-on-scroll">
     <p class="kicker">Echipa noastră</p>
     <h1 class="section-title">Membrii Formației — Formație Nuntă Pitești</h1>
     <p class="section-copy">Soliști vocali, instrumentiști și colaboratori cu experiență de peste 10 ani, disponibili pentru nunți, botezuri și evenimente în Pitești, Argeș și toată România.</p>
@@ -44,7 +44,7 @@ function initiale(name: string): string {
     </div>
 
     {solisti.map((m: any, i: number) => (
-      <div class="member-card-wrap" data-index={i}>
+      <div class="member-card-wrap anim-on-scroll" data-index={i} style={`transition-delay: ${i * 0.12}s`}>
         <article class="member-card">
           <!-- FOTO -->
           <div class="mc-photo-col">
@@ -52,7 +52,7 @@ function initiale(name: string): string {
               <img
                 src={m.imagine}
                 alt={`${m.nume} - ${m.rol} - Formația Florentina Pană Pitești`}
-                class="mc-photo-img"
+                class="mc-photo-img anim-img-hover"
                 loading="lazy"
                 decoding="async"
                 width="400"
@@ -154,7 +154,7 @@ function initiale(name: string): string {
     </div>
 
     {instrumentisti.map((m: any, i: number) => (
-      <div class="member-card-wrap" data-index={i}>
+      <div class="member-card-wrap anim-on-scroll" data-index={i} style={`transition-delay: ${i * 0.12}s`}>
         <article class="member-card">
           <!-- FOTO -->
           <div class="mc-photo-col">
@@ -162,7 +162,7 @@ function initiale(name: string): string {
               <img
                 src={m.imagine}
                 alt={`${m.nume} - ${m.rol} - ${m.specialitate} - Formația Florentina Pană Pitești`}
-                class="mc-photo-img"
+                class="mc-photo-img anim-img-hover"
                 loading="lazy"
                 decoding="async"
                 width="400"
@@ -691,16 +691,18 @@ function initiale(name: string): string {
 
   /* Specialitate */
   .mc-spec {
-    font-size: 0.82rem;
-    color: rgba(180, 200, 235, 0.72);
+    font-size: clamp(0.82rem, 1.1vw, 0.92rem);
+    line-height: 1.5;
+    color: rgba(180, 200, 235, 0.78);
     margin: 0;
     font-style: italic;
   }
 
   /* Experiență */
   .mc-exp {
-    font-size: 0.75rem;
-    color: rgba(200, 215, 240, 0.58);
+    font-size: clamp(0.75rem, 1vw, 0.85rem);
+    line-height: 1.5;
+    color: rgba(200, 215, 240, 0.65);
     margin: 0;
   }
 
@@ -903,19 +905,21 @@ function initiale(name: string): string {
   }
 
   .bio-quote p {
-    font-size: 0.92rem;
+    font-size: clamp(0.88rem, 1.1vw, 0.98rem);
     font-style: italic;
-    color: rgba(180, 215, 255, 0.80);
-    line-height: 1.62;
+    color: rgba(180, 215, 255, 0.85);
+    line-height: 1.75;
     margin: 0;
+    text-wrap: pretty;
   }
 
   /* Text bio */
   .bio-text {
-    font-size: 0.88rem;
-    line-height: 1.76;
-    color: rgba(210, 225, 245, 0.82);
+    font-size: clamp(0.85rem, 1.1vw, 0.95rem);
+    line-height: 1.82;
+    color: rgba(210, 225, 245, 0.85);
     margin: 0 0 1rem;
+    text-wrap: pretty;
   }
 
   /* Taguri pill */

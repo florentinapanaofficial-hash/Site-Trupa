@@ -41,7 +41,7 @@ const hasBandPhoto = typeof (brand as any).bandPhoto === 'string' && (brand as a
         <p class="kicker">Povestea noastră</p>
         <h1 class="section-title">Formație Nuntă Pitești — Formația Florentina Pană</h1>
         <div class="mt-6 flex flex-wrap gap-3">
-          <a href={`tel:${contact.phoneRaw}`} class="btn-solid">Sună acum</a>
+          <a href={`tel:${contact.phoneRaw}`} class="btn-solid anim-cta-pulse">Sună acum</a>
           <a href="/contact" class="btn-outline">Rezervă o dată</a>
         </div>
       </div>
@@ -201,19 +201,21 @@ const hasBandPhoto = typeof (brand as any).bandPhoto === 'string' && (brand as a
   }
   .dp-intro-lead {
     font-size: clamp(1rem, 2vw, 1.15rem);
-    line-height: 1.8;
+    line-height: 1.85;
     color: #ffffff;
-    margin: 0 0 0.9rem;
+    margin: 0 0 1rem;
+    text-wrap: pretty;
   }
   .dp-intro-name {
     color: var(--gold);
     font-weight: 700;
   }
   .dp-intro-body {
-    font-size: clamp(0.95rem, 1.8vw, 1.05rem);
-    line-height: 1.8;
+    font-size: clamp(0.92rem, 1.8vw, 1.05rem);
+    line-height: 1.85;
     color: rgba(255, 255, 255, 0.82);
     margin: 0;
+    text-wrap: pretty;
   }
   @media (max-width: 767px) {
     .dp-intro-block {
@@ -427,6 +429,7 @@ const hasBandPhoto = typeof (brand as any).bandPhoto === 'string' && (brand as a
     font-weight: 700;
     color: #fff;
     margin: 0;
+    text-wrap: balance;
   }
   .dp-grid-4 {
     display: grid;
@@ -461,10 +464,11 @@ const hasBandPhoto = typeof (brand as any).bandPhoto === 'string' && (brand as a
     margin: 0 0 0.5rem;
   }
   .dp-card-desc {
-    font-size: 0.93rem;
-    line-height: 1.65;
+    font-size: clamp(0.88rem, 1.2vw, 0.98rem);
+    line-height: 1.75;
     color: rgba(220, 208, 192, 0.95);
     margin: 0;
+    text-wrap: pretty;
   }
 
   /* FAQ */
@@ -497,11 +501,12 @@ const hasBandPhoto = typeof (brand as any).bandPhoto === 'string' && (brand as a
   .faq-item[open] .faq-chevron { transform: rotate(180deg); }
   .faq-answer {
     padding: 0.85rem 1.2rem 1.05rem;
-    font-size: 0.95rem;
-    line-height: 1.7;
+    font-size: clamp(0.88rem, 1.1vw, 0.98rem);
+    line-height: 1.8;
     color: rgba(220, 208, 192, 0.95);
     margin: 0;
     border-top: 1px solid rgba(255,255,255,0.07);
+    text-wrap: pretty;
   }
 </style>
 

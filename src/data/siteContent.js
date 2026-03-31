@@ -7,7 +7,7 @@ export const siteContent = {
     seo: {
         title: 'Formația Florentina Pană | Muzică live pentru nunți și evenimente',
         description: 'Formația Florentina Pană aduce show live pentru nunți, botezuri și evenimente corporate. Repertoriu variat, artiști profesioniști și energie pe scenă.',
-        ogImage: '/images/og-placeholder.png',
+        ogImage: '/images/og-default-1200x630.jpg',
     },
     contact: {
         phoneRaw: '+40767369658',

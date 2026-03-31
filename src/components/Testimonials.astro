@@ -36,7 +36,7 @@ const testimonials: Testimonial[] = [
 ---
 
 <section id="testimonials" class="section-container py-14 sm:py-16">
-  <header class="max-w-3xl animate-fade-up">
+  <header class="max-w-3xl anim-on-scroll">
     <p class="section-kicker">Testimoniale</p>
     <h2 class="section-title">Clienți care își prezintă brandul cu încredere.</h2>
     <p class="section-description">
@@ -46,8 +46,8 @@ const testimonials: Testimonial[] = [
   </header>
 
   <div class="mt-8 grid gap-6 lg:grid-cols-3">
-    {testimonials.map((item) => (
-      <figure class="card-soft flex h-full flex-col gap-4 p-5 sm:p-6 animate-fade-up">
+    {testimonials.map((item, i) => (
+      <figure class={`card-soft flex h-full flex-col gap-4 p-5 sm:p-6 anim-on-scroll anim-d${i + 1} anim-card-hover`}>
         <div class="flex items-center gap-3">
           <div
             class="h-12 w-12 shrink-0 rounded-full inline-flex items-center justify-center text-sm font-bold text-white"
@@ -59,7 +59,7 @@ const testimonials: Testimonial[] = [
             <div class="text-xs text-body-dim">{item.role}</div>
           </figcaption>
         </div>
-        <blockquote class="text-sm leading-relaxed text-body">
+        <blockquote class="text-sm leading-7 text-body">
           „{item.quote}”
         </blockquote>
       </figure>

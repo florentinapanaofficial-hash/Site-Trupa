@@ -11,7 +11,7 @@ const serve = sirv('dist/client', {
     etag: true,
     gzip: true,
     brotli: true,
-    maxAge: 0,
+    maxAge: 300,          // 5 min default cache for HTML
     immutable: false,
     setHeaders(res, pathname) {
         // /_astro/* → hashed assets → 1 year immutable
@@ -30,9 +30,21 @@ const serve = sirv('dist/client', {
         else if (pathname.startsWith('/fonts/')) {
             res.setHeader('Cache-Control', 'public, max-age=31536000');
         }
+        // JS → 1 year (fingerprinted) or 1 day (non-fingerprinted)
+        else if (pathname.endsWith('.js')) {
+            res.setHeader('Cache-Control', 'public, max-age=86400');
+        }
+        // CSS → 1 day (non-fingerprinted)
+        else if (pathname.endsWith('.css')) {
+            res.setHeader('Cache-Control', 'public, max-age=86400');
+        }
         // robots.txt, sitemap → 1 day
         else if (pathname === '/robots.txt' || pathname.startsWith('/sitemap')) {
             res.setHeader('Cache-Control', 'public, max-age=86400');
+        }
+        // HTML pages → 5 min (stale-while-revalidate for instant perceived speed)
+        else if (pathname.endsWith('.html') || pathname === '/' || !pathname.includes('.')) {
+            res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=3600');
         }
     },
 });
