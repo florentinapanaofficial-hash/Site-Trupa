@@ -20,13 +20,6 @@ const SECURITY_HEADERS: Record<string, string> = {
 export const onRequest = defineMiddleware(async (context, next) => {
     const host = context.request.headers.get('host') ?? '';
 
-    // Redirect non-www să www în producție
-    if (!isDev && host === 'florentinapanaofficial.ro') {
-        const url = new URL(context.request.url);
-        url.host = 'www.florentinapanaofficial.ro';
-        return Response.redirect(url.toString(), 301);
-    }
-
     // Redirect /index.html, /index.php → / (SEO: evită conținut duplicat)
     const { pathname } = context.url;
     if (pathname === '/index.html' || pathname === '/index.php') {

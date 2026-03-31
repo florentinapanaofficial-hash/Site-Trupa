@@ -63,12 +63,6 @@ const SECURITY_HEADERS = {
 const server = createServer((req, res) => {
     const host = req.headers.host || '';
 
-    // ── WWW redirect (production only) ──
-    if (host === 'florentinapanaofficial.ro') {
-        res.writeHead(301, { Location: `https://www.florentinapanaofficial.ro${req.url}` });
-        return res.end();
-    }
-
     // ── /index.html, /index.php → / (SEO: avoid duplicate content) ──
     if (req.url === '/index.html' || req.url === '/index.php') {
         res.writeHead(301, { Location: '/' });
