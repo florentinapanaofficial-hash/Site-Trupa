@@ -153,6 +153,7 @@ const hasExpandableTopMenu = mobileNavigation.length > 1;
     const menuBackdrop = document.querySelector('[data-menu-backdrop]');
     const isMobileViewport = () => window.matchMedia('(max-width: 767px)').matches;
     let lastScrollY = window.scrollY;
+    const MENU_KEY = 'top-menu-open';
 
     const syncTopMenuBodyClass = (isOpen) => {
       document.body.classList.toggle('top-menu-expanded', Boolean(isOpen));
@@ -177,15 +178,9 @@ const hasExpandableTopMenu = mobileNavigation.length > 1;
       sessionStorage.setItem(MENU_KEY, 'true');
     };
 
-    const syncTopMenuBodyClass = (isOpen) => {
-      document.body.classList.toggle('top-menu-expanded', Boolean(isOpen));
-      document.body.classList.toggle('mobile-menu-open', Boolean(isOpen) && isMobileViewport());
-    };
-
     syncTopMenuBodyClass(false);
 
     // Restaurează starea meniului din sesiune anterioară (navigare între pagini)
-    const MENU_KEY = 'top-menu-open';
     const wasOpen = sessionStorage.getItem(MENU_KEY) === 'true';
 
     if (headerEl && menuToggle) {
