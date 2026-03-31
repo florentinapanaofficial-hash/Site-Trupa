@@ -484,15 +484,29 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
 
     };
 
+    const SCROLL_DELTA = 12;      // px de scroll înainte să reacționeze
+    const SCROLL_TOP_ZONE = 40;    // la top pagină, header-ul e mereu vizibil
+
     const onScroll = () => {
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(() => {
         getActiveByScroll();
 
-        if (headerEl) {
+        if (headerEl && !isMobileViewport()) {
           const currentY = window.scrollY;
-          headerEl.classList.remove('header-hidden');
+          // La top pagină → mereu vizibil
+          if (currentY < SCROLL_TOP_ZONE) {
+            headerEl.classList.remove('header-hidden');
+          }
+          // Scroll down → ascunde ușor
+          else if (currentY > lastScrollY + SCROLL_DELTA) {
+            headerEl.classList.add('header-hidden');
+          }
+          // Scroll up → arată ușor
+          else if (currentY < lastScrollY - SCROLL_DELTA) {
+            headerEl.classList.remove('header-hidden');
+          }
           lastScrollY = currentY;
         }
 

@@ -59,9 +59,135 @@
       radial-gradient(ellipse 80%  60% at 50%   0%, rgba(0,8,28,.22) 0%, transparent 55%);
   }
 
+  /* ── Orburi luminoase animate — peisajul în mișcare ──── */
+  #sky-orbs {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .sky-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.35;
+    will-change: transform;
+  }
+
+  /* Orb 1 — auriu cald, stânga-sus */
+  .sky-orb--1 {
+    width: clamp(220px, 35vw, 500px);
+    height: clamp(220px, 35vw, 500px);
+    top: -5%;
+    left: -8%;
+    background: radial-gradient(circle, rgba(255, 200, 60, 0.55) 0%, rgba(245, 166, 35, 0.15) 60%, transparent 100%);
+    animation: orbDrift1 25s ease-in-out infinite;
+  }
+
+  /* Orb 2 — cyan/teal, dreapta-centru */
+  .sky-orb--2 {
+    width: clamp(180px, 28vw, 420px);
+    height: clamp(180px, 28vw, 420px);
+    top: 30%;
+    right: -6%;
+    background: radial-gradient(circle, rgba(11, 188, 214, 0.50) 0%, rgba(0, 120, 200, 0.12) 65%, transparent 100%);
+    animation: orbDrift2 30s ease-in-out infinite;
+  }
+
+  /* Orb 3 — roz/magenta, centru-jos */
+  .sky-orb--3 {
+    width: clamp(200px, 30vw, 450px);
+    height: clamp(200px, 30vw, 450px);
+    bottom: -8%;
+    left: 25%;
+    background: radial-gradient(circle, rgba(232, 50, 90, 0.40) 0%, rgba(180, 40, 80, 0.10) 60%, transparent 100%);
+    animation: orbDrift3 22s ease-in-out infinite;
+  }
+
+  /* Orb 4 — albastru profund, stânga-centru */
+  .sky-orb--4 {
+    width: clamp(160px, 22vw, 380px);
+    height: clamp(160px, 22vw, 380px);
+    top: 55%;
+    left: -4%;
+    background: radial-gradient(circle, rgba(60, 100, 255, 0.45) 0%, rgba(30, 60, 180, 0.10) 65%, transparent 100%);
+    animation: orbDrift4 28s ease-in-out infinite;
+  }
+
+  /* Orb 5 — auriu pal, dreapta-sus */
+  .sky-orb--5 {
+    width: clamp(140px, 20vw, 340px);
+    height: clamp(140px, 20vw, 340px);
+    top: 8%;
+    right: 15%;
+    background: radial-gradient(circle, rgba(255, 220, 100, 0.35) 0%, rgba(200, 160, 50, 0.08) 65%, transparent 100%);
+    animation: orbDrift5 35s ease-in-out infinite;
+  }
+
+  @keyframes orbDrift1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    25%      { transform: translate(8vw, 12vh) scale(1.08); }
+    50%      { transform: translate(15vw, 6vh) scale(0.95); }
+    75%      { transform: translate(5vw, 18vh) scale(1.05); }
+  }
+
+  @keyframes orbDrift2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    30%      { transform: translate(-10vw, 8vh) scale(1.1); }
+    60%      { transform: translate(-6vw, -10vh) scale(0.92); }
+    80%      { transform: translate(-12vw, 3vh) scale(1.04); }
+  }
+
+  @keyframes orbDrift3 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    20%      { transform: translate(12vw, -8vh) scale(1.06); }
+    50%      { transform: translate(-5vw, -15vh) scale(0.94); }
+    70%      { transform: translate(8vw, -5vh) scale(1.08); }
+  }
+
+  @keyframes orbDrift4 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    35%      { transform: translate(10vw, -6vh) scale(1.07); }
+    65%      { transform: translate(6vw, 10vh) scale(0.96); }
+    85%      { transform: translate(14vw, 4vh) scale(1.03); }
+  }
+
+  @keyframes orbDrift5 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    25%      { transform: translate(-8vw, 10vh) scale(1.05); }
+    55%      { transform: translate(-12vw, -5vh) scale(0.93); }
+    80%      { transform: translate(-4vw, 8vh) scale(1.06); }
+  }
+
+  /* ── Reduced motion: oprește animațiile, orburile rămân fixe ──── */
+  @media (prefers-reduced-motion: reduce) {
+    .sky-orb {
+      animation: none !important;
+    }
+  }
+
+  /* ── Mobil: orburi mai mici, blur mai mare ──── */
+  @media (max-width: 767px) {
+    .sky-orb {
+      filter: blur(80px);
+      opacity: 0.28;
+    }
+  }
+
 </style>
 
 <!-- Cer albastru 2D — fără JS -->
 <div id="sky-bg-2d" aria-hidden="true"></div>
+
+<!-- Orburi luminoase animate — peisajul în mișcare vizibil prin sticlă -->
+<div id="sky-orbs" aria-hidden="true">
+  <div class="sky-orb sky-orb--1"></div>
+  <div class="sky-orb sky-orb--2"></div>
+  <div class="sky-orb sky-orb--3"></div>
+  <div class="sky-orb sky-orb--4"></div>
+  <div class="sky-orb sky-orb--5"></div>
+</div>
 
 <div id="sky-vignette" aria-hidden="true"></div>
