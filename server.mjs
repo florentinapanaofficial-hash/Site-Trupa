@@ -18,9 +18,17 @@ const serve = sirv('dist/client', {
         if (pathname.startsWith('/_astro/')) {
             res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
         }
-        // /images/, /fonts/ → 7 days + stale-while-revalidate
-        else if (pathname.startsWith('/images/') || pathname.startsWith('/fonts/')) {
-            res.setHeader('Cache-Control', 'public, max-age=604800, stale-while-revalidate=86400');
+        // /images/* → 1 year
+        else if (pathname.startsWith('/images/')) {
+            res.setHeader('Cache-Control', 'public, max-age=31536000');
+        }
+        // .svg, .ico, .webp → 1 year
+        else if (pathname.endsWith('.svg') || pathname.endsWith('.ico') || pathname.endsWith('.webp')) {
+            res.setHeader('Cache-Control', 'public, max-age=31536000');
+        }
+        // /fonts/ → 1 year
+        else if (pathname.startsWith('/fonts/')) {
+            res.setHeader('Cache-Control', 'public, max-age=31536000');
         }
         // robots.txt, sitemap → 1 day
         else if (pathname === '/robots.txt' || pathname.startsWith('/sitemap')) {
