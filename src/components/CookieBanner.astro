@@ -38,26 +38,12 @@ const { ga4Id } = Astro.props;
 >
   <div class="cookie-banner__inner">
     <p id="cookie-banner-desc" class="cookie-banner__text">
-      Folosim <strong>cookie-uri de analiză</strong> (Google Analytics) pentru a înțelege
-      cum este utilizat site-ul. Cookie-urile <em>strict necesare</em> funcționează fără
-      consimțământ. Celelalte sunt activate <strong>doar după acordul tău explicit</strong>,
-      conform <abbr title="Regulamentul General privind Protecția Datelor">RGPD</abbr>
-      și Directivei ePrivacy.
-      <a href="/politica-confidentialitate" class="cookie-banner__link" target="_blank" rel="noopener noreferrer">
-        Politică de confidențialitate
-      </a>
-      &middot;
-      <a href="/politica-cookie" class="cookie-banner__link" target="_blank" rel="noopener noreferrer">
-        Politică cookie
-      </a>
+      Folosim cookie-uri de analiză, activate <strong>doar cu acordul tău</strong>.
+      <a href="/politica-cookie" class="cookie-banner__link">Detalii</a>
     </p>
     <div class="cookie-banner__actions">
-      <button id="cookie-refuse" type="button" class="cookie-btn cookie-btn--refuse">
-        Refuz
-      </button>
-      <button id="cookie-accept" type="button" class="cookie-btn cookie-btn--accept">
-        Acceptă cookie-urile
-      </button>
+      <button id="cookie-refuse" type="button" class="cookie-btn cookie-btn--refuse">Refuz</button>
+      <button id="cookie-accept" type="button" class="cookie-btn cookie-btn--accept">Acceptă</button>
     </div>
   </div>
 </div>
@@ -149,12 +135,13 @@ const { ga4Id } = Astro.props;
     left: 0;
     right: 0;
     z-index: 9998;
-    background: rgba(10, 13, 28, 0.97);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 1rem 1.5rem;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.5);
+    background: rgba(10, 13, 28, 0.72);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0.65rem 1rem;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.25);
+    pointer-events: auto;
   }
 
   .cookie-banner[hidden] {
@@ -165,15 +152,14 @@ const { ga4Id } = Astro.props;
     max-width: 900px;
     margin: 0 auto;
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
-    gap: 1rem;
+    gap: 0.75rem;
   }
 
   .cookie-banner__text {
-    flex: 1 1 300px;
-    font-size: 0.85rem;
-    line-height: 1.55;
+    flex: 1 1 0%;
+    font-size: 0.78rem;
+    line-height: 1.4;
     color: rgba(255, 255, 255, 0.8);
     margin: 0;
   }
@@ -182,15 +168,10 @@ const { ga4Id } = Astro.props;
     color: #fff;
   }
 
-  .cookie-banner__text em {
-    font-style: normal;
-    color: rgba(255, 255, 255, 0.9);
-  }
-
   .cookie-banner__link {
     color: #7dd3fc;
     text-decoration: underline;
-    margin-left: 0.3em;
+    margin-left: 0.25em;
     white-space: nowrap;
   }
 
@@ -200,18 +181,19 @@ const { ga4Id } = Astro.props;
 
   .cookie-banner__actions {
     display: flex;
-    gap: 0.6rem;
+    gap: 0.4rem;
     flex-shrink: 0;
   }
 
   .cookie-btn {
-    padding: 0.5rem 1.1rem;
-    border-radius: 6px;
-    font-size: 0.85rem;
+    padding: 0.35rem 0.8rem;
+    border-radius: 5px;
+    font-size: 0.75rem;
     font-weight: 600;
     cursor: pointer;
     border: 1px solid transparent;
     transition: opacity 0.15s, background 0.15s;
+    white-space: nowrap;
   }
 
   .cookie-btn--refuse {
@@ -234,16 +216,5 @@ const { ga4Id } = Astro.props;
   .cookie-btn--accept:hover {
     background: #4338ca;
     border-color: #4338ca;
-  }
-
-  @media (max-width: 540px) {
-    .cookie-banner__inner {
-      flex-direction: column;
-      align-items: stretch;
-    }
-
-    .cookie-banner__actions {
-      justify-content: flex-end;
-    }
   }
 </style>
