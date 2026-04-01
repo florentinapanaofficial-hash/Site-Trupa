@@ -9,6 +9,9 @@ export default defineConfig({
   site: siteUrl,
   devToolbar: { enabled: false },
   output: 'hybrid',
+  build: {
+    inlineStylesheets: 'always',
+  },
   adapter: node({
     mode: 'middleware',
   }),
