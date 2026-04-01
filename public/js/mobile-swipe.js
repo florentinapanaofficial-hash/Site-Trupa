@@ -74,15 +74,25 @@
     if (isHomepage) {
         setActiveHref('/');
 
-        function updateActiveSection() {
+        var cachedNavH = 44;
+        var cachedOffsets = [];
+
+        function cacheOffsets() {
             var navEl = document.querySelector('.mob-nav');
-            var navH = navEl ? navEl.offsetHeight : 44;
+            cachedNavH = navEl ? navEl.offsetHeight : 44;
+            cachedOffsets = slides.map(function (s) { return { id: s.id, top: s.offsetTop }; });
+        }
+
+        cacheOffsets();
+        window.addEventListener('resize', function () { requestAnimationFrame(cacheOffsets); }, { passive: true });
+
+        function updateActiveSection() {
             var scrollY = window.scrollY || window.pageYOffset;
-            var threshold = scrollY + navH + (window.innerHeight - navH) * 0.35;
+            var threshold = scrollY + cachedNavH + (window.innerHeight - cachedNavH) * 0.35;
             var active = null;
-            slides.forEach(function (s) {
-                if (s.offsetTop <= threshold) active = s;
-            });
+            for (var i = 0; i < cachedOffsets.length; i++) {
+                if (cachedOffsets[i].top <= threshold) active = cachedOffsets[i];
+            }
             if (active) {
                 var href = sectionToNav[active.id] || '/';
                 setActiveHref(href);
@@ -107,9 +117,7 @@
                 var sec = targetId ? document.getElementById(targetId) : null;
                 if (sec) {
                     e.preventDefault();
-                    var navEl = document.querySelector('.mob-nav');
-                    var navH = navEl ? navEl.offsetHeight : 44;
-                    var top = sec.getBoundingClientRect().top + window.pageYOffset - navH;
+                    var top = sec.getBoundingClientRect().top + window.pageYOffset - cachedNavH;
                     window.scrollTo({ top: top, behavior: 'smooth' });
                 }
             });

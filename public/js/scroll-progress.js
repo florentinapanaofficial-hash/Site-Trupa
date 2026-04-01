@@ -1,9 +1,13 @@
 (() => {
     const root = document.documentElement;
     let ticking = false;
+    let scrollableHeight = 0;
+
+    const cacheHeight = () => {
+        scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
+    };
 
     const updateScrollProgress = () => {
-        const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
         const progress = scrollableHeight > 0 ? Math.min(Math.max(window.scrollY / scrollableHeight, 0), 1) : 0;
         root.style.setProperty('--scroll-progress', progress.toFixed(4));
     };
@@ -17,7 +21,8 @@
         });
     };
 
+    cacheHeight();
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', updateScrollProgress);
+    window.addEventListener('resize', () => { cacheHeight(); updateScrollProgress(); });
     updateScrollProgress();
 })();
