@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Consola de Implementare Textuală SEO — florentinapanaofficial.ro</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ivory: { 50: '#FFFDF7', 100: '#FFF9E6', 200: '#FFF3CC' },
+                        gold: { 300: '#F5D680', 400: '#E8C547', 500: '#D4A825', 600: '#B8911E' },
+                        slate: { 700: '#334155', 800: '#1E293B', 900: '#0F172A' },
+                    },
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'Georgia', 'serif'],
+                        sans: ['"Inter"', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+        rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        .font-serif {
+            font-family: 'Playfair Display', Georgia, serif;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1E293B;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #D4A825;
+            border-radius: 3px;
+        }
+
+        /* Tab active indicator */
+        .tab-btn.active {
+            border-color: #D4A825;
+            color: #D4A825;
+            background: rgba(212, 168, 37, 0.08);
+        }
+
+        .tab-btn {
+            transition: all .2s ease;
+        }
+
+        /* Copy feedback */
+        .copy-ok {
+            animation: copyPulse .5s ease;
+        }
+
+        @keyframes copyPulse {
+            0% {
+                transform: scale(1)
+            }
+
+            50% {
+                transform: scale(1.08)
+            }
+
+            100% {
+                transform: scale(1)
+            }
+        }
+
+        /* Card comparison */
+        .seo-card {
+            transition: box-shadow .25s ease;
+        }
+
+        .seo-card:hover {
+            box-shadow: 0 0 0 1px rgba(212, 168, 37, 0.35), 0 8px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0F172A;
+            color: #FFF9E6;
+            font-size: .7rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .15s;
+        }
+
+        .tooltip:hover::after {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-900 text-ivory-100 min-h-screen">
+
+    <!-- ═══════════════════════════════════════════
+       HEADER
+  ═══════════════════════════════════════════ -->
+    <header class="border-b border-gold-500/20 bg-slate-800/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-9 h-9 rounded-lg bg-gold-500 flex items-center justify-center text-slate-900 font-bold text-sm">
+                    SEO</div>
+                <div>
+                    <h1 class="text-sm font-bold text-ivory-100">Consola de Implementare Textuală SEO</h1>
+                    <p class="text-[11px] text-ivory-200/60">florentinapanaofficial.ro — Formația Florentina Pană</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <span id="copyCounter" class="text-xs text-ivory-200/50">0 texte copiate</span>
+                <button onclick="exportAllTexts()"
+                    class="text-xs bg-gold-500/15 text-gold-400 border border-gold-500/30 rounded-lg px-3 py-1.5 hover:bg-gold-500/25 transition">
+                    ↓ Exportă tot
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-6">
+
+        <!-- ═══════════════════════════════════════════
+         DASHBOARD — Search Volume Charts
+    ═══════════════════════════════════════════ -->
+        <section id="dashboard" class="mb-10">
+            <h2 class="font-serif text-xl font-bold text-gold-400 mb-1">📊 Dashboard — Volume de Căutare Pitești / Argeș
+            </h2>
+            <p class="text-xs text-ivory-200/50 mb-5">Date estimative lunare pe baza Google Keyword Planner & tendințe
+                locale Argeș (2025-2026).</p>
+
+            <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+                <!-- Chart 1: Primary Keywords -->
+                <div class="bg-slate-800 rounded-xl border border-white/5 p-4">
+                    <h3 class="text-xs font-semibold text-ivory-200/70 mb-3">Cuvinte Cheie Principale — Volum Lunar</h3>
+                    <canvas id="chartPrimary" height="200"></canvas>
+                </div>
+                <!-- Chart 2: Secondary Keywords -->
+                <div class="bg-slate-800 rounded-xl border border-white/5 p-4">
+                    <h3 class="text-xs font-semibold text-ivory-200/70 mb-3">Cuvinte Cheie Secundare — Volum Lunar</h3>
+                    <canvas id="chartSecondary" height="200"></canvas>
+                </div>
+                <!-- Chart 3: Seasonal Trend -->
+                <div class="bg-slate-800 rounded-xl border border-white/5 p-4">
+                    <h3 class="text-xs font-semibold text-ivory-200/70 mb-3">Sezonalitate Căutări „formație nuntă
+                        Pitești"</h3>
+                    <canvas id="chartSeasonal" height="200"></canvas>
+                </div>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-5">
+                <div class="bg-slate-800 rounded-xl border border-white/5 p-4 text-center">
+                    <div class="text-2xl font-bold text-gold-400">2.400</div>
+                    <div class="text-[11px] text-ivory-200/50">Căutări / lună<br />Pitești + Argeș</div>
+                </div>
+                <div class="bg-slate-800 rounded-xl border border-white/5 p-4 text-center">
+                    <div class="text-2xl font-bold text-gold-400">68%</div>
+                    <div class="text-[11px] text-ivory-200/50">Creștere YoY<br />nișă „formație nuntă"</div>
+                </div>
+                <div class="bg-slate-800 rounded-xl border border-white/5 p-4 text-center">
+                    <div class="text-2xl font-bold text-gold-400">Mai–Sept</div>
+                    <div class="text-[11px] text-ivory-200/50">Sezon de vârf<br />cerere maximă</div>
+                </div>
+                <div class="bg-slate-800 rounded-xl border border-white/5 p-4 text-center">
+                    <div class="text-2xl font-bold text-gold-400">Top 3</div>
+                    <div class="text-[11px] text-ivory-200/50">Poziție țintă<br />Google organic</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════
+         TABS NAVIGATION
+    ═══════════════════════════════════════════ -->
+        <nav class="flex gap-1 overflow-x-auto pb-1 mb-6 border-b border-white/5" role="tablist"
+            aria-label="Pagini site">
+            <button
+                class="tab-btn active text-sm font-semibold px-4 py-2.5 rounded-t-lg border-b-2 border-transparent whitespace-nowrap"
+                data-tab="acasa" role="tab" aria-selected="true">🏠 Acasă</button>
+            <button
+                class="tab-btn text-sm font-semibold px-4 py-2.5 rounded-t-lg border-b-2 border-transparent text-ivory-200/50 whitespace-nowrap"
+                data-tab="despre" role="tab" aria-selected="false">👤 Despre Mine</button>
+            <button
+                class="tab-btn text-sm font-semibold px-4 py-2.5 rounded-t-lg border-b-2 border-transparent text-ivory-200/50 whitespace-nowrap"
+                data-tab="servicii" role="tab" aria-selected="false">🎵 Servicii</button>
+            <button
+                class="tab-btn text-sm font-semibold px-4 py-2.5 rounded-t-lg border-b-2 border-transparent text-ivory-200/50 whitespace-nowrap"
+                data-tab="galerie" role="tab" aria-selected="false">📸 Galerie / Blog</button>
+            <button
+                class="tab-btn text-sm font-semibold px-4 py-2.5 rounded-t-lg border-b-2 border-transparent text-ivory-200/50 whitespace-nowrap"
+                data-tab="contact" role="tab" aria-selected="false">📞 Contact</button>
+        </nav>
+
+        <!-- ═══════════════════════════════════════════
+         TAB PANELS
+    ═══════════════════════════════════════════ -->
+
+        <!-- ── TAB: ACASĂ ── -->
+        <div id="tab-acasa" class="tab-panel" role="tabpanel">
+            <!-- Meta Tags -->
+            <div class="bg-slate-800/60 border border-gold-500/15 rounded-xl p-5 mb-6">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="text-xs font-bold bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded">META TAGS</span>
+                    <span class="text-xs text-ivory-200/40">florentinapanaofficial.ro/</span>
+                </div>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[11px] text-ivory-200/50 uppercase tracking-wider">Title Tag (max 60
+                            car.)</label>
+                        <div
+                            class="mt-1 bg-slate-900 rounded-lg p-3 text-sm text-ivory-100 border border-white/5 relative group">
+                            Formație Nuntă Pitești | Muzică Live Evenimente Argeș — Florentina Pană
+                            <button onclick="copyText(this)"
+                                class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-[11px] text-ivory-200/50 uppercase tracking-wider">Meta Description (max 155
+                            car.)</label>
+                        <div
+                            class="mt-1 bg-slate-900 rounded-lg p-3 text-sm text-ivory-100 border border-white/5 relative group">
+                            Formația Florentina Pană — muzică live premium la nunți, botezuri și evenimente în Pitești,
+                            Argeș. Repertoriu variat, artiști profesioniști. Cere ofertă acum!
+                            <button onclick="copyText(this)"
+                                class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Cards -->
+            <div class="space-y-4">
+
+                <!-- Hero Title -->
+                <div class="seo-card bg-slate-800 rounded-xl border border-white/5 p-5">
+                    <div class="flex items-start justify-between mb-3">
+                        <span
+                            class="text-[10px] font-bold bg-blue-500/15 text-blue-400 px-2 py-0.5 rounded uppercase">Hero
+                            — Titlu Principal</span>
+                        <span class="text-[10px] text-ivory-200/30">index.astro → h1</span>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-[10px] text-red-400/70 uppercase tracking-wider mb-1">❌ Text Actual
+                                (Generic)</div>
+                            <div class="bg-red-500/5 border border-red-500/10 rounded-lg p-3 text-sm text-ivory-200/70">
+                                Sunet Modern, Vibe Elegant
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-emerald-400/70 uppercase tracking-wider mb-1">✅ Text Nou
+                                Optimizat SEO</div>
+                            <div
+                                class="bg-emerald-500/5 border border-emerald-500/10 rounded-lg p-3 text-sm text-ivory-100 relative group">
+                                Formație Nuntă Pitești — Muzică Live de Excepție în Argeș
+                                <button onclick="copyText(this)"
+                                    class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hero Kicker -->
+                <div class="seo-card bg-slate-800 rounded-xl border border-white/5 p-5">
+                    <div class="flex items-start justify-between mb-3">
+                        <span
+                            class="text-[10px] font-bold bg-blue-500/15 text-blue-400 px-2 py-0.5 rounded uppercase">Hero
+                            — Kicker Badge</span>
+                        <span class="text-[10px] text-ivory-200/30">index.astro → .kicker-badge</span>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-[10px] text-red-400/70 uppercase tracking-wider mb-1">❌ Text Actual
+                                (Generic)</div>
+                            <div class="bg-red-500/5 border border-red-500/10 rounded-lg p-3 text-sm text-ivory-200/70">
+                                Muzică live — România
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-emerald-400/70 uppercase tracking-wider mb-1">✅ Text Nou
+                                Optimizat SEO</div>
+                            <div
+                                class="bg-emerald-500/5 border border-emerald-500/10 rounded-lg p-3 text-sm text-ivory-100 relative group">
+                                Formație evenimente Pitești | Nunți · Botezuri · Corporate în Argeș
+                                <button onclick="copyText(this)"
+                                    class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hero Description -->
+                <div class="seo-card bg-slate-800 rounded-xl border border-white/5 p-5">
+                    <div class="flex items-start justify-between mb-3">
+                        <span
+                            class="text-[10px] font-bold bg-blue-500/15 text-blue-400 px-2 py-0.5 rounded uppercase">Hero
+                            — Descriere</span>
+                        <span class="text-[10px] text-ivory-200/30">index.astro → .hero-lead</span>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-[10px] text-red-400/70 uppercase tracking-wider mb-1">❌ Text Actual
+                                (Generic)</div>
+                            <div class="bg-red-500/5 border border-red-500/10 rounded-lg p-3 text-sm text-ivory-200/70">
+                                Muzică live pentru nunți, botezuri și evenimente în Pitești, Argeș și toată România.
+                                Energie, emoție și profesionalism pe orice scenă.
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-emerald-400/70 uppercase tracking-wider mb-1">✅ Text Nou
+                                Optimizat SEO</div>
+                            <div
+                                class="bg-emerald-500/5 border border-emerald-500/10 rounded-lg p-3 text-sm text-ivory-100 relative group">
+                                Căutați o formație de nuntă în Pitești care să transforme evenimentul într-o experiență
+                                memorabilă? Formația Florentina Pană oferă muzică live premium pentru nunți, botezuri și
+                                evenimente corporate în Pitești, Mioveni, Curtea de Argeș și toată Muntenia. Peste 500
+                                de evenimente de succes.
+                                <button onclick="copyText(this)"
+                                    class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hero Bullets -->
+                <div class="seo-card bg-slate-800 rounded-xl border border-white/5 p-5">
+                    <div class="flex items-start justify-between mb-3">
+                        <span
+                            class="text-[10px] font-bold bg-blue-500/15 text-blue-400 px-2 py-0.5 rounded uppercase">Hero
+                            — Bullets USP</span>
+                        <span class="text-[10px] text-ivory-200/30">siteContent → hero.bullets</span>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-[10px] text-red-400/70 uppercase tracking-wider mb-1">❌ Text Actual
+                                (Generic)</div>
+                            <div class="bg-red-500/5 border border-red-500/10 rounded-lg p-3 text-sm text-ivory-200/70">
+                                • Setup profesional de scenă și sunet<br />
+                                • Program adaptat pe stilul evenimentului<br />
+                                • Comunicare rapidă și organizare clară
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-emerald-400/70 uppercase tracking-wider mb-1">✅ Text Nou
+                                Optimizat SEO</div>
+                            <div
+                                class="bg-emerald-500/5 border border-emerald-500/10 rounded-lg p-3 text-sm text-ivory-100 relative group">
+                                • Sonorizare profesională la cele mai bune locații din Pitești și Argeș<br />
+                                • Program muzical personalizat: populară, ușoară, internațională și petrecere<br />
+                                • Echipă cu 10+ ani experiență — recomandată de sute de miri din Argeș
+                                <button onclick="copyText(this)"
+                                    class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tagline / Brand -->
+                <div class="seo-card bg-slate-800 rounded-xl border border-white/5 p-5">
+                    <div class="flex items-start justify-between mb-3">
+                        <span
+                            class="text-[10px] font-bold bg-blue-500/15 text-blue-400 px-2 py-0.5 rounded uppercase">Brand
+                            — Tagline</span>
+                        <span class="text-[10px] text-ivory-200/30">siteContent → brand.tagline</span>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-[10px] text-red-400/70 uppercase tracking-wider mb-1">❌ Text Actual
+                                (Generic)</div>
+                            <div class="bg-red-500/5 border border-red-500/10 rounded-lg p-3 text-sm text-ivory-200/70">
+                                Muzică live pentru evenimente care rămân în memorie.
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-emerald-400/70 uppercase tracking-wider mb-1">✅ Text Nou
+                                Optimizat SEO</div>
+                            <div
+                                class="bg-emerald-500/5 border border-emerald-500/10 rounded-lg p-3 text-sm text-ivory-100 relative group">
+                                Formație nuntă Pitești — muzică live premium pentru cele mai importante momente din
+                                viața ta.
+                                <button onclick="copyText(this)"
+                                    class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonials Header -->
+                <div class="seo-card bg-slate-800 rounded-xl border border-white/5 p-5">
+                    <div class="flex items-start justify-between mb-3">
+                        <span
+                            class="text-[10px] font-bold bg-blue-500/15 text-blue-400 px-2 py-0.5 rounded uppercase">Testimoniale
+                            — Header</span>
+                        <span class="text-[10px] text-ivory-200/30">Testimonials.astro → h2</span>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-[10px] text-red-400/70 uppercase tracking-wider mb-1">❌ Text Actual
+                                (Generic)</div>
+                            <div class="bg-red-500/5 border border-red-500/10 rounded-lg p-3 text-sm text-ivory-200/70">
+                                Clienți care își prezintă brandul cu încredere.
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-emerald-400/70 uppercase tracking-wider mb-1">✅ Text Nou
+                                Optimizat SEO</div>
+                            <div
+                                class="bg-emerald-500/5 border border-emerald-500/10 rounded-lg p-3 text-sm text-ivory-100 relative group">
+                                Ce spun mirii despre formația noastră de nuntă din Pitești
+                                <button onclick="copyText(this)"
+                                    class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ -->
+                <div class="seo-card bg-slate-800 rounded-xl border border-white/5 p-5">
+                    <div class="flex items-start justify-between mb-3">
+                        <span
+                            class="text-[10px] font-bold bg-blue-500/15 text-blue-400 px-2 py-0.5 rounded uppercase">FAQ
+                            — Întrebări noi optimizate</span>
+                        <span class="text-[10px] text-ivory-200/30">siteContent → faq[]</span>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-[10px] text-red-400/70 uppercase tracking-wider mb-1">❌ Text Actual
+                                (Generic)</div>
+                            <div class="bg-red-500/5 border border-red-500/10 rounded-lg p-3 text-sm text-ivory-200/70">
+                                <strong>Î: Cântați în toată țara?</strong><br />R: Da. Ne deplasăm oriunde în România,
+                                în funcție de disponibilitate.<br /><br />
+                                <strong>Î: Putem alege repertoriul?</strong><br />R: Da. Stabilim împreună direcția
+                                muzicală și momentele speciale.<br /><br />
+                                <strong>Î: Cât durează un program complet?</strong><br />R: Prestație artistică fără
+                                pauze, aproximativ 7-8 ore.
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-emerald-400/70 uppercase tracking-wider mb-1">✅ Text Nou
+                                Optimizat SEO</div>
+                            <div
+                                class="bg-emerald-500/5 border border-emerald-500/10 rounded-lg p-3 text-sm text-ivory-100 relative group">
+                                <strong>Î: Cât costă o formație de nuntă în Pitești?</strong><br />R: Prețul formației
+                                noastre de nuntă în Pitești variază în funcție de pachetul ales, numărul de artiști și
+                                durata evenimentului. Contactați-ne pentru o ofertă personalizată — fără
+                                obligații.<br /><br />
+                                <strong>Î: Ce genuri muzicale cântă formația în Argeș?</strong><br />R: Oferim un
+                                repertoriu complet: muzică populară argeșeană, muzică ușoară românească și
+                                internațională, hituri de petrecere și momente speciale la cerere — perfect pentru nunți
+                                în Pitești, Mioveni sau Curtea de Argeș.<br /><br />
+                                <strong>Î: Cântați la nunți în Mioveni, Curtea de Argeș și alte
+                                    localități?</strong><br />R: Absolut! Suntem disponibili în tot județul Argeș —
+                                Pitești, Mioveni, Curtea de Argeș, Câmpulung — precum și în București și toată
+                                România.<br /><br />
+                                <strong>Î: Cum pot rezerva formația Florentina Pană pentru nuntă?</strong><br />R:
+                                Sunați-ne la 0767 369 658, trimiteți un mesaj pe WhatsApp sau completați formularul de
+                                rezervare online. Vă răspundem în maxim 24 de ore cu disponibilitate și ofertă
+                                detaliată.
+                                <button onclick="copyText(this)"
+                                    class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ── TAB: DESPRE MINE ── -->
+        <div id="tab-despre" class="tab-panel hidden" role="tabpanel">
+            <!-- Meta Tags -->
+            <div class="bg-slate-800/60 border border-gold-500/15 rounded-xl p-5 mb-6">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="text-xs font-bold bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded">META TAGS</span>
+                    <span class="text-xs text-ivory-200/40">florentinapanaofficial.ro/despre</span>
+                </div>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[11px] text-ivory-200/50 uppercase tracking-wider">Title Tag</label>
+                        <div
+                            class="mt-1 bg-slate-900 rounded-lg p-3 text-sm text-ivory-100 border border-white/5 relative group">
+                            Despre Noi — Solistă Nuntă Pitești | Formația Florentina Pană Argeș
+                            <button onclick="copyText(this)"
+                                class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-[11px] text-ivory-200/50 uppercase tracking-wider">Meta Description</label>
+                        <div
+                            class="mt-1 bg-slate-900 rounded-lg p-3 text-sm text-ivory-100 border border-white/5 relative group">
+                            Cunoaște-o pe Florentina Pană — solistă de nuntă din Pitești cu peste 10 ani de experiență.
+                            Formație profesionistă pentru nunți și evenimente în Argeș. Află povestea noastră!
+                            <button onclick="copyText(this)"
+                                class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Page H1 -->
+                <div class="seo-card bg-slate-800 rounded-xl border border-white/5 p-5">
+                    <div class="flex items-start justify-between mb-3">
+                        <span
+                            class="text-[10px] font-bold bg-purple-500/15 text-purple-400 px-2 py-0.5 rounded uppercase">Pagină
+                            Despre — H1</span>
+                        <span class="text-[10px] text-ivory-200/30">despre.astro → h1</span>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-[10px] text-red-400/70 uppercase tracking-wider mb-1">❌ Text Actual</div>
+                            <div class="bg-red-500/5 border border-red-500/10 rounded-lg p-3 text-sm text-ivory-200/70">
+                                Formație Nuntă Pitești — Formația Florentina Pană
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-emerald-400/70 uppercase tracking-wider mb-1">✅ Text Nou
+                                Optimizat SEO</div>
+                            <div
+                                class="bg-emerald-500/5 border border-emerald-500/10 rounded-lg p-3 text-sm text-ivory-100 relative group">
+                                Formația Florentina Pană — Solistă și Formație de Nuntă în Pitești, Argeș
+                                <button onclick="copyText(this)"
+                                    class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- About Intro -->
+                <div class="seo-card bg-slate-800 rounded-xl border border-white/5 p-5">
+                    <div class="flex items-start justify-between mb-3">
+                        <span
+                            class="text-[10px] font-bold bg-purple-500/15 text-purple-400 px-2 py-0.5 rounded uppercase">Despre
+                            — Introducere</span>
+                        <span class="text-[10px] text-ivory-200/30">siteContent → brand.aboutIntro</span>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-[10px] text-red-400/70 uppercase tracking-wider mb-1">❌ Text Actual</div>
+                            <div class="bg-red-500/5 border border-red-500/10 rounded-lg p-3 text-sm text-ivory-200/70">
+                                <em>(Text generic despre formație, fără localizare și fără cuvinte cheie SEO)</em>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-emerald-400/70 uppercase tracking-wider mb-1">✅ Text Nou
+                                Optimizat SEO</div>
+                            <div
+                                class="bg-emerald-500/5 border border-emerald-500/10 rounded-lg p-3 text-sm text-ivory-100 relative group">
+                                Florentina Pană este una dintre cele mai apreciate soliste de nuntă din Pitești și
+                                județul Argeș, cu o experiență de peste un deceniu pe scenele celor mai rafinate
+                                evenimente din Muntenia. Alături de o echipă de instrumentiști virtuoși, Florentina
+                                transformă fiecare nuntă, botez sau gală într-un spectacol live plin de emoție, eleganță
+                                și energie neîntreruptă.
+                                <button onclick="copyText(this)"
+                                    class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- About Paragraph 2 -->
+                <div class="seo-card bg-slate-800 rounded-xl border border-white/5 p-5">
+                    <div class="flex items-start justify-between mb-3">
+                        <span
+                            class="text-[10px] font-bold bg-purple-500/15 text-purple-400 px-2 py-0.5 rounded uppercase">Despre
+                            — Paragraf Extins</span>
+                        <span class="text-[10px] text-ivory-200/30">siteContent → brand.aboutIntro2</span>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-[10px] text-red-400/70 uppercase tracking-wider mb-1">❌ Text Actual</div>
+                            <div class="bg-red-500/5 border border-red-500/10 rounded-lg p-3 text-sm text-ivory-200/70">
+                                <em>(Paragraf secundar generic)</em>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-emerald-400/70 uppercase tracking-wider mb-1">✅ Text Nou
+                                Optimizat SEO</div>
+                            <div
+                                class="bg-emerald-500/5 border border-emerald-500/10 rounded-lg p-3 text-sm text-ivory-100 relative group">
+                                De la primirea invitaților cu acorduri de vioară la dansul mirilor, de la hora
+                                tradițională argeșeană până la momentele de petrecere cu hituri internaționale —
+                                formația noastră de nuntă din Pitești acoperă fiecare moment al serii. Peste 500 de
+                                cupluri din Pitești, Mioveni, Curtea de Argeș și din toată țara ne-au ales să le facem
+                                nunta de neuitat. Repertoriul nostru include muzică populară din Argeș, piese ușoare
+                                românești și internaționale, dar și cele mai noi hituri de petrecere. Fiecare eveniment
+                                este unic, iar programul muzical este construit exclusiv pe dorințele mirilor.
+                                <button onclick="copyText(this)"
+                                    class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Florentina Bio -->
+                <div class="seo-card bg-slate-800 rounded-xl border border-white/5 p-5">
+                    <div class="flex items-start justify-between mb-3">
+                        <span
+                            class="text-[10px] font-bold bg-purple-500/15 text-purple-400 px-2 py-0.5 rounded uppercase">Biografie
+                            — Florentina Pană</span>
+                        <span class="text-[10px] text-ivory-200/30">siteContent → team.vocalists[0].description</span>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-[10px] text-red-400/70 uppercase tracking-wider mb-1">❌ Text Actual</div>
+                            <div class="bg-red-500/5 border border-red-500/10 rounded-lg p-3 text-sm text-ivory-200/70">
+                                Voce cu timbru cald, prezență scenică elegantă și repertoriu construit pe dinamica
+                                evenimentului. Coordonează momentele-cheie astfel încât invitații să rămână conectați de
+                                la început până la final.
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-emerald-400/70 uppercase tracking-wider mb-1">✅ Text Nou
+                                Optimizat SEO</div>
+                            <div
+                                class="bg-emerald-500/5 border border-emerald-500/10 rounded-lg p-3 text-sm text-ivory-100 relative group">
+                                Florentina Pană — solistă de nuntă din Pitești, recunoscută pentru timbrul vocal cald,
+                                prezența scenică elegantă și capacitatea de a citi atmosfera sălii în timp real. Cu o
+                                experiență vastă pe scenele din Argeș și Muntenia, Florentina coordonează fiecare
+                                moment-cheie al nunții — de la intrarea mirilor la ora de dans — oferind un spectacol
+                                live care menține invitații pe ring toată noaptea.
+                                <button onclick="copyText(this)"
+                                    class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── TAB: SERVICII ── -->
+        <div id="tab-servicii" class="tab-panel hidden" role="tabpanel">
+            <!-- Meta Tags -->
+            <div class="bg-slate-800/60 border border-gold-500/15 rounded-xl p-5 mb-6">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="text-xs font-bold bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded">META TAGS</span>
+                    <span class="text-xs text-ivory-200/40">florentinapanaofficial.ro/despre#servicii</span>
+                </div>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[11px] text-ivory-200/50 uppercase tracking-wider">Title Tag</label>
+                        <div
+                            class="mt-1 bg-slate-900 rounded-lg p-3 text-sm text-ivory-100 border border-white/5 relative group">
+                            Servicii Muzică Live Nuntă Pitești | Prețuri Formație Argeș — Florentina Pană
+                            <button onclick="copyText(this)"
+                                class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-[11px] text-ivory-200/50 uppercase tracking-wider">Meta Description</label>
+                        <div
+                            class="mt-1 bg-slate-900 rounded-lg p-3 text-sm text-ivory-100 border border-white/5 relative group">
+                            Servicii complete de muzică live pentru nunți în Pitești și Argeș: formație completă,
+                            sonorizare, lumini, repertoriu personalizat. Cere ofertă de preț de la Formația Florentina
+                            Pană!
+                            <button onclick="copyText(this)"
+                                class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Service: Nunți -->
+                <div class="seo-card bg-slate-800 rounded-xl border border-white/5 p-5">
+                    <div class="flex items-start justify-between mb-3">
+                        <span
+                            class="text-[10px] font-bold bg-amber-500/15 text-amber-400 px-2 py-0.5 rounded uppercase">Serviciu
+                            — Nunți</span>
+                        <span class="text-[10px] text-ivory-200/30">siteContent → services[0]</span>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-[10px] text-red-400/70 uppercase tracking-wider mb-1">❌ Text Actual</div>
+                            <div class="bg-red-500/5 border border-red-500/10 rounded-lg p-3 text-sm text-ivory-200/70">
+                                <strong>Nunți</strong><br />Program complet pe momente-cheie, de la primirea invitaților
+                                până la final.
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-emerald-400/70 uppercase tracking-wider mb-1">✅ Text Nou
+                                Optimizat SEO</div>
+                            <div
+                                class="bg-emerald-500/5 border border-emerald-500/10 rounded-lg p-3 text-sm text-ivory-100 relative group">
+                                <strong>Formație Nuntă Pitești și Argeș</strong><br />Muzică live premium pentru nunta
+                                ta în Pitești, Mioveni sau Curtea de Argeș. Program complet pe momente-cheie: primirea
+                                invitaților cu muzică ambientală, dansul mirilor, hora tradițională argeșeană, momentele
+                                de petrecere și surprizele de la miezul nopții. Fiecare nuntă beneficiază de propriu
+                                repertoriu personalizat — cerem dorințele muzicale ale mirilor cu cel puțin 2 săptămâni
+                                înainte.
+                                <button onclick="copyText(this)"
+                                    class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service: Botezuri -->
+                <div class="seo-card bg-slate-800 rounded-xl border border-white/5 p-5">
+                    <div class="flex items-start justify-between mb-3">
+                        <span
+                            class="text-[10px] font-bold bg-amber-500/15 text-amber-400 px-2 py-0.5 rounded uppercase">Serviciu
+                            — Botezuri</span>
+                        <span class="text-[10px] text-ivory-200/30">siteContent → services[1]</span>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-[10px] text-red-400/70 uppercase tracking-wider mb-1">❌ Text Actual</div>
+                            <div class="bg-red-500/5 border border-red-500/10 rounded-lg p-3 text-sm text-ivory-200/70">
+                                <strong>Botezuri</strong><br />Atmosferă caldă și repertoriu echilibrat pentru invitați
+                                de toate vârstele.
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-emerald-400/70 uppercase tracking-wider mb-1">✅ Text Nou
+                                Optimizat SEO</div>
+                            <div
+                                class="bg-emerald-500/5 border border-emerald-500/10 rounded-lg p-3 text-sm text-ivory-100 relative group">
+                                <strong>Muzică Live la Botez în Pitești</strong><br />Creăm atmosfera perfectă pentru
+                                botezul copilului tău: un mix echilibrat de muzică populară argeșeană, piese ușoare
+                                pentru Familie și momente de petrecere pentru toți invitații. Repertoriu adaptat pentru
+                                public de toate vârstele — de la bunici până la tineret. Disponibili în Pitești, Argeș
+                                și localitățile învecinate.
+                                <button onclick="copyText(this)"
+                                    class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service: Corporate -->
+                <div class="seo-card bg-slate-800 rounded-xl border border-white/5 p-5">
+                    <div class="flex items-start justify-between mb-3">
+                        <span
+                            class="text-[10px] font-bold bg-amber-500/15 text-amber-400 px-2 py-0.5 rounded uppercase">Serviciu
+                            — Corporate</span>
+                        <span class="text-[10px] text-ivory-200/30">siteContent → services[2]</span>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-[10px] text-red-400/70 uppercase tracking-wider mb-1">❌ Text Actual</div>
+                            <div class="bg-red-500/5 border border-red-500/10 rounded-lg p-3 text-sm text-ivory-200/70">
+                                <strong>Corporate</strong><br />Setlist premium și prezență scenică profesionistă pentru
+                                evenimente business.
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-emerald-400/70 uppercase tracking-wider mb-1">✅ Text Nou
+                                Optimizat SEO</div>
+                            <div
+                                class="bg-emerald-500/5 border border-emerald-500/10 rounded-lg p-3 text-sm text-ivory-100 relative group">
+                                <strong>Formație Evenimente Corporate Pitești</strong><br />Oferim prezență scenică
+                                profesionistă pentru gale, petreceri de firmă și evenimente business în Pitești și
+                                județul Argeș. Setlist premium cu piese internaționale, jazz, lounge și momente
+                                interactive adaptate culturii organizaționale. Sonorizare de calitate și punctualitate
+                                de rigoare — exact ce așteaptă companiile din Argeș.
+                                <button onclick="copyText(this)"
+                                    class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Repertoire Section Header -->
+                <div class="seo-card bg-slate-800 rounded-xl border border-white/5 p-5">
+                    <div class="flex items-start justify-between mb-3">
+                        <span
+                            class="text-[10px] font-bold bg-amber-500/15 text-amber-400 px-2 py-0.5 rounded uppercase">Secțiune
+                            Repertoriu — Descriere</span>
+                        <span class="text-[10px] text-ivory-200/30">despre.astro → secțiune repertoriu</span>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-[10px] text-red-400/70 uppercase tracking-wider mb-1">❌ Text Actual</div>
+                            <div class="bg-red-500/5 border border-red-500/10 rounded-lg p-3 text-sm text-ivory-200/70">
+                                <em>(Fără descriere — doar lista de piese)</em>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-emerald-400/70 uppercase tracking-wider mb-1">✅ Text Nou
+                                Optimizat SEO</div>
+                            <div
+                                class="bg-emerald-500/5 border border-emerald-500/10 rounded-lg p-3 text-sm text-ivory-100 relative group">
+                                Repertoriul formației Florentina Pană din Pitești acoperă toate genurile muzicale cerute
+                                la nunțile din Argeș: de la muzică populară autentică argeșeană, la hituri pop românești
+                                și internaționale, dans și muzică de petrecere. Toate piesele sunt interpretate live, cu
+                                aranjamente proprii care aduc un plus de energie și eleganță evenimentului tău. Mirii
+                                pot personaliza lista de piese conform preferințelor.
+                                <button onclick="copyText(this)"
+                                    class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── TAB: GALERIE / BLOG ── -->
+        <div id="tab-galerie" class="tab-panel hidden" role="tabpanel">
+            <!-- Meta Tags -->
+            <div class="bg-slate-800/60 border border-gold-500/15 rounded-xl p-5 mb-6">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="text-xs font-bold bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded">META TAGS</span>
+                    <span class="text-xs text-ivory-200/40">florentinapanaofficial.ro/galerie-foto</span>
+                </div>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[11px] text-ivory-200/50 uppercase tracking-wider">Title Tag</label>
+                        <div
+                            class="mt-1 bg-slate-900 rounded-lg p-3 text-sm text-ivory-100 border border-white/5 relative group">
+                            Galerie Foto Nunți Pitești și Argeș | Formația Florentina Pană Live
+                            <button onclick="copyText(this)"
+                                class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-[11px] text-ivory-200/50 uppercase tracking-wider">Meta Description</label>
+                        <div
+                            class="mt-1 bg-slate-900 rounded-lg p-3 text-sm text-ivory-100 border border-white/5 relative group">
+                            Galerie foto autentică de la nunți și evenimente live în Pitești, Argeș. Vezi formația
+                            Florentina Pană pe scenele celor mai frumoase săli din Muntenia. Energie, emoție și dans!
+                            <button onclick="copyText(this)"
+                                class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Gallery H1 -->
+                <div class="seo-card bg-slate-800 rounded-xl border border-white/5 p-5">
+                    <div class="flex items-start justify-between mb-3">
+                        <span
+                            class="text-[10px] font-bold bg-pink-500/15 text-pink-400 px-2 py-0.5 rounded uppercase">Galerie
+                            — H1 Pagină</span>
+                        <span class="text-[10px] text-ivory-200/30">galerie-foto.astro → h1</span>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-[10px] text-red-400/70 uppercase tracking-wider mb-1">❌ Text Actual</div>
+                            <div class="bg-red-500/5 border border-red-500/10 rounded-lg p-3 text-sm text-ivory-200/70">
+                                Formație Nuntă Pitești — Galerie Evenimente Live
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-emerald-400/70 uppercase tracking-wider mb-1">✅ Text Nou
+                                Optimizat SEO</div>
+                            <div
+                                class="bg-emerald-500/5 border border-emerald-500/10 rounded-lg p-3 text-sm text-ivory-100 relative group">
+                                Galerie Foto — Formație Nuntă Pitești și Evenimente Live în Argeș
+                                <button onclick="copyText(this)"
+                                    class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gallery Description -->
+                <div class="seo-card bg-slate-800 rounded-xl border border-white/5 p-5">
+                    <div class="flex items-start justify-between mb-3">
+                        <span
+                            class="text-[10px] font-bold bg-pink-500/15 text-pink-400 px-2 py-0.5 rounded uppercase">Galerie
+                            — Subtitlu</span>
+                        <span class="text-[10px] text-ivory-200/30">galerie-foto.astro → .gal-subtitle</span>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-[10px] text-red-400/70 uppercase tracking-wider mb-1">❌ Text Actual</div>
+                            <div class="bg-red-500/5 border border-red-500/10 rounded-lg p-3 text-sm text-ivory-200/70">
+                                Momente autentice de dans, energie și emoție, surprinse la nunțile și evenimentele
+                                noastre din Argeș și toată România
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-emerald-400/70 uppercase tracking-wider mb-1">✅ Text Nou
+                                Optimizat SEO</div>
+                            <div
+                                class="bg-emerald-500/5 border border-emerald-500/10 rounded-lg p-3 text-sm text-ivory-100 relative group">
+                                Fotografii autentice de la nunțile și evenimentele noastre din Pitești, Mioveni, Curtea
+                                de Argeș și din toată România. Ringul de dans plin, emoția mirilor și energia
+                                invitaților — surprinse de fotografii profesioniști.
+                                <button onclick="copyText(this)"
+                                    class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image ALT texts -->
+                <div class="seo-card bg-slate-800 rounded-xl border border-white/5 p-5">
+                    <div class="flex items-start justify-between mb-3">
+                        <span
+                            class="text-[10px] font-bold bg-pink-500/15 text-pink-400 px-2 py-0.5 rounded uppercase">Imagini
+                            — Texte ALT Optimizate</span>
+                        <span class="text-[10px] text-ivory-200/30">galerie-foto.astro → img[alt]</span>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-[10px] text-red-400/70 uppercase tracking-wider mb-1">❌ Text Actual</div>
+                            <div class="bg-red-500/5 border border-red-500/10 rounded-lg p-3 text-sm text-ivory-200/70">
+                                • Formație nuntă Pitești — eveniment live cu Formația Florentina Pană<br />
+                                • Muzică live nuntă Argeș — scenă completă la eveniment
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-emerald-400/70 uppercase tracking-wider mb-1">✅ Text Nou
+                                Optimizat SEO</div>
+                            <div
+                                class="bg-emerald-500/5 border border-emerald-500/10 rounded-lg p-3 text-sm text-ivory-100 relative group">
+                                • Formație nuntă Pitești — Florentina Pană cântând live pe scena unui eveniment elegant
+                                în Argeș<br />
+                                • Muzică live la nuntă în Argeș — scenă completă cu sonorizare profesională la salon de
+                                nunți Pitești<br />
+                                • Dans la nuntă în Pitești — invitații pe ringul de dans cu formația Florentina
+                                Pană<br />
+                                • Solistă nuntă Pitești — Florentina Pană interpretând muzică populară argeșeană
+                                live<br />
+                                • Moment special la nuntă Mioveni — dansul mirilor cu muzică live de la Formația
+                                Florentina Pană<br />
+                                • Formație completă pe scenă — muzică de petrecere la eveniment corporate în Pitești,
+                                Argeș
+                                <button onclick="copyText(this)"
+                                    class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Blog Meta -->
+                <div class="bg-slate-800/60 border border-gold-500/15 rounded-xl p-5 mb-2 mt-8">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="text-xs font-bold bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded">META
+                            TAGS</span>
+                        <span class="text-xs text-ivory-200/40">florentinapanaofficial.ro/blog</span>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-[11px] text-ivory-200/50 uppercase tracking-wider">Title Tag</label>
+                            <div
+                                class="mt-1 bg-slate-900 rounded-lg p-3 text-sm text-ivory-100 border border-white/5 relative group">
+                                Blog Muzică Nuntă Pitești | Sfaturi și Noutăți — Formația Florentina Pană
+                                <button onclick="copyText(this)"
+                                    class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-[11px] text-ivory-200/50 uppercase tracking-wider">Meta
+                                Description</label>
+                            <div
+                                class="mt-1 bg-slate-900 rounded-lg p-3 text-sm text-ivory-100 border border-white/5 relative group">
+                                Sfaturi pentru miri, noutăți despre repertoriu și povești de la nunțile din Pitești și
+                                Argeș. Blogul Formației Florentina Pană — inspirație pentru evenimentul tău.
+                                <button onclick="copyText(this)"
+                                    class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Blog Post Ideas -->
+                <div class="seo-card bg-slate-800 rounded-xl border border-white/5 p-5">
+                    <div class="flex items-start justify-between mb-3">
+                        <span
+                            class="text-[10px] font-bold bg-pink-500/15 text-pink-400 px-2 py-0.5 rounded uppercase">Blog
+                            — Articole Recomandate SEO</span>
+                        <span class="text-[10px] text-ivory-200/30">Idei noi de conținut cu cuvinte cheie
+                            targetate</span>
+                    </div>
+                    <div>
+                        <div class="text-[10px] text-emerald-400/70 uppercase tracking-wider mb-1">✅ Titluri Articole
+                            Optimizate SEO</div>
+                        <div
+                            class="bg-emerald-500/5 border border-emerald-500/10 rounded-lg p-3 text-sm text-ivory-100 relative group">
+                            <strong>1.</strong> „Cum alegi formația de nuntă perfectă în Pitești — Ghid Complet
+                            2026"<br />
+                            <strong>2.</strong> „Top 10 piese pentru dansul mirilor — recomandări de la solistă din
+                            Argeș"<br />
+                            <strong>3.</strong> „Cât costă o formație de nuntă în Pitești? Prețuri, pachete și
+                            sfaturi"<br />
+                            <strong>4.</strong> „Muzică populară argeșeană la nuntă — tradiție și eleganță pe
+                            scenă"<br />
+                            <strong>5.</strong> „5 greșeli pe care mirii le fac când aleg muzica pentru nuntă în
+                            Argeș"<br />
+                            <strong>6.</strong> „De ce să alegi muzică live în loc de DJ la nunta ta din Pitești"
+                            <button onclick="copyText(this)"
+                                class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── TAB: CONTACT ── -->
+        <div id="tab-contact" class="tab-panel hidden" role="tabpanel">
+            <!-- Meta Tags -->
+            <div class="bg-slate-800/60 border border-gold-500/15 rounded-xl p-5 mb-6">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="text-xs font-bold bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded">META TAGS</span>
+                    <span class="text-xs text-ivory-200/40">florentinapanaofficial.ro/contact</span>
+                </div>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[11px] text-ivory-200/50 uppercase tracking-wider">Title Tag</label>
+                        <div
+                            class="mt-1 bg-slate-900 rounded-lg p-3 text-sm text-ivory-100 border border-white/5 relative group">
+                            Contact și Rezervări Formație Nuntă Pitești | Florentina Pană Argeș
+                            <button onclick="copyText(this)"
+                                class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-[11px] text-ivory-200/50 uppercase tracking-wider">Meta Description</label>
+                        <div
+                            class="mt-1 bg-slate-900 rounded-lg p-3 text-sm text-ivory-100 border border-white/5 relative group">
+                            Rezervă formația Florentina Pană pentru nunta ta din Pitești sau Argeș. Telefon, WhatsApp
+                            sau formular online — răspundem în 24h cu ofertă personalizată și disponibilitate.
+                            <button onclick="copyText(this)"
+                                class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Contact H1 -->
+                <div class="seo-card bg-slate-800 rounded-xl border border-white/5 p-5">
+                    <div class="flex items-start justify-between mb-3">
+                        <span
+                            class="text-[10px] font-bold bg-teal-500/15 text-teal-400 px-2 py-0.5 rounded uppercase">Contact
+                            — H1 Pagină</span>
+                        <span class="text-[10px] text-ivory-200/30">contact.astro → h1</span>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-[10px] text-red-400/70 uppercase tracking-wider mb-1">❌ Text Actual</div>
+                            <div class="bg-red-500/5 border border-red-500/10 rounded-lg p-3 text-sm text-ivory-200/70">
+                                Rezervă Formația Florentina Pană pentru evenimentul tău
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-emerald-400/70 uppercase tracking-wider mb-1">✅ Text Nou
+                                Optimizat SEO</div>
+                            <div
+                                class="bg-emerald-500/5 border border-emerald-500/10 rounded-lg p-3 text-sm text-ivory-100 relative group">
+                                Rezervă Formația Florentina Pană — Formație Nuntă Pitești și Argeș
+                                <button onclick="copyText(this)"
+                                    class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Description -->
+                <div class="seo-card bg-slate-800 rounded-xl border border-white/5 p-5">
+                    <div class="flex items-start justify-between mb-3">
+                        <span
+                            class="text-[10px] font-bold bg-teal-500/15 text-teal-400 px-2 py-0.5 rounded uppercase">Contact
+                            — Descriere</span>
+                        <span class="text-[10px] text-ivory-200/30">contact.astro → .section-copy</span>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-[10px] text-red-400/70 uppercase tracking-wider mb-1">❌ Text Actual</div>
+                            <div class="bg-red-500/5 border border-red-500/10 rounded-lg p-3 text-sm text-ivory-200/70">
+                                Scrie-ne sau sună-ne direct. Programăm rapid o discuție de 15 minute.
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-emerald-400/70 uppercase tracking-wider mb-1">✅ Text Nou
+                                Optimizat SEO</div>
+                            <div
+                                class="bg-emerald-500/5 border border-emerald-500/10 rounded-lg p-3 text-sm text-ivory-100 relative group">
+                                Ești în căutarea unei formații de nuntă de încredere în Pitești? Contactează-ne
+                                telefonic, pe WhatsApp sau prin formularul de mai jos. Îți oferim o consultație gratuită
+                                de 15 minute în care discutăm data evenimentului, locația din Argeș și preferințele
+                                muzicale — fără nicio obligație. Răspundem în maximum 24 de ore.
+                                <button onclick="copyText(this)"
+                                    class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact City Line -->
+                <div class="seo-card bg-slate-800 rounded-xl border border-white/5 p-5">
+                    <div class="flex items-start justify-between mb-3">
+                        <span
+                            class="text-[10px] font-bold bg-teal-500/15 text-teal-400 px-2 py-0.5 rounded uppercase">Contact
+                            — Locație</span>
+                        <span class="text-[10px] text-ivory-200/30">siteContent → contact.city</span>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-[10px] text-red-400/70 uppercase tracking-wider mb-1">❌ Text Actual</div>
+                            <div class="bg-red-500/5 border border-red-500/10 rounded-lg p-3 text-sm text-ivory-200/70">
+                                Argeș/Pitești, disponibilitate națională
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-emerald-400/70 uppercase tracking-wider mb-1">✅ Text Nou
+                                Optimizat SEO</div>
+                            <div
+                                class="bg-emerald-500/5 border border-emerald-500/10 rounded-lg p-3 text-sm text-ivory-100 relative group">
+                                Bază: Pitești, județul Argeș · Disponibili în Mioveni, Curtea de Argeș, Câmpulung,
+                                București și toată România
+                                <button onclick="copyText(this)"
+                                    class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CTA Buttons -->
+                <div class="seo-card bg-slate-800 rounded-xl border border-white/5 p-5">
+                    <div class="flex items-start justify-between mb-3">
+                        <span
+                            class="text-[10px] font-bold bg-teal-500/15 text-teal-400 px-2 py-0.5 rounded uppercase">CTA
+                            — Butoane Acțiune</span>
+                        <span class="text-[10px] text-ivory-200/30">Texte butoane pe tot site-ul</span>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-[10px] text-red-400/70 uppercase tracking-wider mb-1">❌ Text Actual</div>
+                            <div class="bg-red-500/5 border border-red-500/10 rounded-lg p-3 text-sm text-ivory-200/70">
+                                • Sună acum<br />
+                                • Ascultă live<br />
+                                • Rezervă o dată
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-emerald-400/70 uppercase tracking-wider mb-1">✅ Text Nou
+                                Optimizat SEO</div>
+                            <div
+                                class="bg-emerald-500/5 border border-emerald-500/10 rounded-lg p-3 text-sm text-ivory-100 relative group">
+                                • Cere ofertă de preț — formație nuntă Pitești<br />
+                                • Ascultă formația live — demo sonor<br />
+                                • Verifică disponibilitatea pentru nunta ta<br />
+                                • Sună acum: 0767 369 658<br />
+                                • Rezervă data evenimentului tău în Argeș
+                                <button onclick="copyText(this)"
+                                    class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Schema.org / JSON-LD -->
+                <div class="seo-card bg-slate-800 rounded-xl border border-white/5 p-5">
+                    <div class="flex items-start justify-between mb-3">
+                        <span
+                            class="text-[10px] font-bold bg-teal-500/15 text-teal-400 px-2 py-0.5 rounded uppercase">Schema.org
+                            — LocalBusiness JSON-LD</span>
+                        <span class="text-[10px] text-ivory-200/30">Adaugă în BaseLayout.astro → &lt;head&gt;</span>
+                    </div>
+                    <div>
+                        <div class="text-[10px] text-emerald-400/70 uppercase tracking-wider mb-1">✅ Cod Structurat
+                            Recomandat</div>
+                        <div
+                            class="bg-emerald-500/5 border border-emerald-500/10 rounded-lg p-3 text-xs text-ivory-100 font-mono whitespace-pre-wrap relative group">
+                            &lt;script type="application/ld+json"&gt;
+                            {
+                            "@context": "https://schema.org",
+                            "@type": "MusicGroup",
+                            "name": "Formația Florentina Pană",
+                            "alternateName": "Florentina Pană",
+                            "description": "Formație de nuntă din Pitești, Argeș — muzică live premium pentru nunți,
+                            botezuri și evenimente",
+                            "url": "https://florentinapanaofficial.ro",
+                            "telephone": "+40767369658",
+                            "email": "florentinapanaofficial@gmail.com",
+                            "areaServed": [
+                            {"@type": "City", "name": "Pitești"},
+                            {"@type": "City", "name": "Mioveni"},
+                            {"@type": "City", "name": "Curtea de Argeș"},
+                            {"@type": "AdministrativeArea", "name": "Argeș"}
+                            ],
+                            "address": {
+                            "@type": "PostalAddress",
+                            "addressLocality": "Pitești",
+                            "addressRegion": "Argeș",
+                            "addressCountry": "RO"
+                            },
+                            "genre": ["Muzică populară", "Pop", "Dance", "Muzică de petrecere"],
+                            "sameAs": [
+                            "https://www.youtube.com/@FlorentinaPanaPitesti",
+                            "https://www.facebook.com/florentinapanaofficial/",
+                            "https://www.instagram.com/florentinaformatie/"
+                            ]
+                            }
+                            &lt;/script&gt;
+                            <button onclick="copyText(this)"
+                                class="copy-btn absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-[10px] bg-gold-500/20 text-gold-400 px-2 py-0.5 rounded transition">Copiază</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ═══════════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════════ -->
+    <footer class="border-t border-white/5 py-6 text-center text-xs text-ivory-200/30">
+        Consola SEO — instrument intern pentru <strong class="text-gold-400/60">florentinapanaofficial.ro</strong> ·
+        Generat pentru optimizarea textelor site-ului
+    </footer>
+
+    <!-- ═══════════════════════════════════════════
+       SCRIPTS
+  ═══════════════════════════════════════════ -->
+    <script>
+        // ── Tab Switching ──
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabPanels = document.querySelectorAll('.tab-panel');
+
+        tabButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetTab = btn.getAttribute('data-tab');
+
+                // Update buttons
+                tabButtons.forEach(b => {
+                    b.classList.remove('active');
+                    b.classList.add('text-ivory-200/50');
+                    b.setAttribute('aria-selected', 'false');
+                });
+                btn.classList.add('active');
+                btn.classList.remove('text-ivory-200/50');
+                btn.setAttribute('aria-selected', 'true');
+
+                // Update panels
+                tabPanels.forEach(panel => {
+                    panel.classList.add('hidden');
+                });
+                document.getElementById('tab-' + targetTab)?.classList.remove('hidden');
+
+                // Scroll to top of tabs
+                document.querySelector('[role="tablist"]')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        // ── Copy to Clipboard ──
+        let copyCount = 0;
+        const copyCounter = document.getElementById('copyCounter');
+
+        function copyText(button) {
+            const container = button.parentElement;
+            // Get text content excluding the button itself
+            const clone = container.cloneNode(true);
+            const btnInClone = clone.querySelector('.copy-btn');
+            if (btnInClone) btnInClone.remove();
+            const text = clone.textContent.trim();
+
+            navigator.clipboard.writeText(text).then(() => {
+                button.textContent = '✓ Copiat!';
+                button.classList.add('copy-ok');
+                copyCount++;
+                copyCounter.textContent = copyCount + ' text' + (copyCount > 1 ? 'e' : '') + ' copiat' + (copyCount > 1 ? 'e' : '');
+
+                setTimeout(() => {
+                    button.textContent = 'Copiază';
+                    button.classList.remove('copy-ok');
+                }, 1500);
+            });
+        }
+
+        // ── Export All Texts ──
+        function exportAllTexts() {
+            const allCards = document.querySelectorAll('.seo-card, .bg-slate-800\\/60');
+            let exportContent = '# Consola SEO — Texte Optimizate\n# florentinapanaofficial.ro\n# Exportat: ' + new Date().toLocaleDateString('ro-RO') + '\n\n';
+
+            let sectionIndex = 0;
+            allCards.forEach(card => {
+                const label = card.querySelector('[class*="uppercase"]')?.textContent?.trim() || '';
+                const greenBoxes = card.querySelectorAll('[class*="emerald"]');
+
+                greenBoxes.forEach(box => {
+                    if (box.classList.contains('border') || box.classList.contains('rounded-lg')) {
+                        const clone = box.cloneNode(true);
+                        const btnInClone = clone.querySelector('.copy-btn');
+                        if (btnInClone) btnInClone.remove();
+                        const text = clone.textContent.trim();
+                        if (text) {
+                            sectionIndex++;
+                            exportContent += '---\n## ' + sectionIndex + '. ' + label + '\n\n' + text + '\n\n';
+                        }
+                    }
+                });
+            });
+
+            const blob = new Blob([exportContent], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'seo-texte-florentinapana-' + new Date().toISOString().slice(0, 10) + '.md';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // ── Charts (Chart.js) ──
+        const chartColors = {
+            gold: 'rgba(212,168,37,0.85)',
+            goldLight: 'rgba(212,168,37,0.15)',
+            emerald: 'rgba(16,185,129,0.85)',
+            emeraldLight: 'rgba(16,185,129,0.15)',
+            blue: 'rgba(59,130,246,0.85)',
+            blueLight: 'rgba(59,130,246,0.15)',
+            pink: 'rgba(236,72,153,0.85)',
+            pinkLight: 'rgba(236,72,153,0.15)',
+            amber: 'rgba(245,158,11,0.85)',
+            amberLight: 'rgba(245,158,11,0.15)',
+            purple: 'rgba(168,85,247,0.85)',
+            purpleLight: 'rgba(168,85,247,0.15)',
+        };
+
+        const chartDefaults = {
+            responsive: true,
+            plugins: {
+                legend: { labels: { color: 'rgba(255,249,230,0.6)', font: { size: 10 } } }
+            },
+            scales: {
+                y: { ticks: { color: 'rgba(255,249,230,0.4)', font: { size: 9 } }, grid: { color: 'rgba(255,255,255,0.04)' } },
+                x: { ticks: { color: 'rgba(255,249,230,0.4)', font: { size: 9 } }, grid: { color: 'rgba(255,255,255,0.04)' } }
+            }
+        };
+
+        // Chart 1: Primary Keywords Volume
+        new Chart(document.getElementById('chartPrimary'), {
+            type: 'bar',
+            data: {
+                labels: ['formație nuntă\nPitești', 'muzică nuntă\nArgeș', 'formație\nevenimente Pitești'],
+                datasets: [{
+                    label: 'Căutări / lună',
+                    data: [880, 720, 480],
+                    backgroundColor: [chartColors.gold, chartColors.emerald, chartColors.blue],
+                    borderRadius: 6,
+                    barPercentage: 0.6,
+                }]
+            },
+            options: { ...chartDefaults, plugins: { ...chartDefaults.plugins, legend: { display: false } } }
+        });
+
+        // Chart 2: Secondary Keywords Volume
+        new Chart(document.getElementById('chartSecondary'), {
+            type: 'bar',
+            data: {
+                labels: ['preț formație\nnuntă', 'muzică populară\nArgeș', 'solistă nuntă\nPitești', 'recomandări\nformație nuntă'],
+                datasets: [{
+                    label: 'Căutări / lună',
+                    data: [590, 320, 260, 210],
+                    backgroundColor: [chartColors.amber, chartColors.pink, chartColors.purple, chartColors.emerald],
+                    borderRadius: 6,
+                    barPercentage: 0.6,
+                }]
+            },
+            options: { ...chartDefaults, plugins: { ...chartDefaults.plugins, legend: { display: false } } }
+        });
+
+        // Chart 3: Seasonal Trend
+        new Chart(document.getElementById('chartSeasonal'), {
+            type: 'line',
+            data: {
+                labels: ['Ian', 'Feb', 'Mar', 'Apr', 'Mai', 'Iun', 'Iul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: '„formație nuntă Pitești"',
+                    data: [120, 180, 340, 520, 880, 950, 1020, 980, 860, 540, 280, 150],
+                    borderColor: chartColors.gold,
+                    backgroundColor: chartColors.goldLight,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 3,
+                    pointBackgroundColor: chartColors.gold,
+                }]
+            },
+            options: chartDefaults
+        });
+    </script>
+
+</body>
+
+</html>
