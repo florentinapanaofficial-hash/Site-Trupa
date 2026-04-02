@@ -4,6 +4,7 @@ import Footer from '../components/Footer.astro';
 import SkyBackground from '../components/SkyBackground.astro';
 import CookieBanner from '../components/CookieBanner.astro';
 import siteContent from '../data/siteContent.json';
+import seoContent from '../data/seo-content.json';
 import '../styles/globals.css';
 
 interface Props {
@@ -29,34 +30,13 @@ const ga4Id = import.meta.env.PUBLIC_GA4_ID;
 const { navigation } = siteContent;
 
 const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': ['MusicGroup', 'LocalBusiness'],
-  name: siteContent.brand.name,
-  description: siteContent.seo.description,
-  url: site || '',
+  ...seoContent.schema,
+  url: site || seoContent.schema.url,
   logo: `${site}/images/logo-fp-stage.svg`,
-  telephone: siteContent.contact.phoneRaw,
-  email: siteContent.contact.email,
-  address: {
-    '@type': 'PostalAddress',
-    addressLocality: 'Pitești',
-    addressRegion: 'Argeș',
-    addressCountry: 'RO',
-  },
-  sameAs: [
-    siteContent.socialLinks?.youtube,
-    siteContent.socialLinks?.facebook,
-    siteContent.socialLinks?.instagram,
-  ].filter(Boolean),
-  genre: ['Muzică populară', 'Muzică de petrecere', 'Muzică live', 'Muzică ușoară'],
+  foundingDate: '2014',
   performerIn: {
     '@type': 'MusicEvent',
     name: 'Nunți, botezuri și evenimente corporate',
-  },
-  foundingDate: '2014',
-  areaServed: {
-    '@type': 'Country',
-    name: 'România',
   },
 };
 

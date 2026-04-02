@@ -1,15 +1,18 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import siteContent from '../data/siteContent.json';
+import seo from '../data/seo-content.json';
 import BackButton from '../components/BackButton.astro';
 
-const { seo, contact, brand, services, repertoire } = siteContent;
+const { contact, brand, services, repertoire } = siteContent;
+const despre = seo.despre;
+const servicii = seo.servicii;
 const hasBandPhoto = typeof (brand as any).bandPhoto === 'string' && (brand as any).bandPhoto.trim() !== '';
 ---
 
 <BaseLayout
-  title={`Despre Noi — Formație Nuntă Pitești și Argeș | ${brand.name}`}
-  description="Trupă profesionistă de nuntă din Pitești, Argeș. Formația Florentina Pană oferă muzică live la nunți, botezuri și evenimente în Muntenia și toată România. Servicii, repertoriu și FAQ."
+  title={despre.meta.title}
+  description={despre.meta.description}
 >
   <section class="section-container py-16">
     <div class="mb-8"><BackButton href="/" label="Acasă" /></div>
@@ -39,7 +42,7 @@ const hasBandPhoto = typeof (brand as any).bandPhoto === 'string' && (brand as a
     <header class="dp-intro-block mb-14">
       <div class="dp-intro-left">
         <p class="kicker">Povestea noastră</p>
-        <h1 class="section-title">Formație Nuntă Pitești — Formația Florentina Pană</h1>
+        <h1 class="section-title">{despre.h1}</h1>
         <div class="mt-6 flex flex-wrap gap-3">
           <a href={`tel:${contact.phoneRaw}`} class="btn-solid anim-cta-pulse">Sună acum</a>
           <a href="/contact" class="btn-outline">Rezervă o dată</a>
@@ -47,9 +50,9 @@ const hasBandPhoto = typeof (brand as any).bandPhoto === 'string' && (brand as a
       </div>
       <div class="dp-intro-right">
         <p class="dp-intro-lead">
-          Formația <strong class="dp-intro-name">Florentina Pană</strong> {(brand as any).aboutIntro}
+          Formația <strong class="dp-intro-name">Florentina Pană</strong> {despre.aboutIntro}
         </p>
-        <p class="dp-intro-body">{(brand as any).aboutIntro2}</p>
+        <p class="dp-intro-body">{despre.aboutIntro2}</p>
       </div>
     </header>
 
