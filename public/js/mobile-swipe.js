@@ -2,6 +2,15 @@
 (function () {
     if (!window.matchMedia('(max-width: 767px)').matches) return;
 
+    /* Debounce util — execută fn o singură dată, la `ms` după ultimul apel */
+    function debounce(fn, ms) {
+        var t;
+        return function () {
+            clearTimeout(t);
+            t = setTimeout(fn, ms);
+        };
+    }
+
     var main = document.getElementById('continut');
     if (!main) return;
 
@@ -83,8 +92,11 @@
             cachedOffsets = slides.map(function (s) { return { id: s.id, top: s.offsetTop }; });
         }
 
-        cacheOffsets();
-        window.addEventListener('resize', function () { requestAnimationFrame(cacheOffsets); }, { passive: true });
+        requestAnimationFrame(function () {
+            cacheOffsets();
+            updateActiveSection();
+        });
+        window.addEventListener('resize', debounce(function () { requestAnimationFrame(cacheOffsets); }, 200), { passive: true });
 
         function updateActiveSection() {
             var scrollY = window.scrollY || window.pageYOffset;
@@ -104,8 +116,6 @@
             cancelAnimationFrame(hpScrollRaf);
             hpScrollRaf = requestAnimationFrame(updateActiveSection);
         }, { passive: true });
-
-        updateActiveSection();
 
         navBtns.forEach(function (btn) {
             btn.addEventListener('click', function (e) {
@@ -228,7 +238,8 @@
         if (arrowNext) arrowNext.classList.toggle('is-hidden', !hasNext);
     }
 
-    function slideWidth() { return main.clientWidth || window.innerWidth; }
+    var cachedSlideW = main.clientWidth || window.innerWidth;
+    function slideWidth() { return cachedSlideW; }
 
     function slideTo(idx) {
         if (idx < 0) {
@@ -327,12 +338,13 @@
         repaintSwipe();
     }, { passive: true });
 
-    window.addEventListener('resize', function () {
+    window.addEventListener('resize', debounce(function () {
         requestAnimationFrame(function () {
+            cachedSlideW = main.clientWidth || window.innerWidth;
             main.scrollLeft = current * slideWidth();
             repaintSwipe();
         });
-    }, { passive: true });
+    }, 200), { passive: true });
 
     requestAnimationFrame(function () {
         repaintSwipe();

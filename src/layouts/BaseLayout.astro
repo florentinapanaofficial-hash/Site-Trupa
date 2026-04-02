@@ -328,8 +328,10 @@ const mobileNavAllItems = [
         var h=nav.offsetHeight;
         if(h>0) document.documentElement.style.setProperty('--mob-nav-h',h+'px');
       }
+      var resizeTimer;
+      function debouncedSync(){ clearTimeout(resizeTimer); resizeTimer=setTimeout(sync,200); }
       if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',sync);}else{sync();}
-      window.addEventListener('resize',sync,{passive:true});
+      window.addEventListener('resize',debouncedSync,{passive:true});
     })();
     </script>
 
