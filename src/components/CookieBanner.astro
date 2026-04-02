@@ -48,7 +48,7 @@ const { ga4Id } = Astro.props;
   </div>
 </div>
 
-<script define:vars={{ ga4Id }}>
+<script is:inline define:vars={{ ga4Id }}>
   (function () {
     var STORAGE_KEY = 'cookie_consent'; // valori: 'granted' | 'denied'
     var banner = document.getElementById('cookie-banner');

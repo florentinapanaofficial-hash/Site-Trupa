@@ -512,33 +512,33 @@ const hasBandPhoto = typeof (brand as any).bandPhoto === 'string' && (brand as a
   }
 </style>
 
-<script>
+<script is:inline>
   // ── Modal detalii carduri ──
   (function () {
-    const modal    = document.getElementById('dp-card-modal') as HTMLElement | null;
-    const backdrop = document.getElementById('dp-modal-backdrop') as HTMLElement | null;
-    const closeBtn = document.getElementById('dp-modal-close') as HTMLButtonElement | null;
-    const titleEl  = document.getElementById('dp-modal-title') as HTMLElement | null;
-    const iconEl   = document.getElementById('dp-modal-icon') as HTMLElement | null;
-    const bodyEl   = document.getElementById('dp-modal-body') as HTMLElement | null;
+    const modal    = document.getElementById('dp-card-modal');
+    const backdrop = document.getElementById('dp-modal-backdrop');
+    const closeBtn = document.getElementById('dp-modal-close');
+    const titleEl  = document.getElementById('dp-modal-title');
+    const iconEl   = document.getElementById('dp-modal-icon');
+    const bodyEl   = document.getElementById('dp-modal-body');
 
     if (!modal || !titleEl || !bodyEl) return;
 
-    function openModal(title: string, icon: string, details: string) {
-      titleEl!.textContent = title;
+    function openModal(title, icon, details) {
+      titleEl.textContent = title;
       if (iconEl) iconEl.textContent = icon;
-      bodyEl!.textContent = details || 'Nicio descriere adăugată încă.';
-      modal!.hidden = false;
+      bodyEl.textContent = details || 'Nicio descriere adăugată încă.';
+      modal.hidden = false;
       document.body.style.overflow = 'hidden';
       closeBtn?.focus();
     }
 
     function closeModal() {
-      modal!.hidden = true;
+      modal.hidden = true;
       document.body.style.overflow = '';
     }
 
-    document.querySelectorAll<HTMLButtonElement>('button.dp-card[data-card-title]').forEach(btn => {
+    document.querySelectorAll('button.dp-card[data-card-title]').forEach(btn => {
       btn.addEventListener('click', () => {
         openModal(
           btn.dataset.cardTitle   || '',
@@ -551,7 +551,7 @@ const hasBandPhoto = typeof (brand as any).bandPhoto === 'string' && (brand as a
     backdrop?.addEventListener('click', closeModal);
     closeBtn?.addEventListener('click', closeModal);
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !modal!.hidden) closeModal();
+      if (e.key === 'Escape' && !modal.hidden) closeModal();
     });
   })();
 </script>

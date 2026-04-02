@@ -139,7 +139,7 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
     </div>
   </section>
 
-  <script>
+  <script is:inline>
     const feedbackEl = document.getElementById('form-feedback');
     const feedbackType = new URLSearchParams(window.location.search).get('trimis');
 
@@ -166,19 +166,19 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
       });
     }
 
-    const form = document.getElementById('form-rezervare') as HTMLFormElement | null;
+    const form = document.getElementById('form-rezervare');
     if (form) {
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         // GA4 tracking
-        if (typeof (window as Window & { gtag?: (...args: unknown[]) => void }).gtag === 'function') {
-          (window as Window & { gtag?: (...args: unknown[]) => void }).gtag!(
+        if (typeof window.gtag === 'function') {
+          window.gtag(
             'event', 'generate_lead', { event_category: 'contact' },
           );
         }
 
-        const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement | null;
+        const submitBtn = form.querySelector('button[type="submit"]');
         if (submitBtn) {
           submitBtn.disabled = true;
           submitBtn.textContent = 'Se trimite...';
@@ -195,7 +195,7 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
             body: new FormData(form),
           });
 
-          const json = await res.json() as { ok?: boolean; error?: string };
+          const json = await res.json();
 
           if (res.ok && json.ok) {
             window.location.href = '/contact?trimis=rezervare#contact';

@@ -60,9 +60,9 @@ const { href = '/', label = 'Înapoi' } = Astro.props;
   }
 </style>
 
-<script>
+<script is:inline>
   document.addEventListener('click', function (e) {
-    var btn = (e.target as HTMLElement).closest?.('.back-btn');
+    var btn = (e.target).closest?.('.back-btn');
     if (!btn) return;
 
     // Verifică dacă utilizatorul are istoric real pe acest site

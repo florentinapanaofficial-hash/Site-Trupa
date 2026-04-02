@@ -84,24 +84,24 @@ const photos = [
 <!-- ═══════════════════════════════════════════
      SCRIPT — Filtre, Lightbox, Swipe, Keyboard
 ═══════════════════════════════════════════ -->
-<script>
-  const items = document.querySelectorAll<HTMLElement>('.gal-item');
+<script is:inline>
+  const items = document.querySelectorAll('.gal-item');
 
   // ── Lightbox ──
-  const lb = document.getElementById('gal-lightbox')!;
-  const lbImg = document.getElementById('lb-img') as HTMLImageElement;
-  const lbCounter = lb.querySelector<HTMLElement>('.lb-counter')!;
-  const lbClose = lb.querySelector<HTMLButtonElement>('.lb-close')!;
-  const lbPrev = lb.querySelector<HTMLButtonElement>('.lb-prev')!;
-  const lbNext = lb.querySelector<HTMLButtonElement>('.lb-next')!;
+  const lb = document.getElementById('gal-lightbox');
+  const lbImg = document.getElementById('lb-img');
+  const lbCounter = lb.querySelector('.lb-counter');
+  const lbClose = lb.querySelector('.lb-close');
+  const lbPrev = lb.querySelector('.lb-prev');
+  const lbNext = lb.querySelector('.lb-next');
 
-  function getVisibleItems(): HTMLElement[] {
+  function getVisibleItems() {
     return Array.from(items).filter((it) => it.style.display !== 'none');
   }
 
   let currentIdx = 0;
 
-  function showPhoto(idx: number) {
+  function showPhoto(idx) {
     const visible = getVisibleItems();
     if (idx < 0 || idx >= visible.length) return;
     currentIdx = idx;
@@ -116,11 +116,11 @@ const photos = [
     lbImg.classList.add('lb-fade-in');
   }
 
-  function openLightbox(idx: number) {
+  function openLightbox(idx) {
     lb.classList.add('active');
     document.body.style.overflow = 'hidden';
     // Pe mobil, secțiunea galeriei are scroll propriu — oprim și pe ea
-    const galSection = document.querySelector<HTMLElement>('.gal-page');
+    const galSection = document.querySelector('.gal-page');
     if (galSection) galSection.style.overflow = 'hidden';
     showPhoto(idx);
   }
@@ -134,7 +134,7 @@ const photos = [
     setTimeout(() => {
       lb.classList.remove('active', 'lb-closing');
       document.body.style.overflow = '';
-      const galSection = document.querySelector<HTMLElement>('.gal-page');
+      const galSection = document.querySelector('.gal-page');
       if (galSection) galSection.style.overflow = '';
       lbImg.classList.remove('lb-fade-in');
       lbImg.src = '';
@@ -166,7 +166,7 @@ const photos = [
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         const visible = getVisibleItems();
-        const idx = visible.indexOf(item as HTMLElement);
+        const idx = visible.indexOf(item);
         if (idx >= 0) openLightbox(idx);
       }
     });
@@ -178,7 +178,7 @@ const photos = [
 
   // Tap pe fundal sau imagine → închide (pe mobil mai ales)
   lb.addEventListener('click', (e) => {
-    const t = e.target as HTMLElement;
+    const t = e.target;
     // Nu închide dacă user-ul a dat pe butoanele prev/next
     if (t.closest('.lb-prev') || t.closest('.lb-next')) return;
     closeLightbox();

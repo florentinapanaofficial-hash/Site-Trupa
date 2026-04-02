@@ -359,22 +359,22 @@ function initiale(name: string): string {
   </div>
 </BaseLayout>
 
-<script>
-  document.querySelectorAll<HTMLElement>('.bio-btn').forEach((btn) => {
+<script is:inline>
+  document.querySelectorAll('.bio-btn').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
-      const wrap = btn.closest<HTMLElement>('.member-card-wrap');
+      const wrap = btn.closest('.member-card-wrap');
       if (!wrap) return;
-      const panel = wrap.querySelector<HTMLElement>('.bio-panel');
+      const panel = wrap.querySelector('.bio-panel');
       if (!panel) return;
       const isOpen = panel.classList.contains('open');
 
       // Închide toate celelalte paneluri
-      document.querySelectorAll<HTMLElement>('.bio-panel.open').forEach((p) => {
+      document.querySelectorAll('.bio-panel.open').forEach((p) => {
         p.classList.remove('open');
         p.setAttribute('aria-hidden', 'true');
       });
-      document.querySelectorAll<HTMLElement>('.bio-btn.active').forEach((b) => {
+      document.querySelectorAll('.bio-btn.active').forEach((b) => {
         b.classList.remove('active');
         b.setAttribute('aria-expanded', 'false');
       });
@@ -390,18 +390,18 @@ function initiale(name: string): string {
 
   // Click în afara închide panelul
   document.addEventListener('click', () => {
-    document.querySelectorAll<HTMLElement>('.bio-panel.open').forEach((p) => {
+    document.querySelectorAll('.bio-panel.open').forEach((p) => {
       p.classList.remove('open');
       p.setAttribute('aria-hidden', 'true');
     });
-    document.querySelectorAll<HTMLElement>('.bio-btn.active').forEach((b) => {
+    document.querySelectorAll('.bio-btn.active').forEach((b) => {
       b.classList.remove('active');
       b.setAttribute('aria-expanded', 'false');
     });
   });
 
   // ═══ GALLERY POPUP FX ═══
-  const fxMap: Record<string, { enter: string; leave: string }> = {
+  const fxMap = {
     '1': { enter: 'fx-pop-in',      leave: 'fx-pop-out'      },
     '2': { enter: 'fx-warp-in',     leave: 'fx-warp-out'     },
     '3': { enter: 'fx-rubber-in',   leave: 'fx-rubber-out'   },
@@ -410,11 +410,11 @@ function initiale(name: string): string {
     '6': { enter: 'fx-spindrop-in', leave: 'fx-spindrop-out' },
   };
 
-  const popup    = document.getElementById('gallery-popup')!;
-  const popupImg = document.getElementById('gallery-popup-img') as HTMLImageElement;
+  const popup    = document.getElementById('gallery-popup');
+  const popupImg = document.getElementById('gallery-popup-img');
   let currentFx  = '1';
 
-  function openPopup(src: string, alt: string, fx: string) {
+  function openPopup(src, alt, fx) {
     const anim = fxMap[fx] ?? fxMap['1'];
     popupImg.src = src;
     popupImg.alt = alt;
@@ -423,7 +423,7 @@ function initiale(name: string): string {
     popupImg.classList.add(anim.enter);
   }
 
-  function closePopup(fx: string = currentFx) {
+  function closePopup(fx = currentFx) {
     const anim = fxMap[fx] ?? fxMap['1'];
     popupImg.classList.remove(...Object.values(fxMap).flatMap((v) => [v.enter, v.leave]));
     popupImg.classList.add(anim.leave);
@@ -435,7 +435,7 @@ function initiale(name: string): string {
     }, { once: true });
   }
 
-  document.querySelectorAll<HTMLElement>('.gallery-thumb').forEach((thumb) => {
+  document.querySelectorAll('.gallery-thumb').forEach((thumb) => {
     thumb.addEventListener('click', (e) => {
       e.stopPropagation();
       const fx  = thumb.dataset.fx  ?? '1';

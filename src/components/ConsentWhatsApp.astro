@@ -127,7 +127,7 @@ const waUrl = `https://wa.me/${numarTelefon}?text=${mesajEncoded}`;
   </div>
 </div>
 
-<script>
+<script is:inline>
   (function () {
     var el = document.getElementById('consent-email-js');
     if (!el) return;
@@ -238,7 +238,7 @@ const waUrl = `https://wa.me/${numarTelefon}?text=${mesajEncoded}`;
   }
 </style>
 
-<script>
+<script is:inline>
   /**
    * Logică client-side GDPR WhatsApp Consent
    *
@@ -257,9 +257,9 @@ const waUrl = `https://wa.me/${numarTelefon}?text=${mesajEncoded}`;
   (function () {
     "use strict";
 
-    const btn      = document.getElementById("gdpr-whatsapp-btn") as HTMLButtonElement | null;
-    const checkbox = document.getElementById("gdpr-agree") as HTMLInputElement | null;
-    const errorMsg = document.getElementById("gdpr-error-msg") as HTMLParagraphElement | null;
+    const btn      = document.getElementById("gdpr-whatsapp-btn");
+    const checkbox = document.getElementById("gdpr-agree");
+    const errorMsg = document.getElementById("gdpr-error-msg");
 
     if (!btn || !checkbox || !errorMsg) return;
 
@@ -318,7 +318,7 @@ const waUrl = `https://wa.me/${numarTelefon}?text=${mesajEncoded}`;
 
         if (!response.ok) {
           const data = await response.json().catch(() => ({}));
-          throw new Error((data as { eroare?: string }).eroare ?? `HTTP ${response.status}`);
+          throw new Error((data).eroare ?? `HTTP ${response.status}`);
         }
 
         // ── Pasul 4: Redirect la WhatsApp după confirmare server ───
