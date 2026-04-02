@@ -30,7 +30,11 @@ const serve = sirv('dist/client', {
         else if (pathname.startsWith('/fonts/')) {
             res.setHeader('Cache-Control', 'public, max-age=31536000');
         }
-        // JS → 1 year (fingerprinted) or 1 day (non-fingerprinted)
+        // /js/* → static app scripts → 1 year with stale-while-revalidate
+        else if (pathname.startsWith('/js/')) {
+            res.setHeader('Cache-Control', 'public, max-age=31536000, stale-while-revalidate=86400');
+        }
+        // Other JS → 1 day
         else if (pathname.endsWith('.js')) {
             res.setHeader('Cache-Control', 'public, max-age=86400');
         }

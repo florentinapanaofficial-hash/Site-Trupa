@@ -361,6 +361,20 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     gap: 0.5rem;
     position: relative;
     z-index: 5;
+    /* Min-height previne CLS la încărcarea fonturilor Inter/Oswald */
+    min-height: 520px;
+  }
+
+  @media (max-width: 767px) {
+    .hero-stage-inner {
+      min-height: 600px;
+    }
+  }
+
+  @media (max-width: 374px) {
+    .hero-stage-inner {
+      min-height: 560px;
+    }
   }
 
   /* ════════════════════════════════════════════════════════════════

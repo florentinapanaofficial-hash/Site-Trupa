@@ -545,9 +545,17 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
     }
   };
 
+  function deferredInit() {
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(initScrollSpy);
+    } else {
+      setTimeout(initScrollSpy, 1);
+    }
+  }
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initScrollSpy, { once: true });
+    document.addEventListener('DOMContentLoaded', deferredInit, { once: true });
   } else {
-    initScrollSpy();
+    deferredInit();
   }
 </script>
