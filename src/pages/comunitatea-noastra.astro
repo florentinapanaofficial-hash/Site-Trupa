@@ -163,7 +163,7 @@ const pageDescription = 'Distribuie videoclipurile preferate, interacționează 
         <div class="community-gallery-grid mt-4" data-db-gallery-grid>
           {galleryPhotos.map((photo) => (
             <article class="community-gallery-item" aria-label={photo.titlu}>
-              <img src={photo.imagine_url} alt={photo.titlu} loading="lazy" />
+              <img src={photo.imagine_url} alt={photo.titlu} loading="lazy" decoding="async" width="640" height="480" />
               <div class="community-gallery-meta">
                 <p class="community-gallery-title">{photo.titlu}</p>
                 <p class="community-gallery-date">{new Date(photo.data_upload).toLocaleDateString('ro-RO')}</p>

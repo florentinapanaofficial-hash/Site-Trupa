@@ -114,7 +114,8 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
       </header>
 
       <div class="couple-cards-grid">
-        {realMoments.events.map((event) => {
+        {realMoments.events.map((event, idx) => {
+          const isAboveFold = idx < 3;
           return (
             <article
               class="couple-card"
@@ -133,7 +134,7 @@ const albumPhotos = paddedAlbumPhotos.slice(0, 60);
                   data-lightbox-quote={event.coupleQuote ?? ''}
                   aria-label={`Deschide fotografia ${event.couple}`}
                 >
-                  <img src={event.image} alt={event.couple} loading="eager" decoding="async" width="600" height="400" />
+                  <img src={event.image} alt={event.couple} loading={isAboveFold ? "eager" : "lazy"} decoding="async" width="600" height="400" fetchpriority={isAboveFold ? "high" : "auto"} />
                   <div class="cc-name-overlay">
                     <span class="cc-name">{event.couple}</span>
                     <span class="cc-meta">{event.city} &bull; {event.date}</span>
