@@ -82,11 +82,67 @@ const paddedAlbumPhotos =
 
 const albumPhotos = paddedAlbumPhotos.slice(0, 60);
 
+const SITE_FALLBACK = 'https://florentinapanaofficial.ro';
+const site = Astro.site?.toString().replace(/\/$/, '') ?? SITE_FALLBACK;
+
+const eventsJsonLd = realMoments.events
+  .filter((ev: any) => ev.startDate)
+  .map((ev: any) => {
+    const isCompleted = ev.eventStatus === 'https://schema.org/EventCompleted';
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'MusicEvent',
+      name: ev.title,
+      description: ev.description || `Eveniment live cu ${brand.name} — ${ev.couple}, ${ev.city}`,
+      startDate: ev.startDate,
+      ...(ev.endDate && { endDate: ev.endDate }),
+      eventStatus: ev.eventStatus || 'https://schema.org/EventScheduled',
+      eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+      location: {
+        '@type': 'Place',
+        name: ev.locationName || `Salon Evenimente ${ev.city}`,
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: ev.city,
+          addressCountry: 'RO',
+          ...(ev.locationAddress && { streetAddress: ev.locationAddress }),
+        },
+      },
+      ...(ev.image && {
+        image: ev.image.startsWith('http') ? ev.image : `${site}${ev.image}`,
+      }),
+      performer: {
+        '@type': 'MusicGroup',
+        name: brand.name,
+        url: site,
+      },
+      organizer: {
+        '@type': 'MusicGroup',
+        name: brand.name,
+        url: site,
+      },
+      ...(!isCompleted && {
+        offers: {
+          '@type': 'Offer',
+          url: `${site}/contact`,
+          availability: 'https://schema.org/InStock',
+          priceCurrency: 'RON',
+          price: '0',
+          validFrom: ev.startDate,
+          description: 'Contactați-ne pentru ofertă personalizată',
+        },
+      }),
+    };
+  });
+
 
 ---
 
 <BaseLayout title={`Momente cu Mirii — Album Foto Nunți Pitești, Argeș | ${brand.name}`} description="Album foto cu mirii și trupa la nunți în Pitești, Argeș și Muntenia. Formație nuntă profesionistă — cele mai frumoase momente live de la evenimentele Formației Florentina Pană.">
   <Fragment slot="head">
+    {eventsJsonLd.map((eventSchema: any) => (
+      <script type="application/ld+json" set:html={JSON.stringify(eventSchema)} />
+    ))}
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&display=swap" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&display=swap" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&display=swap" /></noscript>
