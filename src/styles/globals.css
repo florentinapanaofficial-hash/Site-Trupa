@@ -607,6 +607,7 @@ html::-webkit-scrollbar {
 @media (max-width: 767px) {
   html {
     scrollbar-width: none;
+    overscroll-behavior-y: none;
   }
 
   html::-webkit-scrollbar {
@@ -1612,11 +1613,11 @@ details:focus-visible {
     text-transform: uppercase;
     padding: 0.22rem 0.3rem;
     text-align: center;
-    white-space: nowrap;
+    white-space: normal;
     overflow: hidden;
-    text-overflow: ellipsis;
     max-width: 100%;
     box-sizing: border-box;
+    line-height: 1.3;
   }
 
   /* Butonul activ pe mobil — cyan border + forțează vizibilitate

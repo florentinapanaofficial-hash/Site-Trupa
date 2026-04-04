@@ -79,7 +79,7 @@ function initiale(name: string): string {
             {areGalerieFoto(m) ? (
               <div class="mc-gallery-wrap">
                 <div class="mc-gallery" role="list" aria-label={`Galerie foto ${m.nume}`}>
-                  {m.galpisFoto.slice(0, 6).map((foto: any, n: number) => (
+                  {m.galpisFoto.map((foto: any, n: number) => (
                     <div
                       class="mc-gallery-ph gallery-thumb"
                       role="listitem"
@@ -96,7 +96,7 @@ function initiale(name: string): string {
                 </div>
                 {m.galpisFoto.length > 1 && (
                   <div class="mc-gallery-indicator" aria-hidden="true">
-                    {m.galpisFoto.slice(0, 6).map((_: any, n: number) => (
+                    {m.galpisFoto.map((_: any, n: number) => (
                       <span class={`dot${n === 0 ? ' active' : ''}`}></span>
                     ))}
                   </div>
@@ -201,7 +201,7 @@ function initiale(name: string): string {
             {areGalerieFoto(m) ? (
               <div class="mc-gallery-wrap">
                 <div class="mc-gallery" role="list" aria-label={`Galerie foto ${m.nume}`}>
-                  {m.galpisFoto.slice(0, 6).map((foto: any, n: number) => (
+                  {m.galpisFoto.map((foto: any, n: number) => (
                     <div
                       class="mc-gallery-ph gallery-thumb"
                       role="listitem"
@@ -218,7 +218,7 @@ function initiale(name: string): string {
                 </div>
                 {m.galpisFoto.length > 1 && (
                   <div class="mc-gallery-indicator" aria-hidden="true">
-                    {m.galpisFoto.slice(0, 6).map((_: any, n: number) => (
+                    {m.galpisFoto.map((_: any, n: number) => (
                       <span class={`dot${n === 0 ? ' active' : ''}`}></span>
                     ))}
                   </div>
@@ -325,7 +325,7 @@ function initiale(name: string): string {
             {areGalerieFoto(m) ? (
               <div class="mc-gallery-wrap">
                 <div class="mc-gallery" role="list" aria-label={`Galerie foto ${m.nume}`}>
-                  {m.galpisFoto.slice(0, 6).map((foto: any, n: number) => (
+                  {m.galpisFoto.map((foto: any, n: number) => (
                     <div
                       class="mc-gallery-ph gallery-thumb"
                       role="listitem"
@@ -342,7 +342,7 @@ function initiale(name: string): string {
                 </div>
                 {m.galpisFoto.length > 1 && (
                   <div class="mc-gallery-indicator" aria-hidden="true">
-                    {m.galpisFoto.slice(0, 6).map((_: any, n: number) => (
+                    {m.galpisFoto.map((_: any, n: number) => (
                       <span class={`dot${n === 0 ? ' active' : ''}`}></span>
                     ))}
                   </div>
