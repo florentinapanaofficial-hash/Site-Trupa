@@ -73,6 +73,12 @@ const server = createServer((req, res) => {
         return res.end();
     }
 
+    // ── /sitemap.xml → /sitemap-index.xml (Google Search Console compatibility) ──
+    if (req.url === '/sitemap.xml') {
+        res.writeHead(301, { Location: '/sitemap-index.xml' });
+        return res.end();
+    }
+
     // Security headers on ALL responses
     for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
         res.setHeader(key, value);

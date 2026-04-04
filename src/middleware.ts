@@ -28,6 +28,13 @@ export const onRequest = defineMiddleware(async (context, next) => {
         return Response.redirect(clean.toString(), 301);
     }
 
+    // Redirect /sitemap.xml → /sitemap-index.xml (compatibilitate Google Search Console)
+    if (pathname === '/sitemap.xml') {
+        const clean = new URL(context.request.url);
+        clean.pathname = '/sitemap-index.xml';
+        return Response.redirect(clean.toString(), 301);
+    }
+
     const response = await next();
 
     // Aplică security headers pe toate răspunsurile
