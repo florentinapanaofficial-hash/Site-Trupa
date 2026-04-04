@@ -168,7 +168,7 @@
         }
 
         document.addEventListener('touchstart', function (e) {
-            if (e.target.closest && e.target.closest('.mob-nav')) {
+            if (e.target.closest && (e.target.closest('.mob-nav') || e.target.closest('.mc-gallery'))) {
                 hpSkipTouch = true; return;
             }
             hpSkipTouch = false;
@@ -281,7 +281,7 @@
     }
 
     function onTouchStart(e) {
-        if (e.target.closest && e.target.closest('.mob-nav')) {
+        if (e.target.closest && (e.target.closest('.mob-nav') || e.target.closest('.mc-gallery'))) {
             tAxis = 'skip'; return;
         }
         tStartX = e.touches[0].clientX;

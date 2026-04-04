@@ -491,6 +491,9 @@ function initiale(name: string): string {
     }, { once: true });
   }
 
+  // ═══ GALLERY SLIDER — dots + mouse drag ═══
+  let galleryDragged = false;
+
   document.querySelectorAll('.gallery-thumb').forEach((thumb) => {
     function activateThumb() {
       const fx  = thumb.dataset.fx  ?? '1';
@@ -502,6 +505,7 @@ function initiale(name: string): string {
 
     thumb.addEventListener('click', (e) => {
       e.stopPropagation();
+      if (galleryDragged) { galleryDragged = false; return; }
       activateThumb();
     });
 
@@ -574,11 +578,13 @@ function initiale(name: string): string {
     let isDragging = false;
     let startX = 0;
     let scrollStart = 0;
+    let dragMoved = false;
 
     gallery.addEventListener('mousedown', (e) => {
       // Doar click stânga
       if (e.button !== 0) return;
       isDragging = true;
+      dragMoved = false;
       startX = e.pageX;
       scrollStart = gallery.scrollLeft;
       gallery.style.cursor = 'grabbing';
@@ -589,6 +595,7 @@ function initiale(name: string): string {
     document.addEventListener('mousemove', (e) => {
       if (!isDragging) return;
       const dx = e.pageX - startX;
+      if (Math.abs(dx) > 5) dragMoved = true;
       gallery.scrollLeft = scrollStart - dx;
     });
 
@@ -597,6 +604,7 @@ function initiale(name: string): string {
       isDragging = false;
       gallery.style.cursor = '';
       gallery.style.userSelect = '';
+      if (dragMoved) galleryDragged = true;
     });
   });
 </script>
@@ -801,7 +809,7 @@ function initiale(name: string): string {
     height: 100%;
     max-width: 100%;
     object-fit: cover;
-    object-position: top;
+    object-position: center 15%;
     display: block;
     transition: transform 600ms ease;
   }
@@ -920,13 +928,29 @@ function initiale(name: string): string {
     scroll-snap-type: x proximity;
     gap: 0.5rem;
     margin-top: auto;
-    scrollbar-width: none;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(6, 214, 255, 0.45) rgba(255, 255, 255, 0.06);
     cursor: grab;
     padding-bottom: 0.5rem;
   }
 
   .mc-gallery::-webkit-scrollbar {
-    display: none;
+    height: 6px;
+  }
+
+  .mc-gallery::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 3px;
+  }
+
+  .mc-gallery::-webkit-scrollbar-thumb {
+    background: rgba(6, 214, 255, 0.45);
+    border-radius: 3px;
+    transition: background 0.2s;
+  }
+
+  .mc-gallery::-webkit-scrollbar-thumb:hover {
+    background: rgba(6, 214, 255, 0.7);
   }
 
   .mc-gallery-ph {
@@ -995,7 +1019,7 @@ function initiale(name: string): string {
     width: 100%;
     aspect-ratio: 3 / 2;
     object-fit: cover;
-    object-position: top;
+    object-position: center 20%;
     display: block;
     border-radius: inherit;
   }
@@ -1075,6 +1099,11 @@ function initiale(name: string): string {
       padding-left: 1rem;
       padding-right: 1rem;
       position: relative;
+      scrollbar-width: none;
+    }
+
+    .mc-gallery::-webkit-scrollbar {
+      display: none;
     }
 
     .mc-gallery-ph {
