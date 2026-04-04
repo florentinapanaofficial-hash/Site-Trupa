@@ -25,12 +25,12 @@ function initiale(name: string): string {
   title="Membrii Formației Florentina Pană | Trupă Profesionistă Nuntă Pitești, Argeș"
   description="Cunoaște echipa formației Florentina Pană — soliști vocali și instrumentiști cu experiență de peste 20 ani. Formație nuntă Pitești și Argeș, disponibilă pentru nunți, botezuri și evenimente în toată România."
 >
-  <div class="mb-6 px-4 pt-6">
+  <div class="mb-6 px-4 pt-6 max-w-6xl mx-auto">
     <BackButton href="/" label="Acasă" />
   </div>
 
   <!-- ═══ HEADER PAGINĂ ═══ -->
-  <header class="section-head mx-auto text-center mb-10 pt-8 anim-on-scroll">
+  <header class="section-head mx-auto text-center mb-10 pt-8 anim-on-scroll max-w-6xl px-4 sm:px-6 lg:px-8">
     <p class="kicker">Echipa noastră</p>
     <h1 class="section-title">Membrii Formației — Formație Nuntă Pitești</h1>
     <p class="section-copy">Soliști vocali, instrumentiști și colaboratori cu experiență de peste 10 ani, disponibili pentru nunți, botezuri și evenimente în Pitești, Argeș și toată România.</p>
@@ -499,7 +499,8 @@ function initiale(name: string): string {
     main#continut {
       display: block !important;
       flex-direction: unset !important;
-      overflow: visible !important;
+      overflow-x: hidden !important;
+      overflow-y: visible !important;
       scroll-snap-type: none !important;
       height: auto !important;
       min-height: unset !important;
@@ -516,7 +517,8 @@ function initiale(name: string): string {
       width: 100% !important;
       height: auto !important;
       min-height: unset !important;
-      overflow: visible !important;
+      overflow-x: hidden !important;
+      overflow-y: visible !important;
       scroll-snap-align: none !important;
       scroll-snap-stop: unset !important;
       touch-action: auto !important;
@@ -534,12 +536,14 @@ function initiale(name: string): string {
 
 <style>
   /* ══════════════════════════════════════════
-     SECȚIUNI PAGINĂ
+     SECȚIUNI PAGINĂ — simetrie cu section-container (72rem)
   ══════════════════════════════════════════ */
   .mem-section {
     padding: clamp(1.5rem, 3vw, 2.5rem) clamp(1rem, 3vw, 2rem);
-    max-width: 900px;
+    max-width: 72rem;
     margin-inline: auto;
+    box-sizing: border-box;
+    overflow-x: hidden;
   }
 
   .mem-sec-head {
@@ -623,6 +627,7 @@ function initiale(name: string): string {
     margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
     border-radius: 1.25rem;
     overflow: visible;
+    max-width: 100%;
   }
 
   /* ══════════════════════════════════════════
@@ -675,6 +680,7 @@ function initiale(name: string): string {
   .mc-photo-img {
     width: 100%;
     height: 100%;
+    max-width: 100%;
     object-fit: cover;
     object-position: top;
     display: block;
@@ -884,9 +890,9 @@ function initiale(name: string): string {
     }
 
     .mc-gallery-ph {
-      flex: 0 0 70vw;
-      width: 70vw;
-      max-width: 320px;
+      flex: 0 0 min(70vw, 320px);
+      width: min(70vw, 320px);
+      max-width: 100%;
       scroll-snap-align: center;
       border-radius: 0.75rem;
     }
@@ -1092,18 +1098,29 @@ function initiale(name: string): string {
 
     .mc-photo-col {
       min-height: unset;
-      aspect-ratio: 3 / 5;
+      aspect-ratio: 3 / 4;
+      max-height: 70vh;
+    }
+
+    .mc-photo-img {
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+      object-fit: cover;
     }
 
     .mc-photo-ph {
       min-height: unset;
-      aspect-ratio: 3 / 5;
+      aspect-ratio: 3 / 4;
     }
 
     .mc-content-col {
       /* dreapta: 56px buton + 0.75rem offset + 0.5rem gap = ~4.5rem
          jos:    56px buton + 0.75rem offset + 0.5rem gap = ~5rem  */
       padding: 1.25rem 4.5rem 5rem 1rem;
+      max-width: 100%;
+      overflow-x: hidden;
+      box-sizing: border-box;
     }
 
     .bio-btn {

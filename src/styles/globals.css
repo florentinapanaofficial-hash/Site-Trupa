@@ -392,9 +392,11 @@ body.mobile-menu-open .left-side-menu {
     flex-direction: column;
     align-items: center;
     min-width: 0;
-    max-width: 100%;
+    width: calc(100% - 220px);
+    max-width: calc(100% - 220px);
     padding-inline: 0;
     margin-left: 220px;
+    overflow-x: hidden;
   }
 
   #continut {
@@ -1798,6 +1800,15 @@ details:focus-visible {
 }
 
 @media (max-width: 767px) {
+
+  /* ── 0. Siguranță globală imagini mobil — previne overflow orizontal ── */
+  img,
+  video,
+  picture,
+  canvas,
+  svg {
+    max-width: 100%;
+  }
 
   /* ── 1. Header-ul fix rămâne vizibil, cu hamburger ── */
   .top-header {
