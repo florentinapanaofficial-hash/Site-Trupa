@@ -310,7 +310,7 @@
         unlockVertical();
         if (tAxis !== 'x') return;
         var dx = e.changedTouches[0].clientX - tStartX;
-        var threshold = 45;
+        var threshold = Math.max(50, window.innerWidth * 0.12);
         if (dx < -threshold) slideTo(current + 1);
         else if (dx > threshold) slideTo(current - 1);
         else slideTo(current);
