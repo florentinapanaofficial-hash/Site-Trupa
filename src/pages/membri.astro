@@ -77,21 +77,36 @@ function initiale(name: string): string {
 
             <!-- Galerie foto -->
             {areGalerieFoto(m) ? (
-              <div class="mc-gallery" role="list" aria-label={`Galerie foto ${m.nume}`}>
-                {m.galpisFoto.slice(0, 6).map((foto: any, n: number) => (
-                  <div
-                    class="mc-gallery-ph gallery-thumb"
-                    role="listitem"
-                    data-fx={String((n % 6) + 1)}
-                    data-src={foto.src}
-                    data-alt={foto.alt ?? `${m.nume} la eveniment - Formația Florentina Pană`}
-                    tabindex="0"
-                    title="Click pentru previzualizare"
-                  >
-                    <img src={foto.src} alt={foto.alt ?? `${m.nume} la eveniment`} class="mc-gal-thumb-img" loading="lazy" width="300" height="200" />
-                    <span class="mc-gal-overlay" aria-hidden="true">🔍</span>
+              <div class="mc-gallery-wrap">
+                <div class="mc-gallery" role="list" aria-label={`Galerie foto ${m.nume}`}>
+                  {m.galpisFoto.slice(0, 6).map((foto: any, n: number) => (
+                    <div
+                      class="mc-gallery-ph gallery-thumb"
+                      role="listitem"
+                      data-fx={String((n % 6) + 1)}
+                      data-src={foto.src}
+                      data-alt={foto.alt ?? `${m.nume} la eveniment - Formația Florentina Pană`}
+                      tabindex="0"
+                      title="Click pentru previzualizare"
+                    >
+                      <img src={foto.src} alt={foto.alt ?? `${m.nume} la eveniment`} class="mc-gal-thumb-img" loading="lazy" width="300" height="200" />
+                      <span class="mc-gal-overlay" aria-hidden="true">🔍</span>
+                    </div>
+                  ))}
+                </div>
+                {m.galpisFoto.length > 1 && (
+                  <div class="mc-gallery-indicator" aria-hidden="true">
+                    {m.galpisFoto.slice(0, 6).map((_: any, n: number) => (
+                      <span class={`dot${n === 0 ? ' active' : ''}`}></span>
+                    ))}
                   </div>
-                ))}
+                )}
+                {m.galpisFoto.length > 1 && (
+                  <div class="mc-gallery-hint" aria-hidden="true">
+                    <span>Glisează</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+                  </div>
+                )}
               </div>
             ) : (
               <div class="mc-gallery mc-gallery--soon" aria-label="Galerie foto în curând">
@@ -184,21 +199,36 @@ function initiale(name: string): string {
 
             <!-- Galerie foto -->
             {areGalerieFoto(m) ? (
-              <div class="mc-gallery" role="list" aria-label={`Galerie foto ${m.nume}`}>
-                {m.galpisFoto.slice(0, 6).map((foto: any, n: number) => (
-                  <div
-                    class="mc-gallery-ph gallery-thumb"
-                    role="listitem"
-                    data-fx={String((n % 6) + 1)}
-                    data-src={foto.src}
-                    data-alt={foto.alt ?? `${m.nume} la eveniment - Formația Florentina Pană`}
-                    tabindex="0"
-                    title="Click pentru previzualizare"
-                  >
-                    <img src={foto.src} alt={foto.alt ?? `${m.nume} la eveniment`} class="mc-gal-thumb-img" loading="lazy" width="300" height="200" />
-                    <span class="mc-gal-overlay" aria-hidden="true">🔍</span>
+              <div class="mc-gallery-wrap">
+                <div class="mc-gallery" role="list" aria-label={`Galerie foto ${m.nume}`}>
+                  {m.galpisFoto.slice(0, 6).map((foto: any, n: number) => (
+                    <div
+                      class="mc-gallery-ph gallery-thumb"
+                      role="listitem"
+                      data-fx={String((n % 6) + 1)}
+                      data-src={foto.src}
+                      data-alt={foto.alt ?? `${m.nume} la eveniment - Formația Florentina Pană`}
+                      tabindex="0"
+                      title="Click pentru previzualizare"
+                    >
+                      <img src={foto.src} alt={foto.alt ?? `${m.nume} la eveniment`} class="mc-gal-thumb-img" loading="lazy" width="300" height="200" />
+                      <span class="mc-gal-overlay" aria-hidden="true">🔍</span>
+                    </div>
+                  ))}
+                </div>
+                {m.galpisFoto.length > 1 && (
+                  <div class="mc-gallery-indicator" aria-hidden="true">
+                    {m.galpisFoto.slice(0, 6).map((_: any, n: number) => (
+                      <span class={`dot${n === 0 ? ' active' : ''}`}></span>
+                    ))}
                   </div>
-                ))}
+                )}
+                {m.galpisFoto.length > 1 && (
+                  <div class="mc-gallery-hint" aria-hidden="true">
+                    <span>Glisează</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+                  </div>
+                )}
               </div>
             ) : (
               <div class="mc-gallery mc-gallery--soon" aria-label="Galerie foto în curând">
@@ -293,21 +323,36 @@ function initiale(name: string): string {
 
             <!-- Galerie foto -->
             {areGalerieFoto(m) ? (
-              <div class="mc-gallery" role="list" aria-label={`Galerie foto ${m.nume}`}>
-                {m.galpisFoto.slice(0, 6).map((foto: any, n: number) => (
-                  <div
-                    class="mc-gallery-ph gallery-thumb"
-                    role="listitem"
-                    data-fx={String((n % 6) + 1)}
-                    data-src={foto.src}
-                    data-alt={foto.alt ?? `${m.nume} la eveniment - Formația Florentina Pană`}
-                    tabindex="0"
-                    title="Click pentru previzualizare"
-                  >
-                    <img src={foto.src} alt={foto.alt ?? `${m.nume} la eveniment`} class="mc-gal-thumb-img" loading="lazy" width="300" height="200" />
-                    <span class="mc-gal-overlay" aria-hidden="true">🔍</span>
+              <div class="mc-gallery-wrap">
+                <div class="mc-gallery" role="list" aria-label={`Galerie foto ${m.nume}`}>
+                  {m.galpisFoto.slice(0, 6).map((foto: any, n: number) => (
+                    <div
+                      class="mc-gallery-ph gallery-thumb"
+                      role="listitem"
+                      data-fx={String((n % 6) + 1)}
+                      data-src={foto.src}
+                      data-alt={foto.alt ?? `${m.nume} la eveniment - Formația Florentina Pană`}
+                      tabindex="0"
+                      title="Click pentru previzualizare"
+                    >
+                      <img src={foto.src} alt={foto.alt ?? `${m.nume} la eveniment`} class="mc-gal-thumb-img" loading="lazy" width="300" height="200" />
+                      <span class="mc-gal-overlay" aria-hidden="true">🔍</span>
+                    </div>
+                  ))}
+                </div>
+                {m.galpisFoto.length > 1 && (
+                  <div class="mc-gallery-indicator" aria-hidden="true">
+                    {m.galpisFoto.slice(0, 6).map((_: any, n: number) => (
+                      <span class={`dot${n === 0 ? ' active' : ''}`}></span>
+                    ))}
                   </div>
-                ))}
+                )}
+                {m.galpisFoto.length > 1 && (
+                  <div class="mc-gallery-hint" aria-hidden="true">
+                    <span>Glisează</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+                  </div>
+                )}
               </div>
             ) : (
               <div class="mc-gallery mc-gallery--soon" aria-label="Galerie foto în curând">
@@ -479,6 +524,80 @@ function initiale(name: string): string {
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && popup.classList.contains('active')) closePopup(currentFx);
+  });
+
+  // ═══ GALLERY SLIDER — dots + mouse drag ═══
+  document.querySelectorAll('.mc-gallery-wrap').forEach((wrap) => {
+    const gallery = wrap.querySelector('.mc-gallery');
+    const indicator = wrap.querySelector('.mc-gallery-indicator');
+    const hint = wrap.querySelector('.mc-gallery-hint');
+    if (!gallery) return;
+
+    const dots = indicator ? indicator.querySelectorAll('.dot') : [];
+    const thumbs = gallery.querySelectorAll('.mc-gallery-ph');
+
+    let hintHidden = false;
+
+    // ── Actualizare dots la scroll ──
+    function updateDots() {
+      if (dots.length < 2) return;
+      const scrollLeft = gallery.scrollLeft;
+
+      let activeIdx = 0;
+      let minDist = Infinity;
+      thumbs.forEach((thumb, idx) => {
+        const thumbCenter = thumb.offsetLeft + thumb.offsetWidth / 2;
+        const galCenter = scrollLeft + gallery.clientWidth / 2;
+        const dist = Math.abs(thumbCenter - galCenter);
+        if (dist < minDist) {
+          minDist = dist;
+          activeIdx = idx;
+        }
+      });
+
+      dots.forEach((dot, idx) => {
+        dot.classList.toggle('active', idx === activeIdx);
+      });
+    }
+
+    gallery.addEventListener('scroll', () => {
+      // Ascunde hint-ul după primul scroll
+      if (!hintHidden && gallery.scrollLeft > 10 && hint) {
+        hint.style.opacity = '0';
+        hint.style.transition = 'opacity 0.3s';
+        hintHidden = true;
+      }
+      updateDots();
+    }, { passive: true });
+
+    // ── Mouse drag scroll (pentru desktop cu mouse) ──
+    let isDragging = false;
+    let startX = 0;
+    let scrollStart = 0;
+
+    gallery.addEventListener('mousedown', (e) => {
+      // Doar click stânga
+      if (e.button !== 0) return;
+      isDragging = true;
+      startX = e.pageX;
+      scrollStart = gallery.scrollLeft;
+      gallery.style.cursor = 'grabbing';
+      gallery.style.userSelect = 'none';
+      e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const dx = e.pageX - startX;
+      gallery.scrollLeft = scrollStart - dx;
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (!isDragging) return;
+      isDragging = false;
+      gallery.style.cursor = '';
+      gallery.style.userSelect = '';
+    });
   });
 </script>
 
@@ -791,18 +910,31 @@ function initiale(name: string): string {
     margin: 0;
   }
 
-  /* ── Mini galerie — album foto adaptiv ── */
+  /* ── Mini galerie — slider orizontal ── */
   .mc-gallery {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    gap: 0.5rem;
     margin-top: auto;
+    scrollbar-width: none;
+    cursor: grab;
+    padding-bottom: 0.5rem;
+  }
+
+  .mc-gallery::-webkit-scrollbar {
+    display: none;
   }
 
   .mc-gallery-ph {
     position: relative;
-    flex: 0 0 auto;
-    width: calc(33.33% - 0.27rem);
+    flex: 0 0 clamp(100px, 28%, 180px);
+    width: clamp(100px, 28%, 180px);
+    max-width: none;
+    scroll-snap-align: center;
     background: rgba(255, 255, 255, 0.035);
     border: 1px solid rgba(255, 255, 255, 0.07);
     border-radius: 0.5rem;
@@ -868,32 +1000,86 @@ function initiale(name: string): string {
     border-radius: inherit;
   }
 
+  /* ── Slider indicator luminos (toate breakpoints) ── */
+  .mc-gallery-indicator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.4rem;
+    padding-top: 0.5rem;
+  }
+
+  .mc-gallery-indicator .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    transition: background 0.3s, box-shadow 0.3s, transform 0.3s;
+  }
+
+  .mc-gallery-indicator .dot.active {
+    background: rgba(6, 214, 255, 0.95);
+    border-color: rgba(6, 214, 255, 0.5);
+    box-shadow: 0 0 8px rgba(6, 214, 255, 0.7), 0 0 18px rgba(6, 214, 255, 0.35);
+    transform: scale(1.4);
+  }
+
+  /* Hint swipe cu săgeată animată */
+  .mc-gallery-hint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    padding-top: 0.25rem;
+    font-size: 0.55rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(6, 214, 255, 0.5);
+    animation: hintPulse 2s ease-in-out infinite;
+  }
+
+  .mc-gallery-hint svg {
+    width: 14px;
+    height: 14px;
+    animation: hintSlide 1.5s ease-in-out infinite;
+  }
+
+  @keyframes hintPulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+
+  @keyframes hintSlide {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(4px); }
+  }
+
+  /* Spațiu de respiro la final de galerie */
+  .mc-gallery::after {
+    content: '';
+    flex: 0 0 0.6rem;
+  }
+
   /* ══════════════════════════════════════════
-     GALERIE MOBIL — scroll orizontal, thumbnailuri mari
+     GALERIE MOBIL — ajustări specifice
   ══════════════════════════════════════════ */
   @media (max-width: 767px) {
     .mc-gallery {
-      flex-wrap: nowrap;
-      overflow-x: auto;
-      overflow-y: hidden;
-      -webkit-overflow-scrolling: touch;
-      scroll-snap-type: x proximity;
       overscroll-behavior-x: contain;
-      touch-action: pan-x;
-      padding-bottom: 0.5rem;
+      touch-action: pan-x pinch-zoom;
       gap: 0.6rem;
-      scrollbar-width: none;
-    }
-
-    .mc-gallery::-webkit-scrollbar {
-      display: none;
+      /* Galeria trebuie sa iasă din padding-ul părinte */
+      margin-left: -1rem;
+      margin-right: -4.5rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
+      position: relative;
     }
 
     .mc-gallery-ph {
       flex: 0 0 min(70vw, 320px);
       width: min(70vw, 320px);
-      max-width: 100%;
-      scroll-snap-align: center;
       border-radius: 0.75rem;
     }
 
@@ -901,10 +1087,12 @@ function initiale(name: string): string {
       aspect-ratio: 4 / 3;
     }
 
-    /* Indicator scroll — linie subtilă sub galerie */
-    .mc-gallery::after {
-      content: '';
-      flex: 0 0 0.6rem; /* spațiu de respiro la final */
+    .mc-gallery-indicator {
+      margin-left: -1rem;
+    }
+
+    .mc-gallery-hint {
+      margin-left: -1rem;
     }
   }
 
@@ -1119,7 +1307,8 @@ function initiale(name: string): string {
          jos:    56px buton + 0.75rem offset + 0.5rem gap = ~5rem  */
       padding: 1.25rem 4.5rem 5rem 1rem;
       max-width: 100%;
-      overflow-x: hidden;
+      overflow-x: visible;
+      overflow-y: visible;
       box-sizing: border-box;
     }
 
