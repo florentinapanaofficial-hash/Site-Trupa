@@ -379,7 +379,7 @@ body.mobile-menu-open .left-side-menu {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1025px) {
 
   /* ── Header ascuns pe desktop — sidebar-ul preia navigarea ── */
   .top-header {
@@ -388,7 +388,9 @@ body.mobile-menu-open .left-side-menu {
 
   /* ── Layout: sidebar fix + conținut fluid ── */
   .layout-content-shell {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     min-width: 0;
     max-width: 100%;
     padding-inline: 0;
@@ -400,6 +402,9 @@ body.mobile-menu-open .left-side-menu {
     max-width: 100%;
     margin-inline: 0;
     padding-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   /* Elimină pt-40/pt-44 de pe main pe desktop — sidebar preia rolul headerului */

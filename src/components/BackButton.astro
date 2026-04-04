@@ -41,6 +41,13 @@ const { href = '/', label = 'Înapoi' } = Astro.props;
     color: #fff;
   }
 
+  .back-btn:focus-visible {
+    outline: 2px solid rgba(160, 220, 255, 0.85);
+    outline-offset: 2px;
+    background: rgba(100, 200, 255, 0.12);
+    border-color: rgba(160, 220, 255, 0.65);
+  }
+
   .back-btn:active {
     transform: scale(0.96);
   }

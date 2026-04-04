@@ -353,6 +353,7 @@ function initiale(name: string): string {
 
   <!-- ═══ GALLERY POPUP OVERLAY ═══ -->
   <div id="gallery-popup" role="dialog" aria-modal="true" aria-label="Foto mărit">
+    <button id="gallery-popup-close" type="button" aria-label="Închide galeria">✕</button>
     <div id="gallery-popup-inner">
       <img id="gallery-popup-img" src="" alt="" />
     </div>
@@ -412,15 +413,20 @@ function initiale(name: string): string {
 
   const popup    = document.getElementById('gallery-popup');
   const popupImg = document.getElementById('gallery-popup-img');
+  const popupClose = document.getElementById('gallery-popup-close');
   let currentFx  = '1';
+  let lastFocusedThumb = null;
 
   function openPopup(src, alt, fx) {
     const anim = fxMap[fx] ?? fxMap['1'];
+    lastFocusedThumb = document.activeElement;
     popupImg.src = src;
     popupImg.alt = alt;
     popupImg.classList.remove(...Object.values(fxMap).flatMap((v) => [v.enter, v.leave]));
     popup.classList.add('active');
     popupImg.classList.add(anim.enter);
+    // Focus pe butonul de închidere pentru accesibilitate
+    requestAnimationFrame(() => popupClose.focus());
   }
 
   function closePopup(fx = currentFx) {
@@ -432,26 +438,99 @@ function initiale(name: string): string {
       popupImg.src = '';
       popupImg.alt = '';
       popupImg.classList.remove(anim.leave);
+      // Restabilește focus pe thumbnail-ul care a deschis popup-ul
+      if (lastFocusedThumb && lastFocusedThumb.focus) {
+        lastFocusedThumb.focus();
+        lastFocusedThumb = null;
+      }
     }, { once: true });
   }
 
   document.querySelectorAll('.gallery-thumb').forEach((thumb) => {
-    thumb.addEventListener('click', (e) => {
-      e.stopPropagation();
+    function activateThumb() {
       const fx  = thumb.dataset.fx  ?? '1';
       const src = thumb.dataset.src ?? '';
       const alt = thumb.dataset.alt ?? '';
       currentFx = fx;
       openPopup(src, alt, fx);
+    }
+
+    thumb.addEventListener('click', (e) => {
+      e.stopPropagation();
+      activateThumb();
+    });
+
+    // Activare cu tastatura (Enter / Space) pentru accesibilitate
+    thumb.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        e.stopPropagation();
+        activateThumb();
+      }
     });
   });
 
   popup.addEventListener('click', () => closePopup(currentFx));
 
+  document.getElementById('gallery-popup-close').addEventListener('click', (e) => {
+    e.stopPropagation();
+    closePopup(currentFx);
+  });
+
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && popup.classList.contains('active')) closePopup(currentFx);
   });
 </script>
+
+<!-- Override global: pagina Membri folosește scroll vertical pe mobil, nu swipe orizontal -->
+<style is:global>
+  @media (max-width: 767px) {
+    /* Body shell: permite scroll vertical (implicit clip pe non-homepage) */
+    .page-shell {
+      overflow-y: visible !important;
+    }
+
+    /* Layout shell: block normal */
+    .layout-content-shell {
+      overflow: visible !important;
+    }
+
+    /* Dezactivează swipe-ul orizontal: main = block vertical cu scroll normal al body-ului */
+    main#continut {
+      display: block !important;
+      flex-direction: unset !important;
+      overflow: visible !important;
+      scroll-snap-type: none !important;
+      height: auto !important;
+      min-height: unset !important;
+      width: 100% !important;
+      padding-top: calc(var(--mob-nav-h, 72px) + 0.5rem) !important;
+      padding-bottom: 2rem !important;
+    }
+
+    /* Secțiunile revin la flow vertical normal */
+    main#continut > section,
+    main#continut > header,
+    main#continut > div:not(#gallery-popup) {
+      flex: unset !important;
+      width: 100% !important;
+      height: auto !important;
+      min-height: unset !important;
+      overflow: visible !important;
+      scroll-snap-align: none !important;
+      scroll-snap-stop: unset !important;
+      touch-action: auto !important;
+      padding-top: 0 !important;
+    }
+
+    /* Secțiunile membru: padding lateral mic + bottom */
+    main#continut > section.mem-section {
+      padding-left: 0.6rem !important;
+      padding-right: 0.6rem !important;
+      padding-bottom: 1rem !important;
+    }
+  }
+</style>
 
 <style>
   /* ══════════════════════════════════════════
@@ -735,7 +814,11 @@ function initiale(name: string): string {
   .mc-gallery-ph.gallery-thumb:focus {
     border-color: rgba(232, 200, 91, 0.5);
     box-shadow: 0 0 8px rgba(232, 200, 91, 0.35);
-    outline: none;
+  }
+
+  .mc-gallery-ph.gallery-thumb:focus-visible {
+    outline: 2px solid rgba(232, 200, 91, 0.8);
+    outline-offset: 2px;
   }
 
   .mc-gal-icon { font-size: 1rem; line-height: 1; }
@@ -777,6 +860,46 @@ function initiale(name: string): string {
     object-position: top;
     display: block;
     border-radius: inherit;
+  }
+
+  /* ══════════════════════════════════════════
+     GALERIE MOBIL — scroll orizontal, thumbnailuri mari
+  ══════════════════════════════════════════ */
+  @media (max-width: 767px) {
+    .mc-gallery {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x proximity;
+      overscroll-behavior-x: contain;
+      touch-action: pan-x;
+      padding-bottom: 0.5rem;
+      gap: 0.6rem;
+      scrollbar-width: none;
+    }
+
+    .mc-gallery::-webkit-scrollbar {
+      display: none;
+    }
+
+    .mc-gallery-ph {
+      flex: 0 0 70vw;
+      width: 70vw;
+      max-width: 320px;
+      scroll-snap-align: center;
+      border-radius: 0.75rem;
+    }
+
+    .mc-gal-thumb-img {
+      aspect-ratio: 4 / 3;
+    }
+
+    /* Indicator scroll — linie subtilă sub galerie */
+    .mc-gallery::after {
+      content: '';
+      flex: 0 0 0.6rem; /* spațiu de respiro la final */
+    }
   }
 
   /* ── Galerie "în curând" ── */
@@ -983,10 +1106,6 @@ function initiale(name: string): string {
       padding: 1.25rem 4.5rem 5rem 1rem;
     }
 
-    .mc-gallery-ph {
-      min-height: 44px;
-    }
-
     .bio-btn {
       bottom: 0.75rem;
       right: 0.75rem;
@@ -1012,6 +1131,47 @@ function initiale(name: string): string {
 
   #gallery-popup.active {
     display: flex;
+  }
+
+  /* ── Buton închidere popup ── */
+  #gallery-popup-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 10;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #fff;
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 200ms, transform 200ms, border-color 200ms;
+  }
+
+  #gallery-popup-close:hover,
+  #gallery-popup-close:focus-visible {
+    background: rgba(255, 60, 80, 0.65);
+    border-color: rgba(255, 60, 80, 0.6);
+    transform: scale(1.1);
+    outline: none;
+  }
+
+  @media (max-width: 767px) {
+    #gallery-popup-close {
+      top: calc(env(safe-area-inset-top, 0px) + 0.75rem);
+      right: 0.75rem;
+      width: 48px;
+      height: 48px;
+      font-size: 1.4rem;
+    }
   }
 
   #gallery-popup-inner {

@@ -85,7 +85,7 @@ const videosByCategory = (cat: string) =>
                 const slug = videoSlug(video);
                 const thumb = `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`;
                 return (
-                  <a href={`/video/${slug}`} class="video-card" title={video.title}>
+                  <a href={`/video/${slug}`} class="video-card" title={video.title} aria-label={`Redă: ${video.title}`}>
                     <div class="thumb-shell">
                       <img
                         src={thumb}
@@ -171,6 +171,13 @@ const videosByCategory = (cat: string) =>
     transform: translateY(-4px);
     box-shadow: 0 20px 45px rgba(245, 166, 35, 0.18);
     border-color: rgba(245, 166, 35, 0.45);
+  }
+
+  .video-card:focus-visible {
+    outline: 2px solid rgba(245, 166, 35, 0.8);
+    outline-offset: 2px;
+    border-color: rgba(245, 166, 35, 0.45);
+    box-shadow: 0 0 0 4px rgba(245, 166, 35, 0.15);
   }
 
   .thumb-shell {
