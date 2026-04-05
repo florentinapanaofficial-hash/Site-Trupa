@@ -64,8 +64,27 @@ const SECURITY_HEADERS = {
     'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
 };
 
+const CANONICAL_HOST = 'www.florentinapanaofficial.ro';
+
 const server = createServer((req, res) => {
     const host = req.headers.host || '';
+    const proto = req.headers['x-forwarded-proto'] || 'https';
+
+    // ── HTTP → HTTPS redirect (301) ──
+    // Railway termină SSL, dar forward-ează X-Forwarded-Proto
+    if (proto === 'http') {
+        const dest = `https://${host}${req.url}`;
+        res.writeHead(301, { Location: dest });
+        return res.end();
+    }
+
+    // ── non-www → www redirect (301) – o singură versiune canonică ──
+    const bareHost = host.replace(/:\d+$/, '');
+    if (bareHost === 'florentinapanaofficial.ro') {
+        const dest = `https://${CANONICAL_HOST}${req.url}`;
+        res.writeHead(301, { Location: dest });
+        return res.end();
+    }
 
     // ── /index.html, /index.php → / (SEO: avoid duplicate content) ──
     if (req.url === '/index.html' || req.url === '/index.php') {

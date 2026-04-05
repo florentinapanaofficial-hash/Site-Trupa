@@ -16,7 +16,7 @@ interface Props {
 
 const { title, description, ogType = 'website' } = Astro.props as Props;
 
-const SITE_FALLBACK = 'https://florentinapanaofficial.ro';
+const SITE_FALLBACK = 'https://www.florentinapanaofficial.ro';
 const site = Astro.site?.toString().replace(/\/$/, '') ?? SITE_FALLBACK;
 const canonical = new URL(Astro.url.pathname, site).toString();
 

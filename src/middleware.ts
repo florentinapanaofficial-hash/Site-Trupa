@@ -17,8 +17,24 @@ const SECURITY_HEADERS: Record<string, string> = {
     'Cross-Origin-Resource-Policy': 'same-origin',
 };
 
+const CANONICAL_HOST = 'www.florentinapanaofficial.ro';
+
 export const onRequest = defineMiddleware(async (context, next) => {
     const host = context.request.headers.get('host') ?? '';
+    const proto = context.request.headers.get('x-forwarded-proto') ?? 'https';
+
+    // HTTP → HTTPS redirect (301)
+    if (proto === 'http') {
+        const dest = `https://${host}${context.url.pathname}${context.url.search}`;
+        return Response.redirect(dest, 301);
+    }
+
+    // non-www → www redirect (301) – o singură versiune canonică
+    const bareHost = host.replace(/:\d+$/, '');
+    if (bareHost === 'florentinapanaofficial.ro') {
+        const dest = `https://${CANONICAL_HOST}${context.url.pathname}${context.url.search}`;
+        return Response.redirect(dest, 301);
+    }
 
     // Redirect /index.html, /index.php → / (SEO: evită conținut duplicat)
     const { pathname } = context.url;
