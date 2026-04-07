@@ -1,9 +1,11 @@
 ---
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import siteContent from '../data/siteContent.json';
 import seo from '../data/seo-content.json';
 import heroImg from '../assets/card-1-panoramica.jpg';
+
+const optimizedHero = await getImage({ src: heroImg, format: 'webp', width: 320, height: 213 });
 
 const { acasa } = seo;
 const { contact } = siteContent;
@@ -30,6 +32,7 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
 
 <BaseLayout title={acasa.meta.title} description={acasa.meta.description} ogImage={siteContent.seo.ogImage}>
   <Fragment slot="head">
+    <link rel="preload" as="image" href={optimizedHero.src} type="image/webp" fetchpriority="high" />
     <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>
 
