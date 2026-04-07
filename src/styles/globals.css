@@ -1000,18 +1000,7 @@ html::-webkit-scrollbar-thumb:hover {
   transition: opacity 500ms ease-in-out;
 }
 
-/* Când meniul e deschis pe mobil, estompează conținutul paginii
-   pentru ca imaginile sau cartonaşele să nu se suprapună vizual cu meniul */
-@media (max-width: 767px) {
-  body.mobile-menu-open main#continut {
-    opacity: 0.25;
-    transition: opacity 250ms ease;
-  }
 
-  body:not(.mobile-menu-open) main#continut {
-    transition: opacity 400ms ease;
-  }
-}
 
 .nav-link-desktop {
   display: inline-flex;
