@@ -858,6 +858,7 @@ function initiale(name: string): string {
     display: flex;
     flex-direction: column;
     gap: 0.7rem;
+    min-width: 0; /* previne blowout grid — permite overflow-x pe galerie */
   }
 
   /* Badge categorie */
@@ -1099,11 +1100,22 @@ function initiale(name: string): string {
       padding-left: 1rem;
       padding-right: 1rem;
       position: relative;
-      scrollbar-width: none;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(6, 214, 255, 0.45) rgba(255, 255, 255, 0.06);
     }
 
     .mc-gallery::-webkit-scrollbar {
-      display: none;
+      height: 5px;
+    }
+
+    .mc-gallery::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 3px;
+    }
+
+    .mc-gallery::-webkit-scrollbar-thumb {
+      background: rgba(6, 214, 255, 0.45);
+      border-radius: 3px;
     }
 
     .mc-gallery-ph {
