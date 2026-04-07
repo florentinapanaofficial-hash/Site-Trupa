@@ -1094,9 +1094,9 @@ function initiale(name: string): string {
       overscroll-behavior-x: contain;
       touch-action: pan-x pinch-zoom;
       gap: 0.6rem;
-      /* Galeria trebuie sa iasă din padding-ul părinte */
+      /* Galeria iese simetric din padding-ul părinte */
       margin-left: -1rem;
-      margin-right: -4.5rem;
+      margin-right: -1rem;
       padding-left: 1rem;
       padding-right: 1rem;
       position: relative;
@@ -1129,11 +1129,11 @@ function initiale(name: string): string {
     }
 
     .mc-gallery-indicator {
-      margin-left: -1rem;
+      margin-left: 0;
     }
 
     .mc-gallery-hint {
-      margin-left: -1rem;
+      margin-left: 0;
     }
   }
 
@@ -1249,7 +1249,7 @@ function initiale(name: string): string {
     padding: 1.5rem 1.75rem 2rem;
   }
 
-  @media (max-width: 599px) {
+  @media (max-width: 767px) {
     .bio-panel.open {
       padding: 1.25rem 1.25rem 1.5rem;
     }
