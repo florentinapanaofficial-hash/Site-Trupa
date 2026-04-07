@@ -78,6 +78,7 @@ const localBusinessLd = {
 };
 
 const isHomePage = Astro.url.pathname === '/';
+const hasYouTube = ['/galerie-video', '/aparitii-tv', '/video/', '/colaboratori/', '/comunitatea-noastra'].some(p => Astro.url.pathname.startsWith(p));
 const sectionLink = (anchor: string) => (isHomePage ? anchor : `/${anchor}`);
 
 // JSON-LD: WebPage — fiecare pagină primește schema WebPage
@@ -215,9 +216,9 @@ const mobileNavAllItems = [
     <meta name="twitter:site" content="@florentinapana" />
     <meta name="twitter:creator" content="@florentinapana" />
 
-    <!-- Preconnect — reduc latența pt. resursele externe (YouTube, Google) -->
-    <link rel="preconnect" href="https://www.youtube-nocookie.com" />
-    <link rel="preconnect" href="https://img.youtube.com" />
+    <!-- Preconnect YouTube — doar pe paginile cu embed-uri video -->
+    {hasYouTube && <link rel="preconnect" href="https://www.youtube-nocookie.com" />}
+    {hasYouTube && <link rel="preconnect" href="https://img.youtube.com" />}
     <link rel="dns-prefetch" href="https://www.youtube-nocookie.com" />
     <link rel="dns-prefetch" href="https://img.youtube.com" />
     <link rel="dns-prefetch" href="https://www.google-analytics.com" />
