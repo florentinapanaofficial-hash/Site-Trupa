@@ -73,8 +73,10 @@ const articleJsonLd = {
   headline: post.title,
   description: post.excerpt,
   image: postOgImage,
-  author: { '@type': 'Person', name: post.author },
+  url: postCanonical,
+  author: { '@type': 'Organization', name: 'Formația Florentina Pană', url: siteBase },
   datePublished: post.date,
+  dateModified: post.date,
   mainEntityOfPage: { '@type': 'WebPage', '@id': postCanonical },
   publisher: { '@type': 'Organization', name: siteContent.brand.name, url: siteBase },
 };
