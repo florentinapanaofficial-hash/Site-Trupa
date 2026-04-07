@@ -46,9 +46,9 @@ const serve = sirv('dist/client', {
         else if (pathname === '/robots.txt' || pathname.startsWith('/sitemap')) {
             res.setHeader('Cache-Control', 'public, max-age=86400');
         }
-        // HTML pages → 5 min (stale-while-revalidate for instant perceived speed)
+        // HTML pages → short cache + must-revalidate for fast deploys
         else if (pathname.endsWith('.html') || pathname === '/' || !pathname.includes('.')) {
-            res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=3600');
+            res.setHeader('Cache-Control', 'public, max-age=60, must-revalidate');
         }
     },
 });
