@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BackButton from '../components/BackButton.astro';
+import EmbedSnippet from '../components/EmbedSnippet.astro';
 
 /* ── Date galerie: doar poze de la evenimente ── */
 const base = "/images/Galerie Foto Site";
@@ -60,6 +61,18 @@ const photos = [
           </div>
         </figure>
       ))}
+    </div>
+
+    <!-- ═══ EMBED SNIPPET — backlink automat pt. partajare imagine ═══ -->
+    <div class="section-container py-8">
+      <h2 class="gal-title" style="font-size:1.15rem;margin-bottom:0.75rem;">Folosește fotografiile noastre pe site-ul tău</h2>
+      <p style="font-size:0.85rem;color:rgba(255,255,255,0.7);margin-bottom:1rem;">Copiază codul de mai jos pentru a include o fotografie autentică de la evenimentele noastre, cu credit și backlink automat.</p>
+      <EmbedSnippet
+        imageSrc="/images/Galerie Foto Site/Galerie Evenimente 1.jpg"
+        imageAlt="Formație nuntă Pitești — eveniment live cu Formația Florentina Pană"
+        pageUrl="https://www.florentinapanaofficial.ro/galerie-foto"
+        credit="Formația Florentina Pană"
+      />
     </div>
 
   </section>

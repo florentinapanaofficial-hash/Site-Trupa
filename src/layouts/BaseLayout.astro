@@ -80,6 +80,72 @@ const localBusinessLd = {
 const isHomePage = Astro.url.pathname === '/';
 const sectionLink = (anchor: string) => (isHomePage ? anchor : `/${anchor}`);
 
+// JSON-LD: WebPage — fiecare pagină primește schema WebPage
+const webPageLd = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": title,
+  "description": description,
+  "url": canonical,
+  "inLanguage": "ro",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": siteContent.brand.name,
+    "url": site
+  },
+  "author": {
+    "@type": "MusicGroup",
+    "name": "Formația Florentina Pană",
+    "url": site
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Pană Claudiu-Gheorghe Întreprindere Individuală",
+    "url": site,
+    "logo": {
+      "@type": "ImageObject",
+      "url": `${site}/images/logo-fp-stage.svg`
+    }
+  },
+  "datePublished": "2024-01-15",
+  "dateModified": new Date().toISOString().split('T')[0]
+};
+
+// JSON-LD: BreadcrumbList — navigare ierarhică pentru Google
+const pathSegments = Astro.url.pathname.replace(/\/$/, '').split('/').filter(Boolean);
+const breadcrumbItems = [
+  { "@type": "ListItem", position: 1, name: "Acasă", item: site }
+];
+const breadcrumbLabels: Record<string, string> = {
+  'despre': 'Despre noi',
+  'membri': 'Membri',
+  'galerie-video': 'Galerie Video',
+  'galerie-foto': 'Galerie Foto',
+  'momente-cu-mirii': 'Momente cu mirii',
+  'comunitatea-noastra': 'Comunitatea noastră',
+  'aparitii-tv': 'Apariții TV',
+  'contact': 'Contact',
+  'blog': 'Blog',
+  'termeni-conditii': 'Termeni și condiții',
+  'politica-confidentialitate': 'Politica de confidențialitate',
+  'politica-cookie': 'Politica de cookie-uri',
+};
+let breadcrumbPath = site;
+pathSegments.forEach((seg, i) => {
+  breadcrumbPath += `/${seg}`;
+  breadcrumbItems.push({
+    "@type": "ListItem",
+    position: i + 2,
+    name: breadcrumbLabels[seg] || seg.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+    item: breadcrumbPath
+  });
+});
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": breadcrumbItems
+};
+
 const sideMenuTopItems = [
   { href: '/', label: 'Acasă', color: 'cyan', icon: 'home' },
   { href: '/despre', label: 'Despre', color: 'cyan', icon: 'info' },
@@ -147,12 +213,24 @@ const mobileNavAllItems = [
     <meta name="twitter:image" content={ogImage} />
     <!-- [DE_COMPLETAT] Înlocuiește @florentinapana cu contul real X/Twitter -->
     <meta name="twitter:site" content="@florentinapana" />
+    <meta name="twitter:creator" content="@florentinapana" />
+
+    <!-- Preconnect — reduc latența pt. resursele externe (YouTube, Google) -->
+    <link rel="preconnect" href="https://www.youtube-nocookie.com" />
+    <link rel="preconnect" href="https://img.youtube.com" />
+    <link rel="dns-prefetch" href="https://www.youtube-nocookie.com" />
+    <link rel="dns-prefetch" href="https://img.youtube.com" />
+    <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+
     <!-- Fonturi self-hosted — Inter + Oswald, preload latin subset -->
     <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/oswald-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="icon" type="image/svg+xml" href="/images/logo-fp-stage.svg" />
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
     {isHomePage && <script type="application/ld+json" set:html={JSON.stringify(localBusinessLd)} />}
+    <script type="application/ld+json" set:html={JSON.stringify(webPageLd)} />
+    {!isHomePage && <script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />}
     <slot name="head" />
     {/* GA4 NU se încarcă în <head> — se injectează dinamic DUPĂ consimțământul
         utilizatorului prin CookieBanner, conform Rec. 30 & 32 RGPD / ePrivacy */}

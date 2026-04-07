@@ -1,0 +1,163 @@
+---
+/**
+ * EmbedSnippet.astro
+ * ──────────────────────────────────────────────────────────────────
+ * Componentă "Copy-to-Clipboard" — permite utilizatorilor externi
+ * să preia un infografic/imagine de pe site cu backlink inclus automat.
+ *
+ * Utilizare:
+ *   <EmbedSnippet
+ *     imageSrc="/images/Galerie Foto Site/Galerie Evenimente 1.jpg"
+ *     imageAlt="Formație nuntă Pitești — muzică live"
+ *     pageUrl="https://www.florentinapanaofficial.ro/galerie-foto"
+ *     credit="Formația Florentina Pană"
+ *   />
+ */
+
+interface Props {
+  imageSrc: string;
+  imageAlt: string;
+  pageUrl?: string;
+  credit?: string;
+}
+
+const SITE_FALLBACK = 'https://www.florentinapanaofficial.ro';
+const site = Astro.site?.toString().replace(/\/$/, '') ?? SITE_FALLBACK;
+
+const {
+  imageSrc,
+  imageAlt,
+  pageUrl = Astro.url.href || site,
+  credit = 'Formația Florentina Pană',
+} = Astro.props;
+
+const absoluteImg = imageSrc.startsWith('http') ? imageSrc : `${site}${imageSrc}`;
+const embedCode = `<a href="${pageUrl}" target="_blank" rel="noopener noreferrer" title="${credit}"><img src="${absoluteImg}" alt="${imageAlt}" style="max-width:100%;height:auto;" loading="lazy" /></a><p style="font-size:12px;margin-top:4px;">Foto: <a href="${pageUrl}" target="_blank" rel="noopener noreferrer">${credit}</a></p>`;
+---
+
+<div class="embed-snippet" data-embed>
+  <p class="embed-snippet-label">📋 Folosește această imagine pe site-ul tău (cu backlink inclus):</p>
+  <div class="embed-snippet-preview">
+    <img src={imageSrc} alt={imageAlt} loading="lazy" decoding="async" width="400" height="267"
+         class="embed-snippet-img" />
+  </div>
+  <div class="embed-snippet-code-wrap">
+    <code class="embed-snippet-code" data-embed-code>{embedCode}</code>
+    <button class="embed-snippet-btn" type="button" data-embed-copy aria-label="Copiază codul embed">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+      </svg>
+      <span data-embed-label>Copiază codul</span>
+    </button>
+  </div>
+</div>
+
+<style>
+  .embed-snippet {
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 1rem;
+    padding: 1.25rem;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(8px);
+    margin: 1.5rem 0;
+  }
+  .embed-snippet-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 0.75rem;
+  }
+  .embed-snippet-preview {
+    margin-bottom: 0.75rem;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    max-width: 400px;
+  }
+  .embed-snippet-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 0.75rem;
+  }
+  .embed-snippet-code-wrap {
+    position: relative;
+    background: rgba(0,0,0,0.4);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    padding-right: 3.5rem;
+    overflow-x: auto;
+  }
+  .embed-snippet-code {
+    font-family: 'Menlo', 'Consolas', monospace;
+    font-size: 0.72rem;
+    line-height: 1.5;
+    color: #a5d6ff;
+    word-break: break-all;
+    white-space: pre-wrap;
+    display: block;
+  }
+  .embed-snippet-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.65rem;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 0.5rem;
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    font-size: 0.72rem;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .embed-snippet-btn:hover {
+    background: rgba(255,255,255,0.15);
+    border-color: rgba(255,255,255,0.35);
+  }
+  .embed-snippet-btn[data-copied] {
+    border-color: #4ade80;
+    color: #4ade80;
+  }
+</style>
+
+<script>
+  document.querySelectorAll('[data-embed]').forEach((wrap) => {
+    const btn = wrap.querySelector('[data-embed-copy]') as HTMLButtonElement | null;
+    const code = wrap.querySelector('[data-embed-code]') as HTMLElement | null;
+    const label = wrap.querySelector('[data-embed-label]') as HTMLElement | null;
+    if (!btn || !code || !label) return;
+
+    btn.addEventListener('click', async () => {
+      const text = code.textContent ?? '';
+      try {
+        await navigator.clipboard.writeText(text);
+        label.textContent = 'Copiat!';
+        btn.setAttribute('data-copied', '');
+        setTimeout(() => {
+          label.textContent = 'Copiază codul';
+          btn.removeAttribute('data-copied');
+        }, 2500);
+      } catch {
+        // Fallback pt. browsere vechi
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        label.textContent = 'Copiat!';
+        btn.setAttribute('data-copied', '');
+        setTimeout(() => {
+          label.textContent = 'Copiază codul';
+          btn.removeAttribute('data-copied');
+        }, 2500);
+      }
+    });
+  });
+</script>
