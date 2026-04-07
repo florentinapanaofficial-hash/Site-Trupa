@@ -1000,6 +1000,19 @@ html::-webkit-scrollbar-thumb:hover {
   transition: opacity 500ms ease-in-out;
 }
 
+/* Când meniul e deschis pe mobil, estompează conținutul paginii
+   pentru ca imaginile sau cartonaşele să nu se suprapună vizual cu meniul */
+@media (max-width: 767px) {
+  body.mobile-menu-open main#continut {
+    opacity: 0.25;
+    transition: opacity 250ms ease;
+  }
+
+  body:not(.mobile-menu-open) main#continut {
+    transition: opacity 400ms ease;
+  }
+}
+
 .nav-link-desktop {
   display: inline-flex;
 }
@@ -1518,9 +1531,9 @@ details:focus-visible {
     top: 4.0625rem;
     z-index: 99;
     padding: 0.5rem 0.7rem 0.8rem;
-    background: rgba(4, 8, 22, 0.55);
-    backdrop-filter: blur(18px) saturate(1.4);
-    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    background: rgba(4, 8, 22, 0.92);
+    backdrop-filter: blur(24px) saturate(1.4);
+    -webkit-backdrop-filter: blur(24px) saturate(1.4);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
     border-radius: 0 0 1.2rem 1.2rem;
