@@ -126,7 +126,7 @@ Imaginile de galerie folosesc `item.alt` din `siteContent.json` — verifică c�
   "@type": ["MusicGroup", "LocalBusiness"],
   "name": "Formația Florentina Pană",
   "telephone": "+40767369658",
-  "email": "florentinapanaofficial@gmail.com",
+  "email": "contact@florentinapanaofficial.ro",
   "address": { "addressLocality": "Pitești", "addressRegion": "Argeș" },
   "sameAs": [...]
 }

@@ -3,7 +3,7 @@
 **Ultima actualizare:** 23 martie 2026
 **Versiune document:** 1.0
 **Operator de date:** Florentina Pana – trupă muzicală
-**Contact responsabil date:** florentinapanaofficial@gmail.com
+**Contact responsabil date:** contact@florentinapanaofficial.ro
 
 ---
 
@@ -73,7 +73,7 @@ Conform RGPD, aveți dreptul la:
 - **Retragerea consimțământului** (Art. 7(3)) – în orice moment, fără a afecta
   legalitatea prelucrărilor anterioare retragerii.
 
-Cereri: **florentinapanaofficial@gmail.com**
+Cereri: **contact@florentinapanaofficial.ro**
 Autoritate națională de supraveghere: **ANSPDCP** (Autoritatea Națională de Supraveghere a
 Prelucrării Datelor cu Caracter Personal).
 

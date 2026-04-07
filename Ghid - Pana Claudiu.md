@@ -117,7 +117,7 @@ Caută secțiunea `"contact"`:
 "contact": {
   "phoneRaw": "+40767369658",
   "phoneDisplay": "0767 369 658",
-  "email": "florentinapanaofficial@gmail.com",
+  "email": "contact@florentinapanaofficial.ro",
   "city": "Argeș/Pitești, disponibilitate națională"
 }
 ```

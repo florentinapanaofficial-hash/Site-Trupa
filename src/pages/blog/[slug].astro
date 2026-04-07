@@ -91,7 +91,7 @@ const articleJsonLd = {
     <meta property="article:author" content={post.author} />
     <script type="application/ld+json" set:html={JSON.stringify(articleJsonLd)} />
   </Fragment>
-  <div class="bp-page">
+  <section class="bp-page">
 
     {/* ── Hero ── */}
     <div class="bp-hero" style={`--hero-glow: ${heroBg};`}>
@@ -184,7 +184,7 @@ const articleJsonLd = {
       </div>
     </div>
 
-  </div>
+  </section>
 </BaseLayout>
 
 <style>

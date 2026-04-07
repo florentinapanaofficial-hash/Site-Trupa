@@ -1,7 +1,7 @@
 # Security Policy for florentinapanaofficial.ro
 # Conform RFC 9116 — https://securitytxt.org/
 
-Contact: mailto:florentinapanaofficial@gmail.com
+Contact: mailto:contact@florentinapanaofficial.ro
 Contact: tel:+40767369658
 Expires: 2027-04-07T00:00:00.000Z
 Preferred-Languages: ro, en

@@ -25,6 +25,7 @@ function initiale(name: string): string {
   title="Membrii Formației Florentina Pană | Trupă Profesionistă Nuntă Pitești, Argeș"
   description="Cunoaște echipa formației Florentina Pană — soliști vocali și instrumentiști cu experiență de peste 20 ani. Formație nuntă Pitești și Argeș, disponibilă pentru nunți, botezuri și evenimente în toată România."
 >
+  <section class="membri-page-wrap">
   <div class="mb-6 px-4 pt-6 max-w-6xl mx-auto">
     <BackButton href="/" label="Acasă" />
   </div>
@@ -403,6 +404,7 @@ function initiale(name: string): string {
       <img id="gallery-popup-img" src="" alt="" />
     </div>
   </div>
+  </section>
 </BaseLayout>
 
 <script is:inline>
@@ -637,9 +639,10 @@ function initiale(name: string): string {
     }
 
     /* Secțiunile revin la flow vertical normal */
-    main#continut > section,
-    main#continut > header,
-    main#continut > div:not(#gallery-popup) {
+    main#continut > section.membri-page-wrap,
+    main#continut > section.membri-page-wrap > section,
+    main#continut > section.membri-page-wrap > header,
+    main#continut > section.membri-page-wrap > div:not(#gallery-popup) {
       flex: unset !important;
       width: 100% !important;
       height: auto !important;
@@ -653,7 +656,7 @@ function initiale(name: string): string {
     }
 
     /* Secțiunile membru: padding lateral mic + bottom */
-    main#continut > section.mem-section {
+    main#continut > section.membri-page-wrap > section.mem-section {
       padding-left: 0.6rem !important;
       padding-right: 0.6rem !important;
       padding-bottom: 1rem !important;

@@ -2,7 +2,7 @@
 
 **Ultima actualizare:** 23 martie 2026
 **Versiune:** 1.0
-**Responsabil:** florentinapanaofficial@gmail.com
+**Responsabil:** contact@florentinapanaofficial.ro
 
 ---
 
