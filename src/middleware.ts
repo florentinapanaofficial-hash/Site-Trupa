@@ -15,6 +15,20 @@ const SECURITY_HEADERS: Record<string, string> = {
     // Cross-Origin: previne leak-ul de date între origini
     'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
     'Cross-Origin-Resource-Policy': 'same-origin',
+    // Content Security Policy — protejează contra XSS și injecții de resurse
+    'Content-Security-Policy': [
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com",
+        "style-src 'self' 'unsafe-inline'",
+        "img-src 'self' data: https://www.google-analytics.com https://i.ytimg.com https://*.googleusercontent.com",
+        "font-src 'self'",
+        "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://api.whatsapp.com",
+        "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://ec.europa.eu",
+        "object-src 'none'",
+        "base-uri 'self'",
+        "form-action 'self' https://api.whatsapp.com",
+        "frame-ancestors 'self'",
+    ].join('; '),
 };
 
 const CANONICAL_HOST = 'www.florentinapanaofficial.ro';

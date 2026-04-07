@@ -30,6 +30,36 @@ const isHomePage = Astro.url.pathname === '/';
       <a href="/colaboratori/tambal" class="transition hover:text-[#F5A623] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F5A623] rounded">Țambalist</a>
     </div>
   </nav>
+  <!-- Date legale firmă — obligatorii conform Legii 31/1990 Art. 74, Legii 365/2002 Art. 5 -->
+  <div class="section-container border-b border-white/10 py-5 text-xs text-white/60 leading-relaxed">
+    <div class="flex flex-wrap justify-center gap-x-4 gap-y-1 text-center">
+      <span>Pană Claudiu-Gheorghe Întreprindere Individuală</span>
+      <span aria-hidden="true">·</span>
+      <span>CUI: 34528125</span>
+      <span aria-hidden="true">·</span>
+      <span>Nr. Reg. Com.: F3/581/2015</span>
+      <span aria-hidden="true">·</span>
+      <span>Sediu: Calea Craiovei nr. 152, Bl. TG1, Sc. B, Et. 6, Ap. 24, Pitești, jud. Argeș</span>
+      <span aria-hidden="true">·</span>
+      <span>Email: <a href="mailto:florentinapanaofficial@gmail.com" class="transition hover:text-white/80 underline">florentinapanaofficial@gmail.com</a></span>
+      <span aria-hidden="true">·</span>
+      <span>Tel: <a href="tel:+40767369658" class="transition hover:text-white/80 underline">0767 369 658</a></span>
+    </div>
+    <!-- ANPC + SAL — obligatorii conform OG 21/1992, OUG 34/2014, OG 38/2015 -->
+    <div class="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-center">
+      <a href="https://anpc.ro/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 transition hover:text-white/80 underline">
+        <svg viewBox="0 0 20 20" class="h-4 w-4 shrink-0" fill="currentColor" aria-hidden="true"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11H9v-2h2v2zm0-4H9V5h2v4z"/></svg>
+        ANPC — Protecția Consumatorilor
+      </a>
+      <span aria-hidden="true">·</span>
+      <a href="https://ec.europa.eu/consumers/odr/" target="_blank" rel="noopener noreferrer" class="transition hover:text-white/80 underline">
+        SAL / ODR — Soluționarea Online a Litigiilor
+      </a>
+      <span aria-hidden="true">·</span>
+      <span>Entitate SAL: <a href="https://anpc.ro/categorie/sal/" target="_blank" rel="noopener noreferrer" class="transition hover:text-white/80 underline">Lista entități SAL — ANPC</a></span>
+    </div>
+  </div>
+
   <div class="section-container grid gap-4 py-8 text-sm md:grid-cols-3 md:items-center">
     <div class="inline-flex items-center gap-3">
       <img
@@ -99,6 +129,8 @@ const isHomePage = Astro.url.pathname === '/';
         <a href="/politica-confidentialitate" class="transition hover:text-white/80">Politică confidențialitate</a>
         <span aria-hidden="true">·</span>
         <a href="/politica-cookie" class="transition hover:text-white/80">Politică cookie</a>
+        <span aria-hidden="true">·</span>
+        <a href="/termeni-conditii" class="transition hover:text-white/80">Termeni și Condiții</a>
         <span aria-hidden="true">·</span>
         <button
           id="cookie-prefs-btn"

@@ -36,6 +36,47 @@ const jsonLd = {
   foundingDate: '2014',
 };
 
+// Schema LocalBusiness — SEO local, Google Maps, Knowledge Panel
+const localBusinessLd = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "Pană Claudiu-Gheorghe Întreprindere Individuală",
+  "alternateName": "Formația Florentina Pană",
+  "description": "Formație de nuntă din Pitești, Argeș — muzică live premium pentru nunți, botezuri și evenimente",
+  "url": site,
+  "telephone": "+40767369658",
+  "email": "florentinapanaofficial@gmail.com",
+  "image": `${site}/images/logo-fp-stage.svg`,
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Calea Craiovei nr. 152, Bl. TG1, Sc. B, Et. 6, Ap. 24",
+    "addressLocality": "Pitești",
+    "addressRegion": "Argeș",
+    "postalCode": "110005",
+    "addressCountry": "RO"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": 44.8565,
+    "longitude": 24.8692
+  },
+  "priceRange": "$$",
+  "currenciesAccepted": "RON",
+  "paymentAccepted": "Cash, Transfer bancar",
+  "areaServed": [
+    { "@type": "City", "name": "Pitești" },
+    { "@type": "City", "name": "Mioveni" },
+    { "@type": "City", "name": "Curtea de Argeș" },
+    { "@type": "AdministrativeArea", "name": "Argeș" },
+    { "@type": "Country", "name": "România" }
+  ],
+  "sameAs": [
+    "https://www.youtube.com/@FlorentinaPanaPitesti",
+    "https://www.facebook.com/florentinapanaofficial/",
+    "https://www.instagram.com/florentinaformatie/"
+  ]
+};
+
 const isHomePage = Astro.url.pathname === '/';
 const sectionLink = (anchor: string) => (isHomePage ? anchor : `/${anchor}`);
 
@@ -111,6 +152,7 @@ const mobileNavAllItems = [
     <link rel="preload" href="/fonts/oswald-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="icon" type="image/svg+xml" href="/images/logo-fp-stage.svg" />
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    {isHomePage && <script type="application/ld+json" set:html={JSON.stringify(localBusinessLd)} />}
     <slot name="head" />
     {/* GA4 NU se încarcă în <head> — se injectează dinamic DUPĂ consimțământul
         utilizatorului prin CookieBanner, conform Rec. 30 & 32 RGPD / ePrivacy */}
