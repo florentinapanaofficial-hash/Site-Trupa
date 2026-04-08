@@ -36,17 +36,20 @@ const jsonLd = {
   foundingDate: '2014',
 };
 
-// Schema LocalBusiness — SEO local, Google Maps, Knowledge Panel
+// Schema LocalBusiness + MusicGroup — SEO local, Google Maps, Knowledge Panel
 const localBusinessLd = {
   "@context": "https://schema.org",
-  "@type": "LocalBusiness",
-  "name": "Pană Claudiu-Gheorghe Întreprindere Individuală",
-  "alternateName": "Formația Florentina Pană",
-  "description": "Formație de nuntă din Pitești, Argeș — muzică live premium pentru nunți, botezuri și evenimente",
+  "@type": ["LocalBusiness", "MusicGroup"],
+  "name": seoContent.schema.name,
+  "legalName": "Pană Claudiu-Gheorghe Întreprindere Individuală",
+  "alternateName": seoContent.schema.alternateName,
+  "description": seoContent.schema.description,
   "url": site,
-  "telephone": "+40767369658",
-  "email": "contact@florentinapanaofficial.ro",
+  "telephone": seoContent.schema.telephone,
+  "email": seoContent.schema.email,
   "image": `${site}/images/logo-fp-stage.svg`,
+  "logo": `${site}/images/logo-fp-stage.svg`,
+  "foundingDate": "2014",
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "Calea Craiovei nr. 152, Bl. TG1, Sc. B, Et. 6, Ap. 24",
@@ -63,18 +66,9 @@ const localBusinessLd = {
   "priceRange": "$$",
   "currenciesAccepted": "RON",
   "paymentAccepted": "Cash, Transfer bancar",
-  "areaServed": [
-    { "@type": "City", "name": "Pitești" },
-    { "@type": "City", "name": "Mioveni" },
-    { "@type": "City", "name": "Curtea de Argeș" },
-    { "@type": "AdministrativeArea", "name": "Argeș" },
-    { "@type": "Country", "name": "România" }
-  ],
-  "sameAs": [
-    "https://www.youtube.com/@FlorentinaPanaPitesti",
-    "https://www.facebook.com/florentinapanaofficial/",
-    "https://www.instagram.com/florentinaformatie/"
-  ]
+  "areaServed": seoContent.schema.areaServed,
+  "genre": seoContent.schema.genre,
+  "sameAs": seoContent.schema.sameAs
 };
 
 const isHomePage = Astro.url.pathname === '/';
@@ -196,6 +190,8 @@ const mobileNavAllItems = [
     <meta name="geo.region" content="RO-AG" />
     <meta name="geo.placename" content="Pitești, Argeș" />
     {canonical && <link rel="canonical" href={canonical} />}
+    <!-- ✅ SEO: hreflang ro global — toate paginile -->
+    <link rel="alternate" hreflang="ro" href={canonical} />
 
     <meta property="og:type" content={ogType} />
     <meta property="og:title" content={title} />

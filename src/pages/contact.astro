@@ -27,7 +27,7 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
 
           <div class="mt-4 flex flex-wrap gap-2">
             <a class="btn-solid" href={`tel:${contact.phoneRaw}`} onclick="window.gtag&&window.gtag('event','click_phone',{event_category:'contact'})">Telefon: {contact.phoneDisplay}</a>
-            <a class="btn-outline" href={`mailto:${contact.email}`}>Email: {contact.email}</a>
+            <span class="btn-outline ob-email-contact" data-u="contact" data-d="florentinapanaofficial.ro">Email: [email protejat]</span>
           </div>
 
           <div class="desktop-whatsapp-actions mt-3 flex flex-wrap gap-2" aria-label="Comunicare rapidă desktop">
@@ -391,3 +391,17 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
     }
   </style>
 </BaseLayout>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const el = document.querySelector('.ob-email-contact');
+    if (el) {
+      const u = el.getAttribute('data-u');
+      const d = el.getAttribute('data-d');
+      if (u && d) {
+        const addr = u + '@' + d;
+        el.outerHTML = `<a class="btn-outline" href="mailto:${addr}">Email: ${addr}</a>`;
+      }
+    }
+  });
+</script>

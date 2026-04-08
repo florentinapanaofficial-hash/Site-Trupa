@@ -25,7 +25,7 @@ const lastUpdated = '24 martie 2026';
       <p>
         <strong>Formația Florentina Pană</strong> (denumit în continuare „Operatorul")<br />
         Sediu: Pitești, județul Argeș, România<br />
-        Email: <a href="mailto:contact@florentinapanaofficial.ro">contact@florentinapanaofficial.ro</a><br />
+        Email: <span class="ob-email-gdpr" data-u="contact" data-d="florentinapanaofficial.ro">[email protejat]</span><br />
         Telefon: <a href="tel:+40767369658">0767 369 658</a>
       </p>
       <p>
@@ -166,7 +166,7 @@ const lastUpdated = '24 martie 2026';
       </ul>
       <p>
         Pentru exercitarea oricărui drept, trimite o cerere la:
-        <a href="mailto:contact@florentinapanaofficial.ro">contact@florentinapanaofficial.ro</a>.
+        <span class="ob-email-gdpr" data-u="contact" data-d="florentinapanaofficial.ro">[email protejat]</span>.
         Vom răspunde în termen de 30 de zile (Art. 12 RGPD).
       </p>
 
@@ -190,7 +190,7 @@ const lastUpdated = '24 martie 2026';
       <h2>9. Contact GDPR</h2>
       <p>
         Pentru orice întrebare sau solicitare legată de datele personale:<br />
-        Email: <a href="mailto:contact@florentinapanaofficial.ro">contact@florentinapanaofficial.ro</a><br />
+        Email: <span class="ob-email-gdpr" data-u="contact" data-d="florentinapanaofficial.ro">[email protejat]</span><br />
         Telefon: <a href="tel:+40767369658">0767 369 658</a><br />
         Adresă poștală: Pitești, Argeș, România
       </p>
@@ -287,4 +287,27 @@ const lastUpdated = '24 martie 2026';
     font-size: 0.82rem;
     color: rgba(255, 255, 255, 0.55);
   }
+
+  .ob-email-gdpr {
+    color: #7dd3fc;
+    cursor: default;
+  }
+
+  .ob-email-gdpr a {
+    color: #7dd3fc;
+    text-decoration: underline;
+  }
 </style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.ob-email-gdpr').forEach((el) => {
+      const u = el.getAttribute('data-u');
+      const d = el.getAttribute('data-d');
+      if (u && d) {
+        const addr = u + '@' + d;
+        el.innerHTML = `<a href="mailto:${addr}">${addr}</a>`;
+      }
+    });
+  });
+</script>

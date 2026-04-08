@@ -6,15 +6,16 @@ const lastUpdated = '7 aprilie 2026';
 ---
 
 <BaseLayout
-  title="Termeni și Condiții | Formația Florentina Pană"
-  description="Termenii și condițiile de utilizare a site-ului florentinapanaofficial.ro. Informații despre servicii, rezervări, dreptul de retragere și soluționarea litigiilor."
+  title="Formație Nuntă Pitești | Muzică Live Florentina Pană"
+  description="Termenii și condițiile de utilizare a site-ului florentinapanaofficial.ro. Informații despre servicii de muzică live, rezervări, dreptul de retragere și soluționarea litigiilor."
 >
   <section class="section-container py-16 max-w-3xl mx-auto">
     <div class="mb-8"><BackButton href="/" label="Acasă" /></div>
 
     <header class="mb-10 text-center">
       <p class="kicker mx-auto">OUG 34/2014 · Legea 365/2002</p>
-      <h1 class="section-title">Termeni și Condiții</h1>
+      <!-- ✅ SEO: cuvinte cheie în h1 -->
+      <h1 class="section-title">Termeni și Condiții — Formația Florentina Pană</h1>
       <p class="section-copy">Ultima actualizare: <time datetime="2026-04-07">{lastUpdated}</time></p>
     </header>
 
@@ -27,7 +28,8 @@ const lastUpdated = '7 aprilie 2026';
         Sediu: Calea Craiovei nr. 152, Bl. TG1, Sc. B, Et. 6, Ap. 24, Pitești, jud. Argeș, România<br />
         CUI: 34528125<br />
         Nr. Reg. Com.: F3/581/2015<br />
-        Email: <a href="mailto:contact@florentinapanaofficial.ro">contact@florentinapanaofficial.ro</a><br />
+        <!-- ✅ SEO: email obfuscat anti-spam (JS reconstituie mailto) -->
+        Email: <span id="ob-email" data-u="contact" data-d="florentinapanaofficial.ro" class="email-obfuscated">[email protejat]</span><br />
         Telefon: <a href="tel:+40767369658">0767 369 658</a>
       </p>
 
@@ -42,11 +44,12 @@ const lastUpdated = '7 aprilie 2026';
       </p>
 
       <!-- 3. Serviciile -->
-      <h2>3. Serviciile oferite</h2>
+      <!-- ✅ SEO: keyword „muzică live" în h2 -->
+      <h2>3. Serviciile de muzică live oferite</h2>
       <p>Prestatorul oferă servicii de interpretare artistică muzicală live, incluzând:</p>
       <ul>
         <li>Muzică live la nunți, botezuri, aniversări și evenimente private</li>
-        <li>Muzică live la evenimente corporate și gale</li>
+        <li>Muzică live la evenimente corporative, gale și orice alt eveniment corporativ</li>
         <li>Sonorizare profesională pe durata evenimentului</li>
         <li>Program muzical personalizat conform preferințelor clientului</li>
       </ul>
@@ -179,3 +182,66 @@ const lastUpdated = '7 aprilie 2026';
     </div>
   </section>
 </BaseLayout>
+
+<!-- ✅ SEO: script obfuscare email -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const el = document.getElementById('ob-email');
+    if (el) {
+      const addr = el.dataset.u + '@' + el.dataset.d;
+      el.innerHTML = `<a href="mailto:${addr}">${addr}</a>`;
+    }
+  });
+</script>
+
+<!-- ✅ Stiluri prose-policy (lipseau din această pagină) -->
+<style>
+  .prose-policy {
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.7;
+    font-size: 0.93rem;
+  }
+
+  .prose-policy h2 {
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-top: 2.2rem;
+    margin-bottom: 0.6rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .prose-policy p {
+    margin-bottom: 0.9rem;
+  }
+
+  .prose-policy ul {
+    list-style: disc;
+    padding-left: 1.4rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .prose-policy ul li {
+    margin-bottom: 0.35rem;
+  }
+
+  .prose-policy a {
+    color: #7dd3fc;
+    text-decoration: underline;
+  }
+
+  .prose-policy a:hover {
+    color: #38bdf8;
+  }
+
+  .email-obfuscated {
+    color: #7dd3fc;
+    cursor: default;
+  }
+
+  .email-obfuscated a {
+    color: #7dd3fc;
+    text-decoration: underline;
+  }
+</style>

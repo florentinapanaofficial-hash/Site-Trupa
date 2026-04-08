@@ -41,7 +41,7 @@ const isHomePage = Astro.url.pathname === '/';
       <span aria-hidden="true">·</span>
       <span>Sediu: Calea Craiovei nr. 152, Bl. TG1, Sc. B, Et. 6, Ap. 24, Pitești, jud. Argeș, România</span>
       <span aria-hidden="true">·</span>
-      <span>Email: <a href="mailto:contact@florentinapanaofficial.ro" class="transition hover:text-white/80 underline">contact@florentinapanaofficial.ro</a></span>
+      <span>Email: <span class="ob-email" data-u="contact" data-d="florentinapanaofficial.ro">[email protejat]</span></span>
       <span aria-hidden="true">·</span>
       <span>Tel: <a href="tel:+40767369658" class="transition hover:text-white/80 underline">0767 369 658</a></span>
     </div>
@@ -168,6 +168,16 @@ const isHomePage = Astro.url.pathname === '/';
     var d = 'florentinapanaofficial.ro';
     var addr = u + '@' + d;
     el.innerHTML = '<a href="mai' + 'lto:' + addr + '" class="transition hover:text-[#F5A623]">' + addr + '</a>';
+  })();
+  // Obfuscare email în secțiunea address (date legale)
+  (function () {
+    document.querySelectorAll('.ob-email').forEach(function (el) {
+      var u = el.getAttribute('data-u');
+      var d = el.getAttribute('data-d');
+      if (!u || !d) return;
+      var addr = u + '@' + d;
+      el.innerHTML = '<a href="mai' + 'lto:' + addr + '" class="transition hover:text-white/80 underline">' + addr + '</a>';
+    });
   })();
 </script>
 
