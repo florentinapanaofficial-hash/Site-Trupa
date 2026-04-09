@@ -18,7 +18,8 @@ const { title, description, ogType = 'website' } = Astro.props as Props;
 
 const SITE_FALLBACK = 'https://www.florentinapanaofficial.ro';
 const site = Astro.site?.toString().replace(/\/$/, '') ?? SITE_FALLBACK;
-const canonical = new URL(Astro.url.pathname, site).toString();
+const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? SITE_FALLBACK);
+const canonical = canonicalURL.href;
 
 // OG image: transformă calea relativă în URL absolut
 // TODO: creează fișierul fizic public/images/og-default-1200x630.jpg (1200×630px)
@@ -189,9 +190,10 @@ const mobileNavAllItems = [
     <!-- SEO local: județ Argeș, codul ISO RO-AG recunoscut de Google Maps -->
     <meta name="geo.region" content="RO-AG" />
     <meta name="geo.placename" content="Pitești, Argeș" />
-    {canonical && <link rel="canonical" href={canonical} />}
-    <!-- ✅ SEO: hreflang ro global — toate paginile -->
+    <link rel="canonical" href={canonical} />
+    <!-- ✅ SEO: hreflang ro + x-default — Return Tag corect pentru audit -->
     <link rel="alternate" hreflang="ro" href={canonical} />
+    <link rel="alternate" hreflang="x-default" href={canonical} />
 
     <meta property="og:type" content={ogType} />
     <meta property="og:title" content={title} />
