@@ -1593,33 +1593,28 @@ details:focus-visible {
   /* ── 4. Body shell — overflow intern permis ── */
   .page-shell {
     overflow-x: hidden !important;
-  }
-
-  /* Pe paginile non-homepage: overflow-y visible permite pull-to-refresh.
-     Footer-ul e protejat prin height:100dvh pe main. */
-  .page-shell:not(.is-homepage) {
     overflow-y: visible !important;
   }
 
-  /* ── 5. Main = container orizontal cu scroll-snap ── */
+  /* ── 5. Main = container vertical (scroll normal prin body/window) ──
+         Toate paginile folosesc layout vertical pe mobil.
+         Homepage adaugă min-height pe secțiuni și swipe orizontal JS.
+         Nu mai există layout orizontal cu scroll-snap ca bază. ── */
   main#continut {
-    display: flex !important;
-    flex-direction: row !important;
-    overflow-x: scroll !important;
-    overflow-y: hidden !important;
-    scroll-snap-type: x mandatory !important;
-    overscroll-behavior-x: contain !important;
-    -webkit-overflow-scrolling: touch !important;
+    display: block !important;
+    overflow: visible !important;
+    scroll-snap-type: none !important;
+    overscroll-behavior: auto !important;
+    -webkit-overflow-scrolling: auto !important;
     scrollbar-width: none !important;
     -ms-overflow-style: none !important;
     padding: 0 !important;
     margin: 0 !important;
-    /* 100% in loc de 100vw — evitam diferenta de scrollbar (vw include scrollbar pe Android)
-       care ar produce padding asimetric stanga/dreapta */
     width: 100% !important;
     max-width: 100% !important;
-    height: 100dvh !important;
-    min-height: 100dvh !important;
+    height: auto !important;
+    min-height: unset !important;
+    max-height: none !important;
     border-radius: 0 !important;
     border: none !important;
     box-shadow: none !important;
@@ -1627,39 +1622,35 @@ details:focus-visible {
     -webkit-backdrop-filter: none !important;
     background: transparent !important;
     isolation: auto !important;
+    padding-top: calc(var(--mob-nav-h, 72px) + 0.5rem) !important;
+    padding-bottom: 2rem !important;
   }
 
   main#continut::-webkit-scrollbar {
     display: none !important;
   }
 
-  /* ── 6. Fiecare <section> = un slide ── */
+  /* ── 6. Fiecare <section> = bloc vertical cu scroll normal ── */
   main#continut>section {
-    flex: 0 0 100% !important;
+    flex: unset !important;
     width: 100% !important;
-    min-width: 0 !important;
     max-width: 100% !important;
-    height: 100dvh !important;
+    height: auto !important;
     min-height: unset !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    overscroll-behavior-y: none !important;
-    -webkit-overflow-scrolling: touch !important;
-    /* pan-y: browserul gestionțează scroll vertical nativ în secțiune;
-       gestul orizontal rămâne disponibil pentru JS (nu e revendicat de browser) */
-    touch-action: pan-y !important;
-    scroll-snap-align: start !important;
-    /* normal (în loc de always) — permite swipe rapid fără blocare forțată */
-    scroll-snap-stop: normal !important;
+    max-height: none !important;
+    overflow: visible !important;
+    overscroll-behavior: auto !important;
+    -webkit-overflow-scrolling: auto !important;
+    scroll-snap-align: none !important;
+    scroll-snap-stop: unset !important;
+    touch-action: auto !important;
     margin: 0 !important;
     border-radius: 0 !important;
     box-sizing: border-box !important;
-    /* --mob-nav-h este calculat dinamic în BaseLayout (JS);
-       fallback pentru header hamburger (~72px). */
-    padding-top: calc(var(--mob-nav-h, 72px) + 1rem) !important;
-    padding-bottom: 5rem !important;
-    padding-left: 1.4rem !important;
-    padding-right: 1.4rem !important;
+    padding-top: 0 !important;
+    padding-bottom: 1.5rem !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
   }
 
   /* ── Hero Acasă — conținut aliniat sus, nu centrat vertical ── */
@@ -1731,9 +1722,9 @@ details:focus-visible {
       inset 0 1px 0 rgba(255, 255, 255, 0.18);
   }
 
-  /* ── 8. Săgeți swipe stânga / dreapta ── */
+  /* ── 8. Săgeți swipe stânga / dreapta — ascunse implicit, vizibile doar pe homepage ── */
   .mob-swipe-hints {
-    display: block !important;
+    display: none !important;
     pointer-events: none;
   }
 
@@ -1816,37 +1807,21 @@ details:focus-visible {
   }
 
   /* ══════════════════════════════════════════════════════════════
-     HOMEPAGE MOBIL — body scrollează vertical normal
-     main = simplu block cu înălțime auto, scrollul real e al lui body (window).
-     Rotirea telefonului funcționează corect automat.
+     HOMEPAGE MOBIL — secțiuni full-height, swipe orizontal între pagini.
+     Baza (mai sus) e deja vertical; aici adăugăm doar ce diferă:
+     min-height pe secțiuni, overflow-x:clip, touch-action:pan-y,
+     padding mai mare, și săgețile de navigare.
   ══════════════════════════════════════════════════════════════ */
-  body.is-homepage main#continut {
-    display: block !important;
-    flex-direction: unset !important;
-    /* IMPORTANT: overflow trebuie să fie visible pe AMBELE axe.
-       CSS quirk: overflow-x:hidden + overflow-y:visible pe același element
-       face ca browserul să convertească automat visible → auto,
-       creând un al doilea container de scroll (al doilea scrollbar). */
-    overflow: visible !important;
-    /* height auto → body/window preia scrollul (nu main#continut) */
-    scroll-snap-type: none !important;
-    height: auto !important;
-    min-height: unset !important;
-    width: 100% !important;
-  }
 
   body.is-homepage main#continut>section {
-    flex: unset !important;
-    width: 100% !important;
-    height: auto !important;
     min-height: 100dvh !important;
     overflow-x: clip !important;
     overflow-y: visible !important;
-    scroll-snap-align: none !important;
-    scroll-snap-stop: unset !important;
     touch-action: pan-y !important;
     padding-top: calc(var(--mob-nav-h, 72px) + 1rem) !important;
     padding-bottom: 4rem !important;
+    padding-left: 1.4rem !important;
+    padding-right: 1.4rem !important;
   }
 
   body.is-homepage main#continut>section#acasa.hero-stage {
@@ -1861,77 +1836,16 @@ details:focus-visible {
     padding-bottom: 2rem !important;
   }
 
-  /* Pe homepage: doar săgeata next (→) e vizibilă — navigare la pagina următoare */
+  /* Pe homepage: săgețile swipe sunt vizibile */
+  body.is-homepage .mob-swipe-hints {
+    display: block !important;
+  }
+
   body.is-homepage .mob-arrow--prev {
     display: none !important;
   }
 
   body.is-homepage .mob-arrow--next {
     display: flex !important;
-  }
-
-  /* ── Footer global: ascuns pe subpagini mobil (swipe) — pe homepage rămâne vizibil ── */
-  /* Footer acum vizibil pe toate paginile — subpaginile folosesc scroll vertical */
-
-  /* ── Săgeți swipe: ascunse când sliderul are un singur element ── */
-  .mob-swipe-hints.single-slide {
-    display: none !important;
-  }
-
-  /* ══════════════════════════════════════════════════════════════
-     SUBPAGINI MOBIL — SCROLL VERTICAL  (body:not(.is-homepage))
-     ──────────────────────────────────────────────────────────────
-     Toate paginile non-homepage folosesc scroll vertical normal.
-     Acest bloc universal înlocuiește override-urile per-pagină
-     (contact, membri, etc.) care suprascriu swipe-ul cu !important.
-     Clipping-ul orizontal e asigurat de .page-shell (overflow-x:hidden).
-  ══════════════════════════════════════════════════════════════ */
-  body:not(.is-homepage) .page-shell {
-    overflow-y: visible !important;
-  }
-
-  body:not(.is-homepage) .layout-content-shell {
-    overflow: visible !important;
-  }
-
-  body:not(.is-homepage) main#continut {
-    display: block !important;
-    flex-direction: unset !important;
-    overflow: visible !important;
-    scroll-snap-type: none !important;
-    height: auto !important;
-    min-height: unset !important;
-    max-height: none !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    overscroll-behavior: auto !important;
-    -webkit-overflow-scrolling: auto !important;
-    padding-top: calc(var(--mob-nav-h, 72px) + 0.5rem) !important;
-    padding-bottom: 2rem !important;
-  }
-
-  body:not(.is-homepage) main#continut>section {
-    flex: unset !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    height: auto !important;
-    min-height: unset !important;
-    max-height: none !important;
-    overflow: visible !important;
-    overscroll-behavior: auto !important;
-    -webkit-overflow-scrolling: auto !important;
-    scroll-snap-align: none !important;
-    scroll-snap-stop: unset !important;
-    touch-action: auto !important;
-    box-sizing: border-box !important;
-    padding-top: 0 !important;
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
-    padding-bottom: 1.5rem !important;
-  }
-
-  /* Săgețile swipe: ascunse pe subpagini — nu mai e nevoie de swipe */
-  body:not(.is-homepage) .mob-swipe-hints {
-    display: none !important;
   }
 }

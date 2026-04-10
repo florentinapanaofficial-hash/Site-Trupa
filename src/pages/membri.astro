@@ -634,18 +634,10 @@ function initiale(name: string): string {
   });
 </script>
 
-<!-- Override-urile mobile swipe → vertical sunt acum în globals.css
-     (body:not(.is-homepage) — bloc universal pentru toate subpaginile). -->
+<!-- Override-urile mobile sunt acum în globals.css (secțiunile 5 & 6 = vertical by default). -->
 <style is:global>
   @media (max-width: 767px) {
-    /* Subsecțiunile din membri-page-wrap: overflow visible și padding lateral */
-    html main#continut > section.membri-page-wrap > section,
-    html main#continut > section.membri-page-wrap > header,
-    html main#continut > section.membri-page-wrap > div:not(#gallery-popup) {
-      overflow: visible !important;
-      box-sizing: border-box !important;
-    }
-
+    /* Padding lateral specific paginii Membri (mai strâns decât global) */
     html main#continut > section.membri-page-wrap > section.mem-section {
       padding-left: 0.6rem !important;
       padding-right: 0.6rem !important;

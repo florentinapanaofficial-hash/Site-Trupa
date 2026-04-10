@@ -286,11 +286,10 @@
         return;
     }
 
-    /* Subpagini: CSS-ul face layout vertical, deci nu există slides
-       orizontale. Tratăm pagina ca un singur „slide" — orice swipe
-       orizontal navighează direct la pagina anterioară/următoare. */
-    var n2 = 1;
-
+    /* ══════════════════════════════════════════════════════════════
+       SUBPAGINI — layout vertical, swipe orizontal navighează
+       la pagina anterioară/următoare (fără slides, fără scroll-snap).
+    ══════════════════════════════════════════════════════════════ */
     var pageOrder = [
         '/',
         '/despre',
@@ -305,131 +304,32 @@
     var currentPath = location.pathname.replace(/\/$/, '') || '/';
     var pageIdx = pageOrder.indexOf(currentPath);
 
+    /* Marchează butonul activ din navbar */
+    setActiveHref(currentPath !== '/' ? currentPath : '/');
+
     function navigatePage(url) {
         main.style.transition = 'opacity 0.18s ease';
         main.style.opacity = '0';
         setTimeout(function () { window.location.href = url; }, 180);
     }
 
-    function repaintSwipe() {
-        var pathname = location.pathname.replace(/\/$/, '') || '/';
-        setActiveHref(pathname !== '/' ? pathname : '/');
+    /* Detectare swipe orizontal simplu — dx > threshold → navigare */
+    var tStartX = 0, tStartY = 0;
 
-        var hasPrev = current > 0 || pageIdx > 0;
-        var hasNext = current < n2 - 1 || (pageIdx !== -1 && pageIdx < pageOrder.length - 1);
-
-        if (arrowPrev) arrowPrev.classList.toggle('is-hidden', !hasPrev);
-        if (arrowNext) arrowNext.classList.toggle('is-hidden', !hasNext);
-    }
-
-    var cachedSlideW = main.clientWidth || window.innerWidth;
-    function slideWidth() { return cachedSlideW; }
-
-    function slideTo(idx) {
-        if (idx < 0) {
-            if (pageIdx > 0) { navigatePage(pageOrder[pageIdx - 1]); }
-            else { main.scrollTo({ left: 0, behavior: 'smooth' }); }
-            return;
-        }
-        if (idx >= n2) {
-            if (pageIdx !== -1 && pageIdx < pageOrder.length - 1) {
-                navigatePage(pageOrder[pageIdx + 1]);
-            } else {
-                main.scrollTo({ left: (n2 - 1) * slideWidth(), behavior: 'smooth' });
-            }
-            return;
-        }
-        current = idx;
-        main.scrollTo({ left: idx * slideWidth(), behavior: 'smooth' });
-        repaintSwipe();
-    }
-
-    if (arrowPrev) arrowPrev.addEventListener('click', function () { slideTo(current - 1); });
-    if (arrowNext) arrowNext.addEventListener('click', function () { slideTo(current + 1); });
-
-    var tStartX = 0, tStartY = 0, tAxis = null, tScrollStart = 0;
-    var tLocked = false;
-
-    /* Layout vertical: nu blocăm overflowY pe secțiuni */
-    function lockVertical() { }
-    function unlockVertical() { }
-
-    function onTouchStart(e) {
-        if (e.target.closest && (e.target.closest('.mob-nav') || e.target.closest('.mc-gallery'))) {
-            tAxis = 'skip'; return;
-        }
+    document.addEventListener('touchstart', function (e) {
+        if (e.target.closest && (e.target.closest('.mob-nav') || e.target.closest('.mc-gallery'))) return;
         tStartX = e.touches[0].clientX;
         tStartY = e.touches[0].clientY;
-        tScrollStart = main.scrollLeft;
-        tAxis = null;
-    }
+    }, { passive: true });
 
-    function onTouchMove(e) {
-        if (tAxis === 'skip') return;
-        if (!e.touches.length) return;
-        var dx = e.touches[0].clientX - tStartX;
-        var dy = e.touches[0].clientY - tStartY;
-        if (!tAxis && (Math.abs(dx) > 6 || Math.abs(dy) > 6)) {
-            tAxis = Math.abs(dx) >= Math.abs(dy) ? 'x' : 'y';
-        }
-        if (tAxis === 'x') {
-            lockVertical();
-            e.preventDefault();
-            main.scrollLeft = tScrollStart - dx;
-        }
-    }
-
-    function onTouchEnd(e) {
-        if (tAxis === 'skip') { tAxis = null; return; }
-        unlockVertical();
-        if (tAxis !== 'x') return;
+    document.addEventListener('touchend', function (e) {
         var dx = e.changedTouches[0].clientX - tStartX;
-        var threshold = Math.max(50, window.innerWidth * 0.12);
-        if (dx < -threshold) slideTo(current + 1);
-        else if (dx > threshold) slideTo(current - 1);
-        else slideTo(current);
-    }
-
-    document.addEventListener('touchstart', onTouchStart, { passive: true });
-    document.addEventListener('touchmove', onTouchMove, { passive: false });
-    document.addEventListener('touchend', onTouchEnd, { passive: true });
-
-    var rafId;
-    main.addEventListener('scroll', function () {
-        cancelAnimationFrame(rafId);
-        rafId = requestAnimationFrame(function () {
-            var sw = slideWidth();
-            var idx = sw > 0 ? Math.round(main.scrollLeft / sw) : 0;
-            idx = Math.max(0, Math.min(n2 - 1, idx));
-            if (idx !== current) { current = idx; repaintSwipe(); }
-        });
-    }, { passive: true });
-
-    main.addEventListener('scrollend', function () {
-        var sw = slideWidth();
-        var idx = sw > 0 ? Math.round(main.scrollLeft / sw) : 0;
-        current = Math.max(0, Math.min(n2 - 1, idx));
-        repaintSwipe();
-    }, { passive: true });
-
-    window.addEventListener('resize', debounce(function () {
-        requestAnimationFrame(function () {
-            cachedSlideW = main.clientWidth || window.innerWidth;
-            main.scrollLeft = current * slideWidth();
-            repaintSwipe();
-        });
-    }, 200), { passive: true });
-
-    requestAnimationFrame(function () {
-        repaintSwipe();
-        if (arrowNext && !arrowNext.classList.contains('is-hidden')) {
-            arrowNext.classList.add('hint-pulse');
-            arrowNext.addEventListener('animationend', function () {
-                arrowNext.classList.remove('hint-pulse');
-            }, { once: true });
+        var dy = e.changedTouches[0].clientY - tStartY;
+        if (Math.abs(dx) < 50 || Math.abs(dy) > Math.abs(dx)) return;
+        if (dx < 0 && pageIdx !== -1 && pageIdx < pageOrder.length - 1) {
+            navigatePage(pageOrder[pageIdx + 1]);
+        } else if (dx > 0 && pageIdx > 0) {
+            navigatePage(pageOrder[pageIdx - 1]);
         }
-    });
-
-    /* PTR vechi eliminat — pull-to-refresh universal e definit mai sus,
-       înainte de blocul isHomepage, și rulează pe toate paginile. */
+    }, { passive: true });
 })();
