@@ -602,8 +602,8 @@ html::-webkit-scrollbar {
 @media (max-width: 767px) {
   html {
     scrollbar-width: none;
-    /* overscroll-behavior-y: auto — permite pull-to-refresh pe toate paginile */
-    overscroll-behavior-y: auto;
+    /* overscroll-behavior-y: none — previne rubber-band care arată fundalul cerului */
+    overscroll-behavior-y: none;
   }
 
   html::-webkit-scrollbar {
@@ -1643,7 +1643,7 @@ details:focus-visible {
     min-height: unset !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
-    overscroll-behavior-y: auto !important;
+    overscroll-behavior-y: none !important;
     -webkit-overflow-scrolling: touch !important;
     /* pan-y: browserul gestionțează scroll vertical nativ în secțiune;
        gestul orizontal rămâne disponibil pentru JS (nu e revendicat de browser) */
