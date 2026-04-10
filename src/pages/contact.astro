@@ -389,6 +389,56 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
       background: rgba(245, 166, 35, 0.08);
       box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.18);
     }
+
+    /* ══ MOBIL: scoate pagina Contact din regimul swipe orizontal ══ */
+    @media (max-width: 767px) {
+      html .page-shell {
+        overflow-y: visible !important;
+      }
+
+      html .layout-content-shell {
+        overflow: visible !important;
+      }
+
+      html main#continut {
+        display: block !important;
+        flex-direction: unset !important;
+        overflow-x: clip !important;
+        overflow-y: visible !important;
+        scroll-snap-type: none !important;
+        height: auto !important;
+        min-height: unset !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        padding-top: calc(var(--mob-nav-h, 72px) + 0.5rem) !important;
+        padding-bottom: 2rem !important;
+      }
+
+      html main#continut > section.contact-compact {
+        flex: unset !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        min-height: unset !important;
+        overflow-x: clip !important;
+        overflow-y: visible !important;
+        scroll-snap-align: none !important;
+        scroll-snap-stop: unset !important;
+        touch-action: auto !important;
+        box-sizing: border-box !important;
+      }
+
+      /* Ascunde acțiunile WhatsApp desktop pe mobil — butoanele principale rămân */
+      .desktop-whatsapp-actions {
+        display: none !important;
+      }
+
+      /* Iframe Google Maps — constrânge în container */
+      .contact-compact iframe {
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+      }
+    }
   </style>
 </BaseLayout>
 
