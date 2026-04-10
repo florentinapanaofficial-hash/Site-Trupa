@@ -408,6 +408,15 @@ function initiale(name: string): string {
 </BaseLayout>
 
 <script is:inline>
+  // ═══ Mut popup-ul galerie la <body> — evită containment-ul
+  // backdrop-filter/overflow care blochează position:fixed ═══
+  (function() {
+    const popup = document.getElementById('gallery-popup');
+    if (popup && popup.parentElement !== document.body) {
+      document.body.appendChild(popup);
+    }
+  })();
+
   document.querySelectorAll('.bio-btn').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -660,6 +669,165 @@ function initiale(name: string): string {
       padding-left: 0.6rem !important;
       padding-right: 0.6rem !important;
       padding-bottom: 1rem !important;
+    }
+  }
+
+  /* ══════════════════════════════════════════
+     GALLERY POPUP OVERLAY — global (popup e mutat pe <body> via JS)
+  ══════════════════════════════════════════ */
+  #gallery-popup {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9000;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.82);
+    backdrop-filter: blur(6px);
+    cursor: zoom-out;
+  }
+
+  #gallery-popup.active {
+    display: flex;
+  }
+
+  #gallery-popup-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 10;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #fff;
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 200ms, transform 200ms, border-color 200ms;
+  }
+
+  #gallery-popup-close:hover,
+  #gallery-popup-close:focus-visible {
+    background: rgba(255, 60, 80, 0.65);
+    border-color: rgba(255, 60, 80, 0.6);
+    transform: scale(1.1);
+    outline: none;
+  }
+
+  @media (max-width: 767px) {
+    #gallery-popup-close {
+      top: calc(env(safe-area-inset-top, 0px) + 0.75rem);
+      right: 0.75rem;
+      width: 48px;
+      height: 48px;
+      font-size: 1.4rem;
+    }
+  }
+
+  #gallery-popup-inner {
+    position: relative;
+    max-width: 90vw;
+    max-height: 85vh;
+    pointer-events: none;
+  }
+
+  #gallery-popup-img {
+    display: block;
+    max-width: 90vw;
+    max-height: 85vh;
+    border-radius: 0.75rem;
+    box-shadow: 0 0 60px rgba(0,0,0,0.8), 0 0 20px rgba(232,200,91,0.25);
+    border: 1px solid rgba(232,200,91,0.3);
+    object-fit: contain;
+  }
+
+  /* ── FX keyframes ── */
+  @keyframes fx-pop-in {
+    0%   { transform: scale(0.5);  opacity: 0; }
+    70%  { transform: scale(1.06); opacity: 1; }
+    100% { transform: scale(1);    opacity: 1; }
+  }
+  @keyframes fx-pop-out {
+    0%   { transform: scale(1);   opacity: 1; }
+    100% { transform: scale(0.5); opacity: 0; }
+  }
+  @keyframes fx-warp-in {
+    0%   { transform: scaleX(0.1) scaleY(2.5); opacity: 0; }
+    60%  { transform: scaleX(1.05) scaleY(0.97); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes fx-warp-out {
+    0%   { transform: scale(1); opacity: 1; }
+    100% { transform: scaleX(0.1) scaleY(2.5); opacity: 0; }
+  }
+  @keyframes fx-rubber-in {
+    0%   { transform: scale(1);           opacity: 0; }
+    30%  { transform: scaleX(1.25) scaleY(0.75); opacity: 1; }
+    50%  { transform: scaleX(0.85) scaleY(1.15); }
+    70%  { transform: scaleX(1.05) scaleY(0.95); }
+    100% { transform: scale(1); }
+  }
+  @keyframes fx-rubber-out {
+    0%   { transform: scale(1);           opacity: 1; }
+    30%  { transform: scaleX(1.25) scaleY(0.75); }
+    100% { transform: scale(0.1); opacity: 0; }
+  }
+  @keyframes fx-flip-in {
+    0%   { transform: perspective(600px) rotateY(-90deg); opacity: 0; }
+    70%  { transform: perspective(600px) rotateY(8deg);  opacity: 1; }
+    100% { transform: perspective(600px) rotateY(0deg);  opacity: 1; }
+  }
+  @keyframes fx-flip-out {
+    0%   { transform: perspective(600px) rotateY(0deg);   opacity: 1; }
+    100% { transform: perspective(600px) rotateY(90deg);  opacity: 0; }
+  }
+  @keyframes fx-splat-in {
+    0%   { transform: scale(2.5); opacity: 0; filter: blur(12px); }
+    60%  { transform: scale(0.95); opacity: 1; filter: blur(0); }
+    100% { transform: scale(1); opacity: 1; filter: blur(0); }
+  }
+  @keyframes fx-splat-out {
+    0%   { transform: scale(1);   opacity: 1; filter: blur(0); }
+    100% { transform: scale(2.5); opacity: 0; filter: blur(12px); }
+  }
+  @keyframes fx-spindrop-in {
+    0%   { transform: rotate(-180deg) scale(0); opacity: 0; }
+    70%  { transform: rotate(10deg) scale(1.04); opacity: 1; }
+    100% { transform: rotate(0deg) scale(1); opacity: 1; }
+  }
+  @keyframes fx-spindrop-out {
+    0%   { transform: rotate(0deg) scale(1); opacity: 1; }
+    100% { transform: rotate(180deg) scale(0); opacity: 0; }
+  }
+
+  .fx-pop-in      { animation: fx-pop-in      0.7s cubic-bezier(.22,.68,0,1.36) both; }
+  .fx-pop-out     { animation: fx-pop-out     0.45s ease-in both; }
+  .fx-warp-in     { animation: fx-warp-in     0.75s cubic-bezier(.22,.68,0,1.2)  both; }
+  .fx-warp-out    { animation: fx-warp-out    0.45s ease-in both; }
+  .fx-rubber-in   { animation: fx-rubber-in   0.9s ease both; }
+  .fx-rubber-out  { animation: fx-rubber-out  0.45s ease-in both; }
+  .fx-flip-in     { animation: fx-flip-in     0.75s ease both; }
+  .fx-flip-out    { animation: fx-flip-out    0.45s ease-in both; }
+  .fx-splat-in    { animation: fx-splat-in    0.85s cubic-bezier(.22,.68,0,1.2)  both; }
+  .fx-splat-out   { animation: fx-splat-out   0.45s ease-in both; }
+  .fx-spindrop-in { animation: fx-spindrop-in 0.85s cubic-bezier(.22,.68,0,1.36) both; }
+  .fx-spindrop-out{ animation: fx-spindrop-out 0.45s ease-in both; }
+
+  @media (max-width: 767px) {
+    #gallery-popup-inner {
+      max-width: 95vw;
+      max-height: 70vh;
+    }
+    #gallery-popup-img {
+      max-width: 95vw;
+      max-height: 70vh;
     }
   }
 </style>
@@ -1382,177 +1550,4 @@ function initiale(name: string): string {
     }
   }
 
-  /* ══════════════════════════════════════════
-     GALLERY POPUP OVERLAY
-  ══════════════════════════════════════════ */
-  #gallery-popup {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 9000;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.82);
-    backdrop-filter: blur(6px);
-    cursor: zoom-out;
-  }
-
-  #gallery-popup.active {
-    display: flex;
-  }
-
-  /* ── Buton închidere popup ── */
-  #gallery-popup-close {
-    position: absolute;
-    top: 0.75rem;
-    right: 0.75rem;
-    z-index: 10;
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    background: rgba(0, 0, 0, 0.55);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    color: #fff;
-    font-size: 1.25rem;
-    line-height: 1;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 200ms, transform 200ms, border-color 200ms;
-  }
-
-  #gallery-popup-close:hover,
-  #gallery-popup-close:focus-visible {
-    background: rgba(255, 60, 80, 0.65);
-    border-color: rgba(255, 60, 80, 0.6);
-    transform: scale(1.1);
-    outline: none;
-  }
-
-  @media (max-width: 767px) {
-    #gallery-popup-close {
-      top: calc(env(safe-area-inset-top, 0px) + 0.75rem);
-      right: 0.75rem;
-      width: 48px;
-      height: 48px;
-      font-size: 1.4rem;
-    }
-  }
-
-  #gallery-popup-inner {
-    position: relative;
-    max-width: 90vw;
-    max-height: 85vh;
-    pointer-events: none;
-  }
-
-  #gallery-popup-img {
-    display: block;
-    max-width: 90vw;
-    max-height: 85vh;
-    border-radius: 0.75rem;
-    box-shadow: 0 0 60px rgba(0,0,0,0.8), 0 0 20px rgba(232,200,91,0.25);
-    border: 1px solid rgba(232,200,91,0.3);
-    object-fit: contain;
-  }
-
-  /* ── FX 1: pop ── */
-  @keyframes fx-pop-in {
-    0%   { transform: scale(0.5);  opacity: 0; }
-    70%  { transform: scale(1.06); opacity: 1; }
-    100% { transform: scale(1);    opacity: 1; }
-  }
-  @keyframes fx-pop-out {
-    0%   { transform: scale(1);   opacity: 1; }
-    100% { transform: scale(0.5); opacity: 0; }
-  }
-
-  /* ── FX 2: warp ── */
-  @keyframes fx-warp-in {
-    0%   { transform: scaleX(0.1) scaleY(2.5); opacity: 0; }
-    60%  { transform: scaleX(1.05) scaleY(0.97); opacity: 1; }
-    100% { transform: scale(1); opacity: 1; }
-  }
-  @keyframes fx-warp-out {
-    0%   { transform: scale(1); opacity: 1; }
-    100% { transform: scaleX(0.1) scaleY(2.5); opacity: 0; }
-  }
-
-  /* ── FX 3: rubber ── */
-  @keyframes fx-rubber-in {
-    0%   { transform: scale(1);           opacity: 0; }
-    30%  { transform: scaleX(1.25) scaleY(0.75); opacity: 1; }
-    50%  { transform: scaleX(0.85) scaleY(1.15); }
-    70%  { transform: scaleX(1.05) scaleY(0.95); }
-    100% { transform: scale(1); }
-  }
-  @keyframes fx-rubber-out {
-    0%   { transform: scale(1);           opacity: 1; }
-    30%  { transform: scaleX(1.25) scaleY(0.75); }
-    100% { transform: scale(0.1); opacity: 0; }
-  }
-
-  /* ── FX 4: flip ── */
-  @keyframes fx-flip-in {
-    0%   { transform: perspective(600px) rotateY(-90deg); opacity: 0; }
-    70%  { transform: perspective(600px) rotateY(8deg);  opacity: 1; }
-    100% { transform: perspective(600px) rotateY(0deg);  opacity: 1; }
-  }
-  @keyframes fx-flip-out {
-    0%   { transform: perspective(600px) rotateY(0deg);   opacity: 1; }
-    100% { transform: perspective(600px) rotateY(90deg);  opacity: 0; }
-  }
-
-  /* ── FX 5: splat ── */
-  @keyframes fx-splat-in {
-    0%   { transform: scale(2.5); opacity: 0; filter: blur(12px); }
-    60%  { transform: scale(0.95); opacity: 1; filter: blur(0); }
-    100% { transform: scale(1); opacity: 1; filter: blur(0); }
-  }
-  @keyframes fx-splat-out {
-    0%   { transform: scale(1);   opacity: 1; filter: blur(0); }
-    100% { transform: scale(2.5); opacity: 0; filter: blur(12px); }
-  }
-
-  /* ── FX 6: spindrop ── */
-  @keyframes fx-spindrop-in {
-    0%   { transform: rotate(-180deg) scale(0); opacity: 0; }
-    70%  { transform: rotate(10deg) scale(1.04); opacity: 1; }
-    100% { transform: rotate(0deg) scale(1); opacity: 1; }
-  }
-  @keyframes fx-spindrop-out {
-    0%   { transform: rotate(0deg) scale(1); opacity: 1; }
-    100% { transform: rotate(180deg) scale(0); opacity: 0; }
-  }
-
-  /* ── apply animation classes ── */
-  .fx-pop-in      { animation: fx-pop-in      0.7s cubic-bezier(.22,.68,0,1.36) both; }
-  .fx-pop-out     { animation: fx-pop-out     0.45s ease-in both; }
-  .fx-warp-in     { animation: fx-warp-in     0.75s cubic-bezier(.22,.68,0,1.2)  both; }
-  .fx-warp-out    { animation: fx-warp-out    0.45s ease-in both; }
-  .fx-rubber-in   { animation: fx-rubber-in   0.9s ease both; }
-  .fx-rubber-out  { animation: fx-rubber-out  0.45s ease-in both; }
-  .fx-flip-in     { animation: fx-flip-in     0.75s ease both; }
-  .fx-flip-out    { animation: fx-flip-out    0.45s ease-in both; }
-  .fx-splat-in    { animation: fx-splat-in    0.85s cubic-bezier(.22,.68,0,1.2)  both; }
-  .fx-splat-out   { animation: fx-splat-out   0.45s ease-in both; }
-  .fx-spindrop-in { animation: fx-spindrop-in 0.85s cubic-bezier(.22,.68,0,1.36) both; }
-  .fx-spindrop-out{ animation: fx-spindrop-out 0.45s ease-in both; }
-
-  /* ══════════════════════════════════════════
-     POPUP GALERIE — mobile sizing
-  ══════════════════════════════════════════ */
-  @media (max-width: 767px) {
-    #gallery-popup-inner {
-      max-width: 95vw;
-      max-height: 70vh;
-    }
-    #gallery-popup-img {
-      max-width: 95vw;
-      max-height: 70vh;
-    }
-  }
 </style>
