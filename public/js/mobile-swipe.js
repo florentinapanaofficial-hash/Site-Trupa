@@ -47,6 +47,79 @@
         hintsContainer.classList.add('single-slide');
     }
 
+    /* ═══ Pull-to-refresh universal — rulează pe TOATE paginile ═══
+       overscroll-behavior-y:none blochează PTR nativ al browserului,
+       deci implementăm manual: la scrollTop ≈ 0, trage >90px în jos → reload.
+       Ascultăm și touchcancel (touch-action:pan-y face browserul
+       să preia gestul vertical și să nu mai emită touchend). */
+    (function initPTR() {
+        var ptrStartY = 0;
+        var ptrLastY = 0;
+        var ptrActive = false;
+        var ptrIndicator = null;
+
+        function isAtTop() {
+            if ((window.scrollY || window.pageYOffset) > 5) return false;
+            var sec = slides[current];
+            if (sec && sec.scrollTop > 5) return false;
+            return true;
+        }
+
+        function createIndicator() {
+            if (ptrIndicator) return ptrIndicator;
+            ptrIndicator = document.createElement('div');
+            ptrIndicator.setAttribute('aria-hidden', 'true');
+            ptrIndicator.style.cssText =
+                'position:fixed;top:0;left:50%;transform:translateX(-50%) translateY(-60px);' +
+                'z-index:9999;padding:8px 18px;border-radius:0 0 12px 12px;' +
+                'background:rgba(0,200,255,0.15);backdrop-filter:blur(8px);' +
+                'color:rgba(0,220,255,0.9);font-size:12px;font-weight:600;' +
+                'letter-spacing:0.05em;pointer-events:none;transition:transform 0.25s ease;';
+            ptrIndicator.textContent = '↓ Trage pentru refresh';
+            document.body.appendChild(ptrIndicator);
+            return ptrIndicator;
+        }
+
+        document.addEventListener('touchstart', function (e) {
+            if (e.target.closest && (e.target.closest('.mob-nav') || e.target.closest('.mc-gallery'))) {
+                ptrActive = false; return;
+            }
+            if (!isAtTop()) { ptrActive = false; return; }
+            ptrStartY = e.touches[0].clientY;
+            ptrLastY = ptrStartY;
+            ptrActive = true;
+        }, { passive: true });
+
+        document.addEventListener('touchmove', function (e) {
+            if (!ptrActive) return;
+            ptrLastY = e.touches[0].clientY;
+            var dy = ptrLastY - ptrStartY;
+            if (dy > 30 && dy < 150) {
+                var ind = createIndicator();
+                ind.style.transform = 'translateX(-50%) translateY(' + Math.min(dy * 0.4, 40) + 'px)';
+                ind.textContent = dy > 90 ? '↓ Eliberează pentru refresh' : '↓ Trage pentru refresh';
+            }
+        }, { passive: true });
+
+        function ptrEnd(e) {
+            if (!ptrActive) return;
+            ptrActive = false;
+            var endY = (e.changedTouches && e.changedTouches.length)
+                ? e.changedTouches[0].clientY
+                : ptrLastY;
+            var dy = endY - ptrStartY;
+            if (dy > 90) {
+                if (ptrIndicator) ptrIndicator.textContent = '⟳ Se reîncarcă…';
+                location.reload();
+            } else if (ptrIndicator) {
+                ptrIndicator.style.transform = 'translateX(-50%) translateY(-60px)';
+            }
+        }
+
+        document.addEventListener('touchend', ptrEnd, { passive: true });
+        document.addEventListener('touchcancel', ptrEnd, { passive: true });
+    })();
+
     var isHomepage = document.body.classList.contains('is-homepage');
 
     var sectionToNav = {
@@ -364,68 +437,6 @@
         }
     });
 
-    /* ═══ Pull-to-refresh manual ═══
-       Pe layout swipe (100dvh), body nu scrollează → pull-to-refresh nativ nu se activează.
-       Detectăm: secțiunea curentă e la scrollTop=0 + utilizatorul trage >90px în jos → reload. */
-    (function () {
-        var ptrStartY = 0;
-        var ptrActive = false;
-        var ptrIndicator = null;
-
-        function getCurrentSection() {
-            return slides[current] || null;
-        }
-
-        function createIndicator() {
-            if (ptrIndicator) return ptrIndicator;
-            ptrIndicator = document.createElement('div');
-            ptrIndicator.setAttribute('aria-hidden', 'true');
-            ptrIndicator.style.cssText =
-                'position:fixed;top:0;left:50%;transform:translateX(-50%) translateY(-60px);' +
-                'z-index:9999;padding:8px 18px;border-radius:0 0 12px 12px;' +
-                'background:rgba(0,200,255,0.15);backdrop-filter:blur(8px);' +
-                'color:rgba(0,220,255,0.9);font-size:12px;font-weight:600;' +
-                'letter-spacing:0.05em;pointer-events:none;transition:transform 0.25s ease;';
-            ptrIndicator.textContent = '↓ Trage pentru refresh';
-            document.body.appendChild(ptrIndicator);
-            return ptrIndicator;
-        }
-
-        document.addEventListener('touchstart', function (e) {
-            var sec = getCurrentSection();
-            if (!sec) return;
-            // Activează doar dacă secțiunea e la top
-            if (sec.scrollTop > 5) { ptrActive = false; return; }
-            ptrStartY = e.touches[0].clientY;
-            ptrActive = true;
-        }, { passive: true });
-
-        document.addEventListener('touchmove', function (e) {
-            if (!ptrActive) return;
-            var dy = e.touches[0].clientY - ptrStartY;
-            if (dy > 30 && dy < 150) {
-                var ind = createIndicator();
-                ind.style.transform = 'translateX(-50%) translateY(' + Math.min(dy * 0.4, 40) + 'px)';
-                if (dy > 90) {
-                    ind.textContent = '↓ Eliberează pentru refresh';
-                } else {
-                    ind.textContent = '↓ Trage pentru refresh';
-                }
-            }
-        }, { passive: true });
-
-        document.addEventListener('touchend', function (e) {
-            if (!ptrActive) { return; }
-            var dy = e.changedTouches[0].clientY - ptrStartY;
-            ptrActive = false;
-            if (dy > 90) {
-                if (ptrIndicator) {
-                    ptrIndicator.textContent = '⟳ Se reîncarcă…';
-                }
-                location.reload();
-            } else if (ptrIndicator) {
-                ptrIndicator.style.transform = 'translateX(-50%) translateY(-60px)';
-            }
-        }, { passive: true });
-    })();
+    /* PTR vechi eliminat — pull-to-refresh universal e definit mai sus,
+       înainte de blocul isHomepage, și rulează pe toate paginile. */
 })();

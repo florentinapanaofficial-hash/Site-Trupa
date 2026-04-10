@@ -650,22 +650,43 @@ function initiale(name: string): string {
     }
 
     /* Dezactivează swipe-ul orizontal: main = block vertical cu scroll normal al body-ului.
-       „html main#continut" → specificitate (0,1,0,2) bate globals.css (0,1,0,1). */
+       overflow: visible pe AMBELE axe — evită quirk-ul CSS (clip/hidden + visible → auto)
+       care creează un scroll container parazit și blochează touch scroll pe mobil.
+       Clipping-ul orizontal e preluat de .page-shell (overflow-x: hidden). */
     html main#continut {
       display: block !important;
       flex-direction: unset !important;
-      overflow-x: clip !important;
-      overflow-y: visible !important;
+      overflow: visible !important;
       scroll-snap-type: none !important;
       height: auto !important;
       min-height: unset !important;
+      max-height: none !important;
       width: 100% !important;
+      max-width: 100% !important;
+      overscroll-behavior: auto !important;
+      -webkit-overflow-scrolling: auto !important;
       padding-top: calc(var(--mob-nav-h, 72px) + 0.5rem) !important;
       padding-bottom: 2rem !important;
     }
 
     /* Secțiunile revin la flow vertical normal */
-    html main#continut > section.membri-page-wrap,
+    html main#continut > section.membri-page-wrap {
+      flex: unset !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      height: auto !important;
+      min-height: unset !important;
+      max-height: none !important;
+      overflow: visible !important;
+      overscroll-behavior: auto !important;
+      -webkit-overflow-scrolling: auto !important;
+      scroll-snap-align: none !important;
+      scroll-snap-stop: unset !important;
+      touch-action: auto !important;
+      box-sizing: border-box !important;
+      padding-top: 0 !important;
+    }
+
     html main#continut > section.membri-page-wrap > section,
     html main#continut > section.membri-page-wrap > header,
     html main#continut > section.membri-page-wrap > div:not(#gallery-popup) {
@@ -673,11 +694,12 @@ function initiale(name: string): string {
       width: 100% !important;
       height: auto !important;
       min-height: unset !important;
-      overflow-x: clip !important;
-      overflow-y: visible !important;
+      max-height: none !important;
+      overflow: visible !important;
       scroll-snap-align: none !important;
       scroll-snap-stop: unset !important;
       touch-action: auto !important;
+      box-sizing: border-box !important;
       padding-top: 0 !important;
     }
 
