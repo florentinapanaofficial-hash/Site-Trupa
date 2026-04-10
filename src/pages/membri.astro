@@ -481,14 +481,21 @@ function initiale(name: string): string {
     popupImg.classList.remove(...Object.values(fxMap).flatMap((v) => [v.enter, v.leave]));
     popup.classList.add('active');
     popupImg.classList.add(anim.enter);
+    // Adaugă intrare în history — butonul Back va închide popup-ul
+    history.pushState({ galleryOpen: true }, '');
     // Focus pe butonul de închidere pentru accesibilitate
     requestAnimationFrame(() => popupClose.focus());
   }
 
-  function closePopup(fx = currentFx) {
+  function closePopup(fx = currentFx, { fromPopstate = false } = {}) {
+    if (!popup.classList.contains('active')) return;
     const anim = fxMap[fx] ?? fxMap['1'];
     popupImg.classList.remove(...Object.values(fxMap).flatMap((v) => [v.enter, v.leave]));
     popupImg.classList.add(anim.leave);
+    // Dacă nu vine din popstate, scoatem intrarea din history
+    if (!fromPopstate) {
+      history.back();
+    }
     popupImg.addEventListener('animationend', () => {
       popup.classList.remove('active');
       popupImg.src = '';
@@ -501,6 +508,13 @@ function initiale(name: string): string {
       }
     }, { once: true });
   }
+
+  // Butonul fizic Back închide popup-ul dacă e deschis
+  window.addEventListener('popstate', (e) => {
+    if (popup.classList.contains('active')) {
+      closePopup(currentFx, { fromPopstate: true });
+    }
+  });
 
   // ═══ GALLERY SLIDER — dots + mouse drag ═══
   let galleryDragged = false;

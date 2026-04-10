@@ -217,11 +217,6 @@ span {
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.65);
 }
 
-body::before,
-body::after {
-  display: none;
-}
-
 .left-side-menu::before {
   content: none;
 }
@@ -607,7 +602,8 @@ html::-webkit-scrollbar {
 @media (max-width: 767px) {
   html {
     scrollbar-width: none;
-    overscroll-behavior-y: none;
+    /* overscroll-behavior-y: auto — permite pull-to-refresh pe toate paginile */
+    overscroll-behavior-y: auto;
   }
 
   html::-webkit-scrollbar {
@@ -644,14 +640,6 @@ html::-webkit-scrollbar-thumb:hover {
     inset 0 2px 0 rgba(255, 255, 200, 0.70),
     inset 0 -2px 0 rgba(100, 50, 0, 0.50),
     0 0 18px rgba(245, 166, 35, 0.65);
-}
-
-.bg-night {
-  background-color: rgba(7, 20, 34, 0.26) !important;
-}
-
-.bg-graphite {
-  background-color: rgba(11, 29, 46, 0.22) !important;
 }
 
 /* ── Base 3D pill ────────────────────────────────────────────── */
@@ -1101,21 +1089,8 @@ html::-webkit-scrollbar-thumb:hover {
   top: 10px;
 }
 
-.hero-wrap {
-  position: relative;
-}
-
 #acasa {
   position: relative;
-}
-
-#acasa::before {
-  content: '';
-  position: absolute;
-  inset: -0.4rem -0.35rem;
-  z-index: -1;
-  border-radius: 1.25rem;
-  background: transparent;
 }
 
 .kicker {
@@ -1133,15 +1108,13 @@ html::-webkit-scrollbar-thumb:hover {
 }
 
 .btn-solid,
-.btn-outline,
-.nav-link {
+.btn-outline {
   transition: background-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
 }
 
 .btn-solid,
 .btn-outline,
 .btn-whatsapp,
-.nav-link,
 .left-side-link {
   min-height: 44px;
   min-width: 44px;
@@ -1186,8 +1159,7 @@ html::-webkit-scrollbar-thumb:hover {
 }
 
 .btn-solid:hover,
-.btn-outline:hover,
-.nav-link:hover {
+.btn-outline:hover {
   box-shadow: 0 0 0 1px rgba(255, 209, 102, 0.45) inset, 0 0 32px rgba(245, 166, 35, 0.5), 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
@@ -1238,121 +1210,10 @@ html::-webkit-scrollbar-thumb:hover {
 
 .btn-solid:focus-visible,
 .btn-outline:focus-visible,
-.nav-link:focus-visible,
 summary:focus-visible,
 details:focus-visible {
   outline: 3px solid var(--focus);
   outline-offset: 2px;
-}
-
-.nav-link {
-  display: inline-flex;
-  align-items: center;
-  flex-shrink: 0;
-  border: none;
-  border-radius: 9999px;
-  padding: 0.48rem 0.9rem;
-  color: #ffffff;
-  text-decoration: none;
-  background: rgba(5, 14, 35, 0.70);
-  text-shadow:
-    -0.5px -0.5px 0 rgba(255, 255, 255, 0.30),
-    0.5px 1.0px 3px rgba(0, 0, 0, 0.80);
-  position: relative;
-  overflow: hidden;
-  font-weight: 900;
-  font-size: max(0.82rem, 14px);
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  min-height: 44px;
-  min-width: 44px;
-  transition: box-shadow 100ms ease;
-}
-
-/* Gloss shine on nav buttons */
-.nav-link::before {
-  content: '';
-  position: absolute;
-  inset: 0 0 50% 0;
-  pointer-events: none;
-  border-radius: 9999px 9999px 60% 60% / 9999px 9999px 40% 40%;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0.04) 100%);
-  z-index: 1;
-}
-
-/* Nav color variants re-use the same 3D gradient system as sidebar */
-.nav-link.nav-btn-gold {
-  background: linear-gradient(175deg, #ffdc6a 0%, #f5a623 55%, #c07510 100%);
-  color: #3a1f00;
-  text-shadow: 0 1px 0 rgba(255, 220, 100, .55);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), 0 5px 0 #7a4400, 0 6px 14px rgba(0, 0, 0, .55), 0 0 20px rgba(245, 166, 35, .35);
-}
-
-.nav-link.nav-btn-cyan {
-  background: linear-gradient(175deg, #7ef8ff 0%, #06d6ff 55%, #0096bb 100%);
-  color: #002833;
-  text-shadow: 0 1px 0 rgba(180, 248, 255, .55);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), 0 5px 0 #004a65, 0 6px 14px rgba(0, 0, 0, .55), 0 0 20px rgba(6, 214, 255, .35);
-}
-
-.nav-link.nav-btn-violet {
-  background: linear-gradient(175deg, #d8a8ff 0%, #a764ff 55%, #7030cc 100%);
-  color: #1a0040;
-  text-shadow: 0 1px 0 rgba(220, 180, 255, .55);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), 0 5px 0 #3a0880, 0 6px 14px rgba(0, 0, 0, .55), 0 0 20px rgba(167, 100, 255, .35);
-}
-
-.nav-link.nav-btn-rose {
-  background: linear-gradient(175deg, #ff94b8 0%, #ff4678 55%, #cc0040 100%);
-  color: #3a0018;
-  text-shadow: 0 1px 0 rgba(255, 180, 210, .55);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), 0 5px 0 #800020, 0 6px 14px rgba(0, 0, 0, .55), 0 0 20px rgba(255, 70, 120, .35);
-}
-
-.nav-link.nav-btn-teal {
-  background: linear-gradient(175deg, #6effd8 0%, #14dcb4 55%, #009c78 100%);
-  color: #002818;
-  text-shadow: 0 1px 0 rgba(160, 255, 230, .55);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), 0 5px 0 #005a40, 0 6px 14px rgba(0, 0, 0, .55), 0 0 20px rgba(20, 220, 180, .35);
-}
-
-.nav-link.nav-btn-lime {
-  background: linear-gradient(175deg, #c8ff60 0%, #8cf032 55%, #58a800 100%);
-  color: #162800;
-  text-shadow: 0 1px 0 rgba(210, 255, 140, .55);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), 0 5px 0 #306000, 0 6px 14px rgba(0, 0, 0, .55), 0 0 20px rgba(140, 240, 50, .35);
-}
-
-.nav-link[class*="nav-btn-"]:hover {
-  filter: brightness(1.06) saturate(1.1);
-}
-
-.nav-link[class*="nav-btn-"].nav-btn-gold:hover {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), 0 5px 0 #7a4400, 0 6px 14px rgba(0, 0, 0, .45), 0 0 30px rgba(245, 166, 35, .60);
-}
-
-.nav-link[class*="nav-btn-"].nav-btn-cyan:hover {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), 0 5px 0 #004a65, 0 6px 14px rgba(0, 0, 0, .45), 0 0 30px rgba(6, 214, 255, .60);
-}
-
-.nav-link[class*="nav-btn-"].nav-btn-violet:hover {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), 0 5px 0 #3a0880, 0 6px 14px rgba(0, 0, 0, .45), 0 0 30px rgba(167, 100, 255, .60);
-}
-
-.nav-link[class*="nav-btn-"].nav-btn-rose:hover {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), 0 5px 0 #800020, 0 6px 14px rgba(0, 0, 0, .45), 0 0 30px rgba(255, 70, 120, .60);
-}
-
-.nav-link[class*="nav-btn-"].nav-btn-teal:hover {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), 0 5px 0 #005a40, 0 6px 14px rgba(0, 0, 0, .45), 0 0 30px rgba(20, 220, 180, .60);
-}
-
-.nav-link[class*="nav-btn-"].nav-btn-lime:hover {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), 0 5px 0 #306000, 0 6px 14px rgba(0, 0, 0, .45), 0 0 30px rgba(140, 240, 50, .60);
-}
-
-.nav-link:hover {
-  color: inherit;
 }
 
 .nav-label {
@@ -1361,86 +1222,12 @@ details:focus-visible {
   z-index: 2;
 }
 
-.nav-link.is-active {
-  filter: brightness(1.25) saturate(1.4);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.55),
-    0 0 18px 4px rgba(255, 255, 255, 0.25),
-    0 5px 0 var(--btn-shadow-color, #7a4400),
-    0 0 32px 8px var(--btn-glow-color, rgba(255, 200, 0, 0.45)) !important;
-  transition: opacity 350ms ease, filter 350ms ease, box-shadow 100ms ease;
-}
-
-.nav-link.just-activated {
-  animation: nav-pulse 520ms cubic-bezier(0.2, 0.7, 0.2, 1);
-}
-
-@keyframes nav-hover-loop {
-  from {
-    transform: scale(1);
-  }
-
-  to {
-    transform: scale(1.02);
-  }
-}
-
 .no-scrollbar {
   scrollbar-width: none;
 }
 
 .no-scrollbar::-webkit-scrollbar {
   display: none;
-}
-
-@keyframes nav-pulse {
-  0% {
-    transform: scale(0.98);
-    box-shadow: 0 0 0 1px #79c8ff42 inset, 0 0 0 rgba(122, 201, 255, 0);
-  }
-
-  60% {
-    transform: scale(1.02);
-    box-shadow: 0 0 0 1px #79c8ff5c inset, 0 0 26px rgba(122, 201, 255, 0.4);
-  }
-
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 1px #79c8ff47 inset, 0 0 22px rgba(122, 201, 255, 0.36);
-  }
-}
-
-.brand-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 0.7rem;
-  font-size: 0.72rem;
-  font-weight: 800;
-  color: #0C080F;
-  background: linear-gradient(145deg, #F5A623, #FFD166);
-}
-
-.chip-line {
-  display: inline-flex;
-  align-items: center;
-  border: 1px solid var(--line);
-  border-radius: 9999px;
-  background: #ffffff14;
-  padding: 0.42rem 0.72rem;
-}
-
-
-.badge-stat {
-  display: grid;
-  gap: 0.25rem;
-  border: 1px solid var(--line);
-  border-radius: 0.9rem;
-  background: #ffffff0f;
-  padding: 0.6rem 0.7rem;
-  color: #f7faff;
 }
 
 .section-head {
@@ -1488,11 +1275,6 @@ details:focus-visible {
 
 
 @media (max-width: 1023px) {
-  .hero-title {
-    font-size: clamp(1.65rem, 7.2vw, 2.25rem);
-    line-height: 1.08;
-  }
-
   .section-title {
     font-size: clamp(1.25rem, 5.8vw, 1.8rem);
     line-height: 1.2;
@@ -1672,21 +1454,6 @@ details:focus-visible {
     text-shadow: 0 0 10px rgba(6, 214, 255, 0.5) !important;
   }
 
-  /* Meniul mobil e compact (nu full-screen) — scroll-ul rămâne activ */
-  body.mobile-menu-open {
-    /* overflow și touch-action NU se blochează — userul trebuie să poată da scroll */
-  }
-
-  [data-home-gallery-grid] {
-    grid-template-columns: 1fr;
-    gap: 0.85rem;
-  }
-
-  [data-home-gallery-grid] .home-gallery-item img,
-  [data-home-gallery-grid]>img {
-    height: clamp(15rem, 58vw, 19rem);
-  }
-
   .btn-solid,
   .btn-outline,
   .btn-whatsapp,
@@ -1695,29 +1462,10 @@ details:focus-visible {
     padding-top: 0.68rem;
     padding-bottom: 0.68rem;
   }
-
-  .trend-track {
-    animation-duration: 32s;
-  }
-
-  body::before,
-  body::after {
-    animation-duration: 20s;
-  }
-}
-
-@media (min-width: 768px) and (max-width: 1023px) {
-  [data-home-gallery-grid] {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-
-  .btn-solid,
-  body::before,
-  body::after,
-  .trend-track {
+  .btn-solid {
     animation: none !important;
   }
 }
@@ -1847,11 +1595,10 @@ details:focus-visible {
     overflow-x: hidden !important;
   }
 
-  /* Pe paginile non-homepage (swipe orizontal), clip în loc de hidden:
-     previne accesul vertical la footer dar nu blochează pull-to-refresh
-     (clip nu creează scroll container → nu interferează cu overscroll). */
+  /* Pe paginile non-homepage: overflow-y visible permite pull-to-refresh.
+     Footer-ul e protejat prin height:100dvh pe main. */
   .page-shell:not(.is-homepage) {
-    overflow-y: clip !important;
+    overflow-y: visible !important;
   }
 
   /* ── 5. Main = container orizontal cu scroll-snap ── */

@@ -14,6 +14,14 @@
     var main = document.getElementById('continut');
     if (!main) return;
 
+    /* ── Previne restaurarea scroll-ului orizontal de către browser la refresh.
+         Fără asta, scroll-snap + scrollLeft restaurat poate sări la alt slide
+         și declanșa navigare pe altă pagină. ── */
+    if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+    }
+    main.scrollLeft = 0;
+
     /* ── bfcache fix: când browser-ul restaurează pagina din back-forward cache,
          inline styles (opacity:0, transition) sunt păstrate → conținut invizibil.
          pageshow.persisted === true indică restaurare din bfcache. ── */
@@ -355,4 +363,69 @@
             }, { once: true });
         }
     });
+
+    /* ═══ Pull-to-refresh manual ═══
+       Pe layout swipe (100dvh), body nu scrollează → pull-to-refresh nativ nu se activează.
+       Detectăm: secțiunea curentă e la scrollTop=0 + utilizatorul trage >90px în jos → reload. */
+    (function () {
+        var ptrStartY = 0;
+        var ptrActive = false;
+        var ptrIndicator = null;
+
+        function getCurrentSection() {
+            return slides[current] || null;
+        }
+
+        function createIndicator() {
+            if (ptrIndicator) return ptrIndicator;
+            ptrIndicator = document.createElement('div');
+            ptrIndicator.setAttribute('aria-hidden', 'true');
+            ptrIndicator.style.cssText =
+                'position:fixed;top:0;left:50%;transform:translateX(-50%) translateY(-60px);' +
+                'z-index:9999;padding:8px 18px;border-radius:0 0 12px 12px;' +
+                'background:rgba(0,200,255,0.15);backdrop-filter:blur(8px);' +
+                'color:rgba(0,220,255,0.9);font-size:12px;font-weight:600;' +
+                'letter-spacing:0.05em;pointer-events:none;transition:transform 0.25s ease;';
+            ptrIndicator.textContent = '↓ Trage pentru refresh';
+            document.body.appendChild(ptrIndicator);
+            return ptrIndicator;
+        }
+
+        document.addEventListener('touchstart', function (e) {
+            var sec = getCurrentSection();
+            if (!sec) return;
+            // Activează doar dacă secțiunea e la top
+            if (sec.scrollTop > 5) { ptrActive = false; return; }
+            ptrStartY = e.touches[0].clientY;
+            ptrActive = true;
+        }, { passive: true });
+
+        document.addEventListener('touchmove', function (e) {
+            if (!ptrActive) return;
+            var dy = e.touches[0].clientY - ptrStartY;
+            if (dy > 30 && dy < 150) {
+                var ind = createIndicator();
+                ind.style.transform = 'translateX(-50%) translateY(' + Math.min(dy * 0.4, 40) + 'px)';
+                if (dy > 90) {
+                    ind.textContent = '↓ Eliberează pentru refresh';
+                } else {
+                    ind.textContent = '↓ Trage pentru refresh';
+                }
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchend', function (e) {
+            if (!ptrActive) { return; }
+            var dy = e.changedTouches[0].clientY - ptrStartY;
+            ptrActive = false;
+            if (dy > 90) {
+                if (ptrIndicator) {
+                    ptrIndicator.textContent = '⟳ Se reîncarcă…';
+                }
+                location.reload();
+            } else if (ptrIndicator) {
+                ptrIndicator.style.transform = 'translateX(-50%) translateY(-60px)';
+            }
+        }, { passive: true });
+    })();
 })();
