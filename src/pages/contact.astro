@@ -25,7 +25,7 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
           <h1 class="section-title">{contactSeo.h1}</h1>
           <p class="section-copy">{contactSeo.descriere}</p>
 
-          <div class="mt-4 flex flex-wrap gap-2">
+          <div class="mt-4 flex min-w-0 flex-wrap gap-2">
             <a class="btn-solid" href={`tel:${contact.phoneRaw}`} onclick="window.gtag&&window.gtag('event','click_phone',{event_category:'contact'})">Telefon: {contact.phoneDisplay}</a>
             <span class="btn-outline ob-email-contact" data-u="contact" data-d="florentinapanaofficial.ro">Email: [email protejat]</span>
           </div>
@@ -335,7 +335,22 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
       .contact-compact .btn-outline,
       .contact-compact .btn-whatsapp {
         width: 100%;
+        max-width: 100%;
         justify-content: center;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+        white-space: normal;
+        text-align: center;
+      }
+
+      .contact-compact .grid {
+        min-width: 0;
+      }
+
+      .contact-compact .grid > div {
+        min-width: 0;
+        overflow-wrap: anywhere;
+        word-break: break-word;
       }
     }
   </style>
@@ -450,7 +465,7 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
       const d = el.getAttribute('data-d');
       if (u && d) {
         const addr = u + '@' + d;
-        el.outerHTML = `<a class="btn-outline" href="mailto:${addr}">Email: ${addr}</a>`;
+        el.outerHTML = `<a class="btn-outline" href="mailto:${addr}" style="overflow-wrap:anywhere;word-break:break-word">Email: ${addr}</a>`;
       }
     }
   });
