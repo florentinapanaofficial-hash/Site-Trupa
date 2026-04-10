@@ -1871,12 +1871,67 @@ details:focus-visible {
   }
 
   /* ── Footer global: ascuns pe subpagini mobil (swipe) — pe homepage rămâne vizibil ── */
-  body:not(.is-homepage) footer.border-t {
-    display: none !important;
-  }
+  /* Footer acum vizibil pe toate paginile — subpaginile folosesc scroll vertical */
 
   /* ── Săgeți swipe: ascunse când sliderul are un singur element ── */
   .mob-swipe-hints.single-slide {
+    display: none !important;
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     SUBPAGINI MOBIL — SCROLL VERTICAL  (body:not(.is-homepage))
+     ──────────────────────────────────────────────────────────────
+     Toate paginile non-homepage folosesc scroll vertical normal.
+     Acest bloc universal înlocuiește override-urile per-pagină
+     (contact, membri, etc.) care suprascriu swipe-ul cu !important.
+     Clipping-ul orizontal e asigurat de .page-shell (overflow-x:hidden).
+  ══════════════════════════════════════════════════════════════ */
+  body:not(.is-homepage) .page-shell {
+    overflow-y: visible !important;
+  }
+
+  body:not(.is-homepage) .layout-content-shell {
+    overflow: visible !important;
+  }
+
+  body:not(.is-homepage) main#continut {
+    display: block !important;
+    flex-direction: unset !important;
+    overflow: visible !important;
+    scroll-snap-type: none !important;
+    height: auto !important;
+    min-height: unset !important;
+    max-height: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overscroll-behavior: auto !important;
+    -webkit-overflow-scrolling: auto !important;
+    padding-top: calc(var(--mob-nav-h, 72px) + 0.5rem) !important;
+    padding-bottom: 2rem !important;
+  }
+
+  body:not(.is-homepage) main#continut>section {
+    flex: unset !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: unset !important;
+    max-height: none !important;
+    overflow: visible !important;
+    overscroll-behavior: auto !important;
+    -webkit-overflow-scrolling: auto !important;
+    scroll-snap-align: none !important;
+    scroll-snap-stop: unset !important;
+    touch-action: auto !important;
+    box-sizing: border-box !important;
+    padding-top: 0 !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    padding-bottom: 1.5rem !important;
+  }
+
+  /* Săgețile swipe: ascunse pe subpagini — nu mai e nevoie de swipe */
+  body:not(.is-homepage) .mob-swipe-hints {
     display: none !important;
   }
 }

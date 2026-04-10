@@ -286,7 +286,10 @@
         return;
     }
 
-    var n2 = slides.length;
+    /* Subpagini: CSS-ul face layout vertical, deci nu există slides
+       orizontale. Tratăm pagina ca un singur „slide" — orice swipe
+       orizontal navighează direct la pagina anterioară/următoare. */
+    var n2 = 1;
 
     var pageOrder = [
         '/',
@@ -347,19 +350,9 @@
     var tStartX = 0, tStartY = 0, tAxis = null, tScrollStart = 0;
     var tLocked = false;
 
-    function lockVertical() {
-        if (tLocked) return;
-        tLocked = true;
-        var sec = slides[current];
-        if (sec) sec.style.overflowY = 'hidden';
-    }
-
-    function unlockVertical() {
-        if (!tLocked) return;
-        tLocked = false;
-        var sec = slides[current];
-        if (sec) sec.style.overflowY = '';
-    }
+    /* Layout vertical: nu blocăm overflowY pe secțiuni */
+    function lockVertical() { }
+    function unlockVertical() { }
 
     function onTouchStart(e) {
         if (e.target.closest && (e.target.closest('.mob-nav') || e.target.closest('.mc-gallery'))) {
