@@ -634,21 +634,24 @@ function initiale(name: string): string {
   });
 </script>
 
-<!-- Override global: pagina Membri folosește scroll vertical pe mobil, nu swipe orizontal -->
+<!-- Override global: pagina Membri folosește scroll vertical pe mobil, nu swipe orizontal.
+     IMPORTANT: selectoarele folosesc „html" prefix → specificitate mai mare decât globals.css,
+     astfel încât override-ul câștigă ÎNTOTDEAUNA, indiferent de ordinea CSS-ului în bundle. -->
 <style is:global>
   @media (max-width: 767px) {
     /* Body shell: permite scroll vertical (implicit clip pe non-homepage) */
-    .page-shell {
+    html .page-shell {
       overflow-y: visible !important;
     }
 
     /* Layout shell: block normal */
-    .layout-content-shell {
+    html .layout-content-shell {
       overflow: visible !important;
     }
 
-    /* Dezactivează swipe-ul orizontal: main = block vertical cu scroll normal al body-ului */
-    main#continut {
+    /* Dezactivează swipe-ul orizontal: main = block vertical cu scroll normal al body-ului.
+       „html main#continut" → specificitate (0,1,0,2) bate globals.css (0,1,0,1). */
+    html main#continut {
       display: block !important;
       flex-direction: unset !important;
       overflow-x: hidden !important;
@@ -662,10 +665,10 @@ function initiale(name: string): string {
     }
 
     /* Secțiunile revin la flow vertical normal */
-    main#continut > section.membri-page-wrap,
-    main#continut > section.membri-page-wrap > section,
-    main#continut > section.membri-page-wrap > header,
-    main#continut > section.membri-page-wrap > div:not(#gallery-popup) {
+    html main#continut > section.membri-page-wrap,
+    html main#continut > section.membri-page-wrap > section,
+    html main#continut > section.membri-page-wrap > header,
+    html main#continut > section.membri-page-wrap > div:not(#gallery-popup) {
       flex: unset !important;
       width: 100% !important;
       height: auto !important;
@@ -679,7 +682,7 @@ function initiale(name: string): string {
     }
 
     /* Secțiunile membru: padding lateral mic + bottom */
-    main#continut > section.membri-page-wrap > section.mem-section {
+    html main#continut > section.membri-page-wrap > section.mem-section {
       padding-left: 0.6rem !important;
       padding-right: 0.6rem !important;
       padding-bottom: 1rem !important;
