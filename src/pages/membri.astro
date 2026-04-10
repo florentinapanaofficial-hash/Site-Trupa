@@ -1090,10 +1090,26 @@ function initiale(name: string): string {
   }
 
   /* ══════════════════════════════════════════
-     GALERIE MOBIL — ajustări specifice
+     GALERIE MOBIL — containment robust
+     (izolată de overflow-ul părinților — rezistă la
+      orice modificare SEO pe layout-ul global)
   ══════════════════════════════════════════ */
   @media (max-width: 767px) {
+    /* ── Containment: card-ul taie orice overflow orizontal ── */
+    .member-card-wrap {
+      overflow-x: clip;
+      max-width: 100%;
+    }
+
+    .member-card {
+      overflow: hidden !important;
+    }
+
+    /* ── Galeria: scroll propriu, independent de ancestors ── */
     .mc-gallery {
+      overflow-x: auto !important;
+      overflow-y: hidden !important;
+      -webkit-overflow-scrolling: touch !important;
       overscroll-behavior-x: contain;
       touch-action: pan-x pinch-zoom;
       gap: 0.6rem;
@@ -1351,8 +1367,10 @@ function initiale(name: string): string {
          jos:    56px buton + 0.75rem offset + 0.5rem gap = ~5rem  */
       padding: 1.25rem 4.5rem 5rem 1rem;
       max-width: 100%;
-      overflow-x: visible;
-      overflow-y: visible;
+      /* !important — protejat de cascade SEO; galeria are nevoie de visible
+         ca să iasă cu margin negativ până la marginea card-ului */
+      overflow-x: visible !important;
+      overflow-y: visible !important;
       box-sizing: border-box;
     }
 
