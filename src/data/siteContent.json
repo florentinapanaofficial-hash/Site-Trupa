@@ -25,11 +25,6 @@
   },
   "navigation": [
     {
-      "href": "/momente-cu-mirii",
-      "label": "Momente cu mirii",
-      "color": "cyan"
-    },
-    {
       "href": "/comunitatea-noastra",
       "label": "Comunitate",
       "color": "cyan"
