@@ -335,6 +335,31 @@ const schemas = [collectionPageLd, itemListLd, aggregateRatingLd].filter(Boolean
   <!-- ═══ SCRIPT ═══════════════════════════════════════════════════ -->
   <script is:inline>
     /* ── Info tooltip toggle ── */
+    var hoverTimers = new WeakMap();
+    var autoCloseTimers = new WeakMap();
+    var isTouch = 'ontouchstart' in window;
+
+    function closeAllTooltips() {
+      document.querySelectorAll('.chero-card__tooltip.is-visible').forEach(function (t) {
+        t.classList.remove('is-visible');
+        var card = t.closest('.chero-card');
+        if (card) clearTimeout(autoCloseTimers.get(card));
+      });
+    }
+
+    function showTooltip(card) {
+      var tooltip = card.querySelector('.chero-card__tooltip');
+      if (!tooltip || tooltip.classList.contains('is-visible')) return;
+      closeAllTooltips();
+      tooltip.classList.add('is-visible');
+      /* Auto-close după 4s */
+      clearTimeout(autoCloseTimers.get(card));
+      autoCloseTimers.set(card, setTimeout(function () {
+        tooltip.classList.remove('is-visible');
+      }, 4000));
+    }
+
+    /* Click pe butonul ℹ (mobil + desktop) */
     document.querySelectorAll('[data-info-btn]').forEach(function (btn) {
       btn.addEventListener('click', function (e) {
         e.preventDefault();
@@ -344,23 +369,35 @@ const schemas = [collectionPageLd, itemListLd, aggregateRatingLd].filter(Boolean
         var tooltip = card.querySelector('.chero-card__tooltip');
         if (!tooltip) return;
         var isOpen = tooltip.classList.contains('is-visible');
-
-        document.querySelectorAll('.chero-card__tooltip.is-visible').forEach(function (t) {
-          t.classList.remove('is-visible');
-        });
-
-        if (!isOpen) {
-          tooltip.classList.add('is-visible');
-        }
+        closeAllTooltips();
+        if (!isOpen) showTooltip(card);
       });
     });
+
+    /* Desktop hover — apare după 1.5s, dispare la mouseleave */
+    if (!isTouch) {
+      document.querySelectorAll('.chero-card').forEach(function (card) {
+        card.addEventListener('mouseenter', function () {
+          clearTimeout(hoverTimers.get(card));
+          hoverTimers.set(card, setTimeout(function () {
+            showTooltip(card);
+          }, 1500));
+        });
+        card.addEventListener('mouseleave', function () {
+          clearTimeout(hoverTimers.get(card));
+          var tooltip = card.querySelector('.chero-card__tooltip');
+          if (tooltip) {
+            tooltip.classList.remove('is-visible');
+            clearTimeout(autoCloseTimers.get(card));
+          }
+        });
+      });
+    }
 
     /* ── Close tooltips on outside click ── */
     document.addEventListener('click', function (e) {
       if (!e.target.closest('[data-info-btn]') && !e.target.closest('.chero-card__tooltip')) {
-        document.querySelectorAll('.chero-card__tooltip.is-visible').forEach(function (t) {
-          t.classList.remove('is-visible');
-        });
+        closeAllTooltips();
       }
     });
 
