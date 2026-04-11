@@ -336,15 +336,19 @@
     }
 
     /* Detectare swipe orizontal simplu — dx > threshold → navigare */
-    var tStartX = 0, tStartY = 0;
+    var tStartX = 0, tStartY = 0, tSkipSwipe = false;
 
     document.addEventListener('touchstart', function (e) {
-        if (e.target.closest && (e.target.closest('.mob-nav') || e.target.closest('.mc-gallery'))) return;
+        if (e.target.closest && (e.target.closest('.mob-nav') || e.target.closest('.mc-gallery') || e.target.closest('.mc-gallery-wrap'))) {
+            tSkipSwipe = true; return;
+        }
+        tSkipSwipe = false;
         tStartX = e.touches[0].clientX;
         tStartY = e.touches[0].clientY;
     }, { passive: true });
 
     document.addEventListener('touchend', function (e) {
+        if (tSkipSwipe) { tSkipSwipe = false; return; }
         var dx = e.changedTouches[0].clientX - tStartX;
         var dy = e.changedTouches[0].clientY - tStartY;
         if (Math.abs(dx) < 50 || Math.abs(dy) > Math.abs(dx)) return;

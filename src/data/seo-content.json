@@ -116,6 +116,45 @@
             "Rezervă data evenimentului tău în Argeș"
         ]
     },
+    "comunitatea-noastra": {
+        "meta": {
+            "title": "Comunitatea Noastră — Recenzii Nuntă Pitești | Florentina Pană",
+            "description": "Comunitatea Formației Florentina Pană — recenzii reale de la nunți în Pitești și Argeș, galerie foto comunitate și publicații. Descoperă poveștile cuplurilor!"
+        },
+        "h1": "Comunitatea Formației Florentina Pană — Recenzii, Galerie & Publicații",
+        "subtitle": "Fiecare nuntă e o poveste unică. Iată ce spun cuplurile care ne-au încredințat cele mai frumoase momente din viața lor — recenzii autentice, fotografii de la evenimente în Pitești, Argeș și publicații din culisele formației.",
+        "sections": [
+            {
+                "id": "testimoniale",
+                "title": "Cuvintele lor valorează mai mult — Recenzii Nunți Pitești",
+                "description": "Recenzii reale de la cupluri din Pitești, Mioveni, Curtea de Argeș și întreaga Muntenie. Fiecare testimonial reflectă o experiență unică la nuntă cu Formația Florentina Pană."
+            },
+            {
+                "id": "galerie-foto",
+                "title": "Galerie Foto Comunitate — Evenimente Live Argeș",
+                "description": "Fotografii autentice din comunitatea noastră — momente surprinse la nunți și evenimente în Pitești și Argeș."
+            },
+            {
+                "id": "publicatii",
+                "title": "Publicații & Vlog — Sfaturi Muzică Nuntă Pitești",
+                "description": "Articole, ghiduri și vloguri din culisele formației. Inspirație pentru mirii care plănuiesc nunta în Argeș."
+            }
+        ],
+        "faq": [
+            {
+                "question": "Ce spun cuplurile despre Formația Florentina Pană?",
+                "answer": "Cuplurile din Pitești și Argeș ne recomandă pentru energia de pe scenă, repertoriul variat și profesionalismul echipei. Toate recenziile sunt autentice, de la nunți reale."
+            },
+            {
+                "question": "Pot vedea fotografii de la nunțile anterioare?",
+                "answer": "Da! Galeria foto comunitate include imagini autentice de la evenimentele noastre din Pitești, Mioveni, Curtea de Argeș și din toată România."
+            },
+            {
+                "question": "Unde pot citi articole despre muzica de nuntă?",
+                "answer": "Secțiunea Publicații & Vlog conține articole actualizate cu sfaturi pentru miri, noutăți despre repertoriu și povești din culise."
+            }
+        ]
+    },
     "schema": {
         "@context": "https://schema.org",
         "@type": "MusicGroup",
