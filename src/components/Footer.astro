@@ -13,52 +13,70 @@ const socialLinks = {
 const isHomePage = Astro.url.pathname === '/';
 ---
 
-<footer class="border-t border-white/10 bg-[#0C080F] text-white/90">
+<footer class={`border-t border-white/10 bg-[#0C080F] text-white/90 ${isHomePage ? '' : 'footer--accordion'}`}>
   <!-- Navigare site — rezolvă pagini orfane -->
-  <nav class="section-container border-b border-white/10 py-6" aria-label="Hartă site">
-    <div class="flex flex-wrap justify-center gap-x-5 gap-y-2 text-xs text-white/70">
-      <a href="/despre" class="transition hover:text-[#F5A623] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F5A623] rounded">Despre noi</a>
-      <a href="/membri" class="transition hover:text-[#F5A623] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F5A623] rounded">Membri</a>
-      <a href="/galerie-video" class="transition hover:text-[#F5A623] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F5A623] rounded">Galerie Video</a>
-      <a href="/galerie-foto" class="transition hover:text-[#F5A623] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F5A623] rounded">Galerie Foto</a>
-      <a href="/blog" class="transition hover:text-[#F5A623] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F5A623] rounded">Blog</a>
-      <a href="/aparitii-tv" class="transition hover:text-[#F5A623] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F5A623] rounded">Apariții TV</a>
-      <a href="/momente-cu-mirii" class="transition hover:text-[#F5A623] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F5A623] rounded">Momente cu mirii</a>
-      <a href="/comunitatea-noastra" class="transition hover:text-[#F5A623] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F5A623] rounded">Comunitatea noastră</a>
-      <a href="/contact" class="transition hover:text-[#F5A623] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F5A623] rounded">Contact</a>
-      <a href="/colaboratori/saxofon" class="transition hover:text-[#F5A623] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F5A623] rounded">Saxofonist</a>
-      <a href="/colaboratori/tambal" class="transition hover:text-[#F5A623] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F5A623] rounded">Țambalist</a>
+  <div class={`ftr-section ${isHomePage ? '' : 'ftr-section--collapsed'}`} data-ftr-section>
+    <button class="ftr-tab" type="button" data-ftr-toggle aria-expanded={isHomePage ? 'true' : 'false'}>
+      <span class="ftr-tab-icon">🗺️</span>
+      <span class="ftr-tab-text">Hartă site</span>
+      <svg class="ftr-tab-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="ftr-content" data-ftr-content>
+      <nav class="section-container py-5" aria-label="Hartă site">
+        <div class="flex flex-wrap justify-center gap-x-5 gap-y-2 text-xs text-white/70">
+          <a href="/despre" class="transition hover:text-[#F5A623] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F5A623] rounded">Despre noi</a>
+          <a href="/membri" class="transition hover:text-[#F5A623] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F5A623] rounded">Membri</a>
+          <a href="/galerie-video" class="transition hover:text-[#F5A623] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F5A623] rounded">Galerie Video</a>
+          <a href="/galerie-foto" class="transition hover:text-[#F5A623] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F5A623] rounded">Galerie Foto</a>
+          <a href="/blog" class="transition hover:text-[#F5A623] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F5A623] rounded">Blog</a>
+          <a href="/aparitii-tv" class="transition hover:text-[#F5A623] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F5A623] rounded">Apariții TV</a>
+          <a href="/momente-cu-mirii" class="transition hover:text-[#F5A623] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F5A623] rounded">Momente cu mirii</a>
+          <a href="/comunitatea-noastra" class="transition hover:text-[#F5A623] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F5A623] rounded">Comunitatea noastră</a>
+          <a href="/contact" class="transition hover:text-[#F5A623] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F5A623] rounded">Contact</a>
+          <a href="/colaboratori/saxofon" class="transition hover:text-[#F5A623] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F5A623] rounded">Saxofonist</a>
+          <a href="/colaboratori/tambal" class="transition hover:text-[#F5A623] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F5A623] rounded">Țambalist</a>
+        </div>
+      </nav>
     </div>
-  </nav>
-  <!-- Date legale firmă — obligatorii conform Legii 31/1990 Art. 74, Legii 365/2002 Art. 5 -->
-  <address class="section-container border-b border-white/10 py-5 text-xs text-white/60 leading-relaxed not-italic">
-    <div class="flex flex-wrap justify-center gap-x-4 gap-y-1 text-center">
-      <span>Pană Claudiu-Gheorghe Întreprindere Individuală</span>
-      <span aria-hidden="true">·</span>
-      <span>CUI: 34528125</span>
-      <span aria-hidden="true">·</span>
-      <span>Nr. Reg. Com.: F3/581/2015</span>
-      <span aria-hidden="true">·</span>
-      <span>Sediu: Calea Craiovei nr. 152, Bl. TG1, Sc. B, Et. 6, Ap. 24, Pitești, jud. Argeș, România</span>
-      <span aria-hidden="true">·</span>
-      <span>Email: <span class="ob-email" data-u="contact" data-d="florentinapanaofficial.ro">[email protejat]</span></span>
-      <span aria-hidden="true">·</span>
-      <span>Tel: <a href="tel:+40767369658" class="transition hover:text-white/80 underline">0767 369 658</a></span>
+  </div>
+
+  <!-- Date legale firmă + ANPC -->
+  <div class={`ftr-section ${isHomePage ? '' : 'ftr-section--collapsed'}`} data-ftr-section>
+    <button class="ftr-tab" type="button" data-ftr-toggle aria-expanded={isHomePage ? 'true' : 'false'}>
+      <span class="ftr-tab-icon">⚖️</span>
+      <span class="ftr-tab-text">Date firmă &amp; ANPC</span>
+      <svg class="ftr-tab-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="ftr-content" data-ftr-content>
+      <address class="section-container py-5 text-xs text-white/60 leading-relaxed not-italic">
+        <div class="flex flex-wrap justify-center gap-x-4 gap-y-1 text-center">
+          <span>Pană Claudiu-Gheorghe Întreprindere Individuală</span>
+          <span aria-hidden="true">·</span>
+          <span>CUI: 34528125</span>
+          <span aria-hidden="true">·</span>
+          <span>Nr. Reg. Com.: F3/581/2015</span>
+          <span aria-hidden="true">·</span>
+          <span>Sediu: Calea Craiovei nr. 152, Bl. TG1, Sc. B, Et. 6, Ap. 24, Pitești, jud. Argeș, România</span>
+          <span aria-hidden="true">·</span>
+          <span>Email: <span class="ob-email" data-u="contact" data-d="florentinapanaofficial.ro">[email protejat]</span></span>
+          <span aria-hidden="true">·</span>
+          <span>Tel: <a href="tel:+40767369658" class="transition hover:text-white/80 underline">0767 369 658</a></span>
+        </div>
+        <div class="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-center">
+          <a href="https://anpc.ro/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 transition hover:text-white/80 underline">
+            <svg viewBox="0 0 20 20" class="h-4 w-4 shrink-0" fill="currentColor" aria-hidden="true"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11H9v-2h2v2zm0-4H9V5h2v4z"/></svg>
+            ANPC — Protecția Consumatorilor
+          </a>
+          <span aria-hidden="true">·</span>
+          <a href="https://ec.europa.eu/consumers/odr/" target="_blank" rel="noopener noreferrer" class="transition hover:text-white/80 underline">
+            SAL / ODR — Soluționarea Online a Litigiilor
+          </a>
+          <span aria-hidden="true">·</span>
+          <span>Entitate SAL: <a href="https://anpc.ro/categorie/sal/" target="_blank" rel="noopener noreferrer" class="transition hover:text-white/80 underline">Lista entități SAL — ANPC</a></span>
+        </div>
+      </address>
     </div>
-    <!-- ANPC + SAL — obligatorii conform OG 21/1992, OUG 34/2014, OG 38/2015 -->
-    <div class="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-center">
-      <a href="https://anpc.ro/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 transition hover:text-white/80 underline">
-        <svg viewBox="0 0 20 20" class="h-4 w-4 shrink-0" fill="currentColor" aria-hidden="true"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11H9v-2h2v2zm0-4H9V5h2v4z"/></svg>
-        ANPC — Protecția Consumatorilor
-      </a>
-      <span aria-hidden="true">·</span>
-      <a href="https://ec.europa.eu/consumers/odr/" target="_blank" rel="noopener noreferrer" class="transition hover:text-white/80 underline">
-        SAL / ODR — Soluționarea Online a Litigiilor
-      </a>
-      <span aria-hidden="true">·</span>
-      <span>Entitate SAL: <a href="https://anpc.ro/categorie/sal/" target="_blank" rel="noopener noreferrer" class="transition hover:text-white/80 underline">Lista entități SAL — ANPC</a></span>
-    </div>
-  </address>
+  </div>
 
   <div class="section-container grid gap-4 py-8 text-sm md:grid-cols-3 md:items-center">
     <div class="inline-flex items-center gap-3">
@@ -179,5 +197,116 @@ const isHomePage = Astro.url.pathname === '/';
       el.innerHTML = '<a href="mai' + 'lto:' + addr + '" class="transition hover:text-white/80 underline">' + addr + '</a>';
     });
   })();
+
+  /* ═══ Footer acordeon — doar pe subpagini ═══ */
+  (function () {
+    var footer = document.querySelector('.footer--accordion');
+    if (!footer) return; /* pe homepage nu există clasa → nu se execută */
+
+    var sections = footer.querySelectorAll('[data-ftr-section]');
+    sections.forEach(function (sec) {
+      var toggle = sec.querySelector('[data-ftr-toggle]');
+      if (!toggle) return;
+
+      toggle.addEventListener('click', function () {
+        var isOpen = !sec.classList.contains('ftr-section--collapsed');
+        if (isOpen) {
+          sec.classList.add('ftr-section--collapsed');
+          toggle.setAttribute('aria-expanded', 'false');
+        } else {
+          sec.classList.remove('ftr-section--collapsed');
+          toggle.setAttribute('aria-expanded', 'true');
+        }
+      });
+    });
+  })();
 </script>
+
+<style>
+  /* ─── Footer acordeon (doar pe subpagini) ───────────────────────── */
+  .ftr-section {
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  /* Tab-ul — vizibil doar pe subpagini */
+  .ftr-tab {
+    display: none;
+    width: 100%;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: left;
+    transition: background 180ms ease;
+  }
+
+  .ftr-tab:hover {
+    background: rgba(255,255,255,0.04);
+  }
+
+  .footer--accordion .ftr-tab {
+    display: flex;
+  }
+
+  .ftr-tab-icon {
+    font-size: 0.85rem;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .ftr-tab-text {
+    flex: 1;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+  }
+
+  .ftr-tab-chevron {
+    flex-shrink: 0;
+    color: rgba(255,255,255,0.4);
+    transition: transform 250ms ease;
+  }
+
+  .ftr-section--collapsed .ftr-tab-chevron {
+    transform: rotate(0deg);
+  }
+
+  .ftr-section:not(.ftr-section--collapsed) .ftr-tab-chevron {
+    transform: rotate(180deg);
+  }
+
+  /* Conținut — pe homepage e mereu vizibil */
+  .ftr-content {
+    overflow: hidden;
+    transition: max-height 300ms cubic-bezier(0.4, 0, 0.2, 1), opacity 200ms ease;
+  }
+
+  .footer--accordion .ftr-section--collapsed .ftr-content {
+    max-height: 0;
+    opacity: 0;
+  }
+
+  .footer--accordion .ftr-section:not(.ftr-section--collapsed) .ftr-content {
+    max-height: 30rem;
+    opacity: 1;
+  }
+
+  /* Borduri subtile pe secțiuni pe subpagini */
+  .footer--accordion .ftr-section {
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 0.6rem;
+    margin: 0.25rem 0.5rem;
+    background: rgba(255,255,255,0.015);
+  }
+
+  .footer--accordion .ftr-section:not(.ftr-section--collapsed) {
+    border-color: rgba(245,166,35,0.15);
+    background: rgba(245,166,35,0.02);
+  }
+</style>
 
