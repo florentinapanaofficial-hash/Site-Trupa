@@ -20,7 +20,7 @@
     if ('scrollRestoration' in history) {
         history.scrollRestoration = 'manual';
     }
-    main.scrollLeft = 0;
+    requestAnimationFrame(function () { main.scrollLeft = 0; });
 
     /* ── bfcache fix: când browser-ul restaurează pagina din back-forward cache,
          inline styles (opacity:0, transition) sunt păstrate → conținut invizibil.
