@@ -212,17 +212,12 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
 
     syncTopMenuBodyClass(false);
 
-    // Pe mobil, meniul e deschis implicit — INSTANT fără animație
+    // Pe mobil, meniul pornește ÎNCHIS. Pe desktop, restaurăm starea din sessionStorage.
     const wasOpen = sessionStorage.getItem(MENU_KEY) === 'true';
 
     if (headerEl && menuToggle) {
       if (isMobileViewport()) {
-        headerEl.classList.add('menu-instant');
-        openMenu();
-        // Scoatem menu-instant după primul frame ca animațiile viitoare să meargă normal
-        requestAnimationFrame(() => { requestAnimationFrame(() => {
-          headerEl.classList.remove('menu-instant');
-        }); });
+        closeMenu();
       } else if (wasOpen) {
         openMenu();
       }
@@ -245,12 +240,10 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
         menuBackdrop.addEventListener('click', closeMenu);
       }
 
-      // Click pe link desktop → închide meniul
-      // Click pe link MOBIL → NU închide meniul (butoanele rămân fixe)
+      // Click pe orice link din meniu → închide meniul (și pe mobil)
       const navLinks = document.querySelectorAll('#top-menu-panel [data-nav-link]');
       navLinks.forEach((link) => {
         link.addEventListener('click', () => {
-          if (isMobileViewport()) return;          // pe mobil: meniul rămâne deschis
           if (headerEl.classList.contains('menu-open')) {
             closeMenu();
           }
