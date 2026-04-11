@@ -264,15 +264,15 @@ const mobileNavAllItems = [
         {sideMenuTopItems.map((item) => (
           <a href={item.href} class={`left-side-link nav-btn-${item.color}`} data-nav-link>
             <span class="nav-icon" aria-hidden="true">
-              {item.icon === 'home' && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>}
-              {item.icon === 'info' && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>}
-              {item.icon === 'users' && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>}
-              {item.icon === 'video' && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>}
-              {item.icon === 'camera' && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>}
-              {item.icon === 'heart' && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>}
-              {item.icon === 'people' && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>}
-              {item.icon === 'tv' && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>}
-              {item.icon === 'mail' && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>}
+              {item.icon === 'home' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>}
+              {item.icon === 'info' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>}
+              {item.icon === 'users' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>}
+              {item.icon === 'video' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>}
+              {item.icon === 'camera' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>}
+              {item.icon === 'heart' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>}
+              {item.icon === 'people' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>}
+              {item.icon === 'tv' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>}
+              {item.icon === 'mail' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>}
             </span>
             {item.label}
           </a>
@@ -290,19 +290,19 @@ const mobileNavAllItems = [
           {sidebarSocialLinks.youtube && (
             <a href={sidebarSocialLinks.youtube} target="_blank" rel="noopener noreferrer" aria-label="YouTube"
               style="background:#FF0000;box-shadow:0 2px 10px rgba(255,0,0,0.50);">
-              <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="13" rx="4" fill="#fff"/><polygon points="9.5,9.5 9.5,15.5 16.5,12.5" fill="#FF0000"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="13" rx="4" fill="#fff"/><polygon points="9.5,9.5 9.5,15.5 16.5,12.5" fill="#FF0000"/></svg>
             </a>
           )}
           {sidebarSocialLinks.facebook && (
             <a href={sidebarSocialLinks.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook"
               style="background:#1877F2;box-shadow:0 2px 10px rgba(24,119,242,0.50);">
-              <svg viewBox="0 0 24 24" fill="none"><path d="M13.5 21V14.3H16l.4-2.85H13.5V9.7c0-.82.38-1.2 1.38-1.2H16.5V5.85C16.05 5.77 15.1 5.7 14 5.7c-2.65 0-4.05 1.4-4.05 4.15v1.6H8v2.85h1.95V21H13.5z" fill="#fff"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M13.5 21V14.3H16l.4-2.85H13.5V9.7c0-.82.38-1.2 1.38-1.2H16.5V5.85C16.05 5.77 15.1 5.7 14 5.7c-2.65 0-4.05 1.4-4.05 4.15v1.6H8v2.85h1.95V21H13.5z" fill="#fff"/></svg>
             </a>
           )}
           {sidebarSocialLinks.instagram && (
             <a href={sidebarSocialLinks.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram"
               style="background:radial-gradient(circle at 30% 110%,#ffd676 0%,#f46f30 25%,#e1306c 55%,#833ab4 80%,#405de6 100%);box-shadow:0 2px 10px rgba(225,48,108,0.50);">
-              <svg viewBox="0 0 24 24" fill="none"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5" stroke="#fff" stroke-width="2.1"/><circle cx="12" cy="12" r="4.3" stroke="#fff" stroke-width="2"/><circle cx="17.5" cy="6.6" r="1.4" fill="#fff"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5" stroke="#fff" stroke-width="2.1"/><circle cx="12" cy="12" r="4.3" stroke="#fff" stroke-width="2"/><circle cx="17.5" cy="6.6" r="1.4" fill="#fff"/></svg>
             </a>
           )}
         </div>
@@ -437,7 +437,114 @@ const mobileNavAllItems = [
     })();
     </script>
 
-    <!-- IntersectionObserver dezactivat — animațiile au fost scoase -->
+    <!-- IntersectionObserver — Text Reveal cu efect cascadă (staggered) -->
+    <script is:inline>
+    (function(){
+      if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      /* Selectează subtitlurile de secțiune + elementele marcate manual */
+      var targets = document.querySelectorAll('.section-title, .section-copy, .text-reveal');
+      if(!targets.length) return;
+
+      /* Adaugă clasa .text-reveal pe titluri/copii dacă nu o au deja */
+      targets.forEach(function(el){
+        if(!el.classList.contains('text-reveal')) el.classList.add('text-reveal');
+      });
+
+      /* Grupează elementele pe secțiune/container comun
+         pentru a calcula delay-ul cascadă (staggered) corect */
+      var observed = new Map(); /* parent → index counter */
+
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(entry){
+          if(!entry.isIntersecting) return;
+
+          var el = entry.target;
+          var parent = el.parentElement || document.body;
+
+          /* Increment delay staggered per grup de vecini */
+          if(!observed.has(parent)) observed.set(parent, 0);
+          var idx = observed.get(parent);
+          observed.set(parent, idx + 1);
+
+          el.style.setProperty('--reveal-delay', (idx * 120) + 'ms');
+          el.classList.add('is-visible');
+          io.unobserve(el);
+        });
+      }, {
+        rootMargin: '0px 0px -60px 0px',
+        threshold: 0.15
+      });
+
+      targets.forEach(function(el){ io.observe(el); });
+    })();
+    </script>
+    <!-- Magnetic Button — efect discret desktop (CTA-uri de conversie) -->
+    <script is:inline>
+    (function(){
+      /* Doar pe desktop cu mouse și fără preferință reduce-motion */
+      if(window.matchMedia('(max-width: 767px)').matches) return;
+      if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      if(!window.matchMedia('(hover: hover)').matches) return;
+
+      var PROXIMITY = 30;  /* px — distanța de activare */
+      var MAX_SHIFT  = 8;  /* px — deplasare maximă */
+      var SEL = '.hero-cta-primary, .hero-cta-secondary, .btn-solid, .btn-outline, .btn-whatsapp';
+      var btns = document.querySelectorAll(SEL);
+      if(!btns.length) return;
+
+      var rafId = 0;
+      var mouseX = 0, mouseY = 0;
+      var active = null; /* butonul cel mai apropiat */
+
+      document.addEventListener('mousemove', function(e){
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        if(!rafId) rafId = requestAnimationFrame(tick);
+      }, { passive: true });
+
+      function tick(){
+        rafId = 0;
+        var closest = null;
+        var closestDist = Infinity;
+
+        btns.forEach(function(btn){
+          var r = btn.getBoundingClientRect();
+          /* Centrul butonului */
+          var cx = r.left + r.width / 2;
+          var cy = r.top  + r.height / 2;
+          /* Distanța mouse → centru */
+          var dx = mouseX - cx;
+          var dy = mouseY - cy;
+          var dist = Math.sqrt(dx * dx + dy * dy);
+          /* Raza de activare = jumătatea diagonalei + PROXIMITY */
+          var radius = Math.sqrt(r.width * r.width + r.height * r.height) / 2 + PROXIMITY;
+
+          if(dist < radius && dist < closestDist){
+            closest = btn;
+            closestDist = dist;
+            /* Intensitate inversă cu distanța */
+            var factor = Math.max(0, 1 - dist / radius);
+            var shiftX = dx * factor * MAX_SHIFT / radius;
+            var shiftY = dy * factor * MAX_SHIFT / radius;
+            btn.style.transform = 'translate(' + shiftX.toFixed(1) + 'px,' + shiftY.toFixed(1) + 'px)';
+          } else {
+            btn.style.transform = '';
+          }
+        });
+
+        if(active && active !== closest) active.style.transform = '';
+        active = closest;
+      }
+
+      /* Reset pe mouseleave global */
+      document.addEventListener('mouseleave', function(){
+        btns.forEach(function(b){ b.style.transform = ''; });
+        active = null;
+      });
+    })();
+    </script>
+
   </body>
 </html>
 

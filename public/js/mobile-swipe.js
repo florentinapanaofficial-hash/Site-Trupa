@@ -139,24 +139,43 @@
         'galerie-video': '/galerie-video',
     };
 
+    /* Cache cu pozițiile butoanelor din navbar — populat o singură dată
+       la init și la resize, NU la fiecare scroll/touch. */
+    var cachedNavBtnPositions = {};
+    var cachedNavEl = document.querySelector('.mob-nav');
+    var cachedNavWidth = cachedNavEl ? cachedNavEl.offsetWidth : 0;
+
+    function cacheNavBtnPositions() {
+        cachedNavEl = document.querySelector('.mob-nav');
+        cachedNavWidth = cachedNavEl ? cachedNavEl.offsetWidth : 0;
+        navBtns.forEach(function (btn) {
+            var href = btn.getAttribute('data-mb') || '';
+            cachedNavBtnPositions[href] = {
+                left: btn.offsetLeft,
+                width: btn.offsetWidth
+            };
+        });
+    }
+
+    /* Prima citire — într-un rAF separat, ÎNAINTE de orice scriere DOM */
+    requestAnimationFrame(cacheNavBtnPositions);
+    window.addEventListener('resize', debounce(function () {
+        requestAnimationFrame(cacheNavBtnPositions);
+    }, 200), { passive: true });
+
     function setActiveHref(activeHref) {
+        /* SCRIERE DOM — nu citim nimic din layout aici */
         navBtns.forEach(function (btn) {
             var href = btn.getAttribute('data-mb') || '';
             btn.classList.toggle('is-active', href === activeHref);
         });
 
-        var activeBtn = navBtns.find(function (b) {
-            return b.getAttribute('data-mb') === activeHref;
-        });
-        if (activeBtn) {
-            requestAnimationFrame(function () {
-                var nav = document.querySelector('.mob-nav');
-                if (nav) {
-                    var btnLeft = activeBtn.offsetLeft;
-                    var btnWidth = activeBtn.offsetWidth;
-                    var navWidth = nav.offsetWidth;
-                    nav.scrollTo({ left: btnLeft - (navWidth / 2) + (btnWidth / 2), behavior: 'smooth' });
-                }
+        /* Scroll navbar la butonul activ — folosim CACHE-ul, fără forced reflow */
+        var pos = cachedNavBtnPositions[activeHref];
+        if (pos && cachedNavEl) {
+            cachedNavEl.scrollTo({
+                left: pos.left - (cachedNavWidth / 2) + (pos.width / 2),
+                behavior: 'smooth'
             });
         }
     }
@@ -177,7 +196,10 @@
             cacheOffsets();
             updateActiveSection();
         });
-        window.addEventListener('resize', debounce(function () { requestAnimationFrame(cacheOffsets); }, 200), { passive: true });
+        /* cacheOffsets se declanșează DOAR la resize (debounced), nu la scroll */
+        window.addEventListener('resize', debounce(function () {
+            requestAnimationFrame(cacheOffsets);
+        }, 250), { passive: true });
 
         function updateActiveSection() {
             var scrollY = window.scrollY || window.pageYOffset;

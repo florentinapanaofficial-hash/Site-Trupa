@@ -176,6 +176,20 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
     const syncTopMenuBodyClass = (isOpen) => {
       document.body.classList.toggle('top-menu-expanded', Boolean(isOpen));
       document.body.classList.toggle('mobile-menu-open', Boolean(isOpen) && isMobileViewport());
+
+      /* Marchează nav-ul inactiv ca inert (scos din tab order + accesibilitate)
+         pentru a nu încărca DOM-ul cu elemente duplicate desktop/mobil */
+      const desktopNav = document.querySelector('.nav-desktop-bar');
+      const mobileNav  = document.querySelector('.nav-mobile-grid');
+      if (desktopNav && mobileNav) {
+        if (isMobileViewport()) {
+          desktopNav.inert = true;
+          mobileNav.inert  = false;
+        } else {
+          desktopNav.inert = false;
+          mobileNav.inert  = true;
+        }
+      }
     };
 
     const closeMenu = () => {

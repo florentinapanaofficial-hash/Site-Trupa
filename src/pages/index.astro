@@ -502,11 +502,25 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     border-radius: 999px;
     text-decoration: none;
     box-shadow: 0 4px 16px rgba(245, 166, 35, 0.35);
-    transition: transform 180ms ease, box-shadow 180ms ease;
+    transition: transform 180ms ease;
+    position: relative;
+  }
+  .hero-cta-primary::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 999px;
+    pointer-events: none;
+    opacity: 0;
+    box-shadow: 0 6px 24px rgba(245, 166, 35, 0.5);
+    transition: opacity 180ms ease;
+    will-change: opacity;
   }
   .hero-cta-primary:hover {
     transform: translateY(-1px);
-    box-shadow: 0 6px 24px rgba(245, 166, 35, 0.5);
+  }
+  .hero-cta-primary:hover::after {
+    opacity: 1;
   }
   .hero-cta-secondary {
     display: inline-flex;

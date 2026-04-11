@@ -142,6 +142,8 @@ const { ga4Id } = Astro.props;
     -webkit-backdrop-filter: blur(12px);
     box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.25);
     pointer-events: auto;
+    /* PERF: izolează renderingul — nu cauzează CLS / reflow pe conținut */
+    contain: layout style;
   }
 
   .cookie-banner[hidden] {
