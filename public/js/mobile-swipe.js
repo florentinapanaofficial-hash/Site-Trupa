@@ -81,7 +81,7 @@
         }
 
         document.addEventListener('touchstart', function (e) {
-            if (e.target.closest && (e.target.closest('.mob-nav') || e.target.closest('.mc-gallery'))) {
+            if (e.target.closest && (e.target.closest('.mob-nav') || e.target.closest('.mc-gallery') || e.target.closest('.mc-gallery-wrap') || e.target.closest('.gal-masonry') || e.target.closest('.community-gallery-grid') || e.target.closest('[data-lightbox-src]') || e.target.closest('#gal-lightbox') || e.target.closest('.photo-lightbox') || e.target.closest('.chero-grid'))) {
                 ptrActive = false; return;
             }
             if (!isAtTop()) { ptrActive = false; return; }
@@ -271,7 +271,7 @@
         }
 
         document.addEventListener('touchstart', function (e) {
-            if (e.target.closest && (e.target.closest('.mob-nav') || e.target.closest('.mc-gallery'))) {
+            if (e.target.closest && (e.target.closest('.mob-nav') || e.target.closest('.mc-gallery') || e.target.closest('.mc-gallery-wrap') || e.target.closest('.gal-masonry') || e.target.closest('.community-gallery-grid') || e.target.closest('[data-lightbox-src]') || e.target.closest('#gal-lightbox') || e.target.closest('.photo-lightbox') || e.target.closest('.chero-grid'))) {
                 hpSkipTouch = true; return;
             }
             hpSkipTouch = false;
@@ -339,7 +339,7 @@
     var tStartX = 0, tStartY = 0, tSkipSwipe = false;
 
     document.addEventListener('touchstart', function (e) {
-        if (e.target.closest && (e.target.closest('.mob-nav') || e.target.closest('.mc-gallery') || e.target.closest('.mc-gallery-wrap'))) {
+        if (e.target.closest && (e.target.closest('.mob-nav') || e.target.closest('.mc-gallery') || e.target.closest('.mc-gallery-wrap') || e.target.closest('.gal-masonry') || e.target.closest('.community-gallery-grid') || e.target.closest('[data-lightbox-src]') || e.target.closest('#gal-lightbox') || e.target.closest('.photo-lightbox') || e.target.closest('.chero-grid'))) {
             tSkipSwipe = true; return;
         }
         tSkipSwipe = false;
