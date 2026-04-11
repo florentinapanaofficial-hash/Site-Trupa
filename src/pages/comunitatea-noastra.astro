@@ -120,108 +120,122 @@ const pageDescription = 'Distribuie videoclipurile preferate, interacționează 
         Fiecare nuntă e o poveste unică. Iată ce spun cuplurile care ne-au încredințat cele mai frumoase momente din viața lor.
       </p>
     </header>
-    <!-- ─── Testimoniale ─────────────────────────────────────────────── -->
-    <div class="testimonials-wrap mx-auto mb-14 max-w-5xl">
-      <div class="testimonials-head mb-8 text-center">
-        <p class="kicker mx-auto">Ce spun ei</p>
-        <h2 class="section-title text-2xl md:text-3xl">Cuvintele lor valorează mai mult decât orice reclamă</h2>
-      </div>
-      <div class="testimonials-grid">
-        {realMoments.events.map((event) => {
-          const accentColor = (event as any).accentColor ?? '#f5a623';
-          const blogSlug = (event as any).blogSlug ?? '';
-          const initials = event.couple.split('&').map((n: string) => n.trim()[0] ?? '').join('');
-          return (
-            <article class="testimonial-card" style={`--tc:${accentColor}`}>
-              <div class="tc-stars" aria-label="5 stele din 5">★★★★★</div>
-              <blockquote class="tc-quote">{event.coupleQuote}</blockquote>
-              <footer class="tc-footer">
-                <div class="tc-avatar" aria-hidden="true">{initials}</div>
-                <div class="tc-meta">
-                  <p class="tc-name">{event.couple}</p>
-                  <p class="tc-location">{event.city} &bull; {event.date}</p>
-                </div>
-                {blogSlug && (
-                  <a class="tc-blog-link" href={`/blog/${blogSlug}`}>Povestea lor →</a>
-                )}
-              </footer>
-            </article>
-          );
-        })}
-      </div>
-    </div>
-    <!-- ─────────────────────────────────────────────────────────────── -->
-    <section class="community-gallery-wrap mx-auto mb-6 max-w-5xl rounded-2xl border border-white/20 bg-[#120a27d6] p-4 sm:p-5">
-      <div class="flex items-center justify-between gap-3">
-        <h2 class="text-lg font-extrabold text-white">Galerie Foto Comunitate</h2>
-        <span class="rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white/90">
-          {galleryPhotos.length} imagini
-        </span>
-      </div>
+    <!-- ═══ SPLIT SCREEN: sus = Testimoniale, jos = Publicații ═══ -->
+    <div class="split-screen-container">
 
-      {galleryPhotos.length > 0 ? (
-        <div class="community-gallery-grid mt-4" data-db-gallery-grid>
-          {galleryPhotos.map((photo) => (
-            <article class="community-gallery-item" aria-label={photo.titlu}>
-              <img src={photo.imagine_url} alt={photo.titlu} loading="lazy" decoding="async" width="640" height="480" />
-              <div class="community-gallery-meta">
-                <p class="community-gallery-title">{photo.titlu}</p>
-                <p class="community-gallery-date">{new Date(photo.data_upload).toLocaleDateString('ro-RO')}</p>
+      <!-- ─── JUMĂTATEA DE SUS — Testimoniale ──────────────────────── -->
+      <div class="split-pane split-pane--top">
+        <div class="split-pane-inner">
+          <div class="testimonials-head mb-6 text-center">
+            <p class="kicker mx-auto">Ce spun ei</p>
+            <h2 class="section-title text-2xl md:text-3xl">Cuvintele lor valorează mai mult decât orice reclamă</h2>
+          </div>
+          <div class="testimonials-grid">
+            {realMoments.events.map((event) => {
+              const accentColor = (event as any).accentColor ?? '#f5a623';
+              const blogSlug = (event as any).blogSlug ?? '';
+              const initials = event.couple.split('&').map((n: string) => n.trim()[0] ?? '').join('');
+              return (
+                <article class="testimonial-card" style={`--tc:${accentColor}`}>
+                  <div class="tc-stars" aria-label="5 stele din 5">★★★★★</div>
+                  <blockquote class="tc-quote">{event.coupleQuote}</blockquote>
+                  <footer class="tc-footer">
+                    <div class="tc-avatar" aria-hidden="true">{initials}</div>
+                    <div class="tc-meta">
+                      <p class="tc-name">{event.couple}</p>
+                      <p class="tc-location">{event.city} &bull; {event.date}</p>
+                    </div>
+                    {blogSlug && (
+                      <a class="tc-blog-link" href={`/blog/${blogSlug}`}>Povestea lor →</a>
+                    )}
+                  </footer>
+                </article>
+              );
+            })}
+          </div>
+
+          <!-- Galerie Foto Comunitate -->
+          <section class="community-gallery-wrap mt-8 rounded-2xl border border-white/20 bg-[#120a27d6] p-4 sm:p-5">
+            <div class="flex items-center justify-between gap-3">
+              <h2 class="text-lg font-extrabold text-white">Galerie Foto Comunitate</h2>
+              <span class="rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white/90">
+                {galleryPhotos.length} imagini
+              </span>
+            </div>
+            {galleryPhotos.length > 0 ? (
+              <div class="community-gallery-grid mt-4" data-db-gallery-grid>
+                {galleryPhotos.map((photo) => (
+                  <article class="community-gallery-item" aria-label={photo.titlu}>
+                    <img src={photo.imagine_url} alt={photo.titlu} loading="lazy" decoding="async" width="640" height="480" />
+                    <div class="community-gallery-meta">
+                      <p class="community-gallery-title">{photo.titlu}</p>
+                      <p class="community-gallery-date">{new Date(photo.data_upload).toLocaleDateString('ro-RO')}</p>
+                    </div>
+                  </article>
+                ))}
               </div>
-            </article>
-          ))}
+            ) : (
+              <p class="mt-3 text-sm text-white/90">Nu există poze în galerie momentan.</p>
+            )}
+          </section>
         </div>
-      ) : (
-        <p class="mt-3 text-sm text-white/90">Nu există poze în galerie momentan.</p>
-      )}
-    </section>
+      </div>
 
-    <div class="mx-auto max-w-5xl">
-      <aside id="blog" class="community-editorial-column min-w-0" aria-label="Publicații și Vlog">
-        <div class="blog-aside-header">
-          <p class="blog-aside-kicker">Publicații &amp; Vlog</p>
-          <h2 class="blog-aside-title">Articole &amp; povești</h2>
-          <p class="blog-aside-sub">Muzică, culise și ghiduri utile pentru evenimentul tău — scrise de noi, pentru tine.</p>
-        </div>
+      <!-- ─── LINIA SEPARATOARE ──────────────────────────────────── -->
+      <div class="split-divider" aria-hidden="true">
+        <span class="split-divider-label">Publicații &amp; Vlog</span>
+      </div>
 
-        <div class="blog-list">
-          {((blogPosts as any).items as any[]).map((post) => {
-            const bg = accentBgMap[post.categoryAccent] ?? 'rgba(245,166,35,0.22)';
-            const color = accentColorMap[post.categoryAccent] ?? 'var(--gold)';
-            return (
-              <a href={`/blog/${post.slug}`} class="blog-card">
-                <div
-                  class="blog-card-thumb"
-                  aria-hidden="true"
-                  style={`background: radial-gradient(ellipse at 50% 50%, ${bg} 0%, var(--bg-mid) 100%);`}
-                >
-                  <span>{post.coverEmoji}</span>
-                </div>
-                <div class="blog-card-text">
-                  <div class="blog-card-top">
-                    <span
-                      class="blog-cat-pill"
-                      style={`color:${color}; border-color:${color}; background:${bg};`}
-                    >
-                      {post.category}
-                    </span>
-                    <span class="blog-card-time">{post.readTime}</span>
+      <!-- ─── JUMĂTATEA DE JOS — Blog / Publicații ─────────────────── -->
+      <div class="split-pane split-pane--bottom">
+        <div class="split-pane-inner">
+          <div class="blog-aside-header">
+            <p class="blog-aside-kicker">Publicații &amp; Vlog</p>
+            <h2 class="blog-aside-title">Articole &amp; povești</h2>
+            <p class="blog-aside-sub">Muzică, culise și ghiduri utile pentru evenimentul tău — scrise de noi, pentru tine.</p>
+          </div>
+
+          <div class="blog-list">
+            {((blogPosts as any).items as any[]).map((post) => {
+              const bg = accentBgMap[post.categoryAccent] ?? 'rgba(245,166,35,0.22)';
+              const color = accentColorMap[post.categoryAccent] ?? 'var(--gold)';
+              return (
+                <a href={`/blog/${post.slug}`} class="blog-card">
+                  <div
+                    class="blog-card-thumb"
+                    aria-hidden="true"
+                    style={`background: radial-gradient(ellipse at 50% 50%, ${bg} 0%, var(--bg-mid) 100%);`}
+                  >
+                    <span>{post.coverEmoji}</span>
                   </div>
-                  <p class="blog-card-title">{post.title}</p>
-                  <p class="blog-card-excerpt">{post.excerpt}</p>
-                  <span class="blog-card-date">{formatDate(post.date)}</span>
-                </div>
-              </a>
-            );
-          })}
-        </div>
+                  <div class="blog-card-text">
+                    <div class="blog-card-top">
+                      <span
+                        class="blog-cat-pill"
+                        style={`color:${color}; border-color:${color}; background:${bg};`}
+                      >
+                        {post.category}
+                      </span>
+                      <span class="blog-card-time">{post.readTime}</span>
+                    </div>
+                    <p class="blog-card-title">{post.title}</p>
+                    <p class="blog-card-excerpt">{post.excerpt}</p>
+                    <span class="blog-card-date">{formatDate(post.date)}</span>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
 
-        <a href={`/blog/${((blogPosts as any).items as any[])[0]?.slug ?? ''}`} class="blog-aside-cta">
-          Citește ultimul articol
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
-        </a>
-      </aside>
+          <a href={`/blog/${((blogPosts as any).items as any[])[0]?.slug ?? ''}`} class="blog-aside-cta">
+            Citește ultimul articol
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+          </a>
+        </div>
+      </div>
+
     </div>
+    <!-- ═══ END SPLIT SCREEN ═══ -->
 
     <!-- ─── CTA rezervare ────────────────────────────────────────────── -->
     <div class="ctab-wrap mx-auto mt-14 max-w-3xl">
@@ -1064,6 +1078,118 @@ const pageDescription = 'Distribuie videoclipurile preferate, interacționează 
 
     .community-post-hidden {
       display: none;
+    }
+
+    /* ═══ SPLIT SCREEN — sus / jos ═══════════════════════════════════ */
+    .split-screen-container {
+      display: flex;
+      flex-direction: column;
+      max-width: 72rem;
+      margin: 0 auto;
+      /* pe mobile: layout normal, fără split fix */
+    }
+
+    @media (min-width: 768px) {
+      .split-screen-container {
+        height: calc(100vh - 6rem);
+        min-height: 540px;
+      }
+    }
+
+    .split-pane {
+      position: relative;
+    }
+
+    @media (min-width: 768px) {
+      .split-pane {
+        flex: 1 1 50%;
+        min-height: 0;            /* necesar pentru overflow în flex */
+        overflow-y: auto;
+        overflow-x: hidden;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255,255,255,0.18) transparent;
+      }
+
+      .split-pane::-webkit-scrollbar { width: 5px; }
+      .split-pane::-webkit-scrollbar-track { background: transparent; }
+      .split-pane::-webkit-scrollbar-thumb {
+        background: rgba(255,255,255,0.18);
+        border-radius: 9999px;
+      }
+      .split-pane::-webkit-scrollbar-thumb:hover {
+        background: rgba(255,255,255,0.32);
+      }
+    }
+
+    .split-pane-inner {
+      padding: 1.25rem 1rem;
+    }
+
+    @media (min-width: 768px) {
+      .split-pane-inner {
+        padding: 1.5rem 1.5rem;
+      }
+    }
+
+    /* ─── Linia separatoare ────────────────────────────────────────── */
+    .split-divider {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem 0;
+      flex-shrink: 0;
+    }
+
+    .split-divider::before {
+      content: '';
+      position: absolute;
+      left: 1rem;
+      right: 1rem;
+      top: 50%;
+      height: 1px;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(187, 134, 252, 0.5) 20%,
+        rgba(245, 166, 35, 0.6) 50%,
+        rgba(187, 134, 252, 0.5) 80%,
+        transparent 100%
+      );
+      box-shadow: 0 0 12px rgba(187, 134, 252, 0.25);
+    }
+
+    .split-divider-label {
+      position: relative;
+      z-index: 1;
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(245, 166, 35, 0.85);
+      background: var(--bg-deep, #0b0e14);
+      padding: 0.2rem 0.9rem;
+      border-radius: 9999px;
+      border: 1px solid rgba(245, 166, 35, 0.3);
+    }
+
+    /* ─── Indiciu scroll pe fiecare panou ──────────────────────────── */
+    @media (min-width: 768px) {
+      .split-pane--top::after,
+      .split-pane--bottom::after {
+        content: '';
+        position: sticky;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: block;
+        height: 2.5rem;
+        background: linear-gradient(to top, var(--bg-deep, #0b0e14) 0%, transparent 100%);
+        pointer-events: none;
+        margin-top: -2.5rem;
+        z-index: 2;
+      }
     }
 
     /* ─── Testimoniale ───────────────────────────────────────────────── */
