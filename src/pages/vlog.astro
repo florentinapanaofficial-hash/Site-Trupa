@@ -11,7 +11,7 @@ const { brand, seo, contact } = siteContent;
 const couples = couplesData.couples;
 
 const posts = [...((blogPostsRaw as any).items ?? [])]
-  .filter((p) => p.category !== 'Vlog')
+  .filter((p) => p.category === 'Vlog')
   .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
 /* ─── Build couple slug lookup ─────────────────── */
@@ -19,9 +19,6 @@ const coupleByBlogSlug = new Map<string, (typeof couples)[0]>();
 for (const c of couples) {
   if (c.blogSlug) coupleByBlogSlug.set(c.blogSlug, c);
 }
-
-/* ─── Collect unique categories ────────────────── */
-const categories = ['Toate', ...new Set(posts.map((p) => p.category))];
 
 const accentClass: Record<string, string> = {
   gold: 'accent-gold',
@@ -40,37 +37,24 @@ function formatDate(dateStr: string): string {
   });
 }
 
-const pageTitle = `Publicații | ${brand.name}`;
-const pageDescription = `Articole, povești de nuntă și ghiduri utile de la ${brand.name}. Citește despre experiențele cuplurilor noastre și sfaturi pentru o nuntă reușită.`;
+const pageTitle = `Vlog | ${brand.name}`;
+const pageDescription = `Vlog-uri din culise, pregătiri și momente speciale de la evenimentele ${brand.name}. Urmărește ce se întâmplă în spatele scenei.`;
 const SITE = 'https://www.florentinapanaofficial.ro';
 ---
 
 <BaseLayout title={pageTitle} description={pageDescription} ogImage={seo.ogImage}>
 
   <section class="section-container pt-8 pb-16 sm:pt-10 sm:pb-20">
-    <div class="mb-6"><BackButton href="/comunitatea-noastra" label="Comunitate" /></div>
+    <div class="mb-6"><BackButton href="/" label="Acasă" /></div>
 
     <!-- ═══ HERO ═══════════════════════════════════════════════════ -->
     <header class="pub-hero mx-auto text-center mb-8">
       <p class="pub-hero__kicker">Formația Florentina Pană</p>
-      <h1 class="pub-hero__title">Publicații</h1>
+      <h1 class="pub-hero__title">Vlog</h1>
       <p class="pub-hero__subtitle">
-        Povești de nuntă, articole și sfaturi utile pentru o seară perfectă.
+        Din culisele evenimentelor — pregătiri, soundcheck și momente din spatele scenei.
       </p>
     </header>
-
-    <!-- ═══ CATEGORY FILTERS ═══════════════════════════════════════ -->
-    <nav class="pub-filters" aria-label="Filtrează articolele">
-      {categories.map((cat) => (
-        <button
-          class={`pub-filter-btn ${cat === 'Toate' ? 'is-active' : ''}`}
-          data-category={cat}
-          type="button"
-        >
-          {cat}
-        </button>
-      ))}
-    </nav>
 
     <!-- ═══ ARTICLES GRID ══════════════════════════════════════════ -->
     <div class="pub-grid" id="pubGrid">
@@ -86,7 +70,7 @@ const SITE = 'https://www.florentinapanaofficial.ro';
                 {post.coverImage ? (
                   <img src={post.coverImage} alt={post.title} loading="lazy" decoding="async" width="640" height="360" />
                 ) : (
-                  <span class="pub-card__emoji" aria-hidden="true">{post.coverEmoji || '📝'}</span>
+                  <span class="pub-card__emoji" aria-hidden="true">{post.coverEmoji || '🎬'}</span>
                 )}
               </div>
               <div class="pub-card__body">
@@ -135,47 +119,23 @@ const SITE = 'https://www.florentinapanaofficial.ro';
     </div>
 
     <!-- ═══ EMPTY STATE ════════════════════════════════════════════ -->
-    <div class="pub-empty" id="pubEmpty" hidden>
-      <p>📰 Niciun articol în această categorie.</p>
-    </div>
+    {posts.length === 0 && (
+      <div class="pub-empty">
+        <p>🎬 Niciun vlog publicat încă. Revino curând!</p>
+      </div>
+    )}
 
-    <!-- ═══ BACK TO COMMUNITY ══════════════════════════════════════ -->
-    <div class="pub-cta text-center mt-12 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-      <a href="/vlog" class="pub-cta__link">
-        🎬 Vezi și Vlog-ul nostru
-      </a>
-      <a href="/comunitatea-noastra" class="pub-cta__link">
-        ← Înapoi la Mirii Noștri
+    <!-- ═══ BACK LINK ══════════════════════════════════════════════ -->
+    <div class="pub-cta text-center mt-12">
+      <a href="/publicatii" class="pub-cta__link">
+        📰 Vezi și Publicațiile noastre
       </a>
     </div>
   </section>
 
-  <!-- ═══ FILTER + COPY SCRIPTS ════════════════════════════════════ -->
+  <!-- ═══ COPY SCRIPT ══════════════════════════════════════════════ -->
   <script is:inline>
     (function () {
-      var buttons = document.querySelectorAll('.pub-filter-btn');
-      var cards = document.querySelectorAll('.pub-card');
-      var emptyEl = document.getElementById('pubEmpty');
-
-      buttons.forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          buttons.forEach(function (b) { b.classList.remove('is-active'); });
-          btn.classList.add('is-active');
-
-          var cat = btn.getAttribute('data-category');
-          var visible = 0;
-
-          cards.forEach(function (card) {
-            var show = cat === 'Toate' || card.getAttribute('data-category') === cat;
-            card.style.display = show ? '' : 'none';
-            if (show) visible++;
-          });
-
-          if (emptyEl) emptyEl.hidden = visible > 0;
-        });
-      });
-
-      /* Copy link */
       document.querySelectorAll('.pub-share-copy').forEach(function (btn) {
         btn.addEventListener('click', function () {
           var url = btn.getAttribute('data-url');
@@ -220,41 +180,6 @@ const SITE = 'https://www.florentinapanaofficial.ro';
       max-width: 540px;
       margin-left: auto;
       margin-right: auto;
-    }
-
-    /* ═══ FILTERS ═══ */
-    .pub-filters {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      justify-content: center;
-      margin-bottom: 2.5rem;
-    }
-
-    .pub-filter-btn {
-      font-family: 'Oswald', sans-serif;
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      padding: 0.45rem 1rem;
-      border-radius: 9999px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(255, 255, 255, 0.04);
-      color: rgba(255, 255, 255, 0.6);
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .pub-filter-btn:hover {
-      border-color: rgba(255, 255, 255, 0.25);
-      color: rgba(255, 255, 255, 0.85);
-    }
-
-    .pub-filter-btn.is-active {
-      background: var(--gold);
-      border-color: var(--gold);
-      color: #0C080F;
     }
 
     /* ═══ GRID ═══ */

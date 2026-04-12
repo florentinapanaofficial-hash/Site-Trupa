@@ -30,6 +30,16 @@
       "color": "cyan"
     },
     {
+      "href": "/publicatii",
+      "label": "Publicații",
+      "color": "cyan"
+    },
+    {
+      "href": "/vlog",
+      "label": "Vlog",
+      "color": "cyan"
+    },
+    {
       "href": "/aparitii-tv",
       "label": "Apariții TV",
       "color": "cyan"
