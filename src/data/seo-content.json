@@ -1,157 +1,157 @@
 {
     "acasa": {
         "meta": {
-            "title": "Formație Nuntă Pitești | Muzică Live — Florentina Pană",
-            "description": "Formația Florentina Pană — muzică live premium la nunți, botezuri și evenimente în Pitești, Argeș. Repertoriu variat, artiști profesioniști. Cere ofertă acum!"
+            "title": "Formația Florentina Pană | Muzică Live pentru Nunți și Evenimente",
+            "description": "Trupă live premium din Pitești, Argeș — nunți, botezuri și evenimente corporate în toată România. Repertoriu personalizat, 10+ ani experiență. Cere ofertă!"
         },
         "hero": {
-            "h1": "Formație Nuntă Pitești — Muzică Live de Excepție în Argeș",
-            "kicker": "Formație evenimente Pitești | Nunți · Botezuri · Corporate în Argeș",
-            "descriere": "Căutați o trupă muzicală în Pitești care să transforme evenimentul într-o experiență memorabilă? Formația Florentina Pană oferă muzică live premium pentru nunți, botezuri și evenimente corporate în Pitești, Mioveni, Curtea de Argeș și toată Muntenia. Peste 500 de evenimente de succes.",
+            "h1": "Muzică Live Premium pentru Evenimente de Neuitat",
+            "kicker": "Trupă live premium | Nunți · Botezuri · Corporate",
+            "descriere": "Cauți o trupă care să ridice invitații de la masă din prima secundă? Oferim show-uri 100% live, adaptate stilului tău, în Pitești, județul Argeș și în întreaga țară. Peste 500 de evenimente de succes.",
             "bullets": [
-                "Sonorizare profesională la cele mai bune locații din Pitești și Argeș",
+                "Sonorizare profesională la cele mai bune locații din Argeș și din toată țara",
                 "Program muzical personalizat: populară, ușoară, internațională și petrecere",
-                "Echipă cu 10+ ani experiență — recomandată de sute de miri din Argeș"
+                "Echipă cu 10+ ani experiență — recomandată de sute de cupluri fericite"
             ]
         },
         "brand": {
-            "tagline": "Formație nuntă Pitești — muzică live premium pentru cele mai importante momente din viața ta."
+            "tagline": "Muzică live premium pentru cele mai importante momente din viața ta."
         },
         "testimoniale": {
-            "header": "Ce spun mirii despre formația noastră de nuntă din Pitești"
+            "header": "Ce spun mirii despre experiența alături de noi"
         },
         "faq": [
             {
-                "question": "Cât costă o formație de nuntă în Pitești?",
-                "answer": "Prețul trupei noastre muzicale în Pitești variază în funcție de pachetul ales, numărul de artiști și durata evenimentului. Contactați-ne pentru o ofertă personalizată — fără obligații."
+                "question": "Cât costă să angajați o formație live pentru nuntă?",
+                "answer": "Prețul variază în funcție de pachetul ales, numărul de artiști și durata evenimentului. Ne deplasăm cu drag în București, Mioveni, Câmpulung și oriunde este nevoie de muzică de calitate. Contactați-ne pentru o ofertă personalizată."
             },
             {
-                "question": "Ce genuri muzicale cântă formația în Argeș?",
-                "answer": "Oferim un repertoriu complet: muzică populară argeșeană, muzică ușoară românească și internațională, hituri de petrecere și momente speciale la cerere — perfect pentru nunți în Pitești, Mioveni sau Curtea de Argeș."
+                "question": "Ce genuri muzicale interpretați la evenimente?",
+                "answer": "Avem un repertoriu complet: muzică populară românească, piese ușoare, hituri pop și internaționale, dans și muzică de petrecere. Adaptăm fiecare setlist la atmosfera evenimentului și la preferințele voastre."
             },
             {
-                "question": "Cântați la nunți în Mioveni, Curtea de Argeș și alte localități?",
-                "answer": "Absolut! Suntem disponibili în tot județul Argeș — Pitești, Mioveni, Curtea de Argeș, Câmpulung — precum și în București și toată România."
+                "question": "Vă deplasați și în afara județului Argeș?",
+                "answer": "Absolut! Deși avem baza în Pitești, cântăm frecvent în București, Muntenia și în toată România. Suntem obișnuiți cu deplasări și avem logistică proprie."
             },
             {
-                "question": "Cum pot rezerva formația Florentina Pană pentru nuntă?",
-                "answer": "Sunați-ne la 0767 369 658, trimiteți un mesaj pe WhatsApp sau completați formularul de rezervare online. Vă răspundem în maxim 24 de ore cu disponibilitate și ofertă detaliată."
+                "question": "Cum pot rezerva formația pentru evenimentul meu?",
+                "answer": "Sunați-ne la 0767 369 658, trimiteți un mesaj pe WhatsApp sau completați formularul online. Vă răspundem în maxim 24 de ore cu disponibilitate și ofertă detaliată."
             }
         ]
     },
     "despre": {
         "meta": {
-            "title": "Despre Noi | Solistă Nuntă Pitești — Florentina Pană",
-            "description": "Cunoaște-o pe Florentina Pană — solistă de nuntă din Pitești cu peste 10 ani de experiență. Formație profesionistă pentru nunți și evenimente în Argeș. Află povestea noastră!"
+            "title": "Povestea Noastră | Formația Florentina Pană — Argeș",
+            "description": "Peste 10 ani de pasiune pe scenă. Cunoaște echipa și povestea Formației Florentina Pană — trupă live profesionistă din Argeș. Află cum totul a început!"
         },
-        "h1": "Formația Florentina Pană — Solistă și Formație de Nuntă în Pitești, Argeș",
-        "aboutIntro": "Florentina Pană este una dintre cele mai apreciate soliste de nuntă din Pitești și județul Argeș, cu o experiență de peste un deceniu pe scenele celor mai rafinate evenimente din Muntenia. Alături de o echipă de instrumentiști virtuoși, Florentina transformă fiecare nuntă, botez sau gală într-un spectacol live plin de emoție, eleganță și energie neîntreruptă.",
-        "aboutIntro2": "De la primirea invitaților cu acorduri de vioară la dansul mirilor, de la hora tradițională argeșeană până la momentele de petrecere cu hituri internaționale — trupa noastră muzicală din Pitești acoperă fiecare moment al serii. Peste 500 de cupluri din Pitești, Mioveni, Curtea de Argeș și din toată țara ne-au ales să le facem nunta de neuitat. Repertoriul nostru include muzică populară din Argeș, piese ușoare românești și internaționale, dar și cele mai noi hituri de petrecere. Fiecare eveniment este unic, iar programul muzical este construit exclusiv pe dorințele mirilor.",
-        "bio": "Florentina Pană — solistă de nuntă din Pitești, recunoscută pentru timbrul vocal cald, prezența scenică elegantă și capacitatea de a citi atmosfera sălii în timp real. Cu o experiență vastă pe scenele din Argeș și Muntenia, Florentina coordonează fiecare moment-cheie al nunții — de la intrarea mirilor la ora de dans — oferind un spectacol live care menține invitații pe ring toată noaptea."
+        "h1": "Povestea Formației Florentina Pană",
+        "aboutIntro": "Florentina Pană este una dintre cele mai apreciate soliste de muzică live din județul Argeș, cu peste un deceniu de experiență pe scenele celor mai frumoase evenimente din România. Alături de o echipă de instrumentiști virtuoși, Florentina transformă fiecare nuntă, botez sau gală într-un spectacol plin de emoție, eleganță și energie.",
+        "aboutIntro2": "De la primirea invitaților cu acorduri de vioară la dansul mirilor, de la hora tradițională până la momentele de petrecere cu hituri internaționale — trupa noastră acoperă fiecare moment al serii. Peste 500 de cupluri din Argeș, București și din toată țara ne-au ales să le facă evenimentul de neuitat. Repertoriul nostru include muzică populară românească, piese ușoare și cele mai noi hituri de petrecere. Fiecare program muzical este construit exclusiv pe dorințele clientului.",
+        "bio": "Florentina Pană — solistă recunoscută pentru timbrul vocal cald, prezența scenică elegantă și capacitatea de a citi atmosfera sălii în timp real. Coordonează fiecare moment-cheie — de la intrarea mirilor la ora de dans — oferind un spectacol live care menține invitații pe ring toată noaptea."
     },
     "servicii": {
         "meta": {
-            "title": "Servicii Muzică Live Nuntă Pitești — Florentina Pană",
-            "description": "Servicii complete de muzică live pentru nunți în Pitești și Argeș: formație completă, sonorizare, lumini, repertoriu personalizat. Cere ofertă de preț de la Formația Florentina Pană!"
+            "title": "Servicii Muzică Live | Formația Florentina Pană",
+            "description": "Pachete complete de muzică live pentru nunți, botezuri și corporate — sonorizare, lumini, repertoriu personalizat. Cere ofertă de la Formația Florentina Pană!"
         },
         "nunti": {
-            "title": "Formație Nuntă Pitești și Argeș",
-            "descriere": "Muzică live premium pentru nunta ta în Pitești, Mioveni sau Curtea de Argeș. Program complet pe momente-cheie: primirea invitaților cu muzică ambientală, dansul mirilor, hora tradițională argeșeană, momentele de petrecere și surprizele de la miezul nopții. Fiecare nuntă beneficiază de propriu repertoriu personalizat — cerem dorințele muzicale ale mirilor cu cel puțin 2 săptămâni înainte."
+            "title": "Muzică Live la Nuntă",
+            "descriere": "Știm că muzica este sufletul petrecerii. Ne ocupăm de toate momentele cheie: de la primirea elegantă a invitaților, dansul mirilor, hora tradițională, până la ora de foc a petrecerii pe ringul de dans. Fiecare nuntă beneficiază de repertoriu personalizat — discutăm dorințele muzicale cu cel puțin 2 săptămâni înainte."
         },
         "botezuri": {
-            "title": "Muzică Live la Botez în Pitești",
-            "descriere": "Creăm atmosfera perfectă pentru botezul copilului tău: un mix echilibrat de muzică populară argeșeană, piese ușoare pentru Familie și momente de petrecere pentru toți invitații. Repertoriu adaptat pentru public de toate vârstele — de la bunici până la tineret. Disponibili în Pitești, Argeș și localitățile învecinate."
+            "title": "Muzică Live la Botez și Aniversări",
+            "descriere": "Adaptăm ritmul pentru toate generațiile. Îmbinăm tradiția cu modernitatea, asigurându-ne că atât bunicii, cât și cei mai tineri se simt excelent. Repertoriu echilibrat pentru public de toate vârstele, disponibil în tot județul Argeș și în toată țara."
         },
         "corporate": {
-            "title": "Formație Evenimente Corporate Pitești",
-            "descriere": "Oferim prezență scenică profesionistă pentru gale, petreceri de firmă și evenimente business în Pitești și județul Argeș. Setlist premium cu piese internaționale, jazz, lounge și momente interactive adaptate culturii organizaționale. Sonorizare de calitate și punctualitate de rigoare — exact ce așteaptă companiile din Argeș."
+            "title": "Evenimente Corporate și Private",
+            "descriere": "Oferim prezență scenică profesionistă pentru gale, petreceri de firmă și evenimente business. Setlist premium cu piese internaționale, jazz, lounge și momente interactive adaptate culturii organizaționale. Sonorizare de calitate și punctualitate de rigoare."
         },
         "repertoriu": {
-            "descriere": "Repertoriul ansamblului muzical Florentina Pană din Pitești acoperă toate genurile muzicale cerute la nunțile din Argeș: de la muzică populară autentică argeșeană, la hituri pop românești și internaționale, dans și muzică de petrecere. Toate piesele sunt interpretate live, cu aranjamente proprii care aduc un plus de energie și eleganță evenimentului tău. Mirii pot personaliza lista de piese conform preferințelor."
+            "descriere": "Repertoriul Formației Florentina Pană acoperă toate genurile muzicale: de la muzică populară autentică românească, la hituri pop și internaționale, dans și piese de petrecere. Toate piesele sunt interpretate live, cu aranjamente proprii care aduc un plus de energie și eleganță. Mirii pot personaliza lista de piese conform preferințelor."
         }
     },
     "galerie": {
         "meta": {
-            "title": "Galerie Foto Nunți Pitești | Formația Florentina Pană",
-            "description": "Galerie foto autentică de la nunți și evenimente live în Pitești, Argeș. Vezi formația Florentina Pană pe scenele celor mai frumoase săli din Muntenia. Energie, emoție și dans!"
+            "title": "Galerie Foto | Formația Florentina Pană — Evenimente Live",
+            "description": "Fotografii autentice de la nunți și evenimente live. Vezi Formația Florentina Pană pe scenele celor mai frumoase săli din România. Energie, emoție și dans!"
         },
-        "h1": "Galerie Foto — Formație Nuntă Pitești și Evenimente Live în Argeș",
-        "subtitle": "Fotografii autentice de la nunțile și evenimentele noastre din Pitești, Mioveni, Curtea de Argeș și din toată România. Ringul de dans plin, emoția mirilor și energia invitaților — surprinse de fotografii profesioniști.",
+        "h1": "Galerie Foto — Evenimente Live și Momente de Scenă",
+        "subtitle": "Fotografii autentice de la nunțile și evenimentele noastre. Ringul de dans plin, emoția mirilor și energia invitaților — surprinse de fotografii profesioniști.",
         "altTexts": [
-            "Formație nuntă Pitești — Florentina Pană cântând live pe scena unui eveniment elegant în Argeș",
-            "Muzică live la nuntă în Argeș — scenă completă cu sonorizare profesională la salon de nunți Pitești",
-            "Dans la nuntă în Pitești — invitații pe ringul de dans cu formația Florentina Pană",
-            "Solistă nuntă Pitești — Florentina Pană interpretând muzică populară argeșeană live",
-            "Moment special la nuntă Mioveni — dansul mirilor cu muzică live de la Formația Florentina Pană",
-            "Formație completă pe scenă — muzică de petrecere la eveniment corporate în Pitești, Argeș"
+            "Florentina Pană cântând live pe scena unui eveniment elegant",
+            "Scenă completă cu sonorizare profesională la un salon de nunți",
+            "Invitații pe ringul de dans la un eveniment cu muzică live",
+            "Solistă interpretând muzică populară românească live pe scenă",
+            "Moment special — dansul mirilor cu muzică live de la Formația Florentina Pană",
+            "Formație completă pe scenă — muzică de petrecere la eveniment corporate"
         ]
     },
     "blog": {
         "meta": {
-            "title": "Blog Muzică Nuntă Pitești | Formația Florentina Pană",
-            "description": "Sfaturi pentru miri, noutăți despre repertoriu și povești de la nunțile din Pitești și Argeș. Blogul Formației Florentina Pană — inspirație pentru evenimentul tău."
+            "title": "Blog | Sfaturi și Povești — Formația Florentina Pană",
+            "description": "Sfaturi pentru miri, noutăți despre repertoriu și povești de la evenimente. Blogul Formației Florentina Pană — inspirație pentru evenimentul tău."
         },
         "articleIdeas": [
-            "Cum alegi trupa muzicală perfectă în Pitești — Ghid Complet 2026",
-            "Top 10 piese pentru dansul mirilor — recomandări de la solistă din Argeș",
-            "Cât costă o formație de nuntă în Pitești? Prețuri, pachete și sfaturi",
-            "Muzică populară argeșeană la nuntă — tradiție și eleganță pe scenă",
-            "5 greșeli pe care mirii le fac când aleg muzica pentru nuntă în Argeș",
-            "De ce să alegi muzică live în loc de DJ la nunta ta din Pitești"
+            "Cum alegi trupa muzicală perfectă pentru nunta ta — Ghid Complet 2026",
+            "Top 10 piese pentru dansul mirilor — recomandări de la solistă",
+            "Cât costă o formație live? Prețuri, pachete și sfaturi",
+            "Muzică populară la nuntă — tradiție și eleganță pe scenă",
+            "5 greșeli pe care mirii le fac când aleg muzica pentru nuntă",
+            "De ce să alegi muzică live în loc de DJ la nunta ta"
         ]
     },
     "contact": {
         "meta": {
-            "title": "Contact Formație Nuntă Pitești | Florentina Pană",
-            "description": "Rezervă formația Florentina Pană pentru nunta ta din Pitești sau Argeș. Telefon, WhatsApp sau formular online — răspundem în 24h cu ofertă personalizată și disponibilitate."
+            "title": "Rezervă Formația Florentina Pană | Contact",
+            "description": "Rezervă Formația Florentina Pană pentru evenimentul tău. Telefon, WhatsApp sau formular online — răspundem în 24h cu ofertă personalizată și disponibilitate."
         },
-        "h1": "Rezervă Formația Florentina Pană — Formație Nuntă Pitești și Argeș",
-        "descriere": "Ești în căutarea unor artiști live de încredere în Pitești? Contactează-ne telefonic, pe WhatsApp sau prin formularul de mai jos. Îți oferim o consultație gratuită de 15 minute în care discutăm data evenimentului, locația din Argeș și preferințele muzicale — fără nicio obligație. Răspundem în maximum 24 de ore.",
+        "h1": "Rezervă Formația Florentina Pană",
+        "descriere": "Ești în căutarea unor artiști live de încredere? Contactează-ne telefonic, pe WhatsApp sau prin formularul de mai jos. Îți oferim o consultație gratuită de 15 minute în care discutăm data evenimentului, locația și preferințele muzicale — fără nicio obligație. Răspundem în maximum 24 de ore.",
         "city": "Bază: Pitești, județul Argeș · Disponibili în Mioveni, Curtea de Argeș, Câmpulung, București și toată România",
         "cta": [
-            "Cere ofertă de preț — formație nuntă Pitești",
+            "Cere ofertă de preț",
             "Ascultă formația live — demo sonor",
-            "Verifică disponibilitatea pentru nunta ta",
+            "Verifică disponibilitatea pentru evenimentul tău",
             "Sună acum: 0767 369 658",
-            "Rezervă data evenimentului tău în Argeș"
+            "Rezervă data evenimentului"
         ]
     },
     "comunitatea-noastra": {
         "meta": {
-            "title": "Comunitatea Noastră — Recenzii Nuntă Pitești | Florentina Pană",
-            "description": "Comunitatea Formației Florentina Pană — recenzii reale de la nunți în Pitești și Argeș, galerie foto comunitate și publicații. Descoperă poveștile cuplurilor!"
+            "title": "Comunitatea Noastră | Recenzii și Povești — Florentina Pană",
+            "description": "Recenzii reale de la nunți, galerie foto și publicații din culise. Descoperă poveștile cuplurilor care ne-au ales pentru cel mai important eveniment din viața lor!"
         },
-        "h1": "Comunitatea Formației Florentina Pană — Recenzii, Galerie & Publicații",
-        "subtitle": "Fiecare nuntă e o poveste unică. Iată ce spun cuplurile care ne-au încredințat cele mai frumoase momente din viața lor — recenzii autentice, fotografii de la evenimente în Pitești, Argeș și publicații din culisele formației.",
+        "h1": "Comunitatea Formației Florentina Pană",
+        "subtitle": "Fiecare nuntă e o poveste unică. Iată ce spun cuplurile care ne-au încredințat cele mai frumoase momente din viața lor — recenzii autentice, fotografii de la evenimente și publicații din culise.",
         "sections": [
             {
                 "id": "testimoniale",
-                "title": "Cuvintele lor valorează mai mult — Recenzii Nunți Pitești",
-                "description": "Recenzii reale de la cupluri din Pitești, Mioveni, Curtea de Argeș și întreaga Muntenie. Fiecare testimonial reflectă o experiență unică la nuntă cu Formația Florentina Pană."
+                "title": "Cuvintele lor valorează mai mult",
+                "description": "Recenzii reale de la cupluri din Argeș, București și din toată țara. Fiecare testimonial reflectă o experiență unică alături de Formația Florentina Pană."
             },
             {
                 "id": "galerie-foto",
-                "title": "Galerie Foto Comunitate — Evenimente Live Argeș",
-                "description": "Fotografii autentice din comunitatea noastră — momente surprinse la nunți și evenimente în Pitești și Argeș."
+                "title": "Galerie Foto Comunitate",
+                "description": "Fotografii autentice din comunitatea noastră — momente surprinse la nunți și evenimente live."
             },
             {
                 "id": "publicatii",
-                "title": "Publicații & Vlog — Sfaturi Muzică Nuntă Pitești",
-                "description": "Articole, ghiduri și vloguri din culisele formației. Inspirație pentru mirii care plănuiesc nunta în Argeș."
+                "title": "Publicații — Sfaturi și Inspirație",
+                "description": "Articole și ghiduri din culise. Inspirație pentru mirii care plănuiesc evenimentul perfect."
             }
         ],
         "faq": [
             {
                 "question": "Ce spun cuplurile despre Formația Florentina Pană?",
-                "answer": "Cuplurile din Pitești și Argeș ne recomandă pentru energia de pe scenă, repertoriul variat și profesionalismul echipei. Toate recenziile sunt autentice, de la nunți reale."
+                "answer": "Cuplurile ne recomandă pentru energia de pe scenă, repertoriul variat și profesionalismul echipei. Toate recenziile sunt autentice, de la evenimente reale."
             },
             {
-                "question": "Pot vedea fotografii de la nunțile anterioare?",
-                "answer": "Da! Galeria foto comunitate include imagini autentice de la evenimentele noastre din Pitești, Mioveni, Curtea de Argeș și din toată România."
+                "question": "Pot vedea fotografii de la evenimentele anterioare?",
+                "answer": "Da! Galeria foto include imagini autentice de la evenimentele noastre din Argeș, București și din toată România."
             },
             {
                 "question": "Unde pot citi articole despre muzica de nuntă?",
-                "answer": "Secțiunea Publicații & Vlog conține articole actualizate cu sfaturi pentru miri, noutăți despre repertoriu și povești din culise."
+                "answer": "Secțiunea Publicații conține articole actualizate cu sfaturi pentru miri, noutăți despre repertoriu și povești din culise."
             }
         ]
     },
