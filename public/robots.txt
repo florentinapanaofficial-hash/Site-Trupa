@@ -1,6 +1,7 @@
 User-agent: *
 Disallow: /api/
 Disallow: /admin/
+Disallow: /upload/
 
 Sitemap: https://www.florentinapanaofficial.ro/sitemap-index.xml
 

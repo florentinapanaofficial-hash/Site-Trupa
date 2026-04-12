@@ -1,0 +1,310 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CoupleHero from '../../components/CoupleHero.astro';
+import CoupleGallery from '../../components/CoupleGallery.astro';
+import CoupleRecommendation from '../../components/CoupleRecommendation.astro';
+import BackButton from '../../components/BackButton.astro';
+import siteContent from '../../data/siteContent.json';
+import couplesData from '../../data/couples.json';
+
+export const prerender = true;
+
+interface Couple {
+  slug: string;
+  names: string;
+  city: string;
+  date: string;
+  isoDate: string;
+  locationName: string;
+  locationAddress: string;
+  coverPhoto: string;
+  accentColor: string;
+  accentGlow: string;
+  loveStory: string;
+  recommendation: string;
+  recommendationSource: string;
+  danceVideoUrl: string;
+  photos: string[];
+  blogSlug: string;
+  uploadToken: string;
+}
+
+const couples = couplesData.couples as Couple[];
+
+export function getStaticPaths() {
+  return (couplesData.couples as Couple[]).map((couple) => ({
+    params: { slug: couple.slug },
+    props: { couple },
+  }));
+}
+
+const { couple } = Astro.props as { couple: Couple };
+
+const { brand, contact } = siteContent;
+
+const youtubeId = couple.danceVideoUrl
+  ? new URL(couple.danceVideoUrl).searchParams.get('v') || ''
+  : '';
+
+const pageTitle = `${couple.names} — Povestea lor | ${brand.name}`;
+const pageDescription = `Descoperă povestea de dragoste a perechii ${couple.names} din ${couple.city}. Recomandare, galerie foto și dansul mirilor — ${brand.name}.`;
+
+const eventLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Event',
+  name: `Nuntă ${couple.names}`,
+  startDate: couple.isoDate,
+  location: {
+    '@type': 'Place',
+    name: couple.locationName,
+    address: couple.locationAddress,
+  },
+  performer: {
+    '@type': 'MusicGroup',
+    name: brand.name,
+  },
+  description: pageDescription,
+};
+
+const reviewLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Review',
+  reviewBody: couple.recommendation,
+  author: { '@type': 'Person', name: couple.names },
+  itemReviewed: {
+    '@type': 'MusicGroup',
+    name: brand.name,
+  },
+  reviewRating: {
+    '@type': 'Rating',
+    ratingValue: '5',
+    bestRating: '5',
+  },
+};
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+>
+  <main class="couple-page">
+    <BackButton href="/comunitate" label="← Comunitate" />
+
+    <!-- Hero -->
+    <CoupleHero
+      names={couple.names}
+      city={couple.city}
+      date={couple.date}
+      locationName={couple.locationName}
+      coverPhoto={couple.coverPhoto}
+      accentColor={couple.accentColor}
+      accentGlow={couple.accentGlow}
+    />
+
+    <!-- Nav intern -->
+    <nav class="couple-page__nav" aria-label="Secțiuni">
+      <a href="#poveste" class="couple-page__nav-link" style={`--nav-accent: ${couple.accentColor};`}>💕 Povestea</a>
+      <a href="#recomandare" class="couple-page__nav-link" style={`--nav-accent: ${couple.accentColor};`}>💬 Recomandare</a>
+      <a href="#galerie" class="couple-page__nav-link" style={`--nav-accent: ${couple.accentColor};`}>📸 Galerie</a>
+      <a href="#dans" class="couple-page__nav-link" style={`--nav-accent: ${couple.accentColor};`}>💃 Dansul Mirilor</a>
+    </nav>
+
+    <!-- 1. Povestea de dragoste -->
+    <section class="couple-section" id="poveste" style={`--section-accent: ${couple.accentColor};`}>
+      <h2 class="couple-section__title">💕 Povestea lor de dragoste</h2>
+      <div class="couple-section__content">
+        <p>{couple.loveStory}</p>
+      </div>
+    </section>
+
+    <!-- 2. Recomandare -->
+    <CoupleRecommendation
+      recommendation={couple.recommendation}
+      names={couple.names}
+      recommendationSource={couple.recommendationSource}
+      accentColor={couple.accentColor}
+      accentGlow={couple.accentGlow}
+    />
+
+    <!-- 3. Galerie Foto -->
+    <CoupleGallery
+      photos={couple.photos}
+      names={couple.names}
+      accentColor={couple.accentColor}
+    />
+
+    <!-- 4. Dansul Mirilor -->
+    <section class="couple-section" id="dans" style={`--section-accent: ${couple.accentColor};`}>
+      <h2 class="couple-section__title">💃 Dansul Mirilor</h2>
+
+      {youtubeId ? (
+        <div class="couple-dance__video">
+          <iframe
+            src={`https://www.youtube.com/embed/${youtubeId}`}
+            title={`Dansul Mirilor — ${couple.names}`}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+            loading="lazy"
+          ></iframe>
+        </div>
+      ) : (
+        <div class="couple-dance__empty">
+          <p>🎵 Videoclipul cu dansul mirilor va fi adăugat în curând.</p>
+        </div>
+      )}
+    </section>
+
+    <!-- CTA -->
+    {couple.blogSlug && (
+      <div class="couple-page__cta">
+        <a href={`/blog/${couple.blogSlug}`} class="couple-page__cta-link" style={`--cta-accent: ${couple.accentColor};`}>
+          📰 Citește articolul dedicat → {couple.names}
+        </a>
+      </div>
+    )}
+
+    <!-- JSON-LD -->
+    <script type="application/ld+json" set:html={JSON.stringify(eventLd)} />
+    <script type="application/ld+json" set:html={JSON.stringify(reviewLd)} />
+  </main>
+</BaseLayout>
+
+<style>
+  .couple-page {
+    padding-bottom: 3rem;
+  }
+
+  /* Nav intern */
+  .couple-page__nav {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem 1.5rem;
+    flex-wrap: wrap;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .couple-page__nav-link {
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.25s ease;
+    white-space: nowrap;
+  }
+
+  .couple-page__nav-link:hover {
+    color: var(--nav-accent);
+    border-color: var(--nav-accent);
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  /* Sections */
+  .couple-section {
+    padding: 3rem 1.5rem;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .couple-section__title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--section-accent);
+    text-align: center;
+    margin: 0 0 1.5rem;
+  }
+
+  .couple-section__content {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1rem;
+    padding: 2rem;
+  }
+
+  .couple-section__content p {
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.8;
+    font-size: 1.05rem;
+    margin: 0;
+  }
+
+  /* Dance Video */
+  .couple-dance__video {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    border-radius: 1rem;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .couple-dance__video iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 1rem;
+  }
+
+  .couple-dance__empty {
+    text-align: center;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px dashed rgba(255, 255, 255, 0.12);
+    border-radius: 1rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  /* CTA Blog */
+  .couple-page__cta {
+    text-align: center;
+    padding: 2rem 1.5rem;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .couple-page__cta-link {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    border-radius: 2rem;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--cta-accent);
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: all 0.25s ease;
+  }
+
+  .couple-page__cta-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--cta-accent);
+  }
+
+  @media (max-width: 767px) {
+    .couple-section {
+      padding: 2rem 1rem;
+    }
+
+    .couple-section__content {
+      padding: 1.25rem;
+    }
+
+    .couple-page__nav {
+      gap: 0.35rem;
+      padding: 0.75rem 1rem;
+    }
+
+    .couple-page__nav-link {
+      font-size: 0.8rem;
+      padding: 0.4rem 0.75rem;
+    }
+  }
+</style>

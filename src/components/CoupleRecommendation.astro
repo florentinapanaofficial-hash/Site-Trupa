@@ -1,0 +1,175 @@
+---
+interface Props {
+  recommendation: string;
+  names: string;
+  recommendationSource: string;
+  accentColor: string;
+  accentGlow: string;
+}
+
+const { recommendation, names, recommendationSource, accentColor, accentGlow } = Astro.props;
+
+const sourceLabel = recommendationSource
+  ? recommendationSource.includes('google')
+    ? 'Google'
+    : recommendationSource.includes('facebook')
+      ? 'Facebook'
+      : 'Online'
+  : '';
+
+const sourceIcon = recommendationSource
+  ? recommendationSource.includes('google')
+    ? '🔍'
+    : recommendationSource.includes('facebook')
+      ? '📘'
+      : '🌐'
+  : '';
+---
+
+<section class="couple-rec" id="recomandare" style={`--rec-accent: ${accentColor}; --rec-glow: ${accentGlow};`}>
+  <h2 class="couple-rec__title">💬 Recomandarea lor</h2>
+
+  <div class="couple-rec__card">
+    <div class="couple-rec__stars" aria-label="5 din 5 stele">
+      {'⭐'.repeat(5)}
+    </div>
+
+    <blockquote class="couple-rec__quote">
+      <p>{recommendation}</p>
+    </blockquote>
+
+    <div class="couple-rec__author">
+      <div class="couple-rec__avatar">
+        {names
+          .split('&')
+          .map((n) => n.trim().charAt(0))
+          .join('')}
+      </div>
+      <div>
+        <strong class="couple-rec__names">{names}</strong>
+        {recommendationSource && (
+          <a
+            href={recommendationSource}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="couple-rec__source"
+          >
+            {sourceIcon} Verifică pe {sourceLabel}
+          </a>
+        )}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .couple-rec {
+    padding: 3rem 1.5rem;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .couple-rec__title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--rec-accent);
+    text-align: center;
+    margin: 0 0 2rem;
+  }
+
+  .couple-rec__card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1rem;
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .couple-rec__card::before {
+    content: '"';
+    position: absolute;
+    top: -0.5rem;
+    left: 1rem;
+    font-size: 6rem;
+    font-family: Georgia, serif;
+    color: var(--rec-accent);
+    opacity: 0.1;
+    line-height: 1;
+  }
+
+  .couple-rec__stars {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    letter-spacing: 0.15em;
+  }
+
+  .couple-rec__quote {
+    margin: 0 0 1.5rem;
+    padding: 0;
+    border: none;
+  }
+
+  .couple-rec__quote p {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.85);
+    font-style: italic;
+    margin: 0;
+  }
+
+  .couple-rec__author {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    text-align: left;
+  }
+
+  .couple-rec__avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--rec-accent), var(--rec-glow));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .couple-rec__names {
+    display: block;
+    color: var(--rec-accent);
+    font-size: 1rem;
+  }
+
+  .couple-rec__source {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+    text-decoration: none;
+    margin-top: 0.15rem;
+    transition: color 0.2s;
+  }
+
+  .couple-rec__source:hover {
+    color: var(--rec-accent);
+  }
+
+  @media (max-width: 767px) {
+    .couple-rec {
+      padding: 2rem 1rem;
+    }
+
+    .couple-rec__card {
+      padding: 1.5rem 1rem;
+    }
+  }
+</style>

@@ -1,0 +1,544 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import siteContent from '../../data/siteContent.json';
+import couplesRaw from '../../data/couples.json';
+
+export const prerender = false;
+
+const { brand, contact } = siteContent;
+const whatsappNumber = contact.phoneRaw.replace(/\D/g, '');
+
+/* ─── Validate token from URL parameter ────────── */
+const token = Astro.params.token ?? '';
+const couple = couplesRaw.couples.find((c) => c.uploadToken === token) ?? null;
+
+if (!couple) {
+  return Astro.redirect('/comunitatea-noastra');
+}
+
+const pageTitle = `Upload — ${couple.names} | ${brand.name}`;
+const hasDriveLink = !!couple.driveUploadUrl;
+---
+
+<BaseLayout title={pageTitle} description="Pagină privată de upload pentru cuplurile noastre.">
+  <meta slot="head" name="robots" content="noindex, nofollow" />
+
+  <section class="section-container pt-8 pb-16 sm:pt-10 sm:pb-20">
+    <div class="upload-page mx-auto max-w-2xl">
+
+      <header class="upload-hero text-center mb-10">
+        <p class="upload-hero__kicker">Formația Florentina Pană</p>
+        <h1 class="upload-hero__title">Bun venit, {couple.names}!</h1>
+        <p class="upload-hero__subtitle">
+          Aici puteți partaja fotografiile, povestea voastră de dragoste, recomandarea
+          și videoclipul cu dansul mirilor. Toate materialele aprobate vor apărea pe
+          <a href={`/comunitate/${couple.slug}`} class="upload-link-gold">pagina voastră dedicată</a>.
+        </p>
+      </header>
+
+      <!-- ═══ GOOGLE DRIVE — Upload Fișiere ════════════════════════ -->
+      <div class="upload-section">
+        <div class="upload-section__icon">📁</div>
+        <h2 class="upload-section__title">Încarcă fotografii și video</h2>
+        <p class="upload-section__desc">
+          Folosim Google Drive pentru upload-ul fișierelor — simplu, sigur și fără limite de dimensiune.
+          Încărcați pozele de la nuntă, videoclipul dansului mirilor și orice alt material dorit.
+        </p>
+
+        {hasDriveLink ? (
+          <a
+            href={couple.driveUploadUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="upload-drive-btn"
+          >
+            <svg width="24" height="24" viewBox="0 0 87.3 78" aria-hidden="true">
+              <path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3L29 52.2H0c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/>
+              <path d="M43.65 25.15 28.4 1.5C27.05 2.3 25.9 3.4 25.1 4.8L1.2 46.5c-.8 1.4-1.2 2.95-1.2 4.5h29l14.65-25.85z" fill="#00ac47"/>
+              <path d="M73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75L86.1 57c.8-1.4 1.2-2.95 1.2-4.5H58.3L43.65 78h15.25l14.65-1.2z" fill="#ea4335"/>
+              <path d="m43.65 25.15 15.25-26.5c-1.35-.8-2.9-1.15-4.5-1.15H32.85c-1.6 0-3.15.45-4.5 1.25z" fill="#00832d"/>
+              <path d="M58.3 52.5H29L13.75 76.8c1.35.8 2.9 1.2 4.5 1.2h35.5c1.6 0 3.15-.45 4.5-1.2z" fill="#2684fc"/>
+              <path d="M73.4 26.5 62.1 4.8c-.8-1.4-1.95-2.5-3.3-3.3L43.65 25.15 58.3 52.5h29c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/>
+            </svg>
+            Deschide folderul Google Drive
+          </a>
+          <p class="upload-drive-hint">
+            Se deschide folderul vostru privat. Încărcați fișierele dorite — noi le vom verifica și adăuga pe pagină.
+          </p>
+        ) : (
+          <div class="upload-drive-pending">
+            <p>⏳ Folderul vostru Google Drive se pregătește.</p>
+            <p class="upload-drive-pending__hint">
+              Între timp, ne puteți trimite fișierele direct pe WhatsApp:
+            </p>
+            <a
+              href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Bună! Suntem ${couple.names}. Vrem să trimitem fotografii și materiale pentru pagina noastră de pe site.`)}`}
+              class="upload-wa-btn"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              Trimite pe WhatsApp
+            </a>
+          </div>
+        )}
+      </div>
+
+      <!-- ═══ SEPARATOR ════════════════════════════════════════════ -->
+      <div class="upload-separator">
+        <span class="upload-separator__line"></span>
+        <span class="upload-separator__text">Trimite și conținut text</span>
+        <span class="upload-separator__line"></span>
+      </div>
+
+      <!-- ═══ TAB NAVIGATION — text only ═══════════════════════════ -->
+      <nav class="upload-tabs" role="tablist">
+        <button class="upload-tab is-active" data-tab="story" role="tab" aria-selected="true" type="button">💕 Povestea</button>
+        <button class="upload-tab" data-tab="recommendation" role="tab" aria-selected="false" type="button">⭐ Recomandare</button>
+        <button class="upload-tab" data-tab="video" role="tab" aria-selected="false" type="button">🎬 Link video dans</button>
+      </nav>
+
+      <!-- ═══ STORY PANEL ══════════════════════════════════════════ -->
+      <div class="upload-panel is-active" data-panel="story" role="tabpanel">
+        <h2 class="upload-panel__title">Povestea voastră de dragoste</h2>
+        <p class="upload-panel__desc">Spuneți-ne cum v-ați cunoscut, cum a fost cererea în căsătorie, ce v-a făcut să alegeți să fiți împreună pentru totdeauna.</p>
+        <form class="upload-form" data-type="story">
+          <input type="hidden" name="token" value={token} />
+          <input type="hidden" name="type" value="story" />
+
+          <textarea
+            name="story"
+            class="upload-textarea"
+            placeholder="Scrie povestea voastră aici..."
+            rows="10"
+            maxlength="5000"
+            required
+          ></textarea>
+          <small class="upload-counter"><span id="storyCount">0</span>/5000 caractere</small>
+          <button type="submit" class="upload-submit">Trimite povestea</button>
+        </form>
+      </div>
+
+      <!-- ═══ RECOMMENDATION PANEL ═════════════════════════════════ -->
+      <div class="upload-panel" data-panel="recommendation" role="tabpanel" hidden>
+        <h2 class="upload-panel__title">Recomandarea voastră</h2>
+        <p class="upload-panel__desc">Ce ați spune despre experiența cu formația noastră? Recenzia voastră ne ajută enorm!</p>
+        <form class="upload-form" data-type="recommendation">
+          <input type="hidden" name="token" value={token} />
+          <input type="hidden" name="type" value="recommendation" />
+
+          <textarea
+            name="recommendation"
+            class="upload-textarea"
+            placeholder="Scrieți recomandarea voastră aici..."
+            rows="6"
+            maxlength="5000"
+            required
+          ></textarea>
+          <small class="upload-counter"><span id="recCount">0</span>/5000 caractere</small>
+
+          <label class="upload-label">
+            Link recenzie Google sau Facebook (opțional)
+            <input type="url" name="source" class="upload-input" placeholder="https://g.co/kgs/..." />
+          </label>
+
+          <button type="submit" class="upload-submit">Trimite recomandarea</button>
+        </form>
+      </div>
+
+      <!-- ═══ VIDEO PANEL ══════════════════════════════════════════ -->
+      <div class="upload-panel" data-panel="video" role="tabpanel" hidden>
+        <h2 class="upload-panel__title">Dansul mirilor — link video</h2>
+        <p class="upload-panel__desc">Partajați linkul YouTube sau alt link (https://) cu videoclipul dansului vostru.</p>
+        <form class="upload-form" data-type="video">
+          <input type="hidden" name="token" value={token} />
+          <input type="hidden" name="type" value="video" />
+
+          <label class="upload-label">
+            Link video (YouTube, Vimeo etc.)
+            <input type="url" name="videoUrl" class="upload-input" placeholder="https://www.youtube.com/watch?v=..." required />
+          </label>
+
+          <button type="submit" class="upload-submit">Trimite linkul video</button>
+        </form>
+      </div>
+
+      <!-- ═══ STATUS MESSAGE ═══════════════════════════════════════ -->
+      <div class="upload-status" id="uploadStatus" hidden></div>
+
+    </div>
+  </section>
+
+  <!-- ═══ SCRIPTS ══════════════════════════════════════════════════ -->
+  <script is:inline>
+    (function () {
+      /* ─── Tab switching ─── */
+      var tabs = document.querySelectorAll('.upload-tab');
+      var panels = document.querySelectorAll('.upload-panel');
+
+      tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          tabs.forEach(function (t) { t.classList.remove('is-active'); t.setAttribute('aria-selected', 'false'); });
+          panels.forEach(function (p) { p.classList.remove('is-active'); p.hidden = true; });
+
+          tab.classList.add('is-active');
+          tab.setAttribute('aria-selected', 'true');
+          var panel = document.querySelector('[data-panel="' + tab.getAttribute('data-tab') + '"]');
+          if (panel) { panel.classList.add('is-active'); panel.hidden = false; }
+        });
+      });
+
+      /* ─── Character counters ─── */
+      var storyTa = document.querySelector('[name="story"]');
+      var storyCount = document.getElementById('storyCount');
+      if (storyTa && storyCount) {
+        storyTa.addEventListener('input', function () { storyCount.textContent = storyTa.value.length; });
+      }
+
+      var recTa = document.querySelector('[name="recommendation"]');
+      var recCount = document.getElementById('recCount');
+      if (recTa && recCount) {
+        recTa.addEventListener('input', function () { recCount.textContent = recTa.value.length; });
+      }
+
+      /* ─── Form submission (text only) ─── */
+      var statusEl = document.getElementById('uploadStatus');
+
+      document.querySelectorAll('.upload-form').forEach(function (form) {
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+
+          var submitBtn = form.querySelector('.upload-submit');
+          var originalText = submitBtn ? submitBtn.textContent : '';
+          if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Se trimite...'; }
+
+          var fd = new FormData(form);
+
+          fetch('/api/couple-upload', { method: 'POST', body: fd })
+            .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+            .then(function (result) {
+              if (statusEl) {
+                statusEl.hidden = false;
+                statusEl.className = 'upload-status ' + (result.ok ? 'is-success' : 'is-error');
+                statusEl.textContent = result.data.message || result.data.error || (result.ok ? 'Trimis cu succes!' : 'Eroare la trimitere.');
+              }
+              if (result.ok) form.reset();
+              if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = originalText; }
+            })
+            .catch(function () {
+              if (statusEl) {
+                statusEl.hidden = false;
+                statusEl.className = 'upload-status is-error';
+                statusEl.textContent = 'Eroare de conexiune. Verifică internetul și încearcă din nou.';
+              }
+              if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Reîncearcă'; }
+            });
+        });
+      });
+    })();
+  </script>
+
+  <!-- ═══ STYLES ═══════════════════════════════════════════════════ -->
+  <style>
+    .upload-page { padding: 0 1rem; }
+
+    /* Hero */
+    .upload-hero__kicker {
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin: 0 0 0.6rem;
+    }
+
+    .upload-hero__title {
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(1.8rem, 4.5vw, 2.8rem);
+      font-weight: 700;
+      color: var(--title, #fff8ee);
+      margin: 0 0 0.75rem;
+      line-height: 1.15;
+    }
+
+    .upload-hero__subtitle {
+      font-size: 0.95rem;
+      color: rgba(255, 255, 255, 0.65);
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    .upload-link-gold {
+      color: var(--gold);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    /* ═══ Google Drive Section ═══ */
+    .upload-section {
+      text-align: center;
+      padding: 2rem 1.5rem;
+      border-radius: 1.25rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.04);
+      margin-bottom: 2rem;
+    }
+
+    .upload-section__icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .upload-section__title {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--title);
+      margin: 0 0 0.5rem;
+    }
+
+    .upload-section__desc {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.6);
+      margin: 0 0 1.5rem;
+      line-height: 1.5;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .upload-drive-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.85rem 2rem;
+      border-radius: 9999px;
+      border: 2px solid rgba(66, 133, 244, 0.5);
+      background: rgba(66, 133, 244, 0.12);
+      color: #fff;
+      font-family: 'Oswald', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-decoration: none;
+      min-height: 52px;
+      transition: all 0.25s ease;
+    }
+
+    .upload-drive-btn:hover {
+      background: rgba(66, 133, 244, 0.22);
+      border-color: rgba(66, 133, 244, 0.75);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(66, 133, 244, 0.25);
+    }
+
+    .upload-drive-btn svg {
+      flex-shrink: 0;
+    }
+
+    .upload-drive-hint {
+      font-size: 0.78rem;
+      color: rgba(255, 255, 255, 0.4);
+      margin-top: 1rem;
+    }
+
+    .upload-drive-pending {
+      padding: 1.25rem;
+      border-radius: 0.75rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px dashed rgba(255, 255, 255, 0.12);
+    }
+
+    .upload-drive-pending p {
+      margin: 0 0 0.5rem;
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .upload-drive-pending__hint {
+      font-size: 0.82rem;
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    .upload-wa-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      padding: 0.6rem 1.3rem;
+      border-radius: 9999px;
+      background: linear-gradient(135deg, #2fdc81, #1cbf6a);
+      color: #062315;
+      font-weight: 800;
+      font-size: 0.82rem;
+      text-decoration: none;
+      transition: transform 160ms ease, filter 160ms ease;
+    }
+
+    .upload-wa-btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.06);
+    }
+
+    /* ═══ Separator ═══ */
+    .upload-separator {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 1.5rem 0 2rem;
+    }
+
+    .upload-separator__line {
+      flex: 1;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .upload-separator__text {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+
+    /* ═══ Tabs ═══ */
+    .upload-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+
+    .upload-tab {
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      padding: 0.55rem 1.1rem;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+      color: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .upload-tab:hover { border-color: rgba(255, 255, 255, 0.25); color: rgba(255, 255, 255, 0.85); }
+    .upload-tab.is-active { background: var(--gold); border-color: var(--gold); color: #0C080F; }
+
+    /* ═══ Panels ═══ */
+    .upload-panel { display: none; }
+    .upload-panel.is-active { display: block; }
+
+    .upload-panel__title {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--title);
+      margin: 0 0 0.5rem;
+    }
+
+    .upload-panel__desc {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.6);
+      margin: 0 0 1.5rem;
+      line-height: 1.5;
+    }
+
+    /* ═══ Form elements ═══ */
+    .upload-form { display: flex; flex-direction: column; gap: 1rem; }
+
+    .upload-textarea {
+      width: 100%;
+      padding: 1rem;
+      border-radius: 0.75rem;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.05);
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 0.9rem;
+      font-family: inherit;
+      line-height: 1.6;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.25s;
+    }
+
+    .upload-textarea:focus { border-color: var(--gold); }
+    .upload-textarea::placeholder { color: rgba(255, 255, 255, 0.35); }
+
+    .upload-counter {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.4);
+      text-align: right;
+    }
+
+    .upload-label {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.7);
+      font-weight: 600;
+    }
+
+    .upload-input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.05);
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.25s;
+    }
+
+    .upload-input:focus { border-color: var(--gold); }
+    .upload-input::placeholder { color: rgba(255, 255, 255, 0.35); }
+
+    .upload-submit {
+      align-self: flex-start;
+      padding: 0.75rem 1.75rem;
+      border-radius: 9999px;
+      border: none;
+      background: linear-gradient(135deg, var(--gold), #f5a623);
+      color: #0C080F;
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: transform 160ms ease, filter 160ms ease;
+      min-height: 48px;
+    }
+
+    .upload-submit:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.06); }
+    .upload-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ═══ Status ═══ */
+    .upload-status {
+      margin-top: 1.5rem;
+      padding: 1rem 1.25rem;
+      border-radius: 0.75rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .upload-status.is-success {
+      background: rgba(47, 220, 129, 0.12);
+      border: 1px solid rgba(47, 220, 129, 0.3);
+      color: #6effd8;
+    }
+
+    .upload-status.is-error {
+      background: rgba(255, 70, 120, 0.12);
+      border: 1px solid rgba(255, 70, 120, 0.3);
+      color: #ff94b8;
+    }
+  </style>
+</BaseLayout>

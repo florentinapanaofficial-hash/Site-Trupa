@@ -1,0 +1,283 @@
+---
+interface Props {
+  photos: string[];
+  names: string;
+  accentColor: string;
+}
+
+const { photos, names, accentColor } = Astro.props;
+---
+
+<section class="couple-gallery" id="galerie" style={`--gallery-accent: ${accentColor};`}>
+  <h2 class="couple-gallery__title">📸 Am fost alături de ei!</h2>
+
+  {photos.length > 0 ? (
+    <div class="couple-gallery__grid">
+      {photos.map((photo, i) => (
+        <button
+          class="couple-gallery__item"
+          data-lightbox-index={i}
+          type="button"
+          aria-label={`Foto ${i + 1} — ${names}`}
+        >
+          <img src={photo} alt={`${names} — foto ${i + 1}`} loading="lazy" width="600" height="400" />
+          <div class="couple-gallery__overlay" aria-hidden="true">
+            <span>🔍</span>
+          </div>
+        </button>
+      ))}
+    </div>
+  ) : (
+    <div class="couple-gallery__empty">
+      <p>📷 Galeria foto va fi actualizată în curând.</p>
+      <p class="couple-gallery__hint">Mirii pot adăuga fotografii prin linkul personalizat primit pe WhatsApp.</p>
+    </div>
+  )}
+</section>
+
+<!-- Lightbox -->
+<dialog class="couple-lightbox" id="coupleLightbox" aria-label="Galerie foto">
+  <div class="couple-lightbox__backdrop" data-lightbox-close></div>
+  <div class="couple-lightbox__container">
+    <button class="couple-lightbox__close" data-lightbox-close type="button" aria-label="Închide">&times;</button>
+    <button class="couple-lightbox__prev" data-lightbox-prev type="button" aria-label="Foto anterioară">‹</button>
+    <img class="couple-lightbox__img" src="" alt="" />
+    <button class="couple-lightbox__next" data-lightbox-next type="button" aria-label="Foto următoare">›</button>
+    <div class="couple-lightbox__counter"></div>
+  </div>
+</dialog>
+
+<script define:vars={{ photos }}>
+  if (photos.length > 0) {
+    const dialog = document.getElementById('coupleLightbox');
+    const img = dialog?.querySelector('.couple-lightbox__img');
+    const counter = dialog?.querySelector('.couple-lightbox__counter');
+    let currentIndex = 0;
+
+    function showPhoto(index) {
+      if (!img || !counter) return;
+      currentIndex = ((index % photos.length) + photos.length) % photos.length;
+      img.src = photos[currentIndex];
+      img.alt = `Foto ${currentIndex + 1} din ${photos.length}`;
+      counter.textContent = `${currentIndex + 1} / ${photos.length}`;
+    }
+
+    document.querySelectorAll('[data-lightbox-index]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const i = parseInt(btn.getAttribute('data-lightbox-index') || '0', 10);
+        showPhoto(i);
+        dialog?.showModal();
+      });
+    });
+
+    dialog?.querySelectorAll('[data-lightbox-close]').forEach((el) => {
+      el.addEventListener('click', () => dialog.close());
+    });
+
+    dialog?.querySelector('[data-lightbox-prev]')?.addEventListener('click', () => showPhoto(currentIndex - 1));
+    dialog?.querySelector('[data-lightbox-next]')?.addEventListener('click', () => showPhoto(currentIndex + 1));
+
+    dialog?.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') showPhoto(currentIndex - 1);
+      if (e.key === 'ArrowRight') showPhoto(currentIndex + 1);
+      if (e.key === 'Escape') dialog.close();
+    });
+
+    // Touch swipe
+    let touchStartX = 0;
+    dialog?.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].clientX; }, { passive: true });
+    dialog?.addEventListener('touchend', (e) => {
+      const diff = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(diff) > 50) showPhoto(diff > 0 ? currentIndex - 1 : currentIndex + 1);
+    });
+  }
+</script>
+
+<style>
+  .couple-gallery {
+    padding: 3rem 1.5rem;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  .couple-gallery__title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--gallery-accent);
+    text-align: center;
+    margin: 0 0 2rem;
+  }
+
+  .couple-gallery__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .couple-gallery__item {
+    position: relative;
+    border: none;
+    padding: 0;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.04);
+    aspect-ratio: 3 / 2;
+  }
+
+  .couple-gallery__item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .couple-gallery__item:hover img {
+    transform: scale(1.05);
+  }
+
+  .couple-gallery__overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 1.5rem;
+  }
+
+  .couple-gallery__item:hover .couple-gallery__overlay {
+    opacity: 1;
+  }
+
+  .couple-gallery__empty {
+    text-align: center;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px dashed rgba(255, 255, 255, 0.12);
+    border-radius: 1rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1rem;
+  }
+
+  .couple-gallery__hint {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.4);
+    margin-top: 0.5rem;
+  }
+
+  /* Lightbox */
+  .couple-lightbox {
+    border: none;
+    background: transparent;
+    max-width: 100vw;
+    max-height: 100vh;
+    width: 100vw;
+    height: 100vh;
+    padding: 0;
+    margin: 0;
+  }
+
+  .couple-lightbox::backdrop {
+    background: rgba(0, 0, 0, 0.92);
+  }
+
+  .couple-lightbox__backdrop {
+    position: fixed;
+    inset: 0;
+    cursor: pointer;
+  }
+
+  .couple-lightbox__container {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .couple-lightbox__img {
+    max-width: 90vw;
+    max-height: 85vh;
+    object-fit: contain;
+    border-radius: 0.5rem;
+    z-index: 1;
+  }
+
+  .couple-lightbox__close {
+    position: fixed;
+    top: 1rem;
+    right: 1.5rem;
+    font-size: 2.5rem;
+    color: white;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 2;
+    line-height: 1;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+
+  .couple-lightbox__close:hover { opacity: 1; }
+
+  .couple-lightbox__prev,
+  .couple-lightbox__next {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 3rem;
+    color: white;
+    background: rgba(255, 255, 255, 0.08);
+    border: none;
+    cursor: pointer;
+    z-index: 2;
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    opacity: 0.6;
+    transition: opacity 0.2s, background 0.2s;
+    line-height: 1;
+  }
+
+  .couple-lightbox__prev { left: 1rem; }
+  .couple-lightbox__next { right: 1rem; }
+
+  .couple-lightbox__prev:hover,
+  .couple-lightbox__next:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .couple-lightbox__counter {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    z-index: 2;
+  }
+
+  @media (max-width: 767px) {
+    .couple-gallery {
+      padding: 2rem 1rem;
+    }
+
+    .couple-gallery__grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.5rem;
+    }
+
+    .couple-lightbox__prev,
+    .couple-lightbox__next {
+      display: none;
+    }
+  }
+</style>

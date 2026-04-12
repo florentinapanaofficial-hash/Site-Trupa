@@ -1,0 +1,158 @@
+---
+interface Props {
+  names: string;
+  city: string;
+  date: string;
+  locationName: string;
+  coverPhoto: string;
+  accentColor: string;
+  accentGlow: string;
+}
+
+const { names, city, date, locationName, coverPhoto, accentColor, accentGlow } = Astro.props;
+
+const initials = names
+  .split('&')
+  .map((n) => n.trim().charAt(0).toUpperCase())
+  .join(' & ');
+---
+
+<section class="couple-hero" style={`--hero-accent: ${accentColor}; --hero-glow: ${accentGlow};`}>
+  <div class="couple-hero__bg" aria-hidden="true"></div>
+  <div class="couple-hero__content">
+    <nav class="couple-hero__breadcrumb" aria-label="Navigare">
+      <a href="/">Acasă</a>
+      <span aria-hidden="true">›</span>
+      <a href="/comunitate">Comunitate</a>
+      <span aria-hidden="true">›</span>
+      <span>{names}</span>
+    </nav>
+
+    <div class="couple-hero__avatar">
+      {coverPhoto ? (
+        <img src={coverPhoto} alt={`${names}`} width="160" height="160" />
+      ) : (
+        <div class="couple-hero__initials">{initials}</div>
+      )}
+    </div>
+
+    <h1 class="couple-hero__title">{names}</h1>
+    <p class="couple-hero__meta">
+      <span>📍 {city}</span>
+      <span>📅 {date}</span>
+      {locationName && <span>🏛️ {locationName}</span>}
+    </p>
+  </div>
+</section>
+
+<style>
+  .couple-hero {
+    position: relative;
+    padding: 4rem 1.5rem 3rem;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .couple-hero__bg {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center top, var(--hero-glow), transparent 70%);
+    pointer-events: none;
+  }
+
+  .couple-hero__content {
+    position: relative;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  .couple-hero__breadcrumb {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    margin-bottom: 2rem;
+    color: rgba(255, 255, 255, 0.5);
+    flex-wrap: wrap;
+  }
+
+  .couple-hero__breadcrumb a {
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .couple-hero__breadcrumb a:hover {
+    color: var(--hero-accent);
+  }
+
+  .couple-hero__breadcrumb span:last-child {
+    color: var(--hero-accent);
+    font-weight: 600;
+  }
+
+  .couple-hero__avatar {
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 1.5rem;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid var(--hero-accent);
+    box-shadow: 0 0 30px var(--hero-glow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .couple-hero__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .couple-hero__initials {
+    font-family: 'Oswald', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--hero-accent);
+    letter-spacing: 0.05em;
+  }
+
+  .couple-hero__title {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    color: var(--hero-accent);
+    margin: 0 0 1rem;
+    text-shadow: 0 0 30px var(--hero-glow);
+  }
+
+  .couple-hero__meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 767px) {
+    .couple-hero {
+      padding: 3rem 1rem 2rem;
+    }
+
+    .couple-hero__avatar {
+      width: 110px;
+      height: 110px;
+    }
+
+    .couple-hero__meta {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+  }
+</style>

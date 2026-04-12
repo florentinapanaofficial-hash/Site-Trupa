@@ -186,6 +186,7 @@
         },
         {
             "slug": "andreea-si-radu-povestea-lor",
+            "coupleSlug": "andreea-si-radu",
             "category": "Povești de nuntă",
             "categoryAccent": "rose",
             "title": "Andreea & Radu — tradiție, eleganță și un ring de dans de neuitat",
@@ -229,6 +230,7 @@
         },
         {
             "slug": "bianca-si-mihai-povestea-lor",
+            "coupleSlug": "bianca-si-mihai",
             "category": "Povești de nuntă",
             "categoryAccent": "gold",
             "title": "Bianca & Mihai — o noapte întreagă pe ringul de dans din Curtea de Argeș",
@@ -272,6 +274,7 @@
         },
         {
             "slug": "ioana-si-catalin-povestea-lor",
+            "coupleSlug": "ioana-si-catalin",
             "category": "Povești de nuntă",
             "categoryAccent": "teal",
             "title": "Ioana & Cătălin — o atmosferă premium de la primul acord până la ultimul",
@@ -315,6 +318,7 @@
         },
         {
             "slug": "alina-si-stefan-povestea-lor",
+            "coupleSlug": "alina-si-stefan",
             "category": "Povești de nuntă",
             "categoryAccent": "rose",
             "title": "Alina & Ștefan — cum ridicăm o sală în picioare la Brașov",

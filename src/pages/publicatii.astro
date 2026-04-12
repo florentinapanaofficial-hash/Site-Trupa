@@ -1,0 +1,443 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import blogPostsRaw from '../data/blogPosts.json';
+import couplesData from '../data/couples.json';
+import siteContent from '../data/siteContent.json';
+import BackButton from '../components/BackButton.astro';
+
+export const prerender = true;
+
+const { brand, seo, contact } = siteContent;
+const couples = couplesData.couples;
+
+const posts = [...((blogPostsRaw as any).items ?? [])].sort(
+  (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+);
+
+/* ─── Build couple slug lookup ─────────────────── */
+const coupleByBlogSlug = new Map<string, (typeof couples)[0]>();
+for (const c of couples) {
+  if (c.blogSlug) coupleByBlogSlug.set(c.blogSlug, c);
+}
+
+/* ─── Collect unique categories ────────────────── */
+const categories = ['Toate', ...new Set(posts.map((p) => p.category))];
+
+const accentClass: Record<string, string> = {
+  gold: 'accent-gold',
+  rose: 'accent-rose',
+  cyan: 'accent-cyan',
+  violet: 'accent-violet',
+  teal: 'accent-teal',
+  lime: 'accent-lime',
+};
+
+function formatDate(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString('ro-RO', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+}
+
+const pageTitle = `Publicații & Vlog | ${brand.name}`;
+const pageDescription = `Articole, povești de nuntă, vlog-uri și ghiduri utile de la ${brand.name}. Citește despre experiențele cuplurilor noastre și sfaturi pentru o nuntă reușită.`;
+const SITE = 'https://www.florentinapanaofficial.ro';
+---
+
+<BaseLayout title={pageTitle} description={pageDescription} ogImage={seo.ogImage}>
+
+  <section class="section-container pt-8 pb-16 sm:pt-10 sm:pb-20">
+    <div class="mb-6"><BackButton href="/comunitatea-noastra" label="Comunitate" /></div>
+
+    <!-- ═══ HERO ═══════════════════════════════════════════════════ -->
+    <header class="pub-hero mx-auto text-center mb-8">
+      <p class="pub-hero__kicker">Formația Florentina Pană</p>
+      <h1 class="pub-hero__title">Publicații & Vlog</h1>
+      <p class="pub-hero__subtitle">
+        Povești de nuntă, articole din culise și sfaturi utile pentru o seară perfectă.
+      </p>
+    </header>
+
+    <!-- ═══ CATEGORY FILTERS ═══════════════════════════════════════ -->
+    <nav class="pub-filters" aria-label="Filtrează articolele">
+      {categories.map((cat) => (
+        <button
+          class={`pub-filter-btn ${cat === 'Toate' ? 'is-active' : ''}`}
+          data-category={cat}
+          type="button"
+        >
+          {cat}
+        </button>
+      ))}
+    </nav>
+
+    <!-- ═══ ARTICLES GRID ══════════════════════════════════════════ -->
+    <div class="pub-grid" id="pubGrid">
+      {posts.map((post) => {
+        const linkedCouple = coupleByBlogSlug.get(post.slug);
+        const shareText = encodeURIComponent(`${post.title} — ${brand.name}`);
+        const shareUrl = encodeURIComponent(`${SITE}/blog/${post.slug}`);
+
+        return (
+          <article class="pub-card" data-category={post.category}>
+            <a href={`/blog/${post.slug}`} class="pub-card__link" aria-label={`Citește: ${post.title}`}>
+              <div class="pub-card__cover">
+                {post.coverImage ? (
+                  <img src={post.coverImage} alt={post.title} loading="lazy" decoding="async" width="640" height="360" />
+                ) : (
+                  <span class="pub-card__emoji" aria-hidden="true">{post.coverEmoji || '📝'}</span>
+                )}
+              </div>
+              <div class="pub-card__body">
+                <div class="pub-card__meta">
+                  <span class={`pub-badge ${accentClass[post.categoryAccent] ?? ''}`}>{post.category}</span>
+                  <span class="pub-card__readtime">{post.readTime}</span>
+                </div>
+                <h2 class="pub-card__title">{post.title}</h2>
+                <p class="pub-card__excerpt">{post.excerpt}</p>
+                <time class="pub-card__date" datetime={post.date}>{formatDate(post.date)}</time>
+              </div>
+            </a>
+
+            {/* ─── Footer: couple link + share ─── */}
+            <div class="pub-card__footer">
+              {linkedCouple && (
+                <a href={`/comunitate/${linkedCouple.slug}`} class="pub-card__couple-link">
+                  💍 {linkedCouple.names}
+                </a>
+              )}
+              <div class="pub-card__share">
+                <a
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="pub-share-btn"
+                  aria-label={`Distribuie pe Facebook: ${post.title}`}
+                  title="Distribuie pe Facebook"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                </a>
+                <button
+                  type="button"
+                  class="pub-share-btn pub-share-copy"
+                  data-url={`${SITE}/blog/${post.slug}`}
+                  aria-label={`Copiază linkul: ${post.title}`}
+                  title="Copiază linkul"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+              </div>
+            </div>
+          </article>
+        );
+      })}
+    </div>
+
+    <!-- ═══ EMPTY STATE ════════════════════════════════════════════ -->
+    <div class="pub-empty" id="pubEmpty" hidden>
+      <p>📰 Niciun articol în această categorie.</p>
+    </div>
+
+    <!-- ═══ BACK TO COMMUNITY ══════════════════════════════════════ -->
+    <div class="pub-cta text-center mt-12">
+      <a href="/comunitatea-noastra" class="pub-cta__link">
+        ← Înapoi la Mirii Noștri
+      </a>
+    </div>
+  </section>
+
+  <!-- ═══ FILTER + COPY SCRIPTS ════════════════════════════════════ -->
+  <script is:inline>
+    (function () {
+      var buttons = document.querySelectorAll('.pub-filter-btn');
+      var cards = document.querySelectorAll('.pub-card');
+      var emptyEl = document.getElementById('pubEmpty');
+
+      buttons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          buttons.forEach(function (b) { b.classList.remove('is-active'); });
+          btn.classList.add('is-active');
+
+          var cat = btn.getAttribute('data-category');
+          var visible = 0;
+
+          cards.forEach(function (card) {
+            var show = cat === 'Toate' || card.getAttribute('data-category') === cat;
+            card.style.display = show ? '' : 'none';
+            if (show) visible++;
+          });
+
+          if (emptyEl) emptyEl.hidden = visible > 0;
+        });
+      });
+
+      /* Copy link */
+      document.querySelectorAll('.pub-share-copy').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var url = btn.getAttribute('data-url');
+          if (url && navigator.clipboard) {
+            navigator.clipboard.writeText(url).then(function () {
+              btn.setAttribute('title', 'Copiat!');
+              setTimeout(function () { btn.setAttribute('title', 'Copiază linkul'); }, 2000);
+            });
+          }
+        });
+      });
+    })();
+  </script>
+
+  <!-- ═══ STYLES ═══════════════════════════════════════════════════ -->
+  <style>
+    /* ═══ HERO ═══ */
+    .pub-hero__kicker {
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin: 0 0 0.6rem;
+    }
+
+    .pub-hero__title {
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 700;
+      color: var(--title, #fff8ee);
+      margin: 0 0 0.75rem;
+      line-height: 1.15;
+    }
+
+    .pub-hero__subtitle {
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.65);
+      margin: 0;
+      line-height: 1.6;
+      max-width: 540px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ═══ FILTERS ═══ */
+    .pub-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .pub-filter-btn {
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.45rem 1rem;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+      color: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .pub-filter-btn:hover {
+      border-color: rgba(255, 255, 255, 0.25);
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .pub-filter-btn.is-active {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: #0C080F;
+    }
+
+    /* ═══ GRID ═══ */
+    .pub-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+      gap: 1.75rem;
+      max-width: 72rem;
+      margin: 0 auto;
+    }
+
+    /* ═══ CARD ═══ */
+    .pub-card {
+      display: flex;
+      flex-direction: column;
+      border-radius: 1.1rem;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      backdrop-filter: blur(12px);
+      transition: transform 200ms ease, box-shadow 200ms ease;
+    }
+
+    .pub-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.38);
+    }
+
+    .pub-card__link {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .pub-card__cover {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .pub-card__cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .pub-card__emoji {
+      font-size: 3.5rem;
+      line-height: 1;
+    }
+
+    .pub-card__body {
+      padding: 1.25rem 1.4rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      flex: 1;
+    }
+
+    .pub-card__meta {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .pub-badge {
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.65rem;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+    .pub-badge.accent-gold   { background: rgba(245,166,35,.22);  color: #ffd166; }
+    .pub-badge.accent-rose   { background: rgba(255,70,120,.22);  color: #ff94b8; }
+    .pub-badge.accent-cyan   { background: rgba(6,214,255,.22);   color: #7ef8ff; }
+    .pub-badge.accent-violet { background: rgba(167,100,255,.22); color: #d8a8ff; }
+    .pub-badge.accent-teal   { background: rgba(20,220,180,.22);  color: #6effd8; }
+    .pub-badge.accent-lime   { background: rgba(140,240,50,.22);  color: #c8ff60; }
+
+    .pub-card__readtime {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .pub-card__title {
+      font-family: 'Oswald', sans-serif;
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: #ffffff;
+      line-height: 1.25;
+      margin: 0;
+    }
+
+    .pub-card__excerpt {
+      font-size: 0.88rem;
+      color: rgba(255, 255, 255, 0.72);
+      line-height: 1.6;
+      margin: 0;
+      flex: 1;
+    }
+
+    .pub-card__date {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.42);
+    }
+
+    /* ═══ CARD FOOTER ═══ */
+    .pub-card__footer {
+      padding: 0.75rem 1.4rem 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .pub-card__couple-link {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--gold);
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+
+    .pub-card__couple-link:hover {
+      opacity: 0.8;
+      text-decoration: underline;
+    }
+
+    .pub-card__share {
+      display: flex;
+      gap: 0.5rem;
+      margin-left: auto;
+    }
+
+    .pub-share-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+      color: rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .pub-share-btn:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(255, 215, 0, 0.08);
+    }
+
+    /* ═══ EMPTY STATE ═══ */
+    .pub-empty {
+      text-align: center;
+      padding: 2.5rem 1rem;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    /* ═══ CTA LINK ═══ */
+    .pub-cta__link {
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--gold);
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+
+    .pub-cta__link:hover {
+      opacity: 0.8;
+      text-decoration: underline;
+    }
+  </style>
+</BaseLayout>
