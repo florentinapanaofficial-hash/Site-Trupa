@@ -9,7 +9,9 @@
     "preview": "astro preview",
     "start": "node ./dist/server/entry.mjs",
     "update-seo": "node scripts/update-seo.js",
-    "update-seo:dry": "node scripts/update-seo.js --dry-run"
+    "update-seo:dry": "node scripts/update-seo.js --dry-run",
+    "check-links": "node scripts/check-links.mjs",
+    "check-links:fix": "node scripts/check-links.mjs --fix"
   },
   "dependencies": {
     "@astrojs/node": "^8.3.4",

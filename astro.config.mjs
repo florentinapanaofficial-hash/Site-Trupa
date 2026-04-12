@@ -9,8 +9,16 @@ export default defineConfig({
   site: siteUrl,
   devToolbar: { enabled: false },
   output: 'hybrid',
+  trailingSlash: 'always',
+  compressHTML: true,
   build: {
     inlineStylesheets: 'always',
+  },
+  vite: {
+    build: {
+      cssMinify: 'lightningcss',
+      minify: 'esbuild',
+    },
   },
   adapter: node({
     mode: 'middleware',
