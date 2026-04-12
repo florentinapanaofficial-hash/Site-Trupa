@@ -35,9 +35,9 @@ export default defineConfig({
         `${siteUrl}/momente-cu-mirii/`,
       ],
       filter: (page) => {
-        // Elimină duplicatele fără trailing slash generate de customPages
-        const withoutSlash = page.replace(/\/$/, '');
-        const withSlash = withoutSlash + '/';
+        // Exclude pagina de redirect /comunitate/ (301 → /comunitatea-noastra/)
+        const url = new URL(page);
+        if (url.pathname === '/comunitate/') return false;
         // Păstrează doar versiunea cu trailing slash
         return page.endsWith('/');
       },

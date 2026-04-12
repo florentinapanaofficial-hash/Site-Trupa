@@ -5,6 +5,7 @@
 import { readdir, readFile, writeFile } from 'node:fs/promises';
 import { join, extname } from 'node:path';
 import { gzipSync, brotliCompressSync, constants } from 'node:zlib';
+import { transformSync } from 'esbuild';
 
 const DIST = 'dist/client';
 const COMPRESSIBLE = new Set(['.css', '.js', '.mjs', '.html', '.svg', '.json', '.xml', '.txt']);
@@ -23,6 +24,15 @@ async function walk(dir) {
 
 const files = await walk(DIST);
 let totalSaved = 0;
+
+// Minify JS files in dist before compressing
+for (const file of files) {
+    if (extname(file).toLowerCase() === '.js') {
+        const src = await readFile(file, 'utf8');
+        const { code } = transformSync(src, { minify: true, loader: 'js' });
+        await writeFile(file, code);
+    }
+}
 
 for (const file of files) {
     const raw = await readFile(file);
