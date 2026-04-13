@@ -1,6 +1,7 @@
 ---
 import siteContent from '../data/siteContent.json';
 import { sanitizeUrl } from '../lib/sanitize-url';
+import ZoneAcoperite from './ZoneAcoperite.astro';
 
 const year = new Date().getFullYear();
 const { brand, contact } = siteContent;
@@ -79,6 +80,9 @@ const isHomePage = Astro.url.pathname === '/';
       </address>
     </div>
   </div>
+
+  <!-- Zone acoperite — internal linking automat -->
+  <ZoneAcoperite />
 
   <div class="section-container grid gap-4 py-8 text-sm md:grid-cols-3 md:items-center">
     <div class="inline-flex items-center gap-3">

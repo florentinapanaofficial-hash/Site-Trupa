@@ -1,0 +1,135 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import siteContent from '../../data/siteContent.json';
+import BackButton from '../../components/BackButton.astro';
+
+const { contact, brand } = siteContent;
+
+/* ──────────────────────────────────────────────────────────
+   Variabilele de mai jos sunt înlocuite automat de
+   scripts/programmatic-seo/generate-pages.js
+   NU edita manual — regenerează cu:
+     node scripts/programmatic-seo/generate-pages.js
+   ────────────────────────────────────────────────────────── */
+
+const ORAS           = 'Pitești';
+const JUDET          = 'Argeș';
+const KEYWORD        = 'Formație Nuntă Pitești';
+const SLUG           = 'pitesti';
+const LAT            = 44.8565;
+const LNG            = 24.8692;
+const INTRO          = 'Formația Florentina Pană este una dintre cele mai căutate formații de nuntă din Pitești. Cu sediul chiar în inima orașului, oferim muzică live premium la nunți, botezuri și evenimente corporate în tot județul Argeș.';
+const PARAGRAF2      = 'Repertoriul nostru acoperă muzică populară românească autentică, piese ușoare, hituri internaționale și muzică de petrecere — totul adaptat gusturilor mirilor și atmosferei evenimentului. Am cântat la cele mai frumoase restaurante din Pitești și împrejurimi: de la saloane elegante de nunți la locații rustice de vis.';
+const PARAGRAF3      = 'Echipa noastră știe exact cum să mențină ringul de dans plin de la prima secundă până la ultimul cântec. Fiecare eveniment beneficiază de sonorizare profesională, lumini de atmosferă și un program muzical personalizat, discutat în detaliu cu mirii.';
+const CONTENT_INTRO    = 'Pitești este un loc special pentru noi. Am cântat la zeci de nunți memorabile aici și știm exact cum să facem ca fiecare eveniment să fie unic. Formația Florentina Pană — muzică live care se simte.';
+const CONTENT_SERVICES = 'Oferim un pachet complet de Formație Nuntă Pitești: sonorizare profesională, lumini de atmosferă, MC experimentat și un repertoriu vast care se adaptează din mers la energia sălii. De la momentele emoționante la hora tradițională — totul curge natural.';
+const CONTENT_OUTRO    = 'Nu lăsa muzica pe ultimul loc — este ingredientul care leagă totul. Contactează-ne astăzi pentru disponibilitate în Pitești și hai să planificăm împreună coloana sonoră perfectă pentru nunta ta.';
+const LOCATII_POP    = ["Restaurant & Events Noblesse","La Noblesse Events","Pensiunea Flowers"];
+const ZONE_ACOPERITE = ["Pitești","Mioveni","Ștefănești","Bascov","Bradu"];
+
+const SEO_TITLE = `${KEYWORD} — ${brand.name}`;
+const SEO_DESC  = `${KEYWORD} — muzică live la nunți, botezuri și evenimente în ${ORAS}, ${JUDET}. Formație profesionistă cu 10+ ani experiență. Cere ofertă acum!`;
+
+const whatsappNumber = contact.phoneRaw.replace(/\\D/g, '');
+const whatsappText   = encodeURIComponent(`Bună ziua! Aș dori să rezerv formația pentru un eveniment în ${ORAS}.`);
+const whatsappLink   = `https://wa.me/${whatsappNumber}?text=${whatsappText}`;
+
+const localBusinessLd = {
+  "@context": "https://schema.org",
+  "@type": ["LocalBusiness", "MusicGroup"],
+  "name": brand.name,
+  "description": `${KEYWORD} — muzică live premium pentru nunți și evenimente în ${ORAS}`,
+  "url": `https://www.florentinapanaofficial.ro/formatie-nunta/${SLUG}/`,
+  "telephone": contact.phoneRaw,
+  "image": "https://www.florentinapanaofficial.ro/images/logo-fp-stage.svg",
+  "priceRange": "$$",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": ORAS,
+    "addressRegion": JUDET,
+    "addressCountry": "RO"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": LAT,
+    "longitude": LNG
+  },
+  "areaServed": ZONE_ACOPERITE.map((z: string) => ({ "@type": "City", "name": z })),
+  "sameAs": [
+    "https://www.youtube.com/@FlorentinaPanaPitesti",
+    "https://www.facebook.com/florentinapanaofficial/",
+    "https://www.instagram.com/florentinaformatie/"
+  ]
+};
+---
+
+<BaseLayout title={SEO_TITLE} description={SEO_DESC}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(localBusinessLd)} />
+  </Fragment>
+
+  <section class="section-container py-16">
+    <div class="mb-8"><BackButton href="/" label="Acasă" /></div>
+
+    <header class="section-head mx-auto text-center">
+      <p class="kicker">{KEYWORD}</p>
+      <h1 class="section-title">{KEYWORD} — Muzică Live Premium</h1>
+      <p class="section-copy">{INTRO}</p>
+    </header>
+
+    {/* ═══ Secțiunea 1: De ce noi ═══ */}
+    <div class="mt-12 rounded-2xl border border-white/20 bg-white/10 p-6 sm:p-8">
+      <h2 class="text-lg font-extrabold text-white mb-4">De ce să alegi Formația Florentina Pană în {ORAS}?</h2>
+      <p class="text-sm text-white/90 leading-relaxed mb-4">{PARAGRAF2}</p>
+      <p class="text-sm text-white/90 leading-relaxed">{PARAGRAF3}</p>
+    </div>
+
+    {/* ═══ Secțiunea 1.5: Content Blocks (conținut unic anti-duplicat) ═══ */}
+    <div class="mt-8 rounded-2xl border border-white/20 bg-white/10 p-6 sm:p-8">
+      <h2 class="text-lg font-extrabold text-white mb-4">Experiența Muzicală în {ORAS}</h2>
+      <p class="text-sm text-white/90 leading-relaxed mb-4">{CONTENT_INTRO}</p>
+      <p class="text-sm text-white/90 leading-relaxed mb-4">{CONTENT_SERVICES}</p>
+      <p class="text-sm text-white/90 leading-relaxed">{CONTENT_OUTRO}</p>
+    </div>
+
+    {/* ═══ Secțiunea 2: Locații populare ═══ */}
+    <div class="mt-8 rounded-2xl border border-white/20 bg-white/10 p-6 sm:p-8">
+      <h2 class="text-lg font-extrabold text-white mb-4">Locații populare de nunți în {ORAS}</h2>
+      <p class="text-sm text-white/90 mb-4">Am cântat cu succes la multe dintre cele mai apreciate locații din zonă:</p>
+      <ul class="grid gap-2 sm:grid-cols-2">
+        {LOCATII_POP.map((loc: string) => (
+          <li class="flex items-center gap-2 text-sm text-white/90">
+            <span class="text-amber-400" aria-hidden="true">★</span> {loc}
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    {/* ═══ Secțiunea 3: Zone acoperite ═══ */}
+    <div class="mt-8 rounded-2xl border border-white/20 bg-white/10 p-6 sm:p-8">
+      <h3 class="text-base font-bold text-white mb-3">Zone acoperite în {JUDET}</h3>
+      <div class="flex flex-wrap gap-2">
+        {ZONE_ACOPERITE.map((zona: string) => (
+          <span class="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white/90">{zona}</span>
+        ))}
+      </div>
+    </div>
+
+    {/* ═══ CTA Final ═══ */}
+    <div class="mt-12 text-center">
+      <h2 class="text-lg font-extrabold text-white mb-4">Rezervă Formația pentru Evenimentul Tău în {ORAS}</h2>
+      <p class="text-sm text-white/90 mb-6">Contactează-ne acum pentru disponibilitate și ofertă personalizată.</p>
+      <div class="flex flex-wrap justify-center gap-3">
+        <a class="btn-solid" href={`tel:${contact.phoneRaw}`}
+           onclick="window.gtag&&window.gtag('event','click_phone',{event_category:'programmatic-seo'})">
+          Sună: {contact.phoneDisplay}
+        </a>
+        <a class="btn-whatsapp" href={whatsappLink} target="_blank" rel="noopener noreferrer"
+           onclick="window.gtag&&window.gtag('event','click_whatsapp',{event_category:'programmatic-seo'})">
+          WhatsApp
+        </a>
+        <a class="btn-outline" href="/contact">Formular de Contact</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,264 @@
+# 🧠 AI_JOURNAL.md — Memorie Permanentă pentru Asistenți AI
+
+## ⚠️ LA ÎNCEPUTUL FIECĂREI SESIUNI NOI, CITEȘTE ACEST FIȘIER ÎNAINTE SĂ MODIFICI ORICE COD.
+
+---
+
+## 1. Arhitectură și Stack Tehnologic
+
+- **Framework:** Astro 4 (hybrid output) + `@astrojs/node` (middleware mode)
+- **Styling:** TailwindCSS 3 + PostCSS
+- **Server:** `server.mjs` — sirv (pre-compressed .br/.gz) + compression (SSR fallback) + OWASP headers
+- **Deploy:** Railway (`railway.toml`)
+- **Build:** `npm run build` → `astro build && node scripts/compress.mjs`
+
+---
+
+## 2. Structura Fișierelor Cheie
+
+```
+src/
+├── data/
+│   ├── seo-content.json      ← Hub centralizat SEO (titluri, descrieri, h1, schema.org)
+│   ├── siteContent.json       ← Date principale: brand, contact, navigație, servicii, membri
+│   ├── couples.json           ← Testimoniale și date cupluri
+│   ├── blogPosts.json         ← Articole blog/vlog
+│   └── communityPosts.json    ← Postări comunitate
+├── components/                ← Componente Astro reutilizabile
+├── layouts/
+│   └── BaseLayout.astro       ← Layout principal (<head>, <header>, <footer>)
+├── lib/
+│   ├── cors.ts                ← Utilități CORS pentru API
+│   ├── db.js                  ← Conexiune bază de date
+│   └── sanitize-url.ts        ← Sanitizare URL-uri (securitate)
+├── pages/                     ← Rutele site-ului
+│   └── api/                   ← Endpoint-uri API (comentarii, consent, upload, rezervare)
+└── styles/
+    └── globals.css            ← CSS global (~2500+ linii, bundle ~12KB brotli)
+
+scripts/
+├── check-links.mjs            ← Validare linkuri interne/externe
+├── compress.mjs               ← Compresie .gz + .br pentru toate asset-urile text
+├── optimize-images.js         ← Optimizare imagini brute → WebP (sharp)
+├── qa-check.mjs               ← QA: alt text, linkuri, SEO
+└── update-seo.js              ← Sincronizare metadata SEO
+
+_raw_images/                   ← Drop zone imagini brute (în .gitignore)
+
+seo-agent/
+├── seo-data.json              ← Export date Google Search Console
+└── seo-analyzer.js            ← Analiză oportunități SEO (CTR slab + Striking Distance)
+```
+
+### Programmatic SEO — Landing Pages Locale
+```
+scripts/programmatic-seo/
+├── locations.json             ← Array de locații (oraș, județ, keyword, coords, texte)
+├── content-blocks.json        ← Variante de text (intros/services/outros) anti-duplicat
+├── template.astro             ← Șablon cu variabile {{ORAS}}, {{KEYWORD}} etc.
+└── generate-pages.js          ← Generează pagini .astro din template + locations + content-blocks
+
+src/pages/formatie-nunta/      ← Pagini generate (NU edita manual!)
+src/components/ZoneAcoperite.astro ← „Pânza de Păianjen" — linkuri automate către fiecare oraș
+├── pitesti.astro
+├── bucuresti.astro
+└── curtea-de-arges.astro
+```
+
+**Comandă generare:** `node scripts/programmatic-seo/generate-pages.js`
+**Cum adaugi un oraș nou:** Adaugă un obiect în `locations.json` → rulează comanda → rebuild Astro.
+
+---
+
+## 3. Unde se definește SEO-ul (CRITIC!)
+
+### ✅ Pagini care iau SEO din `src/data/seo-content.json`:
+| Rută              | Cheia din JSON       | Observații                                     |
+|-------------------|----------------------|------------------------------------------------|
+| `/`               | `acasa.meta`         | + hero, FAQ, schema.org                        |
+| `/contact`        | `contact.meta`       | + h1, descriere, CTA-uri                       |
+| `/despre`         | `despre.meta`        | + h1, aboutIntro, bio                          |
+| `/comunitatea-noastra` | `comunitatea-noastra.meta` | + JSON-LD CollectionPage           |
+
+### ❌ Pagini cu SEO hardcodat direct în fișierul `.astro`:
+| Rută                        | Fișier                          |
+|-----------------------------|---------------------------------|
+| `/galerie-video`            | `src/pages/galerie-video.astro` |
+| `/galerie-foto`             | `src/pages/galerie-foto.astro`  |
+| `/aparitii-tv`              | `src/pages/aparitii-tv.astro`   |
+| `/membri`                   | `src/pages/membri.astro`        |
+| `/momente-cu-mirii`         | `src/pages/momente-cu-mirii.astro` |
+| `/vlog`                     | `src/pages/vlog.astro`          |
+| `/politica-confidentialitate` | `src/pages/politica-confidentialitate.astro` |
+| `/politica-cookie`          | `src/pages/politica-cookie.astro` |
+| `/termeni-conditii`         | `src/pages/termeni-conditii.astro` |
+
+> **Regulă:** Când modifici SEO, verifică ÎNTÂI dacă pagina citește din `seo-content.json` sau are title/description hardcodat.
+
+---
+
+## 4. Componente Principale
+
+| Componentă              | Rol                                              |
+|--------------------------|--------------------------------------------------|
+| `BaseLayout.astro`       | Layout master — `<head>`, canonical, OG, GA4, JSON-LD |
+| `Header.astro`           | Navigație principală                             |
+| `Footer.astro`           | Footer cu linkuri, legal, social                 |
+| `Hero.astro`             | Secțiune hero cu headline + CTA                  |
+| `CookieBanner.astro`     | Banner GDPR cookies                              |
+| `ConsentWhatsApp.astro`  | Consimțământ comunicare WhatsApp                 |
+| `YoutubeEmbed.astro`     | Embed YouTube cu lazy load                       |
+| `CoupleCard.astro`       | Card testimonial cuplu                           |
+| `Testimonials.astro`     | Secțiune testimoniale                            |
+| `SkyBackground.astro`    | Fundal decorativ animat                          |
+| `ZoneAcoperite.astro`    | Internal linking automat → pagini programmatic SEO |
+
+---
+
+## 5. Reguli Stricte de Editare
+
+### Layout & Componente
+- **NU șterge** niciodată `BaseLayout.astro`, `Header.astro` sau `Footer.astro` — doar modifică conținutul lor.
+- **NU elimina** `CookieBanner.astro` sau `ConsentWhatsApp.astro` — sunt necesare pentru conformitatea GDPR.
+- **NU modifica** `sanitize-url.ts` sau `cors.ts` fără motiv explicit de securitate.
+
+### SEO & Conținut
+- Titlurile SEO: **max 60 caractere**, trebuie să conțină cuvântul cheie principal.
+- Descrierile SEO: **max 155 caractere**, trebuie să includă un Call to Action.
+- Când editezi SEO, verifică sursa (JSON centralizat vs. hardcodat) — vezi tabelele de mai sus.
+- **NU duplica** conținut SEO între `seo-content.json` și fișierele `.astro`.
+
+### Imagini & Assets
+- **Workflow:** Pune imaginile brute în `_raw_images/` → rulează `node scripts/optimize-images.js` → imaginile optimizate apar în `src/assets/`.
+- Scriptul convertește automat în WebP (calitate 80%), redimensionează la max 1920px și șterge originalele.
+- Imaginile din `src/assets/` se folosesc cu `<Image>` Astro (optimizare automată la build).
+- Imaginile statice (logo, OG, SVG) rămân în `public/images/`.
+- OG image: dimensiune standard `1200×630px`.
+- **NU adăuga** imagini brute direct în `src/assets/` — folosește mereu pipeline-ul.
+
+### API & Securitate
+- Endpoint-urile din `src/pages/api/` folosesc `cors.ts` — NU dezactiva CORS.
+- URL-urile din datele utilizatorului se sanitizează prin `sanitize-url.ts`.
+- Formularul de contact are honeypot anti-bot (`bot-field`) — NU îl elimina.
+
+### Build & Deploy
+- `npm run build` = `astro build && node scripts/compress.mjs`
+- Deploy pe Railway — configurare în `railway.toml`
+- Serverul (`server.mjs`) servește fișiere pre-comprimate — ordinea: sirv → compression → ssrHandler.
+- NU modifica ordinea middleware din `server.mjs`.
+
+### CSS
+- Un singur bundle global: `globals.css` (alias „aparitii-tv.*.css" în build — e normal, e doar ordine alfabetică).
+- Stiluri responsive = override-uri, nu duplicări.
+
+---
+
+## 6. Ecosistem SEO Agent (`seo-agent/`)
+
+- `seo-data.json` — Date exportate din Google Search Console (query, page, clicks, impressions, ctr, position).
+- `seo-analyzer.js` — Citește datele și identifică oportunități:
+  - **Regula 1 (CTR slab):** impressions > 50 + CTR < 3%
+  - **Regula 2 (Striking Distance):** poziție medie 11–20
+  - Rulare: `node seo-agent/seo-analyzer.js`
+- `keyword-harvester.js` — Extrage sugestii din Google Autocomplete:
+  - Tehnica „seed + alfabet" (a-z, ă, â, î, ș, ț) + prefixe („pret", „cel mai", „cum")
+  - **NEGATIVE_KEYWORDS** — listă de competitori/termeni irelevanți (eliminare automată)
+  - **ALLOWED_AREAS** — whitelist geografic (Pitești, Argeș, București, Ilfov, Dâmbovița, Vâlcea, Mioveni, Curtea de Argeș, Câmpulung)
+  - Dacă un keyword conține un oraș/județ din România care NU e în ALLOWED_AREAS → eliminat
+  - Keywords-urile generale (fără locație) sunt păstrate
+  - Curăță duplicate, sortează, salvează în `harvested-keywords.json`
+  - Rulare: `node seo-agent/keyword-harvester.js "formatie nunta"`
+  - Acceptă orice seed keyword ca argument CLI
+- `harvested-keywords.json` — Output keyword harvester (auto-generat, NU edita manual).
+
+---
+
+## 7. Jurnal de Sesiune
+
+### 2025-04-13 — Optimizare SEO Top 5 Oportunități
+**Ce s-a modificat:**
+- Creat folderul `seo-agent/` cu `seo-data.json` (date demo GSC) și `seo-analyzer.js`.
+- Actualizat `src/data/seo-content.json`:
+  - `acasa.meta.title`: „Formația Florentina Pană | Muzică Live…" → **„Cele Mai Bune Formații de Nuntă 2025 | Florentina Pană"** (54 car.)
+  - `acasa.meta.description`: rescris cu cuvintele cheie *cele mai bune formații de nuntă* + *formație nuntă 2025* (139 car.)
+  - `contact.meta.title`: „Rezervă Formația Florentina Pană | Contact" → **„Prețuri Formație Nuntă București | Florentina Pană"** (50 car.)
+  - `contact.meta.description`: rescris cu *preț formație nuntă* + CTA (138 car.)
+- Actualizat `src/pages/galerie-video.astro`:
+  - Title: „Galerie Video Muzică Live…" → **„Muzică Nuntă Live — Videoclipuri Formația Florentina Pană"** (~57 car.)
+  - Description: rescris cu *muzică nuntă live* + CTA „Vezi video-urile acum!" (146 car.)
+- **Fișiere atinse:** `seo-content.json`, `galerie-video.astro`
+- **Cuvinte cheie integrate:** cele mai bune formații de nuntă, formație nuntă 2025, muzică nuntă live, prețuri formație nuntă bucurești, formație nuntă preț
+
+### 2025-04-13 — Pipeline Optimizare Imagini
+**Ce s-a creat:**
+- Script `scripts/optimize-images.js` — folosește `sharp` pentru:
+  - Conversie automată → WebP (calitate 80%)
+  - Redimensionare inteligentă (max 1920px lățime)
+  - Ștergere automată a fișierelor brute după procesare
+  - Raport consolă cu: dimensiune veche vs. nouă, economie %, cod Astro import
+- Folder `_raw_images/` (adăugat în `.gitignore`) — drop zone pentru imagini brute
+- **Comandă:** `node scripts/optimize-images.js`
+- **Test:** imagine 328.7 KB → 141.7 KB (economie 56.9%)
+
+### 2025-04-13 — Motor Programmatic SEO
+**Ce s-a creat:**
+- Sistem complet de generare automată a landing page-urilor locale
+- `scripts/programmatic-seo/template.astro` — șablon cu: BaseLayout, JSON-LD LocalBusiness, H1/H2/H3, CTA-uri, zone acoperite
+- `scripts/programmatic-seo/locations.json` — date per oraș (slug, keyword, coords, texte unice, locații populare)
+- `scripts/programmatic-seo/generate-pages.js` — citeste template + locations + content-blocks → generează `.astro` în `src/pages/formatie-nunta/`
+- `scripts/programmatic-seo/content-blocks.json` — variante de text (intros/services/outros) cu {{ORAS}} și {{KEYWORD}}
+  - Random pick per oraș → conținut unic anti-duplicat pe fiecare pagină
+- **Comandă:** `node scripts/programmatic-seo/generate-pages.js`
+- **Pagini generate (test):** `/formatie-nunta/pitesti`, `/formatie-nunta/bucuresti`, `/formatie-nunta/curtea-de-arges`
+- **Build Astro:** ✅ Toate 3 paginile compilate cu succes
+- **Cum adaugi un oraș nou:** Adaugă obiect în `locations.json` → rulează `generate-pages.js` → `npm run build`
+
+### 2025-04-13 — Keyword Harvester (Google Autocomplete)
+**Ce s-a creat:**
+- `seo-agent/keyword-harvester.js` — extrage sugestii din Google Suggest API
+- Tehnica: seed keyword + fiecare literă din alfabet românesc + prefixe („pret", „cel mai", „cum")
+- **Test cu „formatie nunta":** 210 cuvinte cheie unice din 74 request-uri
+- Categorii descoperite: 34 cu oraș, 17 cu preț, 204 cu tip eveniment, 8 cu gen muzical
+- **Comandă:** `node seo-agent/keyword-harvester.js "formatie nunta"`
+
+### 2025-04-13 — Etică SEO: Filtre Negative + Whitelist Geografic
+**Ce s-a modificat:**
+- Extins `NEGATIVE_KEYWORDS` (21 termeni): competitori + orașe irelevante + variante cu diacritice
+- Adăugat `ALLOWED_AREAS` (14 variante pentru 9 localități): Pitești, Argeș, București, Ilfov, Dâmbovița, Vâlcea, Mioveni, Curtea de Argeș, Câmpulung
+- Adăugat `ALL_RO_LOCATIONS` (~70 orașe/județe din România) pentru detectarea automată a locațiilor
+- **Logică filtrare:** dacă keyword conține un oraș/județ din România → TREBUIE să fie în ALLOWED_AREAS. Keywords generale → păstrate.
+- **Rezultat:** 210 brute → 34 eliminate negativ, 61 eliminate geo → **115 curate rămase**
+- **Principiu:** Nu vizăm zone unde nu acoperim servicii. SEO etic = relevanță reală.
+
+---
+
+## 8. Etica SEO
+
+Proiectul respectă principii de **SEO etic** (White Hat):
+- **Nu vizăm competitori** — NEGATIVE_KEYWORDS elimină automat numele trupelor/artiștilor concurenți
+- **Nu vizăm zone neacoperite** — ALLOWED_AREAS garantează că doar locațiile relevante rămân
+- **Conținut autentic** — Landing pages din Programmatic SEO conțin texte unice per oraș, nu spin
+- **Anti-duplicat** — Content Blocks system: 4×intros × 4×services × 4×outros = 64 combinații unice posibile
+- **Relevanță reală** — Fiecare keyword rămas corespunde unui serviciu efectiv oferit
+
+---
+
+### 2025-04-13 — Content Blocks (Anti-Duplicat)
+**Ce s-a creat:**
+- `scripts/programmatic-seo/content-blocks.json` — 3 array-uri (intros, services, outros) × 4 variante fiecare
+- Variabilele `{{ORAS}}` și `{{KEYWORD}}` sunt înlocuite automat per oraș
+- `generate-pages.js` — extins cu `pickRandom()` + `buildContent()` + raport conținut
+- `template.astro` — secțiune nouă „Experiența Muzicală" cu `{CONTENT_INTRO}`, `{CONTENT_SERVICES}`, `{CONTENT_OUTRO}`
+- **Rezultat:** fiecare pagină primește combinație aleatorie unică → **64 combinații posibile** (4×4×4)
+- **Build Astro:** ✅ Toate 3 paginile compilate cu conținut diferit
+
+### 2025-04-13 — Internal Linking Automat („Pânza de Păianjen")
+**Ce s-a creat:**
+- `src/components/ZoneAcoperite.astro` — componentă Astro care citește `locations.json` și randează badge-uri/pill-uri cu link-uri către paginile programmatic SEO
+- Evidențiază pagina curentă (badge amber activ, `pointer-events-none`, `aria-current="page"`)
+- Importată și adăugată în:
+  - `Footer.astro` — deasupra zonei de copyright, pe toate paginile site-ului
+  - `contact.astro` — la finalul secțiunii principale (relevant pentru vizitatorii care vor să rezerve)
+- **Efect SEO:** Elimină „pagini orfane" — fiecare landing page locală primește link-uri interne din footer + contact
+- **Automat:** Când adaugi un oraș nou în `locations.json` → componenta se actualizează automat la build
+- **Build Astro:** ✅ Compilat cu succes, zero erori

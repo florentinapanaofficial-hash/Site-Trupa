@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import siteContent from '../data/siteContent.json';
 import seo from '../data/seo-content.json';
 import BackButton from '../components/BackButton.astro';
+import ZoneAcoperite from '../components/ZoneAcoperite.astro';
 
 const { contact, brand } = siteContent;
 const contactSeo = seo.contact;
@@ -162,6 +163,9 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
         title="Locație Formația Florentina Pană pe Google Maps"
       ></iframe>
     </div>
+
+    <!-- Zone acoperite — relevant pentru cine vrea să rezerve -->
+    <ZoneAcoperite />
   </section>
 
   <Fragment slot="head">
