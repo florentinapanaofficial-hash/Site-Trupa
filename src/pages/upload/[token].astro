@@ -13,7 +13,7 @@ const token = Astro.params.token ?? '';
 const couple = couplesRaw.couples.find((c) => c.uploadToken === token) ?? null;
 
 if (!couple) {
-  return Astro.redirect('/comunitatea-noastra');
+  return Astro.redirect('/comunitate/', 301);
 }
 
 const pageTitle = `Upload — ${couple.names} | ${brand.name}`;
@@ -32,7 +32,7 @@ const hasDriveLink = !!couple.driveUploadUrl;
         <p class="upload-hero__subtitle">
           Aici puteți partaja fotografiile, povestea voastră de dragoste, recomandarea
           și videoclipul cu dansul mirilor. Toate materialele aprobate vor apărea pe
-          <a href={`/comunitate/${couple.slug}`} class="upload-link-gold">pagina voastră dedicată</a>.
+          <a href={`/comunitate/${couple.slug}/`} class="upload-link-gold">pagina voastră dedicată</a>.
         </p>
       </header>
 

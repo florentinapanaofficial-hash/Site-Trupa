@@ -48,7 +48,7 @@ const SITE = 'https://www.florentinapanaofficial.ro';
 <BaseLayout title={pageTitle} description={pageDescription} ogImage={seo.ogImage}>
 
   <section class="section-container pt-8 pb-16 sm:pt-10 sm:pb-20">
-    <div class="mb-6"><BackButton href="/comunitatea-noastra" label="Comunitate" /></div>
+    <div class="mb-6"><BackButton href="/comunitate/" label="Comunitate" /></div>
 
     <!-- ═══ HERO ═══════════════════════════════════════════════════ -->
     <header class="pub-hero mx-auto text-center mb-8">
@@ -77,11 +77,11 @@ const SITE = 'https://www.florentinapanaofficial.ro';
       {posts.map((post) => {
         const linkedCouple = coupleByBlogSlug.get(post.slug);
         const shareText = encodeURIComponent(`${post.title} — ${brand.name}`);
-        const shareUrl = encodeURIComponent(`${SITE}/blog/${post.slug}`);
+        const shareUrl = encodeURIComponent(`${SITE}/blog/${post.slug}/`);
 
         return (
           <article class="pub-card" data-category={post.category}>
-            <a href={`/blog/${post.slug}`} class="pub-card__link" aria-label={`Citește: ${post.title}`}>
+            <a href={`/blog/${post.slug}/`} class="pub-card__link" aria-label={`Citește: ${post.title}`}>
               <div class="pub-card__cover">
                 {post.coverImage ? (
                   <img src={post.coverImage} alt={post.title} loading="lazy" decoding="async" width="640" height="360" />
@@ -103,7 +103,7 @@ const SITE = 'https://www.florentinapanaofficial.ro';
             {/* ─── Footer: couple link + share ─── */}
             <div class="pub-card__footer">
               {linkedCouple && (
-                <a href={`/comunitate/${linkedCouple.slug}`} class="pub-card__couple-link">
+                <a href={`/comunitate/${linkedCouple.slug}/`} class="pub-card__couple-link">
                   💍 {linkedCouple.names}
                 </a>
               )}
@@ -141,10 +141,10 @@ const SITE = 'https://www.florentinapanaofficial.ro';
 
     <!-- ═══ BACK TO COMMUNITY ══════════════════════════════════════ -->
     <div class="pub-cta text-center mt-12 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-      <a href="/vlog" class="pub-cta__link">
+      <a href="/vlog/" class="pub-cta__link">
         🎬 Vezi și Vlog-ul nostru
       </a>
-      <a href="/comunitatea-noastra" class="pub-cta__link">
+      <a href="/comunitate/" class="pub-cta__link">
         ← Înapoi la Mirii Noștri
       </a>
     </div>

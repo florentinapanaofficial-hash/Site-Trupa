@@ -99,7 +99,7 @@ const articleJsonLd = {
     <div class="bp-hero" style={`--hero-glow: ${heroBg};`}>
       <div class="bp-hero-bg-emoji" aria-hidden="true">{post.coverEmoji}</div>
       <div class="bp-hero-inner">
-        <BackButton href="/blog" label="Noutăți" />
+        <BackButton href="/blog/" label="Noutăți" />
         <span
           class="bp-cat"
           style={`color:${accentColor}; border-color:${accentColor}; background:rgba(0,0,0,0.25);`}
@@ -161,13 +161,13 @@ const articleJsonLd = {
       <nav class="bp-nav" aria-label="Navigare articole">
         <div class="bp-nav-inner">
           {prevPost ? (
-            <a href={`/blog/${prevPost.slug}`} class="bp-nav-link bp-nav-link--prev">
+            <a href={`/blog/${prevPost.slug}/`} class="bp-nav-link bp-nav-link--prev">
               <span class="bp-nav-dir">← Anterior</span>
               <span class="bp-nav-post-title">{prevPost.title}</span>
             </a>
           ) : <div></div>}
           {nextPost && (
-            <a href={`/blog/${nextPost.slug}`} class="bp-nav-link bp-nav-link--next">
+            <a href={`/blog/${nextPost.slug}/`} class="bp-nav-link bp-nav-link--next">
               <span class="bp-nav-dir">Următor →</span>
               <span class="bp-nav-post-title">{nextPost.title}</span>
             </a>
@@ -182,7 +182,7 @@ const articleJsonLd = {
       <h2 class="bp-cta-title">Contactează-ne pentru o ofertă personalizată</h2>
       <div class="bp-cta-actions">
         <a href="/#contact" class="btn-solid">Solicită ofertă</a>
-        <a href="/comunitatea-noastra#blog" class="btn-outline">← Blog</a>
+        <a href="/comunitate/#blog" class="btn-outline">← Blog</a>
       </div>
     </div>
 

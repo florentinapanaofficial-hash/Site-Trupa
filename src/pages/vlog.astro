@@ -61,11 +61,11 @@ const SITE = 'https://www.florentinapanaofficial.ro';
       {posts.map((post) => {
         const linkedCouple = coupleByBlogSlug.get(post.slug);
         const shareText = encodeURIComponent(`${post.title} — ${brand.name}`);
-        const shareUrl = encodeURIComponent(`${SITE}/blog/${post.slug}`);
+        const shareUrl = encodeURIComponent(`${SITE}/blog/${post.slug}/`);
 
         return (
           <article class="pub-card" data-category={post.category}>
-            <a href={`/blog/${post.slug}`} class="pub-card__link" aria-label={`Citește: ${post.title}`}>
+            <a href={`/blog/${post.slug}/`} class="pub-card__link" aria-label={`Citește: ${post.title}`}>
               <div class="pub-card__cover">
                 {post.coverImage ? (
                   <img src={post.coverImage} alt={post.title} loading="lazy" decoding="async" width="640" height="360" />
@@ -87,7 +87,7 @@ const SITE = 'https://www.florentinapanaofficial.ro';
             {/* ─── Footer: couple link + share ─── */}
             <div class="pub-card__footer">
               {linkedCouple && (
-                <a href={`/comunitate/${linkedCouple.slug}`} class="pub-card__couple-link">
+                <a href={`/comunitate/${linkedCouple.slug}/`} class="pub-card__couple-link">
                   💍 {linkedCouple.names}
                 </a>
               )}
@@ -127,7 +127,7 @@ const SITE = 'https://www.florentinapanaofficial.ro';
 
     <!-- ═══ BACK LINK ══════════════════════════════════════════════ -->
     <div class="pub-cta text-center mt-12">
-      <a href="/publicatii" class="pub-cta__link">
+      <a href="/publicatii/" class="pub-cta__link">
         📰 Vezi și Publicațiile noastre
       </a>
     </div>

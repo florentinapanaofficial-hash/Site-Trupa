@@ -88,7 +88,7 @@ const reviewLd = {
   description={pageDescription}
 >
   <main class="couple-page">
-    <BackButton href="/comunitatea-noastra" label="← Comunitate" />
+    <BackButton href="/comunitate/" label="← Comunitate" />
 
     <!-- Hero -->
     <CoupleHero
@@ -157,7 +157,7 @@ const reviewLd = {
     <!-- CTA -->
     {couple.blogSlug && (
       <div class="couple-page__cta">
-        <a href={`/blog/${couple.blogSlug}`} class="couple-page__cta-link" style={`--cta-accent: ${couple.accentColor};`}>
+        <a href={`/blog/${couple.blogSlug}/`} class="couple-page__cta-link" style={`--cta-accent: ${couple.accentColor};`}>
           📰 Citește articolul dedicat → {couple.names}
         </a>
       </div>

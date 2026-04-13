@@ -77,7 +77,7 @@ const localBusinessLd = {
 };
 
 const isHomePage = Astro.url.pathname === '/';
-const hasYouTube = ['/galerie-video', '/aparitii-tv', '/video/', '/colaboratori/', '/comunitatea-noastra'].some(p => Astro.url.pathname.startsWith(p));
+const hasYouTube = ['/galerie-video', '/aparitii-tv', '/video/', '/colaboratori/', '/comunitate'].some(p => Astro.url.pathname.startsWith(p));
 const sectionLink = (anchor: string) => (isHomePage ? anchor : `/${anchor}`);
 
 // JSON-LD: WebPage — fiecare pagină primește schema WebPage
@@ -122,7 +122,7 @@ const breadcrumbLabels: Record<string, string> = {
   'galerie-video': 'Galerie Video',
   'galerie-foto': 'Galerie Foto',
   'momente-cu-mirii': 'Momente cu mirii',
-  'comunitatea-noastra': 'Comunitatea noastră',
+  'comunitate': 'Comunitate',
   'aparitii-tv': 'Apariții TV',
   'contact': 'Contact',
   'blog': 'Blog',
@@ -148,13 +148,13 @@ const breadcrumbLd = {
 
 const sideMenuTopItems = [
   { href: '/', label: 'Acasă', color: 'cyan', icon: 'home' },
-  { href: '/despre', label: 'Despre', color: 'cyan', icon: 'info' },
-  { href: '/membri', label: 'Membri', color: 'cyan', icon: 'users' },
-  { href: '/galerie-video', label: 'Galerie Video', color: 'cyan', icon: 'video' },
-  { href: '/galerie-foto', label: 'Galerie Foto', color: 'cyan', icon: 'camera' },
-  { href: '/comunitatea-noastra', label: 'Comunitate', color: 'cyan', icon: 'people' },
-  { href: '/aparitii-tv', label: 'Apariții TV', color: 'cyan', icon: 'tv' },
-  { href: '/contact', label: 'Contact', color: 'cyan', icon: 'mail' },
+  { href: '/despre/', label: 'Despre', color: 'cyan', icon: 'info' },
+  { href: '/membri/', label: 'Membri', color: 'cyan', icon: 'users' },
+  { href: '/galerie-video/', label: 'Galerie Video', color: 'cyan', icon: 'video' },
+  { href: '/galerie-foto/', label: 'Galerie Foto', color: 'cyan', icon: 'camera' },
+  { href: '/comunitate/', label: 'Comunitate', color: 'cyan', icon: 'people' },
+  { href: '/aparitii-tv/', label: 'Apariții TV', color: 'cyan', icon: 'tv' },
+  { href: '/contact/', label: 'Contact', color: 'cyan', icon: 'mail' },
 ];
 
 const sideMenuBottomItems = [];
@@ -169,13 +169,13 @@ const sidebarSocialLinks = {
 // Lista completă pentru nav-ul mobil — ordine logică, corespunde cu swipe-ul stânga→dreapta
 const mobileNavAllItems = [
   { href: '/', label: 'Acasă', color: 'cyan' },
-  { href: '/despre', label: 'Despre', color: 'cyan' },
-  { href: '/membri', label: 'Membri', color: 'cyan' },
-  { href: '/galerie-video', label: 'Galerie Video', color: 'cyan' },
-  { href: '/galerie-foto', label: 'Galerie Foto', color: 'cyan' },
-  { href: '/comunitatea-noastra', label: 'Comunitate', color: 'cyan' },
-  { href: '/aparitii-tv', label: 'Apariții TV', color: 'cyan' },
-  { href: '/contact', label: 'Contact', color: 'cyan' },
+  { href: '/despre/', label: 'Despre', color: 'cyan' },
+  { href: '/membri/', label: 'Membri', color: 'cyan' },
+  { href: '/galerie-video/', label: 'Galerie Video', color: 'cyan' },
+  { href: '/galerie-foto/', label: 'Galerie Foto', color: 'cyan' },
+  { href: '/comunitate/', label: 'Comunitate', color: 'cyan' },
+  { href: '/aparitii-tv/', label: 'Apariții TV', color: 'cyan' },
+  { href: '/contact/', label: 'Contact', color: 'cyan' },
 ];
 ---
 

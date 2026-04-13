@@ -31,13 +31,13 @@ export default defineConfig({
     }),
     sitemap({
       customPages: [
-        `${siteUrl}/comunitatea-noastra/`,
+        `${siteUrl}/comunitate/`,
         `${siteUrl}/momente-cu-mirii/`,
       ],
       filter: (page) => {
-        // Exclude pagina de redirect /comunitate/ (301 → /comunitatea-noastra/)
+        // Exclude pagina de redirect /comunitatea-noastra/ (301 → /comunitate/)
         const url = new URL(page);
-        if (url.pathname === '/comunitate/') return false;
+        if (url.pathname === '/comunitatea-noastra/') return false;
         // Păstrează doar versiunea cu trailing slash
         return page.endsWith('/');
       },

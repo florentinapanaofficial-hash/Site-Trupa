@@ -15,15 +15,15 @@ const normalizeNavHref = (href) => {
     return href;
   }
 
-  if (href.startsWith('/')) {
-    return href;
-  }
-
   if (href.startsWith('#')) {
     return isHomePage ? href : `/${href}`;
   }
 
-  return `/${href}`;
+  let path = href.startsWith('/') ? href : `/${href}`;
+  if (path !== '/' && !path.endsWith('/') && !path.includes('#') && !path.includes('?')) {
+    path += '/';
+  }
+  return path;
 };
 
 const normalizedNavigation = navigation.map((item) => ({
@@ -36,15 +36,15 @@ const desktopNavigation = topNavigation;
 // Navigare completă pentru panoul hamburger mobil
 const mobileFullNavigation = [
   { href: '/', label: 'Acasă', color: 'cyan' },
-  { href: '/despre', label: 'Despre', color: 'cyan' },
-  { href: '/membri', label: 'Membri', color: 'cyan' },
-  { href: '/galerie-video', label: 'Galerie Video', color: 'cyan' },
-  { href: '/galerie-foto', label: 'Galerie Foto', color: 'cyan' },
-  { href: '/comunitatea-noastra', label: 'Comunitate', color: 'cyan' },
-  { href: '/publicatii', label: 'Publicații', color: 'cyan' },
-  { href: '/vlog', label: 'Vlog', color: 'cyan' },
-  { href: '/aparitii-tv', label: 'Apariții TV', color: 'cyan' },
-  { href: '/contact', label: 'Contact', color: 'cyan' },
+  { href: '/despre/', label: 'Despre', color: 'cyan' },
+  { href: '/membri/', label: 'Membri', color: 'cyan' },
+  { href: '/galerie-video/', label: 'Galerie Video', color: 'cyan' },
+  { href: '/galerie-foto/', label: 'Galerie Foto', color: 'cyan' },
+  { href: '/comunitate/', label: 'Comunitate', color: 'cyan' },
+  { href: '/publicatii/', label: 'Publicații', color: 'cyan' },
+  { href: '/vlog/', label: 'Vlog', color: 'cyan' },
+  { href: '/aparitii-tv/', label: 'Apariții TV', color: 'cyan' },
+  { href: '/contact/', label: 'Contact', color: 'cyan' },
 ].map((item) => ({ ...item, href: normalizeNavHref(item.href) }));
 
 const mobileNavigation = topNavigation;

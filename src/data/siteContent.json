@@ -25,22 +25,22 @@
   },
   "navigation": [
     {
-      "href": "/comunitatea-noastra",
+      "href": "/comunitate/",
       "label": "Comunitate",
       "color": "cyan"
     },
     {
-      "href": "/publicatii",
+      "href": "/publicatii/",
       "label": "Publicații",
       "color": "cyan"
     },
     {
-      "href": "/vlog",
+      "href": "/vlog/",
       "label": "Vlog",
       "color": "cyan"
     },
     {
-      "href": "/aparitii-tv",
+      "href": "/aparitii-tv/",
       "label": "Apariții TV",
       "color": "cyan"
     }

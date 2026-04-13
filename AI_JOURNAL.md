@@ -4,6 +4,46 @@
 
 ---
 
+## 🚨 ATENȚIONĂRI CRITICE — CITEȘTE ÎNAINTE DE ORICE MODIFICARE!
+
+### 🔴 1. TRAILING SLASH OBLIGATORIU PE TOATE LINKURILE INTERNE
+- Site-ul are `trailingSlash: 'always'` în `astro.config.mjs`
+- **TOATE** linkurile interne `href` TREBUIE să se termine cu `/` (ex: `/despre/`, `/contact/`, `/comunitate/`)
+- ❌ GREȘIT: `href="/despre"` → generează redirect 301 → scade scorul SEO
+- ✅ CORECT: `href="/despre/"` → acces direct, fără redirect
+- **Excepții:** linkuri externe (`https://...`), `tel:`, `mailto:`, `#ancora`
+- `Header.astro` are funcția `normalizeNavHref()` care adaugă automat trailing slash — NU o elimina/modifica
+- **Istoric:** În aprilie 2026, ~70 linkuri fără trailing slash au scăzut scorul SE Ranking dramatic (34 erori + 35 warnings + 19 redirects)
+
+### 🔴 2. PAGINA COMUNITATE — REDIRECT ACTIV
+- URL-ul canonical este `/comunitate/` (fișier: `src/pages/comunitate/index.astro`)
+- `/comunitatea-noastra/` este DOAR redirect 301 → `/comunitate/` (fișier: `src/pages/comunitatea-noastra.astro`)
+- **NU adăuga linkuri interne către `/comunitatea-noastra/`** — folosește mereu `/comunitate/`
+- **NU modifica** `comunitatea-noastra.astro` — trebuie să rămână redirect simplu
+- Cheia SEO din `seo-content.json` este `comunitate` (NU `comunitatea-noastra`)
+- `astro.config.mjs` are filtru sitemap care exclude `/comunitatea-noastra/` — NU îl elimina
+
+### 🔴 3. CÂND ADAUGI PAGINI SAU LINKURI NOI
+- Verifică MEREU că orice `href="/ruta-noua/"` are trailing slash
+- Adaugă linkul în `Header.astro`, `Footer.astro`, `BaseLayout.astro` (meniu lateral + mobil) dacă e pagină de navigare
+- Adaugă în `siteContent.json` + `siteContent.ts` dacă e element de navigare
+- Adaugă în `astro.config.mjs` → `customPages` dacă e pagină prerendered care nu e descoperită automat de sitemap
+
+### 🔴 4. CÂND MUȚI/REDENUMEȘTI O PAGINĂ
+- Vechiul fișier `.astro` trebuie PĂSTRAT ca redirect 301 (nu șters!)
+- Adaugă filtrul de excludere din sitemap în `astro.config.mjs`
+- Actualizează TOATE linkurile interne (Header, Footer, BaseLayout, componente, pagini, JSON-uri de date)
+- Actualizează cheia din `seo-content.json` dacă pagina citește SEO de acolo
+- Actualizează breadcrumb mapping din `BaseLayout.astro`
+
+### 🟡 5. VERIFICARE ÎNAINTE DE DEPLOY
+- Rulează `npx astro build` — ZERO erori obligatoriu
+- Caută linkuri fără trailing slash: `Get-ChildItem -Path src -Recurse -Include *.astro | Select-String 'href="\/[^"]*[^\/]"' | Where-Object { $_.Line -notmatch 'http|tel:|mailto:|#' }`
+- Caută linkuri template fără trailing slash: `Get-ChildItem -Path src -Recurse -Include *.astro | Select-String 'href=\{.*/[^/]*\}' | Where-Object { $_.Line -notmatch 'http|tel:|mailto:|#' }`
+- Warning-urile `Astro.request.headers` pe pagini prerendered sunt NORMALE — nu sunt erori
+
+---
+
 ## 1. Arhitectură și Stack Tehnologic
 
 - **Framework:** Astro 4 (hybrid output) + `@astrojs/node` (middleware mode)
@@ -78,7 +118,7 @@ src/components/ZoneAcoperite.astro ← „Pânza de Păianjen" — linkuri autom
 | `/`               | `acasa.meta`         | + hero, FAQ, schema.org                        |
 | `/contact`        | `contact.meta`       | + h1, descriere, CTA-uri                       |
 | `/despre`         | `despre.meta`        | + h1, aboutIntro, bio                          |
-| `/comunitatea-noastra` | `comunitatea-noastra.meta` | + JSON-LD CollectionPage           |
+| `/comunitate`          | `comunitate.meta`          | + JSON-LD CollectionPage           |
 
 ### ❌ Pagini cu SEO hardcodat direct în fișierul `.astro`:
 | Rută                        | Fișier                          |
@@ -212,6 +252,29 @@ src/components/ZoneAcoperite.astro ← „Pânza de Păianjen" — linkuri autom
 - **Pagini generate (test):** `/formatie-nunta/pitesti`, `/formatie-nunta/bucuresti`, `/formatie-nunta/curtea-de-arges`
 - **Build Astro:** ✅ Toate 3 paginile compilate cu succes
 - **Cum adaugi un oraș nou:** Adaugă obiect în `locations.json` → rulează `generate-pages.js` → `npm run build`
+
+### 2026-04-13 — Fix Trailing Slash pe toate linkurile interne (~70 instanțe)
+**Problemă:** Scor SE Ranking scăzut — 34 erori „No inbound links", 35 warning-uri „Internal links to 3XX redirect pages", 19 redirects 3XX. Cauza: site-ul are `trailingSlash: 'always'` dar ~70 de linkuri interne nu aveau `/` la final (ex. `/despre` în loc de `/despre/`), generând redirect-uri 301 inutile.
+**Ce s-a modificat (22 fișiere):**
+- **`Header.astro`** — funcția `normalizeNavHref()` adaugă acum automat trailing slash; meniu mobil corectat
+- **`Footer.astro`** — toate cele 16 linkuri interne corectate
+- **`BaseLayout.astro`** — `sideMenuTopItems` + `mobileNavAllItems` corectate
+- **Componente:** `CoupleHero`, `CoupleCard`, `CookieBanner`, `ConsentWhatsApp`, `ZoneAcoperite`
+- **Pagini:** `index`, `despre`, `contact`, `galerie-video`, `comunitatea-noastra`, `publicatii`, `vlog`, `momente-cu-mirii`, `blog/[slug]`, `blog/index`, `comunitate/[slug]`, `video/[slug]`, `termeni-conditii`, `politica-confidentialitate`, `politica-cookie`, `colaboratori/saxofon`, `colaboratori/tambal`, `formatie-nunta/pitesti`, `formatie-nunta/bucuresti`, `formatie-nunta/curtea-de-arges`, `upload/[token]`
+- **Date:** `siteContent.json` + `siteContent.ts` — navigație cu trailing slash
+- **Share URLs:** `publicatii.astro` + `vlog.astro` — URL-urile de share social media corectate
+**Impact așteptat:** Elimină complet cele 3 categorii de erori din SE Ranking (Redirects, No inbound links, Internal links to 3XX).
+
+### 2026-04-13 — Swap rută /comunitatea-noastra/ → /comunitate/
+**Problemă:** URL-ul `/comunitatea-noastra/` era prea lung și greu de reținut. Utilizatorul a creat pagina `/comunitate/` ca înlocuitor.
+**Ce s-a modificat:**
+- **`comunitate/index.astro`** — acum conține pagina completă (CollectionPage + AggregateRating JSON-LD, grid CoupleCard, search, prerender=true)
+- **`comunitatea-noastra.astro`** — transformat în redirect 301 → `/comunitate/` (prerender=false)
+- **Linkuri interne (~14 fișiere):** Header, Footer, BaseLayout, CoupleHero, CoupleCard, blogPosts.json, siteContent.json, siteContent.ts, index.astro, despre.astro, momente-cu-mirii.astro, galerie-video.astro, galerie-foto.astro, aparitii-tv.astro
+- **`seo-content.json`** — cheia redenumită din `comunitatea-noastra` în `comunitate`
+- **`astro.config.mjs`** — sitemap `customPages` actualizat cu `/comunitate/`; filtru adăugat pentru excluderea `/comunitatea-noastra/` din sitemap
+- **`BaseLayout.astro`** — breadcrumb mapping actualizat (`comunitate` → `Comunitatea Noastră`)
+**Impact:** URL canonical corect, fără redirect-uri suplimentare, sitemap curat.
 
 ### 2025-04-13 — Keyword Harvester (Google Autocomplete)
 **Ce s-a creat:**

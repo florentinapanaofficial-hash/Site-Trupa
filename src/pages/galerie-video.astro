@@ -85,7 +85,7 @@ const videosByCategory = (cat: string) =>
                 const slug = videoSlug(video);
                 const thumb = `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`;
                 return (
-                  <a href={`/video/${slug}`} class="video-card" title={video.title} aria-label={`Redă: ${video.title}`}>
+                  <a href={`/video/${slug}/`} class="video-card" title={video.title} aria-label={`Redă: ${video.title}`}>
                     <div class="thumb-shell">
                       <img
                         src={thumb}
@@ -112,7 +112,7 @@ const videosByCategory = (cat: string) =>
     })}
 
     <div class="mt-12 flex justify-center">
-      <a href="/aparitii-tv" class="btn-outline">Vezi și apariții TV</a>
+      <a href="/aparitii-tv/" class="btn-outline">Vezi și apariții TV</a>
     </div>
   </section>
 </BaseLayout>

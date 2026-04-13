@@ -23,7 +23,7 @@ export const siteContent = {
   },
   navigation: [
     { href: '#acasa', label: 'Acasă' },
-    { href: '/comunitatea-noastra', label: 'Noutăți' },
+    { href: '/comunitate/', label: 'Noutăți' },
     { href: '#servicii', label: 'Servicii' },
     { href: '#membri', label: 'Membri' },
     { href: '#faq', label: 'FAQ' },
