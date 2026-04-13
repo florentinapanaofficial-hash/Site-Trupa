@@ -21,14 +21,16 @@ const LNG            = 24.6814;
 const INTRO          = 'Curtea de Argeș — orașul Mănăstirii și al tradițiilor — este unul dintre locurile noastre preferate pentru evenimente live. Formația Florentina Pană aduce muzică autentică la nunțile din această zonă pitorească a județului Argeș.';
 const PARAGRAF2      = 'Știm ce înseamnă o nuntă cu adevărat românească: horă la intrarea mirilor, muzică populară autentică, momente emoționante și petrecere până în zori. Repertoriul nostru e construit special pentru a onora tradițiile locale, combinându-le cu energia muzicii moderne.';
 const PARAGRAF3      = 'Zonele montane din jurul Curții de Argeș oferă locații de nuntă spectaculoase. Noi ne ocupăm de tot ce ține de muzică — sonorizare, lumini și un program muzical pe gustul vostru, discutat cu cel puțin două săptămâni înainte de eveniment.';
-const CONTENT_INTRO    = 'Curtea de Argeș este un loc special pentru noi. Am cântat la zeci de nunți memorabile aici și știm exact cum să facem ca fiecare eveniment să fie unic. Formația Florentina Pană — muzică live care se simte.';
-const CONTENT_SERVICES = 'Ce ne face diferiți? Ascultăm. Fiecare cuplu din Curtea de Argeș primește un program muzical unic, construit împreună cu noi. Combinăm muzica populară românească cu hituri moderne, piese de petrecere și momente speciale — totul live, fără playback.';
-const CONTENT_OUTRO    = 'Fiecare nuntă din Curtea de Argeș la care am cântat ne-a confirmat un lucru: muzica bună face diferența între un eveniment reușit și unul de neuitat. Sună-ne sau scrie-ne pe WhatsApp — răspundem în mai puțin de 2 ore.';
+const CONTENT_INTRO    = 'Dacă ești în căutarea unei atmosfere de neuitat în Curtea de Argeș, ai ajuns unde trebuie. Formația Florentina Pană transformă fiecare eveniment într-o experiență muzicală de excepție — de la primul dans și până la ultimul cântec al serii.';
+const CONTENT_SERVICES = 'Repertoriul nostru acoperă totul: de la muzică populară autentică și romanțe de suflet, la cover-uri internaționale și hituri de petrecere care vor ține ringul de dans plin toată noaptea în Curtea de Argeș. Fiecare program muzical este personalizat — discutăm cu mirii și construim o playlist pe gustul lor.';
+const CONTENT_OUTRO    = 'Ești gata să transformi nunta ta din Curtea de Argeș într-o poveste de neuitat? Formația Florentina Pană este aici pentru tine. Cere o ofertă personalizată — fără obligații, cu drag.';
 const LOCATII_POP    = ["Conacul Manasia","Complex Marami","Hanul Posada"];
 const ZONE_ACOPERITE = ["Curtea de Argeș","Câmpulung","Domnești","Corbeni","Arefu"];
+const META_DESC      = '';
+const KEYWORDS_SCHEMA = [];
 
 const SEO_TITLE = `${KEYWORD} — ${brand.name}`;
-const SEO_DESC  = `${KEYWORD} — muzică live la nunți, botezuri și evenimente în ${ORAS}, ${JUDET}. Formație profesionistă cu 10+ ani experiență. Cere ofertă acum!`;
+const SEO_DESC  = META_DESC || `${KEYWORD} — muzică live la nunți, botezuri și evenimente în ${ORAS}, ${JUDET}. Formație profesionistă cu 10+ ani experiență. Cere ofertă acum!`;
 
 const whatsappNumber = contact.phoneRaw.replace(/\\D/g, '');
 const whatsappText   = encodeURIComponent(`Bună ziua! Aș dori să rezerv formația pentru un eveniment în ${ORAS}.`);
@@ -55,6 +57,7 @@ const localBusinessLd = {
     "longitude": LNG
   },
   "areaServed": ZONE_ACOPERITE.map((z: string) => ({ "@type": "City", "name": z })),
+  ...(KEYWORDS_SCHEMA.length > 0 && { "keywords": KEYWORDS_SCHEMA.join(', ') }),
   "sameAs": [
     "https://www.youtube.com/@FlorentinaPanaPitesti",
     "https://www.facebook.com/florentinapanaofficial/",

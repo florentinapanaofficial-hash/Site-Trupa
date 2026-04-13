@@ -26,9 +26,11 @@ const CONTENT_SERVICES = '{{CONTENT_SERVICES}}';
 const CONTENT_OUTRO    = '{{CONTENT_OUTRO}}';
 const LOCATII_POP    = {{LOCATII_POPULARE}};
 const ZONE_ACOPERITE = {{ZONE_ACOPERITE}};
+const META_DESC      = '{{META_DESC}}';
+const KEYWORDS_SCHEMA = {{KEYWORDS_SCHEMA}};
 
 const SEO_TITLE = `${KEYWORD} — ${brand.name}`;
-const SEO_DESC  = `${KEYWORD} — muzică live la nunți, botezuri și evenimente în ${ORAS}, ${JUDET}. Formație profesionistă cu 10+ ani experiență. Cere ofertă acum!`;
+const SEO_DESC  = META_DESC || `${KEYWORD} — muzică live la nunți, botezuri și evenimente în ${ORAS}, ${JUDET}. Formație profesionistă cu 10+ ani experiență. Cere ofertă acum!`;
 
 const whatsappNumber = contact.phoneRaw.replace(/\\D/g, '');
 const whatsappText   = encodeURIComponent(`Bună ziua! Aș dori să rezerv formația pentru un eveniment în ${ORAS}.`);
@@ -55,6 +57,7 @@ const localBusinessLd = {
     "longitude": LNG
   },
   "areaServed": ZONE_ACOPERITE.map((z: string) => ({ "@type": "City", "name": z })),
+  ...(KEYWORDS_SCHEMA.length > 0 && { "keywords": KEYWORDS_SCHEMA.join(', ') }),
   "sameAs": [
     "https://www.youtube.com/@FlorentinaPanaPitesti",
     "https://www.facebook.com/florentinapanaofficial/",

@@ -83,9 +83,13 @@ for (const loc of locations) {
     page = page.replace(/\{\{CONTENT_SERVICES\}\}/g, escapeAstroString(content.service));
     page = page.replace(/\{\{CONTENT_OUTRO\}\}/g, escapeAstroString(content.outro));
 
+    // Înlocuiește meta_desc (override sau gol)
+    page = page.replace(/\{\{META_DESC\}\}/g, escapeAstroString(loc.meta_desc || ''));
+
     // Înlocuiește array-urile (JSON inline)
     page = page.replace(/\{\{LOCATII_POPULARE\}\}/g, JSON.stringify(loc.locatii_populare));
     page = page.replace(/\{\{ZONE_ACOPERITE\}\}/g, JSON.stringify(loc.zone_acoperite));
+    page = page.replace(/\{\{KEYWORDS_SCHEMA\}\}/g, JSON.stringify(loc.keywords_schema || []));
 
     // Scrie fișierul
     const outputPath = join(OUTPUT_DIR, `${loc.slug}.astro`);
