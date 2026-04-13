@@ -8,15 +8,15 @@ const { seo, brand } = siteContent;
 const personJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Person',
-  name: 'Lăutar la Ȝambal',
-  jobTitle: 'Lăutar la Ȝambal',
+  name: 'Lăutar la Țambal',
+  jobTitle: 'Lăutar la Țambal',
   worksFor: { '@type': 'Organization', name: brand.name },
 };
 ---
 
 <BaseLayout
-  title={`Colaborator Ȝambal | ${brand.name}`}
-  description="Prezentare colaborator Ȝambal pentru momente speciale live în cadrul evenimentelor."
+  title={`Colaborator Țambal | ${brand.name}`}
+  description="Prezentare colaborator Țambal pentru momente speciale live în cadrul evenimentelor."
 >
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(personJsonLd)} />
