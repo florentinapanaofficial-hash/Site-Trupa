@@ -98,6 +98,15 @@ const server = createServer((req, res) => {
         return res.end();
     }
 
+    // ── Trailing slash redirect (match Astro trailingSlash: 'always') ──
+    // SSR pages don't have static index.html; sirv can't add the slash for them.
+    const urlPath = (req.url || '/').split('?')[0];
+    if (!urlPath.endsWith('/') && !urlPath.includes('.')) {
+        const search = (req.url || '').includes('?') ? '?' + (req.url || '').split('?')[1] : '';
+        res.writeHead(301, { Location: `${urlPath}/${search}` });
+        return res.end();
+    }
+
     // Security headers on ALL responses
     for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
         res.setHeader(key, value);
