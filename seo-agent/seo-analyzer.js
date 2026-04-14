@@ -54,7 +54,7 @@ console.table(
     top5.map((o, i) => ({
         '#': i + 1,
         'Cuvânt cheie': o.query,
-        'URL': o.page.replace('https://formatialuminitza.ro', ''),
+        'URL': o.page.replace('https://www.florentinapanaofficial.ro', ''),
         'Afișări': o.impressions,
         'CTR %': (o.ctr * 100).toFixed(2) + ' %',
         'Poziție': o.position.toFixed(1),

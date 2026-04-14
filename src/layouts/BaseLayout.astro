@@ -31,6 +31,7 @@ const rawOgImage = Astro.props.ogImage ?? '/images/og-default-1200x630.jpg';
 const ogImage = rawOgImage.startsWith('http') ? rawOgImage : `${site}${rawOgImage}`;
 
 const ga4Id = import.meta.env.PUBLIC_GA4_ID;
+const gscVerification = import.meta.env.PUBLIC_GSC_VERIFICATION;
 
 const { navigation } = siteContent;
 
@@ -193,6 +194,7 @@ const mobileNavAllItems = [
     <meta name="geo.region" content="RO-AG" />
     <meta name="geo.placename" content="Pitești, Argeș" />
     <link rel="canonical" href={canonical} />
+    {gscVerification && <meta name="google-site-verification" content={gscVerification} />}
 
     <meta property="og:type" content={ogType} />
     <meta property="og:title" content={title} />
