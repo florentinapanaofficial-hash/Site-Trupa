@@ -70,18 +70,19 @@ const server = createServer((req, res) => {
     const host = req.headers.host || '';
     const proto = req.headers['x-forwarded-proto'] || 'https';
 
-    // ── HTTP → HTTPS redirect (301) ──
-    // Railway termină SSL, dar forward-ează X-Forwarded-Proto
-    if (proto === 'http') {
-        const dest = `https://${host}${req.url}`;
-        res.writeHead(301, { Location: dest });
-        return res.end();
-    }
-
-    // ── non-www → www redirect (301) – o singură versiune canonică ──
+    // ── HTTP → HTTPS + non-www → www redirect (301) ──
+    // Consolidat: un singur redirect spre URL-ul canonic cu trailing slash
     const bareHost = host.replace(/:\d+$/, '');
-    if (bareHost === 'florentinapanaofficial.ro') {
-        const dest = `https://${CANONICAL_HOST}${req.url}`;
+    const needsHttps = proto === 'http';
+    const needsWww = bareHost === 'florentinapanaofficial.ro';
+
+    if (needsHttps || needsWww) {
+        const urlPath = (req.url || '/').split('?')[0];
+        const search = (req.url || '').includes('?') ? '?' + (req.url || '').split('?')[1] : '';
+        // Adaugă trailing slash direct dacă e nevoie (evită lanț de redirect-uri)
+        const needsSlash = !urlPath.endsWith('/') && !urlPath.includes('.');
+        const finalPath = needsSlash ? `${urlPath}/` : urlPath;
+        const dest = `https://${CANONICAL_HOST}${finalPath}${search}`;
         res.writeHead(301, { Location: dest });
         return res.end();
     }
