@@ -37,6 +37,7 @@ const SITE_URL = 'https://www.florentinapanaofficial.ro';
 const STATIC_PAGES = [
     '/',
     '/despre/',
+    '/povestea-noastra/',
     '/membri/',
     '/galerie-video/',
     '/galerie-foto/',
