@@ -150,10 +150,13 @@ const breadcrumbLd = {
 const sideMenuTopItems = [
   { href: '/', label: 'Acasă', color: 'cyan', icon: 'home' },
   { href: '/despre/', label: 'Despre', color: 'cyan', icon: 'info' },
+  { href: '/povestea-noastra/', label: 'Povestea noastră', color: 'cyan', icon: 'heart' },
   { href: '/membri/', label: 'Membri', color: 'cyan', icon: 'users' },
   { href: '/galerie-video/', label: 'Galerie Video', color: 'cyan', icon: 'video' },
   { href: '/galerie-foto/', label: 'Galerie Foto', color: 'cyan', icon: 'camera' },
   { href: '/comunitate/', label: 'Comunitate', color: 'cyan', icon: 'people' },
+  { href: '/publicatii/', label: 'Publicații', color: 'cyan', icon: 'book' },
+  { href: '/vlog/', label: 'Vlog', color: 'cyan', icon: 'play' },
   { href: '/aparitii-tv/', label: 'Apariții TV', color: 'cyan', icon: 'tv' },
   { href: '/contact/', label: 'Contact', color: 'cyan', icon: 'mail' },
 ];
@@ -171,10 +174,13 @@ const sidebarSocialLinks = {
 const mobileNavAllItems = [
   { href: '/', label: 'Acasă', color: 'cyan' },
   { href: '/despre/', label: 'Despre', color: 'cyan' },
+  { href: '/povestea-noastra/', label: 'Povestea noastră', color: 'cyan' },
   { href: '/membri/', label: 'Membri', color: 'cyan' },
   { href: '/galerie-video/', label: 'Galerie Video', color: 'cyan' },
   { href: '/galerie-foto/', label: 'Galerie Foto', color: 'cyan' },
   { href: '/comunitate/', label: 'Comunitate', color: 'cyan' },
+  { href: '/publicatii/', label: 'Publicații', color: 'cyan' },
+  { href: '/vlog/', label: 'Vlog', color: 'cyan' },
   { href: '/aparitii-tv/', label: 'Apariții TV', color: 'cyan' },
   { href: '/contact/', label: 'Contact', color: 'cyan' },
 ];
@@ -272,6 +278,8 @@ const mobileNavAllItems = [
               {item.icon === 'camera' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>}
               {item.icon === 'heart' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>}
               {item.icon === 'people' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>}
+              {item.icon === 'book' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>}
+              {item.icon === 'play' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>}
               {item.icon === 'tv' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>}
               {item.icon === 'mail' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>}
             </span>

@@ -1,0 +1,401 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import siteContent from '../data/siteContent.json';
+import BackButton from '../components/BackButton.astro';
+
+export const prerender = true;
+
+const { brand } = siteContent;
+const pageTitle = `Povestea noastră | ${brand.name}`;
+const pageDescription = 'Povestea Florentinei și a lui Claudiu — dragoste, credință, muzică și familie. O scrisoare din suflet pentru femeia din spatele scenei.';
+---
+
+<BaseLayout title={pageTitle} description={pageDescription}>
+
+  <section class="pn-page">
+    <div class="section-container pt-8 pb-4 sm:pt-10">
+      <div class="mb-6"><BackButton href="/" label="Acasă" /></div>
+    </div>
+
+    <!-- ═══ MASTHEAD ═══════════════════════════════════════════════ -->
+    <header class="pn-masthead">
+      <div class="pn-masthead__rule"></div>
+      <p class="pn-masthead__kicker">Scrisă de Claudiu, cu inima deschisă</p>
+      <h1 class="pn-masthead__title">Povestea noastră:<br/>Credință, muzică și dragoste necondiționată</h1>
+      <div class="pn-masthead__rule"></div>
+    </header>
+
+    <!-- ═══ DATE BADGE — 16 Aprilie ════════════════════════════════ -->
+    <div class="pn-date-badge">
+      <span class="pn-date-badge__icon" aria-hidden="true">✦</span>
+      <p class="pn-date-badge__text">
+        <strong>16 Aprilie 2026</strong> — Astăzi împlinesc 48 de ani.<br/>
+        Acest site este cadoul meu pentru EA, pentru Universul nostru.
+      </p>
+      <span class="pn-date-badge__icon" aria-hidden="true">✦</span>
+    </div>
+
+    <!-- ═══ LETTER ═════════════════════════════════════════════════ -->
+    <article class="pn-letter">
+
+      <!-- ── Credința ── -->
+      <div class="pn-opening">
+        <p class="pn-drop-cap">
+          Nimic din ce trăim nu ar fi fost posibil fără Dumnezeu. El ne-a binecuvântat
+          relația, El ne-a adus împreună și El ne-a purtat prin fiecare furtună.
+          Înainte să fie muzică, înainte să fie scenă, a fost credința —
+          și credința a rămas temelia pe care am construit totul.
+        </p>
+      </div>
+
+      <blockquote class="pn-quote">
+        „Dumnezeu ne-a pus pe același drum. Eu doar am avut curajul să rămân pe el."
+      </blockquote>
+
+      <!-- ── Începuturile ── -->
+      <div class="pn-section">
+        <h2 class="pn-section__heading">Când muzica ne-a unit</h2>
+        <p>
+          Am cunoscut-o pe Florentina într-o lume în care sunetul spune mai mult
+          decât orice cuvânt. Ea avea ceva ce nu se învață — un talent nativ,
+          o memorie muzicală de invidiat, capacitatea de a simți folclorul
+          și de a-l transforma în ceva viu, palpabil, <em>intim</em>.
+        </p>
+        <p>
+          Eu cântam la pian de la 5 ani, dar nu studiasem niciodată muzica populară.
+          Până să o întâlnesc pe ea. Florentina m-a atras într-o lume pe care nu o cunoscusem —
+          și am intrat în ea <strong>cu tot sufletul</strong>, ca să o pot acompania,
+          ca să putem fi pe aceeași scenă, în același ritm, în aceeași respirație.
+          Muzica ne-a unit mai puternic decât ar fi putut-o face orice alt lucru din lume.
+        </p>
+      </div>
+
+      <blockquote class="pn-quote">
+        „Cântam la pian de mic, dar folclorul l-am descoperit prin ea. Fiecare melodie populară a devenit o declarație de dragoste."
+      </blockquote>
+
+      <!-- ── Evoluția ── -->
+      <div class="pn-section">
+        <h2 class="pn-section__heading">Prin lacrimi, bucurii și obstacole</h2>
+        <p>
+          Nu a fost ușor. N-aș minți spunând că drumul a fost presărat doar cu aplauze
+          și seri de vis. Au fost lacrimi — multe. Au fost momente în care totul
+          părea că se prăbușește, în care lumea nu înțelegea ce construiam noi.
+          Au fost obstacole care pe alții i-ar fi despărțit.
+        </p>
+        <p>
+          Dar dragostea noastră a fost <em>pură</em>. Fără calcule, fără interese,
+          fără rețete. Am ales-o pe ea nu pentru ce avea, ci pentru <em>cine era</em>.
+          Și ea m-a ales pe mine cu aceeași simplitate.
+          Am crescut împreună, am răbdat împreună, am crezut împreună
+          că totul va avea sens — și a avut.
+        </p>
+      </div>
+
+      <!-- ── Sufletul Florentinei ── -->
+      <div class="pn-section">
+        <h2 class="pn-section__heading">Sufletul ei simplu și frumos</h2>
+        <p>
+          Florentina nu vine din palate, nu vine din lumea luxului.
+          Vine <strong>de la țară</strong>, cu sufletul curat al oamenilor simpli,
+          cu o modestie pe care eu o admir zilnic. Poate de aceea cântă cu atâta
+          autenticitate folclorul — pentru că îl poartă în sânge, nu doar pe scenă.
+        </p>
+        <p>
+          Și dacă vreți să o cunoașteți cu adevărat pe Florentina, nu o căutați
+          sub reflectoare. Căutați-o acasă, vorbind cu animăluțele ei
+          ca și cum ar fi membrii familiei. Are o dragoste imensă pentru fiecare
+          suflet — dar mai ales pentru <strong>Ricky</strong> și <strong>Emmy</strong>,
+          cei doi iepurași care îi aduc o bucurie pe care doar ea o poate explica.
+        </p>
+        <p>
+          Împreună iubim Muzica — și Ea ne iubește pe noi.
+          E un schimb pe care nu-l poți explica, doar simți.
+          Fiecare scenă pe care urcăm ne confirmă asta: suntem acolo unde trebuie să fim.
+        </p>
+
+        <blockquote class="pn-quote">
+          „Când o văd cum ține în brațe un iepuraș și îi vorbește încet,
+          înțeleg de ce copiii o iubesc, de ce miresele o adoră,
+          de ce publicul simte ceva diferit când ea cântă."
+        </blockquote>
+      </div>
+
+      <!-- ── Copiii ── -->
+      <div class="pn-section">
+        <h2 class="pn-section__heading">Andrei, Beatrice și ritmul nostru real</h2>
+        <p>
+          <strong>Andrei</strong> și <strong>Beatrice</strong> sunt cele mai mari binecuvântări
+          pe care le-am primit. Andrei, cu energia lui iscoditoare, care ne amintește
+          mereu că viața e o aventură. Beatrice, cu sensibilitatea ei fină,
+          cu ochii care seamănă cu ai mamei ei — profunzi, calzi, plini de poveste.
+        </p>
+        <p>
+          De multe ori, copiii sunt cu noi — la repetiții, la evenimente, în culise.
+          Ne urmăresc, ne ascultă, ne imită. Și cel mai frumos vis al nostru
+          este ca într-o zi să facă și ei carieră din muzică.
+          Să ducă mai departe ceea ce am construit noi, dar în felul lor,
+          cu vocea lor, cu povestea lor. Fiecare oboseală, fiecare drum lung,
+          fiecare sacrificiu — toate au fost <em>pentru ei</em>.
+        </p>
+      </div>
+
+      <!-- ── Cadoul de 16 Aprilie ── -->
+      <div class="pn-section">
+        <h2 class="pn-section__heading">16 Aprilie — cadoul meu pentru ea</h2>
+        <p>
+          Astăzi, pe 16 Aprilie, împlinesc 48 de ani. Iar cel mai frumos cadou
+          pe care mi-l pot face mie — și ei — este acest site. Nu un site de prezentare.
+          Nu un simplu portofoliu. Ci un <strong>Univers</strong> — universul nostru,
+          așa cum l-am construit noi, notă cu notă, lacrimă cu lacrimă,
+          bucurie cu bucurie.
+        </p>
+        <p>
+          Fiecare pagină de aici poartă o parte din noi. Din muzica noastră.
+          Din familia noastră. Din credința noastră.
+          Dacă îl citești, înseamnă că ai intrat în universul Florentinei Pană —
+          și asta mă face fericit mai presus de cuvinte.
+        </p>
+      </div>
+
+      <!-- ═══ CLOSING ══════════════════════════════════════════════ -->
+      <footer class="pn-closing">
+        <p class="pn-closing__text">
+          „Cu lacrimi în ochi, îți mulțumesc, Florentina.<br/>
+          Mulțumesc pentru lupta ta necontenită pentru familia asta.<br/>
+          Mulțumesc pentru fiecare dimineață în care ai ales să lupți, să nu te lași bătută<br/>
+          când totul te trăgea în jos.<br/>
+          Mulțumesc pentru că exiști.<br/>
+          Eu te iubesc — simplu, curat, pentru totdeauna."
+        </p>
+        <p class="pn-closing__signature">— Claudiu, soțul tău</p>
+        <p class="pn-closing__date">16 Aprilie 2026 · 48 de ani</p>
+      </footer>
+
+    </article>
+
+    <!-- ═══ CTA ════════════════════════════════════════════════════ -->
+    <div class="pn-cta">
+      <p class="pn-cta__text">Vrei să fim parte din povestea ta?</p>
+      <a href="/contact/" class="pn-cta__btn">Scrie-ne</a>
+    </div>
+
+  </section>
+
+</BaseLayout>
+
+<style>
+  /* ── Page shell ─────────────────────────────────────────────── */
+  .pn-page {
+    --pn-gold:  #d4a853;
+    --pn-warm:  #e8c47a;
+    --pn-rose:  #d4868a;
+    --pn-body:  #c8c0b4;
+    --pn-muted: #8a8279;
+    --pn-bg:    #0c0f1f;
+    --pn-surface: rgba(212, 168, 83, .04);
+    background: var(--pn-bg);
+    color: var(--pn-body);
+    min-height: 100vh;
+  }
+
+  /* ── Masthead ───────────────────────────────────────────────── */
+  .pn-masthead {
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto 2rem;
+    padding: 0 1.5rem;
+  }
+  .pn-masthead__rule {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--pn-gold) 30%, var(--pn-warm) 70%, transparent);
+    margin: 1.2rem 0;
+  }
+  .pn-masthead__kicker {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-style: italic;
+    font-size: .95rem;
+    color: var(--pn-warm);
+    letter-spacing: .05em;
+    margin-bottom: .5rem;
+  }
+  .pn-masthead__title {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-style: italic;
+    font-size: clamp(1.5rem, 4.5vw, 2.5rem);
+    font-weight: 400;
+    line-height: 1.25;
+    color: #fff;
+    margin: 0;
+  }
+
+  /* ── Date badge — 16 Aprilie ────────────────────────────────── */
+  .pn-date-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    max-width: 640px;
+    margin: 0 auto 2.5rem;
+    padding: 1.2rem 1.5rem;
+    background: linear-gradient(135deg, rgba(212, 168, 83, .08), rgba(212, 134, 138, .06));
+    border: 1px solid rgba(212, 168, 83, .18);
+    border-radius: 10px;
+    text-align: center;
+  }
+  .pn-date-badge__icon {
+    font-size: 1.1rem;
+    color: var(--pn-gold);
+    flex-shrink: 0;
+  }
+  .pn-date-badge__text {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-style: italic;
+    font-size: .95rem;
+    line-height: 1.6;
+    color: var(--pn-warm);
+    margin: 0;
+  }
+  .pn-date-badge__text strong {
+    color: #fff;
+    font-weight: 600;
+  }
+
+  /* ── Letter / Article ───────────────────────────────────────── */
+  .pn-letter {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 0 1.5rem 2rem;
+  }
+
+  .pn-section {
+    margin-bottom: 2.5rem;
+  }
+  .pn-section__heading {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-style: italic;
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: var(--pn-warm);
+    margin: 0 0 1rem;
+    padding-bottom: .5rem;
+    border-bottom: 1px solid rgba(212, 168, 83, .15);
+  }
+
+  .pn-letter p {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: 1.05rem;
+    line-height: 1.85;
+    color: var(--pn-body);
+    margin: 0 0 1.2rem;
+  }
+  .pn-letter p strong {
+    color: var(--pn-warm);
+    font-weight: 600;
+  }
+  .pn-letter p em {
+    color: var(--pn-rose);
+    font-style: italic;
+  }
+
+  /* ── Drop-cap opening ───────────────────────────────────────── */
+  .pn-opening {
+    margin-bottom: 1rem;
+    padding: 2rem 0 0;
+  }
+  .pn-drop-cap::first-letter {
+    font-family: 'Georgia', serif;
+    font-size: 3.6rem;
+    float: left;
+    line-height: .85;
+    padding-right: .15em;
+    color: var(--pn-gold);
+    font-weight: 700;
+  }
+
+  /* ── Inline quotes — serif cursiv, vocea lui Claudiu ────────── */
+  .pn-quote {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: #fff;
+    border-left: 3px solid var(--pn-rose);
+    background: rgba(212, 134, 138, .05);
+    padding: 1.2rem 1.5rem;
+    margin: 0 0 2.5rem;
+    border-radius: 0 8px 8px 0;
+    quotes: none;
+  }
+
+  /* ── Closing dedication ─────────────────────────────────────── */
+  .pn-closing {
+    margin: 3rem 0 2rem;
+    padding: 2rem 1.5rem;
+    border-left: 3px solid var(--pn-gold);
+    background: var(--pn-surface);
+    border-radius: 0 8px 8px 0;
+  }
+  .pn-closing__text {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #fff;
+    margin: 0 0 1rem;
+  }
+  .pn-closing__signature {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--pn-gold);
+    margin: 0 0 .3rem;
+  }
+  .pn-closing__date {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-style: italic;
+    font-size: .85rem;
+    color: var(--pn-muted);
+    margin: 0;
+  }
+
+  /* ── CTA ────────────────────────────────────────────────────── */
+  .pn-cta {
+    text-align: center;
+    padding: 2.5rem 1.5rem 4rem;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+  .pn-cta__text {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--pn-muted);
+    margin: 0 0 1.2rem;
+  }
+  .pn-cta__btn {
+    display: inline-block;
+    padding: .7rem 2.2rem;
+    font-size: .95rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+    color: var(--pn-bg);
+    background: linear-gradient(135deg, var(--pn-gold), var(--pn-warm));
+    border-radius: 6px;
+    text-decoration: none;
+    transition: opacity .2s, transform .2s;
+  }
+  .pn-cta__btn:hover {
+    opacity: .9;
+    transform: translateY(-1px);
+  }
+
+  /* ── Responsive ─────────────────────────────────────────────── */
+  @media (max-width: 640px) {
+    .pn-masthead   { padding: 0 1rem; }
+    .pn-letter     { padding: 0 1rem 2rem; }
+    .pn-closing    { padding: 1.5rem 1rem; }
+    .pn-date-badge { margin-left: 1rem; margin-right: 1rem; padding: 1rem; }
+    .pn-quote      { padding: 1rem; }
+  }
+</style>

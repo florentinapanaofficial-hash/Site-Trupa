@@ -1,9 +1,73 @@
 {
     "items": [
         {
+            "slug": "magia-sunetului-sub-cupola-metropol-babana",
+            "category": "🏰 Locații de Poveste",
+            "categoryAccent": "gold",
+            "title": "Magia sunetului sub cupola de la Metropol Băbana: Un ghid pentru mirii rafinați",
+            "excerpt": "Cum se transformă acustica spectaculoasă a salonului Metropol Băbana într-o experiență sonoră de neuitat — și de ce muzica live face toată diferența aici.",
+            "coverImage": "",
+            "coverEmoji": "🏰",
+            "readTime": "6 min",
+            "date": "2026-04-12",
+            "author": "Florentina Pană",
+            "content": [
+                {
+                    "type": "paragraph",
+                    "text": "Există locuri care par create pentru muzică live. Salonul Metropol Băbana, situat la câțiva kilometri de Pitești, în inima județului Argeș, este unul dintre ele. Cu tavanul său înalt în formă de cupolă, pereții eleganți și o capacitate generoasă pentru până la 350 de invitați, acest spațiu nu este doar o sală de nunți — este un amfiteatru natural, un loc unde fiecare acord reverberează cu o claritate aproape cinematografică."
+                },
+                {
+                    "type": "heading",
+                    "text": "De ce acustica face diferența la o nuntă"
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Mulți miri aleg locația după decor, meniu sau preț. Puțini se gândesc la acustică — dar tocmai ea este cea care transformă o petrecere obișnuită într-un eveniment memorabil. La Metropol Băbana, cupola acționează ca un difuzor natural: sunetul urcă, se îmblânzește și coboară uniform peste întreaga sală. Ca formație nuntă Pitești cu experiență în zeci de evenimente aici, am învățat exact cum să calibrăm sunetul pentru acest spațiu. Setăm coloanele la unghi deschis, reducem basul cu 2–3 dB față de o sală standard și lăsăm roomul natural al cupolei să facă restul. Rezultatul? O muzică live Argeș care sună cald, plin și intim, fără să fie niciodată agresivă."
+                },
+                {
+                    "type": "image",
+                    "src": "",
+                    "caption": "Salonul Metropol Băbana — cupola elegantă și ambianța de poveste pentru cele mai frumoase locații de nuntă Argeș"
+                },
+                {
+                    "type": "heading",
+                    "text": "O scenă care inspiră artiștii"
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Pentru noi, FP Band, a cânta la Metropol Băbana este întotdeauna o bucurie. Scena generoasă ne permite să aducem setup-ul complet — clape, percuție, chitară, bas și trei voci — fără compromisuri de spațiu. Iar lumina naturală care pătrunde prin ferestrele laterale în timpul golden hour-ului creează o atmosferă pe care niciun spot nu o poate replica. Am observat că invitații se ridică mai repede pe ringul de dans aici decât în orice alt loc din Argeș. Credem că este combinația subtilă dintre eleganța vizuală a sălii și calitatea sunetului live — când auzi vocea solistei cristalin, fără distorsiuni, instinctul este să te miști."
+                },
+                {
+                    "type": "heading",
+                    "text": "Sfaturi pentru mirii care aleg Metropol Băbana"
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Dacă ați ales deja această locație superbă sau o aveți pe lista scurtă, iată ce vă recomandăm din experiența noastră directă: programați soundcheck-ul cu cel puțin două ore înainte, pentru a profita la maximum de acustica specială. Discutați cu formația despre momentele forte ale serii — intrarea mirilor, dansul mirilor, hora mare — și lăsați-le timp să adapteze aranjamentele pentru reverberația naturală a sălii. Alegeți o formație nuntă Pitești care cunoaște deja spațiul, pentru că diferența dintre un sunet calibrat și unul generic este enormă. Metropol Băbana merită o coloană sonoră pe măsură — și noi suntem mereu pregătiți să o oferim."
+                },
+                {
+                    "type": "paragraph",
+                    "text": "Vrei să vezi cum sună FP Band live? Vizitează vlog-ul nostru pentru momente filmate de la evenimente reale. Sau, dacă ești gata să rezervi formația pentru nunta ta la Metropol Băbana, contactează-ne direct — discutăm cu drag despre fiecare detaliu."
+                },
+                {
+                    "type": "links",
+                    "items": [
+                        {
+                            "label": "🎬 Vezi Vlog-ul nostru",
+                            "href": "/vlog/"
+                        },
+                        {
+                            "label": "📞 Contactează-ne",
+                            "href": "/contact/"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "slug": "din-culisele-unui-eveniment-live",
-            "category": "Vlog",
-            "categoryAccent": "rose",
+            "category": "\ud83c\udfb5 Jurnal FP Band",
+            "categoryAccent": "cyan",
             "title": "Din culisele unui eveniment live",
             "excerpt": "Ce se întâmplă în spatele scenei înainte de a urca muzica la volumul maxim? Pregătirile, emoțiile și momentele care nu se văd de pe ring.",
             "coverImage": "",
@@ -45,8 +109,8 @@
         },
         {
             "slug": "radacini-lautaresti-in-romania",
-            "category": "Istorie",
-            "categoryAccent": "gold",
+            "category": "\ud83c\udfb5 Jurnal FP Band",
+            "categoryAccent": "cyan",
             "title": "Rădăcini lăutărești în România",
             "excerpt": "De la tarafurile de mahala ale Bucureștiului interbelic la festivaluri internaționale — o călătorie prin istoria muzicii lăutărești românești.",
             "coverImage": "",
@@ -88,8 +152,8 @@
         },
         {
             "slug": "diferente-intre-hore-sarbe-si-geamparale",
-            "category": "Genuri",
-            "categoryAccent": "teal",
+            "category": "\ud83c\udfb5 Jurnal FP Band",
+            "categoryAccent": "cyan",
             "title": "Diferențe între hore, sârbe și geamparale",
             "excerpt": "Trei ritmuri esențiale ale muzicii românești — cum le recunoști, ce energie transmit și în ce momente ale serii le programăm.",
             "coverImage": "",
@@ -135,7 +199,7 @@
         },
         {
             "slug": "cum-alegi-repertoriul-potrivit-pe-momente",
-            "category": "Educație",
+            "category": "\ud83d\udca1 Sfaturi pentru Miri",
             "categoryAccent": "gold",
             "title": "Cum alegi repertoriul potrivit pe momente",
             "excerpt": "Ghid practic pentru miri și organizatori: ce muzică merge la intrare, la dansul mirilor, la hora mare și la finalul serii.",
@@ -187,7 +251,7 @@
         {
             "slug": "andreea-si-radu-povestea-lor",
             "coupleSlug": "andreea-si-radu",
-            "category": "Povești de nuntă",
+            "category": "🏰 Locații de Poveste",
             "categoryAccent": "rose",
             "title": "Andreea & Radu — tradiție, eleganță și un ring de dans de neuitat",
             "excerpt": "O nuntă de septembrie la Pitești care a combinat tradițiile românești cu eleganța modernă. Cum am construit împreună atmosfera perfectă pentru Andreea și Radu.",
@@ -231,7 +295,7 @@
         {
             "slug": "bianca-si-mihai-povestea-lor",
             "coupleSlug": "bianca-si-mihai",
-            "category": "Povești de nuntă",
+            "category": "🏰 Locații de Poveste",
             "categoryAccent": "gold",
             "title": "Bianca & Mihai — o noapte întreagă pe ringul de dans din Curtea de Argeș",
             "excerpt": "Energia, profesionalismul și comunicarea perfectă — cum am transformat nunta Biancăi și a lui Mihai într-o petrecere pe care invitații n-o vor uita.",
@@ -275,7 +339,7 @@
         {
             "slug": "ioana-si-catalin-povestea-lor",
             "coupleSlug": "ioana-si-catalin",
-            "category": "Povești de nuntă",
+            "category": "🏰 Locații de Poveste",
             "categoryAccent": "teal",
             "title": "Ioana & Cătălin — o atmosferă premium de la primul acord până la ultimul",
             "excerpt": "O nuntă bucureșteană cu standarde ridicate și dorințe muzicale precise. Cum am ascultat, adaptat și livrat exact ce și-au dorit Ioana și Cătălin.",
@@ -319,7 +383,7 @@
         {
             "slug": "alina-si-stefan-povestea-lor",
             "coupleSlug": "alina-si-stefan",
-            "category": "Povești de nuntă",
+            "category": "🏰 Locații de Poveste",
             "categoryAccent": "rose",
             "title": "Alina & Ștefan — cum ridicăm o sală în picioare la Brașov",
             "excerpt": "Nota 10 de la o nuntă brașoveană cu invitați pretențioși și așteptări mari. Energia, surprizele și amintirile de neuitat din mai 2025.",

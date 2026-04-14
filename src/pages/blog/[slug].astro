@@ -9,6 +9,7 @@ interface ContentBlock {
   text?: string;
   src?: string;
   caption?: string;
+  items?: { label: string; href: string }[];
 }
 
 interface Post {
@@ -150,6 +151,15 @@ const articleJsonLd = {
                 <figcaption class="bp-figcaption">{block.caption}</figcaption>
               )}
             </figure>
+          );
+        }
+        if (block.type === 'links' && block.items) {
+          return (
+            <nav class="bp-inline-links" aria-label="Link-uri recomandate">
+              {block.items.map((link) => (
+                <a href={link.href} class="bp-inline-link">{link.label}</a>
+              ))}
+            </nav>
           );
         }
         return null;
@@ -385,6 +395,29 @@ const articleJsonLd = {
   }
   .bp-nav-link:hover .bp-nav-post-title { color: var(--gold); }
   .bp-nav-link:hover .bp-nav-dir { color: var(--gold); }
+
+  /* ── Inline links block ── */
+  .bp-inline-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 1.5rem 0 2rem;
+  }
+  .bp-inline-link {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    color: var(--gold, #f5a623);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(245, 166, 35, 0.3);
+    padding-bottom: 1px;
+    transition: border-color 0.2s, opacity 0.2s;
+  }
+  .bp-inline-link:hover {
+    border-bottom-color: var(--gold, #f5a623);
+    opacity: 0.8;
+  }
 
   /* ── CTA ── */
   .bp-cta {

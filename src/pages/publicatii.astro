@@ -7,38 +7,30 @@ import BackButton from '../components/BackButton.astro';
 
 export const prerender = true;
 
-const { brand, seo, contact } = siteContent;
+const { brand, seo } = siteContent;
 const couples = couplesData.couples;
 
 const posts = [...((blogPostsRaw as any).items ?? [])]
-  .filter((p) => p.category !== 'Vlog')
   .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-/* ─── Build couple slug lookup ─────────────────── */
 const coupleByBlogSlug = new Map<string, (typeof couples)[0]>();
 for (const c of couples) {
   if (c.blogSlug) coupleByBlogSlug.set(c.blogSlug, c);
 }
 
-/* ─── Collect unique categories ────────────────── */
-const categories = ['Toate', ...new Set(posts.map((p) => p.category))];
+const categories = ['Toate', '🏰 Locații de Poveste', '💡 Sfaturi pentru Miri', '🎵 Jurnal FP Band'];
 
 const accentClass: Record<string, string> = {
-  gold: 'accent-gold',
-  rose: 'accent-rose',
-  cyan: 'accent-cyan',
-  violet: 'accent-violet',
-  teal: 'accent-teal',
-  lime: 'accent-lime',
+  gold: 'accent-gold', rose: 'accent-rose', cyan: 'accent-cyan',
+  violet: 'accent-violet', teal: 'accent-teal', lime: 'accent-lime',
 };
 
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('ro-RO', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
+  return new Date(dateStr).toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' });
 }
+
+const featured = posts[0];
+const rest = posts.slice(1);
 
 const pageTitle = `Publicații | ${brand.name}`;
 const pageDescription = `Articole, povești de nuntă și ghiduri utile de la ${brand.name}. Citește despre experiențele cuplurilor noastre și sfaturi pentru o nuntă reușită.`;
@@ -47,86 +39,101 @@ const SITE = 'https://www.florentinapanaofficial.ro';
 
 <BaseLayout title={pageTitle} description={pageDescription} ogImage={seo.ogImage}>
 
-  <section class="section-container pt-8 pb-16 sm:pt-10 sm:pb-20">
-    <div class="mb-6"><BackButton href="/comunitate/" label="Comunitate" /></div>
+  <section class="ed-page">
+    <div class="section-container pt-8 pb-4 sm:pt-10">
+      <div class="mb-6"><BackButton href="/comunitate/" label="Comunitate" /></div>
+    </div>
 
-    <!-- ═══ HERO ═══════════════════════════════════════════════════ -->
-    <header class="pub-hero mx-auto text-center mb-8">
-      <p class="pub-hero__kicker">Formația Florentina Pană</p>
-      <h1 class="pub-hero__title">Publicații</h1>
-      <p class="pub-hero__subtitle">
-        Povești de nuntă, articole și sfaturi utile pentru o seară perfectă.
-      </p>
+    <!-- ═══ MASTHEAD ═══════════════════════════════════════════════ -->
+    <header class="ed-masthead">
+      <div class="ed-masthead__rule"></div>
+      <p class="ed-masthead__kicker">Formația Florentina Pană</p>
+      <h1 class="ed-masthead__title">Publicații</h1>
+      <p class="ed-masthead__sub">Povești de nuntă, articole și sfaturi utile pentru o seară perfectă.</p>
+      <div class="ed-masthead__rule"></div>
     </header>
 
-    <!-- ═══ CATEGORY FILTERS ═══════════════════════════════════════ -->
-    <nav class="pub-filters" aria-label="Filtrează articolele">
+    <!-- ═══ CATEGORY NAV — text links ═════════════════════════════ -->
+    <nav class="ed-cats" aria-label="Filtrează articolele">
       {categories.map((cat) => (
         <button
-          class={`pub-filter-btn ${cat === 'Toate' ? 'is-active' : ''}`}
+          class={`ed-cat-link ${cat === 'Toate' ? 'is-active' : ''}`}
           data-category={cat}
           type="button"
-        >
-          {cat}
-        </button>
+        >{cat}</button>
       ))}
     </nav>
 
-    <!-- ═══ ARTICLES GRID ══════════════════════════════════════════ -->
-    <div class="pub-grid" id="pubGrid">
-      {posts.map((post) => {
+    <!-- ═══ FEATURED / COVER STORY ════════════════════════════════ -->
+    {featured && (
+      <article class="ed-featured" data-category={featured.category} data-featured>
+        <a href={`/blog/${featured.slug}/`} class="ed-featured__link" aria-label={`Citește: ${featured.title}`}>
+          <div class="ed-featured__visual">
+            {featured.coverImage ? (
+              <img src={featured.coverImage} alt={featured.title} loading="eager" decoding="async" width="960" height="540" class="ed-featured__img" />
+            ) : (
+              <span class="ed-featured__emoji" aria-hidden="true">{featured.coverEmoji || '📝'}</span>
+            )}
+            <div class="ed-featured__overlay"></div>
+          </div>
+          <div class="ed-featured__text">
+            <span class={`ed-badge ${accentClass[featured.categoryAccent] ?? ''}`}>{featured.category}</span>
+            <h2 class="ed-featured__title">{featured.title}</h2>
+            <p class="ed-featured__excerpt">{featured.excerpt}</p>
+            <div class="ed-featured__meta">
+              <time datetime={featured.date}>{formatDate(featured.date)}</time>
+              <span class="ed-meta-dot">·</span>
+              <span>{featured.readTime}</span>
+            </div>
+          </div>
+        </a>
+      </article>
+    )}
+
+    <!-- ═══ EDITORIAL LIST ════════════════════════════════════════ -->
+    <div class="ed-list section-container" id="pubGrid">
+      {rest.map((post, i) => {
         const linkedCouple = coupleByBlogSlug.get(post.slug);
-        const shareText = encodeURIComponent(`${post.title} — ${brand.name}`);
         const shareUrl = encodeURIComponent(`${SITE}/blog/${post.slug}/`);
+        const isEven = i % 2 === 0;
 
         return (
-          <article class="pub-card" data-category={post.category}>
-            <a href={`/blog/${post.slug}/`} class="pub-card__link" aria-label={`Citește: ${post.title}`}>
-              <div class="pub-card__cover">
+          <article class={`ed-item ${isEven ? 'ed-item--left' : 'ed-item--right'}`} data-category={post.category}>
+            <a href={`/blog/${post.slug}/`} class="ed-item__visual-link" aria-label={`Citește: ${post.title}`}>
+              <div class="ed-item__visual">
                 {post.coverImage ? (
-                  <img src={post.coverImage} alt={post.title} loading="lazy" decoding="async" width="640" height="360" />
+                  <img src={post.coverImage} alt={post.title} loading="lazy" decoding="async" width="480" height="320" />
                 ) : (
-                  <span class="pub-card__emoji" aria-hidden="true">{post.coverEmoji || '📝'}</span>
+                  <span class="ed-item__emoji" aria-hidden="true">{post.coverEmoji || '📝'}</span>
                 )}
               </div>
-              <div class="pub-card__body">
-                <div class="pub-card__meta">
-                  <span class={`pub-badge ${accentClass[post.categoryAccent] ?? ''}`}>{post.category}</span>
-                  <span class="pub-card__readtime">{post.readTime}</span>
-                </div>
-                <h2 class="pub-card__title">{post.title}</h2>
-                <p class="pub-card__excerpt">{post.excerpt}</p>
-                <time class="pub-card__date" datetime={post.date}>{formatDate(post.date)}</time>
-              </div>
             </a>
-
-            {/* ─── Footer: couple link + share ─── */}
-            <div class="pub-card__footer">
-              {linkedCouple && (
-                <a href={`/comunitate/${linkedCouple.slug}/`} class="pub-card__couple-link">
-                  💍 {linkedCouple.names}
-                </a>
-              )}
-              <div class="pub-card__share">
-                <a
-                  href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="pub-share-btn"
-                  aria-label={`Distribuie pe Facebook: ${post.title}`}
-                  title="Distribuie pe Facebook"
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                </a>
-                <button
-                  type="button"
-                  class="pub-share-btn pub-share-copy"
-                  data-url={`${SITE}/blog/${post.slug}`}
-                  aria-label={`Copiază linkul: ${post.title}`}
-                  title="Copiază linkul"
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                </button>
+            <div class="ed-item__body">
+              <div class="ed-item__top">
+                <span class={`ed-badge ed-badge--sm ${accentClass[post.categoryAccent] ?? ''}`}>{post.category}</span>
+                <span class="ed-item__readtime">{post.readTime}</span>
+              </div>
+              <a href={`/blog/${post.slug}/`} class="ed-item__title-link">
+                <h2 class="ed-item__title">{post.title}</h2>
+              </a>
+              <p class="ed-item__excerpt">{post.excerpt}</p>
+              <div class="ed-item__foot">
+                <time class="ed-item__date" datetime={post.date}>{formatDate(post.date)}</time>
+                <div class="ed-item__actions">
+                  {linkedCouple && (
+                    <a href={`/comunitate/${linkedCouple.slug}/`} class="ed-couple-link">💍 {linkedCouple.names}</a>
+                  )}
+                  <a
+                    href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`}
+                    target="_blank" rel="noopener noreferrer"
+                    class="ed-share-btn" aria-label={`Distribuie pe Facebook: ${post.title}`} title="Facebook"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                  </a>
+                  <button type="button" class="ed-share-btn ed-share-copy" data-url={`${SITE}/blog/${post.slug}`} aria-label={`Copiază linkul: ${post.title}`} title="Copiază linkul">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  </button>
+                </div>
               </div>
             </div>
           </article>
@@ -135,26 +142,24 @@ const SITE = 'https://www.florentinapanaofficial.ro';
     </div>
 
     <!-- ═══ EMPTY STATE ════════════════════════════════════════════ -->
-    <div class="pub-empty" id="pubEmpty" hidden>
-      <p>📰 Niciun articol în această categorie.</p>
+    <div class="ed-empty" id="pubEmpty" hidden>
+      <p>Niciun articol în această categorie.</p>
     </div>
 
-    <!-- ═══ BACK TO COMMUNITY ══════════════════════════════════════ -->
-    <div class="pub-cta text-center mt-12 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-      <a href="/vlog/" class="pub-cta__link">
-        🎬 Vezi și Vlog-ul nostru
-      </a>
-      <a href="/comunitate/" class="pub-cta__link">
-        ← Înapoi la Mirii Noștri
-      </a>
+    <!-- ═══ CTA ════════════════════════════════════════════════════ -->
+    <div class="ed-cta section-container">
+      <a href="/vlog/" class="ed-cta__link">🎬 Vezi și Vlog-ul nostru</a>
+      <span class="ed-cta__sep">|</span>
+      <a href="/comunitate/" class="ed-cta__link">← Înapoi la Mirii Noștri</a>
     </div>
   </section>
 
   <!-- ═══ FILTER + COPY SCRIPTS ════════════════════════════════════ -->
   <script is:inline>
     (function () {
-      var buttons = document.querySelectorAll('.pub-filter-btn');
-      var cards = document.querySelectorAll('.pub-card');
+      var buttons = document.querySelectorAll('.ed-cat-link');
+      var featured = document.querySelector('[data-featured]');
+      var cards = document.querySelectorAll('#pubGrid .ed-item');
       var emptyEl = document.getElementById('pubEmpty');
 
       buttons.forEach(function (btn) {
@@ -164,6 +169,13 @@ const SITE = 'https://www.florentinapanaofficial.ro';
 
           var cat = btn.getAttribute('data-category');
           var visible = 0;
+
+          /* Featured article */
+          if (featured) {
+            var showFeat = cat === 'Toate' || featured.getAttribute('data-category') === cat;
+            featured.style.display = showFeat ? '' : 'none';
+            if (showFeat) visible++;
+          }
 
           cards.forEach(function (card) {
             var show = cat === 'Toate' || card.getAttribute('data-category') === cat;
@@ -175,8 +187,7 @@ const SITE = 'https://www.florentinapanaofficial.ro';
         });
       });
 
-      /* Copy link */
-      document.querySelectorAll('.pub-share-copy').forEach(function (btn) {
+      document.querySelectorAll('.ed-share-copy').forEach(function (btn) {
         btn.addEventListener('click', function () {
           var url = btn.getAttribute('data-url');
           if (url && navigator.clipboard) {
@@ -190,257 +201,421 @@ const SITE = 'https://www.florentinapanaofficial.ro';
     })();
   </script>
 
-  <!-- ═══ STYLES ═══════════════════════════════════════════════════ -->
+  <!-- ═══ EDITORIAL PREMIUM STYLES ═════════════════════════════════ -->
   <style>
-    /* ═══ HERO ═══ */
-    .pub-hero__kicker {
+    /* ── Page shell ── */
+    .ed-page { padding-bottom: 4rem; }
+
+    /* ── Masthead ── */
+    .ed-masthead {
+      text-align: center;
+      max-width: 44rem;
+      margin: 0 auto 2.5rem;
+      padding: 0 1.5rem;
+    }
+    .ed-masthead__rule {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18) 30%, rgba(245,166,35,0.35) 50%, rgba(255,255,255,0.18) 70%, transparent);
+      margin: 1.2rem 0;
+    }
+    .ed-masthead__kicker {
       font-family: 'Oswald', sans-serif;
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       font-weight: 700;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: var(--gold);
+      color: var(--gold, #f5a623);
+      margin: 0 0 0.5rem;
+    }
+    .ed-masthead__title {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 400;
+      font-style: italic;
+      color: #fff8ee;
       margin: 0 0 0.6rem;
+      line-height: 1.1;
+      letter-spacing: -0.01em;
     }
-
-    .pub-hero__title {
-      font-family: 'Oswald', sans-serif;
-      font-size: clamp(2rem, 5vw, 3.2rem);
-      font-weight: 700;
-      color: var(--title, #fff8ee);
-      margin: 0 0 0.75rem;
-      line-height: 1.15;
-    }
-
-    .pub-hero__subtitle {
+    .ed-masthead__sub {
       font-size: 1rem;
-      color: rgba(255, 255, 255, 0.65);
+      color: rgba(255,255,255,0.55);
       margin: 0;
-      line-height: 1.6;
-      max-width: 540px;
+      line-height: 1.65;
+      max-width: 32rem;
       margin-left: auto;
       margin-right: auto;
     }
 
-    /* ═══ FILTERS ═══ */
-    .pub-filters {
+    /* ── Category nav — refined text links ── */
+    .ed-cats {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.5rem;
+      gap: 1.5rem;
       justify-content: center;
-      margin-bottom: 2.5rem;
+      margin: 0 auto 3rem;
+      padding: 0 1.5rem;
     }
-
-    .pub-filter-btn {
+    .ed-cat-link {
       font-family: 'Oswald', sans-serif;
       font-size: 0.78rem;
-      font-weight: 700;
+      font-weight: 600;
       letter-spacing: 0.06em;
       text-transform: uppercase;
-      padding: 0.45rem 1rem;
-      border-radius: 9999px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(255, 255, 255, 0.04);
-      color: rgba(255, 255, 255, 0.6);
+      color: rgba(255,255,255,0.45);
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      padding: 0.3rem 0;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: color 0.25s, border-color 0.25s;
+    }
+    .ed-cat-link:hover {
+      color: rgba(255,255,255,0.85);
+    }
+    .ed-cat-link.is-active {
+      color: #fff;
+      border-bottom-color: var(--gold, #f5a623);
     }
 
-    .pub-filter-btn:hover {
-      border-color: rgba(255, 255, 255, 0.25);
-      color: rgba(255, 255, 255, 0.85);
+    /* ── Badge ── */
+    .ed-badge {
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.7);
     }
+    .ed-badge.accent-gold   { color: #ffd166; }
+    .ed-badge.accent-rose   { color: #ff94b8; }
+    .ed-badge.accent-cyan   { color: #7ef8ff; }
+    .ed-badge.accent-violet { color: #d8a8ff; }
+    .ed-badge.accent-teal   { color: #6effd8; }
+    .ed-badge.accent-lime   { color: #c8ff60; }
+    .ed-badge--sm { font-size: 0.62rem; }
 
-    .pub-filter-btn.is-active {
-      background: var(--gold);
-      border-color: var(--gold);
-      color: #0C080F;
-    }
-
-    /* ═══ GRID ═══ */
-    .pub-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
-      gap: 1.75rem;
+    /* ═══ FEATURED / COVER STORY ═══ */
+    .ed-featured {
       max-width: 72rem;
-      margin: 0 auto;
+      margin: 0 auto 3.5rem;
+      padding: 0 1.5rem;
     }
-
-    /* ═══ CARD ═══ */
-    .pub-card {
-      display: flex;
-      flex-direction: column;
-      border-radius: 1.1rem;
-      overflow: hidden;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      backdrop-filter: blur(12px);
-      transition: transform 200ms ease, box-shadow 200ms ease;
-    }
-
-    .pub-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.38);
-    }
-
-    .pub-card__link {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
+    .ed-featured__link {
+      display: grid;
+      grid-template-columns: 1fr;
       text-decoration: none;
       color: inherit;
+      border-radius: 1rem;
+      overflow: hidden;
+      position: relative;
     }
-
-    .pub-card__cover {
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      background: rgba(255, 255, 255, 0.05);
+    .ed-featured__visual {
+      position: relative;
+      aspect-ratio: 21 / 9;
+      background: rgba(255,255,255,0.04);
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
     }
-
-    .pub-card__cover img {
+    .ed-featured__img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      transition: transform 600ms ease;
+    }
+    .ed-featured__link:hover .ed-featured__img {
+      transform: scale(1.03);
+    }
+    .ed-featured__emoji {
+      font-size: 5rem;
+      line-height: 1;
+      filter: drop-shadow(0 4px 24px rgba(0,0,0,0.5));
+    }
+    .ed-featured__overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(12,8,15,0.92) 0%, rgba(12,8,15,0.4) 50%, transparent 100%);
+      pointer-events: none;
+    }
+    .ed-featured__text {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 2rem 2.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    .ed-featured__title {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: clamp(1.6rem, 3.5vw, 2.6rem);
+      font-weight: 400;
+      font-style: italic;
+      color: #fff;
+      line-height: 1.18;
+      margin: 0;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+    }
+    .ed-featured__excerpt {
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.72);
+      line-height: 1.6;
+      margin: 0;
+      max-width: 38rem;
+    }
+    .ed-featured__meta {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.45);
+      font-family: 'Oswald', sans-serif;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .ed-meta-dot { opacity: 0.4; }
+
+    /* Mobile: stack featured text below image */
+    @media (max-width: 639px) {
+      .ed-featured__visual { aspect-ratio: 16 / 10; }
+      .ed-featured__text { padding: 1.2rem 1.4rem; }
+      .ed-featured__excerpt { display: none; }
     }
 
-    .pub-card__emoji {
-      font-size: 3.5rem;
+    /* Desktop: side-by-side */
+    @media (min-width: 768px) {
+      .ed-featured__link {
+        grid-template-columns: 3fr 2fr;
+        min-height: 22rem;
+      }
+      .ed-featured__visual { aspect-ratio: auto; }
+      .ed-featured__overlay {
+        background: linear-gradient(to right, transparent 0%, rgba(12,8,15,0.85) 70%, rgba(12,8,15,0.95) 100%);
+      }
+      .ed-featured__text {
+        position: relative;
+        padding: 2.5rem 3rem;
+        justify-content: center;
+        background: rgba(12,8,15,0.6);
+        backdrop-filter: blur(16px);
+      }
+    }
+
+    /* ═══ EDITORIAL LIST ═══ */
+    .ed-list {
+      max-width: 56rem;
+      margin: 0 auto;
+    }
+
+    .ed-item {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.2rem;
+      padding: 2rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      transition: opacity 0.2s;
+    }
+    .ed-item:first-child {
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    @media (min-width: 640px) {
+      .ed-item {
+        grid-template-columns: 200px 1fr;
+        gap: 2rem;
+        align-items: start;
+      }
+      .ed-item--right {
+        grid-template-columns: 1fr 200px;
+      }
+      .ed-item--right .ed-item__visual-link {
+        order: 2;
+      }
+      .ed-item--right .ed-item__body {
+        order: 1;
+        text-align: right;
+      }
+      .ed-item--right .ed-item__top {
+        justify-content: flex-end;
+      }
+      .ed-item--right .ed-item__foot {
+        justify-content: flex-end;
+      }
+      .ed-item--right .ed-item__actions {
+        margin-left: 0;
+        margin-right: auto;
+      }
+    }
+
+    @media (min-width: 900px) {
+      .ed-item {
+        grid-template-columns: 260px 1fr;
+        gap: 2.5rem;
+      }
+      .ed-item--right {
+        grid-template-columns: 1fr 260px;
+      }
+    }
+
+    .ed-item__visual-link {
+      text-decoration: none;
+      display: block;
+    }
+    .ed-item__visual {
+      aspect-ratio: 3 / 2;
+      border-radius: 0.6rem;
+      overflow: hidden;
+      background: rgba(255,255,255,0.04);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .ed-item__visual img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 500ms ease, filter 500ms ease;
+      filter: saturate(0.85);
+    }
+    .ed-item:hover .ed-item__visual img {
+      transform: scale(1.04);
+      filter: saturate(1);
+    }
+    .ed-item__emoji {
+      font-size: 2.8rem;
       line-height: 1;
     }
 
-    .pub-card__body {
-      padding: 1.25rem 1.4rem 1rem;
+    .ed-item__body {
       display: flex;
       flex-direction: column;
-      gap: 0.55rem;
-      flex: 1;
+      gap: 0.45rem;
+      justify-content: center;
     }
 
-    .pub-card__meta {
+    .ed-item__top {
       display: flex;
       align-items: center;
       gap: 0.75rem;
     }
-
-    .pub-badge {
-      font-size: 0.72rem;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 0.2rem 0.65rem;
-      border-radius: 9999px;
-      background: rgba(255, 255, 255, 0.1);
-      color: #fff;
-    }
-    .pub-badge.accent-gold   { background: rgba(245,166,35,.22);  color: #ffd166; }
-    .pub-badge.accent-rose   { background: rgba(255,70,120,.22);  color: #ff94b8; }
-    .pub-badge.accent-cyan   { background: rgba(6,214,255,.22);   color: #7ef8ff; }
-    .pub-badge.accent-violet { background: rgba(167,100,255,.22); color: #d8a8ff; }
-    .pub-badge.accent-teal   { background: rgba(20,220,180,.22);  color: #6effd8; }
-    .pub-badge.accent-lime   { background: rgba(140,240,50,.22);  color: #c8ff60; }
-
-    .pub-card__readtime {
-      font-size: 0.75rem;
-      color: rgba(255, 255, 255, 0.5);
-    }
-
-    .pub-card__title {
+    .ed-item__readtime {
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.35);
       font-family: 'Oswald', sans-serif;
-      font-weight: 700;
-      font-size: 1.15rem;
-      color: #ffffff;
-      line-height: 1.25;
-      margin: 0;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
     }
 
-    .pub-card__excerpt {
+    .ed-item__title-link {
+      text-decoration: none;
+      color: inherit;
+    }
+    .ed-item__title {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 1.25rem;
+      font-weight: 400;
+      font-style: italic;
+      color: #fff;
+      line-height: 1.3;
+      margin: 0;
+      transition: color 0.2s;
+    }
+    .ed-item:hover .ed-item__title {
+      color: var(--gold, #f5a623);
+    }
+
+    .ed-item__excerpt {
       font-size: 0.88rem;
-      color: rgba(255, 255, 255, 0.72);
-      line-height: 1.6;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.65;
       margin: 0;
-      flex: 1;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
-    .pub-card__date {
-      font-size: 0.75rem;
-      color: rgba(255, 255, 255, 0.42);
-    }
-
-    /* ═══ CARD FOOTER ═══ */
-    .pub-card__footer {
-      padding: 0.75rem 1.4rem 1rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.07);
+    .ed-item__foot {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 0.5rem;
+      gap: 0.75rem;
+      margin-top: 0.3rem;
       flex-wrap: wrap;
     }
-
-    .pub-card__couple-link {
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: var(--gold);
-      text-decoration: none;
-      transition: opacity 0.2s;
+    .ed-item__date {
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.3);
     }
-
-    .pub-card__couple-link:hover {
-      opacity: 0.8;
-      text-decoration: underline;
-    }
-
-    .pub-card__share {
+    .ed-item__actions {
       display: flex;
+      align-items: center;
       gap: 0.5rem;
       margin-left: auto;
     }
 
-    .pub-share-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(255, 255, 255, 0.04);
-      color: rgba(255, 255, 255, 0.5);
-      cursor: pointer;
-      text-decoration: none;
-      transition: all 0.2s ease;
-    }
-
-    .pub-share-btn:hover {
-      border-color: var(--gold);
-      color: var(--gold);
-      background: rgba(255, 215, 0, 0.08);
-    }
-
-    /* ═══ EMPTY STATE ═══ */
-    .pub-empty {
-      text-align: center;
-      padding: 2.5rem 1rem;
-      color: rgba(255, 255, 255, 0.6);
-    }
-
-    /* ═══ CTA LINK ═══ */
-    .pub-cta__link {
-      font-family: 'Oswald', sans-serif;
-      font-size: 0.9rem;
+    .ed-couple-link {
+      font-size: 0.72rem;
       font-weight: 700;
-      color: var(--gold);
+      color: var(--gold, #f5a623);
       text-decoration: none;
       transition: opacity 0.2s;
     }
+    .ed-couple-link:hover { opacity: 0.7; }
 
-    .pub-cta__link:hover {
-      opacity: 0.8;
-      text-decoration: underline;
+    .ed-share-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: transparent;
+      color: rgba(255,255,255,0.35);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .ed-share-btn:hover {
+      color: var(--gold, #f5a623);
+      border-color: rgba(245,166,35,0.3);
+    }
+
+    /* ── Empty state ── */
+    .ed-empty {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: rgba(255,255,255,0.45);
+      font-style: italic;
+      font-family: Georgia, 'Times New Roman', serif;
+    }
+
+    /* ── CTA ── */
+    .ed-cta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      padding-top: 3rem;
+      max-width: 56rem;
+    }
+    .ed-cta__sep {
+      color: rgba(255,255,255,0.15);
+    }
+    .ed-cta__link {
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--gold, #f5a623);
+      text-decoration: none;
+      letter-spacing: 0.03em;
+      transition: opacity 0.2s;
+    }
+    .ed-cta__link:hover {
+      opacity: 0.7;
     }
   </style>
 </BaseLayout>

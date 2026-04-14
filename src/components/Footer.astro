@@ -40,6 +40,18 @@ const isHomePage = Astro.url.pathname === '/';
           <a href="/colaboratori/tambal/" class="transition hover:text-[#F5A623] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F5A623] rounded">Țambalist</a>
         </div>
       </nav>
+
+      <!-- Ghid evenimente — internal linking SEO -->
+      <nav class="section-container pb-3" aria-label="Ghid evenimente">
+        <p class="text-center text-xs text-white/40">
+          Ghid Evenimente:
+          <a href="/publicatii/?cat=locatii" class="transition hover:text-[#F5A623] text-white/60">Locații de Poveste</a>
+          <span aria-hidden="true" class="text-white/20"> | </span>
+          <a href="/publicatii/?cat=sfaturi" class="transition hover:text-[#F5A623] text-white/60">Sfaturi Miri</a>
+          <span aria-hidden="true" class="text-white/20"> | </span>
+          <a href="/publicatii/?cat=jurnal" class="transition hover:text-[#F5A623] text-white/60">Jurnal FP Band</a>
+        </p>
+      </nav>
     </div>
   </div>
 

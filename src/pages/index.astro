@@ -184,6 +184,9 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
           mirilor și valsul de deschidere până la hora mare și petrecerea de noapte —
           ne adaptăm stilului și dorințelor fiecărui cuplu.
         </p>
+        <p class="hp-seo-text hp-seo-text--link">
+          Inspiră-te din jurnalul nostru de evenimente și descoperă <a href="/publicatii/" class="hp-inline-link">recomandările noastre de locații din Argeș</a>.
+        </p>
       </div>
     </div>
   </section>
@@ -1088,6 +1091,21 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     color: #D0D8E8;
     margin: 0;
     text-wrap: pretty;
+  }
+
+  .hp-seo-text--link {
+    margin-top: 0.75rem;
+  }
+
+  .hp-inline-link {
+    color: var(--gold, #f5a623);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(245, 166, 35, 0.35);
+    transition: border-color 0.2s, opacity 0.2s;
+  }
+  .hp-inline-link:hover {
+    border-bottom-color: var(--gold, #f5a623);
+    opacity: 0.85;
   }
 
   /* FAQ */
