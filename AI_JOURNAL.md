@@ -306,6 +306,32 @@ Proiectul respectă principii de **SEO etic** (White Hat):
 
 ---
 
+### 2026-04-15 — PageSpeed Insights: Contrast + Forced Reflow
+**Probleme identificate din raportul PageSpeed (mobil):**
+
+**1. Contrast insuficient (WCAG AA) — REZOLVAT**
+- `Footer.astro` — secțiunea „Ghid Evenimente" avea text `text-white/40` pe fundal `#0C080F` → contrast ~2.2:1 (necesar ≥4.5:1)
+- Linkurile din ghid aveau `text-white/60` → contrast ~4.1:1 (sub pragul minim)
+- **Fix aplicat:**
+  - Text label: `text-white/40` → `text-white/70`
+  - Linkuri: `text-white/60` → `text-white/80`
+  - Separatori `|`: `text-white/20` → `text-white/40`
+  - Hartă site linkuri: `text-white/70` → `text-white/80`
+
+**2. Rearanjare forțată (forced reflow) — REZOLVAT**
+- `public/js/mobile-swipe.js` linia 146 — `cachedNavEl.offsetWidth` se citea sincron la execuția scriptului, forțând un layout reflow de 57 ms
+- **Fix aplicat:** Inițializare `cachedNavEl = null; cachedNavWidth = 0;` — citirea reală se face doar în `cacheNavBtnPositions()` apelat deja prin `requestAnimationFrame`
+
+**3. CSS nefolosit (~10 KiB) — NU NECESITĂ ACȚIUNE**
+- Provine din variabilele CSS interne Tailwind v3 (`--tw-border-spacing-x`, etc.) pe selectorul `*,::before,::after`
+- Este overhead structural al Tailwind v3, nu se poate elimina fără risc
+- PageSpeed îl marchează „Nu se adaugă la scor"
+
+**Fișiere modificate:** `Footer.astro`, `mobile-swipe.js`
+**Commit:** `a49ee8c` pe `main`
+
+---
+
 ### 2025-04-13 — Content Blocks (Anti-Duplicat)
 **Ce s-a creat:**
 - `scripts/programmatic-seo/content-blocks.json` — 3 array-uri (intros, services, outros) × 4 variante fiecare
