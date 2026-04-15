@@ -43,6 +43,11 @@
       "href": "/aparitii-tv/",
       "label": "Apariții TV",
       "color": "cyan"
+    },
+    {
+      "href": "/live/",
+      "label": "🔴 LIVE",
+      "color": "cyan"
     }
   ],
   "hero": {

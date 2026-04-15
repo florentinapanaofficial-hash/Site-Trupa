@@ -78,7 +78,7 @@ const localBusinessLd = {
 };
 
 const isHomePage = Astro.url.pathname === '/';
-const hasYouTube = ['/galerie-video', '/aparitii-tv', '/video/', '/colaboratori/', '/comunitate'].some(p => Astro.url.pathname.startsWith(p));
+const hasYouTube = ['/galerie-video', '/aparitii-tv', '/video/', '/colaboratori/', '/comunitate', '/live'].some(p => Astro.url.pathname.startsWith(p));
 const sectionLink = (anchor: string) => (isHomePage ? anchor : `/${anchor}`);
 
 // JSON-LD: WebPage — fiecare pagină primește schema WebPage
@@ -125,6 +125,7 @@ const breadcrumbLabels: Record<string, string> = {
   'momente-cu-mirii': 'Momente cu mirii',
   'comunitate': 'Comunitate',
   'aparitii-tv': 'Apariții TV',
+  'live': 'LIVE de la Evenimente',
   'contact': 'Contact',
   'blog': 'Blog',
   'termeni-conditii': 'Termeni și condiții',
@@ -158,6 +159,7 @@ const sideMenuTopItems = [
   { href: '/publicatii/', label: 'Publicații', color: 'cyan', icon: 'book' },
   { href: '/vlog/', label: 'Vlog', color: 'cyan', icon: 'play' },
   { href: '/aparitii-tv/', label: 'Apariții TV', color: 'cyan', icon: 'tv' },
+  { href: '/live/', label: '🔴 LIVE', color: 'cyan', icon: 'video' },
   { href: '/contact/', label: 'Contact', color: 'cyan', icon: 'mail' },
 ];
 
@@ -182,6 +184,7 @@ const mobileNavAllItems = [
   { href: '/publicatii/', label: 'Publicații', color: 'cyan' },
   { href: '/vlog/', label: 'Vlog', color: 'cyan' },
   { href: '/aparitii-tv/', label: 'Apariții TV', color: 'cyan' },
+  { href: '/live/', label: '🔴 LIVE', color: 'cyan' },
   { href: '/contact/', label: 'Contact', color: 'cyan' },
 ];
 ---
