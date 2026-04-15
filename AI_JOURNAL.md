@@ -325,3 +325,40 @@ Proiectul respectă principii de **SEO etic** (White Hat):
 - **Efect SEO:** Elimină „pagini orfane" — fiecare landing page locală primește link-uri interne din footer + contact
 - **Automat:** Când adaugi un oraș nou în `locations.json` → componenta se actualizează automat la build
 - **Build Astro:** ✅ Compilat cu succes, zero erori
+
+### 2026-04-15 — Pagina LIVE de la Evenimente (`live.astro`)
+**Ce s-a creat:**
+- `src/pages/live.astro` — pagină nouă cu design editorial premium (fundal negru profund, fonturi Serif)
+- **Player YouTube Live** — iframe embed `https://www.youtube.com/embed/live_stream?channel=UCNi3X-Qm3V4aaOAFSOlzHew`
+- **Toggle Landscape/Vertical** — două butoane care comută aspect ratio între 16:9 și 9:16 (optimizat pentru filmări tip Stories)
+  - Modul vertical: rama aurie se strânge la max 440px, efect ecran de telefon elegant pe desktop
+- **Glassmorphism** — fundal blur decorativ cu 3 blob-uri difuze (amber, roșu, gold) + `backdrop-filter: blur(30px)` activ în modul vertical
+- **Indicator ON AIR** — punct roșu `animate-pulse` + text «TRANSMISIUNE LIVE»
+- **Ramă aurie** — `border-2 border-amber-500/40` + `box-shadow: 0 0 60px rgba(245,166,35,0.15)`
+- **Butoane distribuire socială** — WhatsApp, Facebook, Copiază linkul (URL dinamic via `window.location.href`)
+  - Stil auriu rotunjit cu hover subtil (`translateY(-1px)` + glow)
+  - Butonul Copy Link oferă feedback vizual verde «Copiat!» timp de 2 secunde
+- **CTA auriu** — «Vrei acest vibe la evenimentul tău? Verifică disponibilitatea» cu iconiță broadcast/radio
+- **Secțiune Program live-uri** — carduri cu calendar pentru următoarele transmisiuni
+- **Navigație** — link 🔴 LIVE adăugat în:
+  - `Header.astro` — meniul hamburger mobil (`mobileFullNavigation`)
+  - `BaseLayout.astro` — sidebar (`sideMenuTopItems`), mobile nav (`mobileNavAllItems`), breadcrumbs
+  - `siteContent.json` — navigația principală desktop
+- **Fișiere modificate:** `Header.astro`, `BaseLayout.astro`, `siteContent.json`
+- **Build Astro:** ✅ 67 pagini generate, zero erori
+
+### 2026-04-15 — Audit SEO complet + Remediere anchor links
+**Audit rezultate:**
+- ✅ Alt atribute imagini — 0 probleme (lightbox-urile cu `alt=""` sunt placeholder-uri dinamice, corect)
+- ✅ Link-uri interne 404 — 0 pagini sparte
+- ✅ Meta description — toate paginile au descrieri unice
+- ✅ Canonical URLs, OG tags, JSON-LD Schema, `rel="noopener noreferrer"` — toate corecte
+- ✅ OG image (`public/images/og-default-1200x630.jpg`) — confirmată existentă
+- ⚠️ **5 anchor links rupte** — `/#membri` și `/#contact` duceau la homepage unde secțiunile nu existau
+
+**Remediere aplicată (3 fișiere):**
+- `src/pages/colaboratori/saxofon.astro` — `/#membri` → `/membri/`, `/#contact` → `/contact/`
+- `src/pages/colaboratori/tambal.astro` — `/#membri` → `/membri/`, `/#contact` → `/contact/`
+- `src/pages/blog/[slug].astro` — `/#contact` → `/contact/`
+
+**Verificare post-remediere:** Build complet ✅ — 67 fișiere generate, zero erori. Warnings pre-existente (`Astro.request.headers` în mod static + CSS minification) sunt normale și nu afectează SEO.

@@ -142,8 +142,8 @@
     /* Cache cu pozițiile butoanelor din navbar — populat o singură dată
        la init și la resize, NU la fiecare scroll/touch. */
     var cachedNavBtnPositions = {};
-    var cachedNavEl = document.querySelector('.mob-nav');
-    var cachedNavWidth = cachedNavEl ? cachedNavEl.offsetWidth : 0;
+    var cachedNavEl = null;
+    var cachedNavWidth = 0;
 
     function cacheNavBtnPositions() {
         cachedNavEl = document.querySelector('.mob-nav');
