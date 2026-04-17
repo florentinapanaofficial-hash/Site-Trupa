@@ -1,9 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import siteContent from '../data/siteContent.json';
+import seo from '../data/seo-content.json';
 import BackButton from '../components/BackButton.astro';
 
-const { seo, brand } = siteContent;
+const { brand } = siteContent;
+const videoSeo = seo.galerieVideo;
 const slugify = (value: string) =>
   value
     .toLowerCase()
@@ -55,16 +57,16 @@ const videosByCategory = (cat: string) =>
 ---
 
 <BaseLayout
-  title={`Muzică Nuntă Live — Videoclipuri ${brand.name}`}
-  description="Ascultă muzică nuntă live cu Formația Florentina Pană. Videoclipuri de la nunți, botezuri și petreceri în Argeș și România. Vezi video-urile acum!"
+  title={videoSeo.meta.title}
+  description={videoSeo.meta.description}
 >
   <section class="section-container py-16">
     <div class="mb-8"><BackButton href="/" label="Acasă" /></div>
     <header class="section-head mx-auto text-center">
       <p class="kicker">Galerie Video</p>
-      <h1 class="section-title">Videoclipuri Live din Repertoriul Nostru</h1>
+      <h1 class="section-title">{videoSeo.h1}</h1>
       <p class="section-copy">
-        Trei capitole muzicale, o singură trupă. Alege un clip și bucură-te de energia live a Formației Florentina Pană.
+        {videoSeo.subtitle}
       </p>
     </header>
 

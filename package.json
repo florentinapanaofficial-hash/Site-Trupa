@@ -16,7 +16,10 @@
     "seo:submit:dry": "node seo-agent/submit-all-to-gsc.js --dry-run",
     "seo:submit:sitemap": "node seo-agent/submit-all-to-gsc.js --sitemap",
     "seo:analyze": "node seo-agent/seo-analyzer.js",
-    "seo:harvest": "node seo-agent/keyword-harvester.js"
+    "seo:harvest": "node seo-agent/keyword-harvester.js",
+    "seo:errors": "node seo-agent/gsc-errors.js",
+    "seo:errors:dry": "node seo-agent/gsc-errors.js --dry-run",
+    "seo:errors:only": "node seo-agent/gsc-errors.js --only-errors"
   },
   "dependencies": {
     "@astrojs/node": "^8.3.4",
