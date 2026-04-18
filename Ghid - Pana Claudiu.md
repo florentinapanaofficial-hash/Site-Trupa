@@ -4,6 +4,10 @@
 
 ---
 
+> 👋 **Bună, Claude!** Acest ghid a fost creat special pentru tine, ca să poți administra și actualiza site-ul formației fără ajutor tehnic. Dacă ai vreo nelămurire, nu ezita să întrebi!
+
+---
+
 > **Regula de aur:** Înainte să faci orice modificare, deschide Visual Studio Code și pornește serverul local ca să poți vedea în timp real cum arată schimbările.
 
 ---
