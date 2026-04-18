@@ -19,7 +19,8 @@
     "seo:harvest": "node seo-agent/keyword-harvester.js",
     "seo:errors": "node seo-agent/gsc-errors.js",
     "seo:errors:dry": "node seo-agent/gsc-errors.js --dry-run",
-    "seo:errors:only": "node seo-agent/gsc-errors.js --only-errors"
+    "seo:errors:only": "node seo-agent/gsc-errors.js --only-errors",
+    "ferrari": "node ferrari.js"
   },
   "dependencies": {
     "@astrojs/node": "^8.3.4",
@@ -31,6 +32,7 @@
     "isomorphic-dompurify": "^3.1.0",
     "mysql2": "^3.11.3",
     "nanoid": "^5.0.8",
+    "openai": "^6.34.0",
     "sharp": "^0.34.5",
     "sirv": "^3.0.2"
   },

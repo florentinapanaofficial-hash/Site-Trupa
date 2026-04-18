@@ -5,14 +5,14 @@
  * și raportează statusul de indexare + erorile detectate.
  *
  * Prerequisite:
- *   1. Service Account cu Search Console API activat în Google Cloud Console
- *   2. .env cu GOOGLE_CLIENT_EMAIL + GOOGLE_PRIVATE_KEY
- *   3. Service Account adăugat ca Owner în Google Search Console
+ * 1. Service Account cu Search Console API activat în Google Cloud Console
+ * 2. .env cu GOOGLE_CLIENT_EMAIL + GOOGLE_PRIVATE_KEY
+ * 3. Service Account adăugat ca Owner în Google Search Console
  *
  * Rulare:
- *   node seo-agent/gsc-errors.js               # inspectează toate paginile
- *   node seo-agent/gsc-errors.js --dry-run      # afișează URL-urile fără a verifica
- *   node seo-agent/gsc-errors.js --only-errors   # afișează doar paginile cu probleme
+ * node seo-agent/gsc-errors.js               # inspectează toate paginile
+ * node seo-agent/gsc-errors.js --dry-run      # afișează URL-urile fără a verifica
+ * node seo-agent/gsc-errors.js --only-errors   # afișează doar paginile cu probleme
  * ──────────────────────────────────────────────────────────
  */
 import { readFileSync, existsSync } from 'node:fs';
@@ -29,6 +29,7 @@ const ONLY_ERRORS = process.argv.includes('--only-errors');
 
 // ── Configurare ──────────────────────────────────────────
 const SITE_URL = 'https://www.florentinapanaofficial.ro';
+const GSC_PROPERTY = 'sc-domain:florentinapanaofficial.ro'; // Identificatorul proprietății din Search Console
 
 // ── Paginile statice ale site-ului ───────────────────────
 const STATIC_PAGES = [
@@ -101,7 +102,7 @@ async function inspectUrl(searchConsole, url) {
         const res = await searchConsole.urlInspection.index.inspect({
             requestBody: {
                 inspectionUrl: url,
-                siteUrl: SITE_URL,
+                siteUrl: GSC_PROPERTY, // Folosește constanta GSC_PROPERTY în loc de SITE_URL
             },
         });
 
@@ -159,20 +160,20 @@ async function main() {
     const allPaths = [...STATIC_PAGES, ...programmaticPages];
     const allUrls = allPaths.map((p) => `${SITE_URL}${p}`);
 
-    console.log(`  📋 Total pagini de verificat: ${allUrls.length}`);
-    console.log(`     ├─ Pagini statice:       ${STATIC_PAGES.length}`);
+    console.log(`   📋 Total pagini de verificat: ${allUrls.length}`);
+    console.log(`     ├─ Pagini statice:           ${STATIC_PAGES.length}`);
     console.log(`     └─ Pagini programatice:  ${programmaticPages.length}\n`);
 
     // ── Dry Run ──────────────────────────────────────────
     if (DRY_RUN) {
-        console.log('  🔍 MOD DRY-RUN — nu se trimit cereri\n');
-        console.log('  Pagini statice:');
+        console.log('   🔍 MOD DRY-RUN — nu se trimit cereri\n');
+        console.log('   Pagini statice:');
         STATIC_PAGES.forEach((p) => console.log(`    ${SITE_URL}${p}`));
         if (programmaticPages.length > 0) {
-            console.log('\n  Pagini programatic SEO:');
+            console.log('\n   Pagini programatic SEO:');
             programmaticPages.forEach((p) => console.log(`    ${SITE_URL}${p}`));
         }
-        console.log(`\n  ✅ ${allUrls.length} URL-uri pregătite. Rulează fără --dry-run pentru a verifica.\n`);
+        console.log(`\n   ✅ ${allUrls.length} URL-uri pregătite. Rulează fără --dry-run pentru a verifica.\n`);
         return;
     }
 
@@ -198,8 +199,9 @@ async function main() {
 
     const searchConsole = google.searchconsole({ version: 'v1', auth });
 
-    console.log(`  🔑 Service Account: ${clientEmail}`);
-    console.log(`  🌐 Site: ${SITE_URL}\n`);
+    console.log(`   🔑 Service Account: ${clientEmail}`);
+    console.log(`   🌐 Site: ${SITE_URL}`);
+    console.log(`   🆔 Proprietate GSC: ${GSC_PROPERTY}\n`);
 
     // ── Inspectare URL-uri ───────────────────────────────
     const results = [];
@@ -210,7 +212,7 @@ async function main() {
     for (let i = 0; i < allUrls.length; i++) {
         const url = allUrls[i];
         const path = allPaths[i];
-        process.stdout.write(`  [${i + 1}/${allUrls.length}] ${path} ... `);
+        process.stdout.write(`   [${i + 1}/${allUrls.length}] ${path} ... `);
 
         const result = await inspectUrl(searchConsole, url);
         results.push(result);
@@ -240,13 +242,13 @@ async function main() {
     }
 
     // ── Sumar ────────────────────────────────────────────
-    console.log('\n\n  ═══════════════════════════════════════════════════');
-    console.log('  📊 SUMAR RAPORT');
-    console.log('  ═══════════════════════════════════════════════════');
-    console.log(`  ✅ Indexate:        ${indexed}/${allUrls.length}`);
-    console.log(`  ⚠️  Avertismente:   ${warnings}`);
-    console.log(`  ❌ Erori:           ${errors}`);
-    console.log('  ═══════════════════════════════════════════════════\n');
+    console.log('\n\n   ═══════════════════════════════════════════════════');
+    console.log('   📊 SUMAR RAPORT');
+    console.log('   ═══════════════════════════════════════════════════');
+    console.log(`   ✅ Indexate:        ${indexed}/${allUrls.length}`);
+    console.log(`   ⚠️  Avertismente:   ${warnings}`);
+    console.log(`   ❌ Erori:           ${errors}`);
+    console.log('   ═══════════════════════════════════════════════════\n');
 
     // ── Detalii erori ────────────────────────────────────
     const problemPages = results.filter(
@@ -254,11 +256,11 @@ async function main() {
     );
 
     if (problemPages.length > 0) {
-        console.log('  🔍 DETALII PAGINI CU PROBLEME:\n');
+        console.log('   🔍 DETALII PAGINI CU PROBLEME:\n');
 
         for (const page of problemPages) {
             const path = page.url.replace(SITE_URL, '');
-            console.log(`  ── ${path} ──`);
+            console.log(`   ── ${path} ──`);
 
             if (page.status === 'EROARE_API') {
                 console.log(`     Eroare API: ${page.errorCode} — ${page.error}`);
@@ -291,7 +293,7 @@ async function main() {
             console.log('');
         }
     } else {
-        console.log('  🎉 Toate paginile sunt indexate fără erori!\n');
+        console.log('   🎉 Toate paginile sunt indexate fără erori!\n');
     }
 }
 
@@ -299,3 +301,4 @@ main().catch((err) => {
     console.error('\n❌ Eroare fatală:', err.message);
     process.exit(1);
 });
+
