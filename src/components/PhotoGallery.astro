@@ -1,0 +1,421 @@
+---
+/**
+ * PhotoGallery.astro — Galerie Virală cu butoane de distribuire & backlinks
+ *
+ * Props:
+ *   images: Array<{ src: string; alt: string; caption: string }>
+ *   siteUrl?: string  (default: https://www.florentinapanaofficial.ro)
+ *   pagePath?: string (default: /galerie-foto)
+ */
+interface ImageItem {
+  src: string;
+  alt: string;
+  caption: string;
+}
+
+interface Props {
+  images: ImageItem[];
+  siteUrl?: string;
+  pagePath?: string;
+}
+
+const {
+  images,
+  siteUrl = 'https://www.florentinapanaofficial.ro',
+  pagePath = '/galerie-foto',
+} = Astro.props;
+
+const pageUrl = `${siteUrl}${pagePath}`;
+---
+
+<section class="pg-section" aria-label="Galerie foto virală">
+  <div class="pg-grid" role="list">
+    {images.map((img, i) => {
+      const anchorId = `foto-${i + 1}`;
+      const shareUrl = `${pageUrl}#${anchorId}`;
+      const waText = encodeURIComponent(`Uite ce atmosferă la Formația Florentina Pană! 🎶 ${shareUrl}`);
+
+      return (
+        <figure
+          id={anchorId}
+          class="pg-card"
+          role="listitem"
+          tabindex="0"
+        >
+          {/* ── Imagine ── */}
+          <img
+            src={img.src}
+            alt={img.alt}
+            class="pg-img"
+            loading="lazy"
+            decoding="async"
+            width="800"
+            height="600"
+          />
+
+          {/* ── Caption ── */}
+          <figcaption class="pg-caption">{img.caption}</figcaption>
+
+          {/* ── Buton Info SEO (i) ── */}
+          <button
+            class="pg-info-btn"
+            type="button"
+            aria-label="Informații despre galerie"
+            data-pg-info
+          >
+            i
+          </button>
+
+          {/* ── Tooltip SEO ── */}
+          <div class="pg-tooltip" role="tooltip" aria-hidden="true">
+            <p>
+              📸 <strong>Despre această galerie:</strong> Descoperă atmosfera
+              creată de <strong>Formația Florentina Pană</strong>! Momente
+              surprinse la nunți și evenimente premium din
+              <strong>Pitești</strong> și județul <strong>Argeș</strong>.
+              Distribuie amintirea preferată!
+            </p>
+          </div>
+
+          {/* ── Butoane distribuire ── */}
+          <div class="pg-share">
+            {/* WhatsApp */}
+            <a
+              href={`https://wa.me/?text=${waText}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="pg-share-btn pg-share-wa"
+              aria-label={`Distribuie pe WhatsApp — ${img.caption}`}
+              title="Distribuie pe WhatsApp"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+              </svg>
+            </a>
+
+            {/* Facebook */}
+            <a
+              href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="pg-share-btn pg-share-fb"
+              aria-label={`Distribuie pe Facebook — ${img.caption}`}
+              title="Distribuie pe Facebook"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+            </a>
+
+            {/* Copiază Link */}
+            <button
+              type="button"
+              class="pg-share-btn pg-share-copy"
+              data-share-url={shareUrl}
+              aria-label={`Copiază link-ul — ${img.caption}`}
+              title="Copiază link-ul"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" aria-hidden="true">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+              </svg>
+              <span class="pg-copy-toast" aria-live="polite"></span>
+            </button>
+          </div>
+        </figure>
+      );
+    })}
+  </div>
+</section>
+
+<!-- ═══ CLIENT SCRIPT ═══ -->
+<script is:inline>
+(function () {
+  /* ── Info tooltip toggle ── */
+  document.querySelectorAll('[data-pg-info]').forEach(function (btn) {
+    var card = btn.closest('.pg-card');
+    var tooltip = card && card.querySelector('.pg-tooltip');
+    if (!tooltip) return;
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var isOpen = tooltip.classList.contains('pg-tooltip--open');
+      // Închide orice alt tooltip deschis
+      document.querySelectorAll('.pg-tooltip--open').forEach(function (t) {
+        t.classList.remove('pg-tooltip--open');
+        t.setAttribute('aria-hidden', 'true');
+      });
+      if (!isOpen) {
+        tooltip.classList.add('pg-tooltip--open');
+        tooltip.setAttribute('aria-hidden', 'false');
+      }
+    });
+  });
+
+  // Închide tooltip-ul dacă click în afara
+  document.addEventListener('click', function () {
+    document.querySelectorAll('.pg-tooltip--open').forEach(function (t) {
+      t.classList.remove('pg-tooltip--open');
+      t.setAttribute('aria-hidden', 'true');
+    });
+  });
+
+  /* ── Copiază link în clipboard ── */
+  document.querySelectorAll('.pg-share-copy').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var url = btn.getAttribute('data-share-url');
+      if (!url) return;
+
+      var toast = btn.querySelector('.pg-copy-toast');
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(function () {
+          showToast(toast);
+        });
+      } else {
+        // Fallback pentru browsere vechi
+        var ta = document.createElement('textarea');
+        ta.value = url;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showToast(toast);
+      }
+    });
+  });
+
+  function showToast(el) {
+    if (!el) return;
+    el.textContent = 'Link copiat!';
+    el.classList.add('pg-copy-toast--show');
+    setTimeout(function () {
+      el.classList.remove('pg-copy-toast--show');
+      el.textContent = '';
+    }, 2000);
+  }
+})();
+</script>
+
+<!-- ═══ STYLES ═══ -->
+<style>
+  /* ── Section ── */
+  .pg-section {
+    width: 100%;
+    max-width: 72rem;
+    margin-inline: auto;
+    padding: clamp(1rem, 3vw, 2rem);
+  }
+
+  /* ── Grid — 3 col desktop, 2 tablet, 1 mobil ── */
+  .pg-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+  }
+
+  @media (max-width: 900px) {
+    .pg-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 520px) {
+    .pg-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ── Card ── */
+  .pg-card {
+    position: relative;
+    margin: 0;
+    border-radius: 1rem;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(10, 14, 30, 0.6);
+    transition: border-color 300ms ease, box-shadow 300ms ease;
+    scroll-margin-top: 5rem;
+  }
+
+  .pg-card:focus-visible {
+    outline: 2px solid rgba(0, 200, 255, 0.60);
+    outline-offset: 2px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .pg-card:hover {
+      border-color: rgba(0, 200, 255, 0.35);
+      box-shadow: 0 0 18px rgba(0, 200, 255, 0.15), 0 8px 24px rgba(0, 60, 120, 0.20);
+    }
+
+    .pg-card:hover .pg-share {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* ── Imagine ── */
+  .pg-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    aspect-ratio: 4 / 3;
+  }
+
+  /* ── Caption ── */
+  .pg-caption {
+    padding: 0.6rem 0.85rem;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: rgba(180, 200, 235, 0.75);
+    text-align: center;
+  }
+
+  /* ── Buton Info (i) ── */
+  .pg-info-btn {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(0, 0, 0, 0.55);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.72rem;
+    font-weight: 700;
+    font-style: italic;
+    font-family: 'Georgia', serif;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 200ms ease, border-color 200ms ease;
+    z-index: 3;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  .pg-info-btn:hover,
+  .pg-info-btn:focus-visible {
+    background: rgba(0, 200, 255, 0.20);
+    border-color: rgba(0, 200, 255, 0.50);
+  }
+
+  /* ── Tooltip SEO ── */
+  .pg-tooltip {
+    position: absolute;
+    top: 2.6rem;
+    right: 0.6rem;
+    width: min(18rem, calc(100% - 1.2rem));
+    padding: 0.75rem 0.9rem;
+    border-radius: 0.75rem;
+    background: rgba(8, 12, 28, 0.92);
+    border: 1px solid rgba(0, 200, 255, 0.20);
+    color: rgba(220, 230, 250, 0.90);
+    font-size: 0.72rem;
+    line-height: 1.55;
+    z-index: 4;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    transition: opacity 250ms ease, transform 250ms ease, visibility 250ms ease;
+    pointer-events: none;
+  }
+
+  .pg-tooltip p { margin: 0; }
+  .pg-tooltip strong { color: #fff; }
+
+  .pg-tooltip--open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  /* ── Bara de Share ── */
+  .pg-share {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.85rem 0.7rem;
+    opacity: 1;
+    transition: opacity 250ms ease, transform 250ms ease;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .pg-share {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+  }
+
+  .pg-share-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.75);
+    cursor: pointer;
+    transition: background 200ms ease, color 200ms ease, border-color 200ms ease, transform 150ms ease;
+    text-decoration: none;
+    position: relative;
+  }
+
+  .pg-share-btn:hover,
+  .pg-share-btn:focus-visible {
+    transform: scale(1.12);
+  }
+
+  .pg-share-wa:hover,
+  .pg-share-wa:focus-visible {
+    background: rgba(37, 211, 102, 0.18);
+    border-color: rgba(37, 211, 102, 0.50);
+    color: #25d366;
+  }
+
+  .pg-share-fb:hover,
+  .pg-share-fb:focus-visible {
+    background: rgba(24, 119, 242, 0.18);
+    border-color: rgba(24, 119, 242, 0.50);
+    color: #1877f2;
+  }
+
+  .pg-share-copy:hover,
+  .pg-share-copy:focus-visible {
+    background: rgba(0, 200, 255, 0.18);
+    border-color: rgba(0, 200, 255, 0.50);
+    color: #00c8ff;
+  }
+
+  /* ── Toast „Link copiat!" ── */
+  .pg-copy-toast {
+    position: absolute;
+    bottom: calc(100% + 0.5rem);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    white-space: nowrap;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.25rem 0.6rem;
+    border-radius: 0.4rem;
+    background: rgba(0, 200, 255, 0.90);
+    color: #000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms ease, transform 200ms ease;
+  }
+
+  .pg-copy-toast--show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+</style>

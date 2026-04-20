@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BackButton from '../components/BackButton.astro';
 import EmbedSnippet from '../components/EmbedSnippet.astro';
+import PhotoGallery from '../components/PhotoGallery.astro';
 
 /* ── Date galerie: toate pozele din colecție ── */
 const base = "/images/Galerie Foto Site";
@@ -89,6 +90,16 @@ const photos = [
           </div>
         </figure>
       ))}
+    </div>
+
+    <!-- ═══ GALERIE VIRALĂ — distribuire & backlinks ═══ -->
+    <div style="margin-top: 2rem;">
+      <h2 class="gal-title" style="font-size:1.15rem;margin-bottom:0.75rem;">Galeria Virală — Distribuie Momentele</h2>
+      <p style="font-size:0.85rem;color:rgba(255,255,255,0.7);margin-bottom:1rem;">Fiecare fotografie are link unic. Distribuie pe WhatsApp sau Facebook, sau copiază link-ul pentru a genera backlinks!</p>
+      <PhotoGallery
+        images={photos.map((p) => ({ src: p.src, alt: p.alt, caption: p.alt }))}
+        pagePath="/galerie-foto"
+      />
     </div>
 
     <!-- ═══ EMBED SNIPPET — backlink automat pt. partajare imagine ═══ -->
