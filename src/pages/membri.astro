@@ -87,6 +87,7 @@ function initiale(name: string): string {
                       data-fx={String((n % 6) + 1)}
                       data-src={foto.src}
                       data-alt={foto.alt ?? `${m.nume} la eveniment - Formația Florentina Pană`}
+                      data-member={m.nume}
                       tabindex="0"
                       title="Click pentru previzualizare"
                     >
@@ -209,6 +210,7 @@ function initiale(name: string): string {
                       data-fx={String((n % 6) + 1)}
                       data-src={foto.src}
                       data-alt={foto.alt ?? `${m.nume} la eveniment - Formația Florentina Pană`}
+                      data-member={m.nume}
                       tabindex="0"
                       title="Click pentru previzualizare"
                     >
@@ -333,6 +335,7 @@ function initiale(name: string): string {
                       data-fx={String((n % 6) + 1)}
                       data-src={foto.src}
                       data-alt={foto.alt ?? `${m.nume} la eveniment - Formația Florentina Pană`}
+                      data-member={m.nume}
                       tabindex="0"
                       title="Click pentru previzualizare"
                     >
@@ -400,9 +403,16 @@ function initiale(name: string): string {
   <!-- ═══ GALLERY POPUP OVERLAY ═══ -->
   <div id="gallery-popup" role="dialog" aria-modal="true" aria-label="Foto mărit">
     <button id="gallery-popup-close" type="button" aria-label="Închide galeria">✕</button>
+    <button id="gallery-popup-prev" type="button" class="gallery-popup-nav gallery-popup-prev" aria-label="Foto anterioară">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
     <div id="gallery-popup-inner">
       <img id="gallery-popup-img" src="" alt="" />
     </div>
+    <button id="gallery-popup-next" type="button" class="gallery-popup-nav gallery-popup-next" aria-label="Foto următoare">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+    </button>
+    <div id="gallery-popup-counter" class="gallery-popup-counter" aria-live="polite"></div>
   </div>
   </section>
 </BaseLayout>
@@ -457,7 +467,7 @@ function initiale(name: string): string {
     });
   });
 
-  // ═══ GALLERY POPUP FX ═══
+  // ═══ GALLERY POPUP FX + NAVIGARE GRUP ═══
   const fxMap = {
     '1': { enter: 'fx-pop-in',      leave: 'fx-pop-out'      },
     '2': { enter: 'fx-warp-in',     leave: 'fx-warp-out'     },
@@ -467,41 +477,96 @@ function initiale(name: string): string {
     '6': { enter: 'fx-spindrop-in', leave: 'fx-spindrop-out' },
   };
 
-  const popup    = document.getElementById('gallery-popup');
-  const popupImg = document.getElementById('gallery-popup-img');
+  const popup      = document.getElementById('gallery-popup');
+  const popupImg   = document.getElementById('gallery-popup-img');
   const popupClose = document.getElementById('gallery-popup-close');
+  const popupPrev  = document.getElementById('gallery-popup-prev');
+  const popupNext  = document.getElementById('gallery-popup-next');
+  const popupCounter = document.getElementById('gallery-popup-counter');
+
   let currentFx  = '1';
   let lastFocusedThumb = null;
 
-  function openPopup(src, alt, fx) {
-    const anim = fxMap[fx] ?? fxMap['1'];
-    lastFocusedThumb = document.activeElement;
-    popupImg.src = src;
-    popupImg.alt = alt;
-    popupImg.classList.remove(...Object.values(fxMap).flatMap((v) => [v.enter, v.leave]));
-    popup.classList.add('active');
-    popupImg.classList.add(anim.enter);
-    // Adaugă intrare în history — butonul Back va închide popup-ul
-    history.pushState({ galleryOpen: true }, '');
-    // Focus pe butonul de închidere pentru accesibilitate
-    requestAnimationFrame(() => popupClose.focus());
+  // Grupurile de poze per membru — populate la click
+  let currentGroup = [];   // Array<{src, alt, fx}>
+  let currentIndex = 0;
+
+  function allFxClasses() {
+    return Object.values(fxMap).flatMap((v) => [v.enter, v.leave]);
   }
 
-  function closePopup(fx = currentFx, { fromPopstate = false } = {}) {
-    if (!popup.classList.contains('active')) return;
+  function updateNav() {
+    const total = currentGroup.length;
+    const hasPrev = currentIndex > 0;
+    const hasNext = currentIndex < total - 1;
+    popupPrev.style.display = total > 1 ? '' : 'none';
+    popupNext.style.display = total > 1 ? '' : 'none';
+    popupPrev.disabled = !hasPrev;
+    popupNext.disabled = !hasNext;
+    popupPrev.style.opacity = hasPrev ? '1' : '0.3';
+    popupNext.style.opacity = hasNext ? '1' : '0.3';
+    popupCounter.textContent = total > 1 ? (currentIndex + 1) + ' / ' + total : '';
+  }
+
+  function showImage(idx, fx, animate) {
+    if (idx < 0 || idx >= currentGroup.length) return;
+    currentIndex = idx;
+    const item = currentGroup[idx];
     const anim = fxMap[fx] ?? fxMap['1'];
-    popupImg.classList.remove(...Object.values(fxMap).flatMap((v) => [v.enter, v.leave]));
+    if (animate) {
+      popupImg.classList.remove(...allFxClasses());
+      popupImg.classList.add(anim.enter);
+    }
+    popupImg.src = item.src;
+    popupImg.alt = item.alt;
+    updateNav();
+  }
+
+  function openPopup(memberName, startIdx, fx) {
+    // Colectează toate thumb-urile aceluiași membru
+    const thumbs = Array.from(document.querySelectorAll('.gallery-thumb[data-member="' + CSS.escape(memberName) + '"]'));
+    currentGroup = thumbs.map(function(t) {
+      return { src: t.dataset.src || '', alt: t.dataset.alt || '', fx: t.dataset.fx || '1' };
+    });
+    currentIndex = startIdx;
+    currentFx = fx;
+
+    lastFocusedThumb = document.activeElement;
+    popupImg.classList.remove(...allFxClasses());
+    popup.classList.add('active');
+
+    showImage(startIdx, fx, true);
+
+    history.pushState({ galleryOpen: true }, '');
+    requestAnimationFrame(function() { popupClose.focus(); });
+  }
+
+  function navigateTo(direction) {
+    var newIdx = currentIndex + direction;
+    if (newIdx < 0 || newIdx >= currentGroup.length) return;
+    var item = currentGroup[newIdx];
+    popupImg.classList.remove(...allFxClasses());
+    showImage(newIdx, item.fx, true);
+  }
+
+  function closePopup(fx, opts) {
+    fx = fx || currentFx;
+    opts = opts || {};
+    if (!popup.classList.contains('active')) return;
+    var anim = fxMap[fx] || fxMap['1'];
+    popupImg.classList.remove(...allFxClasses());
     popupImg.classList.add(anim.leave);
-    // Dacă nu vine din popstate, scoatem intrarea din history
-    if (!fromPopstate) {
+    if (!opts.fromPopstate) {
       history.back();
     }
-    popupImg.addEventListener('animationend', () => {
+    popupImg.addEventListener('animationend', function() {
       popup.classList.remove('active');
       popupImg.src = '';
       popupImg.alt = '';
       popupImg.classList.remove(anim.leave);
-      // Restabilește focus pe thumbnail-ul care a deschis popup-ul
+      currentGroup = [];
+      currentIndex = 0;
+      popupCounter.textContent = '';
       if (lastFocusedThumb && lastFocusedThumb.focus) {
         lastFocusedThumb.focus();
         lastFocusedThumb = null;
@@ -510,7 +575,7 @@ function initiale(name: string): string {
   }
 
   // Butonul fizic Back închide popup-ul dacă e deschis
-  window.addEventListener('popstate', (e) => {
+  window.addEventListener('popstate', function() {
     if (popup.classList.contains('active')) {
       closePopup(currentFx, { fromPopstate: true });
     }
@@ -519,23 +584,24 @@ function initiale(name: string): string {
   // ═══ GALLERY SLIDER — dots + mouse drag ═══
   let galleryDragged = false;
 
-  document.querySelectorAll('.gallery-thumb').forEach((thumb) => {
+  document.querySelectorAll('.gallery-thumb').forEach(function(thumb) {
     function activateThumb() {
-      const fx  = thumb.dataset.fx  ?? '1';
-      const src = thumb.dataset.src ?? '';
-      const alt = thumb.dataset.alt ?? '';
+      var fx     = thumb.dataset.fx     || '1';
+      var member = thumb.dataset.member || '';
+      // Determină indexul în grupul membrului
+      var siblings = Array.from(document.querySelectorAll('.gallery-thumb[data-member="' + CSS.escape(member) + '"]'));
+      var idx = siblings.indexOf(thumb);
       currentFx = fx;
-      openPopup(src, alt, fx);
+      openPopup(member, idx >= 0 ? idx : 0, fx);
     }
 
-    thumb.addEventListener('click', (e) => {
+    thumb.addEventListener('click', function(e) {
       e.stopPropagation();
       if (galleryDragged) { galleryDragged = false; return; }
       activateThumb();
     });
 
-    // Activare cu tastatura (Enter / Space) pentru accesibilitate
-    thumb.addEventListener('keydown', (e) => {
+    thumb.addEventListener('keydown', function(e) {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         e.stopPropagation();
@@ -544,16 +610,64 @@ function initiale(name: string): string {
     });
   });
 
-  popup.addEventListener('click', () => closePopup(currentFx));
+  // ── Navigare prev/next butoane ──
+  popupPrev.addEventListener('click', function(e) { e.stopPropagation(); navigateTo(-1); });
+  popupNext.addEventListener('click', function(e) { e.stopPropagation(); navigateTo(1); });
 
-  document.getElementById('gallery-popup-close').addEventListener('click', (e) => {
+  // ── Click pe backdrop închide ──
+  popup.addEventListener('click', function(e) {
+    // Nu închide dacă click pe butoanele de nav sau pe imagine
+    if (e.target.closest('.gallery-popup-nav') || e.target.closest('#gallery-popup-inner')) return;
+    closePopup(currentFx);
+  });
+
+  popupClose.addEventListener('click', function(e) {
     e.stopPropagation();
     closePopup(currentFx);
   });
 
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && popup.classList.contains('active')) closePopup(currentFx);
+  // ── Tastatură: Escape, Stânga, Dreapta ──
+  document.addEventListener('keydown', function(e) {
+    if (!popup.classList.contains('active')) return;
+    if (e.key === 'Escape') closePopup(currentFx);
+    if (e.key === 'ArrowLeft')  navigateTo(-1);
+    if (e.key === 'ArrowRight') navigateTo(1);
   });
+
+  // ── Touch swipe pe popup ──
+  (function() {
+    var touchStartX = 0;
+    var touchStartY = 0;
+    var swiping = false;
+
+    popup.addEventListener('touchstart', function(e) {
+      if (!popup.classList.contains('active')) return;
+      if (e.touches.length !== 1) return;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      swiping = true;
+    }, { passive: true });
+
+    popup.addEventListener('touchmove', function(e) {
+      if (!swiping) return;
+      // Previne scroll-ul paginii în fundal
+      var dx = Math.abs(e.touches[0].clientX - touchStartX);
+      var dy = Math.abs(e.touches[0].clientY - touchStartY);
+      if (dx > dy) e.preventDefault();
+    }, { passive: false });
+
+    popup.addEventListener('touchend', function(e) {
+      if (!swiping) return;
+      swiping = false;
+      var dx = e.changedTouches[0].clientX - touchStartX;
+      var dy = e.changedTouches[0].clientY - touchStartY;
+      // Swipe orizontal minim 40px și predominant orizontal
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+        if (dx < 0) navigateTo(1);   // swipe stânga → next
+        else        navigateTo(-1);  // swipe dreapta → prev
+      }
+    }, { passive: true });
+  })();
 
   // ═══ GALLERY SLIDER — dots + mouse drag ═══
   document.querySelectorAll('.mc-gallery-wrap').forEach((wrap) => {
@@ -701,6 +815,81 @@ function initiale(name: string): string {
       width: 48px;
       height: 48px;
       font-size: 1.4rem;
+    }
+  }
+
+  /* ── Butoane navigare Prev / Next ── */
+  .gallery-popup-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 200ms, transform 200ms, border-color 200ms, opacity 200ms;
+    pointer-events: auto;
+  }
+
+  .gallery-popup-prev { left: 0.75rem; }
+  .gallery-popup-next { right: 0.75rem; }
+
+  .gallery-popup-nav:hover,
+  .gallery-popup-nav:focus-visible {
+    background: rgba(0, 200, 255, 0.25);
+    border-color: rgba(0, 200, 255, 0.5);
+    transform: translateY(-50%) scale(1.1);
+    outline: none;
+  }
+
+  .gallery-popup-nav:disabled {
+    cursor: default;
+    pointer-events: none;
+  }
+
+  /* ── Counter (1 / N) ── */
+  .gallery-popup-counter {
+    position: absolute;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    padding: 0.3rem 0.9rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    pointer-events: none;
+    min-height: 1.5rem;
+  }
+
+  @media (max-width: 767px) {
+    .gallery-popup-nav {
+      width: 40px;
+      height: 40px;
+    }
+    .gallery-popup-prev { left: 0.4rem; }
+    .gallery-popup-next { right: 0.4rem; }
+    .gallery-popup-nav svg {
+      width: 20px;
+      height: 20px;
+    }
+    .gallery-popup-counter {
+      bottom: 0.75rem;
+      font-size: 0.78rem;
     }
   }
 

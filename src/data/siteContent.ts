@@ -20,6 +20,7 @@ export const siteContent = {
     youtube: 'https://www.youtube.com/@FlorentinaPanaPitesti',
     facebook: 'https://www.facebook.com/florentinapanaofficial/?locale=ro_RO',
     instagram: 'https://www.instagram.com/florentinaformatie/',
+    tiktok: '',
   },
   navigation: [
     { href: '#acasa', label: 'Acasă' },

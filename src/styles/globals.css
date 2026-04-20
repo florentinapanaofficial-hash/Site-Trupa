@@ -1040,29 +1040,33 @@ html::-webkit-scrollbar-thumb:hover {
 }
 
 /* ── Onboarding: puls subtil pe iconița hamburger ── */
-.pulse-icon {
-  animation: icon-pulse 1.5s ease-in-out 3s 3;
+.pulse-icon.pulse-animation {
+  animation: menuPulse 1.8s ease-in-out infinite;
 }
 
-@keyframes icon-pulse {
-  0% {
+@keyframes menuPulse {
+
+  0%,
+  100% {
     transform: scale(1);
-    filter: drop-shadow(0 0 0 rgba(212, 175, 55, 0));
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4);
   }
 
   50% {
-    transform: scale(1.2);
-    filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.8));
-  }
-
-  100% {
-    transform: scale(1);
-    filter: drop-shadow(0 0 0 rgba(212, 175, 55, 0));
+    transform: scale(1.12);
+    box-shadow: 0 0 12px 4px rgba(212, 175, 55, 0.35);
   }
 }
 
+/* Oprește pulsul când meniul e deschis */
 .top-header.menu-open .pulse-icon {
-  animation: none;
+  animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse-icon.pulse-animation {
+    animation: none;
+  }
 }
 
 /* ── Mobile Menu Backdrop ── */
