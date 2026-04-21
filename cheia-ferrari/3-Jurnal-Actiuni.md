@@ -175,3 +175,65 @@ Axate pe cuvântul-cheie principal **„formație nuntă Pitești / Argeș”**:
 | Commit + push pe `origin/main` | ✅ |
 
 **Sesiune închisă cu succes. Site-ul și canalul YouTube funcționează acum ca un singur sistem de achiziție — din fanul de sârbă, în maximum 3 click-uri, într-o conversație WhatsApp pentru Early Booking 2026-2027.** 🏎️💨
+
+---
+
+## 🏁 22 aprilie 2026 (sesiunea 2) — Sistemul de Galerie „Drop & Go”
+
+**Obiectiv:** eliminăm complet pasul manual „adaugă imagine în JSON / importă în componentă” — mireasa pune pozele în folder, ele apar pe site la următorul build.
+
+### Structură nouă
+
+```
+src/assets/imagini-automate/
+├── README.md                        (instrucțiuni pentru autor)
+├── membri/
+│   ├── florentina-pana/.gitkeep
+│   └── catalin/.gitkeep
+└── galerie-generala/.gitkeep
+```
+
+### Componentă nouă
+
+[src/components/GalerieAutomata.astro](src/components/GalerieAutomata.astro) — un singur fișier cu toată magia:
+
+- **Props:**
+  - `caleFolder` (obligatoriu) — ex: `membri/florentina-pana`.
+  - `titlu?` — titlu opțional deasupra galeriei.
+  - `altPrefix?` — prefix pentru alt text, concatenat cu numele fișierului.
+  - `limita?` — număr maxim de imagini afișate.
+- **Mecanism:**
+  - `import.meta.glob('/src/assets/imagini-automate/**/*.{jpeg,jpg,png,gif,...}', { eager: true })` — scanare în timp de build a TUTUROR imaginilor.
+  - Filtrare dinamică prin `Object.entries().filter(([cale]) => cale.startsWith(prefix))` unde `prefix = '/src/assets/imagini-automate/<caleFolder>/'`.
+  - Sortare alfabetică (`localeCompare`) pentru ordine predictibilă.
+- **Optimizare randare:**
+  - `<Image />` din `astro:assets` cu `widths={[400, 800, 1200]}`, `sizes` responsive, `format="webp"`, `quality={82}`, `loading="lazy"`, `decoding="async"`.
+  - Alt text generat automat din numele fișierului (dash-uri → spații).
+- **UI/UX:**
+  - Grid `auto-fill, minmax(260px, 1fr)` — responsive fără media queries.
+  - `aspect-ratio: 4/3`, `object-fit: cover` — consistență vizuală.
+  - Hover lift + shadow (animație 0.4s).
+  - Mesaj prietenos când folderul e gol („Nicio imagine încă în `<cale>`…”).
+
+### Utilizare
+
+```astro
+---
+import GalerieAutomata from '../components/GalerieAutomata.astro';
+---
+<GalerieAutomata caleFolder="membri/florentina-pana" titlu="Florentina pe scenă" />
+<GalerieAutomata caleFolder="galerie-generala" limita={12} />
+```
+
+### Validare
+
+- ✅ `npx astro check` → **0 / 0 / 0** (58 fișiere, inclusiv componenta nouă).
+- ✅ Zero dependințe externe — totul stă pe capabilitățile native Astro + Vite.
+- ✅ Backward compatible — nu afectează galeriile existente ([PhotoGallery.astro](src/components/PhotoGallery.astro), [CoupleGallery.astro](src/components/CoupleGallery.astro)).
+
+### Ce câștigi concret
+
+1. **Zero cod** pentru adăugare poze — drag & drop în folder, commit, gata.
+2. **Optimizare automată** — Astro generează variante WebP responsive la build.
+3. **SEO-friendly** — alt text automat, lazy loading, dimensiuni corecte (Core Web Vitals curat).
+4. **Evoluție viitoare** — poți crea rapid galerii noi doar punând un folder (ex: `membri/marius`, `evenimente/2026-primavara`).
