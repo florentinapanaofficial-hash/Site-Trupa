@@ -172,9 +172,30 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
     const headerEl = document.querySelector('[data-top-header]');
     const menuToggle = document.querySelector('[data-top-menu-toggle]');
     const menuBackdrop = document.querySelector('[data-menu-backdrop]');
-    const isMobileViewport = () => window.matchMedia('(max-width: 767px)').matches;
+    const mobileMq = window.matchMedia('(max-width: 767px)');
+    const isMobileViewport = () => mobileMq.matches;
+    const desktopNav = document.querySelector('.nav-desktop-bar');
+    const mobileNav = document.querySelector('.nav-mobile-grid');
+    const topMenuNav = document.querySelector('#top-menu-panel nav');
     let lastScrollY = window.scrollY;
     const MENU_KEY = 'top-menu-open';
+    let inertRaf = 0;
+    let cachedHeaderSpyOffset = 0;
+    let cachedOrderedSections = [];
+
+    const recalcHeaderSpyOffset = () => {
+      cachedHeaderSpyOffset = (headerEl?.offsetHeight ?? 0) + 8;
+    };
+
+    const recalcSectionTops = () => {
+      if (!hasSectionMap) return;
+      cachedOrderedSections = [...uniqueSections]
+        .map((item) => ({
+          ...item,
+          top: item.section.getBoundingClientRect().top + window.scrollY,
+        }))
+        .sort((a, b) => a.top - b.top);
+    };
 
     const syncTopMenuBodyClass = (isOpen) => {
       document.body.classList.toggle('top-menu-expanded', Boolean(isOpen));
@@ -182,16 +203,17 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
 
       /* Marchează nav-ul inactiv ca inert (scos din tab order + accesibilitate)
          pentru a nu încărca DOM-ul cu elemente duplicate desktop/mobil */
-      const desktopNav = document.querySelector('.nav-desktop-bar');
-      const mobileNav  = document.querySelector('.nav-mobile-grid');
       if (desktopNav && mobileNav) {
-        if (isMobileViewport()) {
-          desktopNav.inert = true;
-          mobileNav.inert  = false;
-        } else {
-          desktopNav.inert = false;
-          mobileNav.inert  = true;
-        }
+        cancelAnimationFrame(inertRaf);
+        inertRaf = requestAnimationFrame(() => {
+          if (isMobileViewport()) {
+            desktopNav.inert = true;
+            mobileNav.inert = false;
+          } else {
+            desktopNav.inert = false;
+            mobileNav.inert = true;
+          }
+        });
       }
     };
 
@@ -214,6 +236,7 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
     };
 
     syncTopMenuBodyClass(false);
+    recalcHeaderSpyOffset();
 
     // Pe mobil, meniul pornește ÎNCHIS. Pe desktop, restaurăm starea din sessionStorage.
     const wasOpen = sessionStorage.getItem(MENU_KEY) === 'true';
@@ -233,8 +256,10 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
         if (willOpen) {
           openMenu();
           menuOpenScrollY = window.scrollY;
+          requestAnimationFrame(recalcHeaderSpyOffset);
         } else {
           closeMenu();
+          requestAnimationFrame(recalcHeaderSpyOffset);
         }
       });
 
@@ -260,6 +285,8 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       });
 
       window.addEventListener('resize', () => {
+        recalcHeaderSpyOffset();
+        recalcSectionTops();
         if (!headerEl.classList.contains('menu-open')) return;
         syncTopMenuBodyClass(true);
       });
@@ -373,10 +400,9 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       });
 
       // has-active pe containerul nav din top-menu-panel
-      const topNav = document.querySelector('#top-menu-panel nav');
-      if (topNav) {
+      if (topMenuNav) {
         const anyActive = routeLinkMap.some((item) => item.pathname === pathname);
-        topNav.classList.toggle('has-active', anyActive);
+        topMenuNav.classList.toggle('has-active', anyActive);
       }
     };
 
@@ -434,13 +460,11 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       lastActiveHref = activeHref;
 
       // has-active pe containerul nav din top-menu-panel
-      const topNav = document.querySelector('#top-menu-panel nav');
-      if (topNav) topNav.classList.toggle('has-active', Boolean(activeHref));
+      if (topMenuNav) topMenuNav.classList.toggle('has-active', Boolean(activeHref));
     };
 
     const getHeaderSpyOffset = () => {
-      const headerHeight = headerEl?.getBoundingClientRect().height ?? 0;
-      return headerHeight + 8;
+      return cachedHeaderSpyOffset;
     };
 
     const hasReachedPendingSection = (marker, orderedSections, targetHref) => {
@@ -458,12 +482,8 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       if (!hasSectionMap) return;
 
       const marker = window.scrollY + getHeaderSpyOffset();
-      const orderedSections = [...uniqueSections]
-        .map((item) => ({
-          ...item,
-          top: item.section.getBoundingClientRect().top + window.scrollY,
-        }))
-        .sort((a, b) => a.top - b.top);
+      const orderedSections = cachedOrderedSections;
+      if (!orderedSections.length) return;
 
       if (pendingActiveHref) {
         const reachedPending = hasReachedPendingSection(marker, orderedSections, pendingActiveHref);
@@ -551,8 +571,15 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
     setActiveByPathname(currentPathname);
 
     if (hasSectionMap) {
+      recalcSectionTops();
       getActiveByScroll();
     }
+
+    window.addEventListener('load', () => {
+      recalcHeaderSpyOffset();
+      recalcSectionTops();
+      getActiveByScroll();
+    }, { once: true });
   };
 
   function deferredInit() {
