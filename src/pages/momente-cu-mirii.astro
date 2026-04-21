@@ -4,8 +4,7 @@ import siteContent from '../data/siteContent.json';
 import BackButton from '../components/BackButton.astro';
 import { query as dbQuery } from '../lib/db.js';
 
-const { seo, realMoments, brand } = siteContent;
-const isDevelopment = import.meta.env.DEV;
+const { realMoments, brand } = siteContent;
 
 export const prerender = false;
 
@@ -31,56 +30,6 @@ try {
 }
 
 const hasDbMomentPhotos = dbMomentPhotos.length > 0;
-
-const deriveAudioUrlFromImage = (imageUrl: string) => {
-  const cleanUrl = String(imageUrl || '').split('?')[0];
-  const fileName = cleanUrl.split('/').pop() ?? '';
-  const baseName = fileName.replace(/\.[^.]+$/, '');
-
-  if (!baseName) return '';
-  return `/uploads/audio/${baseName}.mp3`;
-};
-
-const albumSourcePhotos = hasDbMomentPhotos
-  ? dbMomentPhotos.map((photo) => ({
-      title: photo.titlu,
-      image: photo.imagine_url,
-      caption: `${photo.titlu} • ${new Date(photo.data_upload).toLocaleDateString('ro-RO')}`,
-      audio: deriveAudioUrlFromImage(photo.imagine_url),
-      quote: '',
-    }))
-  : realMoments.events.map((item) => ({
-      title: item.couple,
-      image: item.image,
-      caption: `${item.couple} • ${item.city} • ${item.date}`,
-      audio: item.audioUrl ?? '',
-      quote: item.coupleQuote ?? '',
-    }));
-
-const minimumPhotosForPreview = 12;
-const demoPhotos = Array.from({ length: minimumPhotosForPreview }, (_, index) => {
-  const photoNumber = index + 1;
-  return {
-    title: `Demo Album ${photoNumber}`,
-    image: `https://placehold.co/1600x900/${photoNumber % 2 === 0 ? '1d2e5f' : '293d78'}/f1f7ff?text=Demo+${photoNumber}`,
-    caption: `Cadru demo ${photoNumber} • verificare paginare`,
-    audio: '',
-    quote: '',
-  };
-});
-
-const paddedAlbumPhotos =
-  albumSourcePhotos.length > 0
-    ? albumSourcePhotos
-    : [...realMoments.events.map((item) => ({
-        title: item.couple,
-        image: item.image,
-        caption: `${item.couple} • ${item.city} • ${item.date}`,
-        audio: item.audioUrl ?? '',
-        quote: item.coupleQuote ?? '',
-      })), ...demoPhotos];
-
-const albumPhotos = paddedAlbumPhotos.slice(0, 60);
 
 const SITE_FALLBACK = 'https://florentinapanaofficial.ro';
 const site = Astro.site?.toString().replace(/\/$/, '') ?? SITE_FALLBACK;
@@ -141,10 +90,14 @@ const eventsJsonLd = realMoments.events
 <BaseLayout title={`Momente cu Mirii — Album Foto Nunți Pitești, Argeș | ${brand.name}`} description="Album foto cu mirii și trupa la nunți în Pitești, Argeș și Muntenia. Formație nuntă profesionistă — cele mai frumoase momente live de la evenimentele Formației Florentina Pană.">
   <Fragment slot="head">
     {eventsJsonLd.map((eventSchema: any) => (
-      <script type="application/ld+json" set:html={JSON.stringify(eventSchema)} />
+      <script is:inline type="application/ld+json" set:html={JSON.stringify(eventSchema)} />
     ))}
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&display=swap" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&display=swap" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&display=swap" data-async-css />
+    <script is:inline>
+      // Activează CSS-ul asincron după ce s-a încărcat — echivalent cu media="print" onload="this.media='all'"
+      document.querySelectorAll('link[data-async-css]').forEach((l) => { l.media = 'all'; });
+    </script>
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&display=swap" /></noscript>
   </Fragment>
   <!-- Overlay cer la apus — inutilă în afara dialogului, mutată înăuntru -->
@@ -342,7 +295,7 @@ const eventsJsonLd = realMoments.events
     }
 
     const playDemoSound = () => {
-      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      const AudioContextClass = window.AudioContext || /** @type {any} */ (window).webkitAudioContext;
       if (!AudioContextClass) return;
 
       const audioContext = new AudioContextClass();
@@ -481,7 +434,6 @@ const eventsJsonLd = realMoments.events
     let ptWindT   = Math.random() * 100;
     let ptWindX   = 0;   // curent de fond (lent, sinusoidal)
     let ptGustX   = 0;   // rafală bruscă
-    let ptGustDec = 0;   // decay-ul rafalei
 
     class Petal2D {
       constructor(cW, cH) {
@@ -590,7 +542,7 @@ const eventsJsonLd = realMoments.events
       }
     }
 
-    const ptFrame = (ts) => {
+    const ptFrame = (_ts) => {
       if (!petalsCanvas) return;
       const ctx = petalsCanvas.getContext('2d');
       if (!ctx) return;
@@ -755,56 +707,6 @@ const eventsJsonLd = realMoments.events
       lockPageScrollForLightbox();
       lightbox.showModal();
       startPetals();
-    };
-
-    const createAlbumCard = (photo, animationDelay = 0) => {
-      const frame = document.createElement('article');
-      frame.className = 'album-photo-frame gallery-stage-fade';
-      frame.style.animationDelay = `${animationDelay}ms`;
-
-      const trigger = document.createElement('button');
-      trigger.type = 'button';
-      trigger.className = 'moment-photo-trigger';
-      trigger.setAttribute('data-lightbox-src', String(photo.image ?? ''));
-      trigger.setAttribute('data-lightbox-alt', String(photo.title ?? 'Fotografie eveniment'));
-      trigger.setAttribute('data-lightbox-caption', String(photo.caption ?? ''));
-      trigger.setAttribute('data-lightbox-audio', String(photo.audio ?? ''));
-      trigger.setAttribute('data-lightbox-quote', String(photo.quote ?? ''));
-      trigger.setAttribute('aria-label', `Deschide fotografia ${String(photo.title ?? 'eveniment')}`);
-
-      const image = document.createElement('img');
-      image.src = String(photo.image ?? '');
-      image.alt = String(photo.title ?? 'Fotografie eveniment');
-      image.loading = 'lazy';
-      image.className = 'album-photo';
-
-      const overlay = document.createElement('div');
-      overlay.className = 'album-photo-overlay';
-      overlay.setAttribute('aria-hidden', 'true');
-
-      const overlayTitle = document.createElement('p');
-      overlayTitle.className = 'album-photo-overlay-title';
-      overlayTitle.textContent = String(photo.title ?? 'Moment special');
-
-      const captionStr = String(photo.caption ?? '');
-      const metaParts = captionStr.split('\u2022').slice(1).join('\u2022').trim();
-      const overlayMeta = document.createElement('span');
-      overlayMeta.className = 'album-photo-overlay-meta';
-      overlayMeta.textContent = metaParts || captionStr;
-
-      overlay.append(overlayTitle, overlayMeta);
-
-      if (photo.audio) {
-        const audioPill = document.createElement('span');
-        audioPill.className = 'album-audio-pill';
-        audioPill.setAttribute('aria-hidden', 'true');
-        audioPill.textContent = '\u25b6 Testimonial audio';
-        overlay.append(audioPill);
-      }
-
-      trigger.append(image, overlay);
-      frame.append(trigger);
-      return frame;
     };
 
     const normalizeSearchText = (value) =>
@@ -1508,7 +1410,7 @@ const eventsJsonLd = realMoments.events
 
       const bgInit = () => {
         if (bgCtx) return true;
-        const AC = window.AudioContext || window.webkitAudioContext;
+        const AC = window.AudioContext || /** @type {any} */ (window).webkitAudioContext;
         if (!AC) return false;
         bgCtx = new AC();
         bgMaster = bgCtx.createGain();

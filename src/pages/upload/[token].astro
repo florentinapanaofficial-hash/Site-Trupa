@@ -215,7 +215,7 @@ const hasDriveLink = !!couple.driveUploadUrl;
           var fd = new FormData(form);
 
           fetch('/api/couple-upload', { method: 'POST', body: fd })
-            .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+            .then(async function (res) { var data = await res.json(); return { ok: res.ok, data: data }; })
             .then(function (result) {
               if (statusEl) {
                 statusEl.hidden = false;

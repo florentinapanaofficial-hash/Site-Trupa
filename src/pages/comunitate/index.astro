@@ -68,7 +68,7 @@ const schemas = [collectionPageLd, aggregateRatingLd];
 <BaseLayout title={pageTitle} description={pageDescription} ogImage={seo.ogImage}>
   <Fragment slot="head">
     {schemas.map((schema) => (
-      <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+      <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
     ))}
   </Fragment>
 

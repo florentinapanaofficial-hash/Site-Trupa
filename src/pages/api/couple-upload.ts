@@ -120,7 +120,7 @@ export const POST: APIRoute = async ({ request }) => {
             return json({ error: 'Recomandarea trebuie să aibă între 10 și 5000 de caractere.' }, 400);
         }
         const rawSource = typeof formData.get('source') === 'string' ? String(formData.get('source')) : '';
-        const source = sanitize(rawSource);
+        sanitize(rawSource);
         console.log(`[couple-upload] Recommendation from ${couple.names}: ${rec.substring(0, 100)}...`);
         return json({ success: true, message: 'Recomandarea a fost trimisă! Mulțumim frumos!' }, 200);
     }

@@ -5,7 +5,7 @@ import seo from '../data/seo-content.json';
 import BackButton from '../components/BackButton.astro';
 import ZoneAcoperite from '../components/ZoneAcoperite.astro';
 
-const { contact, brand } = siteContent;
+const { contact } = siteContent;
 const contactSeo = seo.contact;
 
 const whatsappNumber = contact.phoneRaw.replace(/\D/g, '');
@@ -169,7 +169,7 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
   </section>
 
   <Fragment slot="head">
-    <script type="application/ld+json" set:html={JSON.stringify(seo.schema)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(seo.schema)} />
   </Fragment>
 
   <script is:inline>

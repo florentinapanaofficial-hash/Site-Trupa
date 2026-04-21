@@ -1,10 +1,9 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import YoutubeEmbed from '../../components/YoutubeEmbed.astro';
 import siteContent from '../../data/siteContent.json';
 import BackButton from '../../components/BackButton.astro';
 
-const { seo, brand } = siteContent;
+const { brand } = siteContent;
 const personJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Person',
@@ -19,7 +18,7 @@ const personJsonLd = {
   description="Prezentare colaborator Țambal pentru momente speciale live în cadrul evenimentelor."
 >
   <Fragment slot="head">
-    <script type="application/ld+json" set:html={JSON.stringify(personJsonLd)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(personJsonLd)} />
   </Fragment>
   <section class="collab-page" aria-labelledby="collab-title">
     <div class="collab-inner">

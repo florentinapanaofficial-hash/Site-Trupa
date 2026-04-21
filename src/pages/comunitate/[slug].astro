@@ -29,8 +29,6 @@ interface Couple {
   uploadToken: string;
 }
 
-const couples = couplesData.couples as Couple[];
-
 export function getStaticPaths() {
   return (couplesData.couples as Couple[]).map((couple) => ({
     params: { slug: couple.slug },
@@ -40,7 +38,7 @@ export function getStaticPaths() {
 
 const { couple } = Astro.props as { couple: Couple };
 
-const { brand, contact } = siteContent;
+const { brand } = siteContent;
 
 const youtubeId = couple.danceVideoUrl
   ? new URL(couple.danceVideoUrl).searchParams.get('v') || ''
@@ -164,8 +162,8 @@ const reviewLd = {
     )}
 
     <!-- JSON-LD -->
-    <script type="application/ld+json" set:html={JSON.stringify(eventLd)} />
-    <script type="application/ld+json" set:html={JSON.stringify(reviewLd)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(eventLd)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(reviewLd)} />
   </main>
 </BaseLayout>
 

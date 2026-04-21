@@ -33,7 +33,7 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
 <BaseLayout title={acasa.meta.title} description={acasa.meta.description} ogImage={siteContent.seo.ogImage}>
   <Fragment slot="head">
     <link rel="preload" as="image" href={optimizedHero.src} type="image/webp" fetchpriority="high" />
-    <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>
 
   {/* ═══════════════════════════════════════════

@@ -7,7 +7,7 @@ import BackButton from '../components/BackButton.astro';
 
 export const prerender = true;
 
-const { brand, seo, contact } = siteContent;
+const { brand, seo } = siteContent;
 const couples = couplesData.couples;
 
 const posts = [...((blogPostsRaw as any).items ?? [])]
@@ -60,7 +60,6 @@ const SITE = 'https://www.florentinapanaofficial.ro';
     <div class="pub-grid" id="pubGrid">
       {posts.map((post) => {
         const linkedCouple = coupleByBlogSlug.get(post.slug);
-        const shareText = encodeURIComponent(`${post.title} — ${brand.name}`);
         const shareUrl = encodeURIComponent(`${SITE}/blog/${post.slug}/`);
 
         return (

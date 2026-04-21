@@ -68,7 +68,7 @@ const localBusinessLd = {
 
 <BaseLayout title={SEO_TITLE} description={SEO_DESC}>
   <Fragment slot="head">
-    <script type="application/ld+json" set:html={JSON.stringify(localBusinessLd)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(localBusinessLd)} />
   </Fragment>
 
   <section class="section-container py-16">

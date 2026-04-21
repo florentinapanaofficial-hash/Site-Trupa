@@ -33,8 +33,6 @@ const ogImage = rawOgImage.startsWith('http') ? rawOgImage : `${site}${rawOgImag
 const ga4Id = import.meta.env.PUBLIC_GA4_ID;
 const gscVerification = import.meta.env.PUBLIC_GSC_VERIFICATION;
 
-const { navigation } = siteContent;
-
 const jsonLd = {
   ...seoContent.schema,
   url: site || seoContent.schema.url,
@@ -79,7 +77,6 @@ const localBusinessLd = {
 
 const isHomePage = Astro.url.pathname === '/';
 const hasYouTube = ['/galerie-video', '/aparitii-tv', '/video/', '/colaboratori/', '/comunitate', '/live'].some(p => Astro.url.pathname.startsWith(p));
-const sectionLink = (anchor: string) => (isHomePage ? anchor : `/${anchor}`);
 
 // JSON-LD: WebPage — fiecare pagină primește schema WebPage
 const webPageLd = {
@@ -238,10 +235,10 @@ const mobileNavAllItems = [
     <link rel="preload" href="/fonts/oswald-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/oswald-latin-ext.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="icon" type="image/svg+xml" href="/images/logo-fp-stage.svg" />
-    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
-    {isHomePage && <script type="application/ld+json" set:html={JSON.stringify(localBusinessLd)} />}
-    <script type="application/ld+json" set:html={JSON.stringify(webPageLd)} />
-    {!isHomePage && <script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />}
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    {isHomePage && <script is:inline type="application/ld+json" set:html={JSON.stringify(localBusinessLd)} />}
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(webPageLd)} />
+    {!isHomePage && <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />}
     <slot name="head" />
     {/* GA4 NU se încarcă în <head> — se injectează dinamic DUPĂ consimțământul
         utilizatorului prin CookieBanner, conform Rec. 30 & 32 RGPD / ePrivacy */}

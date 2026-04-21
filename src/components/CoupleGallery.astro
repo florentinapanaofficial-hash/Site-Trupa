@@ -47,7 +47,7 @@ const { photos, names, accentColor } = Astro.props;
   </div>
 </dialog>
 
-<script define:vars={{ photos }}>
+<script is:inline define:vars={{ photos }}>
   if (photos.length > 0) {
     const dialog = document.getElementById('coupleLightbox');
     const img = dialog?.querySelector('.couple-lightbox__img');

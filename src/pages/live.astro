@@ -1,9 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import siteContent from '../data/siteContent.json';
 import BackButton from '../components/BackButton.astro';
-
-const { contact } = siteContent;
 
 const YOUTUBE_CHANNEL_ID = 'UCNi3X-Qm3V4aaOAFSOlzHew';
 const liveEmbedUrl = `https://www.youtube.com/embed/live_stream?channel=${YOUTUBE_CHANNEL_ID}`;
@@ -93,7 +90,6 @@ const liveEmbedUrl = `https://www.youtube.com/embed/live_stream?channel=${YOUTUB
               src={liveEmbedUrl}
               title="Live Stream — Formația Florentina Pană"
               class="absolute inset-0 h-full w-full"
-              frameborder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               referrerpolicy="strict-origin-when-cross-origin"
               allowfullscreen

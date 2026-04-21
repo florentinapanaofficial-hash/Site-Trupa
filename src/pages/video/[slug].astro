@@ -57,7 +57,7 @@ const videoJsonLd = {
 
 <BaseLayout title={pageTitle} description={pageDescription} ogImage={ogImage} ogType="video.other">
   <Fragment slot="head">
-    <script type="application/ld+json" set:html={JSON.stringify(videoJsonLd)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(videoJsonLd)} />
   </Fragment>
   <section class="section-container py-16">
     <div class="mb-8"><BackButton href="/galerie-video/" label="Galerie Video" /></div>
