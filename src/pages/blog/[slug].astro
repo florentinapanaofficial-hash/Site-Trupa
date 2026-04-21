@@ -10,6 +10,18 @@ interface ContentBlock {
   src?: string;
   caption?: string;
   items?: { label: string; href: string }[];
+  // CTA block
+  label?: string;
+  ctaText?: string;
+  ctaHref?: string;
+  ctaSecondaryText?: string;
+  ctaSecondaryHref?: string;
+  variant?: 'whatsapp' | 'primary';
+}
+
+interface FaqItem {
+  q: string;
+  a: string;
 }
 
 interface Post {
@@ -24,6 +36,7 @@ interface Post {
   date: string;
   author: string;
   content: ContentBlock[];
+  faq?: FaqItem[];
 }
 
 export const prerender = true;
@@ -81,6 +94,16 @@ const articleJsonLd = {
   mainEntityOfPage: { '@type': 'WebPage', '@id': postCanonical },
   publisher: { '@type': 'Organization', name: siteContent.brand.name, url: siteBase },
 };
+
+const faqJsonLd = post.faq && post.faq.length > 0 ? {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: post.faq.map((item) => ({
+    '@type': 'Question',
+    name: item.q,
+    acceptedAnswer: { '@type': 'Answer', text: item.a },
+  })),
+} : null;
 ---
 
 <BaseLayout
@@ -93,6 +116,7 @@ const articleJsonLd = {
     <meta property="article:published_time" content={post.date} />
     <meta property="article:author" content={post.author} />
     <script is:inline type="application/ld+json" set:html={JSON.stringify(articleJsonLd)} />
+    {faqJsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />}
   </Fragment>
   <section class="bp-page">
 
@@ -162,8 +186,47 @@ const articleJsonLd = {
             </nav>
           );
         }
+        if (block.type === 'cta') {
+          const isWhatsApp = block.variant === 'whatsapp';
+          return (
+            <aside class={`bp-inline-cta${isWhatsApp ? ' bp-inline-cta--wa' : ''}`} role="complementary">
+              {block.label && <p class="bp-inline-cta-label">{block.label}</p>}
+              {block.text && <p class="bp-inline-cta-text">{block.text}</p>}
+              <div class="bp-inline-cta-actions">
+                {block.ctaHref && block.ctaText && (
+                  <a
+                    href={block.ctaHref}
+                    class={isWhatsApp ? 'btn-whatsapp' : 'btn-solid'}
+                    target={block.ctaHref.startsWith('http') ? '_blank' : undefined}
+                    rel={block.ctaHref.startsWith('http') ? 'noopener noreferrer' : undefined}
+                  >
+                    {isWhatsApp && <span aria-hidden="true" class="btn-whatsapp-icon">💬</span>}
+                    {block.ctaText}
+                  </a>
+                )}
+                {block.ctaSecondaryHref && block.ctaSecondaryText && (
+                  <a href={block.ctaSecondaryHref} class="btn-outline">{block.ctaSecondaryText}</a>
+                )}
+              </div>
+            </aside>
+          );
+        }
         return null;
       })}
+
+      {post.faq && post.faq.length > 0 && (
+        <section class="bp-faq" aria-labelledby="bp-faq-title">
+          <h2 id="bp-faq-title" class="bp-h2">Întrebări frecvente despre prețuri și rezervare</h2>
+          <div class="bp-faq-list">
+            {post.faq.map((item) => (
+              <details class="bp-faq-item">
+                <summary class="bp-faq-q">{item.q}</summary>
+                <p class="bp-faq-a">{item.a}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+      )}
     </article>
 
     {/* ── Navigare între articole ── */}
@@ -446,5 +509,116 @@ const articleJsonLd = {
     flex-wrap: wrap;
     gap: 0.85rem;
     justify-content: center;
+  }
+
+  /* ── Inline CTA (WhatsApp / primary) ── */
+  .bp-inline-cta {
+    margin: 2.25rem auto;
+    max-width: 720px;
+    padding: 1.75rem 1.5rem;
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(245,166,35,0.10), rgba(232,50,90,0.08));
+    border: 1px solid rgba(245,166,35,0.35);
+    text-align: center;
+  }
+  .bp-inline-cta--wa {
+    background: linear-gradient(135deg, rgba(37,211,102,0.14), rgba(18,140,126,0.10));
+    border-color: rgba(37,211,102,0.45);
+  }
+  .bp-inline-cta-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 0.45rem;
+  }
+  .bp-inline-cta-text {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(1.15rem, 2.2vw, 1.5rem);
+    font-weight: 600;
+    color: var(--title);
+    margin: 0 0 1.25rem;
+    line-height: 1.35;
+  }
+  .bp-inline-cta-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+  }
+  .btn-whatsapp {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.85rem 1.6rem;
+    border-radius: 9999px;
+    background: #25D366;
+    color: #0a2a18;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 6px 18px rgba(37,211,102,0.35);
+    transition: transform 160ms ease, box-shadow 160ms ease;
+  }
+  .btn-whatsapp:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 26px rgba(37,211,102,0.45);
+  }
+  .btn-whatsapp-icon { font-size: 1.15rem; line-height: 1; }
+
+  /* ── FAQ ── */
+  .bp-faq {
+    max-width: 720px;
+    margin: 3rem auto 1rem;
+    padding-inline: 1.5rem;
+  }
+  .bp-faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+  .bp-faq-item {
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 14px;
+    background: rgba(255,255,255,0.03);
+    padding: 0.15rem 1.1rem;
+    transition: border-color 180ms ease, background 180ms ease;
+  }
+  .bp-faq-item[open] {
+    border-color: rgba(245,166,35,0.45);
+    background: rgba(245,166,35,0.06);
+  }
+  .bp-faq-q {
+    cursor: pointer;
+    list-style: none;
+    padding: 0.95rem 0;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 1.02rem;
+    color: var(--title);
+    position: relative;
+    padding-right: 2rem;
+  }
+  .bp-faq-q::-webkit-details-marker { display: none; }
+  .bp-faq-q::after {
+    content: '+';
+    position: absolute;
+    right: 0.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.4rem;
+    color: var(--gold);
+    transition: transform 180ms ease;
+  }
+  .bp-faq-item[open] .bp-faq-q::after {
+    content: '−';
+  }
+  .bp-faq-a {
+    margin: 0 0 1rem;
+    padding-top: 0.25rem;
+    color: var(--muted);
+    font-size: 0.98rem;
+    line-height: 1.65;
   }
 </style>

@@ -79,3 +79,64 @@ Axate pe cuvântul-cheie principal **„formație nuntă Pitești / Argeș”**:
 - ✅ `npx astro check` → **0 / 0 / 0**
 - ✅ Commit automat: `92b68b1`
 - ✅ Tracker + Jurnal actualizate
+
+---
+
+## 🏁 22 aprilie 2026 — Articol SEO „Preț Formație Nuntă 2026-2027”
+
+**Obiectiv:** atacarea keyword-ului `formatie nunta pret` (poziție GSC 14.5, CTR 1.67%) + variante locale → conversie WhatsApp Early Booking.
+
+### Fișiere create/modificate
+
+- **NOU** intrare în [src/data/blogPosts.json](src/data/blogPosts.json) — slug `pret-formatie-nunta-2026`, articol de ~9 min citire, 16 blocuri de conținut + 6 întrebări FAQ.
+- **EXTINS** [src/pages/blog/[slug].astro](src/pages/blog/%5Bslug%5D.astro):
+  - Extins `interface ContentBlock` cu câmpuri `label`, `ctaText`, `ctaHref`, `ctaSecondaryText`, `ctaSecondaryHref`, `variant`.
+  - Adăugat `interface FaqItem` + câmp opțional `faq?` în `Post`.
+  - Nou renderer pentru `block.type === 'cta'` — variantă `whatsapp` (buton verde) + `primary` (buton gold).
+  - Secțiune `<section class="bp-faq">` cu `<details>` accesibile la finalul articolului (se afișează doar când postul are `faq`).
+  - JSON-LD `FAQPage` emis condiționat în `<head>` (prin `<Fragment slot="head">`) — pe lângă JSON-LD `Article` existent.
+  - CSS nou: `.bp-inline-cta`, `.btn-whatsapp`, `.bp-faq`, `.bp-faq-item` cu animații open/close.
+
+### Logica SEO aplicată
+
+**Keyword targeting (densitate naturală, nu spam):**
+- `formație nuntă Pitești` — în title + H1, prima secțiune și CTA-uri.
+- `preț formație nuntă 2026` — în title, excerpt, 3 paragrafe și FAQ #1, #2, #3.
+- `muzică evenimente Argeș` — în secțiunea „Ce plătești, de fapt”.
+- `formație nuntă prețuri` (variante: `formatie nunta preturi`) — în secțiunea Early Booking.
+- `formație nuntă Argeș` — în secțiunile despre risc și FAQ #4.
+
+**Structură E-E-A-T (Experience, Expertise, Authoritativeness, Trust):**
+- Tonul sincer („fără vânzare agresivă, fără promisiuni goale”) → Trust.
+- Mențiuni de experiență concretă 15 ani + săli reale (Ramada, Star Plaza, Metropol Băbana, Garden Resort) → Expertise + Authoritativeness.
+- Secțiune „3 întrebări corecte de pus oricărei formații” — utilitate pentru cititor chiar dacă alege competitorul → semnal de autenticitate.
+
+**Structured Data:**
+- Schema `Article` (deja existent în renderer) — headline, author, publisher, image, datePublished.
+- Schema `FAQPage` NOU — 6 întrebări-răspuns, eligibilă pentru rich snippets în SERP (featured FAQ accordion).
+- Schema `LocalBusiness` + `WebPage` + `BreadcrumbList` — moștenite din [BaseLayout.astro](src/layouts/BaseLayout.astro).
+
+**Call-to-Action — design persuasiv:**
+- 2 CTA-uri WhatsApp inline în articol (unul după secțiunea Early Booking, unul înainte de FAQ) cu textul exact cerut: **„Verifică disponibilitatea pentru 2026”**.
+- URL WhatsApp prefilled cu mesaje diferite pentru a putea măsura în analitice care CTA convertește mai bine.
+- Buton secundar complementar (nu concurent): primul CTA → „Solicită ofertă scrisă” (`/contact/`), al doilea → „Vezi galeria live” (`/galerie-video/`).
+
+**Psihologie de conversie aplicată:**
+1. **Fear-of-loss** — paragraful despre riscurile formațiilor ieftine (boxe vechi, microfoane care se opresc, „live” fals).
+2. **Scarcity pragmatic** — calendar rezervat cu 10-14 luni înainte, weekenduri limitate.
+3. **Reciprocity** — grila celor 3 întrebări utilă indiferent de alegerea finală.
+4. **Transparență** — lista exactă a clauzelor contractuale, fără hidden fees.
+5. **Social proof implicit** — săli premium menționate, 15 ani experiență.
+
+### Rezultate tehnice
+
+- ✅ `npx astro check` → **0 / 0 / 0** (articol + extensie renderer).
+- ✅ URL public: `/blog/pret-formatie-nunta-2026/`.
+- ✅ JSON-LD Article + FAQPage validate (structură conformă schema.org).
+- ✅ Accesibilitate: `<details>`/`<summary>` keyboard-friendly, CTA-urile WhatsApp au `target="_blank"` + `rel="noopener noreferrer"`.
+
+### Recomandări follow-up (pentru tura următoare)
+
+1. Adăugare foto hero în câmpul `coverImage` al articolului (jpg/webp 1200×630 cu setup-ul live).
+2. Linking intern: adăugat un link către acest articol din pagina [formatie-nunta/pitesti.astro](src/pages/formatie-nunta/pitesti.astro) (ancoră în secțiunea preț).
+3. După 2-3 săptămâni → submit URL nou în Google Search Console pentru indexare accelerată (agentul [seo-agent/force-index.js](seo-agent/force-index.js)).
