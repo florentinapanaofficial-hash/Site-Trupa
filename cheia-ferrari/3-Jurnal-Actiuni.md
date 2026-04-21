@@ -237,3 +237,89 @@ import GalerieAutomata from '../components/GalerieAutomata.astro';
 2. **Optimizare automată** — Astro generează variante WebP responsive la build.
 3. **SEO-friendly** — alt text automat, lazy loading, dimensiuni corecte (Core Web Vitals curat).
 4. **Evoluție viitoare** — poți crea rapid galerii noi doar punând un folder (ex: `membri/marius`, `evenimente/2026-primavara`).
+
+---
+
+## 🏁 22 aprilie 2026 (sesiunea 3) — Arhitectura completă Drop & Go (Image Directory Mapping)
+
+**Obiectiv:** scanare totală proiect → infrastructură de foldere care reflectă fiecare persoană, articol și tip de eveniment din site.
+
+### Surse analizate
+
+| Sursă | Ce am extras |
+|---|---|
+| [src/data/siteContent.json](src/data/siteContent.json) (`members` + `collaborators`) | 5 membri + 2 colaboratori |
+| [src/pages/colaboratori/](src/pages/colaboratori) | `saxofon.astro`, `tambal.astro` — confirmate |
+| [src/data/blogPosts.json](src/data/blogPosts.json) | 10 slug-uri de articole |
+| [src/pages/despre.astro](src/pages/despre.astro) + [src/pages/momente-cu-mirii.astro](src/pages/momente-cu-mirii.astro) | categorii de momente (cununie, recepție, hore/sârbe, dans miri, botez, corporate) |
+
+### 🗺️ Harta completă a folderelor create
+
+```
+src/assets/imagini-automate/
+├── README.md
+│
+├── membri/
+│   ├── florentina-pana/       ← Florentina Pană (voce)           [creat sesiunea 2]
+│   ├── catalin/               ← Cătălin Matei (voce)             [creat sesiunea 2]
+│   ├── oprea-marian/          ← Oprea Marian (vioară)            ⭐ NOU
+│   ├── cristian-ograbek/      ← Cristian Ograbek (acordeon)      ⭐ NOU
+│   └── claudiu-pana/          ← Claudiu Pană (orgă)              ⭐ NOU
+│
+├── colaboratori/
+│   ├── saxofon/                                                   ⭐ NOU
+│   └── tambal/                                                    ⭐ NOU
+│
+├── publicatii/                 ← 1 folder per slug articol blog
+│   ├── pret-formatie-nunta-2026/                                  ⭐ NOU
+│   ├── magia-sunetului-sub-cupola-metropol-babana/                ⭐ NOU
+│   ├── din-culisele-unui-eveniment-live/                          ⭐ NOU
+│   ├── radacini-lautaresti-in-romania/                            ⭐ NOU
+│   ├── diferente-intre-hore-sarbe-si-geamparale/                  ⭐ NOU
+│   ├── cum-alegi-repertoriul-potrivit-pe-momente/                 ⭐ NOU
+│   ├── andreea-si-radu-povestea-lor/                              ⭐ NOU
+│   ├── bianca-si-mihai-povestea-lor/                              ⭐ NOU
+│   ├── ioana-si-catalin-povestea-lor/                             ⭐ NOU
+│   └── alina-si-stefan-povestea-lor/                              ⭐ NOU
+│
+├── evenimente/                 ← categorii de momente
+│   ├── cununie-civila/                                            ⭐ NOU
+│   ├── cununie-religioasa/                                        ⭐ NOU
+│   ├── receptie/                                                  ⭐ NOU
+│   ├── hore-sarbe/                                                ⭐ NOU
+│   ├── dans-miri/                                                 ⭐ NOU
+│   ├── botez/                                                     ⭐ NOU
+│   └── corporate/                                                 ⭐ NOU
+│
+└── galerie-generala/           [creat sesiunea 2]
+```
+
+**Total foldere noi create în sesiunea 3:** **21** (toate cu `.gitkeep` inclus pentru persistență pe GitHub/Railway).
+
+### Cum folosești imediat (exemple)
+
+```astro
+---
+import GalerieAutomata from '../components/GalerieAutomata.astro';
+---
+
+<!-- Pagina unui membru -->
+<GalerieAutomata caleFolder="membri/oprea-marian" titlu="Oprea Marian la vioară" />
+
+<!-- Colaboratori -->
+<GalerieAutomata caleFolder="colaboratori/saxofon" titlu="Saxofon live" />
+
+<!-- Galerie automată pe fiecare articol blog -->
+<GalerieAutomata caleFolder="publicatii/magia-sunetului-sub-cupola-metropol-babana" />
+
+<!-- Categorii pe pagina „Momente cu Mirii” -->
+<GalerieAutomata caleFolder="evenimente/hore-sarbe" titlu="Sârbe și hore la nuntă" />
+<GalerieAutomata caleFolder="evenimente/cununie-religioasa" titlu="Cununii religioase" />
+```
+
+### Validare
+
+- ✅ Structură reflectă 1:1 datele din site (membri din `siteContent.json`, slug-uri din `blogPosts.json`, colaboratori din `pages/colaboratori/`).
+- ✅ Toate `.gitkeep` commit-uite → folderele goale ajung pe GitHub și Railway.
+- ✅ Zero breaking change — doar adăugiri.
+- ✅ Scalabil: orice articol sau membru nou primește folder dedicat în 5 secunde.
