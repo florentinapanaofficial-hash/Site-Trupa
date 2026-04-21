@@ -140,3 +140,38 @@ Axate pe cuvântul-cheie principal **„formație nuntă Pitești / Argeș”**:
 1. Adăugare foto hero în câmpul `coverImage` al articolului (jpg/webp 1200×630 cu setup-ul live).
 2. Linking intern: adăugat un link către acest articol din pagina [formatie-nunta/pitesti.astro](src/pages/formatie-nunta/pitesti.astro) (ancoră în secțiunea preț).
 3. După 2-3 săptămâni → submit URL nou în Google Search Console pentru indexare accelerată (agentul [seo-agent/force-index.js](seo-agent/force-index.js)).
+
+---
+
+## 🏁 22 aprilie 2026 — Optimizare YouTube „Sârba” + Bridge strategic Site ↔ YouTube
+
+**Commit Git:** `fc03e5d` (push `origin/main` · `07cfbf5..fc03e5d`)
+
+### Acțiune executată manual de Claudiu (Șefu)
+
+- **Clip țintă:** `https://www.youtube.com/watch?v=aDB9Aa9cFLY` (Sârba).
+- **Descriere YouTube:** înlocuită cu varianta optimizată SEO generată de agent (hook în primele 125 caractere, keyword-uri locale `formație nuntă Pitești` / `sârbă live Argeș`, CTA WhatsApp, link către site în primul paragraf).
+- **Tag-uri YouTube:** setate conform recomandărilor din [seo-agent/youtube-ferrari-optimizer.js](seo-agent/youtube-ferrari-optimizer.js/) (mix long-tail + branded + local).
+- **Comentariu fixat (pinned):** comentariu cu link-ul către articolul nou [/blog/pret-formatie-nunta-2026/](src/pages/blog/%5Bslug%5D.astro) — **pioneza confirmată, fixată la vârf.** 📌
+
+### Impact strategic
+
+1. **Bridge bidirecțional** — YouTube (trust-builder emoțional prin video live) → articol „Preț Formație Nuntă 2026-2027” (conversie spre WhatsApp Early Booking). Ciclul complet:
+   > invitat YouTube → vede că e 100% live → dă click pe pioneza → citește articolul → apasă CTA WhatsApp.
+2. **Semnal SEO** — link extern de pe YouTube (domain authority ~100) către pagina nouă de blog = boost de indexare + crawl rate crescut pe noua pagină.
+3. **Dwell time** — invitații care ajung de pe YouTube au intent calificat (au văzut deja performance-ul live) → bounce rate mai mic pe articol → semnal Google pozitiv.
+
+### Status final sesiune — 22 aprilie 2026
+
+| Componentă | Stare |
+|---|---|
+| Autopilot Ferrari instalat | ✅ |
+| Polish tehnic (0/0/0) | ✅ |
+| Audit SEO livrat | ✅ |
+| 3 idei clipuri YouTube livrate | ✅ |
+| Articol „Preț Formație Nuntă 2026-2027” publicat | ✅ |
+| Schema Article + FAQPage | ✅ |
+| Clip YouTube „Sârba” optimizat (descriere + tag-uri + pioneza) | ✅ |
+| Commit + push pe `origin/main` | ✅ |
+
+**Sesiune închisă cu succes. Site-ul și canalul YouTube funcționează acum ca un singur sistem de achiziție — din fanul de sârbă, în maximum 3 click-uri, într-o conversație WhatsApp pentru Early Booking 2026-2027.** 🏎️💨
