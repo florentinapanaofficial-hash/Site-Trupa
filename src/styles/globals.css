@@ -1039,22 +1039,76 @@ html::-webkit-scrollbar-thumb:hover {
   transform: rotate(0deg) scale(1);
 }
 
-/* ── Onboarding: puls subtil pe iconița hamburger ── */
+/* ── Onboarding: puls PROEMINENT pe iconița hamburger ──
+   Ring auriu expandat + scale + glow intens + wiggle ușor pentru a atrage clar atenția. */
 .pulse-icon.pulse-animation {
-  animation: menuPulse 1.8s ease-in-out infinite;
+  animation: menuPulse 1.4s ease-in-out infinite;
+  position: relative;
+  z-index: 1;
+}
+
+/* Inel auriu care se expandează în exterior (ripple) */
+.hamburger-btn:has(.pulse-icon.pulse-animation)::before,
+.hamburger-btn:has(.pulse-icon.pulse-animation)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid rgba(212, 175, 55, 0.85);
+  pointer-events: none;
+  animation: menuRipple 1.8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.hamburger-btn:has(.pulse-icon.pulse-animation)::after {
+  animation-delay: 0.9s;
+}
+
+/* Evidențiem și butonul: chenar auriu + fundal subtil aurit */
+.hamburger-btn:has(.pulse-icon.pulse-animation) {
+  border-color: rgba(212, 175, 55, 0.7) !important;
+  background: rgba(212, 175, 55, 0.14) !important;
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.18), 0 8px 22px rgba(212, 175, 55, 0.28);
 }
 
 @keyframes menuPulse {
 
   0%,
   100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4);
+    transform: scale(1) rotate(0deg);
+    text-shadow: 0 0 0 rgba(212, 175, 55, 0);
+    color: var(--title);
   }
 
-  50% {
-    transform: scale(1.12);
-    box-shadow: 0 0 12px 4px rgba(212, 175, 55, 0.35);
+  35% {
+    transform: scale(1.28) rotate(-6deg);
+    text-shadow: 0 0 14px rgba(212, 175, 55, 0.9);
+    color: #f5d76e;
+  }
+
+  55% {
+    transform: scale(1.28) rotate(6deg);
+    text-shadow: 0 0 14px rgba(212, 175, 55, 0.9);
+    color: #f5d76e;
+  }
+
+  75% {
+    transform: scale(1.18) rotate(0deg);
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.7);
+    color: #f5d76e;
+  }
+}
+
+@keyframes menuRipple {
+  0% {
+    opacity: 0.9;
+    transform: scale(1);
+    border-width: 2px;
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.9);
+    border-width: 1px;
   }
 }
 
@@ -1063,9 +1117,19 @@ html::-webkit-scrollbar-thumb:hover {
   animation: none !important;
 }
 
+.top-header.menu-open .hamburger-btn::before,
+.top-header.menu-open .hamburger-btn::after {
+  display: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .pulse-icon.pulse-animation {
     animation: none;
+  }
+
+  .hamburger-btn:has(.pulse-icon.pulse-animation)::before,
+  .hamburger-btn:has(.pulse-icon.pulse-animation)::after {
+    display: none;
   }
 }
 

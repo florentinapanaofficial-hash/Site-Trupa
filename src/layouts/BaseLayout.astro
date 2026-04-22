@@ -459,7 +459,7 @@ const mobileNavAllItems = [
       if(!btn) return;
       var icon = btn.querySelector('.pulse-icon');
       if(!icon) return;
-      var timer = setTimeout(function(){ icon.classList.add('pulse-animation'); }, 5000);
+      var timer = setTimeout(function(){ icon.classList.add('pulse-animation'); }, 2000);
       btn.addEventListener('click', function(){
         clearTimeout(timer);
         icon.classList.remove('pulse-animation');
