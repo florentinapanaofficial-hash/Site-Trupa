@@ -523,6 +523,30 @@ const mobileNavAllItems = [
       var btns = document.querySelectorAll(SEL);
       if(!btns.length) return;
 
+      /* ── Fix forced reflow: cache-uim viewport rects pe scroll/resize
+           și evităm să citim getBoundingClientRect în bucla de mousemove.
+           Reads și writes sunt complet separate (read-phase apoi write-phase). ── */
+      var rects = []; /* {btn, cx, cy, radius} în coordonate viewport */
+      var rectsDirty = true;
+
+      function cacheRects(){
+        rects = [];
+        btns.forEach(function(btn){
+          var r = btn.getBoundingClientRect();
+          rects.push({
+            btn: btn,
+            cx: r.left + r.width / 2,
+            cy: r.top  + r.height / 2,
+            radius: Math.sqrt(r.width * r.width + r.height * r.height) / 2 + PROXIMITY
+          });
+        });
+        rectsDirty = false;
+      }
+
+      function invalidateRects(){ rectsDirty = true; }
+      window.addEventListener('scroll', invalidateRects, { passive: true });
+      window.addEventListener('resize', invalidateRects, { passive: true });
+
       var rafId = 0;
       var mouseX = 0, mouseY = 0;
       var active = null; /* butonul cel mai apropiat */
@@ -535,33 +559,34 @@ const mobileNavAllItems = [
 
       function tick(){
         rafId = 0;
+        if(rectsDirty) cacheRects();
+
+        /* ── READ-only phase: calculăm transformările, fără scrieri DOM ── */
         var closest = null;
         var closestDist = Infinity;
+        var pending = []; /* {btn, transform} */
 
-        btns.forEach(function(btn){
-          var r = btn.getBoundingClientRect();
-          /* Centrul butonului */
-          var cx = r.left + r.width / 2;
-          var cy = r.top  + r.height / 2;
-          /* Distanța mouse → centru */
-          var dx = mouseX - cx;
-          var dy = mouseY - cy;
+        for(var i = 0; i < rects.length; i++){
+          var item = rects[i];
+          var dx = mouseX - item.cx;
+          var dy = mouseY - item.cy;
           var dist = Math.sqrt(dx * dx + dy * dy);
-          /* Raza de activare = jumătatea diagonalei + PROXIMITY */
-          var radius = Math.sqrt(r.width * r.width + r.height * r.height) / 2 + PROXIMITY;
 
-          if(dist < radius && dist < closestDist){
-            closest = btn;
-            closestDist = dist;
-            /* Intensitate inversă cu distanța */
-            var factor = Math.max(0, 1 - dist / radius);
-            var shiftX = dx * factor * MAX_SHIFT / radius;
-            var shiftY = dy * factor * MAX_SHIFT / radius;
-            btn.style.transform = 'translate(' + shiftX.toFixed(1) + 'px,' + shiftY.toFixed(1) + 'px)';
+          if(dist < item.radius){
+            var factor = Math.max(0, 1 - dist / item.radius);
+            var shiftX = dx * factor * MAX_SHIFT / item.radius;
+            var shiftY = dy * factor * MAX_SHIFT / item.radius;
+            pending.push({ btn: item.btn, transform: 'translate(' + shiftX.toFixed(1) + 'px,' + shiftY.toFixed(1) + 'px)' });
+            if(dist < closestDist){ closest = item.btn; closestDist = dist; }
           } else {
-            btn.style.transform = '';
+            pending.push({ btn: item.btn, transform: '' });
           }
-        });
+        }
+
+        /* ── WRITE-only phase: aplicăm toate transformările în bloc ── */
+        for(var j = 0; j < pending.length; j++){
+          pending[j].btn.style.transform = pending[j].transform;
+        }
 
         if(active && active !== closest) active.style.transform = '';
         active = closest;
