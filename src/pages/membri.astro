@@ -634,39 +634,20 @@ function initiale(name: string): string {
     if (e.key === 'ArrowRight') navigateTo(1);
   });
 
-  // ── Touch swipe pe popup ──
+  // ── Pe mobil, swipe-ul în popup este DEZACTIVAT intenționat.
+  //    Navigarea între poze se face DOAR din săgețile ‹ › (.gallery-popup-nav).
+  //    Blocăm propagarea touch-urilor către detectorul global de swipe
+  //    din public/js/mobile-swipe.js, ca un swipe accidental în popup
+  //    să NU mai declanșeze navigarea între paginile din meniu.
   (function() {
-    var touchStartX = 0;
-    var touchStartY = 0;
-    var swiping = false;
-
-    popup.addEventListener('touchstart', function(e) {
+    function stopIfActive(e) {
       if (!popup.classList.contains('active')) return;
-      if (e.touches.length !== 1) return;
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
-      swiping = true;
-    }, { passive: true });
-
-    popup.addEventListener('touchmove', function(e) {
-      if (!swiping) return;
-      // Previne scroll-ul paginii în fundal
-      var dx = Math.abs(e.touches[0].clientX - touchStartX);
-      var dy = Math.abs(e.touches[0].clientY - touchStartY);
-      if (dx > dy) e.preventDefault();
-    }, { passive: false });
-
-    popup.addEventListener('touchend', function(e) {
-      if (!swiping) return;
-      swiping = false;
-      var dx = e.changedTouches[0].clientX - touchStartX;
-      var dy = e.changedTouches[0].clientY - touchStartY;
-      // Swipe orizontal minim 40px și predominant orizontal
-      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) {
-        if (dx < 0) navigateTo(1);   // swipe stânga → next
-        else        navigateTo(-1);  // swipe dreapta → prev
-      }
-    }, { passive: true });
+      e.stopPropagation();
+    }
+    popup.addEventListener('touchstart',  stopIfActive, { passive: true });
+    popup.addEventListener('touchmove',   stopIfActive, { passive: true });
+    popup.addEventListener('touchend',    stopIfActive, { passive: true });
+    popup.addEventListener('touchcancel', stopIfActive, { passive: true });
   })();
 
   // ═══ GALLERY SLIDER — dots + mouse drag ═══

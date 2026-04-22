@@ -293,6 +293,19 @@ src/components/ZoneAcoperite.astro ← „Pânza de Păianjen" — linkuri autom
 - **Rezultat:** 210 brute → 34 eliminate negativ, 61 eliminate geo → **115 curate rămase**
 - **Principiu:** Nu vizăm zone unde nu acoperim servicii. SEO etic = relevanță reală.
 
+### 2026-04-22 — Fix mobil: swipe în popup-ul galeriei de membri declanșa navigarea între pagini
+**Problemă:** Pe mobil, când se deschidea popup-ul cu poza mare a unui membru (pe `/membri/`), un swipe instinctiv stânga/dreapta făcea două lucruri în paralel:
+1. Schimba poza în popup (handler intern).
+2. **Se propaga la `document`** și declanșa navigatorul global din `public/js/mobile-swipe.js`, care ducea utilizatorul la pagina următoare/anterioară din meniu (`/galerie-video/`, `/galerie-foto/` etc.) — exact când omul voia doar să vadă altă poză.
+
+**Fix aplicat în `src/pages/membri.astro`:**
+- Eliminat handler-ul `touchstart`/`touchmove`/`touchend` care schimba poza prin swipe.
+- Adăugat un bloc care apelează `e.stopPropagation()` pe `touchstart`/`touchmove`/`touchend`/`touchcancel` cât timp `#gallery-popup` e `.active`. Asta **blochează swipe-ul global** pe toată durata în care popup-ul e deschis.
+- Navigarea între poze rămâne **exclusiv** prin săgețile laterale `‹ ›` (`.gallery-popup-nav`), care sunt click-uri, nu gesturi. Tastele `←` `→` și `Escape` funcționează în continuare. Închiderea: buton `✕`, click pe backdrop, tasta `Escape`, butonul Back al telefonului.
+
+**De reținut pentru viitor:**
+- `public/js/mobile-swipe.js` are deja o listă de selectoare care suprimă swipe-ul global (vezi `e.target.closest('#gallery-popup')` etc.), **dar** acea verificare se face pe elementul inițial al atingerii. Dacă popup-ul e mutat sub `<body>` la runtime și elementul atins e un copil (imagine/backdrop), `closest('#gallery-popup')` ar trebui să se potrivească — însă, pentru siguranță pe orice browser, am adăugat `stopPropagation` direct pe container. Regula: **orice overlay full-screen pe mobil trebuie să oprească explicit propagarea touch-urilor** către detectorul de swipe din `mobile-swipe.js`.
+
 ---
 
 ## 8. Etica SEO
