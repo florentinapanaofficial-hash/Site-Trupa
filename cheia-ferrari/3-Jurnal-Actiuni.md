@@ -5,6 +5,28 @@ Orice reparație sau optimizare se notează aici de către AI, pentru transparen
 
 ---
 
+## 🏁 22 aprilie 2026 — Audit Seobility 83% rezolvat → țintă 100%
+
+**Commit Git:** `9b3717a` · mesaj: `fix(seo): rezolvare erori Seobility (title length, apple-touch-icon, anchors)`
+
+Managerul a rulat audit SEO pe Seobility: scor **83%**. Au fost raportate 3 ajustări tehnice — toate rezolvate în această sesiune:
+
+1. **Title SEO prea lung (> 580 px)** — articolul `Preț Formație Nuntă 2026-2027` din [src/data/blogPosts.json](src/data/blogPosts.json) avea un titlu de ~140 caractere. Scurtat la **`Preț Formație Nuntă 2026-2027: Calitate vs. Buget în Argeș`** (58 caractere) — se încadrează perfect sub pragul de 60 char / 580 px afișabili în SERP.
+2. **Apple Touch Icon lipsă** — adăugat `<link rel="apple-touch-icon" href="/favicon.ico" />` în `<head>` din [src/layouts/BaseLayout.astro](src/layouts/BaseLayout.astro), imediat după `rel="icon"` SVG existent. Rezolvă warning-ul iOS/Seobility pe toate paginile.
+3. **Anchor texts** — audit rapid pe tot `src/**/*.astro`: **zero** link-uri `<a>` cu text generic („click aici”, „aici”, „vezi mai mult”). Singurul `<a>` fără text vizibil este stretched-link-ul de pe homepage (card „Rezervă acum”) care are `aria-label="Rezervă acum — pagina de contact"` — corect semantic și accesibil.
+
+### Validare
+
+- `npx astro check` → **0 erori · 0 warnings · 0 hints** (58 fișiere).
+- `git push origin main` → OK (`0d0454d..9b3717a`).
+
+### Rezultat așteptat
+
+- Scor Seobility: **83% → ~95-100%** la următorul crawl.
+- Fix-urile sunt on-page (title + head), deci efectul apare în SERP după prima reindexare Google (24-72h).
+
+---
+
 ## 🏁 21 aprilie 2026 — Sesiune Full Option (Polish + Audit SEO)
 
 **Commit Git:** `92b68b1` · mesaj: `chore: full system polish & hints cleanup`
