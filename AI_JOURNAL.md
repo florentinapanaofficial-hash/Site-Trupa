@@ -306,6 +306,26 @@ Proiectul respectă principii de **SEO etic** (White Hat):
 
 ---
 
+### 2026-04-22 — Lighthouse: Forced Reflow rezidual (17ms + 1ms) — REZOLVAT
+**Problema:** raportul Lighthouse marca „Rearanjare forțată" cu sursa în `_lighthouse-eval.js:13:45` (17ms) și `florentinapanaofficial.ro:712:18` (1ms). Cauză reală: pattern **layout thrashing** (WRITE → READ în același tick sincron) în scripturile de inițializare.
+
+**Surse identificate:**
+1. `Header.astro` → `initScrollSpy()`:
+   - `syncTopMenuBodyClass(false)` (WRITE clase pe `<body>`) urmat IMEDIAT de `recalcHeaderSpyOffset()` (READ `offsetHeight`) → forced reflow #1
+   - `setActiveByPathname(currentPathname)` (WRITE `.is-active` pe linkuri) urmat IMEDIAT de `recalcSectionTops()` (READ `getBoundingClientRect`) → forced reflow #2
+2. `BaseLayout.astro` → `sync()` pentru `--mob-nav-h`: READ `offsetHeight` executat direct la `DOMContentLoaded`, după ce alte scripturi au modificat DOM-ul
+
+**Fix aplicat (pattern read-phase → write-phase):**
+- `Header.astro`: inversat ordinea — `recalcHeaderSpyOffset()` rulează ACUM înainte de `syncTopMenuBodyClass(false)`; `recalcSectionTops()` rulează înainte de `setActiveByPathname()`
+- `BaseLayout.astro`: `nav.offsetHeight` citit acum în interiorul unui `requestAnimationFrame`, separându-l de orice WRITE anterior
+
+**Regulă de aur memorată:** În JavaScript, după orice modificare DOM (clase, stiluri, atribute) NU se citește imediat o proprietate geometrică (`offsetWidth/Height/Top/Left`, `clientWidth/Height`, `scrollWidth/Height`, `getBoundingClientRect`, `getComputedStyle`). Fie READ-urile se fac ÎNAINTE de WRITE-uri, fie se izolează într-un `requestAnimationFrame` separat.
+
+**Fișiere modificate:** `src/components/Header.astro`, `src/layouts/BaseLayout.astro`
+**Validare:** `get_errors` → zero erori TypeScript/Astro pe ambele fișiere
+
+---
+
 ### 2026-04-15 — PageSpeed Insights: Contrast + Forced Reflow
 **Probleme identificate din raportul PageSpeed (mobil):**
 

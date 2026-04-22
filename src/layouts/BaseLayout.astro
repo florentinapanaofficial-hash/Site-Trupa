@@ -437,11 +437,16 @@ const mobileNavAllItems = [
     <script is:inline>
     (function(){
       if(!window.matchMedia('(max-width:767px)').matches) return;
+      /* Fix forced reflow: separăm READ (offsetHeight) de orice WRITE anterior
+         cu requestAnimationFrame, ca browserul să folosească layout-ul deja
+         calculat în loc să-l recalculeze sincron. */
       function sync(){
-        var nav=document.querySelector('.top-header');
-        if(!nav) return;
-        var h=nav.offsetHeight;
-        if(h>0) document.documentElement.style.setProperty('--mob-nav-h',h+'px');
+        requestAnimationFrame(function(){
+          var nav=document.querySelector('.top-header');
+          if(!nav) return;
+          var h=nav.offsetHeight;
+          if(h>0) document.documentElement.style.setProperty('--mob-nav-h',h+'px');
+        });
       }
       var resizeTimer;
       function debouncedSync(){ clearTimeout(resizeTimer); resizeTimer=setTimeout(sync,200); }

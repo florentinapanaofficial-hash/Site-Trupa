@@ -234,8 +234,11 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       sessionStorage.setItem(MENU_KEY, 'true');
     };
 
-    syncTopMenuBodyClass(false);
+    /* ── Fix forced reflow: READ înainte de WRITE la init.
+       Citim offsetHeight ÎNAINTE să modificăm clase pe <body>,
+       altfel browserul e forțat să recalculeze layout-ul sincron. ── */
     recalcHeaderSpyOffset();
+    syncTopMenuBodyClass(false);
 
     // Pe mobil, meniul pornește ÎNCHIS. Pe desktop, restaurăm starea din sessionStorage.
     const wasOpen = sessionStorage.getItem(MENU_KEY) === 'true';
@@ -566,11 +569,16 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       });
     });
 
+    /* ── Fix forced reflow: READ getBoundingClientRect ÎNAINTE să scriem
+       clase .is-active pe linkuri via setActiveByPathname. ── */
+    if (hasSectionMap) {
+      recalcSectionTops();
+    }
+
     const currentPathname = window.location.pathname.replace(/\/$/, '') || '/';
     setActiveByPathname(currentPathname);
 
     if (hasSectionMap) {
-      recalcSectionTops();
       getActiveByScroll();
     }
 
