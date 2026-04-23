@@ -64,6 +64,12 @@ const SECURITY_HEADERS = {
     'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
 };
 
+// Resurse publice care trebuie accesibile cross-origin (imagini OG, fonturi, etc.)
+const PUBLIC_ASSET_PREFIXES = ['/images/', '/fonts/', '/_astro/'];
+function isPublicAsset(pathname) {
+    return PUBLIC_ASSET_PREFIXES.some((p) => pathname.startsWith(p));
+}
+
 const CANONICAL_HOST = 'www.florentinapanaofficial.ro';
 
 const server = createServer((req, res) => {
@@ -111,6 +117,10 @@ const server = createServer((req, res) => {
     // Security headers on ALL responses
     for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
         res.setHeader(key, value);
+    }
+    // Imagini, fonturi și assets statice trebuie accesibile cross-origin (Facebook OG, etc.)
+    if (isPublicAsset(urlPath)) {
+        res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
     }
 
     // Static files first (pre-compressed via sirv), SSR with gzip fallback
