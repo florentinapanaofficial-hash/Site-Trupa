@@ -412,7 +412,7 @@
         "name": "Cătălin Matei",
         "role": "Interpret de Muzică Populară de Petrecere",
         "description": "Voce puternică și energie de petrecere autentică. Interacționează natural cu publicul și ridică atmosfera în momentele de dans și tradiție.",
-        "image": "https://placehold.co/400x400/1b2c52/e9f5ff?text=C%C4%83t%C4%83lin+Matei",
+        "image": "/images/catalin-matei.webp",
         "photos": [
           "",
           "",
@@ -626,7 +626,7 @@
         "Tradiție"
       ],
       "categorie": "solisti",
-      "imagine": "",
+      "imagine": "/images/catalin-matei.webp",
       "galpisFoto": []
     },
     {
