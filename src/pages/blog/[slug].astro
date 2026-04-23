@@ -75,6 +75,10 @@ const nextPost = allPosts[allPosts.findIndex((p) => p.slug === post.slug) + 1];
 
 const siteBase = 'https://florentinapanaofficial.ro';
 const postCanonical = `${siteBase}/blog/${post.slug}`;
+const shareUrlEnc = encodeURIComponent(postCanonical);
+const shareTextEnc = encodeURIComponent(post.title);
+const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${shareUrlEnc}`;
+const whatsappShareUrl = `https://wa.me/?text=${shareTextEnc}%20${shareUrlEnc}`;
 const postOgImage = post.coverImage?.startsWith('http')
   ? post.coverImage
   : post.coverImage
@@ -228,6 +232,37 @@ const faqJsonLd = post.faq && post.faq.length > 0 ? {
         </section>
       )}
     </article>
+
+    {/* ── Distribuie articolul ── */}
+    <aside class="bp-share" aria-label="Distribuie articolul">
+      <p class="bp-share-label">Ți-a plăcut articolul? Distribuie-l:</p>
+      <div class="bp-share-actions">
+        <a
+          href={facebookShareUrl}
+          class="bp-share-btn bp-share-btn--fb"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`Distribuie pe Facebook: ${post.title}`}
+        >
+          <svg class="bp-share-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path fill="currentColor" d="M13.5 21v-7.5h2.5l.4-3h-2.9V8.6c0-.87.24-1.46 1.49-1.46H16.6V4.44c-.28-.04-1.22-.12-2.31-.12-2.29 0-3.86 1.4-3.86 3.96V10.5H7.9v3h2.53V21h3.07z"/>
+          </svg>
+          <span>Facebook</span>
+        </a>
+        <a
+          href={whatsappShareUrl}
+          class="bp-share-btn bp-share-btn--wa"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`Distribuie pe WhatsApp: ${post.title}`}
+        >
+          <svg class="bp-share-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path fill="currentColor" d="M20.52 3.48A11.78 11.78 0 0 0 12.05 0C5.5 0 .2 5.3.2 11.85c0 2.09.55 4.13 1.6 5.93L0 24l6.4-1.68a11.83 11.83 0 0 0 5.65 1.44h.01c6.54 0 11.84-5.3 11.84-11.85 0-3.17-1.23-6.15-3.38-8.43zM12.05 21.8h-.01a9.9 9.9 0 0 1-5.05-1.38l-.36-.22-3.8 1 1.02-3.7-.24-.38a9.86 9.86 0 0 1-1.5-5.27c0-5.45 4.44-9.88 9.9-9.88 2.64 0 5.13 1.03 7 2.9a9.82 9.82 0 0 1 2.9 6.99c0 5.45-4.44 9.88-9.86 9.88zm5.4-7.4c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15s-.77.96-.94 1.16c-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51l-.57-.01c-.2 0-.52.07-.8.37-.27.3-1.04 1.01-1.04 2.47s1.07 2.87 1.22 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.69.25-1.28.17-1.41-.07-.13-.27-.2-.57-.35z"/>
+          </svg>
+          <span>WhatsApp</span>
+        </a>
+      </div>
+    </aside>
 
     {/* ── Navigare între articole ── */}
     {(prevPost || nextPost) && (
@@ -416,6 +451,56 @@ const faqJsonLd = post.faq && post.faq.length > 0 ? {
     background: var(--surface);
     border-top: 1px solid var(--line);
     margin: 0;
+  }
+
+  /* ── Distribuie ── */
+  .bp-share {
+    max-width: 720px;
+    margin: 0 auto 2.5rem;
+    padding: 1.5rem;
+    border: 1px solid var(--line);
+    border-radius: 1rem;
+    background: var(--surface);
+    text-align: center;
+  }
+  .bp-share-label {
+    margin: 0 0 0.9rem;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--body);
+    letter-spacing: 0.02em;
+  }
+  .bp-share-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+  .bp-share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.7rem 1.3rem;
+    border-radius: 9999px;
+    font-weight: 700;
+    font-size: 0.92rem;
+    text-decoration: none;
+    color: #fff;
+    transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  }
+  .bp-share-btn:hover,
+  .bp-share-btn:focus-visible {
+    transform: translateY(-2px);
+    filter: brightness(1.08);
+    box-shadow: 0 8px 22px rgba(0,0,0,0.35);
+  }
+  .bp-share-btn--fb { background: #1877F2; }
+  .bp-share-btn--wa { background: #25D366; }
+  .bp-share-icon {
+    width: 1.15rem;
+    height: 1.15rem;
+    flex-shrink: 0;
   }
 
   /* ── Nav articole ── */
