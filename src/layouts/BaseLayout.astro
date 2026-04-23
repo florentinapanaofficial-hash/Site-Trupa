@@ -36,7 +36,7 @@ const gscVerification = import.meta.env.PUBLIC_GSC_VERIFICATION;
 const jsonLd = {
   ...seoContent.schema,
   url: site || seoContent.schema.url,
-  logo: `${site}/images/logo-fp-stage.svg`,
+  logo: `${site}/images/sigla-fp-band.webp`,
   foundingDate: '2014',
 };
 
@@ -51,8 +51,8 @@ const localBusinessLd = {
   "url": site,
   "telephone": seoContent.schema.telephone,
   "email": seoContent.schema.email,
-  "image": `${site}/images/logo-fp-stage.svg`,
-  "logo": `${site}/images/logo-fp-stage.svg`,
+  "image": `${site}/images/sigla-fp-band.webp`,
+  "logo": `${site}/images/sigla-fp-band.webp`,
   "foundingDate": "2014",
   "address": {
     "@type": "PostalAddress",
@@ -102,7 +102,7 @@ const webPageLd = {
     "url": site,
     "logo": {
       "@type": "ImageObject",
-      "url": `${site}/images/logo-fp-stage.svg`
+      "url": `${site}/images/sigla-fp-band.webp`
     }
   },
   "datePublished": "2024-01-15",
@@ -262,7 +262,7 @@ const mobileNavAllItems = [
       <aside class="left-side-menu" aria-label="Navigare principală">
         <!-- Logo + nume formație (vizibil doar pe desktop via CSS) -->
         <a href={isHomePage ? '#acasa' : '/'} class="sidebar-brand" aria-label="Acasă">
-          <img src="/images/logo-fp-stage.svg" alt="Logo Formația Florentina Pană" width="42" height="42" loading="eager" decoding="async" />
+          <img src="/images/sigla-fp-band.webp" alt="Sigla Formația Florentina Pană (FP Band)" width="78" height="42" loading="eager" decoding="async" style="object-fit:contain;border-radius:8px;" />
           <span class="sidebar-brand-text">
             <span class="sidebar-brand-name">{siteContent.brand.name}</span>
             <span class="sidebar-brand-sub">Live Band Premium</span>
