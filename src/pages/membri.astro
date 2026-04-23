@@ -1128,6 +1128,11 @@ function initiale(name: string): string {
     transition: transform 600ms ease;
   }
 
+  /* Ajustări per-membru (când poza are capul aproape de marginea de sus) */
+  .mc-photo-img[src*="oprea-marian"] {
+    object-position: center 5%;
+  }
+
   .member-card-wrap:hover .mc-photo-img {
     transform: scale(1.05);
   }
