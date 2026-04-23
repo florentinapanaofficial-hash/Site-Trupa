@@ -442,7 +442,7 @@
         "name": "Cristian Ograbek",
         "role": "Solist instrumentist - Acordeon",
         "description": "Sunet vibrant și ritm de petrecere, cu acompaniament versatil pentru hore, sârbe și momente live cu public implicat.",
-        "image": "https://placehold.co/400x400/202850/f4fff0?text=Cristian+Ograbek",
+        "image": "/images/cristian-ograbek.webp",
         "photos": [
           "",
           "",
@@ -704,7 +704,7 @@
         "Autenticitate"
       ],
       "categorie": "instrumentisti",
-      "imagine": "",
+      "imagine": "/images/cristian-ograbek.webp",
       "galpisFoto": []
     }
   ],
