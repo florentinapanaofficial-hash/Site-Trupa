@@ -113,7 +113,7 @@ const faqJsonLd = post.faq && post.faq.length > 0 ? {
 <BaseLayout
   title={`${post.title} | ${siteContent.brand.name}`}
   description={post.excerpt}
-  ogImage={post.coverImage || undefined}
+  ogImage={postOgImage}
   ogType="article"
 >
   <Fragment slot="head">

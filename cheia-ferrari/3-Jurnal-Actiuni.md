@@ -4,7 +4,35 @@ Orice reparație sau optimizare se notează aici de către AI, pentru transparen
 - **[Data de azi]**: S-a instalat sistemul Autopilot. Zero erori în consolă. S-au setat bazele pentru SEO automatizat.
 
 ---
+## 🏁 23 aprilie 2026 — Fix Open Graph Facebook + corecție conținut articol
 
+### 1. Corecție nume — articolul „Plăcerea de a Cânta pe Scenă"
+
+În [src/data/blogPosts.json](src/data/blogPosts.json), la articolul `placerea-de-a-canta-pe-scena`, „Ana" a fost înlocuită cu **„Alexia"** în două locuri:
+- textul paragrafului: „Claudiu, Alexia, instrumentiștii..."
+- legenda fotografiei: „Cu Alexia, în pauza dintre două momente..."
+
+### 2. Fix Open Graph — imagini cu spații în cale nu se afișau pe Facebook
+
+**Cauza:** Căile de tip `/images/Galerie Foto Site/fisier.jpg` conțin spații neencodate — Facebook nu putea încărca imaginea OG, afișând articolul fără thumbnail (doar text mare).
+
+**Fix 1 — [src/pages/blog/[slug].astro](src/pages/blog/[slug].astro):** Acum pasează `postOgImage` (URL absolut, deja construit cu `encodeURI`) în `<BaseLayout>` în loc de `post.coverImage` (cale relativă cu spații).
+
+**Fix 2 — [src/layouts/BaseLayout.astro](src/layouts/BaseLayout.astro):** Adăugat `encodeURI(decodeURI(...))` pe `ogImage` — se aplică global pe TOATE paginile, indiferent de sursa imaginii.
+
+**Fix 3 — [src/pages/comunitate/[slug].astro](src/pages/comunitate/[slug].astro):** Pagina cuplurilor nu pasează `ogImage` deloc. Adăugat construirea `coupleOgImage` (URL absolut encoded) din `couple.coverPhoto` și pasată în `<BaseLayout>`.
+
+### Fișiere modificate
+- `src/data/blogPosts.json` — corecție nume Ana → Alexia
+- `src/layouts/BaseLayout.astro` — `encodeURI` global pe ogImage
+- `src/pages/blog/[slug].astro` — pasează `postOgImage` (absolut) în loc de `post.coverImage` (relativ)
+- `src/pages/comunitate/[slug].astro` — adăugat `coupleOgImage` encoded + pasată în BaseLayout
+
+### Validare recomandată
+- [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/) — testează URL articol + forțează scrape nou
+- Verifică că imaginea apare ca thumbnail în previzualizarea Facebook
+
+---
 ## 🏁 23 aprilie 2026 — Fix UX mobil + tabletă + articol nou „Orhideea Events”
 
 **Sesiune Autopilot.** Trei intervenții punctuale pe UX responsive + un articol SEO nou.

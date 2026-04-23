@@ -47,6 +47,11 @@ const youtubeId = couple.danceVideoUrl
 const pageTitle = `${couple.names} — Povestea lor | ${brand.name}`;
 const pageDescription = `Descoperă povestea de dragoste a perechii ${couple.names} din ${couple.city}. Recomandare, galerie foto și dansul mirilor — ${brand.name}.`;
 
+const SITE = 'https://www.florentinapanaofficial.ro';
+const coupleOgImage = couple.coverPhoto
+  ? encodeURI(decodeURI(couple.coverPhoto.startsWith('http') ? couple.coverPhoto : `${SITE}${couple.coverPhoto}`))
+  : undefined;
+
 const eventLd = {
   '@context': 'https://schema.org',
   '@type': 'Event',
@@ -84,6 +89,7 @@ const reviewLd = {
 <BaseLayout
   title={pageTitle}
   description={pageDescription}
+  ogImage={coupleOgImage}
 >
   <main class="couple-page">
     <BackButton href="/comunitate/" label="← Comunitate" />

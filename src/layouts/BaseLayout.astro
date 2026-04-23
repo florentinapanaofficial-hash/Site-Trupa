@@ -25,10 +25,10 @@ const canonicalPath = rawPath === '' ? '/' : `${rawPath}/`;
 const canonicalURL = new URL(canonicalPath, Astro.site ?? SITE_FALLBACK);
 const canonical = canonicalURL.href;
 
-// OG image: transformă calea relativă în URL absolut
-// TODO: creează fișierul fizic public/images/og-default-1200x630.jpg (1200×630px)
+// OG image: transformă calea relativă în URL absolut + encode spații
 const rawOgImage = Astro.props.ogImage ?? '/images/og-default-1200x630.jpg';
-const ogImage = rawOgImage.startsWith('http') ? rawOgImage : `${site}${rawOgImage}`;
+const ogImageAbsolute = rawOgImage.startsWith('http') ? rawOgImage : `${site}${rawOgImage}`;
+const ogImage = encodeURI(decodeURI(ogImageAbsolute));
 
 const ga4Id = import.meta.env.PUBLIC_GA4_ID;
 const gscVerification = import.meta.env.PUBLIC_GSC_VERIFICATION;
