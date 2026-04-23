@@ -1339,9 +1339,17 @@ function initiale(name: string): string {
     width: 100%;
     aspect-ratio: 3 / 2;
     object-fit: cover;
-    object-position: center 20%;
+    /* `center top` păstrează capul personajului vizibil în toate pozele portret;
+       pozele peisagistice rămân centrate orizontal. */
+    object-position: center top;
     display: block;
     border-radius: inherit;
+  }
+
+  /* Ajustări per-poză când `center top` taie fruntea sau nu încadrează corect */
+  .mc-gal-thumb-img[src*="Alexia%20Galerie%202"],
+  .mc-gal-thumb-img[src*="Alexia Galerie 2"] {
+    object-position: center 25%;
   }
 
   /* ── Slider indicator luminos (toate breakpoints) ── */

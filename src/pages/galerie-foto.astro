@@ -4,9 +4,18 @@ import BackButton from '../components/BackButton.astro';
 import EmbedSnippet from '../components/EmbedSnippet.astro';
 import PhotoGallery from '../components/PhotoGallery.astro';
 
-/* ── Date galerie: toate pozele din colecție ── */
+/* ── Date galerie: toate pozele din colecție ──
+   REGULĂ: Pozele NOI se adaugă ÎNTOTDEAUNA la începutul array-ului (sus),
+   în blocul "🆕 ULTIMELE ADĂUGATE". Astfel vizitatorii văd primii cele mai
+   recente momente. Pozele vechi rămân în blocul de mai jos, în ordinea lor. */
 const base = "/images/Galerie Foto Site";
 const photos = [
+  // ═══ 🆕 ULTIMELE ADĂUGATE (cele mai noi primele) ═══
+  { src: `${base}/Eveniment%20Arabesc.jpg`, alt: "Formația Florentina Pană cu trupa Arabesc la eveniment live", cat: "evenimente" },
+  { src: `${base}/Eveniment%20Grup%20Arabesc.jpg`, alt: "Moment de grup cu membrii trupei Arabesc la petrecere", cat: "evenimente" },
+  { src: `${base}/Eveniment%20Grup%20Selfie.jpg`, alt: "Selfie de grup la eveniment — Formația Florentina Pană", cat: "evenimente" },
+
+  // ═══ ARHIVĂ (poze existente) ═══
   { src: `${base}/Galerie Evenimente 1.jpg`, alt: "Eveniment live cu Formația Florentina Pană", cat: "evenimente" },
   { src: `${base}/Galerie Evenimente 2.jpg`, alt: "Scenă completă la eveniment live", cat: "evenimente" },
   { src: `${base}/Florentina Pan%C4%83 1.jpg`, alt: "Florentina Pană — moment de scenă", cat: "solista" },
@@ -107,9 +116,9 @@ const photos = [
       <h2 class="gal-title" style="font-size:1.15rem;margin-bottom:0.75rem;">Distribuie fotografiile noastre</h2>
       <p style="font-size:0.85rem;color:rgba(255,255,255,0.7);margin-bottom:1rem;">Folosește butoanele de mai jos pentru a include o fotografie autentică de la evenimentele noastre pe site-ul tău, cu credit și backlink automat.</p>
       <EmbedSnippet
-        imageSrc="/images/Galerie Foto Site/Galerie Evenimente 1.jpg"
-        imageAlt="Formație nuntă Pitești — eveniment live cu Formația Florentina Pană"
-        pageUrl="https://www.florentinapanaofficial.ro/galerie-foto"
+        imageSrc="/images/Galerie Foto Site/Eveniment Arabesc.jpg"
+        imageAlt="Formația Florentina Pană alături de trupa Arabesc — eveniment live Pitești"
+        pageUrl="https://www.florentinapanaofficial.ro/galerie-foto#foto-1"
         credit="Formația Florentina Pană"
       />
     </div>

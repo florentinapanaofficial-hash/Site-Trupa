@@ -723,8 +723,17 @@
         "Petreceri",
         "Colaborator"
       ],
-      "imagine": "",
-      "galpisFoto": []
+      "imagine": "/images/Galerie Foto Site/Alexia%201%20profil.png",
+      "galpisFoto": [
+        {
+          "src": "/images/Galerie Foto Site/Alexia%20Galerie%201.jpg",
+          "alt": "Alexia Țircomnicu — moment live la eveniment"
+        },
+        {
+          "src": "/images/Galerie Foto Site/Alexia%20Galerie%202.png",
+          "alt": "Alexia Țircomnicu — prezență scenică muzică ușoară și manele"
+        }
+      ]
     },
     {
       "nume": "Nume în curând",
