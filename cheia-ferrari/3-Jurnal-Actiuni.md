@@ -5,6 +5,43 @@ Orice reparație sau optimizare se notează aici de către AI, pentru transparen
 
 ---
 
+## 🏁 23 aprilie 2026 — Fix UX mobil + tabletă + articol nou „Orhideea Events”
+
+**Sesiune Autopilot.** Trei intervenții punctuale pe UX responsive + un articol SEO nou.
+
+### 1. Fix scroll blocat pe galeria membrilor (mobil)
+
+Pe [src/pages/membri.astro](src/pages/membri.astro#L1425), galeria foto a fiecărui membru avea `touch-action: pan-x pinch-zoom`. Rezultat: dacă utilizatorul ținea degetul pe o fotografie și voia să deruleze pagina în sus/jos, browserul ignora gestul vertical. Schimbat la `touch-action: pan-x pan-y pinch-zoom` — browserul acum alege direcția dominantă (orizontal → galerie, vertical → pagină).
+
+### 2. Fix layout tabletă pe pagina Membri
+
+Pe intervalul 768–1023 px nu exista o regulă dedicată, iar layoutul desktop (grid 35/65 + poză `min-height: 500px`) întindea urât pozele portret și suprapunea butonul BIO (absolute) peste dots-ul galeriei și hint-ul „Glisează”. Adăugat breakpoint `@media (min-width: 600px) and (max-width: 1023px)` în [src/pages/membri.astro](src/pages/membri.astro#L1637) cu: poză `clamp(240px, 42vw, 380px)`, `padding-bottom: 4.5rem` pe coloana de conținut (spațiu garantat pentru butonul BIO), itemi galerie reduși la 110–160 px.
+
+### 3. Fix featured story pe mobil în Publicații
+
+Pe [src/pages/publicatii.astro](src/pages/publicatii.astro#L388), primul articol (featured) avea `.ed-featured__text { position: absolute; bottom: 0 }` și pe ≤639 px → titlul + badge-ul se suprapuneau peste imagine. Trecut pe `position: static` pe mobil, cu bandă opacă sub imagine; overlay-ul de degrade a fost dezactivat (nu mai e necesar fără text peste imagine).
+
+### 4. Articol nou: „Formație Nuntă la Orhideea Events Pitești: Ghid Complet”
+
+Nou post SEO în [src/data/blogPosts.json](src/data/blogPosts.json), slug `formatie-nunta-orhideea-events-pitesti`. Devine **featured** pe [/publicatii/](src/pages/publicatii.astro) (datat 23 apr 2026).
+
+- **Target keywords:** `formatie nunta Orhideea Events`, `nunta Orhideea Pitești`, `locație nuntă Argeș`, `formație nuntă Pitești`.
+- **Structură:** 7 secțiuni h2 + 2 CTA WhatsApp inline + 1 placeholder imagine + 6 întrebări FAQ (acustica sălii, sonorizare proprie, componența formației, montaj/soundcheck, 100% live, rezervare).
+- **SEO on-page:** title 55 caractere (sub pragul 580 px), excerpt 180 caractere, h1 unic, anchor texts descriptive, FAQ JSON-LD generat automat de [src/pages/blog/[slug].astro](src/pages/blog/[slug].astro).
+- **Tone of voice:** „Șoferul explică mireseiˮ — direct, fără jargon, cu detalii tehnice reale (line-array, 88-92 dB, Shure Beta, monitoare in-ear, timp montaj 90-120 min).
+
+### Validare
+
+- `npx astro check` → **0 erori · 0 warnings · 0 hints** (58 fișiere).
+- JSON valid (fără erori de parsare).
+
+### Rezultat așteptat
+
+- Captură trafic organic pentru căutări tip „formație nuntă Orhideea Events” și „muzică live Orhideea Pitești”.
+- UX mobil/tabletă îmbunătățit — fără regresii pe desktop.
+
+---
+
 ## 🏁 22 aprilie 2026 — Audit Seobility 83% rezolvat → țintă 100%
 
 **Commit Git:** `9b3717a` · mesaj: `fix(seo): rezolvare erori Seobility (title length, apple-touch-icon, anchors)`

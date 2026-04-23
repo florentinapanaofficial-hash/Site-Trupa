@@ -378,10 +378,20 @@ const SITE = 'https://www.florentinapanaofficial.ro';
     }
     .ed-meta-dot { opacity: 0.4; }
 
-    /* Mobile: stack featured text below image */
+    /* Mobile: stack featured text below image (fără suprapunere) */
     @media (max-width: 639px) {
       .ed-featured__visual { aspect-ratio: 16 / 10; }
-      .ed-featured__text { padding: 1.2rem 1.4rem; }
+      /* Pe mobil scoatem textul de peste imagine și îl așezăm dedesubt. */
+      .ed-featured__text {
+        position: static;
+        padding: 1rem 1.2rem 1.3rem;
+        background: rgba(12, 8, 15, 0.72);
+        backdrop-filter: blur(10px);
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      /* Overlay-ul de degrade nu mai e necesar fără text peste imagine. */
+      .ed-featured__overlay { display: none; }
+      .ed-featured__title { text-shadow: none; }
       .ed-featured__excerpt { display: none; }
     }
 

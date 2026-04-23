@@ -1422,7 +1422,10 @@ function initiale(name: string): string {
       overflow-y: hidden !important;
       -webkit-overflow-scrolling: touch !important;
       overscroll-behavior-x: contain;
-      touch-action: pan-x pinch-zoom;
+      /* Permitem AMBELE axe: browser-ul alege după direcția dominantă —
+         swipe orizontal derulează galeria, swipe vertical derulează pagina.
+         Fără pan-y, degetul fix pe galerie bloca scroll-ul paginii. */
+      touch-action: pan-x pan-y pinch-zoom;
       gap: 0.6rem;
       /* Galeria iese simetric din padding-ul părinte */
       margin-left: -1rem;
@@ -1630,6 +1633,39 @@ function initiale(name: string): string {
   }
 
 
+
+  /* ══════════════════════════════════════════
+     TABLETĂ (600–1023px): 2 coloane, foto compactă
+     ── include atât tabletele portrait (≈768) cât și
+        landscape (≈1024), unde layout-ul desktop cu
+        poză min-height:500px provoca stretch + suprapuneri
+        între BIO btn și hint/indicator galerie. ──
+  ══════════════════════════════════════════ */
+  @media (min-width: 600px) and (max-width: 1023px) {
+    .member-card {
+      grid-template-columns: 32% 1fr;
+    }
+    .mc-photo-col {
+      min-height: clamp(240px, 42vw, 380px);
+    }
+    /* placeholder trebuie să urmeze aceeași înălțime */
+    .mc-photo-ph {
+      min-height: clamp(240px, 42vw, 380px);
+    }
+    .mc-photo-img {
+      object-position: center 20%;
+    }
+    /* Spațiu jos pentru butonul BIO (absolute, 52px + 1rem offset)
+       ca să nu mai acopere indicatorul de dots sau hint-ul "Glisează". */
+    .mc-content-col {
+      padding: 1.25rem 1.25rem 4.5rem 1.25rem;
+    }
+    /* Galeria: itemi ceva mai mici ca să intre uniform în coloana îngustă */
+    .mc-gallery-ph {
+      flex: 0 0 clamp(110px, 32%, 160px);
+      width: clamp(110px, 32%, 160px);
+    }
+  }
 
   /* ══════════════════════════════════════════
      TABLETĂ (600–767px): 2 coloane, foto 30%
