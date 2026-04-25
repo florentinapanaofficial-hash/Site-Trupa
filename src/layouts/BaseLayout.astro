@@ -703,10 +703,11 @@ const mobileNavAllItems = [
         left: 1.5rem;
         z-index: 900;
         display: flex;
+        flex-direction: column;
         align-items: center;
-        gap: 0.55rem;
-        padding: 0.6rem 1rem 0.6rem 0.8rem;
-        border-radius: 2rem;
+        gap: 0.3rem;
+        padding: 0.75rem 1.2rem;
+        border-radius: 1.25rem;
         background: linear-gradient(135deg, #c8890a 0%, #F5A623 55%, #f7c060 100%);
         color: #1a0a00;
         text-decoration: none;
@@ -730,9 +731,8 @@ const mobileNavAllItems = [
       }
 
       .grev-stars {
-        font-size: 0.85rem;
-        letter-spacing: 0.05em;
-        flex-shrink: 0;
+        font-size: 1rem;
+        letter-spacing: 0.08em;
         color: #5c3300;
         text-shadow: 0 1px 0 rgba(255,255,255,0.35);
       }
@@ -740,6 +740,7 @@ const mobileNavAllItems = [
       .grev-text {
         display: flex;
         flex-direction: column;
+        align-items: center;
         line-height: 1.2;
         min-width: 0;
       }
@@ -764,10 +765,7 @@ const mobileNavAllItems = [
       }
 
       .grev-icon {
-        flex-shrink: 0;
-        color: #3d1c00;
-        opacity: 0.75;
-        margin-left: 0.1rem;
+        display: none;
       }
 
       @keyframes grev-pulse {
@@ -779,26 +777,10 @@ const mobileNavAllItems = [
         }
       }
 
-      /* Mobile: mai proeminent, text mai scurt */
+      /* Mobile: ascunde butonul flotant — rămâne doar cel din meniu */
       @media (max-width: 767px) {
         .grev-float {
-          bottom: 1.25rem;
-          left: 1rem;
-          padding: 0.55rem 0.85rem 0.55rem 0.7rem;
-          gap: 0.45rem;
-          max-width: 12rem;
-        }
-
-        .grev-stars {
-          font-size: 0.8rem;
-        }
-
-        .grev-main {
-          font-size: 0.72rem;
-        }
-
-        .grev-sub {
-          font-size: 0.6rem;
+          display: none;
         }
       }
 
