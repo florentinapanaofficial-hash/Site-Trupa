@@ -677,6 +677,137 @@ const mobileNavAllItems = [
       }
     </style>
 
+    <!-- ══ Google Review Floating Button ══ -->
+    <a
+      href="https://g.page/r/Ca7MqSu2OLysEAE/review"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="grev-float"
+      aria-label="Oferă o recenzie Google pentru Formația Florentina Pană"
+    >
+      <span class="grev-stars" aria-hidden="true">★★★★★</span>
+      <span class="grev-text">
+        <span class="grev-main">Oferă o recenzie</span>
+        <span class="grev-sub">Cât de mult ți-a plăcut alături de noi?</span>
+      </span>
+      <svg class="grev-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+        <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.95 7.636l-5.313 5.314a.75.75 0 0 1-1.06 0L8.05 12.424a.75.75 0 1 1 1.06-1.06l2 2 4.78-4.78a.75.75 0 0 1 1.06 1.052z" fill="currentColor"/>
+      </svg>
+    </a>
+
+    <style>
+      /* ── Google Review Floating Pill ── */
+      .grev-float {
+        position: fixed;
+        bottom: 1.5rem;
+        left: 1.5rem;
+        z-index: 900;
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        padding: 0.6rem 1rem 0.6rem 0.8rem;
+        border-radius: 2rem;
+        background: linear-gradient(135deg, #c8890a 0%, #F5A623 55%, #f7c060 100%);
+        color: #1a0a00;
+        text-decoration: none;
+        font-family: inherit;
+        box-shadow: 0 4px 16px rgba(245, 166, 35, 0.5), 0 2px 6px rgba(0,0,0,0.3);
+        animation: grev-pulse 2.8s ease-in-out infinite;
+        transition: transform 200ms ease, box-shadow 200ms ease;
+        max-width: 14rem;
+      }
+
+      .grev-float:hover,
+      .grev-float:focus-visible {
+        transform: scale(1.05) translateY(-2px);
+        box-shadow: 0 8px 24px rgba(245, 166, 35, 0.65), 0 3px 10px rgba(0,0,0,0.35);
+        animation: none;
+      }
+
+      .grev-float:focus-visible {
+        outline: 2px solid #fff;
+        outline-offset: 3px;
+      }
+
+      .grev-stars {
+        font-size: 0.85rem;
+        letter-spacing: 0.05em;
+        flex-shrink: 0;
+        color: #5c3300;
+        text-shadow: 0 1px 0 rgba(255,255,255,0.35);
+      }
+
+      .grev-text {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.2;
+        min-width: 0;
+      }
+
+      .grev-main {
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #1a0a00;
+        white-space: nowrap;
+      }
+
+      .grev-sub {
+        font-size: 0.63rem;
+        font-weight: 500;
+        color: #3d1c00;
+        opacity: 0.85;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .grev-icon {
+        flex-shrink: 0;
+        color: #3d1c00;
+        opacity: 0.75;
+        margin-left: 0.1rem;
+      }
+
+      @keyframes grev-pulse {
+        0%, 100% {
+          box-shadow: 0 4px 16px rgba(245, 166, 35, 0.5), 0 0 0 0 rgba(245, 166, 35, 0.45);
+        }
+        50% {
+          box-shadow: 0 4px 16px rgba(245, 166, 35, 0.5), 0 0 0 10px rgba(245, 166, 35, 0);
+        }
+      }
+
+      /* Mobile: mai proeminent, text mai scurt */
+      @media (max-width: 767px) {
+        .grev-float {
+          bottom: 1.25rem;
+          left: 1rem;
+          padding: 0.55rem 0.85rem 0.55rem 0.7rem;
+          gap: 0.45rem;
+          max-width: 12rem;
+        }
+
+        .grev-stars {
+          font-size: 0.8rem;
+        }
+
+        .grev-main {
+          font-size: 0.72rem;
+        }
+
+        .grev-sub {
+          font-size: 0.6rem;
+        }
+      }
+
+      /* Respectă preferința reduce-motion */
+      @media (prefers-reduced-motion: reduce) {
+        .grev-float { animation: none; }
+      }
+    </style>
+
   </body>
 </html>
 
