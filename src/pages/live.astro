@@ -3,7 +3,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import BackButton from '../components/BackButton.astro';
 
 const YOUTUBE_CHANNEL_ID = 'UCNi3X-Qm3V4aaOAFSOlzHew';
-const liveEmbedUrl = `https://www.youtube.com/embed/live_stream?channel=${YOUTUBE_CHANNEL_ID}`;
 ---
 
 <BaseLayout
@@ -20,8 +19,8 @@ const liveEmbedUrl = `https://www.youtube.com/embed/live_stream?channel=${YOUTUB
     <div class="section-container relative z-10 text-center">
       <div class="mb-8"><BackButton href="/" label="Acasă" /></div>
 
-      {/* Indicator ON AIR */}
-      <div class="mb-6 inline-flex items-center gap-2.5 rounded-full border border-red-500/30 bg-red-500/10 px-5 py-2.5" id="live-badge">
+      {/* Indicator ON AIR — ascuns implicit, JS îl afișează dacă e live */}
+      <div class="mb-6 inline-flex items-center gap-2.5 rounded-full border border-red-500/30 bg-red-500/10 px-5 py-2.5" id="live-badge" style="display:none">
         <span class="relative flex h-3.5 w-3.5">
           <span class="absolute inline-flex h-full w-full animate-pulse rounded-full bg-red-500 opacity-75"></span>
           <span class="relative inline-flex h-3.5 w-3.5 rounded-full bg-red-500"></span>
@@ -85,9 +84,11 @@ const liveEmbedUrl = `https://www.youtube.com/embed/live_stream?channel=${YOUTUB
         {/* Container player — adaptiv landscape / vertical */}
         <div class="live-player-frame" id="live-player-frame">
           <div class="live-player-aspect" id="live-player-aspect">
+            {/* src gol inițial — JS îl populează după verificarea live-status */}
             <iframe
               id="live-player"
-              src={liveEmbedUrl}
+              src=""
+              data-channel={YOUTUBE_CHANNEL_ID}
               title="Live Stream — Formația Florentina Pană"
               class="absolute inset-0 h-full w-full"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -98,6 +99,11 @@ const liveEmbedUrl = `https://www.youtube.com/embed/live_stream?channel=${YOUTUB
           </div>
         </div>
       </div>
+
+      {/* Mesaj offline — afișat de JS când nu e live */}
+      <p id="offline-msg" class="mx-auto mt-4 max-w-xl text-center text-sm leading-relaxed text-amber-400/70" style="display:none">
+        Nu suntem live acum — în player poți vedea ultimele înregistrări de pe canal.
+      </p>
 
       {/* Text descriptiv sub player */}
       <p class="mx-auto mt-8 max-w-xl text-center text-base leading-relaxed text-white/50">
@@ -371,6 +377,34 @@ const liveEmbedUrl = `https://www.youtube.com/embed/live_stream?channel=${YOUTUB
 
 <script is:inline>
   (function () {
+    // ── Detecție live ──
+    var player = document.getElementById('live-player');
+    var badge = document.getElementById('live-badge');
+    var offlineMsg = document.getElementById('offline-msg');
+    var channelId = player ? player.getAttribute('data-channel') : null;
+
+    if (player && channelId) {
+      fetch('/api/live-status/')
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data.isLive && data.videoId) {
+            player.src = 'https://www.youtube-nocookie.com/embed/' + data.videoId + '?autoplay=1&rel=0';
+            if (badge) badge.style.display = '';
+            if (offlineMsg) offlineMsg.style.display = 'none';
+          } else {
+            if (badge) badge.style.display = 'none';
+            if (offlineMsg) offlineMsg.style.display = '';
+            // Fallback: ultimele clipuri publice de pe canal
+            player.src = 'https://www.youtube-nocookie.com/embed/?listType=user_uploads&list=' + channelId;
+          }
+        })
+        .catch(function () {
+          if (badge) badge.style.display = 'none';
+          if (offlineMsg) offlineMsg.style.display = '';
+          if (player) player.src = 'https://www.youtube-nocookie.com/embed/?listType=user_uploads&list=' + channelId;
+        });
+    }
+
     const btnLandscape = document.getElementById('btn-landscape');
     const btnVertical = document.getElementById('btn-vertical');
     const wrap = document.getElementById('live-glass-wrap');
