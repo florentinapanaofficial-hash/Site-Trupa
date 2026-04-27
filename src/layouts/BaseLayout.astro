@@ -12,9 +12,11 @@ interface Props {
   description: string;
   ogImage?: string;
   ogType?: string;
+  datePublished?: string;
+  dateModified?: string;
 }
 
-const { title, description, ogType = 'website' } = Astro.props as Props;
+const { title, description, ogType = 'website', datePublished, dateModified } = Astro.props as Props;
 
 const SITE_FALLBACK = 'https://www.florentinapanaofficial.ro';
 const site = Astro.site?.toString().replace(/\/$/, '') ?? SITE_FALLBACK;
@@ -105,8 +107,8 @@ const webPageLd = {
       "url": `${site}/images/sigla-fp-band.webp`
     }
   },
-  "datePublished": "2024-01-15",
-  "dateModified": new Date().toISOString().split('T')[0]
+  ...(datePublished ? { "datePublished": datePublished } : {}),
+  ...(dateModified ? { "dateModified": dateModified } : {})
 };
 
 // JSON-LD: BreadcrumbList — navigare ierarhică pentru Google
@@ -156,8 +158,7 @@ const sideMenuTopItems = [
   { href: '/publicatii/', label: 'Publicații', color: 'cyan', icon: 'book' },
   { href: '/vlog/', label: 'Vlog', color: 'cyan', icon: 'play' },
   { href: '/aparitii-tv/', label: 'Apariții TV', color: 'cyan', icon: 'tv' },
-  { href: '/live/', label: '🔴 LIVE', color: 'cyan', icon: 'video' },
-  { href: '/contact/', label: 'Contact', color: 'cyan', icon: 'mail' },
+  { href: '/live/', label: '🔴 LIVE', color: 'rose', icon: 'video' },
 ];
 
 const sideMenuBottomItems: { href: string; label: string; color: string }[] = [];
@@ -181,7 +182,7 @@ const mobileNavAllItems = [
   { href: '/publicatii/', label: 'Publicații', color: 'cyan' },
   { href: '/vlog/', label: 'Vlog', color: 'cyan' },
   { href: '/aparitii-tv/', label: 'Apariții TV', color: 'cyan' },
-  { href: '/live/', label: '🔴 LIVE', color: 'cyan' },
+  { href: '/live/', label: '🔴 LIVE', color: 'rose' },
   { href: '/contact/', label: 'Contact', color: 'cyan' },
 ];
 ---

@@ -16,10 +16,15 @@ const CHANNEL_ID = 'UCNi3X-Qm3V4aaOAFSOlzHew';
 
 export const GET: APIRoute = async ({ request }) => {
     const originCheck = checkOrigin(request);
+
+    if (!originCheck.allowed) {
+        return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403 });
+    }
+
     const headers: Record<string, string> = {
         'Content-Type': 'application/json',
         'Cache-Control': 'no-store, max-age=0',
-        ...originCheck.headers,
+        ...(originCheck.origin ? { 'Access-Control-Allow-Origin': originCheck.origin } : {}),
     };
 
     const apiKey = import.meta.env.YOUTUBE_API_KEY;

@@ -11,9 +11,44 @@ const getYoutubeId = (url: string) => {
   const match = url.match(/(?:v=|youtu\.be\/)([^&?/]+)/);
   return match?.[1] ?? '';
 };
+
+const SITE = 'https://www.florentinapanaofficial.ro';
+
+const videoObjectsLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: `Apariții TV — ${brand.name}`,
+  itemListElement: tvAppearances
+    .map((item, idx) => {
+      const ytId = getYoutubeId(item.videoUrl);
+      if (!ytId) return null;
+      return {
+        '@type': 'ListItem',
+        position: idx + 1,
+        item: {
+          '@type': 'VideoObject',
+          name: item.show || `Apariție TV #${idx + 1}`,
+          description: item.note || `Moment live de la ${item.channel} (${item.year})`,
+          thumbnailUrl: `https://img.youtube.com/vi/${ytId}/maxresdefault.jpg`,
+          uploadDate: `${item.year}-01-01`,
+          embedUrl: `https://www.youtube.com/embed/${ytId}`,
+          url: item.videoUrl,
+          publisher: {
+            '@type': 'Organization',
+            name: brand.name,
+            url: SITE,
+          },
+        },
+      };
+    })
+    .filter(Boolean),
+};
 ---
 
 <BaseLayout title={`Apariții TV și Emisiuni | ${brand.name}`} description="Galerie video cu apariții TV ale Formației Florentina Pană în emisiuni și gale televizate din România.">
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(videoObjectsLd)} />
+  </Fragment>
   <section class="section-container py-16">
     <div class="mb-8"><BackButton href="/" label="Acasă" /></div>
     <header class="section-head mx-auto text-center">

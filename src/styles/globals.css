@@ -143,7 +143,7 @@
 }
 
 .feature-icon-gradient {
-  background: linear-gradient(135deg, #F5A623 0%, #FFD700 50%, #0BBCD6 100%);
+  background: linear-gradient(135deg, #F5A623 0%, #FFD700 100%);
   box-shadow: 0 4px 14px rgba(245, 166, 35, 0.35);
 }
 
@@ -179,8 +179,8 @@
   /* ── Text ── */
   --title: #FFF8EE;
   /* alb cald – ca lumina tungsten */
-  --body: #C8B49A;
-  /* bej-auriu – lizibil, cald */
+  --body: #CEC6BA;
+  /* gri-bej cald – lizibil fără tensiune cromatică pe fundal violet-negru */
   --muted: #9A8A78;
   /* text secundar – ajustat pt contrast ≥ 4.5:1 pe #0C080F */
 
@@ -226,7 +226,7 @@
     --gold-bright: #FFF59D;
     --accent-gold: #FFE066;
     --accent-gold-light: #FFF59D;
-    --body: #D4C0A6;
+    --body: #D4CCBE;
     --line: rgba(255, 210, 110, 0.14);
     --line-h: rgba(255, 210, 110, 0.32);
   }

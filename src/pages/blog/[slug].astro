@@ -73,7 +73,7 @@ const heroBg = heroBgMap[post.categoryAccent] ?? 'rgba(245,166,35,0.40)';
 const prevPost = allPosts[allPosts.findIndex((p) => p.slug === post.slug) - 1];
 const nextPost = allPosts[allPosts.findIndex((p) => p.slug === post.slug) + 1];
 
-const siteBase = 'https://florentinapanaofficial.ro';
+const siteBase = 'https://www.florentinapanaofficial.ro';
 const postCanonical = `${siteBase}/blog/${post.slug}`;
 const shareUrlEnc = encodeURIComponent(postCanonical);
 const shareTextEnc = encodeURIComponent(post.title);
@@ -115,6 +115,8 @@ const faqJsonLd = post.faq && post.faq.length > 0 ? {
   description={post.excerpt}
   ogImage={postOgImage}
   ogType="article"
+  datePublished={post.date}
+  dateModified={post.date}
 >
   <Fragment slot="head">
     <meta property="article:published_time" content={post.date} />
@@ -705,3 +707,5 @@ const faqJsonLd = post.faq && post.faq.length > 0 ? {
     line-height: 1.65;
   }
 </style>
+
+
