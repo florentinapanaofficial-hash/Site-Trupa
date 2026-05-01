@@ -27,7 +27,7 @@ export const GET: APIRoute = async ({ request }) => {
         ...(originCheck.origin ? { 'Access-Control-Allow-Origin': originCheck.origin } : {}),
     };
 
-    const apiKey = import.meta.env.YOUTUBE_API_KEY;
+    const apiKey = process.env.YOUTUBE_API_KEY;
 
     if (!apiKey) {
         return new Response(
