@@ -149,7 +149,7 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       <!-- Desktop: bară orizontală cu scroll -->
       <nav class="no-scrollbar section-container nav-desktop-bar flex min-w-0 items-center justify-start gap-4 overflow-x-auto pb-3 text-sm font-medium text-white/90 xl:justify-center" aria-label="Navigație principală">
         {desktopNavigation.map((item) => (
-          <a href={item.href} class={`left-side-link nav-link-desktop${item.color ? ` nav-btn-${item.color}` : ''}`} data-nav-link>
+          <a href={item.href} class={`left-side-link nav-link-desktop${item.color ? ` nav-btn-${item.color}` : ''}`} data-nav-link data-live-link={item.href === '/live/' ? 'true' : undefined}>
             <span class="nav-label">{item.label}</span>
           </a>
         ))}
@@ -157,7 +157,7 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       <!-- Mobil: grilă verticală cu toate paginile -->
       <nav class="nav-mobile-grid" aria-label="Navigație mobilă">
         {mobileFullNavigation.map((item) => (
-          <a href={item.href} class={`left-side-link nav-link-mobile${item.color ? ` nav-btn-${item.color}` : ''}`} data-nav-link>
+          <a href={item.href} class={`left-side-link nav-link-mobile${item.color ? ` nav-btn-${item.color}` : ''}`} data-nav-link data-live-link={item.href === '/live/' ? 'true' : undefined}>
             <span class="nav-label">{item.label}</span>
           </a>
         ))}
@@ -363,6 +363,50 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
     }
 
     const links = Array.from(document.querySelectorAll('#top-menu-panel [data-nav-link]'));
+    const liveLinks = Array.from(document.querySelectorAll('#top-menu-panel [data-live-link="true"]'));
+    const LIVE_STATUS_REFRESH_MS = 60000;
+
+    const applyLiveState = (isLive) => {
+      liveLinks.forEach((link) => {
+        link.classList.toggle('is-live-now', isLive);
+
+        if (isLive) {
+          link.setAttribute('data-live-state', 'on');
+          link.style.opacity = '1';
+          link.style.filter = 'brightness(1.14) saturate(1.22)';
+          link.style.border = '2px solid rgba(239, 68, 68, 0.78)';
+          link.style.boxShadow = '0 0 0 1px rgba(127, 29, 29, 0.4), 0 0 20px rgba(239, 68, 68, 0.28)';
+        } else {
+          link.removeAttribute('data-live-state');
+          link.style.removeProperty('opacity');
+          link.style.removeProperty('filter');
+          link.style.removeProperty('border');
+          link.style.removeProperty('box-shadow');
+        }
+      });
+    };
+
+    const refreshLiveState = () => {
+      if (liveLinks.length === 0) return;
+
+      fetch('/api/live-status/', {
+        cache: 'no-store',
+        headers: {
+          Accept: 'application/json',
+        },
+      })
+        .then((response) => response.ok ? response.json() : { isLive: false })
+        .then((data) => {
+          applyLiveState(Boolean(data?.isLive));
+        })
+        .catch(() => {
+          applyLiveState(false);
+        });
+    };
+
+    refreshLiveState();
+    window.setInterval(refreshLiveState, LIVE_STATUS_REFRESH_MS);
+
     if (links.length === 0) return;
 
     const normalizePathnameFromHref = (href) => {

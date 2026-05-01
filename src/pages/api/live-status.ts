@@ -12,7 +12,7 @@ import { checkOrigin } from '../../lib/cors.js';
 
 export const prerender = false;
 
-const CHANNEL_ID = 'UCNi3X-Qm3V4aaOAFSOlzHew';
+const FALLBACK_CHANNEL_ID = 'UCNi3X-Qm3V4aaOAFSOlzHew';
 
 export const GET: APIRoute = async ({ request }) => {
     const originCheck = checkOrigin(request);
@@ -28,6 +28,7 @@ export const GET: APIRoute = async ({ request }) => {
     };
 
     const apiKey = process.env.YOUTUBE_API_KEY;
+    const channelId = process.env.YOUTUBE_CHANNEL_ID?.trim() || FALLBACK_CHANNEL_ID;
 
     if (!apiKey) {
         return new Response(
@@ -39,7 +40,7 @@ export const GET: APIRoute = async ({ request }) => {
     try {
         const url = new URL('https://www.googleapis.com/youtube/v3/search');
         url.searchParams.set('part', 'id');
-        url.searchParams.set('channelId', CHANNEL_ID);
+        url.searchParams.set('channelId', channelId);
         url.searchParams.set('eventType', 'live');
         url.searchParams.set('type', 'video');
         url.searchParams.set('maxResults', '1');

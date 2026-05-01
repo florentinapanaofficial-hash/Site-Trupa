@@ -2,12 +2,16 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BackButton from '../components/BackButton.astro';
 
-const YOUTUBE_CHANNEL_ID = 'UCNi3X-Qm3V4aaOAFSOlzHew';
+const YOUTUBE_CHANNEL_ID = process.env.YOUTUBE_CHANNEL_ID?.trim() || 'UCNi3X-Qm3V4aaOAFSOlzHew';
+const livePageTitle = 'LIVE de la Evenimente | Formația Florentina Pană';
+const livePageDescription = 'Urmărește live stream-urile de la nunți, botezuri și evenimente cu Formația Florentina Pană. Simte energia FP Band în timp real.';
+const livePageOgImage = '/images/og-live-1200x630.jpg';
 ---
 
 <BaseLayout
-  title="LIVE de la Evenimente | Formația Florentina Pană"
-  description="Urmărește live stream-urile de la nunți, botezuri și evenimente cu Formația Florentina Pană. Simte energia FP Band în timp real."
+  title={livePageTitle}
+  description={livePageDescription}
+  ogImage={livePageOgImage}
 >
 
   {/* ═══════════════════════════════════════════
