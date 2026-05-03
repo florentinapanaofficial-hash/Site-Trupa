@@ -388,7 +388,7 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
     var channelId = player ? player.getAttribute('data-channel') : null;
 
     if (player && channelId) {
-      fetch('/api/live-status/')
+      fetch('/api/live-status')
         .then(function (r) { return r.json(); })
         .then(function (data) {
           if (data.isLive && data.videoId) {
@@ -398,14 +398,14 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
           } else {
             if (badge) badge.style.display = 'none';
             if (offlineMsg) offlineMsg.style.display = '';
-            // Fallback: ultimele clipuri publice de pe canal
-            player.src = 'https://www.youtube-nocookie.com/embed/?listType=user_uploads&list=' + channelId;
+            // Fallback: embed canal YouTube (ultimele videoclipuri / live dacă există)
+            player.src = 'https://www.youtube-nocookie.com/embed/live_stream?channel=' + channelId + '&autoplay=0&rel=0';
           }
         })
         .catch(function () {
           if (badge) badge.style.display = 'none';
           if (offlineMsg) offlineMsg.style.display = '';
-          if (player) player.src = 'https://www.youtube-nocookie.com/embed/?listType=user_uploads&list=' + channelId;
+          if (player) player.src = 'https://www.youtube-nocookie.com/embed/live_stream?channel=' + channelId + '&autoplay=0&rel=0';
         });
     }
 
