@@ -161,6 +161,55 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
         </button>
       </div>
 
+      {/* ── Panou „Anunță Live pe Facebook" ── */}
+      <div class="mx-auto mt-10 max-w-xl rounded-2xl border border-[#1877f2]/30 bg-[#1877f2]/8 p-6" id="announce-box">
+        <div class="mb-3 flex items-center gap-2">
+          <span class="relative flex h-2.5 w-2.5">
+            <span class="absolute inline-flex h-full w-full animate-pulse rounded-full bg-[#1877f2] opacity-75"></span>
+            <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#1877f2]"></span>
+          </span>
+          <p class="text-xs font-bold uppercase tracking-widest text-[#74a7ff]">Anunță evenimentul Live</p>
+        </div>
+
+        <p class="mb-3 text-xs leading-relaxed text-white/40">Copiază textul de mai jos, apoi postează-l pe Facebook — 10 secunde și fanii tăi știu că ești live.</p>
+
+        {/* Textul pre-scris — editabil de Claudiu */}
+        <div class="relative rounded-xl border border-white/10 bg-black/40 p-4">
+          <p class="live-announce-text select-all text-sm leading-relaxed text-white/80" id="announce-text">
+            🎵 Suntem LIVE acum! Urmărește în direct muzica noastră de la eveniment 🎶<br />
+            Intră pe link și simte atmosfera alături de noi 👇<br />
+            https://florentinapanaofficial.ro/live/
+          </p>
+          <button
+            type="button"
+            id="copy-announce"
+            class="mt-3 flex w-full items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 py-2 text-xs font-semibold text-white/60 transition-all hover:border-[#1877f2]/40 hover:bg-[#1877f2]/10 hover:text-[#74a7ff]"
+            aria-label="Copiază textul de anunț"
+          >
+            <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span id="copy-announce-label">Copiază textul</span>
+          </button>
+        </div>
+
+        {/* Buton Facebook mare */}
+        <a
+          id="btn-fb-announce"
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="mt-4 flex w-full items-center justify-center gap-3 rounded-xl bg-[#1877f2] py-3.5 text-sm font-bold text-white shadow-[0_4px_20px_rgba(24,119,242,0.35)] transition-all hover:bg-[#1565d8] hover:shadow-[0_6px_28px_rgba(24,119,242,0.5)]"
+          aria-label="Deschide Facebook pentru a posta"
+        >
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12Z"/>
+          </svg>
+          Postează pe Facebook
+        </a>
+      </div>
+
       {/* CTA — imediat sub player, vizibil indiferent de format */}
       <div class="mt-8 text-center">
         <a
@@ -452,6 +501,36 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
             copyBtn.style.borderColor = '';
             copyBtn.style.color = '';
           }, 2000);
+        });
+      });
+    }
+
+    // ── Panou Anunță Live pe Facebook ──
+    var announceText = document.getElementById('announce-text');
+    var copyAnnounceBtn = document.getElementById('copy-announce');
+    var copyAnnounceLabel = document.getElementById('copy-announce-label');
+    var fbAnnounceBtn = document.getElementById('btn-fb-announce');
+
+    // Buton Facebook — URL sharer cu link-ul paginii live
+    var liveUrl = 'https://florentinapanaofficial.ro/live/';
+    if (fbAnnounceBtn) {
+      fbAnnounceBtn.href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(liveUrl);
+    }
+
+    // Buton Copiază textul de anunț
+    if (copyAnnounceBtn && announceText && copyAnnounceLabel) {
+      copyAnnounceBtn.addEventListener('click', function () {
+        var text = announceText.innerText || announceText.textContent || '';
+        navigator.clipboard.writeText(text.trim()).then(function () {
+          var orig = copyAnnounceLabel.textContent;
+          copyAnnounceLabel.textContent = '✓ Copiat!';
+          copyAnnounceBtn.style.borderColor = 'rgba(34, 197, 94, 0.5)';
+          copyAnnounceBtn.style.color = '#22c55e';
+          setTimeout(function () {
+            copyAnnounceLabel.textContent = orig;
+            copyAnnounceBtn.style.borderColor = '';
+            copyAnnounceBtn.style.color = '';
+          }, 2500);
         });
       });
     }

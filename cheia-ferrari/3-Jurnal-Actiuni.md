@@ -198,6 +198,51 @@ La sfârșitul fiecărei sesiuni, Ferrari execută automat:
 ## 📋 CARTEA DE SERVICE — Sesiuni de lucru
 
 ---
+
+## 🏁 4 mai 2026 — Unificare jurnal + Protocol Ferrari + Panou Live Facebook
+
+### Ce s-a stabilit (structură permanentă)
+- **Singurul jurnal** al proiectului: `cheia-ferrari/3-Jurnal-Actiuni.md` — `AI_JOURNAL.md` șters
+- **Protocol final sesiune:** Ferrari face automat check → add → commit → push. Claudiu nu face nimic tehnic.
+- **Calendar lunar SEO:** la prima sesiune din fiecare lună, Ferrari anunță și execută procesele lunare (~23 min)
+- **Rol Ferrari:** profesor-doctor SEO, nu executor orb — analizează înainte de implementare, atrage atenția când o idee nu e bună strategic
+
+### Panou „Anunță Live pe Facebook" — `src/pages/live.astro`
+**Motivul:** Automatizarea prin Graph API Facebook nu e recomandată (token-uri care expiră la 60 zile, instabilitate Meta, reach penalizat pentru posturi automate). Soluția corectă: panou manual cu text pre-scris, zero întreținere, funcționează mereu.
+
+**Ce s-a adăugat:**
+- Secțiune vizuală cu indicator albastru pulsator „Anunță evenimentul Live"
+- Text pre-scris în română (copyabil cu un singur click) — include emoji + link direct `/live/`
+- Buton „Copiază textul" cu feedback vizual verde „✓ Copiat!" timp de 2.5s
+- Buton mare albastru „Postează pe Facebook" — deschide Facebook Sharer cu URL-ul paginii live pre-completat
+- Zero API, zero token-uri, zero întreținere — funcționează pe orice browser, mereu
+
+**Cum folosești:** Deschizi `/live/` pe telefon → dai click „Copiază textul" → deschizi Facebook → creezi post → lipești textul → postezi. 10 secunde.
+
+### Procese lunare SEO — mai 2026 (prima sesiune din lună)
+- `seo-analyzer.js` → 13 oportunități identificate, top 5 în Tracker SEO actualizat
+- `keyword-harvester.js "formatie nunta"` → 114 keywords curate recoltate (în `harvested-keywords.json`)
+- `check-links.mjs` → 66 linkuri OK; 19 „probleme" sunt false pozitive (template variables Astro + Facebook blochează scraping-ul automat)
+- `2-Tracker-SEO.md` actualizat cu pozițiile mai 2026
+
+### Priorități SEO identificate pentru luna mai
+1. **„cele mai bune formatii de nunta"** — poziție 15.2, CTR 0.67% cu 300 afișări = cea mai mare pierdere. Necesită optimizare title + meta pe homepage.
+2. **„formatie nunta 2025"** — keyword cu an vechi în conținut, de actualizat la 2026
+3. **„muzica nunta live"** — poziție 12.3, optimizare title pe `/galerie-video/`
+4. **Pagină locală București cu focus prețuri** — gap confirmat (poziție 11.8 pe „preturi formatie nunta bucuresti")
+
+### Fișiere modificate
+- `src/pages/live.astro` — panou Anunță Live Facebook
+- `cheia-ferrari/1-Regulament-Autopilot.md` — protocol final sesiune + calendar lunar
+- `cheia-ferrari/2-Tracker-SEO.md` — actualizat mai 2026
+- `cheia-ferrari/3-Jurnal-Actiuni.md` — restructurat complet (singurul jurnal)
+- `AI_JOURNAL.md` — șters
+
+### Validare
+- ✅ `npx astro check` → 0 / 0 / 0
+- ✅ Commit `36edec3` + commit sesiune curentă pe `main`
+
+---
 ## 🏁 23 aprilie 2026 — Fix Open Graph Facebook + corecție conținut articol
 
 ### 1. Corecție nume — articolul „Plăcerea de a Cânta pe Scenă"
