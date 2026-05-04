@@ -163,7 +163,7 @@
 
 
 :root {
-  color-scheme: dark;
+  color-scheme: light dark;
   --scroll-progress: 0;
 
   /* ── Fundal ── */
@@ -218,25 +218,6 @@
   --social-fb: #1877F2;
   --social-ig-bg: radial-gradient(circle at 30% 110%, #ffd676 0%, #f46f30 25%, #e1306c 55%, #833ab4 80%, #405de6 100%);
   --social-tt: #010101;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   DARK MODE ADAPTIV — rafinament auriu pe ecrane OLED / seara
-   Site-ul e dark-first; aceste ajustări cresc luminozitatea aurului
-   pe dispozitive cu mod întunecat activ (negru profund OLED).
-   Contrast asigurat: --gold #FFE066 pe #0C080F → 12.1:1 (AAA).
-═══════════════════════════════════════════════════════════════ */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --gold: #FFE066;
-    --gold-dim: #F5B800;
-    --gold-bright: #FFF59D;
-    --accent-gold: #FFE066;
-    --accent-gold-light: #FFF59D;
-    --body: #D4CCBE;
-    --line: rgba(255, 210, 110, 0.14);
-    --line-h: rgba(255, 210, 110, 0.32);
-  }
 }
 
 body {
