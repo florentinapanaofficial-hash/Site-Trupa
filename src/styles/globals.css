@@ -1850,10 +1850,11 @@ details:focus-visible {
 
 .menu-review-btn {
   display: inline-flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0.65rem 1.4rem;
+  justify-content: center;
+  gap: 0.7rem;
+  padding: 0.6rem 1.4rem;
   border-radius: 2rem;
   background: linear-gradient(135deg, #c8890a 0%, #F5A623 55%, #f7c060 100%);
   color: #1a0a00;
@@ -1885,7 +1886,7 @@ details:focus-visible {
 .menu-review-text {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   line-height: 1.2;
 }
 
@@ -1906,7 +1907,7 @@ details:focus-visible {
   white-space: nowrap;
 }
 
-/* Pe mobil: lățime completă, centrat */
+/* Pe mobil: lățime completă, centrat, layout vertical */
 @media (max-width: 767px) {
   .menu-review-wrap {
     padding: 0.5rem 0.75rem 0.75rem;
@@ -1915,6 +1916,12 @@ details:focus-visible {
   .menu-review-btn {
     width: 100%;
     max-width: 18rem;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .menu-review-text {
+    align-items: center;
   }
 
   .menu-review-sub {
