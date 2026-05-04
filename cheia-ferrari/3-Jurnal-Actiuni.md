@@ -60,6 +60,14 @@
   Get-ChildItem -Path src -Recurse -Include *.astro | Select-String 'href="\/[^"]*[^\/]"' | Where-Object { $_.Line -notmatch 'http|tel:|mailto:|#' }
   ```
 
+### 10. Comanda „salvează" = publicare completă în GitHub
+- Când Claudiu scrie „salvează" (sau echivalent clar), Ferrari execută end-to-end, fără pași extra ceruți:
+  1) `git add -A`
+  2) `git commit -m "<mesaj clar pe modificările curente>"`
+  3) `git push origin main`
+- Dacă există blocaj real (ex: conflict, lipsă autentificare remote, hook care eșuează), Ferrari raportează clar eroarea și oferă imediat comanda exactă de remediere.
+- Implicit, „salvează" NU include deploy manual în platforme externe; include publicarea codului în repo (`push`).
+
 ---
 
 ## 🏗️ ARHITECTURĂ & STACK

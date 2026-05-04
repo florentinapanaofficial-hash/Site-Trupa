@@ -48,32 +48,11 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
   <section class="live-player-section bg-[#1a1005] py-12 sm:py-16">
     <div class="section-container">
 
-      {/* Selector format — toggle landscape / vertical */}
-      <div class="mb-6 flex items-center justify-center gap-3">
-        <button
-          type="button"
-          id="btn-landscape"
-          class="live-format-btn live-format-btn--active"
-          aria-pressed="true"
-          aria-label="Format landscape 16:9"
-        >
-          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <rect x="2" y="5" width="20" height="14" rx="2" />
-          </svg>
-          <span>Landscape</span>
-        </button>
-        <button
-          type="button"
-          id="btn-vertical"
-          class="live-format-btn"
-          aria-pressed="false"
-          aria-label="Format vertical 9:16"
-        >
-          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <rect x="6" y="2" width="12" height="20" rx="2" />
-          </svg>
-          <span>Vertical</span>
-        </button>
+      {/* Status format — detectare automată landscape / vertical */}
+      <div class="mb-6 flex items-center justify-center">
+        <p id="live-format-status" class="live-format-status" aria-live="polite">
+          Detectăm automat formatul video...
+        </p>
       </div>
 
       {/* Wrapper glassmorphism — fundal blur decorativ vizibil în modul vertical pe desktop */}
@@ -251,6 +230,15 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
           <div class="p-4">
             <p class="text-sm font-semibold text-white/90 group-hover:text-amber-400 transition-colors">Live FP Band — Eveniment</p>
             <p class="mt-1 text-xs text-white/40">3 mai 2026</p>
+            <a
+              href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DbffqJGtP9ok"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="live-card-share"
+              aria-label="Distribuie acest live pe Facebook"
+            >
+              Distribuie pe Facebook
+            </a>
           </div>
         </a>
         <!-- Live 2 -->
@@ -268,6 +256,15 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
           <div class="p-4">
             <p class="text-sm font-semibold text-white/90 group-hover:text-amber-400 transition-colors">Live FP Band — Eveniment</p>
             <p class="mt-1 text-xs text-white/40">3 mai 2026</p>
+            <a
+              href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DEAQ_mTbj_uY"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="live-card-share"
+              aria-label="Distribuie acest live pe Facebook"
+            >
+              Distribuie pe Facebook
+            </a>
           </div>
         </a>
         <!-- Live 3 -->
@@ -285,6 +282,15 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
           <div class="p-4">
             <p class="text-sm font-semibold text-white/90 group-hover:text-amber-400 transition-colors">Live FP Band — Eveniment</p>
             <p class="mt-1 text-xs text-white/40">3 mai 2026</p>
+            <a
+              href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D3b9KYuoTjBA"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="live-card-share"
+              aria-label="Distribuie acest live pe Facebook"
+            >
+              Distribuie pe Facebook
+            </a>
           </div>
         </a>
       </div>
@@ -334,29 +340,19 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
 </BaseLayout>
 
 <style>
-  /* ── Format toggle buttons ── */
-  .live-format-btn {
+  /* ── Indicator format detectat automat ── */
+  .live-format-status {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
     padding: 0.45rem 1rem;
     border-radius: 9999px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.04);
-    color: rgba(255, 255, 255, 0.45);
+    border: 1px solid rgba(245, 166, 35, 0.35);
+    background: rgba(245, 166, 35, 0.08);
+    color: rgba(255, 255, 255, 0.7);
     font-size: 0.8rem;
     font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  .live-format-btn:hover {
-    border-color: rgba(245, 166, 35, 0.3);
-    color: rgba(255, 255, 255, 0.7);
-  }
-  .live-format-btn--active {
-    border-color: rgba(245, 166, 35, 0.5);
-    background: rgba(245, 166, 35, 0.1);
-    color: #f5a623;
+    letter-spacing: 0.02em;
   }
 
   /* ── Glassmorphism wrapper ── */
@@ -492,6 +488,26 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
   .live-share-btn:active {
     transform: translateY(0);
   }
+
+  .live-card-share {
+    display: inline-flex;
+    margin-top: 0.6rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(24, 119, 242, 0.35);
+    background: rgba(24, 119, 242, 0.12);
+    color: #8bb7ff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 1;
+    padding: 0.4rem 0.65rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+  .live-card-share:hover {
+    border-color: rgba(24, 119, 242, 0.6);
+    background: rgba(24, 119, 242, 0.2);
+    color: #bfd7ff;
+  }
 </style>
 
 <script is:inline>
@@ -504,6 +520,81 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
 
     var LAST_LIVE_ID = 'bffqJGtP9ok'; // ultimul live înregistrat — actualizează după fiecare eveniment
 
+    var formatStatus = document.getElementById('live-format-status');
+    const wrap = document.getElementById('live-glass-wrap');
+
+    if (!wrap) return;
+
+    function setFormat(vertical) {
+      wrap.classList.toggle('is-vertical', vertical);
+      if (formatStatus) {
+        formatStatus.textContent = vertical
+          ? 'Format detectat automat: Vertical 9:16'
+          : 'Format detectat automat: Landscape 16:9';
+      }
+    }
+
+    function detectByThumbnail(videoId) {
+      var variants = ['maxresdefault', 'sddefault', 'hqdefault'];
+
+      return new Promise(function (resolve) {
+        var index = 0;
+
+        function tryNext() {
+          if (index >= variants.length) {
+            resolve(false);
+            return;
+          }
+
+          var img = new Image();
+          img.onload = function () {
+            resolve(img.naturalHeight > img.naturalWidth);
+          };
+          img.onerror = function () {
+            index += 1;
+            tryNext();
+          };
+          img.src = 'https://i.ytimg.com/vi/' + videoId + '/' + variants[index] + '.jpg';
+        }
+
+        tryNext();
+      });
+    }
+
+    function detectVideoFormat(videoId) {
+      var watchUrl = 'https://www.youtube.com/watch?v=' + videoId;
+      var noEmbedUrl = 'https://noembed.com/embed?url=' + encodeURIComponent(watchUrl);
+
+      return fetch(noEmbedUrl)
+        .then(function (response) {
+          if (!response.ok) throw new Error('noembed failed');
+          return response.json();
+        })
+        .then(function (meta) {
+          if (meta && Number(meta.width) > 0 && Number(meta.height) > 0) {
+            return Number(meta.height) > Number(meta.width);
+          }
+
+          return detectByThumbnail(videoId);
+        })
+        .catch(function () {
+          return detectByThumbnail(videoId);
+        });
+    }
+
+    function applyDetectedFormat(videoId) {
+      detectVideoFormat(videoId)
+        .then(function (isVertical) {
+          setFormat(isVertical);
+        })
+        .catch(function () {
+          setFormat(false);
+        });
+    }
+
+    // Default până la detectarea formatului real
+    setFormat(false);
+
     if (player && channelId) {
       fetch('/api/live-status')
         .then(function (r) { return r.json(); })
@@ -512,38 +603,22 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
             player.src = 'https://www.youtube-nocookie.com/embed/' + data.videoId + '?autoplay=1&rel=0';
             if (badge) badge.style.display = '';
             if (offlineMsg) offlineMsg.style.display = 'none';
+            applyDetectedFormat(data.videoId);
           } else {
             if (badge) badge.style.display = 'none';
             if (offlineMsg) offlineMsg.style.display = '';
             // Fallback: ultimul live înregistrat
             player.src = 'https://www.youtube-nocookie.com/embed/' + LAST_LIVE_ID + '?rel=0';
+            applyDetectedFormat(LAST_LIVE_ID);
           }
         })
         .catch(function () {
           if (badge) badge.style.display = 'none';
           if (offlineMsg) offlineMsg.style.display = '';
           if (player) player.src = 'https://www.youtube-nocookie.com/embed/' + LAST_LIVE_ID + '?rel=0';
+          applyDetectedFormat(LAST_LIVE_ID);
         });
     }
-
-    const btnLandscape = document.getElementById('btn-landscape');
-    const btnVertical = document.getElementById('btn-vertical');
-    const wrap = document.getElementById('live-glass-wrap');
-
-    if (!btnLandscape || !btnVertical || !wrap) return;
-
-    function setFormat(vertical) {
-      wrap.classList.toggle('is-vertical', vertical);
-
-      btnVertical.classList.toggle('live-format-btn--active', vertical);
-      btnVertical.setAttribute('aria-pressed', String(vertical));
-
-      btnLandscape.classList.toggle('live-format-btn--active', !vertical);
-      btnLandscape.setAttribute('aria-pressed', String(!vertical));
-    }
-
-    btnLandscape.addEventListener('click', function () { setFormat(false); });
-    btnVertical.addEventListener('click', function () { setFormat(true); });
 
     // ── Share buttons — URL dinamic ──
     var pageUrl = encodeURIComponent(window.location.href);
