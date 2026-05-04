@@ -63,6 +63,7 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
           name="rezervare-rapida"
           method="POST"
           novalidate
+          onsubmit="window.gtag&&window.gtag('event','generate_lead',{event_category:'contact',event_label:'form-submission'})"
         >
           <p class="hidden" aria-hidden="true">
             <label>

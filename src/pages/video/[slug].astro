@@ -38,6 +38,8 @@ const pageTitle = `${video.title} | Video live | Formația Florentina Pană`;
 const pageDescription = `Urmărește ${video.title}, moment live din repertoriul Formația Florentina Pană. Vezi clipul complet și distribuie pagina.`;
 const ogImage = `https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`;
 const youtubeUrl = sanitizeUrl(video.youtubeUrl ?? `https://www.youtube.com/watch?v=${video.youtubeId}`);
+const ogVideoUrl = `https://www.youtube-nocookie.com/embed/${video.youtubeId}`;
+const ogVideoSecureUrl = ogVideoUrl;
 
 const videoJsonLd = {
   '@context': 'https://schema.org',
@@ -55,7 +57,7 @@ const videoJsonLd = {
 };
 ---
 
-<BaseLayout title={pageTitle} description={pageDescription} ogImage={ogImage} ogType="video.other">
+<BaseLayout title={pageTitle} description={pageDescription} ogImage={ogImage} ogType="video.other" ogVideoUrl={ogVideoUrl} ogVideoSecureUrl={ogVideoSecureUrl} ogVideoType="text/html" ogVideoWidth="1280" ogVideoHeight="720">
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={JSON.stringify(videoJsonLd)} />
   </Fragment>

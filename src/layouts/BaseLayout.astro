@@ -12,11 +12,16 @@ interface Props {
   description: string;
   ogImage?: string;
   ogType?: string;
+  ogVideoUrl?: string;
+  ogVideoSecureUrl?: string;
+  ogVideoType?: string;
+  ogVideoWidth?: string;
+  ogVideoHeight?: string;
   datePublished?: string;
   dateModified?: string;
 }
 
-const { title, description, ogType = 'website', datePublished, dateModified } = Astro.props as Props;
+const { title, description, ogType = 'website', ogVideoUrl, ogVideoSecureUrl, ogVideoType = 'text/html', ogVideoWidth = '1280', ogVideoHeight = '720', datePublished, dateModified } = Astro.props as Props;
 
 const SITE_FALLBACK = 'https://www.florentinapanaofficial.ro';
 const site = Astro.site?.toString().replace(/\/$/, '') ?? SITE_FALLBACK;
@@ -211,6 +216,11 @@ const mobileNavAllItems = [
     <meta property="og:image:alt" content={`${title} – Formația Florentina Pană`} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    {ogVideoUrl && <meta property="og:video" content={ogVideoUrl} />}
+    {ogVideoSecureUrl && <meta property="og:video:secure_url" content={ogVideoSecureUrl} />}
+    {ogVideoType && <meta property="og:video:type" content={ogVideoType} />}
+    {ogVideoWidth && <meta property="og:video:width" content={ogVideoWidth} />}
+    {ogVideoHeight && <meta property="og:video:height" content={ogVideoHeight} />}
     <meta property="og:locale" content="ro_RO" />
     <meta property="og:site_name" content={siteContent.brand.name} />
 
