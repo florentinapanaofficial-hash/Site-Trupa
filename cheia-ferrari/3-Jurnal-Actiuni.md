@@ -183,6 +183,52 @@ node seo-agent/force-index.js                    # Submit URL-uri noi în GSC
 
 ---
 
+## 🎉 PROTOCOL „AM AVUT EVENIMENT" — Workflow complet
+
+Când Claudiu scrie **„Am avut eveniment pe [data]"**, Ferrari aplică pașii de mai jos **în ordine** și **NUMAI cu date reale primite de la Claudiu**. Zero inventat. Zero completat din imaginație.
+
+### Ce îmi dai tu (minim necesar):
+| Info | Exemplu |
+|------|---------|
+| Data evenimentului | 02 mai 2026 |
+| Numele mirilor | Maria & Ioan |
+| Orașul | Pitești |
+| Numele restaurantului/locației | Restaurant Steaua |
+| O frază despre seară (cum a fost) | „A fost o seară incredibilă, publicul a dansat toată noaptea" |
+| Pozele (drag & drop în folderul indicat) | _(instrucțiuni mai jos)_ |
+| Link YouTube dacă ai filmat ceva | https://youtube.com/... |
+
+### Ce fac eu după ce primesc datele:
+
+**Pasul 1 — Cuplul în `couples.json`**
+- Adaug intrare nouă cu datele reale (slug, names, city, date, locationName, loveStory din ce îmi spui tu)
+- `coverPhoto` și `photos[]` — completate NUMAI cu pozele pe care mi le dai tu
+- `blogSlug` — legătura spre articolul de blog creat la pasul 3
+
+**Pasul 2 — Pozele**
+- Tu pui pozele în `_raw_images/` → eu rulez `node scripts/optimize-images.js` → se convertesc WebP automat
+- Le adaug în `galerie-foto.astro` la **ÎNCEPUTUL** array-ului (newest first)
+- Le adaug și în `src/assets/imagini-automate/evenimente/` pentru galeria automată
+
+**Pasul 3 — Articol blog despre restaurant/locație**
+- Articol SEO real în `blogPosts.json` — slug: `nunta-[restaurant]-[oras]-[luna-anul]`
+- Conținut: bazat pe ce îmi spui tu despre seară + date reale despre locație
+- Keywords naturale: `nuntă [Restaurant] [Oraș]`, `formație nuntă [Oraș]`
+- **NICIUN detaliu inventat** — dacă nu știu ceva, te întreb
+
+**Pasul 4 — Commit & push**
+- Fac automat commit cu toate modificările
+
+---
+
+### Exemplu concret — cum îmi scrii:
+
+> „Am avut eveniment pe 02.05.2026. Miri: Maria & Ioan. Restaurant Steaua din Pitești. A fost superb, au dansat toată noaptea. Pun pozele acum."
+
+Atât. Eu mă ocup de restul.
+
+---
+
 ## 🔄 PROTOCOL FINAL SESIUNE
 La sfârșitul fiecărei sesiuni, Ferrari execută automat:
 1. `npx astro check` → 0/0/0
