@@ -120,7 +120,7 @@ const videosByCategory = (cat: string) =>
 
 <style>
   .section-block {
-    margin-top: 4rem;
+    margin-top: clamp(2.5rem, 5vw, 4rem);
     scroll-margin-top: 5rem;
   }
 
@@ -128,7 +128,7 @@ const videosByCategory = (cat: string) =>
     display: flex;
     align-items: center;
     gap: 0.85rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: clamp(1rem, 2vw, 1.5rem);
     flex-wrap: wrap;
   }
 
@@ -154,18 +154,21 @@ const videosByCategory = (cat: string) =>
 
   .video-grid {
     display: grid;
-    gap: 1.25rem;
+    gap: clamp(1rem, 2vw, 1.5rem);
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+    align-items: stretch; /* înălțimi egale pe rând */
   }
 
   .video-card {
-    display: block;
+    display: flex;
+    flex-direction: column;
     border-radius: 1rem;
     overflow: hidden;
     border: 1px solid var(--line, rgba(255,255,255,0.1));
     background: var(--surface, rgba(255,255,255,0.04));
     text-decoration: none;
     transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+    height: 100%; /* card-ul umple celula → toate cardurile au aceeași înălțime */
   }
 
   .video-card:hover {
@@ -227,6 +230,9 @@ const videosByCategory = (cat: string) =>
     color: #e0ecff;
     margin: 0;
     line-height: 1.4;
+    flex: 1; /* împinge titlul să umple spațiul rămas → baze aliniate pe rând */
+    display: flex;
+    align-items: flex-start;
   }
 
   .empty-note {

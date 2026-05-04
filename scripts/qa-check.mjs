@@ -38,8 +38,8 @@ t('JSON-LD @type Article', blog.includes('"Article"'));
 t('Article publisher', blog.includes('"publisher"'));
 
 console.log('\n=== 3) VIDEO PAGE ===');
-t('og:type=video.other', vid === 'video.other');
-t('og:image=YouTube thumbnail', vid.startsWith('https://img.youtube.com'));
+t('og:type=video.other', vid.includes('og:type" content="video.other"'));
+t('og:image=YouTube thumbnail', /og:image"\s+content="https:\/\/img\.youtube\.com\/vi\/[^"]+"/.test(vid));
 t('JSON-LD VideoObject', vid.includes('VideoObject'));
 t('VideoObject embedUrl', vid.includes('embedUrl'));
 
@@ -79,17 +79,10 @@ t('upload: rate limit 429', upl.includes('429'));
 t('upload: MIME validation', upl.includes('ALLOWED_MIME_TYPES'));
 t('upload: size limit 5MB', upl.includes('5 * 1024 * 1024'));
 
-console.log('\n=== 9) GA4 events (contact.html + hoisted bundle) ===');
-import { readdirSync } from 'fs';
-import { join } from 'path';
-const hoistedDir = 'dist/client/_astro';
-const hoistedContent = readdirSync(hoistedDir)
-    .filter(f => f.startsWith('hoisted') && f.endsWith('.js'))
-    .map(f => readFileSync(join(hoistedDir, f), 'utf8'))
-    .join('\n');
-t('click_phone (html attr)', con.includes('click_phone'));
-t('click_whatsapp (html attr)', con.includes('click_whatsapp'));
-t('generate_lead (hoisted bundle)', hoistedContent.includes('generate_lead'));
+console.log('\n=== 9) GA4 events (contact page) ===');
+t('click_phone (contact page)', con.includes('click_phone'));
+t('click_whatsapp (contact page)', con.includes('click_whatsapp'));
+t('generate_lead (contact page)', con.includes('generate_lead'));
 
 console.log(`\n${'='.repeat(40)}`);
 console.log(`TOTAL: ${pass} OK  |  ${fail} FAIL`);

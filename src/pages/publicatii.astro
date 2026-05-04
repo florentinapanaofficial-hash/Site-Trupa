@@ -297,9 +297,9 @@ const SITE = 'https://www.florentinapanaofficial.ro';
 
     /* ═══ FEATURED / COVER STORY ═══ */
     .ed-featured {
-      max-width: 72rem;
-      margin: 0 auto 3.5rem;
-      padding: 0 1.5rem;
+      max-width: var(--container-max);
+      margin: 0 auto clamp(2rem, 5vw, 3.5rem);
+      padding-inline: var(--container-pad-x);
     }
     .ed-featured__link {
       display: grid;

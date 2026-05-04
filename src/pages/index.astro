@@ -762,24 +762,15 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
      același border-radius 1.5rem, același padding lateral 2rem.
   ════════════════════════════════════════════════════════════════ */
   .hp-hero-wrap {
-    max-width: 72rem;         /* aliniat cu section-container max-w-6xl */
-    margin-inline: auto;      /* centrat orizontal */
-    border-radius: 1.5rem;    /* identic cu .hp-card / .hp-highlights */
-    padding-inline: 2rem;     /* identic cu .hp-highlights padding lateral (1.5rem 2rem) */
-    /* padding top/bottom: gestionat de .hero-fullscreen cu !important */
-    /* fundal: gradientul navy vine din #continut>#acasa (globals.css) */
-  }
-
-  /* Pe mobile mic: reduce padding suplimentar — secțiunea are deja 1.4rem */
-  @media (max-width: 480px) {
-    .hp-hero-wrap {
-      padding-inline: 0.75rem;
-    }
+    max-width: var(--container-max);   /* sursă unică token global */
+    margin-inline: auto;
+    border-radius: 1.5rem;
+    padding-inline: var(--container-pad-x);
   }
 
   @media (max-width: 374px) {
     .hp-hero-wrap {
-      padding-inline: 0.25rem;
+      padding-inline: 0.5rem;
     }
     .hero-title-gold {
       font-size: clamp(2rem, 8vw, 3rem);
@@ -795,15 +786,10 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
   ════════════════════════════════════════════════════════════════ */
   .hp-highlights {
     display: grid;
-    /* Side-by-side implicit — stivuit doar pe ecrane foarte mici */
     grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
-    /* margin-top negativ: cardurile urcă sub fade-ul hero-ului */
-    margin-top: -5rem;
-    padding: 1.5rem 2rem;
-    max-width: 72rem;
-    margin-inline: auto;
-    /* Suprascriem margin-inline auto cu un shorthand explicit */
+    max-width: var(--container-max);
+    padding: 1.5rem var(--container-pad-x);
     margin: -5rem auto clamp(2.5rem, 6vw, 4rem);
     position: relative;
     z-index: 4;
@@ -1039,9 +1025,10 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
      SEO CONTENT SECTIONS — Despre, De ce noi, Evenimente, FAQ
   ════════════════════════════════════════════════════════════════ */
   .hp-seo-section {
-    max-width: 72rem;
+    max-width: var(--container-max);
     margin-inline: auto;
-    padding: clamp(2.5rem, 5vw, 3.5rem) 2rem;
+    padding-block: var(--section-pad-y);
+    padding-inline: var(--container-pad-x);
   }
 
   .hp-seo-title {
@@ -1069,11 +1056,7 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     .hp-seo-grid,
     .hp-seo-grid--3 {
       grid-template-columns: 1fr;
-      gap: 1rem;
-    }
-    .hp-seo-section {
-      padding-inline: 1.25rem;
-      padding-block: 2rem;
+      gap: var(--stack-gap);
     }
     .hp-seo-text {
       font-size: 0.88rem;

@@ -980,8 +980,9 @@ function initiale(name: string): string {
      SECȚIUNI PAGINĂ — simetrie cu section-container (72rem)
   ══════════════════════════════════════════ */
   .mem-section {
-    padding: clamp(1.5rem, 3vw, 2.5rem) clamp(1rem, 3vw, 2rem);
-    max-width: 72rem;
+    padding-block: var(--section-pad-y);
+    padding-inline: var(--container-pad-x);
+    max-width: var(--container-max);
     margin-inline: auto;
     box-sizing: border-box;
     overflow-x: clip;

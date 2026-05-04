@@ -185,9 +185,10 @@ const SITE = 'https://www.florentinapanaofficial.ro';
     .pub-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
-      gap: 1.75rem;
-      max-width: 72rem;
+      gap: clamp(1rem, 2.5vw, 1.75rem);
+      max-width: var(--container-max);
       margin: 0 auto;
+      align-items: stretch;
     }
 
     /* ═══ CARD ═══ */

@@ -336,9 +336,10 @@ const schemas = [collectionPageLd, aggregateRatingLd];
     .couples-grid {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 1.25rem;
-      max-width: 72rem;
-      margin: 0 auto 3rem;
+      gap: clamp(1rem, 2vw, 1.5rem);
+      max-width: var(--container-max);
+      margin: 0 auto clamp(2rem, 5vw, 3rem);
+      align-items: stretch;
     }
 
     @media (min-width: 640px) {
@@ -376,7 +377,7 @@ const schemas = [collectionPageLd, aggregateRatingLd];
       text-align: center;
       padding: 2.5rem 1rem;
       color: rgba(255, 255, 255, 0.6);
-      max-width: 72rem;
+      max-width: var(--container-max);
       margin: 0 auto;
     }
 

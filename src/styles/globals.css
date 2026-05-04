@@ -218,6 +218,18 @@
   --social-fb: #1877F2;
   --social-ig-bg: radial-gradient(circle at 30% 110%, #ffd676 0%, #f46f30 25%, #e1306c 55%, #833ab4 80%, #405de6 100%);
   --social-tt: #010101;
+
+  /* ── Layout tokens — sursă unică pentru container, padding lateral și ritm vertical ── */
+  --container-max: 1200px;
+  /* lățime maximă conținut */
+  --container-pad-x: clamp(1.25rem, 4vw, 2rem);
+  /* mobil 20px → desktop 32px */
+  --section-pad-y: clamp(2.5rem, 6vw, 4rem);
+  /* padding vertical intern secțiune */
+  --section-gap-y: clamp(1rem, 2.5vw, 1.75rem);
+  /* spațiu între secțiuni (margin-block) */
+  --stack-gap: clamp(0.85rem, 2vw, 1.25rem);
+  /* spațiu între blocuri în interiorul secțiunii */
 }
 
 body {
@@ -294,12 +306,22 @@ span {
   min-width: 0;
   overflow-x: clip;
   margin-inline: auto;
-  padding-inline: 0.8rem;
+  padding-inline: 0;
 }
 
+/* ──────────────────────────────────────────────────────────────
+   CONTAINER CENTRAL — sursă unică pentru lățime maximă și padding
+   lateral. Toate secțiunile (.section-container, #continut > section,
+   pagini cu container propriu) folosesc aceleași tokeni → aliniere
+   verticală perfectă pe stânga/dreapta între secțiuni.
+   ─────────────────────────────────────────────────────────── */
 .section-container {
-  @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad-x);
   min-width: 0;
+  box-sizing: border-box;
 }
 
 #continut {
@@ -346,8 +368,10 @@ span {
 }
 
 #continut>section {
-  width: min(100% - 1rem, 1240px);
-  margin: 0.85rem auto;
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  margin-block: var(--section-gap-y);
   border-radius: 1.25rem;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(8, 16, 42, 0.55);
@@ -383,11 +407,11 @@ span {
 }
 
 #continut>section:first-of-type {
-  margin-top: 0.5rem;
+  margin-top: var(--section-gap-y);
 }
 
 #continut>section:last-of-type {
-  margin-bottom: 1.05rem;
+  margin-bottom: calc(var(--section-gap-y) * 1.25);
 }
 
 /* SEO sections (Despre, De ce noi, etc.) — glassmorphism subtil */
@@ -629,7 +653,8 @@ body.mobile-menu-open .left-side-menu {
 
   /* ── Secțiuni — lățime mai mare pe desktop fără sidebar central layout ── */
   #continut>section {
-    width: min(100% - 2rem, 1400px);
+    width: 100%;
+    max-width: var(--container-max);
   }
 }
 
@@ -1416,10 +1441,20 @@ details:focus-visible {
 
 .section-head {
   max-width: 62ch;
+  margin-inline: auto;
+  /* centrează blocul header indiferent de containerul părinte */
+  text-align: center;
+  /* axă unică — kicker, h1/h2 și paragraful subordonat */
+}
+
+.section-head>* {
+  margin-inline: auto;
+  /* fiecare copil rămâne centrat pe axa headerului */
 }
 
 .section-title {
-  margin: 0.5rem 0 0;
+  margin: 0.5rem auto 0;
+  /* centrare consistentă chiar și fără text-wrap balance */
   color: var(--title);
   font-family: 'Oswald', sans-serif;
   font-weight: 700;
@@ -1431,7 +1466,8 @@ details:focus-visible {
 }
 
 .section-copy {
-  margin-top: 1rem;
+  margin: 1rem auto 0;
+  /* paragraful header-ului rămâne pe axa centrată */
   color: var(--body);
   font-size: clamp(0.92rem, 1.3vw, 1.05rem);
   line-height: 1.75;
@@ -1951,10 +1987,11 @@ main#continut>section {
   margin: 0 !important;
   border-radius: 0 !important;
   box-sizing: border-box !important;
+  /* Padding lateral simetric (≥ 20px) + ritm vertical uniform pe mobil */
   padding-top: 0 !important;
-  padding-bottom: 1.5rem !important;
-  padding-left: 1rem !important;
-  padding-right: 1rem !important;
+  padding-bottom: var(--section-gap-y) !important;
+  padding-left: var(--container-pad-x) !important;
+  padding-right: var(--container-pad-x) !important;
 }
 
 /* ── Hero Acasă — conținut aliniat sus, nu centrat vertical ── */
@@ -2123,9 +2160,9 @@ body.is-homepage main#continut>section {
   overflow-y: visible !important;
   touch-action: pan-y !important;
   padding-top: calc(var(--mob-nav-h, 72px) + 1rem) !important;
-  padding-bottom: 4rem !important;
-  padding-left: 1.4rem !important;
-  padding-right: 1.4rem !important;
+  padding-bottom: calc(var(--section-pad-y) + 0.5rem) !important;
+  padding-left: var(--container-pad-x) !important;
+  padding-right: var(--container-pad-x) !important;
 }
 
 body.is-homepage main#continut>section#acasa.hero-stage {
