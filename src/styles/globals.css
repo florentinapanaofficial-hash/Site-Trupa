@@ -163,7 +163,7 @@
 
 
 :root {
-  color-scheme: light dark;
+  color-scheme: dark;
   --scroll-progress: 0;
 
   /* ── Fundal ── */
@@ -2151,4 +2151,15 @@ body.is-homepage .mob-arrow--prev {
 
 body.is-homepage .mob-arrow--next {
   display: flex !important;
+}
+
+/* ── Centrare vizuală conținut pe desktop lat (≥1280px) ──
+   Oglindește lățimea sidebar-ului fix (220px) cu margin-right egal,
+   astfel încât conținutul să apară centrat în viewport, nu împins la dreapta. */
+@media (min-width: 1280px) {
+  .layout-content-shell {
+    width: calc(100% - 440px);
+    max-width: calc(100% - 440px);
+    margin-right: 220px;
+  }
 }
