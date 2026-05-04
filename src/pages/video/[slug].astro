@@ -47,6 +47,7 @@ const videoJsonLd = {
   name: video.title,
   description: pageDescription,
   thumbnailUrl: ogImage,
+  uploadDate: video.uploadDate ?? '2024-01-01',
   embedUrl: `https://www.youtube.com/embed/${video.youtubeId}`,
   contentUrl: youtubeUrl,
   publisher: {

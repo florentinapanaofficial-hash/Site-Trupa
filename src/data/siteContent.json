@@ -74,97 +74,113 @@
       "title": "Muzică populară - moment live",
       "youtubeId": "aDB9Aa9cFLY",
       "youtubeUrl": "https://www.youtube.com/watch?v=aDB9Aa9cFLY",
-      "category": "petrecere"
+      "category": "petrecere",
+      "uploadDate": "2024-03-15"
     },
     {
       "title": "Muzică populară - energie de petrecere",
       "youtubeId": "LSd5N1AmiFg",
       "youtubeUrl": "https://www.youtube.com/watch?v=LSd5N1AmiFg",
-      "category": "petrecere"
+      "category": "petrecere",
+      "uploadDate": "2024-04-20"
     },
     {
       "title": "Muzică populară - recital live",
       "youtubeId": "OSrEJczdKuw",
       "youtubeUrl": "https://www.youtube.com/watch?v=OSrEJczdKuw",
-      "category": "petrecere"
+      "category": "petrecere",
+      "uploadDate": "2024-05-10"
     },
     {
       "title": "Muzică ușoară - moment live",
       "youtubeId": "xdcdjAtxZlA",
       "youtubeUrl": "https://www.youtube.com/watch?v=xdcdjAtxZlA",
-      "category": "usoara-diverse"
+      "category": "usoara-diverse",
+      "uploadDate": "2024-06-01"
     },
     {
       "title": "Muzică ușoară - atmosferă live",
       "youtubeId": "FyrQQqFMZvg",
       "youtubeUrl": "https://www.youtube.com/watch?v=FyrQQqFMZvg",
-      "category": "usoara-diverse"
+      "category": "usoara-diverse",
+      "uploadDate": "2024-07-12"
     },
     {
       "title": "Muzică ușoară - voce și instrumente",
       "youtubeId": "GRwVkbUGVPs",
       "youtubeUrl": "https://www.youtube.com/watch?v=GRwVkbUGVPs",
-      "category": "usoara-diverse"
+      "category": "usoara-diverse",
+      "uploadDate": "2024-08-05"
     },
     {
       "title": "Tineret - moment live manele",
       "youtubeId": "HQfVn98caic",
       "youtubeUrl": "https://www.youtube.com/watch?v=HQfVn98caic",
-      "category": "tineret-manele"
+      "category": "tineret-manele",
+      "uploadDate": "2024-09-20"
     },
     {
       "title": "Tineret - energie și atmosferă",
       "youtubeId": "7MQIWMj_W0g",
       "youtubeUrl": "https://www.youtube.com/watch?v=7MQIWMj_W0g",
-      "category": "tineret-manele"
+      "category": "tineret-manele",
+      "uploadDate": "2024-10-08"
     },
     {
       "title": "Tineret - show live complet",
       "youtubeId": "aDB9Aa9cFLY",
       "youtubeUrl": "https://www.youtube.com/watch?v=aDB9Aa9cFLY",
-      "category": "tineret-manele"
+      "category": "tineret-manele",
+      "uploadDate": "2024-11-02"
     },
     {
       "title": "Muzică instrumentală - moment live",
       "youtubeId": "FyrQQqFMZvg",
       "youtubeUrl": "https://www.youtube.com/watch?v=FyrQQqFMZvg",
-      "category": "instrumentala"
+      "category": "instrumentala",
+      "uploadDate": "2024-03-22"
     },
     {
       "title": "Muzică instrumentală - recital",
       "youtubeId": "OSrEJczdKuw",
       "youtubeUrl": "https://www.youtube.com/watch?v=OSrEJczdKuw",
-      "category": "instrumentala"
+      "category": "instrumentala",
+      "uploadDate": "2024-05-18"
     },
     {
       "title": "Muzică instrumentală - atmosferă",
       "youtubeId": "LSd5N1AmiFg",
       "youtubeUrl": "https://www.youtube.com/watch?v=LSd5N1AmiFg",
-      "category": "instrumentala"
+      "category": "instrumentala",
+      "uploadDate": "2024-07-30"
     },
     {
       "title": "Dansul Mirilor - Andreea & Radu",
       "youtubeId": "HQfVn98caic",
       "youtubeUrl": "https://www.youtube.com/watch?v=HQfVn98caic",
-      "category": "dans-miri"
+      "category": "dans-miri",
+      "uploadDate": "2024-06-15"
     },
     {
       "title": "Dansul Mirilor - Bianca & Mihai",
       "youtubeId": "7MQIWMj_W0g",
       "youtubeUrl": "https://www.youtube.com/watch?v=7MQIWMj_W0g",
-      "category": "dans-miri"
+      "category": "dans-miri",
+      "uploadDate": "2024-08-24"
     },
     {
       "title": "Dansul Mirilor - Ioana & Cătălin",
       "youtubeId": "GRwVkbUGVPs",
       "youtubeUrl": "https://www.youtube.com/watch?v=GRwVkbUGVPs",
-      "category": "dans-miri"
+      "category": "dans-miri",
+      "uploadDate": "2024-09-07"
     },
     {
       "title": "Dansul Mirilor - Alina & Ștefan",
       "youtubeId": "xdcdjAtxZlA",
       "youtubeUrl": "https://www.youtube.com/watch?v=xdcdjAtxZlA",
-      "category": "dans-miri"
+      "category": "dans-miri",
+      "uploadDate": "2024-10-19"
     }
   ],
   "videoAdmin": {
