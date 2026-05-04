@@ -84,16 +84,23 @@
   place-items: center;
   flex-shrink: 0;
   border-radius: 0.75rem;
-  transition: opacity 200ms ease, transform 200ms ease;
+  transition: opacity 200ms ease, transform 200ms ease, box-shadow 200ms ease;
+  min-width: 36px;
+  min-height: 36px;
 }
 
 .social-btn:hover {
-  opacity: 0.8;
+  opacity: 0.85;
+  transform: scale(1.05);
+}
+
+.social-btn:active {
+  transform: scale(0.98);
 }
 
 .social-btn:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 0 2.5px rgba(255, 255, 255, 0.7);
 }
 
 .social-btn--yt {
@@ -134,11 +141,11 @@
   border: 1.5px solid rgba(255, 255, 255, 0.55);
 }
 
-/* Zonă tactilă min 48px pe mobil */
+/* Zonă tactilă min 44px pe mobil */
 @media (max-width: 767px) {
   .social-btn {
-    min-width: 48px;
-    min-height: 48px;
+    min-width: 44px;
+    min-height: 44px;
   }
 }
 
