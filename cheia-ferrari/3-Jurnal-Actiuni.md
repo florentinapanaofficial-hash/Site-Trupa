@@ -168,18 +168,81 @@ node seo-agent/force-index.js                    # Submit URL-uri noi în GSC
 ## 📅 CALENDAR LUNAR SEO
 > Ferrari reamintește automat la prima sesiune din fiecare lună.
 
-| # | Proces | Comandă / Acțiune | Timp estimat |
-|---|--------|-------------------|--------------|
-| 1 | Analiză oportunități GSC | `node seo-agent/seo-analyzer.js` | 2 min |
-| 2 | Recoltare keywords noi | `node seo-agent/keyword-harvester.js "formatie nunta"` (+ variante) | 5 min |
-| 3 | Export GSC proaspăt | Claudiu exportă CSV din Search Console → Ferrari actualizează `seo-data.json` | 5 min |
-| 4 | Verificare linkuri | `node scripts/check-links.mjs` | 2 min |
-| 5 | QA complet | `node scripts/qa-check.mjs` | 2 min |
-| 6 | Actualizare Tracker SEO | Ferrari completează `2-Tracker-SEO.md` cu pozițiile noi | 5 min |
-| 7 | Submit URL-uri noi | `node seo-agent/force-index.js` (dacă au fost adăugate pagini) | 1 min |
-| 8 | Commit & push | Ferrari face tot — Claudiu nu face nimic | 1 min |
+### 📋 7-Step Monthly Workflow (Procedura Detaliată)
 
-**Total: ~23 minute/lună pentru a menține SEO-ul optimizat.**
+**Când:** Ziua 1 a fiecărei luni (preferabil 09:00 UTC) | **Durată:** ~30 minute
+
+#### 🔍 Step 1: Build + QA Complet (5 min)
+```bash
+npx astro check                    # 0 errors obligatoriu
+node scripts/qa-check.mjs          # 46+ OK expected
+```
+**Verifică:** TypeScript errors, SEO compliance, GA4 events, CORS
+
+#### 📊 Step 2: Analiză SEO din Google Search Console (5 min)
+```bash
+node seo-agent/seo-analyzer.js
+```
+**Output:** Top 13 keywords cu poziție + CTR + volume
+**Caută:** CTR slab (<1.5%) + volume mare (>150) = **URGENCY**
+
+#### 🔗 Step 3: Validare Linkuri (5 min)
+```bash
+node scripts/check-links.mjs
+```
+**Verifică:** Trailing slash, 404 errors, redirects 301
+
+#### 🌾 Step 4: Keyword Harvesting (5 min — optional dacă budget API)
+```bash
+node seo-agent/keyword-harvester.js "formatie nunta"
+```
+**Output:** 114+ curated keywords din Google Autocomplete → `harvested-keywords.json`
+
+#### 📋 Step 5: Update Tracker-SEO.md (3 min)
+**File:** `cheia-ferrari/2-Tracker-SEO.md`
+**Actualizează:** Poziție curentă, CTR, trend (↑/→/↓), action taken, status
+
+#### 🚀 Step 6: Implement Top 3 Quick Wins (10-15 min)
+**Prioritate automată:**
+
+1. **High CTR Gap + High Volume** → Optimizare titlu/meta (60 char title + 155 char desc)
+2. **Striking Distance (pos 11-15, CTR 1-2%)** → Expand content + internal link building
+3. **Year Outdated** → Refresh "2026→2027" în articole
+
+**Exemplu acțiuni implementate (04.05.2026):**
+- Optimizare titlu `/galerie-video/` → "muzica nunta live" keyword
+- Adăugare Pricing section pe landing pages locale (3 orașe)
+- Early Booking CTA section pe homepage → link building articol preț
+
+#### ✅ Step 7: Commit + Deploy (2 min)
+```bash
+git add -A
+git commit -m "chore(seo): monthly audit [LUNA YEAR] - [3 acțiuni]"
+git push origin main
+```
+
+---
+
+### 🎯 Keywords Tracked Monthly
+| # | Keyword | Pos | CTR | Volume | Target |
+|---|---------|-----|-----|--------|--------|
+| 1 | cele mai bune formatii de nunta | 15.2 | 0.67% | 300 | 2-3% CTR |
+| 2 | formatie nunta 2027 | 13.1 | 2.4% | 250 | Top 10 |
+| 3 | muzica nunta live | 12.3 | 2.38% | 210 | Top 10 |
+| 4 | preturi formatie nunta bucuresti | 11.8 | 2.0% | 200 | Top 10 |
+| 5 | formatie nunta pret | 14.5 | 1.67% | 180 | 10-12 |
+
+### 📊 Execution History
+| Data | Build | QA | SEO Analyzer | Top 3 Actions | Status |
+|------|-------|----|--------------|--------------  |--------|
+| 2026-05-04 | ✅ 0 err | ✅ 46 OK | ✅ 13 opp | Footer, og:video, pricing, link-building | ✅ 4 commits |
+| 2026-06-01 | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ PENDING |
+| 2026-07-01 | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ PENDING |
+
+---
+
+## 📅 CALENDAR LUNAR SEO (Old Table — deprecated)
+> See 7-Step procedure above instead
 
 ---
 
