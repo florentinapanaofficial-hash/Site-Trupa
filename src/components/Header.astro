@@ -98,10 +98,10 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       </a>
       )}
 
-      <!-- Facebook — albastru brand oficial -->
+      <!-- Facebook — albastru brand oficial (ascuns pe mobil, vizibil sm+) -->
       {socialLinks.facebook && (
       <a href={socialLinks.facebook}
-        class="social-btn social-btn--fb social-btn--prominent h-10 w-10"
+        class="social-btn social-btn--fb social-btn--prominent h-10 w-10 hidden sm:inline-grid"
         target="_blank" rel="noopener noreferrer" aria-label="Deschide Facebook">
         <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" role="img" aria-hidden="true">
           <path d="M13.5 21V14.3H16l.4-2.85H13.5V9.7c0-.82.38-1.2 1.38-1.2H16.5V5.85C16.05 5.77 15.1 5.7 14 5.7c-2.65 0-4.05 1.4-4.05 4.15v1.6H8v2.85h1.95V21H13.5z" fill="#fff"/>
@@ -124,10 +124,10 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       </a>
       )}
 
-      <!-- TikTok — negru brand + efect neon cyan/roșu -->
+      <!-- TikTok — negru brand + efect neon cyan/roșu (ascuns pe mobil, vizibil sm+) -->
       {socialLinks.tiktok && (
       <a href={socialLinks.tiktok}
-        class="social-btn social-btn--tt social-btn--prominent h-10 w-10"
+        class="social-btn social-btn--tt social-btn--prominent h-10 w-10 hidden sm:inline-grid"
         target="_blank" rel="noopener noreferrer" aria-label="Deschide TikTok">
         <svg viewBox="0 0 24 24" class="h-5 w-5" role="img" aria-hidden="true" fill="none">
           <!-- strat cyan (umbra stânga-sus) -->
