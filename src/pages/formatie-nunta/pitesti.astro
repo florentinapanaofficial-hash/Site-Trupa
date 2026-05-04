@@ -21,13 +21,13 @@ const LNG            = 24.8692;
 const INTRO          = 'Formația Florentina Pană este una dintre cele mai căutate formații de nuntă din Pitești. Cu sediul chiar în inima orașului, oferim muzică live premium la nunți, botezuri și evenimente corporate în tot județul Argeș.';
 const PARAGRAF2      = 'Repertoriul nostru acoperă muzică populară românească autentică, piese ușoare, hituri internaționale și muzică de petrecere — totul adaptat gusturilor mirilor și atmosferei evenimentului. Am cântat la cele mai frumoase restaurante din Pitești și împrejurimi: de la saloane elegante de nunți la locații rustice de vis.';
 const PARAGRAF3      = 'Echipa noastră știe exact cum să mențină ringul de dans plin de la prima secundă până la ultimul cântec. Fiecare eveniment beneficiază de sonorizare profesională, lumini de atmosferă și un program muzical personalizat, discutat în detaliu cu mirii.';
-const CONTENT_INTRO    = 'Visezi la o nuntă perfectă în Pitești? Totul începe cu muzica potrivită. Formația Florentina Pană creează momente magice prin muzică live — adaptată stilului tău, gusturilor invitaților și atmosferei locației.';
-const CONTENT_SERVICES = 'Oferim un pachet complet de Formație Nuntă Pitești: sonorizare profesională, lumini de atmosferă, MC experimentat și un repertoriu vast care se adaptează din mers la energia sălii. De la momentele emoționante la hora tradițională — totul curge natural.';
-const CONTENT_OUTRO    = 'Nu lăsa muzica pe ultimul loc — este ingredientul care leagă totul. Contactează-ne astăzi pentru disponibilitate în Pitești și hai să planificăm împreună coloana sonoră perfectă pentru nunta ta.';
+const CONTENT_INTRO    = 'Nunta ta în Pitești merită cea mai bună coloană sonoră. Noi suntem Formația Florentina Pană și de peste 10 ani aducem energie, emoție și profesionalism la cele mai frumoase evenimente din zonă.';
+const CONTENT_SERVICES = 'Repertoriul nostru acoperă totul: de la muzică populară autentică și romanțe de suflet, la cover-uri internaționale și hituri de petrecere care vor ține ringul de dans plin toată noaptea în Pitești. Fiecare program muzical este personalizat — discutăm cu mirii și construim o playlist pe gustul lor.';
+const CONTENT_OUTRO    = 'Ești gata să transformi nunta ta din Pitești într-o poveste de neuitat? Formația Florentina Pană este aici pentru tine. Cere o ofertă personalizată — fără obligații, cu drag.';
 const LOCATII_POP    = ["Restaurant & Events Noblesse","La Noblesse Events","Pensiunea Flowers"];
 const ZONE_ACOPERITE = ["Pitești","Mioveni","Ștefănești","Bascov","Bradu"];
 const META_DESC      = 'Cauți formații nuntă Pitești? Alege Trupa Florentina Pană — muzică live premium la nunți, botezuri și evenimente. 10+ ani experiență. Cere ofertă acum!';
-const KEYWORDS_SCHEMA = ["Formație Nuntă Pitești","Formații Nuntă Pitești","trupa nunta Pitesti","muzica live nunta Pitesti"];
+const KEYWORDS_SCHEMA: string[] = ["Formație Nuntă Pitești","Formații Nuntă Pitești","trupa nunta Pitesti","muzica live nunta Pitesti"];
 
 const SEO_TITLE = `${KEYWORD} — ${brand.name}`;
 const SEO_DESC  = META_DESC || `${KEYWORD} — muzică live la nunți, botezuri și evenimente în ${ORAS}, ${JUDET}. Formație profesionistă cu 10+ ani experiență. Cere ofertă acum!`;
@@ -95,6 +95,24 @@ const localBusinessLd = {
       <p class="text-sm text-white/90 leading-relaxed">{CONTENT_OUTRO}</p>
     </div>
 
+    {/* ═══ Secțiunea 1.7: Prețuri & Ofertă ═══ */}
+    <div class="mt-8 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-6 sm:p-8">
+      <h2 class="text-lg font-extrabold text-white mb-4">💰 Prețuri Formație Nuntă {ORAS} — Ofertă Early Booking 2027</h2>
+      <p class="text-sm text-white/90 leading-relaxed mb-4">Calendarul 2027 pentru evenimente în {ORAS} și județele limitrofe se completează rapid — cuplurile care semnează acum beneficiază de tarif Early Booking blocat contractual, la nivelul sezonului 2026.</p>
+      <p class="text-sm text-white/90 leading-relaxed mb-4">Ce primești: formație live cu 5-6 artiști, sonorizare profesională premium, program muzical personalizat, MC experimentat, și garanție scrisă pe echipament backup. Zero playback, 100% live pe scenă.</p>
+      <div class="mt-4 rounded-xl bg-white/5 p-4 border border-white/10">
+        <p class="text-xs text-white/70 mb-2">📞 Contactează-ne pentru ofertă personalizată:</p>
+        <div class="flex flex-wrap gap-2">
+          <a href={`tel:${contact.phoneRaw}`} class="btn-solid text-xs" onclick="window.gtag&&window.gtag('event','click_phone',{event_category:'pricing-cta'})">
+            Sună: {contact.phoneDisplay}
+          </a>
+          <a href={whatsappLink} target="_blank" rel="noopener noreferrer" class="btn-whatsapp text-xs" onclick="window.gtag&&window.gtag('event','click_whatsapp',{event_category:'pricing-cta'})">
+            WhatsApp: Verifică disponibilitate
+          </a>
+        </div>
+      </div>
+    </div>
+
     {/* ═══ Secțiunea 2: Locații populare ═══ */}
     <div class="mt-8 rounded-2xl border border-white/20 bg-white/10 p-6 sm:p-8">
       <h2 class="text-lg font-extrabold text-white mb-4">Locații populare de nunți în {ORAS}</h2>
@@ -131,7 +149,7 @@ const localBusinessLd = {
            onclick="window.gtag&&window.gtag('event','click_whatsapp',{event_category:'programmatic-seo'})">
           WhatsApp
         </a>
-        <a class="btn-outline" href="/contact/">Formular de Contact</a>
+        <a class="btn-outline" href="/contact">Formular de Contact</a>
       </div>
     </div>
   </section>

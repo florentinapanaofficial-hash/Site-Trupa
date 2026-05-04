@@ -21,9 +21,9 @@ const LNG            = 24.6814;
 const INTRO          = 'Curtea de Argeș — orașul Mănăstirii și al tradițiilor — este unul dintre locurile noastre preferate pentru evenimente live. Formația Florentina Pană aduce muzică autentică la nunțile din această zonă pitorească a județului Argeș.';
 const PARAGRAF2      = 'Știm ce înseamnă o nuntă cu adevărat românească: horă la intrarea mirilor, muzică populară autentică, momente emoționante și petrecere până în zori. Repertoriul nostru e construit special pentru a onora tradițiile locale, combinându-le cu energia muzicii moderne.';
 const PARAGRAF3      = 'Zonele montane din jurul Curții de Argeș oferă locații de nuntă spectaculoase. Noi ne ocupăm de tot ce ține de muzică — sonorizare, lumini și un program muzical pe gustul vostru, discutat cu cel puțin două săptămâni înainte de eveniment.';
-const CONTENT_INTRO    = 'Dacă ești în căutarea unei atmosfere de neuitat în Curtea de Argeș, ai ajuns unde trebuie. Formația Florentina Pană transformă fiecare eveniment într-o experiență muzicală de excepție — de la primul dans și până la ultimul cântec al serii.';
-const CONTENT_SERVICES = 'Repertoriul nostru acoperă totul: de la muzică populară autentică și romanțe de suflet, la cover-uri internaționale și hituri de petrecere care vor ține ringul de dans plin toată noaptea în Curtea de Argeș. Fiecare program muzical este personalizat — discutăm cu mirii și construim o playlist pe gustul lor.';
-const CONTENT_OUTRO    = 'Ești gata să transformi nunta ta din Curtea de Argeș într-o poveste de neuitat? Formația Florentina Pană este aici pentru tine. Cere o ofertă personalizată — fără obligații, cu drag.';
+const CONTENT_INTRO    = 'Visezi la o nuntă perfectă în Curtea de Argeș? Totul începe cu muzica potrivită. Formația Florentina Pană creează momente magice prin muzică live — adaptată stilului tău, gusturilor invitaților și atmosferei locației.';
+const CONTENT_SERVICES = 'Ce ne face diferiți? Ascultăm. Fiecare cuplu din Curtea de Argeș primește un program muzical unic, construit împreună cu noi. Combinăm muzica populară românească cu hituri moderne, piese de petrecere și momente speciale — totul live, fără playback.';
+const CONTENT_OUTRO    = 'Fiecare nuntă din Curtea de Argeș la care am cântat ne-a confirmat un lucru: muzica bună face diferența între un eveniment reușit și unul de neuitat. Sună-ne sau scrie-ne pe WhatsApp — răspundem în mai puțin de 2 ore.';
 const LOCATII_POP    = ["Conacul Manasia","Complex Marami","Hanul Posada"];
 const ZONE_ACOPERITE = ["Curtea de Argeș","Câmpulung","Domnești","Corbeni","Arefu"];
 const META_DESC      = '';
@@ -95,6 +95,24 @@ const localBusinessLd = {
       <p class="text-sm text-white/90 leading-relaxed">{CONTENT_OUTRO}</p>
     </div>
 
+    {/* ═══ Secțiunea 1.7: Prețuri & Ofertă ═══ */}
+    <div class="mt-8 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-6 sm:p-8">
+      <h2 class="text-lg font-extrabold text-white mb-4">💰 Prețuri Formație Nuntă {ORAS} — Ofertă Early Booking 2027</h2>
+      <p class="text-sm text-white/90 leading-relaxed mb-4">Calendarul 2027 pentru evenimente în {ORAS} și județele limitrofe se completează rapid — cuplurile care semnează acum beneficiază de tarif Early Booking blocat contractual, la nivelul sezonului 2026.</p>
+      <p class="text-sm text-white/90 leading-relaxed mb-4">Ce primești: formație live cu 5-6 artiști, sonorizare profesională premium, program muzical personalizat, MC experimentat, și garanție scrisă pe echipament backup. Zero playback, 100% live pe scenă.</p>
+      <div class="mt-4 rounded-xl bg-white/5 p-4 border border-white/10">
+        <p class="text-xs text-white/70 mb-2">📞 Contactează-ne pentru ofertă personalizată:</p>
+        <div class="flex flex-wrap gap-2">
+          <a href={`tel:${contact.phoneRaw}`} class="btn-solid text-xs" onclick="window.gtag&&window.gtag('event','click_phone',{event_category:'pricing-cta'})">
+            Sună: {contact.phoneDisplay}
+          </a>
+          <a href={whatsappLink} target="_blank" rel="noopener noreferrer" class="btn-whatsapp text-xs" onclick="window.gtag&&window.gtag('event','click_whatsapp',{event_category:'pricing-cta'})">
+            WhatsApp: Verifică disponibilitate
+          </a>
+        </div>
+      </div>
+    </div>
+
     {/* ═══ Secțiunea 2: Locații populare ═══ */}
     <div class="mt-8 rounded-2xl border border-white/20 bg-white/10 p-6 sm:p-8">
       <h2 class="text-lg font-extrabold text-white mb-4">Locații populare de nunți în {ORAS}</h2>
@@ -131,7 +149,7 @@ const localBusinessLd = {
            onclick="window.gtag&&window.gtag('event','click_whatsapp',{event_category:'programmatic-seo'})">
           WhatsApp
         </a>
-        <a class="btn-outline" href="/contact/">Formular de Contact</a>
+        <a class="btn-outline" href="/contact">Formular de Contact</a>
       </div>
     </div>
   </section>

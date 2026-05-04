@@ -21,9 +21,9 @@ const LNG            = 26.1025;
 const INTRO          = 'Cauți o formație de nuntă pentru un eveniment în București? Formația Florentina Pană se deplasează frecvent în capitală, oferind spectacole live de excepție la cele mai prestigioase locații din oraș.';
 const PARAGRAF2      = 'Ne-am construit o reputație solidă în fața cuplurilor din București prin show-uri pline de energie, un repertoriu vast — de la muzică populară tradițională la hituri de petrecere — și o atitudine profesionistă impecabilă. Peste 100 de nunți organizate cu succes în București și Ilfov.';
 const PARAGRAF3      = 'Fie că este vorba de o nuntă elegantă într-un hotel de 5 stele sau o petrecere vibrantă într-un restaurant cu tradiție, ne adaptăm perfect stilului evenimentului tău. Transportul și logistica sunt incluse — tu te bucuri doar de muzică.';
-const CONTENT_INTRO    = 'București este un loc special pentru noi. Am cântat la zeci de nunți memorabile aici și știm exact cum să facem ca fiecare eveniment să fie unic. Formația Florentina Pană — muzică live care se simte.';
-const CONTENT_SERVICES = 'Repertoriul nostru acoperă totul: de la muzică populară autentică și romanțe de suflet, la cover-uri internaționale și hituri de petrecere care vor ține ringul de dans plin toată noaptea în București. Fiecare program muzical este personalizat — discutăm cu mirii și construim o playlist pe gustul lor.';
-const CONTENT_OUTRO    = 'Am pus suflet în fiecare eveniment din București și continuăm să o facem. Hai să discutăm despre nunta ta — completează formularul de contact sau dă-ne un telefon. Primele 3 date din sezon se rezervă cel mai repede!';
+const CONTENT_INTRO    = 'Visezi la o nuntă perfectă în București? Totul începe cu muzica potrivită. Formația Florentina Pană creează momente magice prin muzică live — adaptată stilului tău, gusturilor invitaților și atmosferei locației.';
+const CONTENT_SERVICES = 'Oferim un pachet complet de Formație Nuntă București: sonorizare profesională, lumini de atmosferă, MC experimentat și un repertoriu vast care se adaptează din mers la energia sălii. De la momentele emoționante la hora tradițională — totul curge natural.';
+const CONTENT_OUTRO    = 'Ești gata să transformi nunta ta din București într-o poveste de neuitat? Formația Florentina Pană este aici pentru tine. Cere o ofertă personalizată — fără obligații, cu drag.';
 const LOCATII_POP    = ["Palatul Snagov","Hanul Drumeților","Ballrooms by Bamboo"];
 const ZONE_ACOPERITE = ["Sector 1–6","Otopeni","Voluntari","Snagov","Buftea"];
 const META_DESC      = '';
@@ -95,6 +95,24 @@ const localBusinessLd = {
       <p class="text-sm text-white/90 leading-relaxed">{CONTENT_OUTRO}</p>
     </div>
 
+    {/* ═══ Secțiunea 1.7: Prețuri & Ofertă ═══ */}
+    <div class="mt-8 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-6 sm:p-8">
+      <h2 class="text-lg font-extrabold text-white mb-4">💰 Prețuri Formație Nuntă {ORAS} — Ofertă Early Booking 2027</h2>
+      <p class="text-sm text-white/90 leading-relaxed mb-4">Calendarul 2027 pentru evenimente în {ORAS} și județele limitrofe se completează rapid — cuplurile care semnează acum beneficiază de tarif Early Booking blocat contractual, la nivelul sezonului 2026.</p>
+      <p class="text-sm text-white/90 leading-relaxed mb-4">Ce primești: formație live cu 5-6 artiști, sonorizare profesională premium, program muzical personalizat, MC experimentat, și garanție scrisă pe echipament backup. Zero playback, 100% live pe scenă.</p>
+      <div class="mt-4 rounded-xl bg-white/5 p-4 border border-white/10">
+        <p class="text-xs text-white/70 mb-2">📞 Contactează-ne pentru ofertă personalizată:</p>
+        <div class="flex flex-wrap gap-2">
+          <a href={`tel:${contact.phoneRaw}`} class="btn-solid text-xs" onclick="window.gtag&&window.gtag('event','click_phone',{event_category:'pricing-cta'})">
+            Sună: {contact.phoneDisplay}
+          </a>
+          <a href={whatsappLink} target="_blank" rel="noopener noreferrer" class="btn-whatsapp text-xs" onclick="window.gtag&&window.gtag('event','click_whatsapp',{event_category:'pricing-cta'})">
+            WhatsApp: Verifică disponibilitate
+          </a>
+        </div>
+      </div>
+    </div>
+
     {/* ═══ Secțiunea 2: Locații populare ═══ */}
     <div class="mt-8 rounded-2xl border border-white/20 bg-white/10 p-6 sm:p-8">
       <h2 class="text-lg font-extrabold text-white mb-4">Locații populare de nunți în {ORAS}</h2>
@@ -131,7 +149,7 @@ const localBusinessLd = {
            onclick="window.gtag&&window.gtag('event','click_whatsapp',{event_category:'programmatic-seo'})">
           WhatsApp
         </a>
-        <a class="btn-outline" href="/contact/">Formular de Contact</a>
+        <a class="btn-outline" href="/contact">Formular de Contact</a>
       </div>
     </div>
   </section>
