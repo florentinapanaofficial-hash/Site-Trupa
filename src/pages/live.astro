@@ -106,7 +106,7 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
 
       {/* Mesaj offline — afișat de JS când nu e live */}
       <p id="offline-msg" class="mx-auto mt-4 max-w-xl text-center text-sm leading-relaxed text-amber-400/70" style="display:none">
-        Nu suntem live acum — în player poți vedea ultimele înregistrări de pe canal.
+        Nu suntem live acum — în player poți vedea ultimul nostru eveniment înregistrat.
       </p>
 
       {/* Text descriptiv sub player */}
@@ -220,6 +220,72 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
             <path stroke-linecap="round" stroke-linejoin="round" d="M9.348 14.652a3.75 3.75 0 0 1 0-5.304m5.304 0a3.75 3.75 0 0 1 0 5.304m-7.425 2.121a6.75 6.75 0 0 1 0-9.546m9.546 0a6.75 6.75 0 0 1 0 9.546M5.106 18.894c-3.808-3.807-3.808-9.98 0-13.788m13.788 0c3.808 3.807 3.808 9.98 0 13.788M12 12h.008v.008H12V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
           </svg>
           Vrei acest vibe la evenimentul tău? Verifică disponibilitatea
+        </a>
+      </div>
+    </div>
+  </section>
+
+  {/* ═══════════════════════════════════════════
+      ULTIMELE LIVE-URI ÎNREGISTRATE
+  ═══════════════════════════════════════════ */}
+  <section class="bg-[#0d0800] py-14 sm:py-18">
+    <div class="section-container">
+      <div class="mx-auto max-w-3xl text-center mb-10">
+        <p class="text-amber-400/70 text-xs font-bold uppercase tracking-widest mb-2">Replay</p>
+        <h2 class="font-serif text-3xl font-bold text-white sm:text-4xl">Ultimele Live-uri Înregistrate</h2>
+        <p class="mt-3 text-white/50 text-sm">Nu ai prins transmisiunea? Revezi evenimentele noastre în întregime.</p>
+      </div>
+      <div class="grid gap-5 sm:grid-cols-3">
+        <!-- Live 1 — cel mai recent -->
+        <a href="https://www.youtube.com/watch?v=bffqJGtP9ok" target="_blank" rel="noopener noreferrer"
+          class="group block rounded-2xl overflow-hidden border border-white/10 bg-white/5 transition-all hover:border-amber-500/40 hover:bg-white/[0.08]">
+          <div class="relative aspect-video">
+            <img src="https://img.youtube.com/vi/bffqJGtP9ok/maxresdefault.jpg"
+              alt="Live FP Band — eveniment 03.05.2026" class="w-full h-full object-cover" loading="lazy" width="480" height="270" />
+            <div class="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
+              <span class="flex h-12 w-12 items-center justify-center rounded-full bg-red-600 shadow-lg">
+                <svg class="h-5 w-5 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+              </span>
+            </div>
+          </div>
+          <div class="p-4">
+            <p class="text-sm font-semibold text-white/90 group-hover:text-amber-400 transition-colors">Live FP Band — Eveniment</p>
+            <p class="mt-1 text-xs text-white/40">3 mai 2026</p>
+          </div>
+        </a>
+        <!-- Live 2 -->
+        <a href="https://www.youtube.com/watch?v=EAQ_mTbj_uY" target="_blank" rel="noopener noreferrer"
+          class="group block rounded-2xl overflow-hidden border border-white/10 bg-white/5 transition-all hover:border-amber-500/40 hover:bg-white/[0.08]">
+          <div class="relative aspect-video">
+            <img src="https://img.youtube.com/vi/EAQ_mTbj_uY/maxresdefault.jpg"
+              alt="Live FP Band — eveniment 03.05.2026" class="w-full h-full object-cover" loading="lazy" width="480" height="270" />
+            <div class="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
+              <span class="flex h-12 w-12 items-center justify-center rounded-full bg-red-600 shadow-lg">
+                <svg class="h-5 w-5 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+              </span>
+            </div>
+          </div>
+          <div class="p-4">
+            <p class="text-sm font-semibold text-white/90 group-hover:text-amber-400 transition-colors">Live FP Band — Eveniment</p>
+            <p class="mt-1 text-xs text-white/40">3 mai 2026</p>
+          </div>
+        </a>
+        <!-- Live 3 -->
+        <a href="https://www.youtube.com/watch?v=3b9KYuoTjBA" target="_blank" rel="noopener noreferrer"
+          class="group block rounded-2xl overflow-hidden border border-white/10 bg-white/5 transition-all hover:border-amber-500/40 hover:bg-white/[0.08]">
+          <div class="relative aspect-video">
+            <img src="https://img.youtube.com/vi/3b9KYuoTjBA/maxresdefault.jpg"
+              alt="Live FP Band — eveniment 03.05.2026" class="w-full h-full object-cover" loading="lazy" width="480" height="270" />
+            <div class="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
+              <span class="flex h-12 w-12 items-center justify-center rounded-full bg-red-600 shadow-lg">
+                <svg class="h-5 w-5 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+              </span>
+            </div>
+          </div>
+          <div class="p-4">
+            <p class="text-sm font-semibold text-white/90 group-hover:text-amber-400 transition-colors">Live FP Band — Eveniment</p>
+            <p class="mt-1 text-xs text-white/40">3 mai 2026</p>
+          </div>
         </a>
       </div>
     </div>
@@ -436,6 +502,8 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
     var offlineMsg = document.getElementById('offline-msg');
     var channelId = player ? player.getAttribute('data-channel') : null;
 
+    var LAST_LIVE_ID = 'bffqJGtP9ok'; // ultimul live înregistrat — actualizează după fiecare eveniment
+
     if (player && channelId) {
       fetch('/api/live-status')
         .then(function (r) { return r.json(); })
@@ -447,14 +515,14 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
           } else {
             if (badge) badge.style.display = 'none';
             if (offlineMsg) offlineMsg.style.display = '';
-            // Fallback: embed canal YouTube (ultimele videoclipuri / live dacă există)
-            player.src = 'https://www.youtube-nocookie.com/embed/live_stream?channel=' + channelId + '&autoplay=0&rel=0';
+            // Fallback: ultimul live înregistrat
+            player.src = 'https://www.youtube-nocookie.com/embed/' + LAST_LIVE_ID + '?rel=0';
           }
         })
         .catch(function () {
           if (badge) badge.style.display = 'none';
           if (offlineMsg) offlineMsg.style.display = '';
-          if (player) player.src = 'https://www.youtube-nocookie.com/embed/live_stream?channel=' + channelId + '&autoplay=0&rel=0';
+          if (player) player.src = 'https://www.youtube-nocookie.com/embed/' + LAST_LIVE_ID + '?rel=0';
         });
     }
 
