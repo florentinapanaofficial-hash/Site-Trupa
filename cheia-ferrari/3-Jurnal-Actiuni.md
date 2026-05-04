@@ -1,7 +1,201 @@
-# JURNAL DE BORD (CARTEA DE SERVICE)
-Orice reparație sau optimizare se notează aici de către AI, pentru transparență totală.
+# 🏎️ JURNAL FERRARI — Memorie Permanentă & Cartea de Service
+> **Singurul jurnal al proiectului.** Citit la fiecare sesiune nouă, ÎNAINTE de orice modificare.
 
-- **[Data de azi]**: S-a instalat sistemul Autopilot. Zero erori în consolă. S-au setat bazele pentru SEO automatizat.
+---
+
+## 🔴 REGULI CRITICE (nenegociabile)
+
+### 1. Trailing Slash obligatoriu pe toate linkurile interne
+- Site-ul are `trailingSlash: 'always'` în `astro.config.mjs`
+- **TOATE** `href` interne TREBUIE să se termine cu `/` (ex: `/despre/`, `/contact/`)
+- ❌ GREȘIT: `href="/despre"` → redirect 301 → scade scorul SEO
+- ✅ CORECT: `href="/despre/"` → acces direct
+- Excepții: linkuri externe (`https://...`), `tel:`, `mailto:`, `#ancora`
+- `Header.astro` are `normalizeNavHref()` care adaugă automat trailing slash — NU o elimina
+- **Istoric:** Apr 2026 — ~70 linkuri fără trailing slash au generat 34 erori + 35 warnings în SE Ranking
+
+### 2. Pagina Comunitate — Redirect activ
+- URL canonical: `/comunitate/` (fișier: `src/pages/comunitate/index.astro`)
+- `/comunitatea-noastra/` este DOAR redirect 301 → `/comunitate/` — NU adăuga linkuri interne spre ea
+- Cheia în `seo-content.json` este `comunitate`
+- `astro.config.mjs` are filtru sitemap care exclude `/comunitatea-noastra/` — NU îl elimina
+
+### 3. Când adaugi pagini sau linkuri noi
+- Trailing slash pe orice `href="/ruta-noua/"`
+- Adaugă în `Header.astro`, `Footer.astro`, `BaseLayout.astro` dacă e pagină de navigare
+- Adaugă în `siteContent.json` + `siteContent.ts` dacă e element de navigare
+- Adaugă în `astro.config.mjs` → `customPages` dacă e pagină prerendered nedescoperită de sitemap
+
+### 4. Când muți/redenumești o pagină
+- Vechiul fișier `.astro` se PĂSTREAZĂ ca redirect 301 (nu se șterge!)
+- Adaugă filtrul de excludere din sitemap în `astro.config.mjs`
+- Actualizează TOATE linkurile interne + cheia din `seo-content.json` + breadcrumb mapping din `BaseLayout.astro`
+
+### 5. Imagini — Workflow obligatoriu
+- Imagini brute → `_raw_images/` → `node scripts/optimize-images.js` → WebP în `src/assets/`
+- **NU adăuga imagini brute direct în `src/assets/`**
+- Imagini statice (logo, OG, SVG) rămân în `public/images/`
+- **Newest First:** când adaugi poze în galerii, prepend (la ÎNCEPUT), nu append
+
+### 6. GDPR & Securitate — NU elimina niciodată
+- `CookieBanner.astro` și `ConsentWhatsApp.astro` — necesare GDPR
+- `bot-field` (honeypot anti-bot) din formularul de contact
+- CORS din `src/lib/cors.ts` pe toate endpoint-urile API
+- `sanitize-url.ts` — NU modifica fără motiv explicit de securitate
+
+### 7. Layout Thrashing — Regula de Aur JS
+- După orice WRITE DOM (clase, stiluri, atribute) **NU citi imediat** proprietăți geometrice (`offsetWidth/Height`, `getBoundingClientRect`, `getComputedStyle`)
+- Fie READ-urile se fac ÎNAINTE de WRITE-uri, fie se izolează într-un `requestAnimationFrame` separat
+- **Istoric:** Apr 2026 — forced reflow 17ms în `Header.astro` + 57ms în `mobile-swipe.js` rezolvate prin acest pattern
+
+### 8. Pagini formatie-nunta — NU edita manual
+- `src/pages/formatie-nunta/` sunt generate automat
+- Cum adaugi un oraș: `locations.json` → `node scripts/programmatic-seo/generate-pages.js` → `npm run build`
+
+### 9. Verificare înainte de deploy
+- `npx astro build` — ZERO erori obligatoriu
+- Warnings `Astro.request.headers` pe pagini prerendered sunt normale
+- Caută linkuri fără trailing slash:
+  ```powershell
+  Get-ChildItem -Path src -Recurse -Include *.astro | Select-String 'href="\/[^"]*[^\/]"' | Where-Object { $_.Line -notmatch 'http|tel:|mailto:|#' }
+  ```
+
+---
+
+## 🏗️ ARHITECTURĂ & STACK
+
+- **Framework:** Astro 4 (hybrid output) + `@astrojs/node` (middleware mode)
+- **Styling:** TailwindCSS 3 + PostCSS — un singur bundle: `globals.css`
+- **Server:** `server.mjs` — sirv (fișiere .br/.gz) + compression + ssrHandler (ordinea NU se modifică)
+- **Deploy:** Railway (`railway.toml`) — `npm run build` = `astro build && node scripts/compress.mjs`
+- **CSS:** În build apare ca `aparitii-tv.*.css` — normal (ordine alfabetică)
+
+### Fișiere cheie
+```
+src/data/
+├── seo-content.json      ← Hub SEO: titluri, descrieri, h1, schema.org
+├── siteContent.json      ← Brand, contact, navigație, servicii, membri
+├── siteContent.ts        ← TypeScript types + navigație
+├── couples.json          ← Testimoniale cupluri
+├── blogPosts.json        ← Articole blog
+└── communityPosts.json   ← Postări comunitate
+
+src/layouts/BaseLayout.astro   ← Layout master: <head>, canonical, OG, GA4, JSON-LD, breadcrumbs
+src/components/
+├── Header.astro          ← Navigație + normalizeNavHref()
+├── Footer.astro          ← Footer + ZoneAcoperite
+├── ZoneAcoperite.astro   ← Internal linking automat pagini locale
+├── GalerieAutomata.astro ← Galerie Drop & Go (import.meta.glob)
+├── CookieBanner.astro    ← GDPR (NU elimina)
+└── ConsentWhatsApp.astro ← GDPR WhatsApp (NU elimina)
+
+scripts/programmatic-seo/
+├── locations.json        ← Date per oraș (slug, keyword, coords, texte)
+├── content-blocks.json   ← Variante text anti-duplicat (64 combinații)
+├── template.astro        ← Șablon pagini locale
+└── generate-pages.js     ← Generator pagini
+
+seo-agent/
+├── seo-data.json         ← Export Google Search Console
+├── seo-analyzer.js       ← Oportunități SEO (CTR slab + Striking Distance)
+├── keyword-harvester.js  ← Sugestii Google Autocomplete
+└── harvested-keywords.json ← Output (NU edita manual)
+```
+
+---
+
+## 📊 UNDE SE DEFINEȘTE SEO-UL
+
+### Din `src/data/seo-content.json`:
+| Rută | Cheia JSON |
+|------|-----------|
+| `/` | `acasa.meta` |
+| `/contact/` | `contact.meta` |
+| `/despre/` | `despre.meta` |
+| `/comunitate/` | `comunitate.meta` |
+
+### Hardcodat în `.astro`:
+`/galerie-video/`, `/galerie-foto/`, `/aparitii-tv/`, `/membri/`, `/momente-cu-mirii/`, `/vlog/`, `/live/`, pagini legale, pagini colaboratori, pagini formatie-nunta
+
+> **Regulă:** Verifică ÎNTÂI sursa înainte de a edita SEO. Title: max 60 car. + keyword principal. Description: max 155 car. + Call to Action.
+
+---
+
+## 🗺️ STRATEGIE SEO — Puncte cheie
+
+### Keywords performante (din GSC):
+- `formatie luminitza` — poziție #1.2, CTR 37.5% ✅ (menține)
+- `trupa nunta` — poziție #6.1, CTR 5.33% ✅ (menține)
+
+### Gap-uri de atacat:
+- `formatie nunta pret` — poziție 14.5, CTR 1.67% → articol + landing cu prețuri
+- `muzica populara nunta` — poziție 16.8 → conținut video + blog
+- `formatii nunti ilfov` — poziție 19.4 → pagină locală dedicată
+- `recenzii formatie nunta` — poziție 15.6 → content pe pagina comunitate
+
+### Etica SEO (White Hat):
+- `NEGATIVE_KEYWORDS` elimină automat competitorii
+- `ALLOWED_AREAS` — doar locații acoperite real (Pitești, Argeș, București, Ilfov, Dâmbovița, Vâlcea, Mioveni, Curtea de Argeș, Câmpulung)
+- Conținut unic per pagină (64 combinații posibile în programmatic SEO)
+
+---
+
+## 🖼️ SISTEMUL GALERIE DROP & GO
+
+- `src/assets/imagini-automate/` — structură de foldere per membri/colaboratori/publicații/evenimente
+- `GalerieAutomata.astro` — scanare automată prin `import.meta.glob`, optimizare WebP, lazy load
+- Adaugi poze: drag & drop în folderul corect → commit → build → apare automat pe site
+- **Foldere principale:** `membri/`, `colaboratori/`, `publicatii/`, `evenimente/`, `galerie-generala/`
+
+---
+
+## ⚡ COMENZI RAPIDE
+
+```bash
+npm run build                                     # Build complet (astro + compresie)
+npx astro check                                   # Verificare 0/0/0 erori/warnings/hints
+node seo-agent/seo-analyzer.js                   # Oportunități SEO din GSC
+node seo-agent/keyword-harvester.js "keyword"    # Keywords Google Autocomplete
+node scripts/optimize-images.js                  # Imagini brute → WebP
+node scripts/programmatic-seo/generate-pages.js  # Regenerare pagini locale
+node scripts/check-links.mjs                     # Validare linkuri
+node scripts/qa-check.mjs                        # QA complet
+node seo-agent/force-index.js                    # Submit URL-uri noi în GSC
+```
+
+---
+
+## 📅 CALENDAR LUNAR SEO
+> Ferrari reamintește automat la prima sesiune din fiecare lună.
+
+| # | Proces | Comandă / Acțiune | Timp estimat |
+|---|--------|-------------------|--------------|
+| 1 | Analiză oportunități GSC | `node seo-agent/seo-analyzer.js` | 2 min |
+| 2 | Recoltare keywords noi | `node seo-agent/keyword-harvester.js "formatie nunta"` (+ variante) | 5 min |
+| 3 | Export GSC proaspăt | Claudiu exportă CSV din Search Console → Ferrari actualizează `seo-data.json` | 5 min |
+| 4 | Verificare linkuri | `node scripts/check-links.mjs` | 2 min |
+| 5 | QA complet | `node scripts/qa-check.mjs` | 2 min |
+| 6 | Actualizare Tracker SEO | Ferrari completează `2-Tracker-SEO.md` cu pozițiile noi | 5 min |
+| 7 | Submit URL-uri noi | `node seo-agent/force-index.js` (dacă au fost adăugate pagini) | 1 min |
+| 8 | Commit & push | Ferrari face tot — Claudiu nu face nimic | 1 min |
+
+**Total: ~23 minute/lună pentru a menține SEO-ul optimizat.**
+
+---
+
+## 🔄 PROTOCOL FINAL SESIUNE
+La sfârșitul fiecărei sesiuni, Ferrari execută automat:
+1. `npx astro check` → 0/0/0
+2. `git add -A`
+3. `git commit -m "mesaj descriptiv"`
+4. `git push origin main`
+5. Actualizare jurnal cu ce s-a rezolvat
+
+**Claudiu nu trebuie să facă nimic tehnic.**
+
+---
+
+## 📋 CARTEA DE SERVICE — Sesiuni de lucru
 
 ---
 ## 🏁 23 aprilie 2026 — Fix Open Graph Facebook + corecție conținut articol
