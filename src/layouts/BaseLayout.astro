@@ -303,6 +303,21 @@ const mobileNavAllItems = [
           <a href={item.href} class={`left-side-link nav-btn-${item.color}`} data-nav-link>{item.label}</a>
         ))}
 
+        <!-- Buton „Oferă o recenzie" — separat vizual de linkurile principale -->
+        <a
+          href="https://g.page/r/Ca7MqSu2OLysEAE/review"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="sidebar-review-btn"
+          aria-label="Oferă o recenzie Google pentru Formația Florentina Pană"
+        >
+          <span class="sidebar-review-stars" aria-hidden="true">★★★★★</span>
+          <span class="sidebar-review-text">
+            <span class="sidebar-review-main">Oferă o recenzie</span>
+            <span class="sidebar-review-sub">Cât de mult ți-a plăcut?</span>
+          </span>
+        </a>
+
         <!-- Spacer flexibil — împinge social media la baza sidebarului -->
         <div class="sidebar-spacer"></div>
 
@@ -335,9 +350,9 @@ const mobileNavAllItems = [
 
       <main id="continut" class="flex-1 min-w-0 pt-40 sm:pt-44">
         <slot />
+        <Footer />
       </main>
     </div>
-    <Footer />
 
     {/* Banner consimțământ cookie – GA4 pornit doar după accept */}
     <CookieBanner ga4Id={ga4Id} />

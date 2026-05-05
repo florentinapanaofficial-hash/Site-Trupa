@@ -462,27 +462,76 @@ body.mobile-menu-open .left-side-menu {
     display: none !important;
   }
 
-  /* ── Layout: sidebar fix + conținut fluid ── */
+  /* ── Scroll lock pe html/body — elimină bara dublă de scroll ──
+     Doar main#continut scrollează pe desktop. html/body sunt blocate la
+     viewport, deci scrollbar-ul global de 18px (declarat mai sus) nu mai
+     are conținut de reprezentat și nu mai apare alături de cel din main. */
+  html,
+  body.page-shell {
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  html::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* ── Layout: Flexbox curat — sidebar fix + scroll izolat în main ──
+     height: 100vh + overflow: hidden pe shell → body nu mai scrollează.
+     Sidebar rămâne lipit, doar main#continut derulează. */
   .layout-content-shell {
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    flex-direction: row;
+    align-items: stretch;
+    height: 100vh;
+    height: 100dvh;
+    width: 100%;
+    max-width: 100%;
     min-width: 0;
-    width: calc(100% - 220px);
-    max-width: calc(100% - 220px);
     padding-inline: 0;
-    margin-left: 220px;
-    overflow-x: hidden;
+    margin-left: 0;
+    margin-right: 0;
+    overflow: hidden;
   }
 
   #continut {
-    width: 100%;
-    max-width: 100%;
-    margin-inline: 0;
-    padding-top: 1.5rem;
+    flex: 1;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    max-width: calc(100vw - 280px);
+    height: 100vh;
+    height: 100dvh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    margin-inline: 0;
+    padding-top: 1.5rem;
+  }
+
+  /* Scrollbar discret pe main */
+  #continut::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  #continut::-webkit-scrollbar-track {
+    background: rgba(0, 0, 20, 0.30);
+  }
+
+  #continut::-webkit-scrollbar-thumb {
+    background: rgba(245, 166, 35, 0.45);
+    border-radius: 8px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  #continut::-webkit-scrollbar-thumb:hover {
+    background: rgba(245, 166, 35, 0.70);
+    background-clip: padding-box;
+    border: 2px solid transparent;
   }
 
   /* Elimină pt-40/pt-44 de pe main pe desktop — sidebar preia rolul headerului */
@@ -492,23 +541,22 @@ body.mobile-menu-open .left-side-menu {
     padding-top: 1.5rem !important;
   }
 
-  /* ── Sidebar fix Sling TV style ── */
+  /* ── Sidebar fix — height: 100vh, scroll intern propriu, nu se mișcă ── */
   .left-side-menu {
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 220px;
-    max-width: 220px;
+    position: relative;
+    width: 280px;
+    max-width: 280px;
+    flex-shrink: 0;
     height: 100vh;
     height: 100dvh;
     z-index: 50;
+    display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
-    gap: 0.25rem;
+    gap: 0.15rem;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 0 0.6rem;
+    padding: 0 0.7rem 0.5rem;
     margin: 0;
     border: none;
     border-right: 1px solid rgba(255, 255, 255, 0.08);
@@ -520,18 +568,32 @@ body.mobile-menu-open .left-side-menu {
     scrollbar-width: none;
   }
 
+  /* ── Hero — ocupă cel puțin un viewport, conținut centrat perfect ──
+     flex: 0 0 auto + min-height: 100vh → nu colapsează când celelalte
+     secțiuni sunt sub el. Restul paginii curge natural în main. */
+  main#continut>section#acasa.hero-stage {
+    flex: 0 0 auto;
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
   .left-side-menu::-webkit-scrollbar {
     display: none;
   }
 
-  /* ── Logo + brand în sidebar ── */
+  /* ── Logo + brand în sidebar — compact, lipit cap de sus ── */
   .sidebar-brand {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    padding: 0.75rem 0.35rem 0.7rem;
-    margin-bottom: 0.25rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    gap: 0.5rem;
+    padding: 0.25rem 0.25rem 0.3rem;
+    margin-bottom: 0.15rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     text-decoration: none;
     transition: opacity 200ms ease;
   }
@@ -541,13 +603,13 @@ body.mobile-menu-open .left-side-menu {
   }
 
   .sidebar-brand img {
-    width: 40px;
-    height: 40px;
-    border-radius: 0.7rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 0.55rem;
     border: 1px solid rgba(245, 166, 35, 0.25);
     background: rgba(255, 255, 255, 0.05);
-    padding: 3px;
-    box-shadow: 0 4px 16px rgba(245, 166, 35, 0.22);
+    padding: 2px;
+    box-shadow: 0 3px 12px rgba(245, 166, 35, 0.20);
     flex-shrink: 0;
   }
 
@@ -575,18 +637,26 @@ body.mobile-menu-open .left-side-menu {
     opacity: 0.7;
   }
 
-  /* ── Linkurile din sidebar — lățime completă, compacte ── */
-  .left-side-link {
+  /* ── Linkurile din sidebar — stil modern, premium, compact (specificitate
+     ridicată prin .left-side-menu .left-side-link ca să bată regulile
+     globale .left-side-link care forțează min-height: 44px + pill) ── */
+  .left-side-menu .left-side-link {
     width: 100%;
+    display: flex;
+    align-items: center;
     justify-content: flex-start;
-    gap: 0.5rem;
-    padding: 0.4rem 0.6rem;
-    border-radius: 0.6rem;
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    min-height: 36px;
     text-align: left;
+    gap: 0.6rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.55rem;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    line-height: 1.2;
+    min-height: 34px;
+    min-width: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -594,24 +664,108 @@ body.mobile-menu-open .left-side-menu {
     box-sizing: border-box;
   }
 
-  .left-side-link .nav-icon {
+  .left-side-menu .left-side-link .nav-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 18px;
-    height: 18px;
-    flex-shrink: 0;
-    opacity: 0.85;
-  }
-
-  .left-side-link .nav-icon svg {
     width: 16px;
     height: 16px;
+    flex-shrink: 0;
+    opacity: 0.78;
+  }
+
+  .left-side-menu .left-side-link .nav-icon svg {
+    width: 14px;
+    height: 14px;
   }
 
   /* ── Spațiu flexibil — ascuns, social folosește margin-top:auto ── */
   .sidebar-spacer {
     display: none;
+  }
+
+  /* ── Buton recenzie Google în sidebar — separat vizual de linkuri ──
+     margin-top mare + linie separatoare deasupra = grupul de linkuri
+     rămâne sus, butonul de recenzie capătă propriul său spațiu, evidențiat. */
+  .sidebar-review-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 1.25rem 0.15rem 0.4rem;
+    padding: 0.65rem 0.85rem;
+    border-radius: 0.7rem;
+    background: linear-gradient(135deg, #c8890a 0%, #F5A623 55%, #f7c060 100%);
+    color: #1a0a00;
+    text-decoration: none;
+    font-family: 'Oswald', sans-serif;
+    box-shadow:
+      0 4px 14px rgba(245, 166, 35, 0.32),
+      0 1px 3px rgba(0, 0, 0, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(245, 166, 35, 0.55);
+    position: relative;
+    transition: transform 180ms ease, box-shadow 180ms ease;
+  }
+
+  /* Linie aurie subțire deasupra butonului — separator vizual față de linkuri */
+  .sidebar-review-btn::before {
+    content: '';
+    position: absolute;
+    top: -0.6rem;
+    left: 12%;
+    right: 12%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(245, 166, 35, 0.45), transparent);
+  }
+
+  .sidebar-review-btn:hover,
+  .sidebar-review-btn:focus-visible {
+    transform: translateY(-1px);
+    box-shadow:
+      0 6px 20px rgba(245, 166, 35, 0.50),
+      0 2px 6px rgba(0, 0, 0, 0.30),
+      inset 0 1px 0 rgba(255, 255, 255, 0.30);
+  }
+
+  .sidebar-review-btn:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+  }
+
+  .sidebar-review-stars {
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    color: #5c3300;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.40);
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .sidebar-review-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.05rem;
+    line-height: 1.2;
+    min-width: 0;
+  }
+
+  .sidebar-review-main {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #1a0a00;
+    white-space: nowrap;
+  }
+
+  .sidebar-review-sub {
+    font-size: 0.62rem;
+    font-weight: 500;
+    color: #3d1c00;
+    opacity: 0.85;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   /* ── Social media în sidebar — fixat la baza sidebarului ── */
@@ -655,6 +809,12 @@ body.mobile-menu-open .left-side-menu {
   #continut>section {
     width: 100%;
     max-width: var(--container-max);
+    /* Vital: în flex column cu main height: 100vh, secțiunile NU au voie să
+       se contracteze sub conținutul lor real. Fără flex-shrink: 0 + overflow
+       visible, paginile lungi (Povestea noastră, Despre etc.) se tăiau la
+       înălțimea viewport-ului. */
+    flex-shrink: 0;
+    overflow: visible;
   }
 }
 
@@ -1809,7 +1969,8 @@ details:focus-visible {
   .sidebar-brand,
   .sidebar-spacer,
   .sidebar-social,
-  .sidebar-copy {
+  .sidebar-copy,
+  .sidebar-review-btn {
     display: none !important;
   }
 
@@ -1930,280 +2091,287 @@ details:focus-visible {
   }
 }
 
-/* ── 3. Layout shell — fără padding lateral, block simplu ── */
-.layout-content-shell {
-  display: block !important;
-  padding-inline: 0 !important;
-  overflow: visible !important;
-}
+/* ══════════════════════════════════════════════════════════════
+   BLOC MOBIL/TABLETĂ (≤ 1024px) — reguli !important care resetează
+   layout-ul vertical pe ecrane mici. Înainte erau orfane (fără @media)
+   și suprascriau și desktop-ul, distrugând Flexbox-ul. Acum sunt
+   închise corect în media query, deci desktop-ul (≥1025px) păstrează
+   Flexbox-ul curat: sidebar sticky 280px + main flex:1 + hero centrat.
+   ══════════════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
 
-/* ── 4. Body shell — overflow intern permis ── */
-.page-shell {
-  overflow-x: hidden !important;
-  overflow-y: visible !important;
-}
+  /* ── 3. Layout shell — fără padding lateral, block simplu ── */
+  .layout-content-shell {
+    display: block !important;
+    padding-inline: 0 !important;
+    overflow: visible !important;
+  }
 
-/* ── 5. Main = container vertical (scroll normal prin body/window) ──
+  /* ── 4. Body shell — overflow intern permis ── */
+  .page-shell {
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+  }
+
+  /* ── 5. Main = container vertical (scroll normal prin body/window) ──
          Toate paginile folosesc layout vertical pe mobil.
          Homepage adaugă min-height pe secțiuni și swipe orizontal JS.
          Nu mai există layout orizontal cu scroll-snap ca bază. ── */
-main#continut {
-  display: block !important;
-  overflow: visible !important;
-  scroll-snap-type: none !important;
-  overscroll-behavior: auto !important;
-  -webkit-overflow-scrolling: auto !important;
-  scrollbar-width: none !important;
-  -ms-overflow-style: none !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  height: auto !important;
-  min-height: unset !important;
-  max-height: none !important;
-  border-radius: 0 !important;
-  border: none !important;
-  box-shadow: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  background: transparent !important;
-  isolation: auto !important;
-  padding-top: calc(var(--mob-nav-h, 72px) + 0.5rem) !important;
-  padding-bottom: 2rem !important;
-}
-
-main#continut::-webkit-scrollbar {
-  display: none !important;
-}
-
-/* ── 6. Fiecare <section> = bloc vertical cu scroll normal ── */
-main#continut>section {
-  flex: unset !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  height: auto !important;
-  min-height: unset !important;
-  max-height: none !important;
-  overflow: visible !important;
-  overscroll-behavior: auto !important;
-  -webkit-overflow-scrolling: auto !important;
-  scroll-snap-align: none !important;
-  scroll-snap-stop: unset !important;
-  touch-action: auto !important;
-  margin: 0 !important;
-  border-radius: 0 !important;
-  box-sizing: border-box !important;
-  /* Padding lateral simetric (≥ 20px) + ritm vertical uniform pe mobil */
-  padding-top: 0 !important;
-  padding-bottom: var(--section-gap-y) !important;
-  padding-left: var(--container-pad-x) !important;
-  padding-right: var(--container-pad-x) !important;
-}
-
-/* ── Hero Acasă — conținut aliniat sus, nu centrat vertical ── */
-main#continut>section#acasa.hero-stage {
-  justify-content: flex-start !important;
-  padding-top: calc(var(--mob-nav-h, 72px) + 1rem) !important;
-}
-
-main#continut>section::-webkit-scrollbar {
-  width: 0 !important;
-}
-
-/* ── 7. Nav plutitor înlocuit de hamburger menu din header ── */
-.mob-nav {
-  display: none !important;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
-  overflow: visible;
-  background: linear-gradient(180deg,
-      rgba(4, 6, 18, 0.98) 0%,
-      rgba(4, 6, 18, 0.96) 84%,
-      rgba(4, 6, 18, 0.80) 100%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 0.45rem 0.5rem 0.45rem;
-}
-
-.mob-nav-track {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  justify-content: center;
-  align-items: center;
-}
-
-.mob-nav-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  white-space: nowrap;
-  text-decoration: none;
-  border-radius: 9999px;
-  font-family: 'Oswald', sans-serif;
-  font-size: max(0.7rem, 14px);
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  padding: 0.34rem 0.65rem;
-  min-height: 48px;
-  min-width: 48px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.07);
-  color: rgba(255, 255, 255, 0.65);
-  transition:
-    background 200ms ease,
-    border-color 200ms ease,
-    color 200ms ease,
-    box-shadow 200ms ease;
-}
-
-.mob-nav-btn.is-active {
-  background: rgba(6, 214, 255, 0.16);
-  border-color: rgba(6, 214, 255, 0.60);
-  color: #7ef8ff;
-  box-shadow:
-    0 0 14px rgba(6, 214, 255, 0.32),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
-}
-
-/* ── 8. Săgeți swipe stânga / dreapta — ascunse implicit, vizibile doar pe homepage ── */
-.mob-swipe-hints {
-  display: none !important;
-  pointer-events: none;
-}
-
-.mob-arrow {
-  position: fixed;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 50;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.75rem;
-  min-width: 44px;
-  height: 6rem;
-  min-height: 44px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.07);
-  color: rgba(255, 255, 255, 0.50);
-  cursor: pointer;
-  pointer-events: auto;
-  transition:
-    opacity 300ms ease,
-    background 200ms ease,
-    color 200ms ease;
-}
-
-.mob-arrow--prev {
-  left: 0;
-  border-left: none;
-  border-radius: 0 1.25rem 1.25rem 0;
-}
-
-.mob-arrow--next {
-  right: 0;
-  border-right: none;
-  border-radius: 1.25rem 0 0 1.25rem;
-}
-
-.mob-arrow.is-hidden {
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
-/* Hint animat — pulsare săgeată dreapta la prima vizită */
-@keyframes arrowBounceRight {
-  0% {
-    transform: translateY(-50%) translateX(0);
+  main#continut {
+    display: block !important;
+    overflow: visible !important;
+    scroll-snap-type: none !important;
+    overscroll-behavior: auto !important;
+    -webkit-overflow-scrolling: auto !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: unset !important;
+    max-height: none !important;
+    border-radius: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: transparent !important;
+    isolation: auto !important;
+    padding-top: calc(var(--mob-nav-h, 72px) + 0.5rem) !important;
+    padding-bottom: 2rem !important;
   }
 
-  35% {
-    transform: translateY(-50%) translateX(-6px);
+  main#continut::-webkit-scrollbar {
+    display: none !important;
   }
 
-  65% {
-    transform: translateY(-50%) translateX(-2px);
+  /* ── 6. Fiecare <section> = bloc vertical cu scroll normal ── */
+  main#continut>section {
+    flex: unset !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: unset !important;
+    max-height: none !important;
+    overflow: visible !important;
+    overscroll-behavior: auto !important;
+    -webkit-overflow-scrolling: auto !important;
+    scroll-snap-align: none !important;
+    scroll-snap-stop: unset !important;
+    touch-action: auto !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-sizing: border-box !important;
+    /* Padding lateral simetric (≥ 20px) + ritm vertical uniform pe mobil */
+    padding-top: 0 !important;
+    padding-bottom: var(--section-gap-y) !important;
+    padding-left: var(--container-pad-x) !important;
+    padding-right: var(--container-pad-x) !important;
   }
 
-  100% {
-    transform: translateY(-50%) translateX(0);
+  /* ── Hero Acasă — conținut aliniat sus, nu centrat vertical ── */
+  main#continut>section#acasa.hero-stage {
+    justify-content: flex-start !important;
+    padding-top: calc(var(--mob-nav-h, 72px) + 1rem) !important;
   }
-}
 
-.mob-arrow--next.hint-pulse {
-  animation: arrowBounceRight 1s ease 1.2s 3 both;
-  background: rgba(6, 214, 255, 0.18) !important;
-  color: rgba(126, 248, 255, 0.95) !important;
-  border-color: rgba(6, 214, 255, 0.45) !important;
-}
+  main#continut>section::-webkit-scrollbar {
+    width: 0 !important;
+  }
 
-.mob-arrow:hover,
-.mob-arrow:focus-visible {
-  background: rgba(6, 214, 255, 0.14);
-  color: rgba(126, 248, 255, 0.9);
-}
+  /* ── 7. Nav plutitor înlocuit de hamburger menu din header ── */
+  .mob-nav {
+    display: none !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    overflow: visible;
+    background: linear-gradient(180deg,
+        rgba(4, 6, 18, 0.98) 0%,
+        rgba(4, 6, 18, 0.96) 84%,
+        rgba(4, 6, 18, 0.80) 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0.45rem 0.5rem 0.45rem;
+  }
 
-/* ── 9. Footer compact pe mobil ── */
-footer {
-  min-height: auto !important;
-  padding-block: 1rem !important;
-}
+  .mob-nav-track {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    justify-content: center;
+    align-items: center;
+  }
 
-/* ══════════════════════════════════════════════════════════════
+  .mob-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    text-decoration: none;
+    border-radius: 9999px;
+    font-family: 'Oswald', sans-serif;
+    font-size: max(0.7rem, 14px);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.34rem 0.65rem;
+    min-height: 48px;
+    min-width: 48px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.07);
+    color: rgba(255, 255, 255, 0.65);
+    transition:
+      background 200ms ease,
+      border-color 200ms ease,
+      color 200ms ease,
+      box-shadow 200ms ease;
+  }
+
+  .mob-nav-btn.is-active {
+    background: rgba(6, 214, 255, 0.16);
+    border-color: rgba(6, 214, 255, 0.60);
+    color: #7ef8ff;
+    box-shadow:
+      0 0 14px rgba(6, 214, 255, 0.32),
+      inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  }
+
+  /* ── 8. Săgeți swipe stânga / dreapta — ascunse implicit, vizibile doar pe homepage ── */
+  .mob-swipe-hints {
+    display: none !important;
+    pointer-events: none;
+  }
+
+  .mob-arrow {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    min-width: 44px;
+    height: 6rem;
+    min-height: 44px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.07);
+    color: rgba(255, 255, 255, 0.50);
+    cursor: pointer;
+    pointer-events: auto;
+    transition:
+      opacity 300ms ease,
+      background 200ms ease,
+      color 200ms ease;
+  }
+
+  .mob-arrow--prev {
+    left: 0;
+    border-left: none;
+    border-radius: 0 1.25rem 1.25rem 0;
+  }
+
+  .mob-arrow--next {
+    right: 0;
+    border-right: none;
+    border-radius: 1.25rem 0 0 1.25rem;
+  }
+
+  .mob-arrow.is-hidden {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  /* Hint animat — pulsare săgeată dreapta la prima vizită */
+  @keyframes arrowBounceRight {
+    0% {
+      transform: translateY(-50%) translateX(0);
+    }
+
+    35% {
+      transform: translateY(-50%) translateX(-6px);
+    }
+
+    65% {
+      transform: translateY(-50%) translateX(-2px);
+    }
+
+    100% {
+      transform: translateY(-50%) translateX(0);
+    }
+  }
+
+  .mob-arrow--next.hint-pulse {
+    animation: arrowBounceRight 1s ease 1.2s 3 both;
+    background: rgba(6, 214, 255, 0.18) !important;
+    color: rgba(126, 248, 255, 0.95) !important;
+    border-color: rgba(6, 214, 255, 0.45) !important;
+  }
+
+  .mob-arrow:hover,
+  .mob-arrow:focus-visible {
+    background: rgba(6, 214, 255, 0.14);
+    color: rgba(126, 248, 255, 0.9);
+  }
+
+  /* ── 9. Footer compact pe mobil ── */
+  footer {
+    min-height: auto !important;
+    padding-block: 1rem !important;
+  }
+
+  /* ══════════════════════════════════════════════════════════════
      HOMEPAGE MOBIL — secțiuni full-height, swipe orizontal între pagini.
      Baza (mai sus) e deja vertical; aici adăugăm doar ce diferă:
      min-height pe secțiuni, overflow-x:clip, touch-action:pan-y,
      padding mai mare, și săgețile de navigare.
   ══════════════════════════════════════════════════════════════ */
 
-body.is-homepage main#continut>section {
-  min-height: 100dvh !important;
-  overflow-x: clip !important;
-  overflow-y: visible !important;
-  touch-action: pan-y !important;
-  padding-top: calc(var(--mob-nav-h, 72px) + 1rem) !important;
-  padding-bottom: calc(var(--section-pad-y) + 0.5rem) !important;
-  padding-left: var(--container-pad-x) !important;
-  padding-right: var(--container-pad-x) !important;
-}
-
-body.is-homepage main#continut>section#acasa.hero-stage {
-  justify-content: flex-start !important;
-  padding-top: calc(var(--mob-nav-h, 72px) + 1rem) !important;
-}
-
-/* Secțiunile SEO pe homepage — nu forța min-height 100dvh, doar cât conținut au */
-body.is-homepage main#continut>section.hp-seo-section {
-  min-height: unset !important;
-  padding-top: 2rem !important;
-  padding-bottom: 2rem !important;
-}
-
-/* Pe homepage: săgețile swipe sunt vizibile */
-body.is-homepage .mob-swipe-hints {
-  display: block !important;
-}
-
-body.is-homepage .mob-arrow--prev {
-  display: none !important;
-}
-
-body.is-homepage .mob-arrow--next {
-  display: flex !important;
-}
-
-/* ── Centrare vizuală conținut pe desktop lat (≥1280px) ──
-   Oglindește lățimea sidebar-ului fix (220px) cu margin-right egal,
-   astfel încât conținutul să apară centrat în viewport, nu împins la dreapta. */
-@media (min-width: 1280px) {
-  .layout-content-shell {
-    width: calc(100% - 440px);
-    max-width: calc(100% - 440px);
-    margin-right: 220px;
+  body.is-homepage main#continut>section {
+    min-height: 100dvh !important;
+    overflow-x: clip !important;
+    overflow-y: visible !important;
+    touch-action: pan-y !important;
+    padding-top: calc(var(--mob-nav-h, 72px) + 1rem) !important;
+    padding-bottom: calc(var(--section-pad-y) + 0.5rem) !important;
+    padding-left: var(--container-pad-x) !important;
+    padding-right: var(--container-pad-x) !important;
   }
+
+  body.is-homepage main#continut>section#acasa.hero-stage {
+    justify-content: flex-start !important;
+    padding-top: calc(var(--mob-nav-h, 72px) + 1rem) !important;
+  }
+
+  /* Secțiunile SEO pe homepage — nu forța min-height 100dvh, doar cât conținut au */
+  body.is-homepage main#continut>section.hp-seo-section {
+    min-height: unset !important;
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+  }
+
+  /* Pe homepage: săgețile swipe sunt vizibile */
+  body.is-homepage .mob-swipe-hints {
+    display: block !important;
+  }
+
+  body.is-homepage .mob-arrow--prev {
+    display: none !important;
+  }
+
+  body.is-homepage .mob-arrow--next {
+    display: flex !important;
+  }
+
 }
+
+/* ← închide @media (max-width: 1024px) — restul fișierului e desktop */
+
+/* ── Layout flex desktop — sidebar sticky în flux, main fluid ──
+   Vechea regulă „mirror margin-right 220px" a fost eliminată: layout-ul
+   este acum un Flexbox real (sidebar 280px + main flex:1), nu mai există
+   margin-left/calc-uri, deci conținutul rămâne aliniat natural. */
