@@ -33,6 +33,9 @@ export default defineConfig({
       customPages: [
         `${siteUrl}/comunitate/`,
         `${siteUrl}/momente-cu-mirii/`,
+        `${siteUrl}/membri/`,
+        `${siteUrl}/aparitii-tv/`,
+        `${siteUrl}/formatie-nunta/curtea-de-arges/`,
       ],
       filter: (page) => {
         // Exclude pagina de redirect /comunitatea-noastra/ (301 → /comunitate/)
