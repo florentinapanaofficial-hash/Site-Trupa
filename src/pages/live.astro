@@ -3,9 +3,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import BackButton from '../components/BackButton.astro';
 
 const YOUTUBE_CHANNEL_ID = process.env.YOUTUBE_CHANNEL_ID?.trim() || 'UCNi3X-Qm3V4aaOAFSOlzHew';
-const livePageTitle = 'LIVE de la Evenimente | Formația Florentina Pană';
+const livePageTitle = 'Live cu Florentina Pană | Trupă Cover & Muzică Evenimente';
 const livePageDescription = 'Urmărește live stream-urile de la nunți, botezuri și evenimente cu Formația Florentina Pană. Simte energia FP Band în timp real.';
 const livePageOgImage = '/images/og-live-1200x630.jpg';
+const isLiveStatus = true; // Schimbă în false când nu e emisie live
 ---
 
 <BaseLayout
@@ -32,8 +33,8 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
         <span class="text-sm font-bold uppercase tracking-widest text-red-400">Transmisiune Live</span>
       </div>
 
-      <h1 class="mx-auto max-w-3xl font-serif text-4xl font-bold leading-tight text-white sm:text-5xl lg:text-6xl">
-        Simte energia FP Band<br class="hidden sm:block" /> în timp real
+      <h1 class="mx-auto max-w-3xl font-['Oswald'] text-4xl font-bold uppercase tracking-widest leading-tight text-white sm:text-5xl lg:text-6xl">
+        Live cu Florentina Pană
       </h1>
       <p class="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-white/60">
         Transmisiuni în direct de la cele mai frumoase evenimente — nunți, botezuri, petreceri.
@@ -48,18 +49,22 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
     <div class="section-container">
       <div class="mx-auto max-w-5xl overflow-hidden rounded-3xl border border-cyan-400/20 bg-black/70 p-3 shadow-[0_20px_50px_rgba(0,0,0,0.45)] sm:p-4">
         <div class="relative overflow-hidden rounded-2xl border border-white/10 bg-black p-2 sm:p-3">
+          {isLiveStatus && (
           <div class="pointer-events-none absolute left-3 top-3 z-10 inline-flex items-center gap-2 rounded-full border border-red-500/35 bg-black/70 px-3 py-1 text-[0.65rem] font-bold uppercase tracking-[0.15em] text-red-400 sm:left-4 sm:top-4 sm:text-xs">
             <span class="h-2.5 w-2.5 animate-pulse rounded-full bg-red-500"></span>
             LIVE
           </div>
+          )}
 
+          {isLiveStatus && (
           <div class="pointer-events-none absolute right-3 top-3 z-10 rounded-md border border-cyan-300/25 bg-[#02101a]/80 px-2.5 py-1 font-['Oswald'] text-xs tracking-[0.1em] text-cyan-200 sm:right-4 sm:top-4 sm:text-sm">
             <span id="mini-live-clock">00:00:00</span>
           </div>
+          )}
 
           <div class="aspect-video overflow-hidden rounded-xl">
             <iframe
-              src="https://www.youtube-nocookie.com/embed/bffqJGtP9ok?controls=1&rel=0&modestbranding=1"
+              src="https://www.youtube-nocookie.com/embed/bffqJGtP9ok?controls=1&rel=0&modestbranding=1&enablejsapi=1"
               title="Mini TV Live Preview"
               class="h-full w-full pointer-events-auto"
               loading="lazy"
@@ -173,6 +178,32 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
       <p id="offline-msg" class="mx-auto mt-4 max-w-xl text-center text-sm leading-relaxed text-amber-400/70" style="display:none">
         Nu suntem live acum — în player poți vedea ultimul nostru eveniment înregistrat.
       </p>
+
+      {/* ── Buton nativ Distribuie ── */}
+      <div class="mt-6 flex justify-center">
+        <button
+          type="button"
+          id="btn-native-share"
+          class="inline-flex items-center gap-2 rounded-xl border border-cyan-400/30 bg-cyan-500/10 px-6 py-3 font-['Oswald'] text-sm uppercase tracking-[0.09em] text-cyan-200 transition hover:border-cyan-400/60 hover:bg-cyan-500/20 hover:text-cyan-100 active:scale-95"
+          aria-label="Distribuie pagina live"
+        >
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 1 1 0-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 1 0 5.367-2.684 3 3 0 0 0-5.367 2.684Zm0 9.316a3 3 0 1 0 5.368 2.684 3 3 0 0 0-5.368-2.684Z" />
+          </svg>
+          Distribuie
+        </button>
+      </div>
+
+      {/* Toast confirmare copiere link */}
+      <div
+        id="live-share-toast"
+        class="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-xl border border-green-500/40 bg-[#071a0e]/90 px-5 py-3 text-sm font-semibold text-green-400 shadow-xl backdrop-blur-sm"
+        style="display:none"
+        role="alert"
+        aria-live="polite"
+      >
+        ✓ Link copiat!
+      </div>
 
       {/* Text descriptiv sub player */}
       <p class="mx-auto mt-8 max-w-xl text-center text-base leading-relaxed text-white/50">
@@ -691,7 +722,7 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
         .then(function (r) { return r.json(); })
         .then(function (data) {
           if (data.isLive && data.videoId) {
-            player.src = 'https://www.youtube-nocookie.com/embed/' + data.videoId + '?controls=1&autoplay=1&rel=0';
+            player.src = 'https://www.youtube-nocookie.com/embed/' + data.videoId + '?controls=1&autoplay=1&rel=0&enablejsapi=1';
             if (badge) badge.style.display = '';
             if (offlineMsg) offlineMsg.style.display = 'none';
             applyDetectedFormat(data.videoId);
@@ -699,14 +730,14 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
             if (badge) badge.style.display = 'none';
             if (offlineMsg) offlineMsg.style.display = '';
             // Fallback: ultimul live înregistrat
-            player.src = 'https://www.youtube-nocookie.com/embed/' + LAST_LIVE_ID + '?controls=1&rel=0';
+            player.src = 'https://www.youtube-nocookie.com/embed/' + LAST_LIVE_ID + '?controls=1&rel=0&enablejsapi=1';
             applyDetectedFormat(LAST_LIVE_ID);
           }
         })
         .catch(function () {
           if (badge) badge.style.display = 'none';
           if (offlineMsg) offlineMsg.style.display = '';
-          if (player) player.src = 'https://www.youtube-nocookie.com/embed/' + LAST_LIVE_ID + '?controls=1&rel=0';
+          if (player) player.src = 'https://www.youtube-nocookie.com/embed/' + LAST_LIVE_ID + '?controls=1&rel=0&enablejsapi=1';
           applyDetectedFormat(LAST_LIVE_ID);
         });
     }
@@ -739,6 +770,47 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
       });
     }
 
+    // ── Buton nativ Distribuie ──
+    var nativeShareBtn = document.getElementById('btn-native-share');
+    var shareToast = document.getElementById('live-share-toast');
+
+    function showShareToast() {
+      if (!shareToast) return;
+      shareToast.style.display = '';
+      clearTimeout(shareToast._hideTimer);
+      shareToast._hideTimer = setTimeout(function () {
+        shareToast.style.display = 'none';
+      }, 2500);
+    }
+
+    if (nativeShareBtn) {
+      nativeShareBtn.addEventListener('click', function () {
+        var url = window.location.href;
+        var shareData = {
+          title: 'Live cu Florentina Pană',
+          text: 'Urmărește transmisiunea live a Formației Florentina Pană!',
+          url: url,
+        };
+        if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+          navigator.share(shareData).catch(function () {});
+        } else {
+          navigator.clipboard.writeText(url).then(showShareToast).catch(function () {
+            try {
+              var ta = document.createElement('textarea');
+              ta.value = url;
+              ta.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
+              document.body.appendChild(ta);
+              ta.focus();
+              ta.select();
+              document.execCommand('copy');
+              document.body.removeChild(ta);
+              showShareToast();
+            } catch (err) {}
+          });
+        }
+      });
+    }
+
     // ── Panou Anunță Live pe Facebook ──
     var announceText = document.getElementById('announce-text');
     var copyAnnounceBtn = document.getElementById('copy-announce');
@@ -768,5 +840,42 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
         });
       });
     }
+  })();
+</script>
+
+<script is:inline>
+  /* ── Mutual Exclusion pe iframes YouTube ─────────────────────────────────────
+     Când un iframe YouTube începe redarea (playerState 1), toate celelalte
+     iframes de pe pagină primesc comanda pauseVideo via postMessage.
+     Necesită enablejsapi=1 în src-ul fiecărui iframe (adăugat deja).
+  ─────────────────────────────────────────────────────────────────────────── */
+  (function () {
+    var YT_PAUSE = JSON.stringify({ event: 'command', func: 'pauseVideo', args: '' });
+    var YT_ORIGIN = 'https://www.youtube-nocookie.com';
+
+    function pauseAllExcept(activeSource) {
+      document.querySelectorAll('iframe[src*="youtube"]').forEach(function (iframe) {
+        try {
+          if (iframe.contentWindow && iframe.contentWindow !== activeSource) {
+            iframe.contentWindow.postMessage(YT_PAUSE, YT_ORIGIN);
+          }
+        } catch (err) {}
+      });
+    }
+
+    window.addEventListener('message', function (e) {
+      if (!e.data || !e.source) return;
+      if (e.origin !== YT_ORIGIN) return;
+      var data;
+      try {
+        data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+      } catch (err) {
+        return;
+      }
+      /* YouTube trimite playerState: 1 (playing) prin evenimentul infoDelivery */
+      if (data.event === 'infoDelivery' && data.info && data.info.playerState === 1) {
+        pauseAllExcept(e.source);
+      }
+    });
   })();
 </script>
