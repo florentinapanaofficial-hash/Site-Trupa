@@ -687,7 +687,7 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
     setFormat(false);
 
     if (player && channelId) {
-      fetch('/api/live-status')
+      fetch('/api/live-status/')
         .then(function (r) { return r.json(); })
         .then(function (data) {
           if (data.isLive && data.videoId) {

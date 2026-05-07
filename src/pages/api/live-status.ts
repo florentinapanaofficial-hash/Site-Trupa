@@ -13,6 +13,79 @@ import { checkOrigin } from '../../lib/cors.js';
 export const prerender = false;
 
 const FALLBACK_CHANNEL_ID = 'UCNi3X-Qm3V4aaOAFSOlzHew';
+const LIVE_STATUS_CACHE_TTL_MS = 55_000;
+const YOUTUBE_FETCH_TIMEOUT_MS = 1_500;
+
+type LiveStatusPayload = {
+    isLive: boolean;
+    videoId: string | null;
+};
+
+let cachedLiveStatus: LiveStatusPayload | null = null;
+let cachedAt = 0;
+let inFlightRequest: Promise<LiveStatusPayload> | null = null;
+
+const isCacheFresh = () => {
+    return cachedLiveStatus && Date.now() - cachedAt < LIVE_STATUS_CACHE_TTL_MS;
+};
+
+const getFallbackPayload = (): LiveStatusPayload => {
+    return cachedLiveStatus ?? { isLive: false, videoId: null };
+};
+
+const fetchLiveStatusFromYoutube = async (apiKey: string, channelId: string): Promise<LiveStatusPayload> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), YOUTUBE_FETCH_TIMEOUT_MS);
+
+    try {
+        const url = new URL('https://www.googleapis.com/youtube/v3/search');
+        url.searchParams.set('part', 'id');
+        url.searchParams.set('channelId', channelId);
+        url.searchParams.set('eventType', 'live');
+        url.searchParams.set('type', 'video');
+        url.searchParams.set('maxResults', '1');
+        url.searchParams.set('fields', 'items(id(videoId))');
+        url.searchParams.set('key', apiKey);
+
+        const res = await fetch(url.toString(), {
+            signal: controller.signal,
+            cache: 'no-store',
+        });
+
+        if (!res.ok) {
+            return getFallbackPayload();
+        }
+
+        const data = await res.json() as { items?: Array<{ id: { videoId: string } }> };
+        const videoId = data?.items?.[0]?.id?.videoId ?? null;
+
+        return { isLive: !!videoId, videoId };
+    } catch {
+        return getFallbackPayload();
+    } finally {
+        clearTimeout(timeoutId);
+    }
+};
+
+const getLiveStatus = async (apiKey: string, channelId: string): Promise<LiveStatusPayload> => {
+    if (isCacheFresh()) {
+        return cachedLiveStatus as LiveStatusPayload;
+    }
+
+    if (!inFlightRequest) {
+        inFlightRequest = fetchLiveStatusFromYoutube(apiKey, channelId)
+            .then((payload) => {
+                cachedLiveStatus = payload;
+                cachedAt = Date.now();
+                return payload;
+            })
+            .finally(() => {
+                inFlightRequest = null;
+            });
+    }
+
+    return inFlightRequest;
+};
 
 export const GET: APIRoute = async ({ request }) => {
     const originCheck = checkOrigin(request);
@@ -38,33 +111,15 @@ export const GET: APIRoute = async ({ request }) => {
     }
 
     try {
-        const url = new URL('https://www.googleapis.com/youtube/v3/search');
-        url.searchParams.set('part', 'id');
-        url.searchParams.set('channelId', channelId);
-        url.searchParams.set('eventType', 'live');
-        url.searchParams.set('type', 'video');
-        url.searchParams.set('maxResults', '1');
-        url.searchParams.set('key', apiKey);
-
-        const res = await fetch(url.toString());
-
-        if (!res.ok) {
-            return new Response(
-                JSON.stringify({ isLive: false, videoId: null }),
-                { status: 200, headers }
-            );
-        }
-
-        const data = await res.json() as { items?: Array<{ id: { videoId: string } }> };
-        const videoId = data?.items?.[0]?.id?.videoId ?? null;
+        const payload = await getLiveStatus(apiKey, channelId);
 
         return new Response(
-            JSON.stringify({ isLive: !!videoId, videoId }),
+            JSON.stringify(payload),
             { status: 200, headers }
         );
     } catch {
         return new Response(
-            JSON.stringify({ isLive: false, videoId: null }),
+            JSON.stringify(getFallbackPayload()),
             { status: 200, headers }
         );
     }

@@ -404,8 +404,16 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
         });
     };
 
-    refreshLiveState();
-    window.setInterval(refreshLiveState, LIVE_STATUS_REFRESH_MS);
+    const startLiveStatePolling = () => {
+      refreshLiveState();
+      window.setInterval(refreshLiveState, LIVE_STATUS_REFRESH_MS);
+    };
+
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(startLiveStatePolling, { timeout: 2500 });
+    } else {
+      window.setTimeout(startLiveStatePolling, 1200);
+    }
 
     if (links.length === 0) return;
 
