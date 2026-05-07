@@ -38,6 +38,7 @@ const pageTitle = `${video.title} | Video live | Formația Florentina Pană`;
 const pageDescription = `Urmărește ${video.title}, moment live din repertoriul Formația Florentina Pană. Vezi clipul complet și distribuie pagina.`;
 const ogImage = `https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`;
 const youtubeUrl = sanitizeUrl(video.youtubeUrl ?? `https://www.youtube.com/watch?v=${video.youtubeId}`);
+const youtubeRedirectUrl = `/youtube-redirect/?to=${encodeURIComponent(youtubeUrl)}&back=${encodeURIComponent('/galerie-video/')}`;
 const ogVideoUrl = `https://www.youtube-nocookie.com/embed/${video.youtubeId}`;
 const ogVideoSecureUrl = ogVideoUrl;
 
@@ -87,9 +88,7 @@ const videoJsonLd = {
           </span>
         )}
         <a
-          href={youtubeUrl}
-          target="_blank"
-          rel="noopener noreferrer"
+          href={youtubeRedirectUrl}
           class="inline-flex items-center rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-cyan-100 transition hover:-translate-y-0.5 hover:border-cyan-200/50 hover:bg-cyan-300/10"
         >
           Vezi pe YouTube

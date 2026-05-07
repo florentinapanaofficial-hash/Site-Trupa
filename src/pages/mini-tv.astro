@@ -1,0 +1,392 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const miniTvTitle = 'Mini TV Live | Formația Florentina Pană';
+const miniTvDescription = 'Mini TV Live cu player video, burtieră animată și arhivă rapidă. Urmărește vibe-ul FP Band și intră în culisele celor mai tari momente.';
+---
+
+<BaseLayout title={miniTvTitle} description={miniTvDescription} ogImage="/images/og-live-1200x630.jpg">
+  <section class="relative overflow-hidden bg-[#050b1d] py-12 sm:py-16">
+    <div class="pointer-events-none absolute inset-0 opacity-70" aria-hidden="true">
+      <div class="absolute -top-28 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-cyan-500/20 blur-3xl"></div>
+      <div class="absolute -bottom-20 right-10 h-56 w-56 rounded-full bg-[#d4a84f]/20 blur-3xl"></div>
+    </div>
+
+    <div class="section-container relative z-10">
+      <div class="mx-auto mb-8 max-w-3xl text-center">
+        <p class="mini-tv-kicker">Studio Digital FP Band</p>
+        <h1 class="mt-3 text-4xl font-bold text-white sm:text-5xl lg:text-6xl">Mini TV Live</h1>
+        <p class="mx-auto mt-4 text-base text-white/70 sm:text-lg">
+          Emisie premium într-un format compact: live stream, burtieră de campanie și acces instant la edițiile recente.
+        </p>
+      </div>
+
+      <div class="mx-auto max-w-5xl">
+        <div class="mini-tv-frame">
+          <div class="mini-tv-screen-shell">
+            <div class="mini-tv-live-badge" aria-label="Transmisiune live">
+              <span class="mini-tv-led" aria-hidden="true"></span>
+              <span>● LIVE</span>
+            </div>
+
+            <div class="mini-tv-clock" aria-live="polite" aria-label="Ora curentă de emisie">
+              <span id="mini-tv-clock">00:00:00</span>
+            </div>
+
+            <div class="mini-tv-player aspect-video">
+              <iframe
+                src="https://www.youtube-nocookie.com/embed/bffqJGtP9ok?controls=1&rel=0&modestbranding=1"
+                title="Mini TV Live - player test"
+                class="h-full w-full pointer-events-auto"
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen
+              ></iframe>
+            </div>
+          </div>
+
+          <div class="mini-tv-ticker" aria-label="Burtieră promoțională">
+            <div class="mini-tv-ticker-track">
+              <span>Early Booking 2026: Rezervă acum! | Vizitează secțiunea Blog | Partenerul serii: Conacul Helven</span>
+              <span aria-hidden="true">Early Booking 2026: Rezervă acum! | Vizitează secțiunea Blog | Partenerul serii: Conacul Helven</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mx-auto mt-8 flex max-w-xl flex-wrap items-center justify-center gap-3">
+        <a href="/live/" class="mini-tv-cta">Vezi LIVE complet</a>
+        <a href="/blog/" class="mini-tv-cta mini-tv-cta--secondary">Intră pe Blog</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-[#02060f] py-12 sm:py-16">
+    <div class="section-container">
+      <div class="mx-auto mb-8 max-w-2xl text-center">
+        <p class="mini-tv-kicker">Arhiva Blitzkrieg</p>
+        <h2 class="mt-3 text-3xl font-bold text-white sm:text-4xl">Ediții Anterioare</h2>
+        <p class="mx-auto mt-3 text-sm text-white/65 sm:text-base">
+          Recapitulare rapidă cu cele mai recente momente live din culisele evenimentelor.
+        </p>
+      </div>
+
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <a href="/youtube-redirect/?to=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DbffqJGtP9ok&back=%2Fmini-tv%2F" class="mini-tv-card">
+          <div class="aspect-video overflow-hidden">
+            <img
+              src="https://img.youtube.com/vi/bffqJGtP9ok/hqdefault.jpg"
+              alt="Blitzkrieg: Intrarea mirilor pe ring"
+              class="h-full w-full object-cover"
+              loading="lazy"
+              width="480"
+              height="360"
+              decoding="async"
+            />
+          </div>
+          <div class="p-4">
+            <h3 class="text-base font-semibold text-white">Intrarea mirilor pe ring</h3>
+            <p class="mt-1 text-xs text-white/55">Ediția 12 • Pitești</p>
+          </div>
+        </a>
+
+        <a href="/youtube-redirect/?to=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DEAQ_mTbj_uY&back=%2Fmini-tv%2F" class="mini-tv-card">
+          <div class="aspect-video overflow-hidden">
+            <img
+              src="https://img.youtube.com/vi/EAQ_mTbj_uY/hqdefault.jpg"
+              alt="Blitzkrieg: Solo saxofon și tobă"
+              class="h-full w-full object-cover"
+              loading="lazy"
+              width="480"
+              height="360"
+              decoding="async"
+            />
+          </div>
+          <div class="p-4">
+            <h3 class="text-base font-semibold text-white">Solo saxofon și tobă</h3>
+            <p class="mt-1 text-xs text-white/55">Ediția 11 • Curtea de Argeș</p>
+          </div>
+        </a>
+
+        <a href="/youtube-redirect/?to=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D3b9KYuoTjBA&back=%2Fmini-tv%2F" class="mini-tv-card">
+          <div class="aspect-video overflow-hidden">
+            <img
+              src="https://img.youtube.com/vi/3b9KYuoTjBA/hqdefault.jpg"
+              alt="Blitzkrieg: Dansul invitaților"
+              class="h-full w-full object-cover"
+              loading="lazy"
+              width="480"
+              height="360"
+              decoding="async"
+            />
+          </div>
+          <div class="p-4">
+            <h3 class="text-base font-semibold text-white">Dansul invitaților</h3>
+            <p class="mt-1 text-xs text-white/55">Ediția 10 • București</p>
+          </div>
+        </a>
+
+        <a href="/youtube-redirect/?to=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DY4A7YEY2j5w&back=%2Fmini-tv%2F" class="mini-tv-card">
+          <div class="aspect-video overflow-hidden">
+            <img
+              src="https://img.youtube.com/vi/Y4A7YEY2j5w/hqdefault.jpg"
+              alt="Blitzkrieg: Final cu public în delir"
+              class="h-full w-full object-cover"
+              loading="lazy"
+              width="480"
+              height="360"
+              decoding="async"
+            />
+          </div>
+          <div class="p-4">
+            <h3 class="text-base font-semibold text-white">Final cu public în delir</h3>
+            <p class="mt-1 text-xs text-white/55">Ediția 9 • Argeș</p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <script is:inline>
+    (() => {
+      const clockEl = document.getElementById('mini-tv-clock');
+      if (!clockEl) return;
+
+      const formatter = new Intl.DateTimeFormat('ro-RO', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+        timeZone: 'Europe/Bucharest',
+      });
+
+      const updateClock = () => {
+        clockEl.textContent = formatter.format(new Date());
+      };
+
+      updateClock();
+      window.setInterval(updateClock, 1000);
+    })();
+  </script>
+
+  <style>
+    .mini-tv-kicker {
+      margin: 0;
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.79rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #5ad4ff;
+      text-shadow: 0 0 14px rgba(90, 212, 255, 0.35);
+    }
+
+    .mini-tv-frame {
+      border-radius: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: linear-gradient(160deg, rgba(24, 29, 38, 0.95), rgba(7, 7, 7, 0.98));
+      padding: 0.75rem;
+      box-shadow:
+        0 24px 45px rgba(0, 0, 0, 0.55),
+        inset 0 1px 0 rgba(255, 255, 255, 0.07);
+    }
+
+    .mini-tv-screen-shell {
+      position: relative;
+      overflow: hidden;
+      border-radius: 1.3rem;
+      border: 1px solid rgba(90, 212, 255, 0.2);
+      background: #050505;
+      padding: 0.7rem;
+    }
+
+    .mini-tv-player {
+      overflow: hidden;
+      border-radius: 0.9rem;
+      background: #000;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    }
+
+    .mini-tv-player iframe {
+      pointer-events: auto;
+    }
+
+    .mini-tv-live-badge {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      z-index: 10;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 76, 76, 0.35);
+      background: rgba(20, 0, 0, 0.82);
+      padding: 0.35rem 0.75rem;
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      color: #ff6262;
+      text-transform: uppercase;
+      pointer-events: none;
+      backdrop-filter: blur(4px);
+    }
+
+    .mini-tv-led {
+      width: 0.6rem;
+      height: 0.6rem;
+      border-radius: 50%;
+      background: #ff2f2f;
+      box-shadow: 0 0 0 0 rgba(255, 47, 47, 0.7);
+      animation: miniTvPulse 1.7s infinite;
+      flex-shrink: 0;
+    }
+
+    .mini-tv-clock {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      z-index: 10;
+      border-radius: 0.6rem;
+      border: 1px solid rgba(90, 212, 255, 0.25);
+      background: rgba(2, 10, 17, 0.78);
+      padding: 0.35rem 0.65rem;
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.92rem;
+      letter-spacing: 0.1em;
+      color: #b5ecff;
+      pointer-events: none;
+      backdrop-filter: blur(4px);
+    }
+
+    .mini-tv-ticker {
+      margin-top: 0.75rem;
+      overflow: hidden;
+      border-radius: 0.75rem;
+      border: 1px solid rgba(212, 168, 79, 0.5);
+      background: linear-gradient(90deg, #050505, #15110a, #050505);
+      padding: 0.45rem 0;
+    }
+
+    .mini-tv-ticker-track {
+      display: inline-flex;
+      min-width: 100%;
+      gap: 3rem;
+      white-space: nowrap;
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      color: #f2cd82;
+      animation: miniTvTicker 22s linear infinite;
+    }
+
+    .mini-tv-cta {
+      border-radius: 0.85rem;
+      border: 1px solid rgba(90, 212, 255, 0.4);
+      background: linear-gradient(120deg, #0f4d69, #123b8f);
+      padding: 0.7rem 1.1rem;
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.92rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #e9f9ff;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      text-decoration: none;
+      box-shadow: 0 10px 24px rgba(7, 51, 88, 0.35);
+    }
+
+    .mini-tv-cta:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 13px 26px rgba(17, 78, 131, 0.4);
+    }
+
+    .mini-tv-cta--secondary {
+      border-color: rgba(212, 168, 79, 0.5);
+      background: linear-gradient(120deg, #664716, #9f7330);
+      color: #fff8e6;
+      box-shadow: 0 10px 24px rgba(95, 62, 20, 0.3);
+    }
+
+    .mini-tv-card {
+      overflow: hidden;
+      border-radius: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+      text-decoration: none;
+      transition: transform 0.23s ease, border-color 0.23s ease, box-shadow 0.23s ease;
+    }
+
+    .mini-tv-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(90, 212, 255, 0.35);
+      box-shadow: 0 15px 34px rgba(0, 0, 0, 0.4);
+    }
+
+    .mini-tv-card h3 {
+      font-family: 'Oswald', sans-serif;
+      text-shadow: none;
+    }
+
+    .mini-tv-card p {
+      text-shadow: none;
+    }
+
+    @keyframes miniTvPulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(255, 47, 47, 0.7);
+      }
+
+      70% {
+        box-shadow: 0 0 0 9px rgba(255, 47, 47, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(255, 47, 47, 0);
+      }
+    }
+
+    @keyframes miniTvTicker {
+      from {
+        transform: translateX(0);
+      }
+
+      to {
+        transform: translateX(-50%);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .mini-tv-live-badge {
+        top: 0.7rem;
+        left: 0.7rem;
+        padding: 0.28rem 0.55rem;
+        font-size: 0.68rem;
+      }
+
+      .mini-tv-clock {
+        top: 0.7rem;
+        right: 0.7rem;
+        font-size: 0.78rem;
+        padding: 0.28rem 0.48rem;
+      }
+
+      .mini-tv-frame {
+        border-radius: 1.3rem;
+        padding: 0.5rem;
+      }
+
+      .mini-tv-screen-shell {
+        border-radius: 1rem;
+        padding: 0.5rem;
+      }
+
+      .mini-tv-player {
+        border-radius: 0.7rem;
+      }
+
+      .mini-tv-ticker-track {
+        font-size: 0.74rem;
+      }
+    }
+  </style>
+</BaseLayout>

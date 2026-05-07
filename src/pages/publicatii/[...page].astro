@@ -1,0 +1,366 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BackButton from '../../components/BackButton.astro';
+import siteContent from '../../data/siteContent.json';
+
+export const prerender = true;
+
+export async function getStaticPaths({ paginate }) {
+  const entries = (await getCollection('publicatii')).sort((a, b) => 
+    b.data.dataPublicarii.getTime() - a.data.dataPublicarii.getTime()
+  );
+  return paginate(entries, { pageSize: 10 });
+}
+
+const { page } = Astro.props;
+const { brand } = siteContent;
+
+const allEntries = (await getCollection('publicatii')).sort((a, b) => 
+  b.data.dataPublicarii.getTime() - a.data.dataPublicarii.getTime()
+);
+
+const searchIndex = allEntries.map((entry) => ({
+  slug: entry.slug,
+  titlu: entry.data.titlu,
+  descriere: entry.data.descriere,
+  categorie: entry.data.categorie,
+  imaginePrincipala: entry.data.imaginePrincipala,
+  dataPublicarii: entry.data.dataPublicarii.toLocaleDateString('ro-RO', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }),
+}));
+
+const currentPage = page.currentPage;
+const pageTitle = currentPage > 1
+  ? `Publicații - Pagina ${currentPage} | ${brand.name}`
+  : `Publicații | ${brand.name}`;
+const pageDescription = currentPage > 1
+  ? `Arhiva publicațiilor ${brand.name}, pagina ${currentPage}. Citește articole premium despre evenimente, locații și culisele FP Band.`
+  : `Arhiva publicațiilor ${brand.name}. Citește articole premium despre evenimente, locații și culisele FP Band.`;
+
+function formatDate(date) {
+  return date.toLocaleDateString('ro-RO', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+}
+---
+
+<BaseLayout title={pageTitle} description={pageDescription} ogImage="/images/og-default-1200x630.jpg">
+  <section class="pub-archive">
+    <div class="section-container pt-8 pb-4 sm:pt-10">
+      <div class="mb-6"><BackButton href="/" label="Acasă" /></div>
+    </div>
+
+    <header class="pub-hero section-container">
+      <p class="pub-kicker">Editorial FP Band</p>
+      <h1 class="pub-title">Publicații</h1>
+      <p class="pub-subtitle">
+        Articole premium despre evenimente, culise, locații și idei care transformă muzica live într-o experiență memorabilă.
+      </p>
+    </header>
+
+    <div class="section-container">
+      <div class="pub-search-shell">
+        <label class="pub-search-label" for="publicatii-search">Caută după titlu</label>
+        <input
+          id="publicatii-search"
+          type="search"
+          class="pub-search-input"
+          placeholder="Ex: live premium, locație, ghid..."
+          autocomplete="off"
+        />
+      </div>
+
+      <div class="pub-grid" id="publicatii-grid">
+        {page.data.map((entry) => (
+          <article class="pub-card">
+            <a href={`/publicatii/${entry.slug}/`} class="pub-card__image-link" aria-label={`Deschide articolul ${entry.data.titlu}`}>
+              <img
+                src={entry.data.imaginePrincipala}
+                alt={entry.data.titlu}
+                class="pub-card__image"
+                loading="lazy"
+                decoding="async"
+                width="960"
+                height="540"
+              />
+            </a>
+            <div class="pub-card__body">
+              <p class="pub-card__meta">{entry.data.categorie} • {formatDate(entry.data.dataPublicarii)}</p>
+              <a href={`/publicatii/${entry.slug}/`} class="pub-card__title-link">
+                <h2 class="pub-card__title">{entry.data.titlu}</h2>
+              </a>
+              <p class="pub-card__excerpt">{entry.data.descriere}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <div class="pub-empty" id="publicatii-empty" hidden>
+        <p>Nu există articole care corespund acestei căutări.</p>
+      </div>
+
+      <nav class="pub-pagination" id="publicatii-pagination" aria-label="Navigație între paginile de publicații">
+        {page.url.prev ? (
+          <a href={page.url.prev} class="pub-page-btn">Înapoi</a>
+        ) : <span></span>}
+        <span class="pub-page-status">Pagina {page.currentPage} din {page.lastPage}</span>
+        {page.url.next ? (
+          <a href={page.url.next} class="pub-page-btn">Înainte</a>
+        ) : <span></span>}
+      </nav>
+    </div>
+  </section>
+
+  <script type="application/json" id="publicatii-search-data" set:html={JSON.stringify(searchIndex)}></script>
+  <script is:inline>
+    (() => {
+      const input = document.getElementById('publicatii-search');
+      const grid = document.getElementById('publicatii-grid');
+      const pagination = document.getElementById('publicatii-pagination');
+      const empty = document.getElementById('publicatii-empty');
+      const dataEl = document.getElementById('publicatii-search-data');
+
+      if (!input || !grid || !pagination || !empty || !dataEl) return;
+
+      const entries = JSON.parse(dataEl.textContent || '[]');
+      const defaultMarkup = grid.innerHTML;
+
+      const escapeHtml = (value) => String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+
+      input.addEventListener('input', () => {
+        const query = input.value.trim().toLowerCase();
+
+        if (!query) {
+          grid.innerHTML = defaultMarkup;
+          pagination.hidden = false;
+          empty.hidden = true;
+          return;
+        }
+
+        const results = entries.filter((entry) => entry.titlu.toLowerCase().includes(query));
+        pagination.hidden = true;
+
+        if (!results.length) {
+          grid.innerHTML = '';
+          empty.hidden = false;
+          return;
+        }
+
+        empty.hidden = true;
+        grid.innerHTML = results.map((entry) => `
+          <article class="pub-card">
+            <a href="/publicatii/${entry.slug}/" class="pub-card__image-link" aria-label="Deschide articolul ${escapeHtml(entry.titlu)}">
+              <img src="${escapeHtml(entry.imaginePrincipala)}" alt="${escapeHtml(entry.titlu)}" class="pub-card__image" loading="lazy" decoding="async" width="960" height="540" />
+            </a>
+            <div class="pub-card__body">
+              <p class="pub-card__meta">${escapeHtml(entry.categorie)} • ${escapeHtml(entry.dataPublicarii)}</p>
+              <a href="/publicatii/${entry.slug}/" class="pub-card__title-link">
+                <h2 class="pub-card__title">${escapeHtml(entry.titlu)}</h2>
+              </a>
+              <p class="pub-card__excerpt">${escapeHtml(entry.descriere)}</p>
+            </div>
+          </article>
+        `).join('');
+      });
+    })();
+  </script>
+
+  <style>
+    .pub-archive {
+      padding-bottom: 4rem;
+    }
+
+    .pub-hero {
+      text-align: center;
+      max-width: 56rem;
+      margin: 0 auto 2.5rem;
+    }
+
+    .pub-kicker {
+      margin: 0;
+      font-family: 'Oswald', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      font-size: 0.78rem;
+      color: #66d9ff;
+    }
+
+    .pub-title {
+      margin: 0.8rem 0 0;
+      font-size: clamp(2.7rem, 7vw, 4.8rem);
+      color: #fff9ef;
+    }
+
+    .pub-subtitle {
+      margin: 1rem auto 0;
+      max-width: 42rem;
+      color: rgba(255, 255, 255, 0.68);
+      font-size: 1.02rem;
+    }
+
+    .pub-search-shell {
+      margin: 0 auto 2rem;
+      max-width: 42rem;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 1.25rem;
+      background: linear-gradient(180deg, rgba(8, 18, 39, 0.86), rgba(4, 9, 20, 0.92));
+      padding: 1rem;
+      box-shadow: 0 18px 38px rgba(0, 0, 0, 0.24);
+    }
+
+    .pub-search-label {
+      display: block;
+      margin-bottom: 0.55rem;
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #f2cc7f;
+    }
+
+    .pub-search-input {
+      width: 100%;
+      border: 1px solid rgba(102, 217, 255, 0.2);
+      border-radius: 0.9rem;
+      background: rgba(255, 255, 255, 0.04);
+      color: #eefaff;
+      padding: 0.95rem 1rem;
+      outline: none;
+    }
+
+    .pub-search-input:focus {
+      border-color: rgba(102, 217, 255, 0.45);
+      box-shadow: 0 0 0 3px rgba(102, 217, 255, 0.12);
+    }
+
+    .pub-grid {
+      display: grid;
+      gap: 1.4rem;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+
+    .pub-card {
+      overflow: hidden;
+      border-radius: 1.35rem;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018));
+      box-shadow: 0 16px 34px rgba(0, 0, 0, 0.24);
+      transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+    }
+
+    .pub-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(102, 217, 255, 0.24);
+      box-shadow: 0 20px 42px rgba(0, 0, 0, 0.32);
+    }
+
+    .pub-card__image-link {
+      display: block;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+    }
+
+    .pub-card__image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .pub-card:hover .pub-card__image {
+      transform: scale(1.03);
+    }
+
+    .pub-card__body {
+      padding: 1rem 1rem 1.15rem;
+    }
+
+    .pub-card__meta {
+      margin: 0 0 0.55rem;
+      font-size: 0.8rem;
+      color: #f2cc7f;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .pub-card__title-link {
+      text-decoration: none;
+    }
+
+    .pub-card__title {
+      margin: 0;
+      font-size: 1.45rem;
+      color: #ffffff;
+    }
+
+    .pub-card__excerpt {
+      margin: 0.7rem 0 0;
+      color: rgba(255, 255, 255, 0.7);
+      line-height: 1.7;
+    }
+
+    .pub-pagination {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 1rem;
+      align-items: center;
+      margin-top: 2rem;
+    }
+
+    .pub-page-status {
+      justify-self: center;
+      color: rgba(255, 255, 255, 0.65);
+      font-size: 0.92rem;
+    }
+
+    .pub-page-btn {
+      justify-self: start;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+      border-radius: 999px;
+      border: 1px solid rgba(242, 204, 127, 0.35);
+      background: rgba(242, 204, 127, 0.08);
+      color: #ffe2a0;
+      padding: 0.7rem 1rem;
+      font-family: 'Oswald', sans-serif;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      text-decoration: none;
+    }
+
+    .pub-pagination > :last-child.pub-page-btn {
+      justify-self: end;
+    }
+
+    .pub-empty {
+      margin-top: 1.5rem;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    @media (max-width: 640px) {
+      .pub-pagination {
+        grid-template-columns: 1fr;
+      }
+
+      .pub-page-btn,
+      .pub-pagination > :last-child.pub-page-btn,
+      .pub-page-status {
+        justify-self: center;
+      }
+    }
+  </style>
+</BaseLayout>

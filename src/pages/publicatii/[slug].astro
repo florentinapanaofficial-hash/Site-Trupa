@@ -1,0 +1,133 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BackButton from '../../components/BackButton.astro';
+import siteContent from '../../data/siteContent.json';
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const entries = await getCollection('publicatii');
+  return entries.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { brand } = siteContent;
+const { Content } = await entry.render();
+
+const pageTitle = `${entry.data.titlu} | Publicații | ${brand.name}`;
+const pageDescription = entry.data.descriere;
+
+const publishedDate = entry.data.dataPublicarii.toLocaleDateString('ro-RO', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+---
+
+<BaseLayout title={pageTitle} description={pageDescription} ogImage={entry.data.imaginePrincipala}>
+  <article class="pub-article">
+    <div class="section-container pt-8 pb-4 sm:pt-10">
+      <div class="mb-6"><BackButton href="/publicatii/" label="Toate publicațiile" /></div>
+    </div>
+
+    <header class="pub-article__hero section-container">
+      <p class="pub-article__meta">{entry.data.categorie} • {publishedDate}</p>
+      <h1 class="pub-article__title">{entry.data.titlu}</h1>
+      <p class="pub-article__description">{entry.data.descriere}</p>
+      <div class="pub-article__image-wrap">
+        <img
+          src={entry.data.imaginePrincipala}
+          alt={entry.data.titlu}
+          class="pub-article__image"
+          loading="eager"
+          decoding="async"
+          width="1600"
+          height="900"
+        />
+      </div>
+    </header>
+
+    <div class="section-container">
+      <div class="pub-article__content prose-shell">
+        <Content />
+      </div>
+    </div>
+  </article>
+
+  <style>
+    .pub-article {
+      padding-bottom: 4rem;
+    }
+
+    .pub-article__hero {
+      max-width: 58rem;
+      margin: 0 auto 2rem;
+      text-align: center;
+    }
+
+    .pub-article__meta {
+      margin: 0;
+      font-family: 'Oswald', sans-serif;
+      color: #f2cc7f;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 0.8rem;
+    }
+
+    .pub-article__title {
+      margin: 0.8rem 0 0;
+      font-size: clamp(2.4rem, 6vw, 4.3rem);
+      color: #fff9ef;
+    }
+
+    .pub-article__description {
+      margin: 1rem auto 0;
+      max-width: 44rem;
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 1.02rem;
+    }
+
+    .pub-article__image-wrap {
+      margin-top: 1.8rem;
+      overflow: hidden;
+      border-radius: 1.6rem;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      box-shadow: 0 22px 48px rgba(0, 0, 0, 0.3);
+    }
+
+    .pub-article__image {
+      display: block;
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+    }
+
+    .pub-article__content {
+      max-width: 50rem;
+      margin: 0 auto;
+      padding: 2rem clamp(1.1rem, 3vw, 2rem);
+      border-radius: 1.5rem;
+      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .prose-shell :global(h2),
+    .prose-shell :global(h3) {
+      margin-top: 1.8rem;
+      margin-bottom: 0.8rem;
+      color: #fff9ef;
+    }
+
+    .prose-shell :global(p) {
+      margin: 0 0 1rem;
+      max-width: none;
+      color: rgba(255, 255, 255, 0.78);
+      line-height: 1.9;
+      font-size: 1.03rem;
+    }
+  </style>
+</BaseLayout>

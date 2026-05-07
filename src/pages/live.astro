@@ -42,6 +42,92 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
   </section>
 
   {/* ═══════════════════════════════════════════
+      MINI TV LIVE — preview rapid în pagina /live/
+  ═══════════════════════════════════════════ */}
+  <section class="bg-[#070d1d] py-10 sm:py-12">
+    <div class="section-container">
+      <div class="mx-auto max-w-5xl overflow-hidden rounded-3xl border border-cyan-400/20 bg-black/70 p-3 shadow-[0_20px_50px_rgba(0,0,0,0.45)] sm:p-4">
+        <div class="relative overflow-hidden rounded-2xl border border-white/10 bg-black p-2 sm:p-3">
+          <div class="pointer-events-none absolute left-3 top-3 z-10 inline-flex items-center gap-2 rounded-full border border-red-500/35 bg-black/70 px-3 py-1 text-[0.65rem] font-bold uppercase tracking-[0.15em] text-red-400 sm:left-4 sm:top-4 sm:text-xs">
+            <span class="h-2.5 w-2.5 animate-pulse rounded-full bg-red-500"></span>
+            LIVE
+          </div>
+
+          <div class="pointer-events-none absolute right-3 top-3 z-10 rounded-md border border-cyan-300/25 bg-[#02101a]/80 px-2.5 py-1 font-['Oswald'] text-xs tracking-[0.1em] text-cyan-200 sm:right-4 sm:top-4 sm:text-sm">
+            <span id="mini-live-clock">00:00:00</span>
+          </div>
+
+          <div class="aspect-video overflow-hidden rounded-xl">
+            <iframe
+              src="https://www.youtube-nocookie.com/embed/bffqJGtP9ok?controls=1&rel=0&modestbranding=1"
+              title="Mini TV Live Preview"
+              class="h-full w-full pointer-events-auto"
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen
+            ></iframe>
+          </div>
+        </div>
+
+        <div class="mt-2 overflow-hidden rounded-xl border border-amber-400/40 bg-gradient-to-r from-black via-[#1a1307] to-black py-2">
+          <div class="live-mini-ticker-track inline-flex min-w-full gap-10 whitespace-nowrap font-['Oswald'] text-xs uppercase tracking-[0.08em] text-amber-300 sm:text-sm">
+            <span>Early Booking 2026: Rezervă acum! | Vizitează secțiunea Blog | Partenerul serii: Conacul Helven</span>
+            <span aria-hidden="true">Early Booking 2026: Rezervă acum! | Vizitează secțiunea Blog | Partenerul serii: Conacul Helven</span>
+          </div>
+        </div>
+
+        <div class="mt-4 flex justify-center">
+          <a
+            href="/mini-tv/"
+            class="inline-flex items-center gap-2 rounded-xl border border-cyan-400/40 bg-gradient-to-r from-[#0b3e59] to-[#123f95] px-5 py-2.5 font-['Oswald'] text-xs uppercase tracking-[0.09em] text-white transition-all hover:scale-[1.02] hover:shadow-[0_10px_28px_rgba(15,73,129,0.45)] sm:text-sm"
+          >
+            Deschide Mini TV Live
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script is:inline>
+    (() => {
+      const clockEl = document.getElementById('mini-live-clock');
+      if (!clockEl) return;
+
+      const formatter = new Intl.DateTimeFormat('ro-RO', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+        timeZone: 'Europe/Bucharest',
+      });
+
+      const updateClock = () => {
+        clockEl.textContent = formatter.format(new Date());
+      };
+
+      updateClock();
+      window.setInterval(updateClock, 1000);
+    })();
+  </script>
+
+  <style>
+    .live-mini-ticker-track {
+      animation: liveMiniTicker 22s linear infinite;
+    }
+
+    @keyframes liveMiniTicker {
+      from {
+        transform: translateX(0);
+      }
+
+      to {
+        transform: translateX(-50%);
+      }
+    }
+  </style>
+
+  {/* ═══════════════════════════════════════════
       PLAYER — YouTube Live Embed + ramă aurie
       Suportă atât 16:9 (landscape) cât și 9:16 (vertical/Stories)
   ═══════════════════════════════════════════ */}
@@ -216,7 +302,7 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
       </div>
       <div class="grid gap-5 sm:grid-cols-3">
         <!-- Live 1 — cel mai recent -->
-        <a href="https://www.youtube.com/watch?v=bffqJGtP9ok" target="_blank" rel="noopener noreferrer"
+        <a href="/youtube-redirect/?to=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DbffqJGtP9ok&back=%2Flive%2F"
           class="group block rounded-2xl overflow-hidden border border-white/10 bg-white/5 transition-all hover:border-amber-500/40 hover:bg-white/[0.08]">
           <div class="relative aspect-video">
             <img src="https://img.youtube.com/vi/bffqJGtP9ok/hqdefault.jpg"
@@ -242,7 +328,7 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
           </div>
         </a>
         <!-- Live 2 -->
-        <a href="https://www.youtube.com/watch?v=EAQ_mTbj_uY" target="_blank" rel="noopener noreferrer"
+        <a href="/youtube-redirect/?to=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DEAQ_mTbj_uY&back=%2Flive%2F"
           class="group block rounded-2xl overflow-hidden border border-white/10 bg-white/5 transition-all hover:border-amber-500/40 hover:bg-white/[0.08]">
           <div class="relative aspect-video">
             <img src="https://img.youtube.com/vi/EAQ_mTbj_uY/hqdefault.jpg"
@@ -268,7 +354,7 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
           </div>
         </a>
         <!-- Live 3 -->
-        <a href="https://www.youtube.com/watch?v=3b9KYuoTjBA" target="_blank" rel="noopener noreferrer"
+        <a href="/youtube-redirect/?to=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D3b9KYuoTjBA&back=%2Flive%2F"
           class="group block rounded-2xl overflow-hidden border border-white/10 bg-white/5 transition-all hover:border-amber-500/40 hover:bg-white/[0.08]">
           <div class="relative aspect-video">
             <img src="https://img.youtube.com/vi/3b9KYuoTjBA/hqdefault.jpg"
@@ -450,6 +536,10 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
     aspect-ratio: 9 / 16;
   }
 
+  .live-player-aspect iframe {
+    pointer-events: auto;
+  }
+
   /* Glassmorphism backdrop pe wrapper în modul vertical */
   .live-glass-wrap.is-vertical::before {
     content: '';
@@ -458,6 +548,7 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
     z-index: 0;
     border-radius: 2rem;
     background: rgba(26, 16, 5, 0.5);
+    pointer-events: none;
     backdrop-filter: blur(30px) saturate(1.4);
     -webkit-backdrop-filter: blur(30px) saturate(1.4);
   }
@@ -600,7 +691,7 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
         .then(function (r) { return r.json(); })
         .then(function (data) {
           if (data.isLive && data.videoId) {
-            player.src = 'https://www.youtube-nocookie.com/embed/' + data.videoId + '?autoplay=1&rel=0';
+            player.src = 'https://www.youtube-nocookie.com/embed/' + data.videoId + '?controls=1&autoplay=1&rel=0';
             if (badge) badge.style.display = '';
             if (offlineMsg) offlineMsg.style.display = 'none';
             applyDetectedFormat(data.videoId);
@@ -608,14 +699,14 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
             if (badge) badge.style.display = 'none';
             if (offlineMsg) offlineMsg.style.display = '';
             // Fallback: ultimul live înregistrat
-            player.src = 'https://www.youtube-nocookie.com/embed/' + LAST_LIVE_ID + '?rel=0';
+            player.src = 'https://www.youtube-nocookie.com/embed/' + LAST_LIVE_ID + '?controls=1&rel=0';
             applyDetectedFormat(LAST_LIVE_ID);
           }
         })
         .catch(function () {
           if (badge) badge.style.display = 'none';
           if (offlineMsg) offlineMsg.style.display = '';
-          if (player) player.src = 'https://www.youtube-nocookie.com/embed/' + LAST_LIVE_ID + '?rel=0';
+          if (player) player.src = 'https://www.youtube-nocookie.com/embed/' + LAST_LIVE_ID + '?controls=1&rel=0';
           applyDetectedFormat(LAST_LIVE_ID);
         });
     }

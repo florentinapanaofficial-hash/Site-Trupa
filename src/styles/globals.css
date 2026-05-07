@@ -1979,6 +1979,13 @@ details:focus-visible {
   }
 }
 
+/* Desktop-only — ascunde butonul de recenzie din meniu (vizibil în sidebar) */
+@media (min-width: 1025px) {
+  .menu-review-wrap {
+    display: none !important;
+  }
+}
+
 @media (max-width: 767px) {
 
   /* ── 0. Siguranță globală imagini mobil — previne overflow orizontal ── */
