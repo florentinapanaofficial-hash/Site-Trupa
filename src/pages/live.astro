@@ -2,11 +2,10 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BackButton from '../components/BackButton.astro';
 
-const YOUTUBE_CHANNEL_ID = process.env.YOUTUBE_CHANNEL_ID?.trim() || 'UCNi3X-Qm3V4aaOAFSOlzHew';
 const livePageTitle = 'Live cu Florentina Pană | Trupă Cover & Muzică Evenimente';
 const livePageDescription = 'Urmărește live stream-urile de la nunți, botezuri și evenimente cu Formația Florentina Pană. Simte energia FP Band în timp real.';
 const livePageOgImage = '/images/og-live-1200x630.jpg';
-const isLiveStatus = true; // Schimbă în false când nu e emisie live
+const isLiveStatus = true;
 ---
 
 <BaseLayout
@@ -132,8 +131,8 @@ const isLiveStatus = true; // Schimbă în false când nu e emisie live
     }
   </style>
 
-  {/* ═══════════════════════════════════════════
-      PLAYER — YouTube Live Embed + ramă aurie
+    {/* ═══════════════════════════════════════════
+      PLAYER — Cloudflare Live Embed + ramă aurie
       Suportă atât 16:9 (landscape) cât și 9:16 (vertical/Stories)
   ═══════════════════════════════════════════ */}
   <section class="live-player-section bg-[#1a1005] py-12 sm:py-16">
@@ -158,11 +157,10 @@ const isLiveStatus = true; // Schimbă în false când nu e emisie live
         {/* Container player — adaptiv landscape / vertical */}
         <div class="live-player-frame" id="live-player-frame">
           <div class="live-player-aspect" id="live-player-aspect">
-            {/* src gol inițial — JS îl populează după verificarea live-status */}
             <iframe
               id="live-player"
-              src=""
-              data-channel={YOUTUBE_CHANNEL_ID}
+              src="https://live.florentinapanaofficial.ro/2232b3dc18529783f99c0200bb49145d/iframe?preload=true&autoplay=true&muted=true"
+              data-live={String(isLiveStatus)}
               title="Live Stream — Formația Florentina Pană"
               class="absolute inset-0 h-full w-full"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -634,13 +632,11 @@ const isLiveStatus = true; // Schimbă în false când nu e emisie live
 
 <script is:inline>
   (function () {
-    // ── Detecție live ──
+    // ── Status live + format default pentru player Cloudflare ──
     var player = document.getElementById('live-player');
     var badge = document.getElementById('live-badge');
     var offlineMsg = document.getElementById('offline-msg');
-    var channelId = player ? player.getAttribute('data-channel') : null;
-
-    var LAST_LIVE_ID = 'bffqJGtP9ok'; // ultimul live înregistrat — actualizează după fiecare eveniment
+    var isLive = player ? player.getAttribute('data-live') === 'true' : false;
 
     var formatStatus = document.getElementById('live-format-status');
     const wrap = document.getElementById('live-glass-wrap');
@@ -656,91 +652,10 @@ const isLiveStatus = true; // Schimbă în false când nu e emisie live
       }
     }
 
-    function detectByThumbnail(videoId) {
-      var variants = ['maxresdefault', 'sddefault', 'hqdefault'];
-
-      return new Promise(function (resolve) {
-        var index = 0;
-
-        function tryNext() {
-          if (index >= variants.length) {
-            resolve(false);
-            return;
-          }
-
-          var img = new Image();
-          img.onload = function () {
-            resolve(img.naturalHeight > img.naturalWidth);
-          };
-          img.onerror = function () {
-            index += 1;
-            tryNext();
-          };
-          img.src = 'https://i.ytimg.com/vi/' + videoId + '/' + variants[index] + '.jpg';
-        }
-
-        tryNext();
-      });
-    }
-
-    function detectVideoFormat(videoId) {
-      var watchUrl = 'https://www.youtube.com/watch?v=' + videoId;
-      var noEmbedUrl = 'https://noembed.com/embed?url=' + encodeURIComponent(watchUrl);
-
-      return fetch(noEmbedUrl)
-        .then(function (response) {
-          if (!response.ok) throw new Error('noembed failed');
-          return response.json();
-        })
-        .then(function (meta) {
-          if (meta && Number(meta.width) > 0 && Number(meta.height) > 0) {
-            return Number(meta.height) > Number(meta.width);
-          }
-
-          return detectByThumbnail(videoId);
-        })
-        .catch(function () {
-          return detectByThumbnail(videoId);
-        });
-    }
-
-    function applyDetectedFormat(videoId) {
-      detectVideoFormat(videoId)
-        .then(function (isVertical) {
-          setFormat(isVertical);
-        })
-        .catch(function () {
-          setFormat(false);
-        });
-    }
-
-    // Default până la detectarea formatului real
+    // Playerul Cloudflare folosește stream landscape în pagina principală
     setFormat(false);
-
-    if (player && channelId) {
-      fetch('/api/live-status/')
-        .then(function (r) { return r.json(); })
-        .then(function (data) {
-          if (data.isLive && data.videoId) {
-            player.src = 'https://www.youtube-nocookie.com/embed/' + data.videoId + '?controls=1&autoplay=1&rel=0&enablejsapi=1';
-            if (badge) badge.style.display = '';
-            if (offlineMsg) offlineMsg.style.display = 'none';
-            applyDetectedFormat(data.videoId);
-          } else {
-            if (badge) badge.style.display = 'none';
-            if (offlineMsg) offlineMsg.style.display = '';
-            // Fallback: ultimul live înregistrat
-            player.src = 'https://www.youtube-nocookie.com/embed/' + LAST_LIVE_ID + '?controls=1&rel=0&enablejsapi=1';
-            applyDetectedFormat(LAST_LIVE_ID);
-          }
-        })
-        .catch(function () {
-          if (badge) badge.style.display = 'none';
-          if (offlineMsg) offlineMsg.style.display = '';
-          if (player) player.src = 'https://www.youtube-nocookie.com/embed/' + LAST_LIVE_ID + '?controls=1&rel=0&enablejsapi=1';
-          applyDetectedFormat(LAST_LIVE_ID);
-        });
-    }
+    if (badge) badge.style.display = isLive ? '' : 'none';
+    if (offlineMsg) offlineMsg.style.display = isLive ? 'none' : '';
 
     // ── Share buttons — URL dinamic ──
     var pageUrl = encodeURIComponent(window.location.href);
