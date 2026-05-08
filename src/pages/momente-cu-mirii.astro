@@ -1549,7 +1549,7 @@ const eventsJsonLd = realMoments.events
       width: 100%;
       max-width: 1200px;
       height: auto;
-      max-height: 82vh;
+      max-height: 82dvh;
       aspect-ratio: 16/7;
       object-fit: cover;
       border-radius: 1.6rem;
@@ -1929,17 +1929,17 @@ const eventsJsonLd = realMoments.events
     }
 
     .cinematic-lightbox {
-      --lightbox-shell-height-desktop: min(72vh, calc(100dvh - 14rem));
-      --lightbox-image-max-height-desktop: min(68vh, calc(100dvh - 16rem));
+      --lightbox-shell-height-desktop: min(72dvh, calc(100dvh - 14rem));
+      --lightbox-image-max-height-desktop: min(68dvh, calc(100dvh - 16rem));
       --lightbox-image-max-width-desktop: min(96vw, 1300px);
-      --lightbox-shell-height-mobile: min(58vh, calc(100dvh - 16rem));
-      --lightbox-image-max-height-mobile: min(54vh, calc(100dvh - 18rem));
+      --lightbox-shell-height-mobile: min(58dvh, calc(100dvh - 16rem));
+      --lightbox-image-max-height-mobile: min(54dvh, calc(100dvh - 18rem));
       position: fixed;
       inset: 0;
       margin: 0;
       width: 100vw;
       max-width: none;
-      min-height: 100vh;
+      min-height: 100dvh;
       height: 100dvh;
       border: 0;
       border-radius: 0;
@@ -1958,11 +1958,11 @@ const eventsJsonLd = realMoments.events
     }
 
     .cinematic-lightbox[data-size-preset='large'] {
-      --lightbox-shell-height-desktop: min(76vh, calc(100dvh - 11rem));
-      --lightbox-image-max-height-desktop: min(72vh, calc(100dvh - 13rem));
+      --lightbox-shell-height-desktop: min(76dvh, calc(100dvh - 11rem));
+      --lightbox-image-max-height-desktop: min(72dvh, calc(100dvh - 13rem));
       --lightbox-image-max-width-desktop: min(97vw, 1380px);
-      --lightbox-shell-height-mobile: min(62vh, calc(100dvh - 13rem));
-      --lightbox-image-max-height-mobile: min(58vh, calc(100dvh - 15rem));
+      --lightbox-shell-height-mobile: min(62dvh, calc(100dvh - 13rem));
+      --lightbox-image-max-height-mobile: min(58dvh, calc(100dvh - 15rem));
     }
 
     :global(html.lightbox-open-lock) {

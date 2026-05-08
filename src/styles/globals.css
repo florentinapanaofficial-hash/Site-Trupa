@@ -234,7 +234,7 @@
 
 body {
   margin: 0;
-  min-height: 100vh;
+  min-height: 100dvh;
   font-family: 'Inter', 'Inter Fallback', system-ui, sans-serif;
   font-size: clamp(0.94rem, 1.2vw, 1.06rem);
   line-height: 1.7;
@@ -250,6 +250,11 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+}
+
+html,
+body {
+  overscroll-behavior-y: none;
 }
 
 h1,
@@ -292,7 +297,9 @@ span {
 
 
 .page-shell {
-  @apply min-h-screen flex flex-col;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   max-width: 100%;
   overflow-x: clip;
@@ -468,7 +475,6 @@ body.mobile-menu-open .left-side-menu {
      are conținut de reprezentat și nu mai apare alături de cel din main. */
   html,
   body.page-shell {
-    height: 100vh;
     height: 100dvh;
     overflow: hidden;
   }
@@ -478,13 +484,12 @@ body.mobile-menu-open .left-side-menu {
   }
 
   /* ── Layout: Flexbox curat — sidebar fix + scroll izolat în main ──
-     height: 100vh + overflow: hidden pe shell → body nu mai scrollează.
+      height: 100dvh + overflow: hidden pe shell → body nu mai scrollează.
      Sidebar rămâne lipit, doar main#continut derulează. */
   .layout-content-shell {
     display: flex;
     flex-direction: row;
     align-items: stretch;
-    height: 100vh;
     height: 100dvh;
     width: 100%;
     max-width: 100%;
@@ -503,7 +508,6 @@ body.mobile-menu-open .left-side-menu {
     width: 100%;
     min-width: 0;
     max-width: calc(100vw - 280px);
-    height: 100vh;
     height: 100dvh;
     overflow-y: auto;
     overflow-x: hidden;
@@ -541,13 +545,12 @@ body.mobile-menu-open .left-side-menu {
     padding-top: 1.5rem !important;
   }
 
-  /* ── Sidebar fix — height: 100vh, scroll intern propriu, nu se mișcă ── */
+  /* ── Sidebar fix — height: 100dvh, scroll intern propriu, nu se mișcă ── */
   .left-side-menu {
     position: relative;
     width: 280px;
     max-width: 280px;
     flex-shrink: 0;
-    height: 100vh;
     height: 100dvh;
     z-index: 50;
     display: flex;
@@ -569,12 +572,11 @@ body.mobile-menu-open .left-side-menu {
   }
 
   /* ── Hero — ocupă cel puțin un viewport, conținut centrat perfect ──
-     flex: 0 0 auto + min-height: 100vh → nu colapsează când celelalte
+      flex: 0 0 auto + min-height: 100dvh → nu colapsează când celelalte
      secțiuni sunt sub el. Restul paginii curge natural în main. */
   main#continut>section#acasa.hero-stage {
     flex: 0 0 auto;
     width: 100%;
-    min-height: 100vh;
     min-height: 100dvh;
     display: flex;
     flex-direction: column;
@@ -809,7 +811,7 @@ body.mobile-menu-open .left-side-menu {
   #continut>section {
     width: 100%;
     max-width: var(--container-max);
-    /* Vital: în flex column cu main height: 100vh, secțiunile NU au voie să
+    /* Vital: în flex column cu main height: 100dvh, secțiunile NU au voie să
        se contracteze sub conținutul lor real. Fără flex-shrink: 0 + overflow
        visible, paginile lungi (Povestea noastră, Despre etc.) se tăiau la
        înălțimea viewport-ului. */
@@ -841,8 +843,6 @@ html::-webkit-scrollbar {
 @media (max-width: 767px) {
   html {
     scrollbar-width: none;
-    /* overscroll-behavior-y: none — previne rubber-band care arată fundalul cerului */
-    overscroll-behavior-y: none;
   }
 
   html::-webkit-scrollbar {
