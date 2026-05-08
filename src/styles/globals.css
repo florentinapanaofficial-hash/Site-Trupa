@@ -243,18 +243,13 @@ body {
   letter-spacing: 0.005em;
   word-spacing: 0.02em;
   position: relative;
-  overflow-x: hidden;
+  overflow-x: clip;
   background: transparent !important;
   background-color: transparent !important;
   background-image: none !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-}
-
-html,
-body {
-  overscroll-behavior-y: none;
 }
 
 h1,
@@ -843,6 +838,8 @@ html::-webkit-scrollbar {
 @media (max-width: 767px) {
   html {
     scrollbar-width: none;
+    /* overscroll-behavior-y: none — previne rubber-band care arată fundalul cerului */
+    overscroll-behavior-y: none;
   }
 
   html::-webkit-scrollbar {
@@ -2114,9 +2111,12 @@ details:focus-visible {
     overflow: visible !important;
   }
 
-  /* ── 4. Body shell — overflow intern permis ── */
+  /* ── 4. Body shell — overflow intern permis ──
+     overflow-x: clip (nu hidden) ca body să NU devină scroll container
+     pe mobil. Altfel iOS/Android dau scroll body în loc de html, iar
+     window.scrollY rămâne 0 (rupe scroll-spy + PTR din mobile-swipe.js). */
   .page-shell {
-    overflow-x: hidden !important;
+    overflow-x: clip !important;
     overflow-y: visible !important;
   }
 
