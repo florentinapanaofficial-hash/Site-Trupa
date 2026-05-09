@@ -26,6 +26,7 @@
     "@astrojs/check": "^0.9.8",
     "@astrojs/node": "^8.3.4",
     "@google/generative-ai": "^0.24.1",
+    "@supabase/supabase-js": "^2.105.4",
     "astro": "^4.8.0",
     "clsx": "^2.1.1",
     "compression": "^1.8.1",
