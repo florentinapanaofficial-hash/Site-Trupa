@@ -5,7 +5,7 @@ import BackButton from '../components/BackButton.astro';
 const livePageTitle = 'Live cu Florentina Pană | Trupă Cover & Muzică Evenimente';
 const livePageDescription = 'Urmărește live stream-urile de la nunți, botezuri și evenimente cu Formația Florentina Pană. Simte energia FP Band în timp real.';
 const livePageOgImage = '/images/og-live-1200x630.jpg';
-const isLiveStatus = true;
+const replayVideoId = 'bffqJGtP9ok';
 ---
 
 <BaseLayout
@@ -48,27 +48,23 @@ const isLiveStatus = true;
     <div class="section-container">
       <div class="mx-auto max-w-5xl overflow-hidden rounded-3xl border border-cyan-400/20 bg-black/70 p-3 shadow-[0_20px_50px_rgba(0,0,0,0.45)] sm:p-4">
         <div class="relative overflow-hidden rounded-2xl border border-white/10 bg-black p-2 sm:p-3">
-          {isLiveStatus && (
           <div class="pointer-events-none absolute left-3 top-3 z-10 inline-flex items-center gap-2 rounded-full border border-red-500/35 bg-black/70 px-3 py-1 text-[0.65rem] font-bold uppercase tracking-[0.15em] text-red-400 sm:left-4 sm:top-4 sm:text-xs">
             <span class="h-2.5 w-2.5 animate-pulse rounded-full bg-red-500"></span>
             LIVE
           </div>
-          )}
 
-          {isLiveStatus && (
           <div class="pointer-events-none absolute right-3 top-3 z-10 rounded-md border border-cyan-300/25 bg-[#02101a]/80 px-2.5 py-1 font-['Oswald'] text-xs tracking-[0.1em] text-cyan-200 sm:right-4 sm:top-4 sm:text-sm">
             <span id="mini-live-clock">00:00:00</span>
           </div>
-          )}
 
           <div class="aspect-video overflow-hidden rounded-xl">
             <iframe
-              src="https://www.youtube-nocookie.com/embed/bffqJGtP9ok?controls=1&rel=0&modestbranding=1&enablejsapi=1"
+              src={`https://www.youtube-nocookie.com/embed/${replayVideoId}?controls=1&rel=0&modestbranding=1&enablejsapi=1`}
               title="Mini TV Live Preview"
               class="h-full w-full pointer-events-auto"
               loading="lazy"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerpolicy="strict-origin-when-cross-origin"
+              referrerpolicy="origin"
               allowfullscreen
             ></iframe>
           </div>
@@ -132,7 +128,7 @@ const isLiveStatus = true;
   </style>
 
     {/* ═══════════════════════════════════════════
-      PLAYER — Cloudflare Live Embed + ramă aurie
+      PLAYER — YouTube Live/Replay Embed + ramă aurie
       Suportă atât 16:9 (landscape) cât și 9:16 (vertical/Stories)
   ═══════════════════════════════════════════ */}
   <section class="live-player-section bg-[#1a1005] py-12 sm:py-16">
@@ -159,15 +155,26 @@ const isLiveStatus = true;
           <div class="live-player-aspect" id="live-player-aspect">
             <iframe
               id="live-player"
-              src="https://live.florentinapanaofficial.ro/1477e3eef4e0b4e5bb6691f265530f05/iframe?preload=true&autoplay=true&muted=true"
-              data-live={String(isLiveStatus)}
+              src={`https://www.youtube-nocookie.com/embed/${replayVideoId}?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1&enablejsapi=1`}
+              data-live="false"
               title="Live Stream — Formația Florentina Pană"
               class="absolute inset-0 h-full w-full"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerpolicy="strict-origin-when-cross-origin"
+              referrerpolicy="origin"
               allowfullscreen
               loading="lazy"
             ></iframe>
+
+            {/* ── Lower Third — Burtieră cu Like notifications ── */}
+            <div id="lower-third" class="absolute bottom-0 left-0 right-0 z-20 min-h-20 bg-gradient-to-t from-black/90 via-black/70 to-transparent px-4 py-3 backdrop-blur-sm" style="display:none">
+              <div class="flex items-center justify-center h-full">
+                <div id="lower-third-content" class="text-center">
+                  <p class="text-lg sm:text-xl font-bold text-white">
+                    <span class="animate-pulse">❤️</span> <span id="lower-third-text">Cineva a dat like!</span>
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -177,8 +184,30 @@ const isLiveStatus = true;
         Nu suntem live acum — în player poți vedea ultimul nostru eveniment înregistrat.
       </p>
 
-      {/* ── Buton nativ Distribuie ── */}
-      <div class="mt-6 flex justify-center">
+      <div class="mt-3 flex justify-center">
+        <a
+          id="open-on-youtube"
+          href={`https://www.youtube.com/watch?v=${replayVideoId}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 rounded-full border border-red-500/40 bg-red-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-red-300 transition hover:border-red-500/70 hover:bg-red-500/20 hover:text-red-200"
+        >
+          Deschide pe YouTube
+        </a>
+      </div>
+
+      {/* ── Like Button + Distribuie ── */}
+      <div class="mt-6 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+        <button
+          type="button"
+          id="btn-like"
+          class="inline-flex items-center gap-2 rounded-xl border-2 border-red-500/40 bg-red-500/10 px-6 py-3 font-['Oswald'] text-sm uppercase tracking-[0.09em] text-red-300 transition hover:border-red-500/70 hover:bg-red-500/20 hover:text-red-200 active:scale-95 shadow-[0_4px_16px_rgba(239,68,68,0.2)]"
+          aria-label="Dă like la transmisiunea live"
+        >
+          <span class="text-lg">❤️</span>
+          <span id="like-text">Like</span>
+          <span id="like-count" class="ml-1 text-xs opacity-70"></span>
+        </button>
         <button
           type="button"
           id="btn-native-share"
@@ -190,6 +219,14 @@ const isLiveStatus = true;
           </svg>
           Distribuie
         </button>
+      </div>
+
+      {/* ── Ticker Text — Bandă de text care curge ── */}
+      <div class="mt-6 overflow-hidden rounded-xl border border-cyan-400/20 bg-gradient-to-r from-black via-[#0d1a2e] to-black py-2">
+        <div class="live-main-ticker-track inline-flex min-w-full gap-8 whitespace-nowrap font-['Oswald'] text-xs uppercase tracking-[0.1em] text-cyan-300 sm:text-sm">
+          <span>Urmăriți-ne live! • Comentați pe platforme! • Florentina Pană • Muzică & Energie • Suntem aici pentru voi!</span>
+          <span aria-hidden="true">Urmăriți-ne live! • Comentați pe platforme! • Florentina Pană • Muzică & Energie • Suntem aici pentru voi!</span>
+        </div>
       </div>
 
       {/* Toast confirmare copiere link */}
@@ -470,6 +507,20 @@ const isLiveStatus = true;
     letter-spacing: 0.02em;
   }
 
+  /* ── Ticker Text — Animație continuă ── */
+  .live-main-ticker-track {
+    animation: liveMainTicker 30s linear infinite;
+  }
+
+  @keyframes liveMainTicker {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
   /* ── Glassmorphism wrapper ── */
   .live-glass-wrap {
     position: relative;
@@ -628,18 +679,167 @@ const isLiveStatus = true;
     background: rgba(24, 119, 242, 0.2);
     color: #bfd7ff;
   }
+
+  /* ── Lower Third Animations ── */
+  @keyframes slideInLowerThird {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideOutLowerThird {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+  }
 </style>
 
 <script is:inline>
+  /* ═════════════════════════════════════════════════════════════════
+     SUPABASE CLIENT — Inițializare cu PUBLIC_SUPABASE_URL și PUBLIC_SUPABASE_ANON_KEY
+  ═════════════════════════════════════════════════════════════════ */
+  (async function initSupabase() {
+    const supabaseUrl = 'https://uhqujllxujfbyvwrafzn.supabase.co';
+    const supabaseKey = 'sb_publishable_Pizn5TO9w3NpDGMtIKLuGg_TIlKCeCT';
+
+    // Importăm Supabase client din CDN
+    try {
+      const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+      const client = createClient(supabaseUrl, supabaseKey);
+      window.supabaseClient = client;
+
+      // Inițializează Like button și Realtime listeners
+      initializeLiveFeatures();
+    } catch (err) {
+      console.error('Supabase client failed to load:', err);
+    }
+  })();
+
+  const initializeLiveFeatures = async () => {
+    if (!window.supabaseClient) return;
+
+    const likeBtn = document.getElementById('btn-like');
+    const likeCount = document.getElementById('like-count');
+    const lowerThird = document.getElementById('lower-third');
+    const lowerThirdText = document.getElementById('lower-third-text');
+    const client = window.supabaseClient;
+    
+    // Identifică stream-ul după data curentă
+    const streamId = 'live-stream-' + new Date().toISOString().split('T')[0];
+
+    // ── Încarcă Like count inițial ──
+    const loadLikeCount = async () => {
+      try {
+        const { count, error } = await client
+          .from('interactions')
+          .select('*', { count: 'exact', head: true })
+          .eq('stream_id', streamId)
+          .eq('type', 'like');
+
+        if (!error && count !== null && likeCount) {
+          likeCount.textContent = count > 0 ? `(${count})` : '';
+        }
+      } catch (err) {
+        console.error('Error loading like count:', err);
+      }
+    };
+
+    // ── Like button handler ──
+    if (likeBtn) {
+      likeBtn.addEventListener('click', async () => {
+        try {
+          // Inserează like în Supabase
+          const { error } = await client
+            .from('interactions')
+            .insert([
+              {
+                stream_id: streamId,
+                type: 'like',
+                created_at: new Date().toISOString(),
+              }
+            ]);
+
+          if (!error) {
+            likeBtn.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+              likeBtn.style.transform = 'scale(1)';
+            }, 200);
+          }
+        } catch (err) {
+          console.error('Error adding like:', err);
+        }
+      });
+    }
+
+    // ── Realtime listener — ascultă noi like-uri ──
+    if (lowerThird && client) {
+      const channel = client
+        .channel(`interactions:stream_id=eq.${streamId}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'interactions',
+            filter: `stream_id=eq.${streamId}`,
+          },
+          (payload) => {
+            if (payload.new.type === 'like') {
+              showLowerThirdNotification();
+              loadLikeCount(); // Reîncarcă numărul de like-uri
+            }
+          }
+        )
+        .subscribe((status) => {
+          if (status === 'SUBSCRIBED') {
+            console.log('✓ Realtime listener activ pentru like-uri');
+          }
+        });
+    }
+
+    // ── Animație Lower Third ──
+    const showLowerThirdNotification = () => {
+      if (!lowerThird) return;
+
+      lowerThird.style.display = 'flex';
+      lowerThird.style.animation = 'slideInLowerThird 0.4s ease';
+
+      // Ascunde după 3 secunde
+      setTimeout(() => {
+        lowerThird.style.animation = 'slideOutLowerThird 0.4s ease forwards';
+        setTimeout(() => {
+          lowerThird.style.display = 'none';
+        }, 400);
+      }, 3000);
+    };
+
+    // Încarcă contul inițial
+    await loadLikeCount();
+  };
+</script>
+
+<script is:inline>
   (function () {
-    // ── Status live + format default pentru player Cloudflare ──
+    // ── Status live + fallback replay pentru player YouTube ──
     var player = document.getElementById('live-player');
     var badge = document.getElementById('live-badge');
     var offlineMsg = document.getElementById('offline-msg');
-    var isLive = player ? player.getAttribute('data-live') === 'true' : false;
+    var replayVideoId = 'bffqJGtP9ok';
+    var isLive = false;
 
     var formatStatus = document.getElementById('live-format-status');
     const wrap = document.getElementById('live-glass-wrap');
+    var openOnYoutube = document.getElementById('open-on-youtube');
 
     if (!wrap) return;
 
@@ -652,10 +852,53 @@ const isLiveStatus = true;
       }
     }
 
-    // Playerul Cloudflare folosește stream landscape în pagina principală
+    function toEmbedUrl(videoId, autoplay, muted) {
+      return 'https://www.youtube-nocookie.com/embed/' +
+        encodeURIComponent(videoId) +
+        '?autoplay=' + (autoplay ? '1' : '0') +
+        '&mute=' + (muted ? '1' : '0') +
+        '&controls=1&rel=0&modestbranding=1&enablejsapi=1';
+    }
+
+    function isValidYoutubeId(value) {
+      return /^[A-Za-z0-9_-]{11}$/.test(String(value || ''));
+    }
+
+    function applyLiveState(nextLive) {
+      isLive = !!nextLive;
+      if (player) player.setAttribute('data-live', isLive ? 'true' : 'false');
+      if (badge) badge.style.display = isLive ? '' : 'none';
+      if (offlineMsg) offlineMsg.style.display = isLive ? 'none' : '';
+    }
+
+    async function syncPlayerWithLiveStatus() {
+      if (!player) return;
+
+      try {
+        var response = await fetch('/api/live-status/', { cache: 'no-store' });
+        if (!response.ok) throw new Error('live-status fetch failed');
+
+        var payload = await response.json();
+        var liveVideoId = payload && payload.videoId;
+
+        if (payload && payload.isLive && isValidYoutubeId(liveVideoId)) {
+          player.src = toEmbedUrl(liveVideoId, true, false);
+          if (openOnYoutube) openOnYoutube.href = 'https://www.youtube.com/watch?v=' + encodeURIComponent(liveVideoId);
+          applyLiveState(true);
+          return;
+        }
+      } catch (err) {
+        console.warn('[live-page] Live status unavailable, fallback to replay.', err);
+      }
+
+      player.src = toEmbedUrl(replayVideoId, false, false);
+      if (openOnYoutube) openOnYoutube.href = 'https://www.youtube.com/watch?v=' + encodeURIComponent(replayVideoId);
+      applyLiveState(false);
+    }
+
+    // Playerul principal este landscape în această pagină
     setFormat(false);
-    if (badge) badge.style.display = isLive ? '' : 'none';
-    if (offlineMsg) offlineMsg.style.display = isLive ? 'none' : '';
+    syncPlayerWithLiveStatus();
 
     // ── Share buttons — URL dinamic ──
     var pageUrl = encodeURIComponent(window.location.href);

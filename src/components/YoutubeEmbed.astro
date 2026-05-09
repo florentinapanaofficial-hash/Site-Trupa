@@ -116,7 +116,7 @@ const ytLink = `https://www.youtube.com/watch?v=${youtubeId}`;
       iframe.title = title;
       iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
       iframe.setAttribute('allowfullscreen', '');
-      iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+      iframe.setAttribute('referrerpolicy', 'origin');
       iframe.setAttribute('loading', 'lazy');
       iframe.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:0;';
       gate.appendChild(iframe);

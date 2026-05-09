@@ -33,6 +33,15 @@ const getFallbackPayload = (): LiveStatusPayload => {
     return cachedLiveStatus ?? { isLive: false, videoId: null };
 };
 
+const readErrorText = async (res: Response): Promise<string> => {
+    try {
+        const text = await res.text();
+        return text.length > 300 ? `${text.slice(0, 300)}...` : text;
+    } catch {
+        return '';
+    }
+};
+
 const fetchLiveStatusFromYoutube = async (apiKey: string, channelId: string): Promise<LiveStatusPayload> => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), YOUTUBE_FETCH_TIMEOUT_MS);
@@ -53,6 +62,10 @@ const fetchLiveStatusFromYoutube = async (apiKey: string, channelId: string): Pr
         });
 
         if (!res.ok) {
+            const responseText = await readErrorText(res);
+            console.warn(
+                `[api/live-status] YouTube API error: status=${res.status} channelId=${channelId} body=${responseText || 'empty'}`
+            );
             return getFallbackPayload();
         }
 
@@ -60,7 +73,13 @@ const fetchLiveStatusFromYoutube = async (apiKey: string, channelId: string): Pr
         const videoId = data?.items?.[0]?.id?.videoId ?? null;
 
         return { isLive: !!videoId, videoId };
-    } catch {
+    } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') {
+            console.warn(`[api/live-status] YouTube API timeout after ${YOUTUBE_FETCH_TIMEOUT_MS}ms channelId=${channelId}`);
+        } else {
+            const message = error instanceof Error ? error.message : 'unknown error';
+            console.warn(`[api/live-status] YouTube API request failed: channelId=${channelId} error=${message}`);
+        }
         return getFallbackPayload();
     } finally {
         clearTimeout(timeoutId);
@@ -100,8 +119,11 @@ export const GET: APIRoute = async ({ request }) => {
         ...(originCheck.origin ? { 'Access-Control-Allow-Origin': originCheck.origin } : {}),
     };
 
-    const apiKey = process.env.YOUTUBE_API_KEY;
-    const channelId = process.env.YOUTUBE_CHANNEL_ID?.trim() || FALLBACK_CHANNEL_ID;
+    const apiKey = process.env.YOUTUBE_API_KEY?.trim() || import.meta.env.YOUTUBE_API_KEY?.trim();
+    const channelId =
+        process.env.YOUTUBE_CHANNEL_ID?.trim() ||
+        import.meta.env.YOUTUBE_CHANNEL_ID?.trim() ||
+        FALLBACK_CHANNEL_ID;
 
     if (!apiKey) {
         return new Response(

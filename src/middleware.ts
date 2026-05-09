@@ -9,7 +9,7 @@ const SECURITY_HEADERS: Record<string, string> = {
     // Previne MIME-type sniffing (atacuri prin fișiere deghizate)
     'X-Content-Type-Options': 'nosniff',
     // Controlează informațiile trimise în header-ul Referer
-    'Referrer-Policy': 'strict-origin-when-cross-origin',
+    'Referrer-Policy': 'origin-when-cross-origin',
     // Dezactivează API-uri de browser nefolosite (cameră, microfon, locație, plăți)
     'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=()',
     // Cross-Origin: previne leak-ul de date între origini
@@ -18,11 +18,11 @@ const SECURITY_HEADERS: Record<string, string> = {
     // Content Security Policy — protejează contra XSS și injecții de resurse
     'Content-Security-Policy': [
         "default-src 'self'",
-        "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com",
+        "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://cdn.jsdelivr.net",
         "style-src 'self' 'unsafe-inline'",
-        "img-src 'self' data: https://www.google-analytics.com https://i.ytimg.com https://*.googleusercontent.com",
+        "img-src 'self' data: https://www.google-analytics.com https://i.ytimg.com https://img.youtube.com https://*.googleusercontent.com",
         "font-src 'self'",
-        "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://api.whatsapp.com",
+        "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://api.whatsapp.com https://*.supabase.co wss://*.supabase.co",
         "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://ec.europa.eu",
         "object-src 'none'",
         "base-uri 'self'",
