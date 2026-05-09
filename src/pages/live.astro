@@ -5,7 +5,6 @@ import BackButton from '../components/BackButton.astro';
 const livePageTitle = 'Live cu Florentina Pană | Trupă Cover & Muzică Evenimente';
 const livePageDescription = 'Urmărește live stream-urile de la nunți, botezuri și evenimente cu Formația Florentina Pană. Simte energia FP Band în timp real.';
 const livePageOgImage = '/images/og-live-1200x630.jpg';
-const replayVideoId = 'bffqJGtP9ok';
 ---
 
 <BaseLayout
@@ -53,17 +52,23 @@ const replayVideoId = 'bffqJGtP9ok';
             LIVE
           </div>
 
-          <div class="pointer-events-none absolute right-3 top-3 z-10 rounded-md border border-cyan-300/25 bg-[#02101a]/80 px-2.5 py-1 font-['Oswald'] text-xs tracking-[0.1em] text-cyan-200 sm:right-4 sm:top-4 sm:text-sm">
+          <div
+            id="mini-live-clock-wrap"
+            class="pointer-events-none absolute right-3 top-3 z-10 rounded-md border border-cyan-300/25 bg-[#02101a]/80 px-2.5 py-1 font-['Oswald'] text-xs tracking-[0.1em] text-cyan-200 sm:right-4 sm:top-4 sm:text-sm"
+            style="display:none"
+          >
             <span id="mini-live-clock">00:00:00</span>
           </div>
 
           <div class="aspect-video overflow-hidden rounded-xl">
             <iframe
-              src={`https://www.youtube-nocookie.com/embed/${replayVideoId}?controls=1&rel=0&modestbranding=1&enablejsapi=1`}
+              id="mini-live-player"
+              src="about:blank"
+              data-fallback-src="about:blank"
               title="Mini TV Live Preview"
-              class="h-full w-full pointer-events-auto"
+              class="h-full w-full pointer-events-auto bg-black"
               loading="lazy"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allow="accelerometer; gyroscope; encrypted-media; picture-in-picture;"
               referrerpolicy="origin"
               allowfullscreen
             ></iframe>
@@ -155,11 +160,11 @@ const replayVideoId = 'bffqJGtP9ok';
           <div class="live-player-aspect" id="live-player-aspect">
             <iframe
               id="live-player"
-              src={`https://www.youtube-nocookie.com/embed/${replayVideoId}?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1&enablejsapi=1`}
+              src="about:blank"
               data-live="false"
               title="Live Stream — Formația Florentina Pană"
-              class="absolute inset-0 h-full w-full"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              class="absolute inset-0 h-full w-full bg-black"
+              allow="accelerometer; gyroscope; encrypted-media; picture-in-picture;"
               referrerpolicy="origin"
               allowfullscreen
               loading="lazy"
@@ -186,13 +191,14 @@ const replayVideoId = 'bffqJGtP9ok';
 
       <div class="mt-3 flex justify-center">
         <a
-          id="open-on-youtube"
-          href={`https://www.youtube.com/watch?v=${replayVideoId}`}
+          id="open-on-cloudflare"
+          href="#"
           target="_blank"
           rel="noopener noreferrer"
-          class="inline-flex items-center gap-2 rounded-full border border-red-500/40 bg-red-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-red-300 transition hover:border-red-500/70 hover:bg-red-500/20 hover:text-red-200"
+          class="inline-flex items-center gap-2 rounded-full border border-amber-500/40 bg-amber-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-amber-300 transition hover:border-amber-500/70 hover:bg-amber-500/20 hover:text-amber-200"
+          style="display:none"
         >
-          Deschide pe YouTube
+          Deschide într-o fereastră nouă
         </a>
       </div>
 
@@ -307,9 +313,11 @@ const replayVideoId = 'bffqJGtP9ok';
         {/* Textul pre-scris — editabil de Claudiu */}
         <div class="relative rounded-xl border border-white/10 bg-black/40 p-4">
           <p class="live-announce-text select-all text-sm leading-relaxed text-white/80" id="announce-text">
-            🎵 Suntem LIVE acum! Urmărește în direct muzica noastră de la eveniment 🎶<br />
-            Intră pe link și simte atmosfera alături de noi 👇<br />
-            https://florentinapanaofficial.ro/live/
+            🔴 SUNTEM LIVE ACUM!<br />
+            Florentina Pană & FP Band — direct de la eveniment 🎵<br /><br />
+            ⚠️ Transmisia este DOAR pe site-ul nostru, nu pe Facebook.<br />
+            👉 florentinapanaofficial.ro/live-preview/<br /><br />
+            Intră acum și simte atmosfera alături de noi! ❤️
           </p>
           <button
             type="button"
@@ -830,16 +838,15 @@ const replayVideoId = 'bffqJGtP9ok';
 
 <script is:inline>
   (function () {
-    // ── Status live + fallback replay pentru player YouTube ──
+    // ── Status live + fallback replay pentru player Cloudflare Stream ──
     var player = document.getElementById('live-player');
+    var miniPlayer = document.getElementById('mini-live-player');
     var badge = document.getElementById('live-badge');
     var offlineMsg = document.getElementById('offline-msg');
-    var replayVideoId = 'bffqJGtP9ok';
-    var isLive = false;
-
+    var openExternal = document.getElementById('open-on-cloudflare');
     var formatStatus = document.getElementById('live-format-status');
-    const wrap = document.getElementById('live-glass-wrap');
-    var openOnYoutube = document.getElementById('open-on-youtube');
+    var wrap = document.getElementById('live-glass-wrap');
+    var isLive = false;
 
     if (!wrap) return;
 
@@ -852,16 +859,30 @@ const replayVideoId = 'bffqJGtP9ok';
       }
     }
 
-    function toEmbedUrl(videoId, autoplay, muted) {
-      return 'https://www.youtube-nocookie.com/embed/' +
-        encodeURIComponent(videoId) +
-        '?autoplay=' + (autoplay ? '1' : '0') +
-        '&mute=' + (muted ? '1' : '0') +
-        '&controls=1&rel=0&modestbranding=1&enablejsapi=1';
+    function isValidUid(value) {
+      // Cloudflare Stream UID = 32 caractere hex
+      return /^[a-f0-9]{32}$/i.test(String(value || ''));
     }
 
-    function isValidYoutubeId(value) {
-      return /^[A-Za-z0-9_-]{11}$/.test(String(value || ''));
+    function isValidCustomerCode(value) {
+      // Cod subdomain Cloudflare — alfanumeric (litere mici + cifre), 8-40 caractere
+      return /^[a-z0-9]{6,40}$/.test(String(value || ''));
+    }
+
+    function buildCloudflareIframeUrl(customerCode, videoUid, opts) {
+      opts = opts || {};
+      var params = [];
+      if (opts.autoplay) params.push('autoplay=true');
+      if (opts.muted) params.push('muted=true');
+      if (opts.controls === false) params.push('controls=false');
+      var qs = params.length ? '?' + params.join('&') : '';
+      return 'https://customer-' + encodeURIComponent(customerCode) +
+        '.cloudflarestream.com/' + encodeURIComponent(videoUid) + '/iframe' + qs;
+    }
+
+    function buildCloudflareWatchUrl(customerCode, videoUid) {
+      return 'https://customer-' + encodeURIComponent(customerCode) +
+        '.cloudflarestream.com/' + encodeURIComponent(videoUid) + '/watch';
     }
 
     function applyLiveState(nextLive) {
@@ -869,6 +890,24 @@ const replayVideoId = 'bffqJGtP9ok';
       if (player) player.setAttribute('data-live', isLive ? 'true' : 'false');
       if (badge) badge.style.display = isLive ? '' : 'none';
       if (offlineMsg) offlineMsg.style.display = isLive ? 'none' : '';
+      var clockWrap = document.getElementById('mini-live-clock-wrap');
+      if (clockWrap) clockWrap.style.display = isLive ? '' : 'none';
+    }
+
+    function setIframeSrc(iframe, src) {
+      if (!iframe) return;
+      if (iframe.src !== src) iframe.src = src;
+    }
+
+    function showOfflinePlaceholder() {
+      // Nu există nici live, nici replay configurat — afișăm un poster simplu.
+      if (player) setIframeSrc(player, 'about:blank');
+      if (miniPlayer) setIframeSrc(miniPlayer, 'about:blank');
+      applyLiveState(false);
+      if (offlineMsg) {
+        offlineMsg.style.display = '';
+        offlineMsg.textContent = 'Nu suntem live acum și nu există un replay disponibil. Revino mai târziu pentru noi transmisiuni.';
+      }
     }
 
     async function syncPlayerWithLiveStatus() {
@@ -879,26 +918,52 @@ const replayVideoId = 'bffqJGtP9ok';
         if (!response.ok) throw new Error('live-status fetch failed');
 
         var payload = await response.json();
-        var liveVideoId = payload && payload.videoId;
+        var customerCode = payload && payload.customerCode;
+        var liveUid = payload && payload.videoId;
+        var replayUid = payload && payload.replayId;
 
-        if (payload && payload.isLive && isValidYoutubeId(liveVideoId)) {
-          player.src = toEmbedUrl(liveVideoId, true, false);
-          if (openOnYoutube) openOnYoutube.href = 'https://www.youtube.com/watch?v=' + encodeURIComponent(liveVideoId);
+        if (!isValidCustomerCode(customerCode)) {
+          console.warn('[live-page] Cloudflare Stream nu este configurat (customerCode lipsă).');
+          showOfflinePlaceholder();
+          return;
+        }
+
+        if (payload && payload.isLive && isValidUid(liveUid)) {
+          var liveSrc = buildCloudflareIframeUrl(customerCode, liveUid, { autoplay: true, muted: false });
+          setIframeSrc(player, liveSrc);
+          if (miniPlayer) setIframeSrc(miniPlayer, buildCloudflareIframeUrl(customerCode, liveUid, { autoplay: true, muted: true, controls: false }));
+          if (openExternal) {
+            openExternal.href = buildCloudflareWatchUrl(customerCode, liveUid);
+            openExternal.style.display = '';
+          }
           applyLiveState(true);
           return;
         }
-      } catch (err) {
-        console.warn('[live-page] Live status unavailable, fallback to replay.', err);
-      }
 
-      player.src = toEmbedUrl(replayVideoId, false, false);
-      if (openOnYoutube) openOnYoutube.href = 'https://www.youtube.com/watch?v=' + encodeURIComponent(replayVideoId);
-      applyLiveState(false);
+        if (isValidUid(replayUid)) {
+          setIframeSrc(player, buildCloudflareIframeUrl(customerCode, replayUid, { autoplay: false, muted: false }));
+          if (miniPlayer) setIframeSrc(miniPlayer, buildCloudflareIframeUrl(customerCode, replayUid, { autoplay: true, muted: true, controls: false }));
+          if (openExternal) {
+            openExternal.href = buildCloudflareWatchUrl(customerCode, replayUid);
+            openExternal.style.display = '';
+          }
+          applyLiveState(false);
+          return;
+        }
+
+        showOfflinePlaceholder();
+      } catch (err) {
+        console.warn('[live-page] Live status unavailable.', err);
+        showOfflinePlaceholder();
+      }
     }
 
     // Playerul principal este landscape în această pagină
     setFormat(false);
     syncPlayerWithLiveStatus();
+
+    // Repolling la 60s pentru a prinde tranziția online → offline
+    window.setInterval(syncPlayerWithLiveStatus, 60000);
 
     // ── Share buttons — URL dinamic ──
     var pageUrl = encodeURIComponent(window.location.href);
@@ -975,8 +1040,8 @@ const replayVideoId = 'bffqJGtP9ok';
     var copyAnnounceLabel = document.getElementById('copy-announce-label');
     var fbAnnounceBtn = document.getElementById('btn-fb-announce');
 
-    // Buton Facebook — URL sharer cu link-ul paginii live
-    var liveUrl = 'https://florentinapanaofficial.ro/live/';
+    // Buton Facebook — URL sharer cu link-ul paginii de preview live (60s teaser → redirect către site)
+    var liveUrl = 'https://florentinapanaofficial.ro/live-preview/?utm_source=facebook&utm_medium=social&utm_campaign=live_alert';
     if (fbAnnounceBtn) {
       fbAnnounceBtn.href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(liveUrl);
     }
@@ -1002,37 +1067,33 @@ const replayVideoId = 'bffqJGtP9ok';
 </script>
 
 <script is:inline>
-  /* ── Mutual Exclusion pe iframes YouTube ─────────────────────────────────────
-     Când un iframe YouTube începe redarea (playerState 1), toate celelalte
-     iframes de pe pagină primesc comanda pauseVideo via postMessage.
-     Necesită enablejsapi=1 în src-ul fiecărui iframe (adăugat deja).
-  ─────────────────────────────────────────────────────────────────────────── */
+  /* ── Mutual Exclusion între playerul principal și mini-preview ──
+     Când utilizatorul dă play pe playerul principal, oprim mini-preview-ul
+     (mute) și invers — folosind postMessage Cloudflare Stream Player SDK. */
   (function () {
-    var YT_PAUSE = JSON.stringify({ event: 'command', func: 'pauseVideo', args: '' });
-    var YT_ORIGIN = 'https://www.youtube-nocookie.com';
+    var STREAM_ORIGIN_PATTERN = /^https:\/\/customer-[a-z0-9]{6,40}\.cloudflarestream\.com$/i;
+    var mainPlayer = document.getElementById('live-player');
+    var miniPlayer = document.getElementById('mini-live-player');
+    if (!mainPlayer && !miniPlayer) return;
 
-    function pauseAllExcept(activeSource) {
-      document.querySelectorAll('iframe[src*="youtube"]').forEach(function (iframe) {
-        try {
-          if (iframe.contentWindow && iframe.contentWindow !== activeSource) {
-            iframe.contentWindow.postMessage(YT_PAUSE, YT_ORIGIN);
-          }
-        } catch (err) {}
-      });
+    function postCommand(iframe, method) {
+      try {
+        if (!iframe || !iframe.contentWindow) return;
+        iframe.contentWindow.postMessage(
+          { event: 'command', func: method, args: [] },
+          '*'
+        );
+      } catch (err) {}
     }
 
     window.addEventListener('message', function (e) {
-      if (!e.data || !e.source) return;
-      if (e.origin !== YT_ORIGIN) return;
-      var data;
-      try {
-        data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
-      } catch (err) {
-        return;
-      }
-      /* YouTube trimite playerState: 1 (playing) prin evenimentul infoDelivery */
-      if (data.event === 'infoDelivery' && data.info && data.info.playerState === 1) {
-        pauseAllExcept(e.source);
+      if (!e.origin || !STREAM_ORIGIN_PATTERN.test(e.origin)) return;
+      var data = e.data;
+      if (!data || typeof data !== 'object') return;
+      // Cloudflare Stream emite evenimente { event: 'play' | 'pause' | ... }
+      if (data.event === 'play' && e.source) {
+        if (mainPlayer && mainPlayer.contentWindow !== e.source) postCommand(mainPlayer, 'pause');
+        if (miniPlayer && miniPlayer.contentWindow !== e.source) postCommand(miniPlayer, 'pause');
       }
     });
   })();

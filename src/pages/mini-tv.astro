@@ -24,25 +24,29 @@ const miniTvDescription = 'Mini TV Live cu player video, burtieră animată și 
       <div class="mx-auto max-w-5xl">
         <div class="mini-tv-frame">
           <div class="mini-tv-screen-shell">
-            <div class="mini-tv-live-badge" aria-label="Transmisiune live">
+            <div id="mini-tv-live-badge" class="mini-tv-live-badge" aria-label="Transmisiune live" style="display:none">
               <span class="mini-tv-led" aria-hidden="true"></span>
               <span>● LIVE</span>
             </div>
 
-            <div class="mini-tv-clock" aria-live="polite" aria-label="Ora curentă de emisie">
+            <div id="mini-tv-clock-wrap" class="mini-tv-clock" aria-live="polite" aria-label="Ora curentă de emisie" style="display:none">
               <span id="mini-tv-clock">00:00:00</span>
             </div>
 
             <div class="mini-tv-player aspect-video">
               <iframe
-                src="https://www.youtube-nocookie.com/embed/bffqJGtP9ok?controls=1&rel=0&modestbranding=1&enablejsapi=1"
-                title="Mini TV Live - player test"
-                class="h-full w-full pointer-events-auto"
+                id="mini-tv-cloudflare-player"
+                src="about:blank"
+                title="Mini TV Live - Cloudflare Stream"
+                class="h-full w-full pointer-events-auto bg-black"
                 loading="lazy"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allow="accelerometer; gyroscope; encrypted-media; picture-in-picture;"
                 referrerpolicy="strict-origin-when-cross-origin"
                 allowfullscreen
               ></iframe>
+              <p id="mini-tv-fallback-msg" class="mini-tv-fallback-msg" style="display:none">
+                Transmisiunea este offline. Revino în curând pentru următorul live.
+              </p>
             </div>
           </div>
 
@@ -170,6 +174,88 @@ const miniTvDescription = 'Mini TV Live cu player video, burtieră animată și 
     })();
   </script>
 
+  <script is:inline>
+    /* ── Sincronizare player Cloudflare Stream cu /api/live-status/ ── */
+    (function () {
+      var iframe = document.getElementById('mini-tv-cloudflare-player');
+      var fallbackMsg = document.getElementById('mini-tv-fallback-msg');
+      if (!iframe) return;
+
+      function isValidUid(value) {
+        return /^[a-f0-9]{32}$/i.test(String(value || ''));
+      }
+
+      function isValidCustomerCode(value) {
+        return /^[a-z0-9]{6,40}$/.test(String(value || ''));
+      }
+
+      function buildIframeUrl(customerCode, uid, opts) {
+        opts = opts || {};
+        var params = [];
+        if (opts.autoplay) params.push('autoplay=true');
+        if (opts.muted) params.push('muted=true');
+        if (opts.controls === false) params.push('controls=false');
+        var qs = params.length ? '?' + params.join('&') : '';
+        return 'https://customer-' + encodeURIComponent(customerCode) +
+          '.cloudflarestream.com/' + encodeURIComponent(uid) + '/iframe' + qs;
+      }
+
+      function showOffline() {
+        iframe.style.display = 'none';
+        if (fallbackMsg) fallbackMsg.style.display = '';
+        toggleLiveChrome(false);
+      }
+
+      function showVideo(src, opts) {
+        iframe.style.display = '';
+        if (fallbackMsg) fallbackMsg.style.display = 'none';
+        if (iframe.src !== src) iframe.src = src;
+        toggleLiveChrome(!!(opts && opts.live));
+      }
+
+      function toggleLiveChrome(live) {
+        var liveBadge = document.getElementById('mini-tv-live-badge');
+        var clockWrap = document.getElementById('mini-tv-clock-wrap');
+        if (liveBadge) liveBadge.style.display = live ? '' : 'none';
+        if (clockWrap) clockWrap.style.display = live ? '' : 'none';
+      }
+
+      async function sync() {
+        try {
+          var response = await fetch('/api/live-status/', { cache: 'no-store' });
+          if (!response.ok) throw new Error('live-status fetch failed');
+          var payload = await response.json();
+          var customer = payload && payload.customerCode;
+          var liveUid = payload && payload.videoId;
+          var replayUid = payload && payload.replayId;
+
+          if (!isValidCustomerCode(customer)) {
+            showOffline();
+            return;
+          }
+
+          if (payload && payload.isLive && isValidUid(liveUid)) {
+            showVideo(buildIframeUrl(customer, liveUid, { autoplay: true, muted: true }), { live: true });
+            return;
+          }
+
+          if (isValidUid(replayUid)) {
+            showVideo(buildIframeUrl(customer, replayUid, { autoplay: true, muted: true }), { live: false });
+            return;
+          }
+
+          showOffline();
+        } catch (err) {
+          console.warn('[mini-tv] live-status unavailable.', err);
+          showOffline();
+        }
+      }
+
+      sync();
+      window.setInterval(sync, 60000);
+    })();
+  </script>
+
   <style>
     .mini-tv-kicker {
       margin: 0;
@@ -209,6 +295,21 @@ const miniTvDescription = 'Mini TV Live cu player video, burtieră animată și 
 
     .mini-tv-player iframe {
       pointer-events: auto;
+    }
+
+    .mini-tv-fallback-msg {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.7);
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.95rem;
+      letter-spacing: 0.05em;
+      background: linear-gradient(135deg, #050505, #0e0e16);
     }
 
     .mini-tv-live-badge {

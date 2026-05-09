@@ -1,0 +1,193 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const title = 'Preview Live · Florentina Pană | Trupă Cover Evenimente';
+const description = 'Preview de 60 de secunde din transmisia live. Continuă pe site pentru experiența completă.';
+const ogImage = '/images/og-live-1200x630.jpg';
+---
+
+<BaseLayout title={title} description={description} ogImage={ogImage} noindex={true}>
+  <section class="relative min-h-screen overflow-hidden bg-black">
+    <div class="absolute inset-0 bg-gradient-to-b from-black via-[#0a0500] to-black"></div>
+
+    <div class="relative z-10 mx-auto flex min-h-screen max-w-5xl flex-col items-center justify-center px-4 py-10 sm:py-14">
+
+      {/* Brand mic deasupra player */}
+      <div class="mb-4 flex items-center gap-3 text-center">
+        <span class="relative flex h-3 w-3">
+          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75"></span>
+          <span class="relative inline-flex h-3 w-3 rounded-full bg-red-500"></span>
+        </span>
+        <span class="font-['Oswald'] text-xs font-bold uppercase tracking-[0.25em] text-red-400 sm:text-sm">
+          Live · Florentina Pană
+        </span>
+      </div>
+
+      {/* Player Cloudflare — preview 60s */}
+      <div class="relative w-full max-w-3xl rounded-3xl border-2 border-amber-500/40 bg-black/60 p-3 shadow-[0_20px_60px_rgba(245,166,35,0.2)] sm:p-4">
+        <div class="relative aspect-video overflow-hidden rounded-2xl bg-black">
+          <iframe
+            id="preview-player"
+            src="about:blank"
+            title="Preview Live · 60 secunde"
+            class="absolute inset-0 h-full w-full bg-black"
+            allow="accelerometer; gyroscope; encrypted-media; picture-in-picture;"
+            referrerpolicy="origin"
+            allowfullscreen
+            loading="eager"
+          ></iframe>
+
+          {/* Overlay countdown */}
+          <div
+            id="preview-countdown"
+            class="pointer-events-none absolute right-3 top-3 z-10 flex items-center gap-2 rounded-full border border-amber-400/50 bg-black/75 px-3 py-1.5 font-['Oswald'] text-xs font-bold uppercase tracking-[0.15em] text-amber-300 backdrop-blur-sm sm:right-4 sm:top-4 sm:text-sm"
+          >
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Preview: <span id="preview-seconds">60</span>s</span>
+          </div>
+
+          {/* Mesaj fallback când nu e live și nu există replay */}
+          <div
+            id="preview-offline"
+            class="absolute inset-0 z-20 hidden flex-col items-center justify-center gap-4 bg-gradient-to-b from-black via-[#0a0500] to-black p-6 text-center"
+          >
+            <p class="font-['Oswald'] text-lg font-bold uppercase tracking-[0.15em] text-amber-300 sm:text-xl">
+              Transmisia nu este activă
+            </p>
+            <p class="max-w-md text-sm text-white/70 sm:text-base">
+              Revino curând pentru următorul live. Între timp, descoperă-ne pe site.
+            </p>
+            <a
+              href="/"
+              class="mt-2 inline-flex items-center gap-2 rounded-xl bg-amber-500 px-6 py-3 font-['Oswald'] text-sm font-bold uppercase tracking-[0.1em] text-black shadow-lg transition hover:scale-105 hover:bg-amber-400"
+            >
+              Vizitează site-ul →
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* CTA imediat sub player + buton skip */}
+      <div class="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:gap-4">
+        <a
+          id="preview-continue"
+          href="/live/"
+          class="inline-flex items-center gap-2 rounded-xl border-2 border-amber-500/60 bg-gradient-to-r from-amber-600 to-amber-500 px-7 py-3.5 font-["Oswald"] text-sm font-bold uppercase tracking-[0.1em] text-black shadow-[0_8px_28px_rgba(245,166,35,0.4)] transition-all hover:scale-105"
+        >
+          Continuă pe site →
+        </a>
+        <a
+          href="/contact/"
+          class="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-6 py-3 font-["Oswald"] text-xs font-semibold uppercase tracking-[0.1em] text-white/85 transition hover:border-white/40 hover:bg-white/10"
+        >
+          Verifică disponibilitatea
+        </a>
+      </div>
+
+      <p class="mt-5 max-w-md text-center text-xs leading-relaxed text-white/45">
+        Preview de 60 de secunde. Apoi vei fi redirecționat automat pe pagina principală pentru detalii complete.
+      </p>
+    </div>
+  </section>
+
+  <script is:inline>
+    (function () {
+      var iframe = document.getElementById('preview-player');
+      var offlineOverlay = document.getElementById('preview-offline');
+      var countdownEl = document.getElementById('preview-countdown');
+      var secondsEl = document.getElementById('preview-seconds');
+      var continueBtn = document.getElementById('preview-continue');
+      if (!iframe) return;
+
+      // Permitem suprascrierea destinației prin ?next= (whitelist intern)
+      var SAFE_NEXT_PATHS = ['/', '/contact/', '/live/', '/despre/', '/comunitate/', '/momente-cu-mirii/'];
+      var DEFAULT_NEXT = '/';
+      var DEFAULT_DURATION = 60;
+
+      var qs = new URLSearchParams(window.location.search);
+      var rawNext = qs.get('next');
+      var nextPath = SAFE_NEXT_PATHS.indexOf(rawNext) !== -1 ? rawNext : DEFAULT_NEXT;
+      var rawDuration = parseInt(qs.get('seconds') || '', 10);
+      var duration = (isFinite(rawDuration) && rawDuration > 5 && rawDuration <= 180) ? rawDuration : DEFAULT_DURATION;
+
+      if (continueBtn) continueBtn.href = nextPath;
+
+      function isValidUid(value) { return /^[a-f0-9]{32}$/i.test(String(value || '')); }
+      function isValidCustomerCode(value) { return /^[a-z0-9]{6,40}$/.test(String(value || '')); }
+
+      function buildIframeUrl(customerCode, uid) {
+        return 'https://customer-' + encodeURIComponent(customerCode) +
+          '.cloudflarestream.com/' + encodeURIComponent(uid) +
+          '/iframe?autoplay=true&muted=true&controls=false&preload=auto';
+      }
+
+      function showOffline() {
+        if (offlineOverlay) {
+          offlineOverlay.style.display = 'flex';
+          offlineOverlay.classList.remove('hidden');
+        }
+        if (countdownEl) countdownEl.style.display = 'none';
+      }
+
+      function startCountdown() {
+        if (!secondsEl) return;
+        var remaining = duration;
+        secondsEl.textContent = String(remaining);
+        var timer = window.setInterval(function () {
+          remaining -= 1;
+          if (secondsEl) secondsEl.textContent = String(Math.max(remaining, 0));
+          if (remaining <= 0) {
+            window.clearInterval(timer);
+            // Oprim playerul înainte de redirect (curățenie)
+            try { iframe.src = 'about:blank'; } catch (err) {}
+            // Adăugăm UTM pentru tracking în GA4
+            var redirectUrl = nextPath;
+            try {
+              var url = new URL(redirectUrl, window.location.origin);
+              url.searchParams.set('utm_source', 'live_preview');
+              url.searchParams.set('utm_medium', 'redirect');
+              url.searchParams.set('utm_campaign', 'live_teaser');
+              redirectUrl = url.pathname + url.search;
+            } catch (err) {}
+            window.location.replace(redirectUrl);
+          }
+        }, 1000);
+      }
+
+      async function init() {
+        try {
+          var response = await fetch('/api/live-status/', { cache: 'no-store' });
+          if (!response.ok) throw new Error('live-status fetch failed');
+          var payload = await response.json();
+          var customer = payload && payload.customerCode;
+          var liveUid = payload && payload.videoId;
+          var replayUid = payload && payload.replayId;
+
+          if (!isValidCustomerCode(customer)) {
+            showOffline();
+            return;
+          }
+
+          var targetUid = null;
+          if (payload && payload.isLive && isValidUid(liveUid)) targetUid = liveUid;
+          else if (isValidUid(replayUid)) targetUid = replayUid;
+
+          if (!targetUid) {
+            showOffline();
+            return;
+          }
+
+          iframe.src = buildIframeUrl(customer, targetUid);
+          startCountdown();
+        } catch (err) {
+          console.warn('[live-preview] live-status unavailable.', err);
+          showOffline();
+        }
+      }
+
+      init();
+    })();
+  </script>
+</BaseLayout>

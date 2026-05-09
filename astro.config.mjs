@@ -41,6 +41,8 @@ export default defineConfig({
         // Exclude pagina de redirect /comunitatea-noastra/ (301 → /comunitate/)
         const url = new URL(page);
         if (url.pathname === '/comunitatea-noastra/') return false;
+        // Exclude /live-preview/ — pagină de campanie (teaser 60s), nu trebuie indexată
+        if (url.pathname === '/live-preview/') return false;
         // Păstrează doar versiunea cu trailing slash
         return page.endsWith('/');
       },

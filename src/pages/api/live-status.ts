@@ -1,10 +1,21 @@
-/**
- * /api/live-status – Verifică dacă canalul YouTube este live în acest moment
- * ──────────────────────────────────────────────────────────────────────────
- * Apelează YouTube Data API v3 (search.list cu eventType=live) și returnează
- * { isLive: boolean, videoId: string | null }
+﻿/**
+ * /api/live-status – Verifică dacă Live Input-ul Cloudflare Stream este în direct acum.
+ * ────────────────────────────────────────────────────────────────────────────────────
+ * Apelează Cloudflare Stream API (`/accounts/{ACCT}/stream/live_inputs/{ID}/videos?limit=1`)
+ * și returnează:
+ *   {
+ *     isLive: boolean,
+ *     videoId: string | null,        // UID-ul sesiunii live curente (Cloudflare videoUID)
+ *     replayId: string | null,       // UID-ul video-ului de replay (fallback când nu e live)
+ *     customerCode: string | null,   // codul subdomain Cloudflare Stream pentru iframe URL
+ *     source: 'cloudflare'
+ *   }
  *
- * Cache-Control: no-store — răspunsul NU trebuie cached (starea live se schimbă)
+ * Frontend-ul construiește URL-ul iframe astfel:
+ *   https://customer-{customerCode}.cloudflarestream.com/{videoId|replayId}/iframe
+ *
+ * Cache-Control: public, max-age=30, stale-while-revalidate=300 — pentru a evita
+ * apariția endpoint-ului în „Critical Request Chain” (Lighthouse / LCP).
  */
 
 import type { APIRoute } from 'astro';
@@ -12,13 +23,27 @@ import { checkOrigin } from '../../lib/cors.js';
 
 export const prerender = false;
 
-const FALLBACK_CHANNEL_ID = 'UCNi3X-Qm3V4aaOAFSOlzHew';
-const LIVE_STATUS_CACHE_TTL_MS = 55_000;
-const YOUTUBE_FETCH_TIMEOUT_MS = 1_500;
+const LIVE_STATUS_CACHE_TTL_MS = 25_000;
+const CLOUDFLARE_FETCH_TIMEOUT_MS = 1_800;
 
 type LiveStatusPayload = {
     isLive: boolean;
     videoId: string | null;
+    replayId: string | null;
+    customerCode: string | null;
+    source: 'cloudflare';
+};
+
+type CloudflareVideo = {
+    uid: string;
+    status?: { state?: string };
+    liveInput?: string;
+};
+
+type CloudflareLiveVideosResponse = {
+    success?: boolean;
+    result?: CloudflareVideo[];
+    errors?: Array<{ code: number; message: string }>;
 };
 
 let cachedLiveStatus: LiveStatusPayload | null = null;
@@ -29,8 +54,16 @@ const isCacheFresh = () => {
     return cachedLiveStatus && Date.now() - cachedAt < LIVE_STATUS_CACHE_TTL_MS;
 };
 
-const getFallbackPayload = (): LiveStatusPayload => {
-    return cachedLiveStatus ?? { isLive: false, videoId: null };
+const buildOfflinePayload = (replayId: string | null, customerCode: string | null): LiveStatusPayload => ({
+    isLive: false,
+    videoId: null,
+    replayId,
+    customerCode,
+    source: 'cloudflare',
+});
+
+const getFallbackPayload = (replayId: string | null, customerCode: string | null): LiveStatusPayload => {
+    return cachedLiveStatus ?? buildOfflinePayload(replayId, customerCode);
 };
 
 const readErrorText = async (res: Response): Promise<string> => {
@@ -42,57 +75,84 @@ const readErrorText = async (res: Response): Promise<string> => {
     }
 };
 
-const fetchLiveStatusFromYoutube = async (apiKey: string, channelId: string): Promise<LiveStatusPayload> => {
+const fetchLiveStatusFromCloudflare = async (
+    accountId: string,
+    liveInputId: string,
+    apiToken: string,
+    replayId: string | null,
+    customerCode: string | null
+): Promise<LiveStatusPayload> => {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), YOUTUBE_FETCH_TIMEOUT_MS);
+    const timeoutId = setTimeout(() => controller.abort(), CLOUDFLARE_FETCH_TIMEOUT_MS);
 
     try {
-        const url = new URL('https://www.googleapis.com/youtube/v3/search');
-        url.searchParams.set('part', 'id');
-        url.searchParams.set('channelId', channelId);
-        url.searchParams.set('eventType', 'live');
-        url.searchParams.set('type', 'video');
-        url.searchParams.set('maxResults', '1');
-        url.searchParams.set('fields', 'items(id(videoId))');
-        url.searchParams.set('key', apiKey);
+        const url = `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(accountId)}/stream/live_inputs/${encodeURIComponent(liveInputId)}/videos`;
 
-        const res = await fetch(url.toString(), {
+        const res = await fetch(url, {
             signal: controller.signal,
             cache: 'no-store',
+            headers: {
+                Authorization: `Bearer ${apiToken}`,
+                Accept: 'application/json',
+            },
         });
 
         if (!res.ok) {
             const responseText = await readErrorText(res);
             console.warn(
-                `[api/live-status] YouTube API error: status=${res.status} channelId=${channelId} body=${responseText || 'empty'}`
+                `[api/live-status] Cloudflare Stream API error: status=${res.status} liveInputId=${liveInputId} body=${responseText || 'empty'}`
             );
-            return getFallbackPayload();
+            return getFallbackPayload(replayId, customerCode);
         }
 
-        const data = await res.json() as { items?: Array<{ id: { videoId: string } }> };
-        const videoId = data?.items?.[0]?.id?.videoId ?? null;
+        const data = (await res.json()) as CloudflareLiveVideosResponse;
 
-        return { isLive: !!videoId, videoId };
+        if (!data?.success || !Array.isArray(data.result)) {
+            console.warn(`[api/live-status] Cloudflare Stream API returned success=false: ${JSON.stringify(data?.errors ?? [])}`);
+            return getFallbackPayload(replayId, customerCode);
+        }
+
+        // Caută o sesiune live activă (state === 'live-inprogress').
+        // Cloudflare returnează video-urile sortate cronologic descrescător; cel mai recent este primul.
+        const liveVideo = data.result.find((video) => video?.status?.state === 'live-inprogress');
+
+        if (liveVideo?.uid) {
+            return {
+                isLive: true,
+                videoId: liveVideo.uid,
+                replayId,
+                customerCode,
+                source: 'cloudflare',
+            };
+        }
+
+        return buildOfflinePayload(replayId, customerCode);
     } catch (error) {
         if (error instanceof DOMException && error.name === 'AbortError') {
-            console.warn(`[api/live-status] YouTube API timeout after ${YOUTUBE_FETCH_TIMEOUT_MS}ms channelId=${channelId}`);
+            console.warn(`[api/live-status] Cloudflare Stream API timeout after ${CLOUDFLARE_FETCH_TIMEOUT_MS}ms liveInputId=${liveInputId}`);
         } else {
             const message = error instanceof Error ? error.message : 'unknown error';
-            console.warn(`[api/live-status] YouTube API request failed: channelId=${channelId} error=${message}`);
+            console.warn(`[api/live-status] Cloudflare Stream API request failed: liveInputId=${liveInputId} error=${message}`);
         }
-        return getFallbackPayload();
+        return getFallbackPayload(replayId, customerCode);
     } finally {
         clearTimeout(timeoutId);
     }
 };
 
-const getLiveStatus = async (apiKey: string, channelId: string): Promise<LiveStatusPayload> => {
+const getLiveStatus = async (
+    accountId: string,
+    liveInputId: string,
+    apiToken: string,
+    replayId: string | null,
+    customerCode: string | null
+): Promise<LiveStatusPayload> => {
     if (isCacheFresh()) {
         return cachedLiveStatus as LiveStatusPayload;
     }
 
     if (!inFlightRequest) {
-        inFlightRequest = fetchLiveStatusFromYoutube(apiKey, channelId)
+        inFlightRequest = fetchLiveStatusFromCloudflare(accountId, liveInputId, apiToken, replayId, customerCode)
             .then((payload) => {
                 cachedLiveStatus = payload;
                 cachedAt = Date.now();
@@ -106,6 +166,13 @@ const getLiveStatus = async (apiKey: string, channelId: string): Promise<LiveSta
     return inFlightRequest;
 };
 
+const readEnv = (key: string): string | null => {
+    const fromProcess = typeof process !== 'undefined' ? process.env?.[key]?.trim() : '';
+    if (fromProcess) return fromProcess;
+    const fromImport = (import.meta.env as Record<string, string | undefined>)[key]?.trim();
+    return fromImport ? fromImport : null;
+};
+
 export const GET: APIRoute = async ({ request }) => {
     const originCheck = checkOrigin(request);
 
@@ -115,33 +182,31 @@ export const GET: APIRoute = async ({ request }) => {
 
     const headers: Record<string, string> = {
         'Content-Type': 'application/json',
-        'Cache-Control': 'no-store, max-age=0',
+        'Cache-Control': 'public, max-age=30, stale-while-revalidate=300',
+        Vary: 'Origin',
         ...(originCheck.origin ? { 'Access-Control-Allow-Origin': originCheck.origin } : {}),
     };
 
-    const apiKey = process.env.YOUTUBE_API_KEY?.trim() || import.meta.env.YOUTUBE_API_KEY?.trim();
-    const channelId =
-        process.env.YOUTUBE_CHANNEL_ID?.trim() ||
-        import.meta.env.YOUTUBE_CHANNEL_ID?.trim() ||
-        FALLBACK_CHANNEL_ID;
+    const accountId = readEnv('CLOUDFLARE_ACCOUNT_ID');
+    const liveInputId = readEnv('CLOUDFLARE_LIVE_INPUT_ID');
+    const apiToken = readEnv('CLOUDFLARE_STREAM_TOKEN');
+    const customerCode = readEnv('CLOUDFLARE_STREAM_CUSTOMER_CODE');
+    const replayId = readEnv('CLOUDFLARE_REPLAY_VIDEO_UID');
 
-    if (!apiKey) {
+    if (!accountId || !liveInputId || !apiToken) {
+        // Configurare incompletă — răspundem fallback fără a mai apela Cloudflare.
         return new Response(
-            JSON.stringify({ isLive: false, videoId: null, error: 'API key lipsă' }),
+            JSON.stringify(buildOfflinePayload(replayId, customerCode)),
             { status: 200, headers }
         );
     }
 
     try {
-        const payload = await getLiveStatus(apiKey, channelId);
-
-        return new Response(
-            JSON.stringify(payload),
-            { status: 200, headers }
-        );
+        const payload = await getLiveStatus(accountId, liveInputId, apiToken, replayId, customerCode);
+        return new Response(JSON.stringify(payload), { status: 200, headers });
     } catch {
         return new Response(
-            JSON.stringify(getFallbackPayload()),
+            JSON.stringify(getFallbackPayload(replayId, customerCode)),
             { status: 200, headers }
         );
     }

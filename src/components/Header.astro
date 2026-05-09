@@ -390,7 +390,6 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       if (liveLinks.length === 0) return;
 
       fetch('/api/live-status/', {
-        cache: 'no-store',
         headers: {
           Accept: 'application/json',
         },
@@ -409,10 +408,23 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       window.setInterval(refreshLiveState, LIVE_STATUS_REFRESH_MS);
     };
 
-    if ('requestIdleCallback' in window) {
-      window.requestIdleCallback(startLiveStatePolling, { timeout: 2500 });
+    // Amânăm apelul cu un delay mare după `load` ca să iasă complet din
+    // lanțul critic raportat de Lighthouse (LCP / Critical Request Chain).
+    const scheduleLivePolling = () => {
+      const kickoff = () => {
+        if ('requestIdleCallback' in window) {
+          window.requestIdleCallback(startLiveStatePolling, { timeout: 5000 });
+        } else {
+          window.setTimeout(startLiveStatePolling, 500);
+        }
+      };
+      window.setTimeout(kickoff, 4000);
+    };
+
+    if (document.readyState === 'complete') {
+      scheduleLivePolling();
     } else {
-      window.setTimeout(startLiveStatePolling, 1200);
+      window.addEventListener('load', scheduleLivePolling, { once: true });
     }
 
     if (links.length === 0) return;
