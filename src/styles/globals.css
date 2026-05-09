@@ -888,9 +888,9 @@ html::-webkit-scrollbar-thumb:hover {
   overflow: hidden;
   border-radius: 9999px;
   text-decoration: none;
-  font-size: clamp(0.65rem, 1.4vw, 0.82rem);
+  font-size: clamp(0.72rem, 1.4vw, 0.95rem);
   font-weight: 900;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   padding: 0.48rem 0.9rem;
   white-space: nowrap;
@@ -1658,6 +1658,54 @@ details:focus-visible {
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   MOBIL — LIZIBILITATE TEXT PE FUNDAL CER ALBASTRU
+   SkyBackground are gradient #0b1e5e → #2272d4 (zonă centrală
+   foarte luminoasă). Textele plutitoare în afara cardurilor
+   (.section-title, .section-copy, .kicker, paragrafe) ajungeau
+   sub 4.5:1 contrast → senzație că „scrisul nu are luminozitate".
+   Soluție: text-shadow dark + brighten body/muted DOAR pe mobil.
+═══════════════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+
+  /* Textul „plutitor" (NU în carduri) primește haloul subtil de umbră
+     care creează separare optică pe fundal albastru luminos. */
+  .section-title,
+  .section-h2,
+  .section-copy,
+  .kicker,
+  main p,
+  main h2,
+  main h3 {
+    text-shadow:
+      0 1px 2px rgba(3, 8, 22, 0.65),
+      0 0 16px rgba(3, 8, 22, 0.35);
+  }
+
+  /* În interiorul cardurilor cu fundal solid NU avem nevoie de shadow */
+  .glass-card .section-title,
+  .glass-card .section-copy,
+  .glass-card p,
+  .glass-card h2,
+  .glass-card h3,
+  .hp-card p,
+  .hp-card h2,
+  .hp-card h3,
+  article p,
+  article h2,
+  article h3 {
+    text-shadow: none;
+  }
+
+  /* Brighten textul secundar pentru a depăși 4.5:1 pe albastru */
+  :root {
+    --body: #E8E2D6;
+    /* mai luminos decât #CEC6BA */
+    --muted: #C4B8A4;
+    /* mai luminos decât #9A8A78 */
+  }
+}
+
 @media (max-width: 767px) {
   .top-menu-toggle-label {
     display: none;
@@ -1943,6 +1991,23 @@ details:focus-visible {
     opacity: 1;
     transform: none;
     transition: none;
+  }
+}
+
+/* ── MOBIL: eliminăm slide-up (translateY) la text-reveal ──
+   Pe telefon, dacă utilizatorul scrolează lent și se oprește în dreptul
+   unui titlu, animația de translateY(24px → 0) era percepută ca un
+   „salt al paginii cu câțiva milimetri în sus". Păstrăm doar fade-in,
+   fără mișcare verticală — eliminăm complet senzația de jump. */
+@media (max-width: 767px) {
+  .text-reveal {
+    transform: none;
+    transition: opacity 0.45s ease-out;
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  .text-reveal.is-visible {
+    transform: none;
   }
 }
 
