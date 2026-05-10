@@ -224,9 +224,9 @@
   /* lățime maximă conținut */
   --container-pad-x: clamp(1.25rem, 4vw, 2rem);
   /* mobil 20px → desktop 32px */
-  --section-pad-y: clamp(2.5rem, 6vw, 4rem);
+  --section-pad-y: clamp(1.75rem, 4vw, 3rem);
   /* padding vertical intern secțiune */
-  --section-gap-y: clamp(1rem, 2.5vw, 1.75rem);
+  --section-gap-y: clamp(0.5rem, 1.5vw, 1rem);
   /* spațiu între secțiuni (margin-block) */
   --stack-gap: clamp(0.85rem, 2vw, 1.25rem);
   /* spațiu între blocuri în interiorul secțiunii */
@@ -2419,11 +2419,14 @@ details:focus-visible {
     padding-top: calc(var(--mob-nav-h, 72px) + 1rem) !important;
   }
 
-  /* Secțiunile SEO pe homepage — nu forța min-height 100dvh, doar cât conținut au */
-  body.is-homepage main#continut>section.hp-seo-section {
+  /* Secțiunile cu conținut compact pe homepage — nu forța min-height 100dvh,
+     doar cât conținut au (altfel apar spații mari cu doar fundalul vizibil). */
+  body.is-homepage main#continut>section.hp-seo-section,
+  body.is-homepage main#continut>section.hp-early-booking,
+  body.is-homepage main#continut>section.hp-highlights {
     min-height: unset !important;
-    padding-top: 2rem !important;
-    padding-bottom: 2rem !important;
+    padding-top: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
   }
 
   /* Pe homepage: săgețile swipe sunt vizibile */

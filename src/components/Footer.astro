@@ -23,8 +23,8 @@ const isHomePage = Astro.url.pathname === '/';
       <svg class="ftr-tab-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
     </button>
     <div class="ftr-content" data-ftr-content>
-      <nav class="section-container py-5" aria-label="Hartă site">
-        <div class="flex flex-wrap justify-center gap-x-5 gap-y-2 text-xs text-white/80">
+      <nav class="section-container py-3" aria-label="Hartă site">
+        <div class="flex flex-wrap justify-center gap-x-5 gap-y-1.5 text-xs text-white/80">
           <a href="/despre/" class="transition hover:text-[#F5A623] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F5A623] rounded">Despre noi</a>
           <a href="/membri/" class="transition hover:text-[#F5A623] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F5A623] rounded">Membri</a>
           <a href="/galerie-video/" class="transition hover:text-[#F5A623] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F5A623] rounded">Galerie Video</a>
@@ -42,7 +42,7 @@ const isHomePage = Astro.url.pathname === '/';
       </nav>
 
       <!-- Ghid evenimente — internal linking SEO -->
-      <nav class="section-container pb-3" aria-label="Ghid evenimente">
+      <nav class="section-container pb-2" aria-label="Ghid evenimente">
         <p class="text-center text-xs text-white/70">
           Ghid Evenimente:
           <a href="/publicatii/?cat=locatii" class="transition hover:text-[#F5A623] text-white/80">Locații de Poveste</a>
@@ -63,7 +63,7 @@ const isHomePage = Astro.url.pathname === '/';
       <svg class="ftr-tab-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
     </button>
     <div class="ftr-content" data-ftr-content>
-      <address class="section-container py-5 text-xs text-white/60 leading-relaxed not-italic">
+      <address class="section-container py-3 text-xs text-white/60 leading-relaxed not-italic">
         <div class="flex flex-wrap justify-center gap-x-4 gap-y-1 text-center">
           <span>Pană Claudiu-Gheorghe Întreprindere Individuală</span>
           <span aria-hidden="true">·</span>
@@ -77,7 +77,7 @@ const isHomePage = Astro.url.pathname === '/';
           <span aria-hidden="true">·</span>
           <span>Tel: <a href="tel:+40767369658" class="transition hover:text-white/80 underline">0767 369 658</a></span>
         </div>
-        <div class="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-center">
+        <div class="mt-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-center">
           <a href="https://anpc.ro/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 transition hover:text-white/80 underline">
             <svg viewBox="0 0 20 20" class="h-4 w-4 shrink-0" fill="currentColor" aria-hidden="true"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11H9v-2h2v2zm0-4H9V5h2v4z"/></svg>
             ANPC — Protecția Consumatorilor
@@ -96,9 +96,9 @@ const isHomePage = Astro.url.pathname === '/';
   <!-- Zone acoperite — internal linking automat -->
   <ZoneAcoperite />
 
-  <div class="section-container grid gap-6 py-8 sm:gap-8 md:gap-4 text-sm md:grid-cols-3 md:items-center md:text-sm sm:text-xs">
+  <div class="section-container grid gap-4 py-4 sm:gap-5 md:gap-4 text-sm md:grid-cols-3 md:items-center md:text-sm sm:text-xs">
     {/* Coloana 1: Logo + copyright */}
-    <div class="flex flex-col items-start gap-3 sm:items-start md:items-start">
+    <div class="flex flex-col items-start gap-2 sm:items-start md:items-start">
       <img
         src="/images/sigla-fp-band.webp"
         alt="Sigla Formația Florentina Pană (FP Band)"
@@ -112,7 +112,7 @@ const isHomePage = Astro.url.pathname === '/';
     </div>
 
     {/* Coloana 2: Butoane sociale + link "Înapoi sus" */}
-    <div class="flex flex-col items-center gap-4 md:items-center">
+    <div class="flex flex-col items-center gap-2 md:items-center">
       <a href={isHomePage ? '#acasa' : '/#acasa'} class="text-xs sm:text-sm transition hover:text-[#F5A623] text-white/80 underline">
         ↑ Înapoi sus
       </a>
@@ -165,12 +165,12 @@ const isHomePage = Astro.url.pathname === '/';
 
     {/* Coloana 3: Email + telefon + linkuri legale */}
     <div class="justify-self-center md:justify-self-end text-center md:text-right text-xs sm:text-sm">
-      <div class="flex flex-col items-center md:items-end gap-2">
+      <div class="flex flex-col items-center md:items-end gap-1">
         <span id="footer-email-js" class="transition hover:text-[#F5A623] text-white/80"></span>
         <span aria-hidden="true" class="text-white/40"> | </span>
         <a href={`tel:${contact.phoneRaw}`} class="transition hover:text-[#F5A623] text-white/80">{contact.phoneDisplay}</a>
       </div>
-      <div class="mt-3 flex flex-wrap justify-center md:justify-end gap-x-2 md:gap-x-3 gap-y-1 text-xs" style="color:rgba(255,255,255,0.6);">
+      <div class="mt-2 flex flex-wrap justify-center md:justify-end gap-x-2 md:gap-x-3 gap-y-1 text-xs" style="color:rgba(255,255,255,0.6);">
         <a href="/politica-confidentialitate/" class="transition hover:text-white/90 text-white/70">Confidențialitate</a>
         <span aria-hidden="true" class="text-white/40">·</span>
         <a href="/politica-cookie/" class="transition hover:text-white/90 text-white/70">Cookie</a>

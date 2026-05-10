@@ -1,10 +1,14 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BackButton from '../components/BackButton.astro';
+import liveReplays from '../data/liveReplays.json';
 
 const livePageTitle = 'Live cu Florentina Pană | Trupă Cover & Muzică Evenimente';
 const livePageDescription = 'Urmărește live stream-urile de la nunți, botezuri și evenimente cu Formația Florentina Pană. Simte energia FP Band în timp real.';
 const livePageOgImage = '/images/og-live-1200x630.jpg';
+
+/* Replay-uri sortate descrescător după dată (newest-first) */
+const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
 ---
 
 <BaseLayout
@@ -39,98 +43,6 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
       </p>
     </div>
   </section>
-
-  {/* ═══════════════════════════════════════════
-      MINI TV LIVE — preview rapid în pagina /live/
-  ═══════════════════════════════════════════ */}
-  <section class="bg-[#070d1d] py-10 sm:py-12">
-    <div class="section-container">
-      <div class="mx-auto max-w-5xl overflow-hidden rounded-3xl border border-cyan-400/20 bg-black/70 p-3 shadow-[0_20px_50px_rgba(0,0,0,0.45)] sm:p-4">
-        <div class="relative overflow-hidden rounded-2xl border border-white/10 bg-black p-2 sm:p-3">
-          <div class="pointer-events-none absolute left-3 top-3 z-10 inline-flex items-center gap-2 rounded-full border border-red-500/35 bg-black/70 px-3 py-1 text-[0.65rem] font-bold uppercase tracking-[0.15em] text-red-400 sm:left-4 sm:top-4 sm:text-xs">
-            <span class="h-2.5 w-2.5 animate-pulse rounded-full bg-red-500"></span>
-            LIVE
-          </div>
-
-          <div
-            id="mini-live-clock-wrap"
-            class="pointer-events-none absolute right-3 top-3 z-10 rounded-md border border-cyan-300/25 bg-[#02101a]/80 px-2.5 py-1 font-['Oswald'] text-xs tracking-[0.1em] text-cyan-200 sm:right-4 sm:top-4 sm:text-sm"
-            style="display:none"
-          >
-            <span id="mini-live-clock">00:00:00</span>
-          </div>
-
-          <div class="aspect-video overflow-hidden rounded-xl">
-            <iframe
-              id="mini-live-player"
-              src="about:blank"
-              data-fallback-src="about:blank"
-              title="Mini TV Live Preview"
-              class="h-full w-full pointer-events-auto bg-black"
-              loading="lazy"
-              allow="accelerometer; gyroscope; encrypted-media; picture-in-picture;"
-              referrerpolicy="origin"
-              allowfullscreen
-            ></iframe>
-          </div>
-        </div>
-
-        <div class="mt-2 overflow-hidden rounded-xl border border-amber-400/40 bg-gradient-to-r from-black via-[#1a1307] to-black py-2">
-          <div class="live-mini-ticker-track inline-flex min-w-full gap-10 whitespace-nowrap font-['Oswald'] text-xs uppercase tracking-[0.08em] text-amber-300 sm:text-sm">
-            <span>Early Booking 2026: Rezervă acum! | Vizitează secțiunea Blog | Partenerul serii: Conacul Helven</span>
-            <span aria-hidden="true">Early Booking 2026: Rezervă acum! | Vizitează secțiunea Blog | Partenerul serii: Conacul Helven</span>
-          </div>
-        </div>
-
-        <div class="mt-4 flex justify-center">
-          <a
-            href="/mini-tv/"
-            class="inline-flex items-center gap-2 rounded-xl border border-cyan-400/40 bg-gradient-to-r from-[#0b3e59] to-[#123f95] px-5 py-2.5 font-['Oswald'] text-xs uppercase tracking-[0.09em] text-white transition-all hover:scale-[1.02] hover:shadow-[0_10px_28px_rgba(15,73,129,0.45)] sm:text-sm"
-          >
-            Deschide Mini TV Live
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <script is:inline>
-    (() => {
-      const clockEl = document.getElementById('mini-live-clock');
-      if (!clockEl) return;
-
-      const formatter = new Intl.DateTimeFormat('ro-RO', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false,
-        timeZone: 'Europe/Bucharest',
-      });
-
-      const updateClock = () => {
-        clockEl.textContent = formatter.format(new Date());
-      };
-
-      updateClock();
-      window.setInterval(updateClock, 1000);
-    })();
-  </script>
-
-  <style>
-    .live-mini-ticker-track {
-      animation: liveMiniTicker 22s linear infinite;
-    }
-
-    @keyframes liveMiniTicker {
-      from {
-        transform: translateX(0);
-      }
-
-      to {
-        transform: translateX(-50%);
-      }
-    }
-  </style>
 
     {/* ═══════════════════════════════════════════
       PLAYER — YouTube Live/Replay Embed + ramă aurie
@@ -180,13 +92,30 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
                 </div>
               </div>
             </div>
+
+            {/* ── Overlay Premium Offline — vizibil când nu suntem live ── */}
+            <div id="offline-overlay" class="live-offline-overlay" style="display:none" aria-live="polite">
+              <div class="live-offline-card">
+                <div class="live-offline-badge">
+                  <span class="live-offline-pulse" aria-hidden="true"></span>
+                  <span>În pauză până la următorul eveniment</span>
+                </div>
+                <h3 class="live-offline-title">Revenim curând în direct</h3>
+                <p class="live-offline-text">
+                  Nu transmitem live în acest moment. În player rulează momente alese din ultimele evenimente — rămâi pe aproape, urcăm pe scenă în curând.
+                </p>
+                <p class="live-offline-hint">
+                  Transmisia începe pe site la 10 minute după startul evenimentului.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Mesaj offline — afișat de JS când nu e live */}
       <p id="offline-msg" class="mx-auto mt-4 max-w-xl text-center text-sm leading-relaxed text-amber-400/70" style="display:none">
-        Nu suntem live acum — în player poți vedea ultimul nostru eveniment înregistrat.
+        În player rulează momente alese din ultimele noastre evenimente. Te anunțăm aici imediat ce intrăm în direct.
       </p>
 
       <div class="mt-3 flex justify-center">
@@ -253,21 +182,6 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
 
       {/* ── Butoane distribuire socială ── */}
       <div class="mx-auto mt-6 flex max-w-md flex-wrap items-center justify-center gap-3">
-        {/* WhatsApp */}
-        <a
-          id="share-wa"
-          href="#"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="live-share-btn"
-          aria-label="Distribuie pe WhatsApp"
-        >
-          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347ZM12.05 21.785h-.01a9.87 9.87 0 0 1-5.03-1.378l-.361-.214-3.741.981.998-3.648-.235-.374A9.86 9.86 0 0 1 2.2 12.05C2.2 6.62 6.62 2.2 12.05 2.2c2.634 0 5.108 1.027 6.968 2.893A9.82 9.82 0 0 1 21.9 12.06c-.005 5.43-4.42 9.85-9.85 9.85v-.125ZM12.05.075C5.495.075.075 5.495.075 12.05c0 2.12.553 4.19 1.607 6.02L.05 24l6.095-1.598A11.93 11.93 0 0 0 12.05 24.1c6.555 0 11.975-5.42 11.975-11.975C24.025 5.57 18.605.075 12.05.075Z"/>
-          </svg>
-          <span>WhatsApp</span>
-        </a>
-
         {/* Facebook */}
         <a
           id="share-fb"
@@ -298,57 +212,6 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
         </button>
       </div>
 
-      {/* ── Panou „Anunță Live pe Facebook" ── */}
-      <div class="mx-auto mt-10 max-w-xl rounded-2xl border border-[#1877f2]/30 bg-[#1877f2]/8 p-6" id="announce-box">
-        <div class="mb-3 flex items-center gap-2">
-          <span class="relative flex h-2.5 w-2.5">
-            <span class="absolute inline-flex h-full w-full animate-pulse rounded-full bg-[#1877f2] opacity-75"></span>
-            <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#1877f2]"></span>
-          </span>
-          <p class="text-xs font-bold uppercase tracking-widest text-[#74a7ff]">Anunță evenimentul Live</p>
-        </div>
-
-        <p class="mb-3 text-xs leading-relaxed text-white/40">Copiază textul de mai jos, apoi postează-l pe Facebook — 10 secunde și fanii tăi știu că ești live.</p>
-
-        {/* Textul pre-scris — editabil de Claudiu */}
-        <div class="relative rounded-xl border border-white/10 bg-black/40 p-4">
-          <p class="live-announce-text select-all text-sm leading-relaxed text-white/80" id="announce-text">
-            🔴 SUNTEM LIVE ACUM!<br />
-            Florentina Pană & FP Band — direct de la eveniment 🎵<br /><br />
-            ⚠️ Transmisia este DOAR pe site-ul nostru, nu pe Facebook.<br />
-            👉 florentinapanaofficial.ro/live-preview/<br /><br />
-            Intră acum și simte atmosfera alături de noi! ❤️
-          </p>
-          <button
-            type="button"
-            id="copy-announce"
-            class="mt-3 flex w-full items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 py-2 text-xs font-semibold text-white/60 transition-all hover:border-[#1877f2]/40 hover:bg-[#1877f2]/10 hover:text-[#74a7ff]"
-            aria-label="Copiază textul de anunț"
-          >
-            <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-            </svg>
-            <span id="copy-announce-label">Copiază textul</span>
-          </button>
-        </div>
-
-        {/* Buton Facebook mare */}
-        <a
-          id="btn-fb-announce"
-          href="#"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="mt-4 flex w-full items-center justify-center gap-3 rounded-xl bg-[#1877f2] py-3.5 text-sm font-bold text-white shadow-[0_4px_20px_rgba(24,119,242,0.35)] transition-all hover:bg-[#1565d8] hover:shadow-[0_6px_28px_rgba(24,119,242,0.5)]"
-          aria-label="Deschide Facebook pentru a posta"
-        >
-          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12Z"/>
-          </svg>
-          Postează pe Facebook
-        </a>
-      </div>
-
       {/* CTA — imediat sub player, vizibil indiferent de format */}
       <div class="mt-8 text-center">
         <a
@@ -374,125 +237,102 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
         <h2 class="font-serif text-3xl font-bold text-white sm:text-4xl">Ultimele Live-uri Înregistrate</h2>
         <p class="mt-3 text-white/50 text-sm">Nu ai prins transmisiunea? Revezi evenimentele noastre în întregime.</p>
       </div>
-      <div class="grid gap-5 sm:grid-cols-3">
-        <!-- Live 1 — cel mai recent -->
-        <a href="/youtube-redirect/?to=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DbffqJGtP9ok&back=%2Flive%2F"
-          class="group block rounded-2xl overflow-hidden border border-white/10 bg-white/5 transition-all hover:border-amber-500/40 hover:bg-white/[0.08]">
-          <div class="relative aspect-video">
-            <img src="https://img.youtube.com/vi/bffqJGtP9ok/hqdefault.jpg"
-              alt="Live FP Band — eveniment 03.05.2026" class="w-full h-full object-cover" loading="lazy" decoding="async" fetchpriority="low" width="480" height="360" />
-            <div class="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
-              <span class="flex h-12 w-12 items-center justify-center rounded-full bg-red-600 shadow-lg">
-                <svg class="h-5 w-5 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
-              </span>
-            </div>
-          </div>
-          <div class="p-4">
-            <p class="text-sm font-semibold text-white/90 group-hover:text-amber-400 transition-colors">Live FP Band — Eveniment</p>
-            <p class="mt-1 text-xs text-white/40">3 mai 2026</p>
-            <a
-              href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DbffqJGtP9ok"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="live-card-share"
-              aria-label="Distribuie acest live pe Facebook"
-            >
-              Distribuie pe Facebook
+      <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {replays.map((replay) => {
+          const detailUrl = `/live/replay/${replay.slug}/`;
+          const watchUrl = replay.cloudflareUid
+            ? `https://watch.cloudflarestream.com/${replay.cloudflareUid}`
+            : `https://www.youtube.com/watch?v=${replay.youtubeId}`;
+          const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(watchUrl)}`;
+          return (
+            <a href={detailUrl}
+              class="group block rounded-2xl overflow-hidden border border-white/10 bg-white/5 transition-all hover:border-amber-500/40 hover:bg-white/[0.08]">
+              <div class="relative aspect-video">
+                <img src={replay.thumbnail}
+                  alt={replay.title}
+                  class="w-full h-full object-cover" loading="lazy" decoding="async" fetchpriority="low" width="480" height="360" />
+                <div class="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span class="flex h-12 w-12 items-center justify-center rounded-full bg-red-600 shadow-lg">
+                    <svg class="h-5 w-5 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+                  </span>
+                </div>
+                <span class="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-amber-400/35 bg-black/70 px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-amber-300 backdrop-blur-sm">
+                  <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <polygon points="5,3 19,12 5,21"/>
+                  </svg>
+                  Replay
+                </span>
+              </div>
+              <div class="p-4">
+                <p class="text-sm font-semibold text-white/90 group-hover:text-amber-400 transition-colors line-clamp-2">{replay.title}</p>
+                <p class="mt-1 text-xs text-white/40">{replay.eventType} — {replay.location}</p>
+                <a
+                  href={shareUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="live-card-share"
+                  aria-label={`Distribuie ${replay.title} pe Facebook`}
+                  onclick="event.stopPropagation()"
+                >
+                  Distribuie pe Facebook
+                </a>
+              </div>
             </a>
-          </div>
-        </a>
-        <!-- Live 2 -->
-        <a href="/youtube-redirect/?to=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DEAQ_mTbj_uY&back=%2Flive%2F"
-          class="group block rounded-2xl overflow-hidden border border-white/10 bg-white/5 transition-all hover:border-amber-500/40 hover:bg-white/[0.08]">
-          <div class="relative aspect-video">
-            <img src="https://img.youtube.com/vi/EAQ_mTbj_uY/hqdefault.jpg"
-              alt="Live FP Band — eveniment 03.05.2026" class="w-full h-full object-cover" loading="lazy" decoding="async" fetchpriority="low" width="480" height="360" />
-            <div class="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
-              <span class="flex h-12 w-12 items-center justify-center rounded-full bg-red-600 shadow-lg">
-                <svg class="h-5 w-5 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
-              </span>
-            </div>
-          </div>
-          <div class="p-4">
-            <p class="text-sm font-semibold text-white/90 group-hover:text-amber-400 transition-colors">Live FP Band — Eveniment</p>
-            <p class="mt-1 text-xs text-white/40">3 mai 2026</p>
-            <a
-              href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DEAQ_mTbj_uY"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="live-card-share"
-              aria-label="Distribuie acest live pe Facebook"
-            >
-              Distribuie pe Facebook
-            </a>
-          </div>
-        </a>
-        <!-- Live 3 -->
-        <a href="/youtube-redirect/?to=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D3b9KYuoTjBA&back=%2Flive%2F"
-          class="group block rounded-2xl overflow-hidden border border-white/10 bg-white/5 transition-all hover:border-amber-500/40 hover:bg-white/[0.08]">
-          <div class="relative aspect-video">
-            <img src="https://img.youtube.com/vi/3b9KYuoTjBA/hqdefault.jpg"
-              alt="Live FP Band — eveniment 03.05.2026" class="w-full h-full object-cover" loading="lazy" decoding="async" fetchpriority="low" width="480" height="360" />
-            <div class="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
-              <span class="flex h-12 w-12 items-center justify-center rounded-full bg-red-600 shadow-lg">
-                <svg class="h-5 w-5 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
-              </span>
-            </div>
-          </div>
-          <div class="p-4">
-            <p class="text-sm font-semibold text-white/90 group-hover:text-amber-400 transition-colors">Live FP Band — Eveniment</p>
-            <p class="mt-1 text-xs text-white/40">3 mai 2026</p>
-            <a
-              href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D3b9KYuoTjBA"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="live-card-share"
-              aria-label="Distribuie acest live pe Facebook"
-            >
-              Distribuie pe Facebook
-            </a>
-          </div>
-        </a>
+          );
+        })}
       </div>
     </div>
   </section>
 
   {/* ═══════════════════════════════════════════
-      PROGRAM — Următoarele live-uri
+      ANUNȚ — Fii aproape de noi + CTA Contact
   ═══════════════════════════════════════════ */}
   <section class="bg-black py-16 sm:py-20">
     <div class="section-container">
-      <div class="mx-auto max-w-2xl text-center">
-        <h2 class="mb-2 font-serif text-3xl font-bold text-white sm:text-4xl">Programul Live-urilor</h2>
-        <p class="mb-10 text-white/50">Următoarele transmisiuni programate</p>
+      <div class="live-stay-close mx-auto max-w-2xl text-center">
+        <span class="live-stay-badge">
+          <span class="live-offline-pulse" aria-hidden="true"></span>
+          Rămâi conectat
+        </span>
+        <h2 class="mt-4 mb-3 font-serif text-3xl font-bold text-white sm:text-4xl">
+          Fii aproape de noi
+        </h2>
+        <p class="mx-auto mb-8 max-w-xl text-white/70">
+          Urmărește-ne pe site, Facebook, Instagram și YouTube — anunțăm fiecare transmisiune live înainte de a urca pe scenă.
+        </p>
 
-        <div class="space-y-4 text-left">
-          <div class="flex items-start gap-4 rounded-xl border border-white/10 bg-white/5 p-5">
-            <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-400">
-              <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
-              </svg>
-            </div>
-            <div>
-              <p class="font-semibold text-white">Nuntă — Pitești, Argeș</p>
-              <p class="mt-1 text-sm text-white/50">Data și ora vor fi anunțate în curând</p>
-            </div>
-          </div>
-
-          <div class="flex items-start gap-4 rounded-xl border border-white/10 bg-white/5 p-5">
-            <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-400">
-              <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
-              </svg>
-            </div>
-            <div>
-              <p class="font-semibold text-white">Botez — Câmpulung, Argeș</p>
-              <p class="mt-1 text-sm text-white/50">Data și ora vor fi anunțate în curând</p>
-            </div>
-          </div>
+        <div class="live-stay-socials">
+          <a href="https://www.facebook.com/florentinapanaofficial" target="_blank" rel="noopener" aria-label="Facebook" class="live-stay-social">
+            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.77l-.44 2.89h-2.33v6.99A10 10 0 0 0 22 12Z"/></svg>
+            <span>Facebook</span>
+          </a>
+          <a href="https://www.instagram.com/florentinapanaofficial/" target="_blank" rel="noopener" aria-label="Instagram" class="live-stay-social">
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="5"/>
+              <circle cx="12" cy="12" r="4"/>
+              <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+            </svg>
+            <span>Instagram</span>
+          </a>
+          <a href="https://www.youtube.com/@FlorentinaPanaPitesti" target="_blank" rel="noopener" aria-label="YouTube" class="live-stay-social">
+            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M23.5 6.51a3 3 0 0 0-2.11-2.13C19.5 3.86 12 3.86 12 3.86s-7.5 0-9.39.52A3 3 0 0 0 .5 6.51 31.4 31.4 0 0 0 0 12a31.4 31.4 0 0 0 .5 5.49 3 3 0 0 0 2.11 2.13c1.89.52 9.39.52 9.39.52s7.5 0 9.39-.52a3 3 0 0 0 2.11-2.13A31.4 31.4 0 0 0 24 12a31.4 31.4 0 0 0-.5-5.49ZM9.6 15.57V8.43L15.82 12 9.6 15.57Z"/></svg>
+            <span>YouTube</span>
+          </a>
         </div>
+      </div>
 
-        <p class="mt-8 text-sm text-white/30">Programul se actualizează periodic. Urmărește-ne pe rețelele sociale pentru notificări.</p>
+      {/* ── Pâlnia de conversie: vizitator → client ── */}
+      <div class="live-cta-conversion mx-auto mt-10 max-w-2xl text-center">
+        <h3 class="live-cta-title">Îți place ce auzi?</h3>
+        <p class="live-cta-subtitle">
+          Verifică disponibilitatea Formației Florentina Pană pentru data evenimentului tău — răspundem rapid și cu detalii complete.
+        </p>
+        <a href="/contact/" class="live-cta-button">
+          <span>Verifică disponibilitatea</span>
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/>
+          </svg>
+        </a>
       </div>
     </div>
   </section>
@@ -710,6 +550,246 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
       transform: translateY(20px);
     }
   }
+
+  /* ── Overlay Premium Offline ── */
+  .live-offline-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 15;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(245, 166, 35, 0.18) 0%, transparent 55%),
+      linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.78) 100%);
+    backdrop-filter: blur(4px) saturate(1.1);
+    -webkit-backdrop-filter: blur(4px) saturate(1.1);
+    pointer-events: none;
+    animation: liveOfflineFadeIn 0.5s ease;
+  }
+
+  @keyframes liveOfflineFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .live-offline-card {
+    pointer-events: auto;
+    max-width: 32rem;
+    text-align: center;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(245, 166, 35, 0.30);
+    background: rgba(15, 10, 4, 0.78);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    box-shadow:
+      0 18px 50px rgba(0, 0, 0, 0.55),
+      inset 0 1px 0 rgba(245, 166, 35, 0.15);
+  }
+
+  .live-offline-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(245, 166, 35, 0.40);
+    background: rgba(245, 166, 35, 0.10);
+    color: #f5c97a;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .live-offline-pulse {
+    position: relative;
+    display: inline-block;
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    background: #f5a623;
+    box-shadow: 0 0 0 0 rgba(245, 166, 35, 0.8);
+    animation: liveOfflinePulse 2.2s ease-out infinite;
+  }
+
+  @keyframes liveOfflinePulse {
+    0%   { box-shadow: 0 0 0 0 rgba(245, 166, 35, 0.7); }
+    70%  { box-shadow: 0 0 0 12px rgba(245, 166, 35, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(245, 166, 35, 0); }
+  }
+
+  .live-offline-title {
+    margin: 1rem 0 0.6rem;
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(1.25rem, 3vw, 1.75rem);
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .live-offline-text {
+    margin: 0 0 0.75rem;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+
+  .live-offline-hint {
+    margin: 0;
+    color: rgba(245, 201, 122, 0.85);
+    font-size: 0.78rem;
+    font-style: italic;
+  }
+
+  /* Pe mobil — card mai compact, fundal mai opac (player mai mic) */
+  @media (max-width: 640px) {
+    .live-offline-card {
+      padding: 1rem;
+    }
+    .live-offline-text {
+      font-size: 0.85rem;
+    }
+    .live-offline-hint {
+      font-size: 0.72rem;
+    }
+  }
+
+  /* ── Secțiune „Fii aproape de noi" ── */
+  .live-stay-close {
+    padding: 2rem 1.5rem;
+    border-radius: 1.25rem;
+    border: 1px solid rgba(245, 166, 35, 0.22);
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(245, 166, 35, 0.10) 0%, transparent 60%),
+      rgba(255, 255, 255, 0.025);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  .live-stay-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(245, 166, 35, 0.40);
+    background: rgba(245, 166, 35, 0.10);
+    color: #f5c97a;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .live-stay-socials {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .live-stay-social {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.1rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.04);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .live-stay-social:hover {
+    transform: translateY(-2px);
+    background: rgba(245, 166, 35, 0.10);
+    border-color: rgba(245, 166, 35, 0.45);
+    color: #ffffff;
+  }
+
+  @media (max-width: 480px) {
+    .live-stay-close {
+      padding: 1.5rem 1rem;
+    }
+    .live-stay-social {
+      padding: 0.55rem 0.9rem;
+      font-size: 0.85rem;
+    }
+  }
+
+  /* ── CTA conversie: Verifică disponibilitatea ── */
+  .live-cta-conversion {
+    padding: 1.75rem 1.5rem;
+    border-radius: 1.25rem;
+    border: 1px solid rgba(245, 166, 35, 0.30);
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(245, 166, 35, 0.14) 0%, transparent 65%),
+      rgba(15, 10, 4, 0.55);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  .live-cta-title {
+    margin: 0 0 0.5rem;
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(1.25rem, 3vw, 1.65rem);
+    font-weight: 700;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .live-cta-subtitle {
+    margin: 0 0 1.25rem;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+
+  .live-cta-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.95rem 1.75rem;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #f5a623 0%, #d98a0c 100%);
+    color: #1a0f02;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    box-shadow:
+      0 10px 26px rgba(245, 166, 35, 0.32),
+      inset 0 1px 0 rgba(255, 255, 255, 0.30);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .live-cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 14px 32px rgba(245, 166, 35, 0.42),
+      inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+
+  @media (max-width: 480px) {
+    .live-cta-conversion {
+      padding: 1.25rem 1rem;
+    }
+    .live-cta-button {
+      width: 100%;
+      justify-content: center;
+      font-size: 0.9rem;
+      padding: 0.85rem 1.25rem;
+    }
+  }
 </style>
 
 <script is:inline>
@@ -836,17 +916,18 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
   };
 </script>
 
-<script is:inline>
+<script is:inline define:vars={{ replays }}>
   (function () {
-    // ── Status live + fallback replay pentru player Cloudflare Stream ──
+    // ── Status live + fallback playlist YouTube auto pentru offline ──
     var player = document.getElementById('live-player');
-    var miniPlayer = document.getElementById('mini-live-player');
     var badge = document.getElementById('live-badge');
     var offlineMsg = document.getElementById('offline-msg');
+    var offlineOverlay = document.getElementById('offline-overlay');
     var openExternal = document.getElementById('open-on-cloudflare');
     var formatStatus = document.getElementById('live-format-status');
     var wrap = document.getElementById('live-glass-wrap');
     var isLive = false;
+    var currentMode = null; // 'live' | 'offline-playlist' — evită reload inutil
 
     if (!wrap) return;
 
@@ -860,12 +941,10 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
     }
 
     function isValidUid(value) {
-      // Cloudflare Stream UID = 32 caractere hex
       return /^[a-f0-9]{32}$/i.test(String(value || ''));
     }
 
     function isValidCustomerCode(value) {
-      // Cod subdomain Cloudflare — alfanumeric (litere mici + cifre), 8-40 caractere
       return /^[a-z0-9]{6,40}$/.test(String(value || ''));
     }
 
@@ -885,13 +964,25 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
         '.cloudflarestream.com/' + encodeURIComponent(videoUid) + '/watch';
     }
 
+    function buildYoutubePlaylistUrl(replayList) {
+      if (!Array.isArray(replayList) || replayList.length === 0) return '';
+      var ids = replayList.map(function (r) { return r.youtubeId || r.videoId; }).filter(Boolean);
+      if (ids.length === 0) return '';
+      var first = ids[0];
+      var rest = ids.slice(1).join(',');
+      // Loop pe playlist necesită playlist=primul,restul + loop=1
+      var loopList = ids.join(',');
+      return 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(first) +
+        '?autoplay=1&mute=1&loop=1&controls=1&modestbranding=1&rel=0' +
+        (rest ? '&playlist=' + encodeURIComponent(rest) : '&playlist=' + encodeURIComponent(loopList));
+    }
+
     function applyLiveState(nextLive) {
       isLive = !!nextLive;
       if (player) player.setAttribute('data-live', isLive ? 'true' : 'false');
       if (badge) badge.style.display = isLive ? '' : 'none';
       if (offlineMsg) offlineMsg.style.display = isLive ? 'none' : '';
-      var clockWrap = document.getElementById('mini-live-clock-wrap');
-      if (clockWrap) clockWrap.style.display = isLive ? '' : 'none';
+      if (offlineOverlay) offlineOverlay.style.display = isLive ? 'none' : '';
     }
 
     function setIframeSrc(iframe, src) {
@@ -899,15 +990,20 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
       if (iframe.src !== src) iframe.src = src;
     }
 
-    function showOfflinePlaceholder() {
-      // Nu există nici live, nici replay configurat — afișăm un poster simplu.
-      if (player) setIframeSrc(player, 'about:blank');
-      if (miniPlayer) setIframeSrc(miniPlayer, 'about:blank');
-      applyLiveState(false);
-      if (offlineMsg) {
-        offlineMsg.style.display = '';
-        offlineMsg.textContent = 'Nu suntem live acum și nu există un replay disponibil. Revino mai târziu pentru noi transmisiuni.';
+    function showOfflinePlaylist() {
+      if (currentMode === 'offline-playlist') {
+        applyLiveState(false);
+        return;
       }
+      var ytUrl = buildYoutubePlaylistUrl(replays);
+      if (player && ytUrl) {
+        setIframeSrc(player, ytUrl);
+      } else if (player) {
+        setIframeSrc(player, 'about:blank');
+      }
+      if (openExternal) openExternal.style.display = 'none';
+      applyLiveState(false);
+      currentMode = 'offline-playlist';
     }
 
     async function syncPlayerWithLiveStatus() {
@@ -920,41 +1016,24 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
         var payload = await response.json();
         var customerCode = payload && payload.customerCode;
         var liveUid = payload && payload.videoId;
-        var replayUid = payload && payload.replayId;
 
-        if (!isValidCustomerCode(customerCode)) {
-          console.warn('[live-page] Cloudflare Stream nu este configurat (customerCode lipsă).');
-          showOfflinePlaceholder();
-          return;
-        }
-
-        if (payload && payload.isLive && isValidUid(liveUid)) {
+        if (payload && payload.isLive && isValidCustomerCode(customerCode) && isValidUid(liveUid)) {
           var liveSrc = buildCloudflareIframeUrl(customerCode, liveUid, { autoplay: true, muted: false });
           setIframeSrc(player, liveSrc);
-          if (miniPlayer) setIframeSrc(miniPlayer, buildCloudflareIframeUrl(customerCode, liveUid, { autoplay: true, muted: true, controls: false }));
           if (openExternal) {
             openExternal.href = buildCloudflareWatchUrl(customerCode, liveUid);
             openExternal.style.display = '';
           }
           applyLiveState(true);
+          currentMode = 'live';
           return;
         }
 
-        if (isValidUid(replayUid)) {
-          setIframeSrc(player, buildCloudflareIframeUrl(customerCode, replayUid, { autoplay: false, muted: false }));
-          if (miniPlayer) setIframeSrc(miniPlayer, buildCloudflareIframeUrl(customerCode, replayUid, { autoplay: true, muted: true, controls: false }));
-          if (openExternal) {
-            openExternal.href = buildCloudflareWatchUrl(customerCode, replayUid);
-            openExternal.style.display = '';
-          }
-          applyLiveState(false);
-          return;
-        }
-
-        showOfflinePlaceholder();
+        // Nu e live → playlist YouTube cu replay-urile noastre
+        showOfflinePlaylist();
       } catch (err) {
         console.warn('[live-page] Live status unavailable.', err);
-        showOfflinePlaceholder();
+        showOfflinePlaylist();
       }
     }
 
@@ -967,14 +1046,11 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
 
     // ── Share buttons — URL dinamic ──
     var pageUrl = encodeURIComponent(window.location.href);
-    var shareText = encodeURIComponent('Uită-te acum LIVE la FP Band: ' + window.location.href);
 
-    var waBtn = document.getElementById('share-wa');
     var fbBtn = document.getElementById('share-fb');
     var copyBtn = document.getElementById('share-copy');
     var copyLabel = document.getElementById('copy-label');
 
-    if (waBtn) waBtn.href = 'https://api.whatsapp.com/send?text=' + shareText;
     if (fbBtn) fbBtn.href = 'https://www.facebook.com/sharer/sharer.php?u=' + pageUrl;
 
     if (copyBtn && copyLabel) {
@@ -1033,68 +1109,5 @@ const livePageOgImage = '/images/og-live-1200x630.jpg';
         }
       });
     }
-
-    // ── Panou Anunță Live pe Facebook ──
-    var announceText = document.getElementById('announce-text');
-    var copyAnnounceBtn = document.getElementById('copy-announce');
-    var copyAnnounceLabel = document.getElementById('copy-announce-label');
-    var fbAnnounceBtn = document.getElementById('btn-fb-announce');
-
-    // Buton Facebook — URL sharer cu link-ul paginii de preview live (60s teaser → redirect către site)
-    var liveUrl = 'https://florentinapanaofficial.ro/live-preview/?utm_source=facebook&utm_medium=social&utm_campaign=live_alert';
-    if (fbAnnounceBtn) {
-      fbAnnounceBtn.href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(liveUrl);
-    }
-
-    // Buton Copiază textul de anunț
-    if (copyAnnounceBtn && announceText && copyAnnounceLabel) {
-      copyAnnounceBtn.addEventListener('click', function () {
-        var text = announceText.innerText || announceText.textContent || '';
-        navigator.clipboard.writeText(text.trim()).then(function () {
-          var orig = copyAnnounceLabel.textContent;
-          copyAnnounceLabel.textContent = '✓ Copiat!';
-          copyAnnounceBtn.style.borderColor = 'rgba(34, 197, 94, 0.5)';
-          copyAnnounceBtn.style.color = '#22c55e';
-          setTimeout(function () {
-            copyAnnounceLabel.textContent = orig;
-            copyAnnounceBtn.style.borderColor = '';
-            copyAnnounceBtn.style.color = '';
-          }, 2500);
-        });
-      });
-    }
-  })();
-</script>
-
-<script is:inline>
-  /* ── Mutual Exclusion între playerul principal și mini-preview ──
-     Când utilizatorul dă play pe playerul principal, oprim mini-preview-ul
-     (mute) și invers — folosind postMessage Cloudflare Stream Player SDK. */
-  (function () {
-    var STREAM_ORIGIN_PATTERN = /^https:\/\/customer-[a-z0-9]{6,40}\.cloudflarestream\.com$/i;
-    var mainPlayer = document.getElementById('live-player');
-    var miniPlayer = document.getElementById('mini-live-player');
-    if (!mainPlayer && !miniPlayer) return;
-
-    function postCommand(iframe, method) {
-      try {
-        if (!iframe || !iframe.contentWindow) return;
-        iframe.contentWindow.postMessage(
-          { event: 'command', func: method, args: [] },
-          '*'
-        );
-      } catch (err) {}
-    }
-
-    window.addEventListener('message', function (e) {
-      if (!e.origin || !STREAM_ORIGIN_PATTERN.test(e.origin)) return;
-      var data = e.data;
-      if (!data || typeof data !== 'object') return;
-      // Cloudflare Stream emite evenimente { event: 'play' | 'pause' | ... }
-      if (data.event === 'play' && e.source) {
-        if (mainPlayer && mainPlayer.contentWindow !== e.source) postCommand(mainPlayer, 'pause');
-        if (miniPlayer && miniPlayer.contentWindow !== e.source) postCommand(miniPlayer, 'pause');
-      }
-    });
   })();
 </script>

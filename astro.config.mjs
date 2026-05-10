@@ -43,6 +43,8 @@ export default defineConfig({
         if (url.pathname === '/comunitatea-noastra/') return false;
         // Exclude /live-preview/ — pagină de campanie (teaser 60s), nu trebuie indexată
         if (url.pathname === '/live-preview/') return false;
+        // Exclude /mini-tv/ — redirect 301 → /live/ (pagina a fost integrată)
+        if (url.pathname === '/mini-tv/') return false;
         // Păstrează doar versiunea cu trailing slash
         return page.endsWith('/');
       },

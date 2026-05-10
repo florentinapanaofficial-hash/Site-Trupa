@@ -1,0 +1,226 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import BackButton from '../../../components/BackButton.astro';
+import liveReplays from '../../../data/liveReplays.json';
+
+export const prerender = true;
+
+export function getStaticPaths() {
+  return liveReplays.map((replay) => ({
+    params: { slug: replay.slug },
+    props: { replay },
+  }));
+}
+
+interface Replay {
+  slug: string;
+  title: string;
+  shortTitle: string;
+  metaDescription: string;
+  description: string;
+  eventType: string;
+  location: string;
+  date: string;
+  durationSeconds: number;
+  tags: string[];
+  youtubeId: string | null;
+  cloudflareUid: string | null;
+  thumbnail: string;
+}
+
+const { replay } = Astro.props as { replay: Replay };
+
+const pageTitle = `${replay.title} | Replay Live | Formația Florentina Pană`;
+const pageDescription = replay.metaDescription;
+const ogImage = replay.thumbnail;
+
+const dateFormatter = new Intl.DateTimeFormat('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' });
+const [y, m, d] = replay.date.split('-').map(Number);
+const formattedDate = dateFormatter.format(new Date(y, m - 1, d));
+const isoDate = `${replay.date}T20:00:00+03:00`;
+
+const minutes = Math.floor(replay.durationSeconds / 60);
+const seconds = replay.durationSeconds % 60;
+const formattedDuration = `${minutes} min${seconds > 0 ? ` ${seconds}s` : ''}`;
+const isoDuration = `PT${minutes}M${seconds > 0 ? `${seconds}S` : ''}`;
+
+const embedUrl = replay.cloudflareUid
+  ? `https://iframe.cloudflarestream.com/${replay.cloudflareUid}?autoplay=false&muted=false&controls=true`
+  : `https://www.youtube-nocookie.com/embed/${replay.youtubeId}?rel=0&modestbranding=1`;
+const watchUrl = replay.cloudflareUid
+  ? `https://watch.cloudflarestream.com/${replay.cloudflareUid}`
+  : `https://www.youtube.com/watch?v=${replay.youtubeId}`;
+
+const SITE_URL = 'https://www.florentinapanaofficial.ro';
+const canonicalUrl = `${SITE_URL}/live/replay/${replay.slug}/`;
+const shareFbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(canonicalUrl)}`;
+
+const paragraphs = replay.description.split(/\n\n+/);
+
+const otherReplays = liveReplays
+  .filter((r) => r.slug !== replay.slug)
+  .sort((a, b) => b.date.localeCompare(a.date))
+  .slice(0, 3);
+
+const videoJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'VideoObject',
+  name: replay.title,
+  description: replay.description,
+  thumbnailUrl: replay.thumbnail,
+  uploadDate: isoDate,
+  duration: isoDuration,
+  contentUrl: watchUrl,
+  embedUrl,
+  publisher: {
+    '@type': 'Organization',
+    name: 'Formația Florentina Pană',
+    url: SITE_URL,
+    logo: {
+      '@type': 'ImageObject',
+      url: `${SITE_URL}/images/sigla-fp-band.webp`,
+    },
+  },
+  keywords: replay.tags.join(', '),
+  inLanguage: 'ro',
+  isFamilyFriendly: true,
+  contentLocation: {
+    '@type': 'Place',
+    name: replay.location,
+  },
+};
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  ogImage={ogImage}
+  ogType="video.other"
+  ogVideoUrl={embedUrl}
+  ogVideoSecureUrl={embedUrl}
+  ogVideoWidth="1280"
+  ogVideoHeight="720"
+  datePublished={isoDate}
+>
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(videoJsonLd)} />
+
+  <section class="bg-black py-10 sm:py-14">
+    <div class="section-container">
+      <BackButton href="/live/" label="Înapoi la Live" />
+
+      <div class="replay-player-wrap mx-auto mt-6 max-w-4xl">
+        <div class="relative w-full overflow-hidden rounded-2xl bg-black aspect-video shadow-2xl ring-1 ring-amber-500/20">
+          <iframe
+            src={embedUrl}
+            title={replay.title}
+            class="absolute inset-0 h-full w-full"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+            loading="lazy"
+          ></iframe>
+        </div>
+      </div>
+
+      <div class="mx-auto mt-6 max-w-4xl">
+        <div class="flex flex-wrap gap-2 mb-3">
+          <span class="replay-meta-badge"><svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25"/></svg>{formattedDate}</span>
+          <span class="replay-meta-badge"><svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/></svg>{replay.location}</span>
+          <span class="replay-meta-badge"><svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>{formattedDuration}</span>
+          <span class="replay-meta-badge replay-meta-badge--type">{replay.eventType}</span>
+        </div>
+        <h1 class="font-serif text-2xl font-bold text-white sm:text-3xl lg:text-4xl">{replay.title}</h1>
+
+        <div class="mt-5 flex flex-wrap gap-3">
+          <a href={shareFbUrl} target="_blank" rel="noopener noreferrer" class="replay-action-btn">
+            <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.77l-.44 2.89h-2.33v6.99A10 10 0 0 0 22 12Z"/></svg>
+            Distribuie pe Facebook
+          </a>
+          <button type="button" class="replay-action-btn" data-replay-copy data-url={canonicalUrl}>
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"/></svg>
+            <span data-copy-text>Copiază link</span>
+          </button>
+        </div>
+      </div>
+
+      <article class="replay-description mx-auto mt-8 max-w-4xl">
+        <h2 class="replay-section-title">Despre acest replay</h2>
+        {paragraphs.map((p) => <p>{p}</p>)}
+
+        <div class="mt-6 flex flex-wrap gap-2">
+          {replay.tags.map((tag) => (
+            <span class="replay-tag">#{tag}</span>
+          ))}
+        </div>
+      </article>
+
+      <div class="replay-cta mx-auto mt-10 max-w-4xl">
+        <h2 class="replay-cta-title">Vrei un eveniment ca acesta?</h2>
+        <p class="replay-cta-subtitle">
+          Verifică disponibilitatea Formației Florentina Pană pentru data evenimentului tău. Răspundem rapid, cu pachet personalizat și detalii complete.
+        </p>
+        <a href="/contact/" class="replay-cta-btn">
+          <span>Verifică disponibilitatea</span>
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/></svg>
+        </a>
+      </div>
+
+      {otherReplays.length > 0 && (
+        <div class="mx-auto mt-14 max-w-5xl">
+          <h2 class="replay-section-title text-center">Alte replay-uri</h2>
+          <div class="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {otherReplays.map((other) => (
+              <a href={`/live/replay/${other.slug}/`} class="group block rounded-2xl overflow-hidden border border-white/10 bg-white/5 transition-all hover:border-amber-500/40 hover:bg-white/[0.08]">
+                <div class="relative aspect-video">
+                  <img src={other.thumbnail} alt={other.title} class="w-full h-full object-cover" loading="lazy" decoding="async" width="480" height="360" />
+                  <div class="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span class="flex h-12 w-12 items-center justify-center rounded-full bg-red-600 shadow-lg">
+                      <svg class="h-5 w-5 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+                    </span>
+                  </div>
+                </div>
+                <div class="p-4">
+                  <p class="text-sm font-semibold text-white/90 group-hover:text-amber-400 transition-colors line-clamp-2">{other.title}</p>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  </section>
+</BaseLayout>
+
+<script is:inline>
+  document.querySelectorAll('[data-replay-copy]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const url = btn.getAttribute('data-url') || window.location.href;
+      const label = btn.querySelector('[data-copy-text]');
+      try {
+        await navigator.clipboard.writeText(url);
+        if (label) {
+          const original = label.textContent;
+          label.textContent = 'Link copiat!';
+          setTimeout(() => { label.textContent = original; }, 2000);
+        }
+      } catch (e) {}
+    });
+  });
+</script>
+
+<style>
+  .replay-meta-badge { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.8rem; border-radius: 9999px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.78); font-size: 0.75rem; font-weight: 600; }
+  .replay-meta-badge--type { border-color: rgba(245,166,35,0.40); background: rgba(245,166,35,0.10); color: #f5c97a; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.7rem; }
+  .replay-action-btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1rem; border-radius: 9999px; border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.85); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease; }
+  .replay-action-btn:hover { transform: translateY(-1px); background: rgba(245,166,35,0.10); border-color: rgba(245,166,35,0.45); color: #fff; }
+  .replay-section-title { font-family: 'Oswald', sans-serif; font-size: 1.35rem; font-weight: 700; color: #fff; letter-spacing: 0.04em; margin: 0 0 1rem; text-transform: uppercase; }
+  .replay-description p { color: rgba(255,255,255,0.78); line-height: 1.75; margin-bottom: 1rem; font-size: 1rem; }
+  .replay-tag { display: inline-block; padding: 0.3rem 0.7rem; border-radius: 9999px; background: rgba(245,166,35,0.08); border: 1px solid rgba(245,166,35,0.22); color: rgba(245,201,122,0.9); font-size: 0.75rem; font-weight: 500; }
+  .replay-cta { padding: 1.75rem 1.5rem; border-radius: 1.25rem; border: 1px solid rgba(245,166,35,0.30); background: radial-gradient(ellipse at 50% 0%, rgba(245,166,35,0.14) 0%, transparent 65%), rgba(15,10,4,0.55); text-align: center; }
+  .replay-cta-title { margin: 0 0 0.5rem; font-family: 'Oswald', sans-serif; font-size: 1.5rem; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; }
+  .replay-cta-subtitle { margin: 0 auto 1.25rem; max-width: 36rem; color: rgba(255,255,255,0.72); font-size: 0.95rem; line-height: 1.55; }
+  .replay-cta-btn { display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.95rem 1.75rem; border-radius: 9999px; background: linear-gradient(135deg, #f5a623 0%, #d98a0c 100%); color: #1a0f02; font-family: 'Oswald', sans-serif; font-size: 1rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; box-shadow: 0 10px 26px rgba(245,166,35,0.32), inset 0 1px 0 rgba(255,255,255,0.30); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+  .replay-cta-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(245,166,35,0.42), inset 0 1px 0 rgba(255,255,255,0.35); }
+  .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  @media (max-width: 480px) { .replay-cta { padding: 1.25rem 1rem; } .replay-cta-btn { width: 100%; justify-content: center; font-size: 0.9rem; } }
+</style>
