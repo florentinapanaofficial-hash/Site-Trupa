@@ -92,29 +92,29 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
                 </div>
               </div>
             </div>
-
-            {/* ── Overlay Premium Offline — vizibil când nu suntem live ── */}
-            <div id="offline-overlay" class="live-offline-overlay" style="display:none" aria-live="polite">
-              <div class="live-offline-card">
-                <div class="live-offline-badge">
-                  <span class="live-offline-pulse" aria-hidden="true"></span>
-                  <span>În pauză până la următorul eveniment</span>
-                </div>
-                <h3 class="live-offline-title">Revenim curând în direct</h3>
-                <p class="live-offline-text">
-                  Nu transmitem live în acest moment. În player rulează momente alese din ultimele evenimente — rămâi pe aproape, urcăm pe scenă în curând.
-                </p>
-                <p class="live-offline-hint">
-                  Transmisia începe pe site la 10 minute după startul evenimentului.
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </div>
 
-      {/* Mesaj offline — afișat de JS când nu e live */}
-      <p id="offline-msg" class="mx-auto mt-4 max-w-xl text-center text-sm leading-relaxed text-amber-400/70" style="display:none">
+      {/* ── Card Premium Offline — afișat sub player când nu suntem live ── */}
+      <div id="offline-overlay" class="live-offline-overlay" style="display:none" aria-live="polite">
+        <div class="live-offline-card">
+          <div class="live-offline-badge">
+            <span class="live-offline-pulse" aria-hidden="true"></span>
+            <span>În pauză până la următorul eveniment</span>
+          </div>
+          <h3 class="live-offline-title">Revenim curând în direct</h3>
+          <p class="live-offline-text">
+            Nu transmitem live în acest moment. În player rulează momente alese din ultimele evenimente — rămâi pe aproape, urcăm pe scenă în curând.
+          </p>
+          <p class="live-offline-hint">
+            Transmisia începe pe site la 10 minute după startul evenimentului.
+          </p>
+        </div>
+      </div>
+
+      {/* Mesaj offline — afișat de JS când nu e live (ascuns vizual — păstrat pentru cititoarele de ecran) */}
+      <p id="offline-msg" class="sr-only" style="display:none">
         În player rulează momente alese din ultimele noastre evenimente. Te anunțăm aici imediat ce intrăm în direct.
       </p>
 
@@ -551,20 +551,14 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
     }
   }
 
-  /* ── Overlay Premium Offline ── */
+  /* ── Card Premium Offline (sub player) ── */
   .live-offline-overlay {
-    position: absolute;
-    inset: 0;
-    z-index: 15;
+    position: relative;
+    margin: 1.25rem auto 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 1rem;
-    background:
-      radial-gradient(ellipse at 50% 30%, rgba(245, 166, 35, 0.18) 0%, transparent 55%),
-      linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.78) 100%);
-    backdrop-filter: blur(4px) saturate(1.1);
-    -webkit-backdrop-filter: blur(4px) saturate(1.1);
+    padding: 0 1rem;
     pointer-events: none;
     animation: liveOfflineFadeIn 0.5s ease;
   }
