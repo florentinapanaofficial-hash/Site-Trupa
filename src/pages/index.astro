@@ -49,15 +49,15 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
 
       {/* Card foto — vizibil doar pe mobil, colțuri rotunjite */}
       <div class="hero-photo-card anim-hero-load anim-hero-d2">
-        <Image
-          src={heroImg}
+        <img
+          src={optimizedHero.src}
           alt="Formația Florentina Pană — spectacol live pe scenă"
           class="hero-photo-img anim-img-hover"
-          format="webp"
-          width={320}
-          height={213}
+          width="320"
+          height="213"
           loading="eager"
           fetchpriority="high"
+          decoding="sync"
         />
       </div>
 

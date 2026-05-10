@@ -242,6 +242,9 @@ const mobileNavAllItems = [
     <link rel="dns-prefetch" href="https://www.google-analytics.com" />
     <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
 
+    {/* LCP image preload (din pagină) — ÎNAINTE de fonturi pentru prioritate maximă */}
+    <slot name="head" />
+
     <!-- Fonturi self-hosted — Inter + Oswald, preload latin + latin-ext -->
     <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/inter-latin-ext.woff2" as="font" type="font/woff2" crossorigin />
@@ -253,7 +256,6 @@ const mobileNavAllItems = [
     {isHomePage && <script is:inline type="application/ld+json" set:html={JSON.stringify(localBusinessLd)} />}
     <script is:inline type="application/ld+json" set:html={JSON.stringify(webPageLd)} />
     {!isHomePage && <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />}
-    <slot name="head" />
     {/* GA4 NU se încarcă în <head> — se injectează dinamic DUPĂ consimțământul
         utilizatorului prin CookieBanner, conform Rec. 30 & 32 RGPD / ePrivacy */}
   </head>
