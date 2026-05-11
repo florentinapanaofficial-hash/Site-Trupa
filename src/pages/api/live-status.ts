@@ -86,9 +86,10 @@ const fetchLiveStatusFromCloudflare = async (
     const timeoutId = setTimeout(() => controller.abort(), CLOUDFLARE_FETCH_TIMEOUT_MS);
 
     try {
-        const url = `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(accountId)}/stream/live_inputs/${encodeURIComponent(liveInputId)}/videos`;
+        // Endpoint 1: Verifica statusul live input-ului (mai important)
+        const statusUrl = `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(accountId)}/stream/live_inputs/${encodeURIComponent(liveInputId)}`;
 
-        const res = await fetch(url, {
+        const statusRes = await fetch(statusUrl, {
             signal: controller.signal,
             cache: 'no-store',
             headers: {
@@ -97,42 +98,94 @@ const fetchLiveStatusFromCloudflare = async (
             },
         });
 
-        if (!res.ok) {
-            const responseText = await readErrorText(res);
-            console.warn(
-                `[api/live-status] Cloudflare Stream API error: status=${res.status} liveInputId=${liveInputId} body=${responseText || 'empty'}`
+        if (!statusRes.ok) {
+            const responseText = await readErrorText(statusRes);
+            console.error(
+                `[api/live-status] Cloudflare live_inputs/{id} endpoint error: status=${statusRes.status} liveInputId=${liveInputId} response=${responseText || 'empty'}`
             );
-            return getFallbackPayload(replayId, customerCode);
+        } else {
+            const statusData = await statusRes.json() as any;
+            console.log(`[api/live-status] Live input status response:`, JSON.stringify(statusData, null, 2));
+
+            if (statusData?.success && statusData.result) {
+                const liveInput = statusData.result;
+                const isLiveActive = liveInput?.status === 'active' || liveInput?.meta?.live === true;
+
+                if (isLiveActive) {
+                    console.log(`[api/live-status] ✓ LIVE DETECTED - status: ${liveInput?.status}`);
+
+                    // Dacă e active, obținem video UID din endpoint-ul de videos
+                    const videosUrl = `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(accountId)}/stream/live_inputs/${encodeURIComponent(liveInputId)}/videos?limit=1`;
+                    const videosRes = await fetch(videosUrl, {
+                        signal: controller.signal,
+                        cache: 'no-store',
+                        headers: {
+                            Authorization: `Bearer ${apiToken}`,
+                            Accept: 'application/json',
+                        },
+                    });
+
+                    if (videosRes.ok) {
+                        const videosData = (await videosRes.json()) as CloudflareLiveVideosResponse;
+                        const currentVideo = videosData?.result?.[0];
+
+                        if (currentVideo?.uid) {
+                            console.log(`[api/live-status] ✓ Video UID: ${currentVideo.uid}`);
+                            return {
+                                isLive: true,
+                                videoId: currentVideo.uid,
+                                replayId,
+                                customerCode,
+                                source: 'cloudflare',
+                            };
+                        }
+                    } else {
+                        console.error(`[api/live-status] Failed to fetch videos: status=${videosRes.status}`);
+                    }
+                } else {
+                    console.log(`[api/live-status] Live input not active - status: ${liveInput?.status}`);
+                }
+            }
         }
 
-        const data = (await res.json()) as CloudflareLiveVideosResponse;
+        // Fallback: Caută video cu state 'live-inprogress' din endpoint /videos
+        const fallbackUrl = `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(accountId)}/stream/live_inputs/${encodeURIComponent(liveInputId)}/videos?limit=1`;
+        const fallbackRes = await fetch(fallbackUrl, {
+            signal: controller.signal,
+            cache: 'no-store',
+            headers: {
+                Authorization: `Bearer ${apiToken}`,
+                Accept: 'application/json',
+            },
+        });
 
-        if (!data?.success || !Array.isArray(data.result)) {
-            console.warn(`[api/live-status] Cloudflare Stream API returned success=false: ${JSON.stringify(data?.errors ?? [])}`);
-            return getFallbackPayload(replayId, customerCode);
+        if (fallbackRes.ok) {
+            const fallbackData = (await fallbackRes.json()) as CloudflareLiveVideosResponse;
+            console.log(`[api/live-status] Videos endpoint response:`, JSON.stringify(fallbackData, null, 2));
+
+            if (fallbackData?.success && Array.isArray(fallbackData.result)) {
+                const liveVideo = fallbackData.result.find((video) => video?.status?.state === 'live-inprogress');
+                if (liveVideo?.uid) {
+                    console.log(`[api/live-status] ✓ Found live video (state=live-inprogress): ${liveVideo.uid}`);
+                    return {
+                        isLive: true,
+                        videoId: liveVideo.uid,
+                        replayId,
+                        customerCode,
+                        source: 'cloudflare',
+                    };
+                }
+            }
         }
 
-        // Caută o sesiune live activă (state === 'live-inprogress').
-        // Cloudflare returnează video-urile sortate cronologic descrescător; cel mai recent este primul.
-        const liveVideo = data.result.find((video) => video?.status?.state === 'live-inprogress');
-
-        if (liveVideo?.uid) {
-            return {
-                isLive: true,
-                videoId: liveVideo.uid,
-                replayId,
-                customerCode,
-                source: 'cloudflare',
-            };
-        }
-
+        console.log(`[api/live-status] No active live session found`);
         return buildOfflinePayload(replayId, customerCode);
     } catch (error) {
         if (error instanceof DOMException && error.name === 'AbortError') {
-            console.warn(`[api/live-status] Cloudflare Stream API timeout after ${CLOUDFLARE_FETCH_TIMEOUT_MS}ms liveInputId=${liveInputId}`);
+            console.error(`[api/live-status] Cloudflare Stream API timeout after ${CLOUDFLARE_FETCH_TIMEOUT_MS}ms liveInputId=${liveInputId}`);
         } else {
             const message = error instanceof Error ? error.message : 'unknown error';
-            console.warn(`[api/live-status] Cloudflare Stream API request failed: liveInputId=${liveInputId} error=${message}`);
+            console.error(`[api/live-status] Cloudflare Stream API request failed: liveInputId=${liveInputId} error=${message}`);
         }
         return getFallbackPayload(replayId, customerCode);
     } finally {
