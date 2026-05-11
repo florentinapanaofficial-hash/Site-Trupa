@@ -72,13 +72,11 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
           <div class="live-player-aspect" id="live-player-aspect">
             <iframe
               id="live-player"
-              src="about:blank"
-              data-live="false"
               title="Live Stream — Formația Florentina Pană"
               class="absolute inset-0 h-full w-full bg-black"
-              allow="accelerometer; gyroscope; encrypted-media; picture-in-picture;"
-              referrerpolicy="origin"
-              allowfullscreen
+              style="border: none;"
+              allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+              allowfullscreen="true"
               loading="lazy"
             ></iframe>
 
@@ -958,22 +956,8 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
         '.cloudflarestream.com/' + encodeURIComponent(videoUid) + '/watch';
     }
 
-    function buildYoutubePlaylistUrl(replayList) {
-      if (!Array.isArray(replayList) || replayList.length === 0) return '';
-      var ids = replayList.map(function (r) { return r.youtubeId || r.videoId; }).filter(Boolean);
-      if (ids.length === 0) return '';
-      var first = ids[0];
-      var rest = ids.slice(1).join(',');
-      // Loop pe playlist necesită playlist=primul,restul + loop=1
-      var loopList = ids.join(',');
-      return 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(first) +
-        '?autoplay=1&mute=1&loop=1&controls=1&modestbranding=1&rel=0' +
-        (rest ? '&playlist=' + encodeURIComponent(rest) : '&playlist=' + encodeURIComponent(loopList));
-    }
-
     function applyLiveState(nextLive) {
       isLive = !!nextLive;
-      if (player) player.setAttribute('data-live', isLive ? 'true' : 'false');
       if (badge) badge.style.display = isLive ? '' : 'none';
       if (offlineMsg) offlineMsg.style.display = isLive ? 'none' : '';
       if (offlineOverlay) offlineOverlay.style.display = isLive ? 'none' : '';
@@ -989,10 +973,8 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
         applyLiveState(false);
         return;
       }
-      var ytUrl = buildYoutubePlaylistUrl(replays);
-      if (player && ytUrl) {
-        setIframeSrc(player, ytUrl);
-      } else if (player) {
+      // Offline — arăt blank, nu YouTube
+      if (player) {
         setIframeSrc(player, 'about:blank');
       }
       if (openExternal) openExternal.style.display = 'none';
@@ -1012,6 +994,7 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
         var liveUid = payload && payload.videoId;
 
         if (payload && payload.isLive && isValidCustomerCode(customerCode) && isValidUid(liveUid)) {
+          // Live cu Cloudflare Stream
           var liveSrc = buildCloudflareIframeUrl(customerCode, liveUid, { autoplay: true, muted: false });
           setIframeSrc(player, liveSrc);
           if (openExternal) {
@@ -1023,10 +1006,10 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
           return;
         }
 
-        // Nu e live → playlist YouTube cu replay-urile noastre
+        // Nu e live → fallback blank (offline)
         showOfflinePlaylist();
       } catch (err) {
-        console.warn('[live-page] Live status unavailable.', err);
+        console.warn('[live-page] Cloudflare Stream unavailable.', err);
         showOfflinePlaylist();
       }
     }
