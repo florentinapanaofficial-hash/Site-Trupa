@@ -109,10 +109,20 @@ const fetchLiveStatusFromCloudflare = async (
 
             if (statusData?.success && statusData.result) {
                 const liveInput = statusData.result;
-                const isLiveActive = liveInput?.status === 'active' || liveInput?.meta?.live === true;
+                // Cloudflare returnează `status` ca obiect: { current: { state: 'connected' | 'idle' | ... } }
+                // În unele variante mai vechi era un string. Acoperim ambele formate.
+                const statusObj = liveInput?.status;
+                const currentState =
+                    (typeof statusObj === 'object' && statusObj?.current?.state) ||
+                    (typeof statusObj === 'string' ? statusObj : null);
+                const isLiveActive =
+                    currentState === 'connected' ||
+                    currentState === 'live-inprogress' ||
+                    currentState === 'active' ||
+                    liveInput?.meta?.live === true;
 
                 if (isLiveActive) {
-                    console.log(`[api/live-status] ✓ LIVE DETECTED - status: ${liveInput?.status}`);
+                    console.log(`[api/live-status] ✓ LIVE DETECTED - state: ${currentState}`);
 
                     // Dacă e active, obținem video UID din endpoint-ul de videos
                     const videosUrl = `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(accountId)}/stream/live_inputs/${encodeURIComponent(liveInputId)}/videos?limit=1`;
@@ -143,7 +153,7 @@ const fetchLiveStatusFromCloudflare = async (
                         console.error(`[api/live-status] Failed to fetch videos: status=${videosRes.status}`);
                     }
                 } else {
-                    console.log(`[api/live-status] Live input not active - status: ${liveInput?.status}`);
+                    console.log(`[api/live-status] Live input not active - state: ${currentState}`);
                 }
             }
         }
