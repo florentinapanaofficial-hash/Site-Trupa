@@ -1,7 +1,6 @@
 ---
 
 import { getCollection } from 'astro:content';
-import { createClient } from '@supabase/supabase-js';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import BackButton from '../../components/BackButton.astro';
 import siteContent from '../../data/siteContent.json';
@@ -9,14 +8,27 @@ import siteContent from '../../data/siteContent.json';
 export const prerender = true;
 
 export async function getStaticPaths() {
-  // Fetch articole din Supabase
-  const supabase = createClient(
-    import.meta.env.SUPABASE_URL,
-    import.meta.env.SUPABASE_ANON_KEY
-  );
-  const { data: dbArticles, error } = await supabase
-    .from('articole_publicatii')
-    .select('slug, titlu, descriere, continut, categorie, imagine_principala, created_at');
+  // Fetch articole din Supabase via REST (fără realtime/websocket în build)
+  const supabaseUrl = import.meta.env.SUPABASE_URL;
+  const supabaseAnonKey = import.meta.env.SUPABASE_ANON_KEY;
+
+  let dbArticles = [];
+  if (supabaseUrl && supabaseAnonKey) {
+    const url = `${supabaseUrl}/rest/v1/articole_publicatii?select=slug,titlu,descriere,continut,categorie,imagine_principala,created_at`;
+    const response = await fetch(url, {
+      headers: {
+        apikey: supabaseAnonKey,
+        Authorization: `Bearer ${supabaseAnonKey}`,
+      },
+    });
+
+    if (!response.ok) {
+      console.log('Eroare Supabase REST:', response.status, response.statusText);
+    } else {
+      const payload = await response.json();
+      dbArticles = Array.isArray(payload) ? payload : [];
+    }
+  }
 
   let supabaseEntries = [];
   if (dbArticles && Array.isArray(dbArticles)) {
