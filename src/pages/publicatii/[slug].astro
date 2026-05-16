@@ -4,7 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import BackButton from '../../components/BackButton.astro';
 import siteContent from '../../data/siteContent.json';
 
-export const prerender = true;
+export const prerender = false;
 
 export async function getStaticPaths() {
   const localEntries = await getCollection('publicatii');
