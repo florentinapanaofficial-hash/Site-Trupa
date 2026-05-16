@@ -249,6 +249,15 @@ const isHomePage = Astro.url.pathname === '/';
 </script>
 
 <style>
+  /* Extinde culoarea ink a footer-ului dincolo de marginea de jos,
+     ca să nu se vadă SkyBackground-ul (position: fixed) pe sub
+     safe-area-inset sau bara browserului mobil. */
+  footer {
+    position: relative;
+    box-shadow: 0 100vh 0 100vh #0C080F;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px));
+  }
+
   /* ─── Footer acordeon (doar pe subpagini) ───────────────────────── */
   .ftr-section {
     border-bottom: 1px solid rgba(255,255,255,0.08);
