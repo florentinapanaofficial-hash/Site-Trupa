@@ -18,19 +18,38 @@ export async function getStaticPaths() {
 
   let dbArticles = [];
   if (supabaseUrl && supabaseAnonKey) {
-    const url = `${supabaseUrl}/rest/v1/articole_publicatii?select=slug,titlu,continut,created_at`;
-    const response = await fetch(url, {
-      headers: {
-        apikey: supabaseAnonKey,
-        Authorization: `Bearer ${supabaseAnonKey}`,
-      },
-    });
+    const headers = {
+      apikey: supabaseAnonKey,
+      Authorization: `Bearer ${supabaseAnonKey}`,
+    };
 
-    if (!response.ok) {
-      console.log('Eroare Supabase REST:', response.status, response.statusText);
-    } else {
-      const payload = await response.json();
-      dbArticles = Array.isArray(payload) ? payload : [];
+    const tableCandidates = [
+      'articole_publicatii',
+      'publicatii',
+      'blog_posts',
+      'posts',
+    ];
+
+    const selectCandidates = [
+      'slug,titlu,continut,created_at',
+      'slug,title,content,body,created_at,published_at',
+      '*',
+    ];
+
+    for (const table of tableCandidates) {
+      for (const select of selectCandidates) {
+        const url = `${supabaseUrl}/rest/v1/${table}?select=${encodeURIComponent(select)}`;
+        const response = await fetch(url, { headers });
+        if (!response.ok) continue;
+
+        const payload = await response.json();
+        if (Array.isArray(payload)) {
+          console.log(`[publicatii/slug] Supabase source: ${table} (${payload.length} rows)`);
+          dbArticles = payload;
+          break;
+        }
+      }
+      if (dbArticles.length > 0) break;
     }
   }
 
@@ -38,7 +57,15 @@ export async function getStaticPaths() {
 
   const supabasePaths = dbArticles?.map((articol) => ({
     params: { slug: articol.slug },
-    props: { type: 'supabase', item: articol },
+    props: {
+      type: 'supabase',
+      item: {
+        ...articol,
+        titlu: articol.titlu || articol.title || 'Articol',
+        continut: articol.continut || articol.content || articol.body || '',
+        created_at: articol.created_at || articol.published_at || new Date().toISOString(),
+      },
+    },
   })) || [];
 
   return [...localPaths, ...supabasePaths];

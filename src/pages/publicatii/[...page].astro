@@ -14,19 +14,38 @@ export async function getStaticPaths() {
 
   let dbArticles = [];
   if (supabaseUrl && supabaseAnonKey) {
-    const url = `${supabaseUrl}/rest/v1/articole_publicatii?select=slug,titlu,descriere,continut,categorie,imagine_principala,created_at`;
-    const response = await fetch(url, {
-      headers: {
-        apikey: supabaseAnonKey,
-        Authorization: `Bearer ${supabaseAnonKey}`,
-      },
-    });
+    const headers = {
+      apikey: supabaseAnonKey,
+      Authorization: `Bearer ${supabaseAnonKey}`,
+    };
 
-    if (!response.ok) {
-      console.log('Eroare Supabase REST:', response.status, response.statusText);
-    } else {
-      const payload = await response.json();
-      dbArticles = Array.isArray(payload) ? payload : [];
+    const tableCandidates = [
+      'articole_publicatii',
+      'publicatii',
+      'blog_posts',
+      'posts',
+    ];
+
+    const selectCandidates = [
+      'slug,titlu,descriere,continut,categorie,imagine_principala,created_at',
+      'slug,title,excerpt,content,category,cover_image,image,created_at,published_at',
+      '*',
+    ];
+
+    for (const table of tableCandidates) {
+      for (const select of selectCandidates) {
+        const url = `${supabaseUrl}/rest/v1/${table}?select=${encodeURIComponent(select)}`;
+        const response = await fetch(url, { headers });
+        if (!response.ok) continue;
+
+        const payload = await response.json();
+        if (Array.isArray(payload)) {
+          console.log(`[publicatii] Supabase source: ${table} (${payload.length} rows)`);
+          dbArticles = payload;
+          break;
+        }
+      }
+      if (dbArticles.length > 0) break;
     }
   }
 
@@ -44,12 +63,12 @@ export async function getStaticPaths() {
       }
       return {
         slug: articol.slug,
-        titlu: articol.titlu,
-        descriere: articol.descriere,
+        titlu: articol.titlu || articol.title || 'Articol',
+        descriere: articol.descriere || articol.excerpt || '',
         preview,
-        categorie: articol.categorie || 'Noutăți',
-        imaginePrincipala: articol.imagine_principala || '/images/og-default-1200x630.jpg',
-        dataPublicarii: articol.created_at,
+        categorie: articol.categorie || articol.category || 'Noutăți',
+        imaginePrincipala: articol.imagine_principala || articol.cover_image || articol.image || '/images/og-default-1200x630.jpg',
+        dataPublicarii: articol.created_at || articol.published_at || new Date().toISOString(),
         type: 'supabase',
       };
     });
