@@ -149,6 +149,9 @@ const photos = [
 
   function openLightbox(idx) {
     lb.classList.add('active');
+    // Blochează scroll-ul în spatele lightbox-ului — pe mobil scrollează html,
+    // pe desktop body; setăm pe ambele ca să acoperim toate scenariile.
+    document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
     // Pe mobil, secțiunea galeriei are scroll propriu — oprim și pe ea
     const galSection = document.querySelector('.gal-page');
@@ -164,6 +167,7 @@ const photos = [
     lb.classList.add('lb-closing');
     setTimeout(() => {
       lb.classList.remove('active', 'lb-closing');
+      document.documentElement.style.overflow = '';
       document.body.style.overflow = '';
       const galSection = document.querySelector('.gal-page');
       if (galSection) galSection.style.overflow = '';

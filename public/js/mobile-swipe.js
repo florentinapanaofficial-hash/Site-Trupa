@@ -1,6 +1,7 @@
-/* Mobil swipe/scroll controller — rulează pe ≤767px (telefon) */
+/* Mobil swipe/scroll controller — rulează pe ≤1024px (telefon + tabletă)
+   Sincronizat cu CSS-ul săgeților din globals.css @media (max-width: 1024px). */
 (function () {
-    if (!window.matchMedia('(max-width: 767px)').matches) return;
+    if (!window.matchMedia('(max-width: 1024px)').matches) return;
 
     /* Debounce util — execută fn o singură dată, la `ms` după ultimul apel */
     function debounce(fn, ms) {

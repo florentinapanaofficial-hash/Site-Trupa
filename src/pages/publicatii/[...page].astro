@@ -107,8 +107,12 @@ export async function getStaticPaths() {
     };
   });
 
-  // Combină toate articolele și sortează după dată descrescător
-  const allEntries = [...supabaseEntries, ...jsonBlogEntries, ...localEntries]
+  // Combină toate articolele: Supabase prioritar, MD/JSON doar dacă slug-ul nu e suprascris
+  const supabaseSlugs = new Set(supabaseEntries.map((e) => e.slug));
+  const filteredJsonBlog = jsonBlogEntries.filter((e: any) => !supabaseSlugs.has(e.slug));
+  const filteredLocal = localEntries.filter((e: any) => !supabaseSlugs.has(e.slug));
+
+  const allEntries = [...supabaseEntries, ...filteredJsonBlog, ...filteredLocal]
     .sort((a, b) => new Date(b.dataPublicarii).getTime() - new Date(a.dataPublicarii).getTime());
 
   // Paginare manuală (10 per pagină)
