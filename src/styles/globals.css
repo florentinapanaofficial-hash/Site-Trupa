@@ -2322,7 +2322,9 @@ details:focus-visible {
 
   .mob-arrow {
     position: fixed;
-    top: 50%;
+    /* svh = small viewport height — NU se schimbă când bara URL a browserului mobil
+       se ascunde/apare la scroll, deci săgeata nu mai sare cu câțiva milimetri. */
+    top: 50svh;
     transform: translateY(-50%);
     z-index: 50;
     display: flex;
@@ -2360,30 +2362,67 @@ details:focus-visible {
     pointer-events: none !important;
   }
 
-  /* Hint animat — pulsare săgeată dreapta la prima vizită */
+  /* Hint animat — pulsare săgeată dreapta, ciclic, ca să sugereze
+     gestul de "tragere" (peek-and-tug). 3 pulsări apoi pauză 4s. */
   @keyframes arrowBounceRight {
-    0% {
+
+    0%,
+    70%,
+    100% {
       transform: translateY(-50%) translateX(0);
     }
 
-    35% {
-      transform: translateY(-50%) translateX(-6px);
+    10%,
+    30%,
+    50% {
+      transform: translateY(-50%) translateX(-10px);
     }
 
-    65% {
-      transform: translateY(-50%) translateX(-2px);
-    }
-
-    100% {
+    20%,
+    40%,
+    60% {
       transform: translateY(-50%) translateX(0);
     }
   }
 
-  .mob-arrow--next.hint-pulse {
-    animation: arrowBounceRight 1s ease 1.2s 3 both;
+  .mob-arrow--next.hint-pulse,
+  .mob-arrow--prev.hint-pulse {
+    animation: arrowBounceRight 6s ease-in-out 1s infinite both;
     background: rgba(6, 214, 255, 0.18) !important;
     color: rgba(126, 248, 255, 0.95) !important;
     border-color: rgba(6, 214, 255, 0.45) !important;
+  }
+
+  /* Săgeata "prev" face oglindă — pulse spre dreapta */
+  @keyframes arrowBounceLeft {
+
+    0%,
+    70%,
+    100% {
+      transform: translateY(-50%) translateX(0);
+    }
+
+    10%,
+    30%,
+    50% {
+      transform: translateY(-50%) translateX(10px);
+    }
+
+    20%,
+    40%,
+    60% {
+      transform: translateY(-50%) translateX(0);
+    }
+  }
+
+  .mob-arrow--prev.hint-pulse {
+    animation-name: arrowBounceLeft;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mob-arrow.hint-pulse {
+      animation: none !important;
+    }
   }
 
   .mob-arrow:hover,
@@ -2431,17 +2470,19 @@ details:focus-visible {
     padding-bottom: 1.5rem !important;
   }
 
-  /* Pe homepage: săgețile swipe sunt vizibile */
-  body.is-homepage .mob-swipe-hints {
+  /* Săgețile swipe sunt vizibile pe TOATE paginile mobil */
+  .mob-swipe-hints {
     display: block !important;
   }
 
-  body.is-homepage .mob-arrow--prev {
-    display: none !important;
+  /* Vizibilitatea individuală e controlată de JS prin .is-hidden */
+  .mob-arrow--prev,
+  .mob-arrow--next {
+    display: flex !important;
   }
 
-  body.is-homepage .mob-arrow--next {
-    display: flex !important;
+  .mob-arrow.is-hidden {
+    display: none !important;
   }
 
 }

@@ -124,20 +124,44 @@
 
     var sectionToNav = {
         'acasa': '/',
-        'video': '/galerie-video',
-        'galerie': '/galerie-foto',
-        'membri': '/membri',
-        'about': '/despre',
-        'despre': '/despre',
-        'contact': '/contact',
-        'momente-cu-mirii': '/momente-cu-mirii',
-        'comunitate': '/comunitatea-noastra',
-        'comunitatea': '/comunitatea-noastra',
-        'aparitii-tv': '/aparitii-tv',
-        'aparitii': '/aparitii-tv',
-        'galerie-foto': '/galerie-foto',
-        'galerie-video': '/galerie-video',
+        'video': '/galerie-video/',
+        'galerie': '/galerie-foto/',
+        'membri': '/membri/',
+        'about': '/despre/',
+        'despre': '/despre/',
+        'contact': '/contact/',
+        'momente-cu-mirii': '/momente-cu-mirii/',
+        'comunitate': '/comunitate/',
+        'comunitatea': '/comunitate/',
+        'aparitii-tv': '/aparitii-tv/',
+        'aparitii': '/aparitii-tv/',
+        'galerie-foto': '/galerie-foto/',
+        'galerie-video': '/galerie-video/',
     };
+
+    /* Ordinea oficială de swipe — corespunde EXACT cu meniul mobil
+       (mobileNavAllItems din BaseLayout.astro). */
+    var SITE_PAGE_ORDER = [
+        '/',
+        '/despre/',
+        '/povestea-noastra/',
+        '/membri/',
+        '/galerie-video/',
+        '/galerie-foto/',
+        '/comunitate/',
+        '/blog/',
+        '/vlog/',
+        '/aparitii-tv/',
+        '/live/',
+        '/contact/',
+    ];
+
+    /* Normalizează path-ul curent astfel încât să găsească match în SITE_PAGE_ORDER */
+    function normalizePath(p) {
+        if (!p) return '/';
+        if (p === '/') return '/';
+        return p.endsWith('/') ? p : p + '/';
+    }
 
     /* Cache cu pozițiile butoanelor din navbar — populat o singură dată
        la init și la resize, NU la fiecare scroll/touch. */
@@ -236,18 +260,8 @@
             });
         });
 
-        var hpPageOrder = [
-            '/',
-            '/despre',
-            '/membri',
-            '/galerie-video',
-            '/galerie-foto',
-            '/momente-cu-mirii',
-            '/comunitatea-noastra',
-            '/aparitii-tv',
-            '/contact',
-        ];
-        var hpCurrentPath = location.pathname.replace(/\/$/, '') || '/';
+        var hpPageOrder = SITE_PAGE_ORDER.slice();
+        var hpCurrentPath = normalizePath(location.pathname);
         var hpPageIdx = hpPageOrder.indexOf(hpCurrentPath);
 
         function hpNavigatePage(url) {
@@ -298,11 +312,14 @@
 
         /* ── Săgeți laterale pe homepage ── */
         if (arrowPrev) arrowPrev.classList.add('is-hidden');
-        if (arrowNext && hpPageIdx < hpPageOrder.length - 1) {
+        if (arrowNext && hpPageIdx >= 0 && hpPageIdx < hpPageOrder.length - 1) {
             arrowNext.classList.remove('is-hidden');
+            arrowNext.classList.add('hint-pulse');
             arrowNext.addEventListener('click', function () {
                 hpNavigatePage(hpPageOrder[hpPageIdx + 1]);
             });
+        } else if (arrowNext) {
+            arrowNext.classList.add('is-hidden');
         }
 
         return;
@@ -312,27 +329,41 @@
        SUBPAGINI — layout vertical, swipe orizontal navighează
        la pagina anterioară/următoare (fără slides, fără scroll-snap).
     ══════════════════════════════════════════════════════════════ */
-    var pageOrder = [
-        '/',
-        '/despre',
-        '/membri',
-        '/galerie-video',
-        '/galerie-foto',
-        '/momente-cu-mirii',
-        '/comunitatea-noastra',
-        '/aparitii-tv',
-        '/contact',
-    ];
-    var currentPath = location.pathname.replace(/\/$/, '') || '/';
+    var pageOrder = SITE_PAGE_ORDER.slice();
+    var currentPath = normalizePath(location.pathname);
     var pageIdx = pageOrder.indexOf(currentPath);
 
     /* Marchează butonul activ din navbar */
-    setActiveHref(currentPath !== '/' ? currentPath : '/');
+    setActiveHref(currentPath);
 
     function navigatePage(url) {
         main.style.transition = 'opacity 0.18s ease';
         main.style.opacity = '0';
         setTimeout(function () { window.location.href = url; }, 180);
+    }
+
+    /* ── Săgeți laterale pe subpagini ── */
+    if (arrowPrev) {
+        if (pageIdx > 0) {
+            arrowPrev.classList.remove('is-hidden');
+            arrowPrev.classList.add('hint-pulse');
+            arrowPrev.addEventListener('click', function () {
+                navigatePage(pageOrder[pageIdx - 1]);
+            });
+        } else {
+            arrowPrev.classList.add('is-hidden');
+        }
+    }
+    if (arrowNext) {
+        if (pageIdx >= 0 && pageIdx < pageOrder.length - 1) {
+            arrowNext.classList.remove('is-hidden');
+            arrowNext.classList.add('hint-pulse');
+            arrowNext.addEventListener('click', function () {
+                navigatePage(pageOrder[pageIdx + 1]);
+            });
+        } else {
+            arrowNext.classList.add('is-hidden');
+        }
     }
 
     /* Detectare swipe orizontal simplu — dx > threshold → navigare */
