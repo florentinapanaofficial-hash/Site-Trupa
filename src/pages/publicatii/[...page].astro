@@ -9,8 +9,8 @@ export const prerender = true;
 
 export async function getStaticPaths() {
   // Fetch articole din Supabase via REST (fără realtime/websocket în build)
-  const supabaseUrl = import.meta.env.SUPABASE_URL;
-  const supabaseAnonKey = import.meta.env.SUPABASE_ANON_KEY;
+  const supabaseUrl = import.meta.env.SUPABASE_URL || import.meta.env.PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = import.meta.env.SUPABASE_ANON_KEY || import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
   let dbArticles = [];
   if (supabaseUrl && supabaseAnonKey) {
