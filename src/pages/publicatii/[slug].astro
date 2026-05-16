@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import BackButton from '../../components/BackButton.astro';
 import siteContent from '../../data/siteContent.json';
+import blogPostsRaw from '../../data/blogPosts.json';
 
 export const prerender = true;
 
@@ -11,6 +12,13 @@ export async function getStaticPaths() {
   const localPaths = localEntries.map((entry) => ({
     params: { slug: entry.slug },
     props: { type: 'local', item: entry },
+  }));
+
+  // Articole din blogPosts.json — toate cele 12
+  const jsonBlogPosts = ((blogPostsRaw as any).items) ?? [];
+  const jsonBlogPaths = jsonBlogPosts.map((post: any) => ({
+    params: { slug: post.slug },
+    props: { type: 'jsonBlog', item: post },
   }));
 
   const supabaseUrl = import.meta.env.SUPABASE_URL || import.meta.env.PUBLIC_SUPABASE_URL;
@@ -53,22 +61,28 @@ export async function getStaticPaths() {
     }
   }
 
-  console.log("Articole găsite în DB:", dbArticles?.length || 0);
+  // Filtrează slug-urile deja prezente în surse cu prioritate mai mare
+  const takenSlugs = new Set<string>([
+    ...localPaths.map((p) => p.params.slug),
+    ...jsonBlogPaths.map((p) => p.params.slug),
+  ]);
 
-  const supabasePaths = dbArticles?.map((articol) => ({
-    params: { slug: articol.slug },
-    props: {
-      type: 'supabase',
-      item: {
-        ...articol,
-        titlu: articol.titlu || articol.title || 'Articol',
-        continut: articol.continut || articol.content || articol.body || '',
-        created_at: articol.created_at || articol.published_at || new Date().toISOString(),
+  const supabasePaths = (dbArticles || [])
+    .filter((articol: any) => !takenSlugs.has(articol.slug))
+    .map((articol: any) => ({
+      params: { slug: articol.slug },
+      props: {
+        type: 'supabase',
+        item: {
+          ...articol,
+          titlu: articol.titlu || articol.title || 'Articol',
+          continut: articol.continut || articol.content || articol.body || '',
+          created_at: articol.created_at || articol.published_at || new Date().toISOString(),
+        },
       },
-    },
-  })) || [];
+    }));
 
-  return [...localPaths, ...supabasePaths];
+  return [...localPaths, ...jsonBlogPaths, ...supabasePaths];
 }
 
 const { type, item } = Astro.props;
@@ -79,66 +93,127 @@ let pageDescription = '';
 let publishedDate = '';
 let category = '';
 let ogImage = '';
-let ContentComponent = null;
+let ContentComponent: any = null;
+
+const formatDate = (d: string | Date) =>
+  new Date(d).toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' });
 
 if (type === 'local') {
-  pageTitle = `${item.data.titlu} | Publicații | ${brand.name}`;
+  pageTitle = `${item.data.titlu} | Blog | ${brand.name}`;
   pageDescription = item.data.descriere;
   ogImage = item.data.imaginePrincipala;
   category = item.data.categorie;
-  publishedDate = item.data.dataPublicarii.toLocaleDateString('ro-RO', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
+  publishedDate = formatDate(item.data.dataPublicarii);
   const rendered = await item.render();
   ContentComponent = rendered.Content;
+} else if (type === 'jsonBlog') {
+  pageTitle = `${item.title} | Blog | ${brand.name}`;
+  pageDescription = item.excerpt || item.title;
+  ogImage = item.coverImage || '/images/og-default-1200x630.jpg';
+  category = item.category || 'Blog';
+  publishedDate = formatDate(item.date);
 } else {
-  pageTitle = `${item.titlu} | Publicații | ${brand.name}`;
-  pageDescription = item.titlu; 
-  category = "Noutăți";
-  publishedDate = new Date(item.created_at || Date.now()).toLocaleDateString('ro-RO', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
+  pageTitle = `${item.titlu} | Blog | ${brand.name}`;
+  pageDescription = item.titlu;
+  category = 'Noutăți';
+  publishedDate = formatDate(item.created_at || new Date());
 }
 ---
 
 <BaseLayout title={pageTitle} description={pageDescription} ogImage={ogImage}>
   <article class="pub-article">
     <div class="section-container pt-8 pb-4 sm:pt-10">
-      <div class="mb-6"><BackButton href="/publicatii/" label="Toate publicațiile" /></div>
+      <div class="mb-6"><BackButton href="/publicatii/" label="Toate articolele" /></div>
     </div>
 
     <header class="pub-article__hero section-container">
       <p class="pub-article__meta">{category} • {publishedDate}</p>
-      <h1 class="pub-article__title">{type === 'local' ? item.data.titlu : item.titlu}</h1>
-      
+      <h1 class="pub-article__title">
+        {type === 'local' ? item.data.titlu : type === 'jsonBlog' ? item.title : item.titlu}
+      </h1>
+
       {type === 'local' && <p class="pub-article__description">{item.data.descriere}</p>}
-      
+      {type === 'jsonBlog' && item.excerpt && <p class="pub-article__description">{item.excerpt}</p>}
+
       {type === 'local' && item.data.imaginePrincipala && (
         <div class="pub-article__image-wrap">
-          <img
-            src={item.data.imaginePrincipala}
-            alt={item.data.titlu}
-            class="pub-article__image"
-            loading="eager"
-            decoding="async"
-            width="1600"
-            height="900"
-          />
+          <img src={item.data.imaginePrincipala} alt={item.data.titlu} class="pub-article__image" loading="eager" decoding="async" width="1600" height="900" />
+        </div>
+      )}
+
+      {type === 'jsonBlog' && item.coverImage && (
+        <div class="pub-article__image-wrap">
+          <img src={item.coverImage} alt={item.title} class="pub-article__image" loading="eager" decoding="async" width="1600" height="900" />
         </div>
       )}
     </header>
 
     <div class="section-container">
       <div class="pub-article__content prose-shell">
-        {type === 'local' && ContentComponent ? (
-          <ContentComponent />
-        ) : (
-          <div set:html={item.continut} />
+        {type === 'local' && ContentComponent && (<ContentComponent />)}
+
+        {type === 'jsonBlog' && Array.isArray(item.content) && item.content.map((block: any) => {
+          if (block.type === 'heading') return <h2>{block.text}</h2>;
+          if (block.type === 'paragraph') return <p>{block.text}</p>;
+          if (block.type === 'image') {
+            return (
+              <figure class="pub-figure">
+                {block.src && (
+                  <img src={block.src} alt={block.caption || item.title} loading="lazy" decoding="async" width="1200" height="675" />
+                )}
+                {block.caption && <figcaption>{block.caption}</figcaption>}
+              </figure>
+            );
+          }
+          if (block.type === 'links' && Array.isArray(block.items)) {
+            return (
+              <nav class="pub-inline-links" aria-label="Link-uri recomandate">
+                {block.items.map((link: any) => (
+                  <a href={link.href} class="pub-inline-link">{link.label}</a>
+                ))}
+              </nav>
+            );
+          }
+          if (block.type === 'cta') {
+            const isWhatsApp = block.variant === 'whatsapp';
+            return (
+              <aside class={`pub-inline-cta${isWhatsApp ? ' pub-inline-cta--wa' : ''}`}>
+                {block.label && <p class="pub-inline-cta__label">{block.label}</p>}
+                {block.text && <p class="pub-inline-cta__text">{block.text}</p>}
+                <div class="pub-inline-cta__actions">
+                  {block.ctaHref && block.ctaText && (
+                    <a
+                      href={block.ctaHref}
+                      class={isWhatsApp ? 'btn-cta btn-cta--wa' : 'btn-cta'}
+                      target={block.ctaHref.startsWith('http') ? '_blank' : undefined}
+                      rel={block.ctaHref.startsWith('http') ? 'noopener noreferrer' : undefined}
+                    >
+                      {block.ctaText}
+                    </a>
+                  )}
+                  {block.ctaSecondaryHref && block.ctaSecondaryText && (
+                    <a href={block.ctaSecondaryHref} class="btn-cta btn-cta--outline">{block.ctaSecondaryText}</a>
+                  )}
+                </div>
+              </aside>
+            );
+          }
+          return null;
+        })}
+
+        {type === 'jsonBlog' && Array.isArray(item.faq) && item.faq.length > 0 && (
+          <section class="pub-faq" aria-labelledby="pub-faq-title">
+            <h2 id="pub-faq-title">Întrebări frecvente</h2>
+            {item.faq.map((q: any) => (
+              <details class="pub-faq__item">
+                <summary>{q.q}</summary>
+                <p>{q.a}</p>
+              </details>
+            ))}
+          </section>
         )}
+
+        {type === 'supabase' && (<div set:html={item.continut} />)}
       </div>
     </div>
   </article>

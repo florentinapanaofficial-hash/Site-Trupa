@@ -4,6 +4,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import BackButton from '../../components/BackButton.astro';
 import siteContent from '../../data/siteContent.json';
+import blogPostsRaw from '../../data/blogPosts.json';
 
 export const prerender = true;
 
@@ -86,14 +87,35 @@ export async function getStaticPaths() {
     type: 'local',
   }));
 
-  // Combină toate articolele (locale + Supabase) și sortează după dată descrescător
-  const allEntries = [...supabaseEntries, ...localEntries].sort((a, b) => new Date(b.dataPublicarii) - new Date(a.dataPublicarii));
+  // Articole din blogPosts.json (toate, incl. Vlog) — sursa principală a blog-ului
+  const jsonBlogEntries = (((blogPostsRaw as any).items) ?? []).map((post: any) => {
+    let preview = post.excerpt || '';
+    if (!preview && Array.isArray(post.content)) {
+      const firstParagraph = post.content.find((b: any) => b.type === 'paragraph');
+      preview = firstParagraph?.text || '';
+    }
+    preview = String(preview).slice(0, 320);
+    return {
+      slug: post.slug,
+      titlu: post.title,
+      descriere: post.excerpt,
+      preview,
+      categorie: post.category || 'Blog',
+      imaginePrincipala: post.coverImage || '/images/og-default-1200x630.jpg',
+      dataPublicarii: post.date,
+      type: 'jsonBlog',
+    };
+  });
+
+  // Combină toate articolele și sortează după dată descrescător
+  const allEntries = [...supabaseEntries, ...jsonBlogEntries, ...localEntries]
+    .sort((a, b) => new Date(b.dataPublicarii).getTime() - new Date(a.dataPublicarii).getTime());
 
   // Paginare manuală (10 per pagină)
   const pageSize = 10;
   const totalPages = Math.ceil(allEntries.length / pageSize);
   const paths = Array.from({ length: totalPages }, (_, i) => ({
-    params: { page: i === 0 ? undefined : [String(i + 1)] },
+    params: { page: i === 0 ? undefined : String(i + 1) },
     props: { pageIndex: i, totalPages, allEntries },
   }));
   return paths;
