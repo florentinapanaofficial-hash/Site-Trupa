@@ -55,11 +55,11 @@ export async function getStaticPaths() {
       // Generează preview din descriere sau continut (HTML strip simplu)
       let preview = '';
       if (articol.descriere && articol.descriere.length > 0) {
-        preview = articol.descriere.slice(0, 180) + (articol.descriere.length > 180 ? '…' : '');
+        preview = articol.descriere.slice(0, 320) + (articol.descriere.length > 320 ? '' : '');
       } else if (articol.continut && articol.continut.length > 0) {
         // Elimină tagurile HTML pentru preview
-        const text = articol.continut.replace(/<[^>]+>/g, '');
-        preview = text.slice(0, 180) + (text.length > 180 ? '…' : '');
+        const text = articol.continut.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+        preview = text.slice(0, 320);
       }
       return {
         slug: articol.slug,
@@ -79,7 +79,7 @@ export async function getStaticPaths() {
     slug: entry.slug,
     titlu: entry.data.titlu,
     descriere: entry.data.descriere,
-    preview: entry.data.descriere ? entry.data.descriere.slice(0, 180) + (entry.data.descriere.length > 180 ? '…' : '') : '',
+    preview: entry.data.descriere ? entry.data.descriere.slice(0, 320) : '',
     categorie: entry.data.categorie,
     imaginePrincipala: entry.data.imaginePrincipala,
     dataPublicarii: entry.data.dataPublicarii,
@@ -177,12 +177,19 @@ function formatDate(date) {
                 width="960"
                 height="540"
               />
-              <div class="pub-card__body">
-                <p class="pub-card__meta">{entry.categorie} • {formatDate(entry.dataPublicarii)}</p>
-                <h2 class="pub-card__title pub-card__title--centered">{entry.titlu}</h2>
-                <p class="pub-card__excerpt pub-card__excerpt--preview">{entry.preview || entry.descriere} <span class="pub-card__dots">…</span></p>
-              </div>
             </a>
+            <div class="pub-card__body">
+              <p class="pub-card__meta">{entry.categorie} • {formatDate(entry.dataPublicarii)}</p>
+              <h2 class="pub-card__title pub-card__title--centered">
+                <a href={`/publicatii/${entry.slug}/`} class="pub-card__title-link">{entry.titlu}</a>
+              </h2>
+              <p class="pub-card__excerpt pub-card__excerpt--preview">
+                {entry.preview || entry.descriere}<span class="pub-card__dots"> …</span>
+              </p>
+              <a href={`/publicatii/${entry.slug}/`} class="pub-card__readmore" aria-label={`Citește articolul ${entry.titlu}`}>
+                Citește mai mult →
+              </a>
+            </div>
           </article>
         ))}
       </div>
@@ -347,10 +354,53 @@ function formatDate(date) {
       color: #ffffff;
     }
 
+    .pub-card__title-link {
+      color: inherit;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+    .pub-card__title-link:hover {
+      color: #ffe2a0;
+    }
+
     .pub-card__excerpt {
       margin: 0.7rem 0 0;
-      color: rgba(255, 255, 255, 0.7);
-      line-height: 1.7;
+      color: rgba(255, 255, 255, 0.78);
+      line-height: 1.65;
+      /* Limitează vizual la 4 rânduri, restul … */
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .pub-card__dots {
+      color: rgba(255, 255, 255, 0.55);
+      font-weight: 600;
+      letter-spacing: 0.1em;
+    }
+
+    .pub-card__readmore {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin-top: 0.9rem;
+      padding: 0.5rem 0;
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.92rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #ffe2a0;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(242, 204, 127, 0.35);
+      width: fit-content;
+      transition: color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    }
+    .pub-card__readmore:hover,
+    .pub-card__readmore:focus-visible {
+      color: #fff7d6;
+      border-color: rgba(242, 204, 127, 0.7);
+      transform: translateX(3px);
     }
 
     .pub-pagination {
