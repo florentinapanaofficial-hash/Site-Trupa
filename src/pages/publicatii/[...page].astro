@@ -1,48 +1,104 @@
 ---
+
 import { getCollection } from 'astro:content';
+import { createClient } from '@supabase/supabase-js';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import BackButton from '../../components/BackButton.astro';
 import siteContent from '../../data/siteContent.json';
 
 export const prerender = true;
 
-export async function getStaticPaths({ paginate }) {
-  const entries = (await getCollection('publicatii')).sort((a, b) => 
-    b.data.dataPublicarii.getTime() - a.data.dataPublicarii.getTime()
+export async function getStaticPaths() {
+  // Fetch articole din Supabase
+  const supabase = createClient(
+    import.meta.env.SUPABASE_URL,
+    import.meta.env.SUPABASE_ANON_KEY
   );
-  return paginate(entries, { pageSize: 10 });
+  const { data: dbArticles, error } = await supabase
+    .from('articole_publicatii')
+    .select('slug, titlu, descriere, continut, categorie, imagine_principala, created_at');
+
+  let supabaseEntries = [];
+  if (dbArticles && Array.isArray(dbArticles)) {
+    supabaseEntries = dbArticles.map((articol) => {
+      // Generează preview din descriere sau continut (HTML strip simplu)
+      let preview = '';
+      if (articol.descriere && articol.descriere.length > 0) {
+        preview = articol.descriere.slice(0, 180) + (articol.descriere.length > 180 ? '…' : '');
+      } else if (articol.continut && articol.continut.length > 0) {
+        // Elimină tagurile HTML pentru preview
+        const text = articol.continut.replace(/<[^>]+>/g, '');
+        preview = text.slice(0, 180) + (text.length > 180 ? '…' : '');
+      }
+      return {
+        slug: articol.slug,
+        titlu: articol.titlu,
+        descriere: articol.descriere,
+        preview,
+        categorie: articol.categorie || 'Noutăți',
+        imaginePrincipala: articol.imagine_principala || '/images/og-default-1200x630.jpg',
+        dataPublicarii: articol.created_at,
+        type: 'supabase',
+      };
+    });
+  }
+
+  // Fallback la content local dacă nu există nimic în Supabase
+  const localEntries = (await getCollection('publicatii')).map((entry) => ({
+    slug: entry.slug,
+    titlu: entry.data.titlu,
+    descriere: entry.data.descriere,
+    preview: entry.data.descriere ? entry.data.descriere.slice(0, 180) + (entry.data.descriere.length > 180 ? '…' : '') : '',
+    categorie: entry.data.categorie,
+    imaginePrincipala: entry.data.imaginePrincipala,
+    dataPublicarii: entry.data.dataPublicarii,
+    type: 'local',
+  }));
+
+  // Combină toate articolele (locale + Supabase) și sortează după dată descrescător
+  const allEntries = [...supabaseEntries, ...localEntries].sort((a, b) => new Date(b.dataPublicarii) - new Date(a.dataPublicarii));
+
+  // Paginare manuală (10 per pagină)
+  const pageSize = 10;
+  const totalPages = Math.ceil(allEntries.length / pageSize);
+  const paths = Array.from({ length: totalPages }, (_, i) => ({
+    params: { page: i === 0 ? undefined : [String(i + 1)] },
+    props: { pageIndex: i, totalPages, allEntries },
+  }));
+  return paths;
 }
 
-const { page } = Astro.props;
+const { pageIndex = 0, totalPages = 1, allEntries = [] } = Astro.props;
 const { brand } = siteContent;
 
-const allEntries = (await getCollection('publicatii')).sort((a, b) => 
-  b.data.dataPublicarii.getTime() - a.data.dataPublicarii.getTime()
-);
+const pagedEntries = allEntries.slice(pageIndex * 10, (pageIndex + 1) * 10);
 
 const searchIndex = allEntries.map((entry) => ({
   slug: entry.slug,
-  titlu: entry.data.titlu,
-  descriere: entry.data.descriere,
-  categorie: entry.data.categorie,
-  imaginePrincipala: entry.data.imaginePrincipala,
-  dataPublicarii: entry.data.dataPublicarii.toLocaleDateString('ro-RO', {
+  titlu: entry.titlu,
+  descriere: entry.descriere,
+  preview: entry.preview,
+  categorie: entry.categorie,
+  imaginePrincipala: entry.imaginePrincipala,
+  dataPublicarii: new Date(entry.dataPublicarii).toLocaleDateString('ro-RO', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
   }),
 }));
 
-const currentPage = page.currentPage;
+const currentPage = pageIndex + 1;
 const pageTitle = currentPage > 1
-  ? `Publicații - Pagina ${currentPage} | ${brand.name}`
-  : `Publicații | ${brand.name}`;
+  ? `Blog - Pagina ${currentPage} | ${brand.name}`
+  : `Blog | ${brand.name}`;
 const pageDescription = currentPage > 1
-  ? `Arhiva publicațiilor ${brand.name}, pagina ${currentPage}. Citește articole premium despre evenimente, locații și culisele FP Band.`
-  : `Arhiva publicațiilor ${brand.name}. Citește articole premium despre evenimente, locații și culisele FP Band.`;
+  ? `Blogul ${brand.name}, pagina ${currentPage}. Articole, ghiduri, povești și opinii despre muzică live, evenimente și viața de trupă.`
+  : `Blogul ${brand.name}. Articole, ghiduri, povești și opinii despre muzică live, evenimente și viața de trupă.`;
 
 function formatDate(date) {
-  return date.toLocaleDateString('ro-RO', {
+  if (!date) return '';
+  const d = typeof date === 'string' ? new Date(date) : date;
+  return d.toLocaleDateString('ro-RO', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
@@ -57,46 +113,45 @@ function formatDate(date) {
     </div>
 
     <header class="pub-hero section-container">
-      <p class="pub-kicker">Editorial FP Band</p>
-      <h1 class="pub-title">Publicații</h1>
+      <p class="pub-kicker">Blog FP Band</p>
+      <h1 class="pub-title">Blog</h1>
       <p class="pub-subtitle">
-        Articole premium despre evenimente, culise, locații și idei care transformă muzica live într-o experiență memorabilă.
+        Articole, ghiduri, povești și opinii despre muzică live, evenimente și viața de trupă.
       </p>
     </header>
 
     <div class="section-container">
       <div class="pub-search-shell">
-        <label class="pub-search-label" for="publicatii-search">Caută după titlu</label>
+        <label class="pub-search-label" for="blog-search">Caută în blog</label>
         <input
-          id="publicatii-search"
+          id="blog-search"
           type="search"
           class="pub-search-input"
-          placeholder="Ex: live premium, locație, ghid..."
+          placeholder="Ex: orhideea, lăutari, sonorizare..."
           autocomplete="off"
         />
+        <ul id="blog-search-suggestions" class="blog-search-suggestions" hidden></ul>
       </div>
 
       <div class="pub-grid" id="publicatii-grid">
-        {page.data.map((entry) => (
-          <article class="pub-card">
-            <a href={`/publicatii/${entry.slug}/`} class="pub-card__image-link" aria-label={`Deschide articolul ${entry.data.titlu}`}>
+        {pagedEntries.map((entry) => (
+          <article class="pub-card enhanced-card">
+            <a href={`/publicatii/${entry.slug}/`} class="pub-card__image-link" aria-label={`Deschide articolul ${entry.titlu}`} tabindex="0">
               <img
-                src={entry.data.imaginePrincipala}
-                alt={entry.data.titlu}
+                src={entry.imaginePrincipala}
+                alt={entry.titlu}
                 class="pub-card__image"
                 loading="lazy"
                 decoding="async"
                 width="960"
                 height="540"
               />
+              <div class="pub-card__body">
+                <p class="pub-card__meta">{entry.categorie} • {formatDate(entry.dataPublicarii)}</p>
+                <h2 class="pub-card__title pub-card__title--centered">{entry.titlu}</h2>
+                <p class="pub-card__excerpt pub-card__excerpt--preview">{entry.preview || entry.descriere} <span class="pub-card__dots">…</span></p>
+              </div>
             </a>
-            <div class="pub-card__body">
-              <p class="pub-card__meta">{entry.data.categorie} • {formatDate(entry.data.dataPublicarii)}</p>
-              <a href={`/publicatii/${entry.slug}/`} class="pub-card__title-link">
-                <h2 class="pub-card__title">{entry.data.titlu}</h2>
-              </a>
-              <p class="pub-card__excerpt">{entry.data.descriere}</p>
-            </div>
           </article>
         ))}
       </div>
@@ -106,144 +161,103 @@ function formatDate(date) {
       </div>
 
       <nav class="pub-pagination" id="publicatii-pagination" aria-label="Navigație între paginile de publicații">
-        {page.url.prev ? (
-          <a href={page.url.prev} class="pub-page-btn">Înapoi</a>
+        {currentPage > 1 ? (
+          <a href={currentPage === 2 ? '/publicatii/' : `/publicatii/${currentPage - 1}/`} class="pub-page-btn">Înapoi</a>
         ) : <span></span>}
-        <span class="pub-page-status">Pagina {page.currentPage} din {page.lastPage}</span>
-        {page.url.next ? (
-          <a href={page.url.next} class="pub-page-btn">Înainte</a>
+        <span class="pub-page-status">Pagina {currentPage} din {totalPages}</span>
+        {currentPage < totalPages ? (
+          <a href={`/publicatii/${currentPage + 1}/`} class="pub-page-btn">Înainte</a>
         ) : <span></span>}
       </nav>
     </div>
   </section>
 
-  <script type="application/json" id="publicatii-search-data" set:html={JSON.stringify(searchIndex)}></script>
+  <script type="application/json" id="blog-search-data" set:html={JSON.stringify(searchIndex)}></script>
   <script is:inline>
     (() => {
-      const input = document.getElementById('publicatii-search');
-      const grid = document.getElementById('publicatii-grid');
-      const pagination = document.getElementById('publicatii-pagination');
-      const empty = document.getElementById('publicatii-empty');
-      const dataEl = document.getElementById('publicatii-search-data');
-
-      if (!input || !grid || !pagination || !empty || !dataEl) return;
-
+      const input = document.getElementById('blog-search');
+      const suggestions = document.getElementById('blog-search-suggestions');
+      const dataEl = document.getElementById('blog-search-data');
+      if (!input || !suggestions || !dataEl) return;
       const entries = JSON.parse(dataEl.textContent || '[]');
-      const defaultMarkup = grid.innerHTML;
-
       const escapeHtml = (value) => String(value)
         .replaceAll('&', '&amp;')
         .replaceAll('<', '&lt;')
         .replaceAll('>', '&gt;')
         .replaceAll('"', '&quot;')
         .replaceAll("'", '&#39;');
-
       input.addEventListener('input', () => {
         const query = input.value.trim().toLowerCase();
-
         if (!query) {
-          grid.innerHTML = defaultMarkup;
-          pagination.hidden = false;
-          empty.hidden = true;
+          suggestions.innerHTML = '';
+          suggestions.hidden = true;
           return;
         }
-
-        const results = entries.filter((entry) => entry.titlu.toLowerCase().includes(query));
-        pagination.hidden = true;
-
+        const results = entries.filter((entry) =>
+          entry.titlu.toLowerCase().includes(query)
+        ).slice(0, 7);
         if (!results.length) {
-          grid.innerHTML = '';
-          empty.hidden = false;
+          suggestions.innerHTML = '<li class="blog-search-noresult">Nicio potrivire</li>';
+          suggestions.hidden = false;
           return;
         }
-
-        empty.hidden = true;
-        grid.innerHTML = results.map((entry) => `
-          <article class="pub-card">
-            <a href="/publicatii/${entry.slug}/" class="pub-card__image-link" aria-label="Deschide articolul ${escapeHtml(entry.titlu)}">
-              <img src="${escapeHtml(entry.imaginePrincipala)}" alt="${escapeHtml(entry.titlu)}" class="pub-card__image" loading="lazy" decoding="async" width="960" height="540" />
+        suggestions.innerHTML = results.map((entry) => `
+          <li class="blog-search-suggestion">
+            <a href="/blog/${escapeHtml(entry.slug)}/">
+              <strong>${escapeHtml(entry.titlu)}</strong>
             </a>
-            <div class="pub-card__body">
-              <p class="pub-card__meta">${escapeHtml(entry.categorie)} • ${escapeHtml(entry.dataPublicarii)}</p>
-              <a href="/publicatii/${entry.slug}/" class="pub-card__title-link">
-                <h2 class="pub-card__title">${escapeHtml(entry.titlu)}</h2>
-              </a>
-              <p class="pub-card__excerpt">${escapeHtml(entry.descriere)}</p>
-            </div>
-          </article>
+          </li>
         `).join('');
+        suggestions.hidden = false;
+      });
+      document.addEventListener('click', (e) => {
+        if (!suggestions.contains(e.target) && e.target !== input) {
+          suggestions.hidden = true;
+        }
       });
     })();
   </script>
-
   <style>
-    .pub-archive {
-      padding-bottom: 4rem;
-    }
-
-    .pub-hero {
-      text-align: center;
-      max-width: 56rem;
-      margin: 0 auto 2.5rem;
-    }
-
-    .pub-kicker {
+    .blog-search-suggestions {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #23232b;
+      border-radius: 0 0 1rem 1rem;
+      box-shadow: 0 8px 32px 0 rgb(0 0 0 / 0.18);
+      z-index: 20;
       margin: 0;
-      font-family: 'Oswald', sans-serif;
-      text-transform: uppercase;
-      letter-spacing: 0.22em;
-      font-size: 0.78rem;
-      color: #66d9ff;
+      padding: 0.5rem 0;
+      list-style: none;
+      max-height: 320px;
+      overflow-y: auto;
+      border: 1px solid #33334a;
     }
-
-    .pub-title {
-      margin: 0.8rem 0 0;
-      font-size: clamp(2.7rem, 7vw, 4.8rem);
-      color: #fff9ef;
-    }
-
-    .pub-subtitle {
-      margin: 1rem auto 0;
-      max-width: 42rem;
-      color: rgba(255, 255, 255, 0.68);
-      font-size: 1.02rem;
-    }
-
-    .pub-search-shell {
-      margin: 0 auto 2rem;
-      max-width: 42rem;
-      border: 1px solid rgba(255, 255, 255, 0.09);
-      border-radius: 1.25rem;
-      background: linear-gradient(180deg, rgba(8, 18, 39, 0.86), rgba(4, 9, 20, 0.92));
-      padding: 1rem;
-      box-shadow: 0 18px 38px rgba(0, 0, 0, 0.24);
-    }
-
-    .pub-search-label {
+    .blog-search-suggestion a {
       display: block;
-      margin-bottom: 0.55rem;
-      font-family: 'Oswald', sans-serif;
-      font-size: 0.8rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: #f2cc7f;
+      padding: 0.7rem 1.2rem 0.5rem 1.2rem;
+      color: #fff;
+      text-decoration: none;
+      border-bottom: 1px solid #33334a;
+      font-size: 1.08rem;
+      transition: background 0.15s;
     }
-
-    .pub-search-input {
-      width: 100%;
-      border: 1px solid rgba(102, 217, 255, 0.2);
-      border-radius: 0.9rem;
-      background: rgba(255, 255, 255, 0.04);
-      color: #eefaff;
-      padding: 0.95rem 1rem;
-      outline: none;
+    .blog-search-suggestion:last-child a {
+      border-bottom: none;
     }
-
-    .pub-search-input:focus {
-      border-color: rgba(102, 217, 255, 0.45);
-      box-shadow: 0 0 0 3px rgba(102, 217, 255, 0.12);
+    .blog-search-suggestion a:hover {
+      background: #2e2e3a;
     }
-
+    .blog-search-noresult {
+      color: #a1a1aa;
+      padding: 0.7rem 1.2rem;
+      font-size: 1.05rem;
+      text-align: center;
+    }
+  </style>
+      ...existing code...
+  <style>
     .pub-grid {
       display: grid;
       gap: 1.4rem;

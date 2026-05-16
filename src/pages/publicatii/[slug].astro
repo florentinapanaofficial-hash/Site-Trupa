@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import { createClient } from '@supabase/supabase-js';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import BackButton from '../../components/BackButton.astro';
 import siteContent from '../../data/siteContent.json';
@@ -7,53 +8,100 @@ import siteContent from '../../data/siteContent.json';
 export const prerender = true;
 
 export async function getStaticPaths() {
-  const entries = await getCollection('publicatii');
-  return entries.map((entry) => ({
+  const localEntries = await getCollection('publicatii');
+  const localPaths = localEntries.map((entry) => ({
     params: { slug: entry.slug },
-    props: { entry },
+    props: { type: 'local', item: entry },
   }));
+
+  const supabase = createClient(
+    import.meta.env.SUPABASE_URL,
+    import.meta.env.SUPABASE_ANON_KEY
+  );
+  
+  const { data: dbArticles, error } = await supabase
+    .from('articole_publicatii')
+    .select('slug, titlu, continut, created_at');
+
+  if (error) console.log("Eroare Supabase:", error);
+  console.log("Articole găsite în DB:", dbArticles?.length || 0);
+
+  const supabasePaths = dbArticles?.map((articol) => ({
+    params: { slug: articol.slug },
+    props: { type: 'supabase', item: articol },
+  })) || [];
+
+  return [...localPaths, ...supabasePaths];
 }
 
-const { entry } = Astro.props;
+const { type, item } = Astro.props;
 const { brand } = siteContent;
-const { Content } = await entry.render();
 
-const pageTitle = `${entry.data.titlu} | Publicații | ${brand.name}`;
-const pageDescription = entry.data.descriere;
+let pageTitle = '';
+let pageDescription = '';
+let publishedDate = '';
+let category = '';
+let ogImage = '';
+let ContentComponent = null;
 
-const publishedDate = entry.data.dataPublicarii.toLocaleDateString('ro-RO', {
-  day: 'numeric',
-  month: 'long',
-  year: 'numeric',
-});
+if (type === 'local') {
+  pageTitle = `${item.data.titlu} | Publicații | ${brand.name}`;
+  pageDescription = item.data.descriere;
+  ogImage = item.data.imaginePrincipala;
+  category = item.data.categorie;
+  publishedDate = item.data.dataPublicarii.toLocaleDateString('ro-RO', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+  const rendered = await item.render();
+  ContentComponent = rendered.Content;
+} else {
+  pageTitle = `${item.titlu} | Publicații | ${brand.name}`;
+  pageDescription = item.titlu; 
+  category = "Noutăți";
+  publishedDate = new Date(item.created_at || Date.now()).toLocaleDateString('ro-RO', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+}
 ---
 
-<BaseLayout title={pageTitle} description={pageDescription} ogImage={entry.data.imaginePrincipala}>
+<BaseLayout title={pageTitle} description={pageDescription} ogImage={ogImage}>
   <article class="pub-article">
     <div class="section-container pt-8 pb-4 sm:pt-10">
       <div class="mb-6"><BackButton href="/publicatii/" label="Toate publicațiile" /></div>
     </div>
 
     <header class="pub-article__hero section-container">
-      <p class="pub-article__meta">{entry.data.categorie} • {publishedDate}</p>
-      <h1 class="pub-article__title">{entry.data.titlu}</h1>
-      <p class="pub-article__description">{entry.data.descriere}</p>
-      <div class="pub-article__image-wrap">
-        <img
-          src={entry.data.imaginePrincipala}
-          alt={entry.data.titlu}
-          class="pub-article__image"
-          loading="eager"
-          decoding="async"
-          width="1600"
-          height="900"
-        />
-      </div>
+      <p class="pub-article__meta">{category} • {publishedDate}</p>
+      <h1 class="pub-article__title">{type === 'local' ? item.data.titlu : item.titlu}</h1>
+      
+      {type === 'local' && <p class="pub-article__description">{item.data.descriere}</p>}
+      
+      {type === 'local' && item.data.imaginePrincipala && (
+        <div class="pub-article__image-wrap">
+          <img
+            src={item.data.imaginePrincipala}
+            alt={item.data.titlu}
+            class="pub-article__image"
+            loading="eager"
+            decoding="async"
+            width="1600"
+            height="900"
+          />
+        </div>
+      )}
     </header>
 
     <div class="section-container">
       <div class="pub-article__content prose-shell">
-        <Content />
+        {type === 'local' && ContentComponent ? (
+          <ContentComponent />
+        ) : (
+          <div set:html={item.continut} />
+        )}
       </div>
     </div>
   </article>
@@ -128,6 +176,11 @@ const publishedDate = entry.data.dataPublicarii.toLocaleDateString('ro-RO', {
       color: rgba(255, 255, 255, 0.78);
       line-height: 1.9;
       font-size: 1.03rem;
+    }
+
+    .prose-shell :global(a) {
+      color: #f2cc7f;
+      text-decoration: underline;
     }
   </style>
 </BaseLayout>
