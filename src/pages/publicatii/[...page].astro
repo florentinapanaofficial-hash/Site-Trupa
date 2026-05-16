@@ -5,7 +5,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import BackButton from '../../components/BackButton.astro';
 import siteContent from '../../data/siteContent.json';
 
-export const prerender = false;
+export const prerender = true;
 
 export async function getStaticPaths() {
   // Fetch articole din Supabase via REST (fără realtime/websocket în build)
