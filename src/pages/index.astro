@@ -198,6 +198,42 @@ const heroPhotos = [
     </div>
   </section>
 
+  <section class="hp-signature-flow section-container" aria-label="Cum transformăm evenimentul într-un spectacol">
+    <div class="hp-signature-head reveal-on-scroll from-bottom" style="--reveal-delay: 20ms">
+      <p class="hp-signature-kicker">Signature Flow</p>
+      <h2 class="hp-signature-title">De la primul mesaj la ultimul dans: un parcurs de scenă impecabil</h2>
+      <p class="hp-signature-copy">
+        Fiecare etapă este gândită să reducă stresul mirilor și să maximizeze energia invitaților.
+        Nu lăsăm nimic la întâmplare.
+      </p>
+    </div>
+
+    <div class="hp-signature-grid">
+      <article class="hp-signature-card reveal-on-scroll from-left" style="--reveal-delay: 70ms">
+        <span class="hp-signature-step">01</span>
+        <h3>Consultanță și direcție muzicală</h3>
+        <p>Stabilim împreună stilul serii, momentele cheie și vibe-ul dorit pentru invitați.</p>
+      </article>
+
+      <article class="hp-signature-card reveal-on-scroll from-bottom" style="--reveal-delay: 140ms">
+        <span class="hp-signature-step">02</span>
+        <h3>Scenariu dinamic al evenimentului</h3>
+        <p>Orchestrăm ritmul petrecerii în valuri: eleganță, energie, explozie pe ring, final memorabil.</p>
+      </article>
+
+      <article class="hp-signature-card reveal-on-scroll from-right" style="--reveal-delay: 210ms">
+        <span class="hp-signature-step">03</span>
+        <h3>Execuție live premium</h3>
+        <p>Livrăm un show autentic, cu reacție în timp real la public și atmosferă de festival elegant.</p>
+      </article>
+    </div>
+
+    <div class="hp-signature-actions reveal-on-scroll from-bottom" style="--reveal-delay: 250ms">
+      <a href="/contact/" class="btn-solid">Vreau aceeași experiență</a>
+      <a href="/galerie-video/" class="btn-outline">Vezi rezultatul live</a>
+    </div>
+  </section>
+
   {/* ═══════════════════════════════════════════
       SHOWCASE CINEMATIC — text + video + foto cu reveal la scroll
   ═══════════════════════════════════════════ */}
@@ -1222,6 +1258,125 @@ const heroPhotos = [
     padding-block: clamp(1rem, 2.5vw, 1.35rem);
   }
 
+  .hp-signature-flow {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding-block: clamp(1.2rem, 2.8vw, 1.9rem);
+  }
+
+  .hp-signature-head {
+    max-width: 70ch;
+    margin: 0 auto 1.15rem;
+    text-align: center;
+  }
+
+  .hp-signature-kicker {
+    margin: 0;
+    color: rgba(176, 236, 246, 0.92);
+    font-size: 0.66rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  .hp-signature-title {
+    margin: 0.45rem 0 0;
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(1.4rem, 2.8vw, 1.95rem);
+    color: #f8fbff;
+    line-height: 1.18;
+    text-wrap: balance;
+  }
+
+  .hp-signature-copy {
+    margin: 0.6rem auto 0;
+    max-width: 62ch;
+    color: rgba(209, 223, 243, 0.92);
+    font-size: clamp(0.88rem, 1.18vw, 0.98rem);
+    line-height: 1.75;
+    text-wrap: pretty;
+  }
+
+  .hp-signature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(0.75rem, 1.5vw, 1rem);
+    position: relative;
+  }
+
+  .hp-signature-grid::before {
+    content: '';
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    top: 1.95rem;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(11, 188, 214, 0.4), rgba(245, 166, 35, 0.45), transparent);
+    pointer-events: none;
+  }
+
+  .hp-signature-card {
+    position: relative;
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background:
+      linear-gradient(130deg, rgba(9, 19, 42, 0.72), rgba(8, 16, 36, 0.7)),
+      radial-gradient(circle at 85% 10%, rgba(11, 188, 214, 0.17), transparent 42%);
+    padding: 1rem 1rem 1.05rem;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.26);
+    transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+    z-index: 1;
+  }
+
+  .hp-signature-step {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.1rem;
+    height: 2.1rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 209, 102, 0.6);
+    background: rgba(255, 209, 102, 0.16);
+    color: #ffe3ab;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  .hp-signature-card h3 {
+    margin: 0.65rem 0 0;
+    color: #f6f9ff;
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(1rem, 1.45vw, 1.15rem);
+    line-height: 1.24;
+    text-wrap: balance;
+  }
+
+  .hp-signature-card p {
+    margin: 0.5rem 0 0;
+    color: rgba(211, 224, 243, 0.92);
+    font-size: 0.86rem;
+    line-height: 1.72;
+    text-wrap: pretty;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .hp-signature-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(11, 188, 214, 0.36);
+      box-shadow: 0 16px 34px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  .hp-signature-actions {
+    margin-top: 0.95rem;
+    display: flex;
+    gap: 0.7rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
   .hp-trust-ribbon-inner {
     border-radius: 1.15rem;
     border: 1px solid rgba(255, 255, 255, 0.16);
@@ -1314,6 +1469,28 @@ const heroPhotos = [
     .hp-trust-cta {
       width: 100%;
       font-size: 0.68rem;
+    }
+
+    .hp-signature-grid {
+      grid-template-columns: 1fr;
+      gap: 0.7rem;
+    }
+
+    .hp-signature-grid::before {
+      display: none;
+    }
+
+    .hp-signature-card {
+      padding: 0.9rem;
+    }
+
+    .hp-signature-card p {
+      font-size: 0.84rem;
+    }
+
+    .hp-signature-actions .btn-solid,
+    .hp-signature-actions .btn-outline {
+      width: 100%;
     }
   }
 
