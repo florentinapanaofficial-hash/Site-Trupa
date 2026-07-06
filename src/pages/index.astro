@@ -203,6 +203,7 @@ const heroPhotos = [
   ═══════════════════════════════════════════ */}
   <section id="showcase-cinematic" class="hp-cinematic section-container" aria-label="Showcase live foto-video">
     <div class="hp-cinematic-head reveal-on-scroll from-bottom" style="--reveal-delay: 0ms">
+      <span class="hp-cinematic-eyebrow">Live Editorial Experience</span>
       <p class="hp-cinematic-kicker">Experiență vizuală</p>
       <h2 class="hp-cinematic-title">Nu doar muzică. Un spectacol care prinde viață în fața ta.</h2>
       <p class="hp-cinematic-copy">
@@ -251,6 +252,34 @@ const heroPhotos = [
           <span class="hp-cine-caption">Cadru autentic de la eveniment</span>
         </a>
       ))}
+
+      <div class="hp-cine-editorial reveal-on-scroll from-left" style="--reveal-delay: 210ms">
+        <p class="hp-cine-editorial-kicker">Semnătura noastră</p>
+        <h3>Scenografie audio + ritm inteligent al serii</h3>
+        <p>
+          Construim tensiunea serii în valuri: intro elegant, urcare energică, explozie pe ring și final memorabil.
+          Asta transformă evenimentul într-un show, nu într-o simplă petrecere.
+        </p>
+        <a href="/contact/" class="hp-cine-editorial-cta">Cere oferta premium</a>
+      </div>
+    </div>
+
+    <div class="hp-cinematic-marquee reveal-on-scroll from-bottom" style="--reveal-delay: 260ms" aria-hidden="true">
+      <div class="hp-cinematic-track">
+        <span>LIVE BAND PREMIUM</span>
+        <span>•</span>
+        <span>REPERTORIU PERSONALIZAT</span>
+        <span>•</span>
+        <span>ENERGIE REALĂ PE SCENĂ</span>
+        <span>•</span>
+        <span>FORMAȚIA FLORENTINA PANĂ</span>
+        <span>•</span>
+        <span>LIVE BAND PREMIUM</span>
+        <span>•</span>
+        <span>REPERTORIU PERSONALIZAT</span>
+        <span>•</span>
+        <span>ENERGIE REALĂ PE SCENĂ</span>
+      </div>
     </div>
   </section>
 
@@ -549,6 +578,34 @@ const heroPhotos = [
         });
         card.addEventListener('mouseleave', reset);
         window.addEventListener('resize', () => { rect = null; reset(); }, { passive: true });
+      });
+    })();
+  </script>
+
+  <script is:inline>
+    (() => {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      if (window.matchMedia('(max-width: 1024px)').matches) return;
+      if (!window.matchMedia('(hover: hover)').matches) return;
+
+      const cinematicCards = Array.from(document.querySelectorAll('.hp-cine-card'));
+      if (!cinematicCards.length) return;
+
+      cinematicCards.forEach((card) => {
+        let rect = null;
+        const cacheRect = () => { rect = card.getBoundingClientRect(); };
+        const clear = () => { card.style.transform = ''; };
+
+        card.addEventListener('mouseenter', cacheRect);
+        card.addEventListener('mousemove', (event) => {
+          if (!rect) cacheRect();
+          const px = (event.clientX - rect.left) / rect.width;
+          const py = (event.clientY - rect.top) / rect.height;
+          const x = (px - 0.5) * 5;
+          const y = (py - 0.5) * 5;
+          card.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) scale(1.015)`;
+        });
+        card.addEventListener('mouseleave', clear);
       });
     })();
   </script>
@@ -1707,6 +1764,22 @@ const heroPhotos = [
     text-align: center;
   }
 
+  .hp-cinematic-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.45rem;
+    padding: 0.24rem 0.65rem;
+    border-radius: 999px;
+    border: 1px solid rgba(11, 188, 214, 0.42);
+    background: rgba(11, 188, 214, 0.12);
+    color: rgba(172, 240, 248, 0.95);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
   .hp-cinematic-kicker {
     display: inline-block;
     margin: 0 0 0.55rem;
@@ -1821,8 +1894,20 @@ const heroPhotos = [
   .hp-cine-card--video:nth-of-type(2) { grid-column: span 4; }
   .hp-cine-card--video:nth-of-type(3) { grid-column: span 4; }
 
+  .hp-cine-card--video:nth-of-type(1) {
+    grid-column: span 7;
+    grid-row: span 2;
+    min-height: 330px;
+  }
+
+  .hp-cine-card--video:nth-of-type(2),
+  .hp-cine-card--video:nth-of-type(3) {
+    grid-column: span 5;
+    min-height: 150px;
+  }
+
   .hp-cine-story {
-    grid-column: span 6;
+    grid-column: span 7;
     padding: 1.4rem;
     display: flex;
     flex-direction: column;
@@ -1857,7 +1942,93 @@ const heroPhotos = [
   }
 
   .hp-cine-card--photo {
-    grid-column: span 3;
+    grid-column: span 4;
+  }
+
+  .hp-cine-editorial {
+    grid-column: span 5;
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background:
+      radial-gradient(circle at 85% 20%, rgba(245, 166, 35, 0.22), transparent 42%),
+      rgba(9, 18, 40, 0.72);
+    padding: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.32);
+  }
+
+  .hp-cine-editorial-kicker {
+    margin: 0;
+    font-size: 0.64rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255, 225, 160, 0.9);
+    font-weight: 700;
+  }
+
+  .hp-cine-editorial h3 {
+    margin: 0;
+    color: #f8fbff;
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(1.08rem, 1.9vw, 1.32rem);
+    line-height: 1.2;
+  }
+
+  .hp-cine-editorial p {
+    margin: 0;
+    color: rgba(211, 224, 243, 0.94);
+    line-height: 1.72;
+    font-size: 0.86rem;
+  }
+
+  .hp-cine-editorial-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    margin-top: 0.25rem;
+    min-height: 44px;
+    border-radius: 999px;
+    border: 1px solid rgba(245, 166, 35, 0.46);
+    padding: 0.45rem 0.9rem;
+    text-decoration: none;
+    color: #ffe8bd;
+    background: linear-gradient(135deg, rgba(245, 166, 35, 0.22), rgba(255, 209, 102, 0.16));
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 700;
+    transition: transform 180ms ease, filter 180ms ease;
+  }
+
+  .hp-cine-editorial-cta:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+  }
+
+  .hp-cinematic-marquee {
+    margin-top: 0.95rem;
+    border-radius: 0.95rem;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(8, 16, 38, 0.6);
+    overflow: hidden;
+  }
+
+  .hp-cinematic-track {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    min-width: max-content;
+    padding: 0.62rem 0.8rem;
+    color: rgba(227, 238, 255, 0.88);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 700;
+    animation: cinematicMarquee 18s linear infinite;
   }
 
   @media (hover: hover) and (pointer: fine) {
@@ -1877,9 +2048,15 @@ const heroPhotos = [
     .hp-cine-card--video:nth-of-type(2),
     .hp-cine-card--video:nth-of-type(3) {
       grid-column: span 6;
+      grid-row: auto;
+      min-height: 220px;
     }
 
     .hp-cine-story {
+      grid-column: span 12;
+    }
+
+    .hp-cine-editorial {
       grid-column: span 12;
     }
 
@@ -1897,6 +2074,7 @@ const heroPhotos = [
     .hp-cine-card--video:nth-of-type(2),
     .hp-cine-card--video:nth-of-type(3),
     .hp-cine-story,
+    .hp-cine-editorial,
     .hp-cine-card--photo {
       grid-column: 1 / -1;
     }
@@ -1947,6 +2125,10 @@ const heroPhotos = [
       transition: none;
     }
 
+    .hp-cinematic-track {
+      animation: none;
+    }
+
     .hero-orb {
       animation: none;
     }
@@ -1959,6 +2141,16 @@ const heroPhotos = [
 
     to {
       transform: translate3d(0, -14px, 0) scale(1.05);
+    }
+  }
+
+  @keyframes cinematicMarquee {
+    from {
+      transform: translateX(0);
+    }
+
+    to {
+      transform: translateX(-35%);
     }
   }
 
