@@ -401,9 +401,18 @@ const heroPhotos = [
   {/* ═══════════════════════════════════════════
       HIGHLIGHTS — 2 carduri clickabile
   ═══════════════════════════════════════════ */}
-  <section id="highlights" class="hp-highlights" aria-label="Descoperă mai mult">
+  <section id="highlights" class="hp-highlights hp-highlights--diamond" aria-label="Descoperă mai mult">
 
-    <a href="/despre/" class="hp-card hp-card--story anim-on-scroll anim-d1 anim-card-hover">
+    <div class="hp-diamond-head reveal-on-scroll from-bottom" style="--reveal-delay: 60ms">
+      <p class="hp-diamond-kicker">Diamantul serii</p>
+      <h2 class="hp-diamond-title">Eleganță vizuală, energie live, impact memorabil</h2>
+      <p class="hp-diamond-copy">
+        Am construit această zonă ca o vitrină premium: poveste, rezervare rapidă și semnale clare de încredere,
+        totul într-o experiență fluidă care atrage instant atenția.
+      </p>
+    </div>
+
+    <a href="/despre/" class="hp-card hp-card--story anim-on-scroll anim-d1 anim-card-hover reveal-on-scroll from-left" style="--reveal-delay: 100ms">
       <img
         src="/images/galerie-foto-site/placerea-scenei-panoramica-1.jpg"
         alt="Formația Florentina Pană pe scenă — moment live de la un eveniment"
@@ -425,7 +434,7 @@ const heroPhotos = [
       </div>
     </a>
 
-    <div class="hp-card hp-card--book anim-on-scroll anim-d2 anim-card-hover">
+    <div class="hp-card hp-card--book anim-on-scroll anim-d2 anim-card-hover reveal-on-scroll from-right" style="--reveal-delay: 180ms">
       {/* Stretched link acoperă tot cardul — navigare spre /contact */}
       <a href="/contact/" class="hp-card-link" aria-label="Rezervă acum — pagina de contact"></a>
       <div class="hp-card-overlay" aria-hidden="true"></div>
@@ -448,6 +457,13 @@ const heroPhotos = [
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
         </span>
       </div>
+    </div>
+
+    <div class="hp-diamond-strip reveal-on-scroll from-bottom" style="--reveal-delay: 220ms" aria-label="Beneficii premium">
+      <span class="hp-diamond-pill">Sunet premium</span>
+      <span class="hp-diamond-pill">Program personalizat</span>
+      <span class="hp-diamond-pill">Coordonare profesionistă</span>
+      <span class="hp-diamond-pill">Vibe memorabil</span>
     </div>
 
   </section>
@@ -505,6 +521,35 @@ const heroPhotos = [
       }, { threshold: 0.6 });
 
       nums.forEach((n) => io.observe(n));
+    })();
+  </script>
+
+  <script is:inline>
+    (() => {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      if (window.matchMedia('(max-width: 1024px)').matches) return;
+      if (!window.matchMedia('(hover: hover)').matches) return;
+
+      const cards = Array.from(document.querySelectorAll('.hp-highlights--diamond .hp-card'));
+      if (!cards.length) return;
+
+      cards.forEach((card) => {
+        let rect = null;
+        const cacheRect = () => { rect = card.getBoundingClientRect(); };
+        const reset = () => { card.style.transform = ''; };
+
+        card.addEventListener('mouseenter', cacheRect);
+        card.addEventListener('mousemove', (event) => {
+          if (!rect) cacheRect();
+          const px = (event.clientX - rect.left) / rect.width;
+          const py = (event.clientY - rect.top) / rect.height;
+          const moveX = (px - 0.5) * 8;
+          const moveY = (py - 0.5) * 6;
+          card.style.transform = `translate3d(${moveX.toFixed(2)}px, ${moveY.toFixed(2)}px, 0) scale(1.018)`;
+        });
+        card.addEventListener('mouseleave', reset);
+        window.addEventListener('resize', () => { rect = null; reset(); }, { passive: true });
+      });
     })();
   </script>
 
@@ -1015,6 +1060,105 @@ const heroPhotos = [
     z-index: 4;
   }
 
+  .hp-highlights--diamond {
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 1.5rem;
+    background:
+      linear-gradient(130deg, rgba(8, 16, 40, 0.56), rgba(10, 20, 46, 0.52)),
+      radial-gradient(circle at 10% 15%, rgba(11, 188, 214, 0.16), transparent 42%),
+      radial-gradient(circle at 88% 88%, rgba(245, 166, 35, 0.14), transparent 40%);
+    box-shadow: 0 14px 42px rgba(0, 0, 0, 0.32);
+    overflow: hidden;
+  }
+
+  .hp-highlights--diamond::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(112deg,
+      transparent 0%,
+      transparent 34%,
+      rgba(255, 255, 255, 0.14) 47%,
+      rgba(255, 255, 255, 0.03) 56%,
+      transparent 66%,
+      transparent 100%);
+    transform: translateX(-35%);
+    opacity: 0;
+    transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1), opacity 320ms ease;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .hp-highlights--diamond:hover::before {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  .hp-diamond-head,
+  .hp-diamond-strip {
+    grid-column: 1 / -1;
+  }
+
+  .hp-diamond-head {
+    max-width: 70ch;
+    margin: 0 auto;
+    text-align: center;
+    padding-top: 0.35rem;
+  }
+
+  .hp-diamond-kicker {
+    margin: 0;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255, 223, 167, 0.92);
+  }
+
+  .hp-diamond-title {
+    margin: 0.45rem 0 0;
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(1.45rem, 3vw, 2rem);
+    line-height: 1.16;
+    color: #f8fbff;
+    text-wrap: balance;
+  }
+
+  .hp-diamond-copy {
+    margin: 0.65rem auto 0;
+    max-width: 62ch;
+    color: rgba(210, 224, 245, 0.92);
+    font-size: clamp(0.88rem, 1.15vw, 0.98rem);
+    line-height: 1.75;
+    text-wrap: pretty;
+  }
+
+  .hp-diamond-strip {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.55rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 0.95rem;
+    margin-top: -0.15rem;
+  }
+
+  .hp-diamond-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(236, 245, 255, 0.95);
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.34rem 0.68rem;
+  }
+
   .hp-trust-ribbon {
     max-width: var(--container-max);
     margin: 0 auto;
@@ -1124,6 +1268,19 @@ const heroPhotos = [
       margin-top: -3rem;
     }
 
+    .hp-diamond-head {
+      padding-top: 0;
+    }
+
+    .hp-diamond-title {
+      font-size: clamp(1.3rem, 6.2vw, 1.7rem);
+    }
+
+    .hp-diamond-copy {
+      font-size: 0.85rem;
+      line-height: 1.72;
+    }
+
     /* Reduce card min-height când stivuite — evită spațiu alb excesiv */
     .hp-card {
       min-height: 240px;
@@ -1166,6 +1323,17 @@ const heroPhotos = [
                 border-color 300ms ease;
   }
 
+  .hp-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    opacity: 0.55;
+    z-index: 2;
+  }
+
   @media (min-width: 1025px) {
     .hp-card { min-height: 340px; }
   }
@@ -1174,6 +1342,11 @@ const heroPhotos = [
   @media (hover: hover) and (pointer: fine) {
     .hp-card:hover {
       transform: scale(1.02);
+    }
+
+    .hp-card:hover::before {
+      border-color: rgba(255, 255, 255, 0.24);
+      opacity: 1;
     }
   }
 
