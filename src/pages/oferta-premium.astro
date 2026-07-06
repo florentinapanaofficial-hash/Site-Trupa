@@ -13,6 +13,34 @@ const whatsappHref = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
   title="Ofertă Premium Formație Nuntă | Florentina Pană"
   description="Descoperă oferta premium Florentina Pană: muzică live completă, atmosferă elegantă și coordonare profesionistă. Cere oferta personalizată acum."
 >
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json">{JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": "Ofertă Premium Formație Nuntă 2026-2027",
+      "description": "Servicii muzicale live premium pentru nunți, botezuri, aniversări și corporate. Repertoriu personalizat, energie reală pe scenă, coordonare profesionistă.",
+      "provider": {
+        "@type": "MusicGroup",
+        "name": "Formația Florentina Pană",
+        "url": "https://www.florentinapanaofficial.ro/"
+      },
+      "areaServed": {
+        "@type": "Country",
+        "name": "Romania"
+      },
+      "serviceType": "Live Music Entertainment",
+      "offers": {
+        "@type": "Offer",
+        "name": "Pachet Signature Muzică Live",
+        "description": "Program muzical live adaptat evenimentului, suport pentru timeline, repertoriu divers și coordonare cu echipa organizatorică.",
+        "url": "https://www.florentinapanaofficial.ro/oferta-premium/",
+        "availability": "https://schema.org/InStock",
+        "validFrom": "2026-01-01",
+        "validThrough": "2027-12-31"
+      },
+      "url": "https://www.florentinapanaofficial.ro/oferta-premium/"
+    })}</script>
+  </Fragment>
   <section class="section-container premium-page py-12">
     <div class="mb-5"><BackButton href="/contact/" label="Înapoi la contact" /></div>
 
