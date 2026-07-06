@@ -249,6 +249,44 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
     </div>
   </section>
 
+  <section class="hp-team-spotlight section-container" aria-label="Cunoaște nucleul formației">
+    <div class="hp-team-head reveal-on-scroll from-bottom" style="--reveal-delay: 55ms">
+      <p class="hp-team-kicker">Nucleul formației</p>
+      <h2 class="hp-team-title">Oameni reali, energie reală, chimie care se simte pe scenă</h2>
+      <p class="hp-team-copy">
+        Înainte de playlist, există oamenii. De aceea punem accent pe relația directă cu voi,
+        pe încredere și pe vibe-ul pe care îl construim împreună la eveniment.
+      </p>
+    </div>
+
+    <div class="hp-team-grid">
+      <article class="hp-team-card reveal-on-scroll from-left" style="--reveal-delay: 80ms">
+        <img src="/images/galerie-foto-site/placerea-scenei-claudiu-florentina.jpg" alt="Florentina și Claudiu în timpul unui show live" loading="lazy" decoding="async" width="720" height="460" />
+        <div class="hp-team-overlay" aria-hidden="true"></div>
+        <div class="hp-team-content">
+          <p class="hp-team-role">Voce & Show Direction</p>
+          <h3>Florentina Pană</h3>
+          <p>Prezență scenică puternică, emoție autentică și conexiune directă cu invitații.</p>
+        </div>
+      </article>
+
+      <article class="hp-team-card reveal-on-scroll from-right" style="--reveal-delay: 150ms">
+        <img src="/images/galerie-foto-site/placerea-scenei-panoramica-2.jpg" alt="Claudiu coordonând atmosfera live la eveniment" loading="lazy" decoding="async" width="720" height="460" />
+        <div class="hp-team-overlay" aria-hidden="true"></div>
+        <div class="hp-team-content">
+          <p class="hp-team-role">Coordonare & Energie Live</p>
+          <h3>Pană Claudiu</h3>
+          <p>Ritm impecabil al serii, tranziții inteligente și focus total pe experiența invitaților.</p>
+        </div>
+      </article>
+    </div>
+
+    <div class="hp-team-actions reveal-on-scroll from-bottom" style="--reveal-delay: 200ms">
+      <a href="/membri/" class="btn-outline">Vezi toată echipa</a>
+      <a href="/contact/" class="btn-solid">Hai să ne cunoaștem</a>
+    </div>
+  </section>
+
   <section class="hp-trust-ribbon section-container" aria-label="Beneficii premium">
     <div class="hp-trust-ribbon-inner reveal-on-scroll from-bottom" style="--reveal-delay: 40ms">
       <p class="hp-trust-title">Standardul nostru pentru evenimentul tău</p>
@@ -1359,6 +1397,132 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
     padding-block: clamp(0.55rem, 1.8vw, 1rem);
   }
 
+  .hp-team-spotlight {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding-block: clamp(1rem, 2.4vw, 1.6rem);
+  }
+
+  .hp-team-head {
+    max-width: 72ch;
+    margin: 0 auto 0.95rem;
+    text-align: center;
+  }
+
+  .hp-team-kicker {
+    margin: 0;
+    color: rgba(255, 221, 155, 0.92);
+    font-size: 0.66rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  .hp-team-title {
+    margin: 0.45rem 0 0;
+    color: #f8fbff;
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+
+  .hp-team-copy {
+    margin: 0.6rem auto 0;
+    color: rgba(209, 223, 243, 0.93);
+    max-width: 64ch;
+    font-size: clamp(0.87rem, 1.1vw, 0.96rem);
+    line-height: 1.74;
+    text-wrap: pretty;
+  }
+
+  .hp-team-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(0.75rem, 1.6vw, 1rem);
+  }
+
+  .hp-team-card {
+    position: relative;
+    border-radius: 1rem;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    min-height: 280px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+  }
+
+  .hp-team-card img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(1.05) contrast(1.04);
+    transition: transform 340ms ease;
+  }
+
+  .hp-team-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(4, 10, 25, 0.2) 0%, rgba(4, 10, 25, 0.75) 76%, rgba(4, 10, 25, 0.9) 100%);
+    z-index: 1;
+  }
+
+  .hp-team-content {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    padding: 0.85rem 0.9rem 0.95rem;
+  }
+
+  .hp-team-role {
+    margin: 0;
+    color: rgba(165, 234, 246, 0.95);
+    font-size: 0.64rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  .hp-team-content h3 {
+    margin: 0.28rem 0 0;
+    color: #fff;
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(1.05rem, 1.6vw, 1.28rem);
+    line-height: 1.2;
+  }
+
+  .hp-team-content p {
+    margin: 0.42rem 0 0;
+    color: rgba(225, 236, 253, 0.92);
+    font-size: 0.82rem;
+    line-height: 1.66;
+    max-width: 46ch;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .hp-team-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(255, 209, 102, 0.32);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.34);
+    }
+
+    .hp-team-card:hover img {
+      transform: scale(1.04);
+    }
+  }
+
+  .hp-team-actions {
+    margin-top: 0.85rem;
+    display: flex;
+    gap: 0.65rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
   .hp-convert-wrap {
     border-radius: 1rem;
     border: 1px solid rgba(255, 255, 255, 0.15);
@@ -1740,6 +1904,29 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
       grid-template-columns: 1fr;
       gap: 0.65rem;
       padding: 0.75rem;
+    }
+
+    .hp-team-grid {
+      grid-template-columns: 1fr;
+      gap: 0.7rem;
+    }
+
+    .hp-team-card {
+      min-height: 250px;
+    }
+
+    .hp-team-content {
+      padding: 0.75rem 0.8rem 0.85rem;
+    }
+
+    .hp-team-content p {
+      font-size: 0.8rem;
+      line-height: 1.62;
+    }
+
+    .hp-team-actions .btn-solid,
+    .hp-team-actions .btn-outline {
+      width: 100%;
     }
 
     .hp-convert-actions {
