@@ -60,6 +60,8 @@ const signatureCouples = [...couplesData.couples]
     recommendation: item.recommendation,
     slug: item.slug,
   }));
+const heroTelHref = `tel:${contact.phoneRaw}`;
+const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%83!%20Vreau%20s%C4%83%20verific%20disponibilitatea%20Forma%C8%9Biei%20Florentina%20Pan%C4%83.`;
 ---
 
 <BaseLayout title={acasa.meta.title} description={acasa.meta.description} ogImage={siteContent.seo.ogImage}>
@@ -220,6 +222,29 @@ const signatureCouples = [...couplesData.couples]
           <a href="/despre/" class="btn-outline">Cunoaște-ne mai bine</a>
           <a href="/contact/" class="btn-solid">Hai să vorbim acum</a>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="hp-convert-strip section-container" aria-label="Contact rapid și ofertă">
+    <div class="hp-convert-wrap reveal-on-scroll from-bottom" style="--reveal-delay: 45ms">
+      <div class="hp-convert-copy">
+        <p class="hp-convert-kicker">Disponibilitate rapidă</p>
+        <h2 class="hp-convert-title">Spune-ne data, iar noi revenim rapid cu disponibilitate și ofertă.</h2>
+      </div>
+      <div class="hp-convert-actions">
+        <a href={heroTelHref} class="hp-convert-btn hp-convert-btn--call" aria-label="Sună acum pentru ofertă">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          Sună Acum
+        </a>
+        <a href={heroWaHref} class="hp-convert-btn hp-convert-btn--wa" target="_blank" rel="noopener noreferrer" aria-label="Scrie pe WhatsApp pentru disponibilitate">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
+          WhatsApp
+        </a>
+        <a href="/contact/" class="hp-convert-btn hp-convert-btn--offer" aria-label="Vezi oferta și contact">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41 11 23l-9-9 9.59-9.59a2 2 0 0 1 1.41-.59H20a2 2 0 0 1 2 2v6.99a2 2 0 0 1-.59 1.42Z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          Vezi Oferta
+        </a>
       </div>
     </div>
   </section>
@@ -1328,6 +1353,102 @@ const signatureCouples = [...couplesData.couples]
     padding-block: clamp(1.1rem, 2.6vw, 1.8rem);
   }
 
+  .hp-convert-strip {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding-block: clamp(0.55rem, 1.8vw, 1rem);
+  }
+
+  .hp-convert-wrap {
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background:
+      linear-gradient(120deg, rgba(8, 17, 40, 0.76), rgba(10, 20, 46, 0.74)),
+      radial-gradient(circle at 15% 20%, rgba(11, 188, 214, 0.16), transparent 42%),
+      radial-gradient(circle at 85% 80%, rgba(245, 166, 35, 0.16), transparent 42%);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+    padding: 0.85rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  .hp-convert-copy {
+    min-width: 0;
+  }
+
+  .hp-convert-kicker {
+    margin: 0;
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(170, 236, 247, 0.94);
+    font-weight: 700;
+  }
+
+  .hp-convert-title {
+    margin: 0.35rem 0 0;
+    color: #f7fbff;
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(1rem, 1.7vw, 1.25rem);
+    line-height: 1.24;
+    text-wrap: balance;
+  }
+
+  .hp-convert-actions {
+    display: flex;
+    gap: 0.52rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .hp-convert-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    min-height: 44px;
+    padding: 0.5rem 0.78rem;
+    border-radius: 0.72rem;
+    text-decoration: none;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 700;
+    transition: transform 180ms ease, filter 180ms ease, border-color 180ms ease;
+  }
+
+  .hp-convert-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .hp-convert-btn--call {
+    color: #daf0ff;
+    border: 1px solid rgba(11, 188, 214, 0.42);
+    background: rgba(11, 188, 214, 0.16);
+  }
+
+  .hp-convert-btn--wa {
+    color: #10281a;
+    border: 1px solid rgba(55, 207, 120, 0.48);
+    background: linear-gradient(135deg, #38de8a 0%, #28be72 100%);
+  }
+
+  .hp-convert-btn--offer {
+    color: #2a1700;
+    border: 1px solid rgba(245, 166, 35, 0.44);
+    background: linear-gradient(135deg, #ffd166 0%, #f5a623 100%);
+  }
+
+  .hp-convert-btn:hover,
+  .hp-convert-btn:focus-visible {
+    transform: translateY(-1px);
+    filter: brightness(1.03) saturate(1.04);
+  }
+
   .hp-meet-wrap {
     display: grid;
     grid-template-columns: 1.05fr 1fr;
@@ -1613,6 +1734,21 @@ const signatureCouples = [...couplesData.couples]
     .hp-meet-wrap {
       grid-template-columns: 1fr;
       gap: 0;
+    }
+
+    .hp-convert-wrap {
+      grid-template-columns: 1fr;
+      gap: 0.65rem;
+      padding: 0.75rem;
+    }
+
+    .hp-convert-actions {
+      width: 100%;
+      justify-content: stretch;
+    }
+
+    .hp-convert-btn {
+      width: 100%;
     }
 
     .hp-meet-media {
