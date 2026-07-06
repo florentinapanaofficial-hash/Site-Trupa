@@ -2577,6 +2577,25 @@ body::before {
     radial-gradient(circle at 80% 10%, rgba(11, 188, 214, 0.14), transparent 40%);
 }
 
+.header-premium-pill {
+  margin-top: 0.28rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  padding: 0.1rem 0.48rem;
+  border: 1px solid rgba(255, 209, 102, 0.5);
+  background: linear-gradient(135deg, rgba(255, 209, 102, 0.24), rgba(245, 166, 35, 0.22));
+  color: #ffe8b4;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.53rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  text-shadow: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 2px 8px rgba(245, 166, 35, 0.25);
+  animation: premium-pill-glow 2.8s ease-in-out infinite;
+}
+
 @media (min-width: 1025px) {
   .left-side-menu .left-side-link {
     transition: transform 180ms ease, filter 180ms ease, background-color 180ms ease, border-color 180ms ease;
@@ -2654,8 +2673,26 @@ select:focus-visible {
   }
 }
 
+@keyframes premium-pill-glow {
+
+  0%,
+  100% {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 2px 8px rgba(245, 166, 35, 0.2);
+    filter: saturate(1);
+  }
+
+  50% {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.32), 0 4px 14px rgba(245, 166, 35, 0.35);
+    filter: saturate(1.05);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   body::before {
+    animation: none;
+  }
+
+  .header-premium-pill {
     animation: none;
   }
 
