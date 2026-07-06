@@ -40,6 +40,8 @@ const ogImage = encodeURI(decodeURI(ogImageAbsolute));
 
 const ga4Id = import.meta.env.PUBLIC_GA4_ID;
 const gscVerification = import.meta.env.PUBLIC_GSC_VERIFICATION;
+const telHref = `tel:${siteContent.contact.phoneRaw}`;
+const waFloatHref = `https://wa.me/${siteContent.contact.phoneRaw.replace('+', '')}?text=Bun%C4%83!%20Vreau%20o%20ofert%C4%83%20pentru%20Forma%C8%9Bia%20Florentina%20Pan%C4%83.`;
 
 const jsonLd = {
   ...seoContent.schema,
@@ -260,6 +262,7 @@ const mobileNavAllItems = [
         utilizatorului prin CookieBanner, conform Rec. 30 & 32 RGPD / ePrivacy */}
   </head>
   <body class={`page-shell${isHomePage ? ' is-homepage' : ''}`}>
+    <div class="scroll-progress" aria-hidden="true"></div>
     <a href="#continut" class="skip-link">Sari la conținut</a>
     <SkyBackground />
     <Header />
@@ -697,7 +700,7 @@ const mobileNavAllItems = [
 
     <!-- ══ WhatsApp Floating Contact Button ══ -->
     <a
-      href="https://wa.me/40767369658?text=Bun%C4%83!%20Vreau%20o%20ofert%C4%83%20pentru%20Forma%C8%9Bia%20Florentina%20Pan%C4%83."
+      href={waFloatHref}
       target="_blank"
       rel="noopener noreferrer"
       class="wa-float"
@@ -709,7 +712,30 @@ const mobileNavAllItems = [
       </svg>
     </a>
 
+    <nav class="quick-dock" aria-label="Acțiuni rapide">
+      <a href={telHref} class="quick-dock-btn quick-dock-btn--call" aria-label="Sună acum">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        <span>Sună acum</span>
+      </a>
+      <a href={waFloatHref} class="quick-dock-btn quick-dock-btn--wa" target="_blank" rel="noopener noreferrer" aria-label="Scrie pe WhatsApp">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
+        <span>WhatsApp</span>
+      </a>
+    </nav>
+
     <style>
+      .scroll-progress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 3px;
+        width: max(0%, calc(var(--scroll-progress, 0) * 100%));
+        z-index: 999;
+        background: linear-gradient(90deg, #0bbcd6 0%, #ffd700 48%, #f5a623 100%);
+        box-shadow: 0 0 14px rgba(245, 166, 35, 0.45);
+        pointer-events: none;
+      }
+
       /* ── WhatsApp Floating Button ── */
       .wa-float {
         position: fixed;
@@ -750,7 +776,7 @@ const mobileNavAllItems = [
       /* Pe mobil: poziționare optimizată — fără suprapunere cu elementele galeriei */
       @media (max-width: 767px) {
         .wa-float {
-          bottom: 1.25rem;
+          bottom: 5.5rem;
           right: 1rem;
           width: 3rem;
           height: 3rem;
@@ -758,6 +784,68 @@ const mobileNavAllItems = [
         .wa-float svg {
           width: 24px;
           height: 24px;
+        }
+      }
+
+      .quick-dock {
+        position: fixed;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 0.85rem;
+        z-index: 920;
+        display: none;
+        gap: 0.6rem;
+        width: min(94vw, 420px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 1rem;
+        padding: 0.45rem;
+        background: rgba(8, 16, 38, 0.82);
+        backdrop-filter: blur(14px) saturate(1.3);
+        -webkit-backdrop-filter: blur(14px) saturate(1.3);
+        box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
+      }
+
+      .quick-dock-btn {
+        flex: 1;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.45rem;
+        border-radius: 0.8rem;
+        text-decoration: none;
+        font-family: 'Oswald', sans-serif;
+        font-size: 0.82rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        font-weight: 700;
+      }
+
+      .quick-dock-btn svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      .quick-dock-btn--call {
+        color: #d8ecff;
+        border: 1px solid rgba(11, 188, 214, 0.42);
+        background: rgba(11, 188, 214, 0.16);
+      }
+
+      .quick-dock-btn--wa {
+        color: #0f2719;
+        border: 1px solid rgba(55, 207, 120, 0.45);
+        background: linear-gradient(135deg, #38de8a 0%, #28be72 100%);
+      }
+
+      .quick-dock-btn:focus-visible {
+        outline: 2px solid #fff;
+        outline-offset: 2px;
+      }
+
+      @media (max-width: 767px) {
+        .quick-dock {
+          display: flex;
         }
       }
 
