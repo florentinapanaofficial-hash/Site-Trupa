@@ -28,6 +28,26 @@ const faqJsonLd = {
   })),
 };
 const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%83%20ziua!%20A%C8%99%20dori%20s%C4%83%20rezerv%20Forma%C8%9Bia%20Florentina%20Pan%C4%83%20pentru%20evenimentul%20meu.`;
+
+const heroVideos = siteContent.videos.slice(0, 3).map((video) => ({
+  title: video.title,
+  thumb: `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`,
+}));
+
+const heroPhotos = [
+  {
+    src: '/images/galerie-foto-site/placerea-scenei-panoramica-2.jpg',
+    alt: 'Formația Florentina Pană în plin show live pe scenă',
+  },
+  {
+    src: '/images/galerie-foto-site/placerea-scenei-claudiu-florentina.jpg',
+    alt: 'Moment live în duet pe scenă la un eveniment premium',
+  },
+  {
+    src: '/images/galerie-foto-site/placerea-scenei-grup-arabesc.jpg',
+    alt: 'Invitați pe ringul de dans la un moment live energic',
+  },
+];
 ---
 
 <BaseLayout title={acasa.meta.title} description={acasa.meta.description} ogImage={siteContent.seo.ogImage}>
@@ -161,6 +181,62 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
   </section>
 
   {/* ═══════════════════════════════════════════
+      SHOWCASE CINEMATIC — text + video + foto cu reveal la scroll
+  ═══════════════════════════════════════════ */}
+  <section id="showcase-cinematic" class="hp-cinematic section-container" aria-label="Showcase live foto-video">
+    <div class="hp-cinematic-head reveal-on-scroll from-bottom" style="--reveal-delay: 0ms">
+      <p class="hp-cinematic-kicker">Experiență vizuală</p>
+      <h2 class="hp-cinematic-title">Nu doar muzică. Un spectacol care prinde viață în fața ta.</h2>
+      <p class="hp-cinematic-copy">
+        Când faci scroll, povestea se deschide în ritmul evenimentului: cadre live, lumină, energie și momente reale
+        care transformă o pagină statică într-o atmosferă de scenă.
+      </p>
+    </div>
+
+    <div class="hp-cinematic-grid">
+      {heroVideos.map((video, index) => (
+        <a
+          href="/galerie-video/"
+          class="hp-cine-card hp-cine-card--video reveal-on-scroll from-left"
+          style={`--reveal-delay: ${index * 90}ms`}
+          aria-label={`Vezi videoclipuri live: ${video.title}`}
+        >
+          <img src={video.thumb} alt={video.title} loading="lazy" decoding="async" width="640" height="360" />
+          <span class="hp-cine-overlay" aria-hidden="true"></span>
+          <span class="hp-cine-chip" aria-hidden="true">LIVE</span>
+          <span class="hp-cine-play" aria-hidden="true">▶</span>
+          <span class="hp-cine-caption">{video.title}</span>
+        </a>
+      ))}
+
+      <div class="hp-cine-story reveal-on-scroll from-right" style="--reveal-delay: 140ms">
+        <h3>Scroll și simte ritmul serii</h3>
+        <p>
+          Paragrafele și cardurile intră gradual din lateral, exact ca intrarea unei formații pe scenă.
+          Accentul rămâne pe conținut, dar prezentarea capătă impact emoțional.
+        </p>
+        <div class="hp-cine-actions">
+          <a href="/galerie-foto/" class="btn-outline">Vezi galerie foto</a>
+          <a href="/contact/" class="btn-solid">Rezervă data ta</a>
+        </div>
+      </div>
+
+      {heroPhotos.map((photo, index) => (
+        <a
+          href="/galerie-foto/"
+          class="hp-cine-card hp-cine-card--photo reveal-on-scroll from-right"
+          style={`--reveal-delay: ${160 + index * 100}ms`}
+          aria-label="Vezi mai multe fotografii din galerie"
+        >
+          <img src={photo.src} alt={photo.alt} loading="lazy" decoding="async" width="800" height="500" />
+          <span class="hp-cine-overlay" aria-hidden="true"></span>
+          <span class="hp-cine-caption">Cadru autentic de la eveniment</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  {/* ═══════════════════════════════════════════
       EARLY BOOKING — Link intern la articol preț
   ═══════════════════════════════════════════ */}
   <section class="hp-early-booking section-container py-8 sm:py-12" aria-label="Oferte Early Booking">
@@ -171,7 +247,7 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
         Calendarul se umple rapid. Cuplurile care rezervă acum beneficiază de tarif Early Booking blocat contractual, 
         indiferent de evoluția costurilor pe piață. Zero surprize, doar profesionalism.
       </p>
-      <a href="/blog/pret-formatie-nunta-2026/" class="btn-solid inline-block" onclick="window.gtag&&window.gtag('event','click_early_booking',{event_category:'homepage',event_label:'pricing-link'})">
+      <a href="/publicatii/pret-formatie-nunta-2026/" class="btn-solid inline-block" onclick="window.gtag&&window.gtag('event','click_early_booking',{event_category:'homepage',event_label:'pricing-link'})">
         Detalii Prețuri & Ofertă →
       </a>
     </div>
@@ -357,6 +433,26 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     </div>
 
   </section>
+
+  <script is:inline>
+    (() => {
+      const targets = Array.from(document.querySelectorAll('.reveal-on-scroll'));
+      if (!targets.length || !('IntersectionObserver' in window)) return;
+
+      const io = new IntersectionObserver((entries, observer) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        });
+      }, {
+        threshold: 0.18,
+        rootMargin: '0px 0px -8% 0px',
+      });
+
+      targets.forEach((target) => io.observe(target));
+    })();
+  </script>
 
 </BaseLayout>
 
@@ -1205,6 +1301,262 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
     line-height: 1.8;
     color: #D0D8E8;
     text-wrap: pretty;
+  }
+
+  /* ════════════════════════════════════════════════════════════════
+     SHOWCASE CINEMATIC — layout mixt text + video + foto
+  ════════════════════════════════════════════════════════════════ */
+  .hp-cinematic {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding-block: clamp(2rem, 5vw, 3.5rem);
+  }
+
+  .hp-cinematic-head {
+    max-width: 68ch;
+    margin: 0 auto 1.5rem;
+    text-align: center;
+  }
+
+  .hp-cinematic-kicker {
+    display: inline-block;
+    margin: 0 0 0.55rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(241, 229, 172, 0.9);
+  }
+
+  .hp-cinematic-title {
+    margin: 0;
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(1.6rem, 4.4vw, 2.4rem);
+    line-height: 1.15;
+    color: #fff;
+    text-wrap: balance;
+  }
+
+  .hp-cinematic-copy {
+    margin: 0.85rem auto 0;
+    color: #d0d8e8;
+    line-height: 1.75;
+    font-size: clamp(0.9rem, 1.3vw, 1rem);
+    max-width: 62ch;
+    text-wrap: pretty;
+  }
+
+  .hp-cinematic-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: clamp(0.75rem, 1.8vw, 1.2rem);
+    align-items: stretch;
+  }
+
+  .hp-cine-card,
+  .hp-cine-story {
+    position: relative;
+    border-radius: 1.1rem;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(9, 18, 42, 0.58);
+    min-height: 220px;
+  }
+
+  .hp-cine-card {
+    text-decoration: none;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.34);
+    transition: transform 280ms ease, box-shadow 280ms ease, border-color 280ms ease;
+  }
+
+  .hp-cine-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 420ms ease;
+  }
+
+  .hp-cine-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0.12) 60%, transparent 100%);
+    pointer-events: none;
+  }
+
+  .hp-cine-caption {
+    position: absolute;
+    left: 0.9rem;
+    right: 0.9rem;
+    bottom: 0.75rem;
+    color: #fff;
+    font-size: 0.84rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    z-index: 3;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
+  }
+
+  .hp-cine-chip {
+    position: absolute;
+    top: 0.7rem;
+    left: 0.7rem;
+    z-index: 3;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    background: rgba(240, 59, 59, 0.9);
+    color: #fff;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .hp-cine-play {
+    position: absolute;
+    right: 0.7rem;
+    top: 0.62rem;
+    z-index: 3;
+    width: 1.95rem;
+    height: 1.95rem;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+
+  .hp-cine-card--video:nth-of-type(1) { grid-column: span 4; }
+  .hp-cine-card--video:nth-of-type(2) { grid-column: span 4; }
+  .hp-cine-card--video:nth-of-type(3) { grid-column: span 4; }
+
+  .hp-cine-story {
+    grid-column: span 6;
+    padding: 1.4rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.8rem;
+    background:
+      radial-gradient(circle at 80% 15%, rgba(245, 166, 35, 0.2), transparent 40%),
+      radial-gradient(circle at 10% 90%, rgba(11, 188, 214, 0.24), transparent 45%),
+      rgba(8, 16, 36, 0.82);
+  }
+
+  .hp-cine-story h3 {
+    margin: 0;
+    color: #fff;
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(1.2rem, 2.1vw, 1.6rem);
+    line-height: 1.15;
+  }
+
+  .hp-cine-story p {
+    margin: 0;
+    color: #d4dcef;
+    line-height: 1.75;
+    font-size: 0.92rem;
+  }
+
+  .hp-cine-actions {
+    display: flex;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+    margin-top: 0.25rem;
+  }
+
+  .hp-cine-card--photo {
+    grid-column: span 3;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .hp-cine-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 22px 44px rgba(0, 0, 0, 0.4);
+      border-color: rgba(245, 166, 35, 0.5);
+    }
+
+    .hp-cine-card:hover img {
+      transform: scale(1.05);
+    }
+  }
+
+  @media (max-width: 1024px) {
+    .hp-cine-card--video:nth-of-type(1),
+    .hp-cine-card--video:nth-of-type(2),
+    .hp-cine-card--video:nth-of-type(3) {
+      grid-column: span 6;
+    }
+
+    .hp-cine-story {
+      grid-column: span 12;
+    }
+
+    .hp-cine-card--photo {
+      grid-column: span 4;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .hp-cinematic-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .hp-cine-card--video:nth-of-type(1),
+    .hp-cine-card--video:nth-of-type(2),
+    .hp-cine-card--video:nth-of-type(3),
+    .hp-cine-story,
+    .hp-cine-card--photo {
+      grid-column: 1 / -1;
+    }
+
+    .hp-cine-card,
+    .hp-cine-story {
+      min-height: 210px;
+    }
+  }
+
+  /* ════════════════════════════════════════════════════════════════
+     REVEAL ON SCROLL — intrări laterale + fade elegant
+  ════════════════════════════════════════════════════════════════ */
+  .reveal-on-scroll {
+    opacity: 0;
+    transform: translate3d(0, 32px, 0);
+    transition:
+      opacity 720ms ease,
+      transform 820ms cubic-bezier(0.2, 0.72, 0.08, 1);
+    transition-delay: var(--reveal-delay, 0ms);
+    will-change: transform, opacity;
+  }
+
+  .reveal-on-scroll.from-left {
+    transform: translate3d(-44px, 0, 0);
+  }
+
+  .reveal-on-scroll.from-right {
+    transform: translate3d(44px, 0, 0);
+  }
+
+  .reveal-on-scroll.from-bottom {
+    transform: translate3d(0, 34px, 0);
+  }
+
+  .reveal-on-scroll.is-visible {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal-on-scroll,
+    .reveal-on-scroll.from-left,
+    .reveal-on-scroll.from-right,
+    .reveal-on-scroll.from-bottom {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
   }
 
 </style>
