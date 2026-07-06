@@ -33,14 +33,23 @@ export async function getStaticPaths() {
       '*',
     ];
 
+    const fetchArrayPayload = async (url: string, init: RequestInit) => {
+      try {
+        const response = await fetch(url, init);
+        if (!response.ok) return null;
+        const payload = await response.json();
+        return Array.isArray(payload) ? payload : null;
+      } catch (error) {
+        console.warn('[publicatii/archive] Supabase fetch error:', error);
+        return null;
+      }
+    };
+
     for (const table of tableCandidates) {
       for (const select of selectCandidates) {
         const url = `${supabaseUrl}/rest/v1/${table}?select=${encodeURIComponent(select)}`;
-        const response = await fetch(url, { headers });
-        if (!response.ok) continue;
-
-        const payload = await response.json();
-        if (Array.isArray(payload)) {
+        const payload = await fetchArrayPayload(url, { headers });
+        if (payload) {
           console.log(`[publicatii] Supabase source: ${table} (${payload.length} rows)`);
           dbArticles = payload;
           break;

@@ -44,14 +44,23 @@ export async function getStaticPaths() {
       '*',
     ];
 
+    const fetchArrayPayload = async (url: string, init: RequestInit) => {
+      try {
+        const response = await fetch(url, init);
+        if (!response.ok) return null;
+        const payload = await response.json();
+        return Array.isArray(payload) ? payload : null;
+      } catch (error) {
+        console.warn('[publicatii/slug] Supabase fetch error:', error);
+        return null;
+      }
+    };
+
     for (const table of tableCandidates) {
       for (const select of selectCandidates) {
         const url = `${supabaseUrl}/rest/v1/${table}?select=${encodeURIComponent(select)}`;
-        const response = await fetch(url, { headers });
-        if (!response.ok) continue;
-
-        const payload = await response.json();
-        if (Array.isArray(payload)) {
+        const payload = await fetchArrayPayload(url, { headers });
+        if (payload) {
           console.log(`[publicatii/slug] Supabase source: ${table} (${payload.length} rows)`);
           dbArticles = payload;
           break;
@@ -95,9 +104,11 @@ const { brand } = siteContent;
 let pageTitle = '';
 let pageDescription = '';
 let publishedDate = '';
+let publishedIso = '';
 let category = '';
 let ogImage = '';
 let ContentComponent: any = null;
+let articleHeading = '';
 
 const formatDate = (d: string | Date) =>
   new Date(d).toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -109,20 +120,25 @@ const canonicalUrl = `${SITE_URL}/publicatii/${articleSlug}/`;
 
 if (type === 'local') {
   pageTitle = `${item.data.titlu} | Blog | ${brand.name}`;
+  articleHeading = item.data.titlu;
   pageDescription = item.data.descriere;
   ogImage = item.data.imaginePrincipala;
   category = item.data.categorie;
   publishedDate = formatDate(item.data.dataPublicarii);
+  publishedIso = new Date(item.data.dataPublicarii).toISOString();
   const rendered = await item.render();
   ContentComponent = rendered.Content;
 } else if (type === 'jsonBlog') {
   pageTitle = `${item.title} | Blog | ${brand.name}`;
+  articleHeading = item.title;
   pageDescription = item.excerpt || item.title;
   ogImage = item.coverImage || '/images/og-default-1200x630.jpg';
   category = item.category || 'Blog';
   publishedDate = formatDate(item.date);
+  publishedIso = new Date(item.date).toISOString();
 } else {
   pageTitle = `${item.titlu} | Blog | ${brand.name}`;
+  articleHeading = item.titlu;
   // Construiește o descriere SEO reală: descriere explicită sau primele 155 caractere din conținut
   const plainText = String(item.continut || '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
   pageDescription = (item.descriere && item.descriere.length > 0)
@@ -131,7 +147,31 @@ if (type === 'local') {
   ogImage = item.imagine_principala || '/images/og-default-1200x630.jpg';
   category = item.categorie || 'Noutăți';
   publishedDate = formatDate(item.created_at || new Date());
+  publishedIso = new Date(item.created_at || new Date()).toISOString();
 }
+
+const articleJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: articleHeading,
+  description: pageDescription,
+  datePublished: publishedIso,
+  dateModified: publishedIso,
+  author: {
+    '@type': 'Person',
+    name: type === 'jsonBlog' ? (item.author || 'Florentina Pană') : 'Florentina Pană',
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: brand.name,
+    logo: {
+      '@type': 'ImageObject',
+      url: `${SITE_URL}/images/sigla-fp-band.webp`,
+    },
+  },
+  mainEntityOfPage: canonicalUrl,
+  image: ogImage.startsWith('http') ? ogImage : `${SITE_URL}${ogImage}`,
+};
 
 // Pentru articolele Supabase cu conținut text plain (cu \n),
 // parteajăm în paragrafe; HTML deja formatat trece ne-atins prin set:html
@@ -141,7 +181,19 @@ const supabaseParagraphs = (type === 'supabase' && !supabaseIsHtml)
   : [];
 ---
 
-<BaseLayout title={pageTitle} description={pageDescription} ogImage={ogImage}>
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  ogImage={ogImage}
+  ogType="article"
+  datePublished={publishedIso}
+  dateModified={publishedIso}
+>
+  <Fragment slot="head">
+    <meta property="article:published_time" content={publishedIso} />
+    <meta property="article:author" content="Florentina Pană" />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(articleJsonLd)} />
+  </Fragment>
   <article class="pub-article">
     <div class="section-container pt-8 pb-4 sm:pt-10">
       <div class="mb-6"><BackButton href="/publicatii/" label="Toate articolele" /></div>

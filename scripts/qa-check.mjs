@@ -1,7 +1,7 @@
 import { readFileSync, existsSync } from 'fs';
 
 const hp = readFileSync('dist/client/index.html', 'utf8');
-const blog = readFileSync('dist/client/blog/din-culisele-unui-eveniment-live/index.html', 'utf8');
+const blog = readFileSync('dist/client/publicatii/din-culisele-unui-eveniment-live/index.html', 'utf8');
 const vid = readFileSync('dist/client/video/muzica-populara-moment-live-adb9aa9cfly/index.html', 'utf8');
 const rb = readFileSync('public/robots.txt', 'utf8');
 const sax = readFileSync('dist/client/colaboratori/saxofon/index.html', 'utf8');

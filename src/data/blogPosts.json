@@ -114,6 +114,19 @@
                     "ctaHref": "https://wa.me/40767369658?text=Bun%C4%83%20ziua!%20A%C8%99%20dori%20s%C4%83%20verific%20disponibilitatea%20forma%C8%9Biei%20Florentina%20Pan%C4%83%20pentru%20evenimentul%20meu.",
                     "ctaSecondaryText": "Vezi oferta completă",
                     "ctaSecondaryHref": "/contact/"
+                },
+                {
+                    "type": "links",
+                    "items": [
+                        {
+                            "label": "Preț formație nuntă București & Argeș",
+                            "href": "/contact/"
+                        },
+                        {
+                            "label": "Muzică nuntă live: videoclipuri reale",
+                            "href": "/galerie-video/"
+                        }
+                    ]
                 }
             ],
             "faq": [
@@ -239,6 +252,19 @@
                     "ctaHref": "https://wa.me/40767369658?text=Bun%C4%83%20ziua!%20A%C8%99%20dori%20o%20ofert%C4%84%20pentru%20forma%C8%9Bia%20Florentina%20Pan%C4%83%20la%20Orhideea%20Events%20Pite%C8%99ti.",
                     "ctaSecondaryText": "Vezi galeria live",
                     "ctaSecondaryHref": "/galerie-video/"
+                },
+                {
+                    "type": "links",
+                    "items": [
+                        {
+                            "label": "Solicită ofertă și preț pentru formație nuntă",
+                            "href": "/contact/"
+                        },
+                        {
+                            "label": "Vezi toate clipurile live de la evenimente",
+                            "href": "/galerie-video/"
+                        }
+                    ]
                 }
             ],
             "faq": [
@@ -338,6 +364,19 @@
                     "ctaHref": "https://wa.me/40767369658?text=Bun%C4%83%20ziua!%20V%C4%83%20contactez%20pentru%20oferta%20Early%20Booking%202026-2027.%20A%C8%99%20dori%20s%C4%83%20verific%20disponibilitatea%20pentru%20data%20evenimentului%20meu.",
                     "ctaSecondaryText": "Solicită ofertă scrisă",
                     "ctaSecondaryHref": "/contact/"
+                },
+                {
+                    "type": "links",
+                    "items": [
+                        {
+                            "label": "Compară prețuri formație nuntă și cere ofertă",
+                            "href": "/contact/"
+                        },
+                        {
+                            "label": "Ascultă muzică nuntă live în videoclipuri reale",
+                            "href": "/galerie-video/"
+                        }
+                    ]
                 },
                 {
                     "type": "heading",
@@ -501,6 +540,19 @@
                 {
                     "type": "paragraph",
                     "text": "Iar când se aprind luminile și primii acorduri umplu sala — toată oboseala dispare. Aceasta este magia muzicii live."
+                },
+                {
+                    "type": "links",
+                    "items": [
+                        {
+                            "label": "Cere preț formație nuntă în București și Argeș",
+                            "href": "/contact/"
+                        },
+                        {
+                            "label": "Vezi muzică nuntă live în videoclipuri reale",
+                            "href": "/galerie-video/"
+                        }
+                    ]
                 }
             ]
         },
@@ -544,6 +596,19 @@
                 {
                     "type": "paragraph",
                     "text": "Astăzi, formații ca a noastră păstrează vie această tradiție, aducând-o în festivaluri, nunți și gale — fără a pierde autenticitatea care o face unică în lume."
+                },
+                {
+                    "type": "links",
+                    "items": [
+                        {
+                            "label": "Solicită ofertă pentru formație de nuntă",
+                            "href": "/contact/"
+                        },
+                        {
+                            "label": "Ascultă repertoriul live al formației",
+                            "href": "/galerie-video/"
+                        }
+                    ]
                 }
             ]
         },
@@ -591,6 +656,19 @@
                     "type": "image",
                     "src": "",
                     "caption": "Dansatori în cerc la o horă tradițională românească"
+                },
+                {
+                    "type": "links",
+                    "items": [
+                        {
+                            "label": "Verifică prețuri formație nuntă și disponibilitatea",
+                            "href": "/contact/"
+                        },
+                        {
+                            "label": "Urmărește momente live de horă și sârbă",
+                            "href": "/galerie-video/"
+                        }
+                    ]
                 }
             ]
         },
@@ -642,6 +720,19 @@
                 {
                     "type": "paragraph",
                     "text": "Finalul serii este la fel de important ca debutul. Ultimele 30 de minute trebuie să fie un crescendo emoțional — melodii care aduc lacrimi, îmbrățișări și amintiri pentru totdeauna."
+                },
+                {
+                    "type": "links",
+                    "items": [
+                        {
+                            "label": "Primește ofertă personalizată pentru evenimentul tău",
+                            "href": "/contact/"
+                        },
+                        {
+                            "label": "Vezi exemple reale de muzică nuntă live",
+                            "href": "/galerie-video/"
+                        }
+                    ]
                 }
             ]
         },
@@ -686,6 +777,19 @@
                 {
                     "type": "paragraph",
                     "text": "«A fost exact cum ne-am dorit: tradiție, eleganță și o atmosferă incredibilă pe ringul de dans.» — Andreea. Suntem recunoscători că am putut face parte din povestea lor."
+                },
+                {
+                    "type": "links",
+                    "items": [
+                        {
+                            "label": "Cere preț pentru formație de nuntă",
+                            "href": "/contact/"
+                        },
+                        {
+                            "label": "Descoperă videoclipuri live de la nunți reale",
+                            "href": "/galerie-video/"
+                        }
+                    ]
                 }
             ]
         },
@@ -730,6 +834,19 @@
                 {
                     "type": "paragraph",
                     "text": "«Invitații au dansat toată noaptea. Formația a avut energie, profesionalism și comunicare perfectă.» — Bianca. Mulțumim pentru încredere și pentru că ne-ați lăsat să fim parte din cea mai frumoasă zi a voastră."
+                },
+                {
+                    "type": "links",
+                    "items": [
+                        {
+                            "label": "Solicită ofertă rapidă pentru data nunții",
+                            "href": "/contact/"
+                        },
+                        {
+                            "label": "Vezi atmosfera live din evenimentele noastre",
+                            "href": "/galerie-video/"
+                        }
+                    ]
                 }
             ]
         },
@@ -774,6 +891,19 @@
                 {
                     "type": "paragraph",
                     "text": "«Ne-au ascultat toate dorințele muzicale și au creat o atmosferă premium de la început până la final.» — Ioana. Acestea sunt cuvintele care ne motivează să creștem în fiecare zi."
+                },
+                {
+                    "type": "links",
+                    "items": [
+                        {
+                            "label": "Verifică disponibilitatea și prețul formației",
+                            "href": "/contact/"
+                        },
+                        {
+                            "label": "Ascultă muzica noastră live în videoclipuri",
+                            "href": "/galerie-video/"
+                        }
+                    ]
                 }
             ]
         },
@@ -818,6 +948,19 @@
                 {
                     "type": "paragraph",
                     "text": "«O echipă de nota 10! Au ridicat sala în picioare și au făcut din seara noastră o amintire de neuitat.» — Alina & Ștefan. Notele de 10 se câștigă pe scenă, nu se promit în oferte. Suntem mândri că am meritat-o."
+                },
+                {
+                    "type": "links",
+                    "items": [
+                        {
+                            "label": "Solicită preț formație nuntă București & Argeș",
+                            "href": "/contact/"
+                        },
+                        {
+                            "label": "Vezi momente reale cu ringul de dans plin",
+                            "href": "/galerie-video/"
+                        }
+                    ]
                 }
             ]
         }
