@@ -3,6 +3,7 @@ import { Image, getImage } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import siteContent from '../data/siteContent.json';
 import seo from '../data/seo-content.json';
+import couplesData from '../data/couples.json';
 import heroImg from '../assets/card-1-panoramica.jpg';
 
 const optimizedHero = await getImage({ src: heroImg, format: 'webp', width: 320, height: 213 });
@@ -48,6 +49,17 @@ const heroPhotos = [
     alt: 'Invitați pe ringul de dans la un moment live energic',
   },
 ];
+
+const signatureCouples = [...couplesData.couples]
+  .sort((a, b) => (b.isoDate || '').localeCompare(a.isoDate || ''))
+  .slice(0, 3)
+  .map((item) => ({
+    names: item.names,
+    city: item.city,
+    date: item.date,
+    recommendation: item.recommendation,
+    slug: item.slug,
+  }));
 ---
 
 <BaseLayout title={acasa.meta.title} description={acasa.meta.description} ogImage={siteContent.seo.ogImage}>
@@ -316,6 +328,31 @@ const heroPhotos = [
         <span>•</span>
         <span>ENERGIE REALĂ PE SCENĂ</span>
       </div>
+    </div>
+  </section>
+
+  <section class="hp-proof section-container" aria-label="Recomandări reale de la cupluri">
+    <div class="hp-proof-head reveal-on-scroll from-bottom" style="--reveal-delay: 35ms">
+      <p class="hp-proof-kicker">Social Proof Real</p>
+      <h2 class="hp-proof-title">Recomandări autentice de la mirii care au trăit experiența completă</h2>
+      <p class="hp-proof-copy">
+        Atmosfera nu se explică doar în cuvintele noastre. Se vede în reacția cuplurilor care au dansat,
+        au trăit emoția și ne-au recomandat mai departe.
+      </p>
+    </div>
+
+    <div class="hp-proof-grid">
+      {signatureCouples.map((item, index) => (
+        <article class="hp-proof-card reveal-on-scroll from-bottom" style={`--reveal-delay: ${70 + index * 80}ms`}>
+          <span class="hp-proof-quote" aria-hidden="true">“</span>
+          <p class="hp-proof-text">{item.recommendation}</p>
+          <div class="hp-proof-meta">
+            <strong>{item.names}</strong>
+            <span>{item.city} · {item.date}</span>
+          </div>
+          <a href="/comunitate/" class="hp-proof-link" aria-label={`Vezi povestea pentru ${item.names}`}>Vezi povestea completă</a>
+        </article>
+      ))}
     </div>
   </section>
 
@@ -2208,6 +2245,128 @@ const heroPhotos = [
     animation: cinematicMarquee 18s linear infinite;
   }
 
+  .hp-proof {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding-block: clamp(1.3rem, 3vw, 2rem);
+  }
+
+  .hp-proof-head {
+    max-width: 70ch;
+    margin: 0 auto 1rem;
+    text-align: center;
+  }
+
+  .hp-proof-kicker {
+    margin: 0;
+    font-size: 0.66rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(255, 220, 160, 0.9);
+    font-weight: 700;
+  }
+
+  .hp-proof-title {
+    margin: 0.46rem 0 0;
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(1.35rem, 2.75vw, 1.9rem);
+    color: #f8fbff;
+    line-height: 1.18;
+    text-wrap: balance;
+  }
+
+  .hp-proof-copy {
+    margin: 0.62rem auto 0;
+    max-width: 63ch;
+    color: rgba(209, 223, 243, 0.92);
+    font-size: clamp(0.88rem, 1.16vw, 0.98rem);
+    line-height: 1.75;
+    text-wrap: pretty;
+  }
+
+  .hp-proof-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(0.75rem, 1.5vw, 1rem);
+  }
+
+  .hp-proof-card {
+    position: relative;
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background:
+      linear-gradient(130deg, rgba(8, 16, 38, 0.74), rgba(10, 21, 46, 0.7)),
+      radial-gradient(circle at 82% 18%, rgba(11, 188, 214, 0.2), transparent 42%);
+    padding: 0.95rem 0.95rem 1rem;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+    display: flex;
+    flex-direction: column;
+    min-height: 232px;
+    transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+  }
+
+  .hp-proof-quote {
+    color: rgba(255, 209, 102, 0.95);
+    font-size: 1.9rem;
+    line-height: 1;
+    font-family: 'Oswald', sans-serif;
+    margin-bottom: 0.15rem;
+  }
+
+  .hp-proof-text {
+    margin: 0;
+    color: rgba(230, 239, 255, 0.94);
+    font-size: 0.87rem;
+    line-height: 1.72;
+    text-wrap: pretty;
+  }
+
+  .hp-proof-meta {
+    margin-top: auto;
+    padding-top: 0.7rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.14rem;
+  }
+
+  .hp-proof-meta strong {
+    color: #f7fbff;
+    font-size: 0.8rem;
+    letter-spacing: 0.02em;
+  }
+
+  .hp-proof-meta span {
+    color: rgba(169, 194, 228, 0.9);
+    font-size: 0.73rem;
+    letter-spacing: 0.02em;
+  }
+
+  .hp-proof-link {
+    margin-top: 0.7rem;
+    width: fit-content;
+    text-decoration: none;
+    color: rgba(255, 226, 168, 0.95);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 700;
+    border-bottom: 1px solid rgba(255, 209, 102, 0.4);
+    transition: border-color 180ms ease, color 180ms ease;
+  }
+
+  .hp-proof-link:hover {
+    color: #ffeec4;
+    border-bottom-color: rgba(255, 209, 102, 0.85);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .hp-proof-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(255, 209, 102, 0.34);
+      box-shadow: 0 16px 34px rgba(0, 0, 0, 0.3);
+    }
+  }
+
   @media (hover: hover) and (pointer: fine) {
     .hp-cine-card:hover {
       transform: translateY(-4px);
@@ -2237,6 +2396,10 @@ const heroPhotos = [
       grid-column: span 12;
     }
 
+    .hp-proof-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
     .hp-cine-card--photo {
       grid-column: span 4;
     }
@@ -2259,6 +2422,20 @@ const heroPhotos = [
     .hp-cine-card,
     .hp-cine-story {
       min-height: 210px;
+    }
+
+    .hp-proof-grid {
+      grid-template-columns: 1fr;
+      gap: 0.7rem;
+    }
+
+    .hp-proof-card {
+      min-height: auto;
+      padding: 0.88rem;
+    }
+
+    .hp-proof-text {
+      font-size: 0.84rem;
     }
   }
 
