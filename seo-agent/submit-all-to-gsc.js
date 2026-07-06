@@ -53,6 +53,7 @@ const STATIC_PAGES = [
     '/termeni-conditii/',
     '/colaboratori/saxofon/',
     '/colaboratori/tambal/',
+    '/oferta-premium/',
 ];
 
 // ── Încarcă .env manual ──────────────────────────────────
