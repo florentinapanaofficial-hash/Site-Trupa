@@ -721,6 +721,10 @@ const mobileNavAllItems = [
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
         <span>WhatsApp</span>
       </a>
+      <a href="/contact/" class="quick-dock-btn quick-dock-btn--offer" aria-label="Vezi ofertă">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41 11 23l-9-9 9.59-9.59a2 2 0 0 1 1.41-.59H20a2 2 0 0 1 2 2v6.99a2 2 0 0 1-.59 1.42Z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+        <span>Ofertă</span>
+      </a>
     </nav>
 
     <style>
@@ -791,18 +795,21 @@ const mobileNavAllItems = [
         position: fixed;
         left: 50%;
         transform: translateX(-50%);
-        bottom: 0.85rem;
+        bottom: calc(env(safe-area-inset-bottom, 0px) + 0.65rem);
         z-index: 920;
         display: none;
         gap: 0.6rem;
-        width: min(94vw, 420px);
+        width: min(95vw, 520px);
         border: 1px solid rgba(255, 255, 255, 0.18);
-        border-radius: 1rem;
-        padding: 0.45rem;
-        background: rgba(8, 16, 38, 0.82);
+        border-radius: 1.1rem;
+        padding: 0.42rem;
+        background:
+          linear-gradient(120deg, rgba(8, 16, 38, 0.84), rgba(10, 21, 45, 0.86)),
+          radial-gradient(circle at 80% 0%, rgba(11, 188, 214, 0.2), transparent 42%);
         backdrop-filter: blur(14px) saturate(1.3);
         -webkit-backdrop-filter: blur(14px) saturate(1.3);
-        box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35), 0 0 22px rgba(11, 188, 214, 0.14);
+        animation: quick-dock-rise 320ms cubic-bezier(0.22, 1, 0.36, 1);
       }
 
       .quick-dock-btn {
@@ -812,13 +819,14 @@ const mobileNavAllItems = [
         align-items: center;
         justify-content: center;
         gap: 0.45rem;
-        border-radius: 0.8rem;
+        border-radius: 0.74rem;
         text-decoration: none;
         font-family: 'Oswald', sans-serif;
-        font-size: 0.82rem;
+        font-size: 0.76rem;
         letter-spacing: 0.04em;
         text-transform: uppercase;
         font-weight: 700;
+        transition: transform 180ms ease, filter 180ms ease, box-shadow 180ms ease;
       }
 
       .quick-dock-btn svg {
@@ -838,6 +846,19 @@ const mobileNavAllItems = [
         background: linear-gradient(135deg, #38de8a 0%, #28be72 100%);
       }
 
+      .quick-dock-btn--offer {
+        color: #2c1700;
+        border: 1px solid rgba(245, 166, 35, 0.44);
+        background: linear-gradient(135deg, #ffd166 0%, #f5a623 100%);
+      }
+
+      .quick-dock-btn:hover,
+      .quick-dock-btn:focus-visible {
+        transform: translateY(-1px);
+        filter: saturate(1.04) brightness(1.03);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      }
+
       .quick-dock-btn:focus-visible {
         outline: 2px solid #fff;
         outline-offset: 2px;
@@ -849,9 +870,27 @@ const mobileNavAllItems = [
         }
       }
 
+      body.mobile-menu-open .quick-dock {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      @keyframes quick-dock-rise {
+        from {
+          opacity: 0;
+          transform: translate(-50%, 8px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translate(-50%, 0);
+        }
+      }
+
       /* Respectă preferința reduce-motion */
       @media (prefers-reduced-motion: reduce) {
         .wa-float { animation: none; }
+        .quick-dock { animation: none; }
       }
     </style>
 
