@@ -30,6 +30,50 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
             trimite data, locația și intervalul orar, iar revenim cu un pachet clar, adaptat evenimentului tău.
           </p>
 
+          <div class="lead-wizard mt-4" id="lead-wizard" data-step="1" aria-label="Planificator rapid în 3 pași">
+            <p class="lead-wizard-kicker">Planificator rapid</p>
+            <h2 class="lead-wizard-title">În 20 secunde pregătim solicitarea ta</h2>
+
+            <div class="lead-wizard-steps" aria-hidden="true">
+              <span class="lead-wizard-dot is-active" data-step-dot="1">1</span>
+              <span class="lead-wizard-dot" data-step-dot="2">2</span>
+              <span class="lead-wizard-dot" data-step-dot="3">3</span>
+            </div>
+
+            <div class="lead-step is-active" data-step-panel="1">
+              <label class="form-label" for="wizard-event">Tip eveniment</label>
+              <select id="wizard-event" class="input-glass mt-1" aria-label="Alege tipul de eveniment">
+                <option value="">Alege opțiunea</option>
+                <option>Nuntă</option>
+                <option>Botez</option>
+                <option>Aniversare</option>
+                <option>Corporate</option>
+                <option>Alt tip</option>
+              </select>
+              <button type="button" class="btn-outline btn-compact mt-2" data-wizard-next="2">Pasul următor</button>
+            </div>
+
+            <div class="lead-step" data-step-panel="2">
+              <label class="form-label" for="wizard-date">Data evenimentului</label>
+              <input id="wizard-date" class="input-glass mt-1" type="date" aria-label="Alege data evenimentului" />
+              <div class="mt-2 flex flex-wrap gap-2">
+                <button type="button" class="btn-outline btn-compact" data-wizard-prev="1">Înapoi</button>
+                <button type="button" class="btn-outline btn-compact" data-wizard-next="3">Pasul următor</button>
+              </div>
+            </div>
+
+            <div class="lead-step" data-step-panel="3">
+              <label class="form-label" for="wizard-city">Oraș / locație</label>
+              <input id="wizard-city" class="input-glass mt-1" type="text" placeholder="Ex: București, Salon Magnolia" maxlength="120" aria-label="Oraș și locație" />
+              <div class="mt-2 flex flex-wrap gap-2">
+                <button type="button" class="btn-outline btn-compact" data-wizard-prev="2">Înapoi</button>
+                <button type="button" class="btn-solid btn-compact" id="wizard-apply">Aplică în formular</button>
+              </div>
+            </div>
+
+            <p id="wizard-status" class="wizard-status" aria-live="polite"></p>
+          </div>
+
           <div class="mt-4 flex min-w-0 flex-wrap gap-2">
             <a class="btn-solid" href={`tel:${contact.phoneRaw}`} onclick="window.gtag&&window.gtag('event','click_phone',{event_category:'contact'})">Telefon: {contact.phoneDisplay}</a>
             <span class="btn-outline ob-email-contact" data-u="contact" data-d="florentinapanaofficial.ro">Email: [email protejat]</span>
@@ -75,6 +119,9 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
               <input name="bot-field" autocomplete="off" tabindex="-1" />
             </label>
           </p>
+          <input type="hidden" name="PlanificatorEveniment" id="planificator-eveniment" />
+          <input type="hidden" name="PlanificatorData" id="planificator-data" />
+          <input type="hidden" name="PlanificatorOras" id="planificator-oras" />
           <h2 class="text-sm font-extrabold text-white">Rezervare rapidă</h2>
           <p class="mt-1 text-[11px] text-white/90">Completezi câmpurile, iar noi revenim cu ofertă personalizată.</p>
 
@@ -205,6 +252,114 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
     }
 
     const form = document.getElementById('form-rezervare');
+    const wizard = document.getElementById('lead-wizard');
+
+    const setWizardStep = (step) => {
+      if (!wizard) return;
+      wizard.setAttribute('data-step', String(step));
+
+      const panels = wizard.querySelectorAll('[data-step-panel]');
+      panels.forEach((panel) => {
+        const panelStep = Number(panel.getAttribute('data-step-panel'));
+        panel.classList.toggle('is-active', panelStep === step);
+      });
+
+      const dots = wizard.querySelectorAll('[data-step-dot]');
+      dots.forEach((dot) => {
+        const dotStep = Number(dot.getAttribute('data-step-dot'));
+        dot.classList.toggle('is-active', dotStep <= step);
+      });
+    };
+
+    if (wizard) {
+      const wizardEvent = document.getElementById('wizard-event');
+      const wizardDate = document.getElementById('wizard-date');
+      const wizardCity = document.getElementById('wizard-city');
+      const wizardStatus = document.getElementById('wizard-status');
+      const hiddenEvent = document.getElementById('planificator-eveniment');
+      const hiddenDate = document.getElementById('planificator-data');
+      const hiddenCity = document.getElementById('planificator-oras');
+
+      wizard.querySelectorAll('[data-wizard-next]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const targetStep = Number(btn.getAttribute('data-wizard-next'));
+
+          if (targetStep === 2 && wizardEvent instanceof HTMLSelectElement && !wizardEvent.value) {
+            wizardStatus.textContent = 'Alege tipul de eveniment pentru a continua.';
+            return;
+          }
+
+          if (targetStep === 3 && wizardDate instanceof HTMLInputElement && !wizardDate.value) {
+            wizardStatus.textContent = 'Selectează data evenimentului pentru a continua.';
+            return;
+          }
+
+          wizardStatus.textContent = '';
+          setWizardStep(targetStep);
+        });
+      });
+
+      wizard.querySelectorAll('[data-wizard-prev]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const targetStep = Number(btn.getAttribute('data-wizard-prev'));
+          wizardStatus.textContent = '';
+          setWizardStep(targetStep);
+        });
+      });
+
+      const applyBtn = document.getElementById('wizard-apply');
+      if (applyBtn) {
+        applyBtn.addEventListener('click', () => {
+          if (!(wizardEvent instanceof HTMLSelectElement) || !(wizardDate instanceof HTMLInputElement) || !(wizardCity instanceof HTMLInputElement)) return;
+
+          const eventVal = wizardEvent.value.trim();
+          const dateVal = wizardDate.value.trim();
+          const cityVal = wizardCity.value.trim();
+
+          if (!eventVal || !dateVal || !cityVal) {
+            if (wizardStatus) wizardStatus.textContent = 'Completează toate cele 3 câmpuri pentru a aplica în formular.';
+            return;
+          }
+
+          const eventSelect = form?.querySelector('select[name="Eveniment"]');
+          const dateInput = form?.querySelector('input[name="Data"]');
+          const messageInput = form?.querySelector('textarea[name="Mesaj"]');
+
+          if (eventSelect instanceof HTMLSelectElement) {
+            eventSelect.value = eventVal;
+          }
+
+          if (dateInput instanceof HTMLInputElement) {
+            dateInput.value = dateVal;
+          }
+
+          if (messageInput instanceof HTMLTextAreaElement) {
+            const intro = `Detalii rapide: ${eventVal}, data ${dateVal}, locație ${cityVal}.`;
+            if (!messageInput.value.includes(intro)) {
+              messageInput.value = `${intro}\n${messageInput.value}`.trim();
+            }
+          }
+
+          if (hiddenEvent instanceof HTMLInputElement) hiddenEvent.value = eventVal;
+          if (hiddenDate instanceof HTMLInputElement) hiddenDate.value = dateVal;
+          if (hiddenCity instanceof HTMLInputElement) hiddenCity.value = cityVal;
+
+          if (wizardStatus) {
+            wizardStatus.textContent = 'Perfect! Am pregătit formularul. Mai completezi numele și telefonul.';
+          }
+
+          if (typeof window.gtag === 'function') {
+            window.gtag('event', 'lead_wizard_apply', { event_category: 'contact' });
+          }
+
+          const nameInput = form?.querySelector('input[name="Nume"]');
+          if (nameInput instanceof HTMLInputElement) {
+            nameInput.focus();
+          }
+        });
+      }
+    }
+
     if (form) {
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -262,6 +417,74 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
   </script>
 
   <style>
+    .lead-wizard {
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 0.95rem;
+      background: rgba(8, 16, 42, 0.62);
+      padding: 0.8rem;
+    }
+
+    .lead-wizard-kicker {
+      margin: 0;
+      font-size: 0.64rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(170, 236, 247, 0.94);
+    }
+
+    .lead-wizard-title {
+      margin: 0.28rem 0 0;
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(0.98rem, 1.7vw, 1.14rem);
+      color: #f8fbff;
+      line-height: 1.2;
+      text-wrap: balance;
+    }
+
+    .lead-wizard-steps {
+      margin-top: 0.6rem;
+      display: flex;
+      gap: 0.4rem;
+      align-items: center;
+    }
+
+    .lead-wizard-dot {
+      width: 1.35rem;
+      height: 1.35rem;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.66rem;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .lead-wizard-dot.is-active {
+      color: #0e2533;
+      border-color: rgba(11, 188, 214, 0.5);
+      background: linear-gradient(135deg, #7ef8ff 0%, #06d6ff 100%);
+    }
+
+    .lead-step {
+      display: none;
+      margin-top: 0.7rem;
+    }
+
+    .lead-step.is-active {
+      display: block;
+    }
+
+    .wizard-status {
+      margin: 0.55rem 0 0;
+      min-height: 1.1rem;
+      font-size: 0.72rem;
+      color: rgba(214, 235, 255, 0.92);
+    }
+
     .contact-compact .section-title {
       font-size: clamp(1.55rem, 2.8vw, 2.1rem);
       line-height: 1.1;
