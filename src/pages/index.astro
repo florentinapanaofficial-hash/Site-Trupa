@@ -197,6 +197,33 @@ const signatureCouples = [...couplesData.couples]
     </div>
   </section>
 
+  <section class="hp-meet-teaser section-container" aria-label="Cunoaște Formația Florentina Pană">
+    <div class="hp-meet-wrap reveal-on-scroll from-bottom" style="--reveal-delay: 30ms">
+      <div class="hp-meet-media">
+        <img
+          src="/images/galerie-foto-site/placerea-scenei-claudiu-florentina.jpg"
+          alt="Florentina și Claudiu în timpul unui moment live"
+          loading="lazy"
+          decoding="async"
+          width="720"
+          height="460"
+        />
+      </div>
+      <div class="hp-meet-content">
+        <p class="hp-meet-kicker">Conexiune reală</p>
+        <h2 class="hp-meet-title">Vrei să ne cunoști înainte de eveniment? Exact așa lucrăm.</h2>
+        <p class="hp-meet-copy">
+          Discutăm direct cu voi, înțelegem atmosfera dorită și construim împreună planul serii.
+          Ne pasă de oameni, nu doar de playlist.
+        </p>
+        <div class="hp-meet-actions">
+          <a href="/despre/" class="btn-outline">Cunoaște-ne mai bine</a>
+          <a href="/contact/" class="btn-solid">Hai să vorbim acum</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="hp-trust-ribbon section-container" aria-label="Beneficii premium">
     <div class="hp-trust-ribbon-inner reveal-on-scroll from-bottom" style="--reveal-delay: 40ms">
       <p class="hp-trust-title">Standardul nostru pentru evenimentul tău</p>
@@ -1295,6 +1322,81 @@ const signatureCouples = [...couplesData.couples]
     padding-block: clamp(1rem, 2.5vw, 1.35rem);
   }
 
+  .hp-meet-teaser {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding-block: clamp(1.1rem, 2.6vw, 1.8rem);
+  }
+
+  .hp-meet-wrap {
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    gap: clamp(0.8rem, 1.8vw, 1.2rem);
+    align-items: stretch;
+    border-radius: 1.2rem;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background:
+      linear-gradient(135deg, rgba(8, 16, 38, 0.74), rgba(9, 20, 46, 0.7)),
+      radial-gradient(circle at 88% 18%, rgba(245, 166, 35, 0.16), transparent 42%),
+      radial-gradient(circle at 8% 86%, rgba(11, 188, 214, 0.16), transparent 45%);
+    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+  }
+
+  .hp-meet-media {
+    min-height: 100%;
+    position: relative;
+  }
+
+  .hp-meet-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    filter: saturate(1.04) contrast(1.03);
+  }
+
+  .hp-meet-content {
+    padding: clamp(1rem, 2.2vw, 1.5rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.65rem;
+  }
+
+  .hp-meet-kicker {
+    margin: 0;
+    color: rgba(177, 236, 246, 0.94);
+    font-size: 0.66rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  .hp-meet-title {
+    margin: 0;
+    color: #f8fbff;
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(1.2rem, 2.5vw, 1.72rem);
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+
+  .hp-meet-copy {
+    margin: 0;
+    color: rgba(210, 223, 242, 0.94);
+    font-size: clamp(0.87rem, 1.12vw, 0.98rem);
+    line-height: 1.75;
+    text-wrap: pretty;
+  }
+
+  .hp-meet-actions {
+    margin-top: 0.2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+  }
+
   .hp-signature-flow {
     max-width: var(--container-max);
     margin: 0 auto;
@@ -1506,6 +1608,24 @@ const signatureCouples = [...couplesData.couples]
     .hp-trust-cta {
       width: 100%;
       font-size: 0.68rem;
+    }
+
+    .hp-meet-wrap {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+
+    .hp-meet-media {
+      min-height: 220px;
+    }
+
+    .hp-meet-content {
+      padding: 0.9rem;
+    }
+
+    .hp-meet-actions .btn-solid,
+    .hp-meet-actions .btn-outline {
+      width: 100%;
     }
 
     .hp-signature-grid {
