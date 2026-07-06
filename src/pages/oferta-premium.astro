@@ -10,11 +10,50 @@ const whatsappHref = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
 ---
 
 <BaseLayout
-  title="Ofertă Premium Formație Nuntă | Florentina Pană"
-  description="Descoperă oferta premium Florentina Pană: muzică live completă, atmosferă elegantă și coordonare profesionistă. Cere oferta personalizată acum."
+  title="Prețuri & Ofertă Formație Nuntă 2026 | Florentina Pană"
+  description="Prețuri formație nuntă 2026-2027: pachet muzică live complet, repertoriu personalizat, sunet profesional. Cere oferta personalizată acum — răspuns rapid."
 >
   <Fragment slot="head">
-    <script is:inline type="application/ld+json">{JSON.stringify({
+    <script is:inline type="application/ld+json">{JSON.stringify([
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Cât costă o formație de nuntă în 2026?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Prețul formației de nuntă variază în funcție de numărul de artiști, durata programului și locația evenimentului. Contactați-ne pentru o ofertă personalizată adaptată bugetului și evenimentului dumneavoastră."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Ce include pachetul premium de muzică live?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Pachetul premium include program muzical live complet, repertoriu personalizat (petrecere, dans, momente tradiționale, piese moderne), suport pentru organizarea timeline-ului serii și interacțiune elegantă cu invitații."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "În ce orașe activează Formația Florentina Pană?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Formația Florentina Pană activează în toată România: București, Pitești, Câmpulung, Curtea de Argeș, Craiova, Ploiești, Brașov și alte orașe. Contactați-ne pentru disponibilitate."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Cum pot rezerva formația pentru evenimentul meu?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Puteți rezerva formația prin formularul de contact de pe site, telefonic sau pe WhatsApp. Verificăm disponibilitatea și revenim cu ofertă personalizată în cel mai scurt timp."
+          }
+        }
+      ]
+    },
+    {
       "@context": "https://schema.org",
       "@type": "Service",
       "name": "Ofertă Premium Formație Nuntă 2026-2027",
@@ -39,17 +78,19 @@ const whatsappHref = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
         "validThrough": "2027-12-31"
       },
       "url": "https://www.florentinapanaofficial.ro/oferta-premium/"
-    })}</script>
+    }
+    ])}</script>
   </Fragment>
   <section class="section-container premium-page py-12">
     <div class="mb-5"><BackButton href="/contact/" label="Înapoi la contact" /></div>
 
     <article class="premium-shell">
-      <p class="premium-kicker">Pachet Signature</p>
-      <h1 class="premium-title">Ofertă Premium 2026-2027 pentru evenimente memorabile</h1>
+      <p class="premium-kicker">Pachet Signature — Muzică Live Nuntă 2026-2027</p>
+      <h1 class="premium-title">Prețuri și ofertă formație nuntă adaptată evenimentului tău</h1>
       <p class="premium-lead">
-        Ai nevoie de energie live, repertoriu atent ales și o echipă care ține ritmul serii fără întreruperi.
-        Pachetul premium este construit pentru evenimente unde calitatea muzicală și fluxul elegant contează de la primul dans până la ultimul bis.
+        Cauți o <strong>formație de nuntă cu prețuri clare și pachet complet</strong>? Florentina Pană oferă muzică live
+        de calitate premium pentru nunți, botezuri și aniversări — repertoriu personalizat, sunet profesional și
+        o echipă care ține ritmul serii de la primul dans până la ultimul bis.
       </p>
 
       <div class="premium-grid mt-6">
@@ -75,11 +116,34 @@ const whatsappHref = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
       </div>
 
       <section class="premium-highlight mt-6" aria-label="Avantaj competitiv">
-        <h2>Avantajul premium</h2>
+        <h2>De ce aleg cuplurile formația Florentina Pană?</h2>
         <p>
-          Nu primești doar muzică, ci o experiență completă: calibrare pe public, tranziții curate între momente,
-          prezență scenică și comunicare rapidă cu echipa ta de organizare.
+          Nu primești doar <strong>muzică live la nuntă</strong>, ci o experiență completă: calibrare pe public,
+          tranziții curate între momente, prezență scenică autentică și comunicare rapidă cu echipa ta de organizare.
+          Pachetul de <strong>muzică live pentru nuntă</strong> include tot ce ai nevoie pentru o seară fără momente goale.
         </p>
+      </section>
+
+      <section class="premium-faq mt-6" aria-label="Întrebări frecvente despre formația de nuntă">
+        <h2 class="premium-faq-title">Întrebări frecvente</h2>
+        <dl class="premium-faq-list">
+          <div class="premium-faq-item">
+            <dt>Cât costă o formație de nuntă în 2026?</dt>
+            <dd>Prețul variază în funcție de numărul de artiști, durata programului și locație. Trimite-ne data și orașul, iar noi revenim cu o ofertă clară, adaptată bugetului tău.</dd>
+          </div>
+          <div class="premium-faq-item">
+            <dt>Ce include pachetul premium de muzică live?</dt>
+            <dd>Program muzical live complet, repertoriu personalizat (petrecere, dans, momente tradiționale, piese moderne), suport pentru timeline-ul serii și interacțiune elegantă cu invitații.</dd>
+          </div>
+          <div class="premium-faq-item">
+            <dt>În ce orașe activează Formația Florentina Pană?</dt>
+            <dd>Activăm în toată România: București, Pitești, Câmpulung, Curtea de Argeș, Craiova, Ploiești, Brașov și alte orașe. Contactează-ne pentru disponibilitate.</dd>
+          </div>
+          <div class="premium-faq-item">
+            <dt>Cum rezerv formația pentru evenimentul meu?</dt>
+            <dd>Prin formularul de contact, telefonic sau pe WhatsApp. Verificăm disponibilitatea și revenim cu ofertă personalizată în cel mai scurt timp.</dd>
+          </div>
+        </dl>
       </section>
 
       <section class="premium-cta mt-6">
@@ -205,6 +269,41 @@ const whatsappHref = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
       display: flex;
       gap: 0.6rem;
       flex-wrap: wrap;
+    }
+
+    .premium-faq {
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 0.95rem;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 0.95rem;
+    }
+
+    .premium-faq-title {
+      margin: 0 0 0.75rem;
+      font-size: 1.02rem;
+      font-weight: 700;
+      color: #f6faff;
+    }
+
+    .premium-faq-list {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .premium-faq-item dt {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: rgba(200, 235, 255, 0.97);
+      margin-bottom: 0.25rem;
+    }
+
+    .premium-faq-item dd {
+      margin: 0;
+      font-size: 0.88rem;
+      line-height: 1.6;
+      color: rgba(220, 238, 255, 0.82);
     }
 
     @media (max-width: 900px) {
