@@ -74,6 +74,14 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
             <p id="wizard-status" class="wizard-status" aria-live="polite"></p>
           </div>
 
+          <a
+            href="/oferta-premium/"
+            class="premium-offer-link mt-3"
+            onclick="window.gtag&&window.gtag('event','click_premium_offer',{event_category:'contact'})"
+          >
+            Vezi oferta premium 2026-2027 și serviciile incluse
+          </a>
+
           <div class="mt-4 flex min-w-0 flex-wrap gap-2">
             <a class="btn-solid" href={`tel:${contact.phoneRaw}`} onclick="window.gtag&&window.gtag('event','click_phone',{event_category:'contact'})">Telefon: {contact.phoneDisplay}</a>
             <span class="btn-outline ob-email-contact" data-u="contact" data-d="florentinapanaofficial.ro">Email: [email protejat]</span>
@@ -253,6 +261,7 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
 
     const form = document.getElementById('form-rezervare');
     const wizard = document.getElementById('lead-wizard');
+    let formStarted = false;
 
     const setWizardStep = (step) => {
       if (!wizard) return;
@@ -296,6 +305,13 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
 
           wizardStatus.textContent = '';
           setWizardStep(targetStep);
+
+          if (typeof window.gtag === 'function') {
+            window.gtag('event', 'lead_wizard_step_complete', {
+              event_category: 'contact',
+              step: targetStep - 1,
+            });
+          }
         });
       });
 
@@ -358,6 +374,28 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
           }
         });
       }
+
+      if (wizardEvent instanceof HTMLSelectElement) {
+        wizardEvent.addEventListener('focus', () => {
+          if (typeof window.gtag === 'function') {
+            window.gtag('event', 'lead_wizard_start', { event_category: 'contact' });
+          }
+        }, { once: true });
+      }
+    }
+
+    if (form) {
+      const trackFormStart = () => {
+        if (formStarted) return;
+        formStarted = true;
+        if (typeof window.gtag === 'function') {
+          window.gtag('event', 'lead_form_start', { event_category: 'contact' });
+        }
+      };
+
+      form.querySelectorAll('input, select, textarea').forEach((el) => {
+        el.addEventListener('focus', trackFormStart, { once: true });
+      });
     }
 
     if (form) {
@@ -391,8 +429,14 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
           const json = await res.json();
 
           if (res.ok && json.ok) {
-            window.location.href = '/contact?trimis=rezervare#contact';
+            if (typeof window.gtag === 'function') {
+              window.gtag('event', 'lead_submit_success', { event_category: 'contact' });
+            }
+            window.location.href = '/contact/?trimis=rezervare#contact';
           } else {
+            if (typeof window.gtag === 'function') {
+              window.gtag('event', 'lead_submit_error', { event_category: 'contact' });
+            }
             if (feedbackEl) {
               feedbackEl.textContent = json.error ?? 'Eroare la trimitere. Încearcă din nou.';
               feedbackEl.classList.remove('hidden');
@@ -402,6 +446,9 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
             }
           }
         } catch {
+          if (typeof window.gtag === 'function') {
+            window.gtag('event', 'lead_submit_network_error', { event_category: 'contact' });
+          }
           if (feedbackEl) {
             feedbackEl.textContent = 'Eroare de rețea. Verifică conexiunea și încearcă din nou.';
             feedbackEl.classList.remove('hidden');
@@ -483,6 +530,25 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
       min-height: 1.1rem;
       font-size: 0.72rem;
       color: rgba(214, 235, 255, 0.92);
+    }
+
+    .premium-offer-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 213, 122, 0.5);
+      background: linear-gradient(130deg, rgba(255, 210, 118, 0.22), rgba(255, 255, 255, 0.06));
+      color: #fff4d2;
+      padding: 0.5rem 0.82rem;
+      font-size: 0.76rem;
+      font-weight: 700;
+      transition: transform 180ms ease, border-color 180ms ease;
+    }
+
+    .premium-offer-link:hover {
+      transform: translateY(-1px);
+      border-color: rgba(255, 231, 166, 0.8);
     }
 
     .contact-compact .section-title {

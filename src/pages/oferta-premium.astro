@@ -1,0 +1,196 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BackButton from '../components/BackButton.astro';
+import siteContent from '../data/siteContent.json';
+
+const { contact } = siteContent;
+const whatsappNumber = contact.phoneRaw.replace(/\D/g, '');
+const whatsappMessage = encodeURIComponent('Bună ziua! Doresc oferta premium pentru evenimentul meu.');
+const whatsappHref = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
+---
+
+<BaseLayout
+  title="Ofertă Premium Formație Nuntă | Florentina Pană"
+  description="Descoperă oferta premium Florentina Pană: muzică live completă, atmosferă elegantă și coordonare profesionistă. Cere oferta personalizată acum."
+>
+  <section class="section-container premium-page py-12">
+    <div class="mb-5"><BackButton href="/contact/" label="Înapoi la contact" /></div>
+
+    <article class="premium-shell">
+      <p class="premium-kicker">Pachet Signature</p>
+      <h1 class="premium-title">Ofertă Premium 2026-2027 pentru evenimente memorabile</h1>
+      <p class="premium-lead">
+        Ai nevoie de energie live, repertoriu atent ales și o echipă care ține ritmul serii fără întreruperi.
+        Pachetul premium este construit pentru evenimente unde calitatea muzicală și fluxul elegant contează de la primul dans până la ultimul bis.
+      </p>
+
+      <div class="premium-grid mt-6">
+        <section class="premium-card">
+          <h2>Ce primești în pachet</h2>
+          <ul>
+            <li>Program live adaptat momentelor cheie ale evenimentului</li>
+            <li>Repertoriu divers: petrecere, dans, momente tradiționale, piese moderne</li>
+            <li>Interacțiune elegantă cu invitații, fără pauze incomode</li>
+            <li>Suport pentru organizarea timeline-ului muzical al serii</li>
+          </ul>
+        </section>
+
+        <section class="premium-card">
+          <h2>Pentru cine este potrivit</h2>
+          <ul>
+            <li>Cupluri care vor o nuntă premium, fluidă și fără momente moarte</li>
+            <li>Botezuri sau aniversări cu invitați din generații diferite</li>
+            <li>Evenimente corporate cu standard ridicat de prezentare</li>
+            <li>Organizatori care au nevoie de colaborare clară, profesionistă</li>
+          </ul>
+        </section>
+      </div>
+
+      <section class="premium-highlight mt-6" aria-label="Avantaj competitiv">
+        <h2>Avantajul premium</h2>
+        <p>
+          Nu primești doar muzică, ci o experiență completă: calibrare pe public, tranziții curate între momente,
+          prezență scenică și comunicare rapidă cu echipa ta de organizare.
+        </p>
+      </section>
+
+      <section class="premium-cta mt-6">
+        <p class="premium-cta-title">Vrei o ofertă personalizată în funcție de data și locația ta?</p>
+        <div class="premium-cta-actions">
+          <a
+            class="btn-solid"
+            href="/contact/?sursa=oferta-premium"
+            onclick="window.gtag&&window.gtag('event','premium_offer_contact_click',{event_category:'offer'})"
+          >
+            Cere ofertă personalizată
+          </a>
+          <a
+            class="btn-outline"
+            href={whatsappHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            onclick="window.gtag&&window.gtag('event','premium_offer_whatsapp_click',{event_category:'offer'})"
+          >
+            Discută pe WhatsApp
+          </a>
+        </div>
+      </section>
+    </article>
+  </section>
+
+  <style>
+    .premium-shell {
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 1.1rem;
+      background:
+        radial-gradient(circle at 12% 20%, rgba(255, 231, 166, 0.16), transparent 42%),
+        radial-gradient(circle at 85% 0%, rgba(71, 185, 255, 0.14), transparent 35%),
+        rgba(8, 16, 42, 0.8);
+      padding: clamp(1rem, 2vw, 1.5rem);
+    }
+
+    .premium-kicker {
+      margin: 0;
+      font-size: 0.72rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: rgba(252, 228, 176, 0.95);
+    }
+
+    .premium-title {
+      margin: 0.38rem 0 0;
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(1.6rem, 3vw, 2.4rem);
+      line-height: 1.1;
+      color: #f8fbff;
+      text-wrap: balance;
+    }
+
+    .premium-lead {
+      margin-top: 0.7rem;
+      max-width: 70ch;
+      color: rgba(234, 243, 255, 0.92);
+      line-height: 1.65;
+      font-size: 0.98rem;
+    }
+
+    .premium-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.9rem;
+    }
+
+    .premium-card {
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 0.95rem;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 0.95rem;
+    }
+
+    .premium-card h2,
+    .premium-highlight h2 {
+      margin: 0;
+      font-size: 1.02rem;
+      font-weight: 700;
+      color: #f6faff;
+    }
+
+    .premium-card ul {
+      margin: 0.6rem 0 0;
+      padding-left: 1rem;
+      color: rgba(231, 242, 255, 0.9);
+      line-height: 1.65;
+      font-size: 0.92rem;
+    }
+
+    .premium-highlight {
+      border-radius: 0.95rem;
+      border: 1px solid rgba(255, 225, 150, 0.32);
+      background: rgba(255, 205, 112, 0.08);
+      padding: 0.9rem;
+    }
+
+    .premium-highlight p {
+      margin: 0.5rem 0 0;
+      color: rgba(240, 247, 255, 0.92);
+      line-height: 1.65;
+      font-size: 0.94rem;
+    }
+
+    .premium-cta {
+      border-radius: 0.95rem;
+      border: 1px solid rgba(125, 211, 252, 0.28);
+      background: rgba(15, 28, 58, 0.8);
+      padding: 0.9rem;
+    }
+
+    .premium-cta-title {
+      margin: 0;
+      color: #e8f4ff;
+      font-weight: 700;
+      font-size: 0.96rem;
+    }
+
+    .premium-cta-actions {
+      margin-top: 0.65rem;
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 900px) {
+      .premium-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 767px) {
+      .premium-cta-actions .btn-solid,
+      .premium-cta-actions .btn-outline {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</BaseLayout>
