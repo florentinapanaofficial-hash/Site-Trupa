@@ -2003,10 +2003,29 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
     }
 
     .hp-team-card {
+      display: flex;
+      flex-direction: column;
       min-height: 250px;
     }
 
+    .hp-team-card img {
+      position: relative;
+      inset: auto;
+      height: auto;
+      aspect-ratio: 16 / 10;
+      flex: none;
+    }
+
+    .hp-team-overlay {
+      display: none;
+    }
+
     .hp-team-content {
+      position: relative;
+      left: auto;
+      right: auto;
+      bottom: auto;
+      background: linear-gradient(180deg, rgba(4, 10, 25, 0.10), rgba(4, 10, 25, 0.82));
       padding: 0.75rem 0.8rem 0.85rem;
     }
 
