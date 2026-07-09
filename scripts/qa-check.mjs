@@ -54,8 +54,8 @@ t('sitemap-index.xml present', existsSync('dist/client/sitemap-index.xml'));
 console.log('\n=== 6) COLABORATORI — Person JSON-LD ===');
 t('Person schema saxofon', sax.includes('"Person"'));
 t('worksFor saxofon', sax.includes('worksFor'));
-t('Person schema tambal', tam.includes('"Person"'));
-t('worksFor tambal', tam.includes('worksFor'));
+t('tambal: redirect meta către /membri/', tam.includes('url=/membri/'));
+t('tambal: canonical către /membri/', tam.includes('href="/membri/"'));
 
 console.log('\n=== 7) CORS module ===');
 t('checkOrigin exported', cors.includes('export function checkOrigin'));

@@ -8,12 +8,25 @@ import blogPostsRaw from '../../data/blogPosts.json';
 
 export const prerender = true;
 
+type ArchiveEntry = {
+  slug: string;
+  titlu: string;
+  descriere: string;
+  preview: string;
+  categorie: string;
+  imaginePrincipala: string;
+  dataPublicarii: string;
+  type: 'supabase' | 'jsonBlog' | 'local';
+};
+
 export async function getStaticPaths() {
   // Fetch articole din Supabase via REST (fără realtime/websocket în build)
   const supabaseUrl = import.meta.env.SUPABASE_URL || import.meta.env.PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = import.meta.env.SUPABASE_ANON_KEY || import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
-  let dbArticles = [];
+  let dbArticles: any[] = [];
+  let supabaseDnsFailed = false;
+  let loggedSupabaseFallback = false;
   if (supabaseUrl && supabaseAnonKey) {
     const headers = {
       apikey: supabaseAnonKey,
@@ -40,13 +53,25 @@ export async function getStaticPaths() {
         const payload = await response.json();
         return Array.isArray(payload) ? payload : null;
       } catch (error) {
+        const errorText = String(error);
+        const errorCode = (error as any)?.cause?.code;
+        if (errorCode === 'ENOTFOUND' || errorText.includes('ENOTFOUND')) {
+          supabaseDnsFailed = true;
+          if (!loggedSupabaseFallback) {
+            console.warn('[publicatii/archive] Supabase indisponibil in build (DNS). Se foloseste fallback local.');
+            loggedSupabaseFallback = true;
+          }
+          return null;
+        }
         console.warn('[publicatii/archive] Supabase fetch error:', error);
         return null;
       }
     };
 
     for (const table of tableCandidates) {
+      if (supabaseDnsFailed) break;
       for (const select of selectCandidates) {
+        if (supabaseDnsFailed) break;
         const url = `${supabaseUrl}/rest/v1/${table}?select=${encodeURIComponent(select)}`;
         const payload = await fetchArrayPayload(url, { headers });
         if (payload) {
@@ -59,7 +84,7 @@ export async function getStaticPaths() {
     }
   }
 
-  let supabaseEntries = [];
+  let supabaseEntries: ArchiveEntry[] = [];
   if (dbArticles && Array.isArray(dbArticles)) {
     supabaseEntries = dbArticles.map((articol) => {
       // Generează preview din descriere sau continut (HTML strip simplu)
@@ -134,7 +159,11 @@ export async function getStaticPaths() {
   return paths;
 }
 
-const { pageIndex = 0, totalPages = 1, allEntries = [] } = Astro.props;
+const { pageIndex = 0, totalPages = 1, allEntries = [] } = Astro.props as {
+  pageIndex?: number;
+  totalPages?: number;
+  allEntries?: ArchiveEntry[];
+};
 const { brand } = siteContent;
 
 const pagedEntries = allEntries.slice(pageIndex * 10, (pageIndex + 1) * 10);
@@ -161,7 +190,7 @@ const pageDescription = currentPage > 1
   ? `Blogul ${brand.name}, pagina ${currentPage}. Articole, ghiduri, povești și opinii despre muzică live, evenimente și viața de trupă.`
   : `Blogul ${brand.name}. Articole, ghiduri, povești și opinii despre muzică live, evenimente și viața de trupă.`;
 
-function formatDate(date) {
+function formatDate(date: string | Date | undefined) {
   if (!date) return '';
   const d = typeof date === 'string' ? new Date(date) : date;
   return d.toLocaleDateString('ro-RO', {

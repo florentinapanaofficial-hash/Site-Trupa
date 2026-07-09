@@ -25,6 +25,8 @@ export async function getStaticPaths() {
   const supabaseAnonKey = import.meta.env.SUPABASE_ANON_KEY || import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
   let dbArticles = [];
+  let supabaseDnsFailed = false;
+  let loggedSupabaseFallback = false;
   if (supabaseUrl && supabaseAnonKey) {
     const headers = {
       apikey: supabaseAnonKey,
@@ -51,13 +53,25 @@ export async function getStaticPaths() {
         const payload = await response.json();
         return Array.isArray(payload) ? payload : null;
       } catch (error) {
+        const errorText = String(error);
+        const errorCode = (error as any)?.cause?.code;
+        if (errorCode === 'ENOTFOUND' || errorText.includes('ENOTFOUND')) {
+          supabaseDnsFailed = true;
+          if (!loggedSupabaseFallback) {
+            console.warn('[publicatii/slug] Supabase indisponibil in build (DNS). Se foloseste fallback local.');
+            loggedSupabaseFallback = true;
+          }
+          return null;
+        }
         console.warn('[publicatii/slug] Supabase fetch error:', error);
         return null;
       }
     };
 
     for (const table of tableCandidates) {
+      if (supabaseDnsFailed) break;
       for (const select of selectCandidates) {
+        if (supabaseDnsFailed) break;
         const url = `${supabaseUrl}/rest/v1/${table}?select=${encodeURIComponent(select)}`;
         const payload = await fetchArrayPayload(url, { headers });
         if (payload) {
@@ -92,8 +106,8 @@ export async function getStaticPaths() {
   const supabaseSlugs = new Set<string>(supabasePaths.map((p) => p.params.slug));
 
   // MD local + JSON intră doar dacă slug-ul NU e suprascris de Supabase
-  const filteredLocal = localPaths.filter((p) => !supabaseSlugs.has(p.params.slug));
-  const filteredJsonBlog = jsonBlogPaths.filter((p) => !supabaseSlugs.has(p.params.slug));
+  const filteredLocal = localPaths.filter((p: { params: { slug: string } }) => !supabaseSlugs.has(p.params.slug));
+  const filteredJsonBlog = jsonBlogPaths.filter((p: { params: { slug: string } }) => !supabaseSlugs.has(p.params.slug));
 
   return [...supabasePaths, ...filteredJsonBlog, ...filteredLocal];
 }
@@ -288,11 +302,12 @@ const supabaseParagraphs = (type === 'supabase' && !supabaseIsHtml)
 
         {type === 'supabase' && supabaseIsHtml && (<div set:html={item.continut} />)}
         {type === 'supabase' && !supabaseIsHtml && supabaseParagraphs.map((p: string) => {
-          // Prima linie = titlu? Dacă e identică cu titlul articolului, o sărim ca să nu apară dublat
           if (p === item.titlu) return null;
-          // Detectează sub-titluri numerotate ("1. ..." sau "### ...")
-          if (/^\d+\.\s+\S/.test(p) && p.length < 120) return <h2>{p}</h2>;
-          if (/^###?\s+/.test(p)) return <h2>{p.replace(/^#+\s+/, '')}</h2>;
+          const isNumberedHeading = /^\d+\.\s+\S/.test(p) && p.length < 120;
+          const isHashHeading = /^###?\s+/.test(p);
+          if (isNumberedHeading || isHashHeading) {
+            return <h2>{isHashHeading ? p.replace(/^#+\s+/, '') : p}</h2>;
+          }
           return <p>{p}</p>;
         })}
       </div>

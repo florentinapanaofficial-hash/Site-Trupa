@@ -11,6 +11,9 @@ import path from 'node:path';
    în blocul "🆕 ULTIMELE ADĂUGATE". Astfel vizitatorii văd primii cele mai
    recente momente. Pozele vechi rămân în blocul de mai jos, în ordinea lor. */
 const base = "/images/galerie-foto-site";
+type GalleryPhoto = { src: string; alt: string; cat: string };
+type DirPhotoMeta = { name: string; mtimeMs: number };
+
 const basePhotos = [
   // ═══ DOAR PRIMELE 5 — restul pozelor sunt afișate pe pagina /membri/ ═══
   { src: `${base}/Eveniment%20Arabesc.jpg`, alt: "Formația Florentina Pană cu trupa Arabesc la eveniment live", cat: "evenimente" },
@@ -23,7 +26,7 @@ const basePhotos = [
 // Folosim process.cwd() + path.join pentru a evita probleme cu spații în new URL()
 const extraPhotoDirPath = path.join(process.cwd(), 'public', 'images', 'poze 09.07.2026');
 const allowedExt = new Set(['.jpg', '.jpeg', '.png', '.webp', '.avif']);
-let latestPhotos = [];
+let latestPhotos: GalleryPhoto[] = [];
 
 try {
   const entries = await readdir(extraPhotoDirPath, { withFileTypes: true });
@@ -36,12 +39,12 @@ try {
         if (!allowedExt.has(ext)) return null;
         const filePath = path.join(extraPhotoDirPath, name);
         const meta = await stat(filePath);
-        return { name, mtimeMs: meta.mtimeMs };
+        return { name, mtimeMs: meta.mtimeMs } as DirPhotoMeta;
       }),
   );
 
   latestPhotos = filesWithMeta
-    .filter(Boolean)
+    .filter((item): item is DirPhotoMeta => item !== null)
     .sort((a, b) => b.mtimeMs - a.mtimeMs)
     .map(({ name }) => {
       const cleanName = name.replace(/\.[^.]+$/, '').replace(/[\-_]+/g, ' ').trim();

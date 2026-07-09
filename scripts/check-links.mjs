@@ -22,6 +22,13 @@ const SKIP_PATTERNS = [
     /www\.googletagmanager\.com/,
     /www\.google-analytics\.com/,
     /wa\.me\//,
+    /youtube-nocookie\.com$/,
+    /img\.youtube\.com$/,
+    /i\.ytimg\.com$/,
+    /iframe\.cloudflarestream\.com$/,
+    /\.supabase\.co/,
+    /customer-/,
+    /g\.co\/kgs\/?$/,
 ];
 
 async function walk(dir) {
@@ -41,6 +48,15 @@ function extractUrls(content) {
     let m;
     while ((m = re.exec(content))) {
         let url = m[0].replace(/[.,;:!?)]+$/, ''); // strip trailing punctuation
+        // Skip template placeholders / wildcard hosts that are not real runtime URLs.
+        if (url.includes('${') || url.includes('{') || url.includes('}') || url.includes('*')) continue;
+        if (url === 'https://' || url === 'http://') continue;
+        try {
+            const parsed = new URL(url);
+            if ((parsed.pathname === '/' || parsed.pathname === '') && !parsed.search && !parsed.hash) continue;
+        } catch {
+            continue;
+        }
         urls.add(url);
     }
     return [...urls];
@@ -50,12 +66,23 @@ async function checkUrl(url) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), TIMEOUT);
     try {
-        const res = await fetch(url, {
+        let res = await fetch(url, {
             method: 'HEAD',
             signal: controller.signal,
             redirect: 'follow',
             headers: { 'User-Agent': 'Mozilla/5.0 (compatible; LinkChecker/1.0)' },
         });
+
+        // Some providers block/lie on HEAD; retry once with GET for better signal.
+        if (!res.ok && [400, 403, 404, 405].includes(res.status)) {
+            res = await fetch(url, {
+                method: 'GET',
+                signal: controller.signal,
+                redirect: 'follow',
+                headers: { 'User-Agent': 'Mozilla/5.0 (compatible; LinkChecker/1.0)' },
+            });
+        }
+
         clearTimeout(timer);
         return { url, status: res.status, ok: res.ok, redirected: res.redirected, finalUrl: res.url };
     } catch (err) {
