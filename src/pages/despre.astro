@@ -4,9 +4,17 @@ import siteContent from '../data/siteContent.json';
 import seo from '../data/seo-content.json';
 import BackButton from '../components/BackButton.astro';
 
-const { contact, brand, services, repertoire } = siteContent;
+const { contact, brand, services, repertoire, membri, colaboratori: colaboratoriData } = siteContent as any;
 const despre = seo.despre;
-const hasBandPhoto = typeof (brand as any).bandPhoto === 'string' && (brand as any).bandPhoto.trim() !== '';
+const hasBandPhoto = typeof brand.bandPhoto === 'string' && brand.bandPhoto.trim() !== '';
+const cineMembers: Array<{src:string; name:string; role:string}> = [
+  ...((membri ?? []) as any[]).filter((m: any) => m.imagine?.trim()),
+  ...((colaboratoriData ?? []) as any[]).filter((c: any) => c.imagine?.trim()),
+].map((m: any) => ({
+  src:  m.imagine as string,
+  name: m.nume   as string,
+  role: (m.categorie === 'instrumentisti' ? m.specialitate : m.rol) as string,
+}));
 ---
 
 <BaseLayout
@@ -16,26 +24,37 @@ const hasBandPhoto = typeof (brand as any).bandPhoto === 'string' && (brand as a
   <section class="section-container py-16">
     <div class="mb-8"><BackButton href="/" label="Acasă" /></div>
 
-    {/* ── Foto panoramică trupă ── */}
-    <div class="dp-band-photo-wrap">
-      {hasBandPhoto ? (
-        <img
-          src={(brand as any).bandPhoto}
-          alt="Formația Florentina Pană — trupă profesionistă nuntă Pitești, Argeș"
-          class="dp-band-photo"
-          loading="eager"
-          decoding="async"
-          width="1200"
-          height="600"
-        />
-      ) : (
-        <div class="dp-band-photo-placeholder" aria-label="Spațiu rezervat pentru poza panoramică a trupei">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><circle cx="8.5" cy="10" r="1.5"/><path d="m21 15-5-5L5 20"/></svg>
-          <p class="dp-band-photo-label">Foto panoramică trupă — în curând</p>
-          <p class="dp-band-photo-hint">Adaugă <code>"bandPhoto": "/images/trupa.jpg"</code> în <code>src/data/siteContent.json</code></p>
+    {/* ── Montaj cinematic membrii ── */}
+    {cineMembers.length > 0 && (
+      <div class="cine-montage mb-14" aria-label="Montaj cinematic — membrii Formației Florentina Pană">
+        {cineMembers.map((m, i) => (
+          <div class={`cine-slide${i === 0 ? ' is-active' : ''}`} data-index={String(i)} data-name={m.name} data-role={m.role}>
+            <img class="cine-img" src={m.src} alt={`${m.name} — ${m.role}`}
+              loading={i === 0 ? 'eager' : 'lazy'} decoding="async" width="1200" height="400" />
+          </div>
+        ))}
+        <div class="cine-scanlines"  aria-hidden="true"></div>
+        <div class="cine-vignette"   aria-hidden="true"></div>
+        <div class="cine-grad"       aria-hidden="true"></div>
+        <div class="cine-lb cine-lb--top" aria-hidden="true"></div>
+        <div class="cine-lb cine-lb--bot" aria-hidden="true"></div>
+        <div class="cine-beams" aria-hidden="true">
+          <div class="cine-beam cb1"></div>
+          <div class="cine-beam cb2"></div>
+          <div class="cine-beam cb3"></div>
         </div>
-      )}
-    </div>
+        <div class="cine-grain" aria-hidden="true"></div>
+        <div class="cine-info" id="cine-info" aria-hidden="true">
+          <span class="cine-role-txt" id="cine-role">{cineMembers[0]?.role ?? ''}</span>
+          <span class="cine-name-txt" id="cine-name">{cineMembers[0]?.name ?? ''}</span>
+        </div>
+        <div class="cine-progress" aria-hidden="true">
+          {cineMembers.map((_m, i) => (
+            <button type="button" class={`cine-dot${i === 0 ? ' is-active' : ''}`} data-dot={String(i)}></button>
+          ))}
+        </div>
+      </div>
+    )}
 
     {/* ── Despre noi ── */}
     <header class="dp-intro-block mb-14">
@@ -185,6 +204,163 @@ const hasBandPhoto = typeof (brand as any).bandPhoto === 'string' && (brand as a
 </BaseLayout>
 
 <style>
+  /* ════════════════════════════════════════════
+     MONTAJ CINEMATIC MEMBRII
+  ════════════════════════════════════════════ */
+  .cine-montage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 21 / 7;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.10);
+    box-shadow: 0 24px 64px rgba(0,0,0,0.60), 0 0 0 1px rgba(6,214,255,0.06);
+    background: #050b1e;
+    isolation: isolate;
+    cursor: default;
+  }
+  @media (max-width: 767px) {
+    .cine-montage { aspect-ratio: 16 / 9; }
+  }
+  @media (max-width: 479px) {
+    .cine-montage { aspect-ratio: 4 / 3; border-radius: 1rem; }
+  }
+
+  /* ── Photo slides ── */
+  .cine-slide {
+    position: absolute; inset: 0;
+    opacity: 0;
+    transition: opacity 1.4s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity;
+  }
+  .cine-slide.is-active { opacity: 1; }
+
+  .cine-img {
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: center 15%;
+    display: block;
+  }
+  .cine-slide.is-active .cine-img {
+    animation: cine-kenburns 12s ease-in-out both;
+  }
+  @keyframes cine-kenburns {
+    0%   { transform: scale(1.05) translate(1%, 0.5%); }
+    50%  { transform: scale(1.10) translate(-1%, -0.5%); }
+    100% { transform: scale(1.05) translate(0.5%, 0.3%); }
+  }
+
+  /* Per-member photo alignment */
+  .cine-img[src*="oprea-marian"]     { object-position: center 5%; }
+  .cine-img[src*="catalin-matei"]    { object-position: center 20%; }
+  .cine-img[src*="cristian-ograbek"] { object-position: center 50%; }
+  .cine-img[src*="Claudiu"]          { object-position: center 50%; }
+  .cine-img[src*="Alexia%201"]       { object-position: center top; }
+
+  /* ── Letterbox bars (cinematic) ── */
+  .cine-lb {
+    position: absolute; left: 0; right: 0; height: 11%;
+    background: #000; z-index: 6; pointer-events: none;
+  }
+  .cine-lb--top { top: 0; }
+  .cine-lb--bot { bottom: 0; }
+
+  /* ── Atmosphere overlays ── */
+  .cine-scanlines {
+    position: absolute; inset: 0; z-index: 3; pointer-events: none;
+    background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 3px);
+  }
+  .cine-vignette {
+    position: absolute; inset: 0; z-index: 2; pointer-events: none;
+    background: radial-gradient(ellipse 80% 90% at center, transparent 35%, rgba(0,0,0,0.72) 100%);
+  }
+  .cine-grad {
+    position: absolute; inset: 0; z-index: 2; pointer-events: none;
+    background: linear-gradient(to right, rgba(0,0,0,0.68) 0%, transparent 35%, transparent 70%, rgba(0,0,0,0.50) 100%);
+  }
+
+  /* ── Stage beam lights ── */
+  .cine-beams {
+    position: absolute; inset: 0; overflow: hidden;
+    pointer-events: none; z-index: 1;
+  }
+  .cine-beam {
+    position: absolute; top: 0;
+    width: 180px; height: 100%;
+    transform-origin: 50% 0%;
+    clip-path: polygon(28% 0%, 72% 0%, 100% 100%, 0% 100%);
+  }
+  .cb1 { left: 12%; background: linear-gradient(to bottom, rgba(6,214,255,0.22), transparent 70%); transform: rotate(-10deg); animation: cine-beam-p 6s ease-in-out infinite; }
+  .cb2 { left: 50%; transform: translateX(-50%); background: linear-gradient(to bottom, rgba(245,200,60,0.16), transparent 65%); animation: cine-beam-p 9s ease-in-out infinite 2s; }
+  .cb3 { right: 12%; left: auto; background: linear-gradient(to bottom, rgba(6,214,255,0.22), transparent 70%); transform: rotate(10deg); animation: cine-beam-p 6s ease-in-out infinite 1.2s; }
+  @keyframes cine-beam-p {
+    0%, 100% { opacity: 1; }
+    45% { opacity: 0.45; }
+    70% { opacity: 0.85; }
+  }
+
+  /* ── Film grain ── */
+  .cine-grain {
+    position: absolute; inset: 0; z-index: 4; pointer-events: none;
+    opacity: 0.045;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 180px 180px;
+    animation: grain-anim 0.1s steps(1) infinite;
+  }
+  @keyframes grain-anim {
+    0%   { background-position: 0 0; }
+    25%  { background-position: -60px -40px; }
+    50%  { background-position: 40px 60px; }
+    75%  { background-position: -30px 20px; }
+    100% { background-position: 0 0; }
+  }
+
+  /* ── Member name overlay ── */
+  .cine-info {
+    position: absolute; bottom: 14%; left: 5%; z-index: 7;
+    display: flex; flex-direction: column; gap: 0.2rem;
+    pointer-events: none;
+  }
+  .cine-role-txt {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(0.55rem, 1.2vw, 0.78rem);
+    letter-spacing: 0.28em; text-transform: uppercase;
+    color: rgba(6,214,255,0.90);
+    opacity: 0; transform: translateY(6px);
+    transition: opacity 0.55s ease 0.2s, transform 0.55s ease 0.2s;
+  }
+  .cine-name-txt {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(1.0rem, 2.6vw, 2.0rem);
+    font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    color: #ffffff;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.9), 0 0 40px rgba(6,214,255,0.25);
+    opacity: 0; transform: translateY(8px);
+    transition: opacity 0.55s ease 0.35s, transform 0.55s ease 0.35s;
+  }
+  .cine-info.is-visible .cine-role-txt,
+  .cine-info.is-visible .cine-name-txt {
+    opacity: 1; transform: translateY(0);
+  }
+
+  /* ── Progress dots ── */
+  .cine-progress {
+    position: absolute; bottom: 14%; right: 5%; z-index: 7;
+    display: flex; align-items: center; gap: 0.45rem;
+  }
+  .cine-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: rgba(255,255,255,0.30);
+    border: 1px solid rgba(255,255,255,0.12);
+    padding: 0; cursor: pointer;
+    transition: background 300ms, width 300ms, border-radius 300ms, box-shadow 300ms;
+  }
+  .cine-dot.is-active {
+    width: 22px; border-radius: 3px;
+    background: rgba(6,214,255,0.90);
+    border-color: rgba(6,214,255,0.50);
+    box-shadow: 0 0 8px rgba(6,214,255,0.55);
+  }
+
   /* ── Intro two-col ── */
   .dp-intro-block {
     display: grid;
@@ -560,6 +736,65 @@ const hasBandPhoto = typeof (brand as any).bandPhoto === 'string' && (brand as a
     closeBtn?.addEventListener('click', closeModal);
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && !modal.hidden) closeModal();
+    });
+  })();
+
+  // ── Montaj cinematic membrii ──
+  (function() {
+    var slides  = Array.from(document.querySelectorAll('.cine-slide'));
+    var dots    = Array.from(document.querySelectorAll('.cine-dot'));
+    var infoEl  = document.getElementById('cine-info');
+    var nameEl  = document.getElementById('cine-name');
+    var roleEl  = document.getElementById('cine-role');
+    if (!slides.length) return;
+
+    var members = slides.map(function(s) {
+      return { name: s.dataset.name || '', role: s.dataset.role || '' };
+    });
+    var current = 0;
+    var INTERVAL = 4600;
+    var timer = null;
+
+    function reveal() {
+      if (infoEl) infoEl.classList.add('is-visible');
+    }
+    function goTo(idx) {
+      slides[current].classList.remove('is-active');
+      if (dots[current]) dots[current].classList.remove('is-active');
+      if (infoEl) infoEl.classList.remove('is-visible');
+      current = ((idx % slides.length) + slides.length) % slides.length;
+      slides[current].classList.add('is-active');
+      if (dots[current]) dots[current].classList.add('is-active');
+      if (nameEl) nameEl.textContent = members[current].name;
+      if (roleEl) roleEl.textContent = members[current].role;
+      setTimeout(reveal, 750);
+    }
+    // Init overlay
+    if (nameEl) nameEl.textContent = members[0].name;
+    if (roleEl) roleEl.textContent = members[0].role;
+    setTimeout(reveal, 600);
+    // Dots click
+    dots.forEach(function(dot, i) {
+      dot.addEventListener('click', function() {
+        clearInterval(timer);
+        goTo(i);
+        timer = setInterval(function() { goTo(current + 1); }, INTERVAL);
+      });
+    });
+    // Auto advance
+    timer = setInterval(function() { goTo(current + 1); }, INTERVAL);
+    // Pause on hover
+    var montage = document.querySelector('.cine-montage');
+    if (montage) {
+      montage.addEventListener('mouseenter', function() { clearInterval(timer); });
+      montage.addEventListener('mouseleave', function() {
+        timer = setInterval(function() { goTo(current + 1); }, INTERVAL);
+      });
+    }
+    // Save resources when tab hidden
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden) { clearInterval(timer); }
+      else { timer = setInterval(function() { goTo(current + 1); }, INTERVAL); }
     });
   })();
 </script>
