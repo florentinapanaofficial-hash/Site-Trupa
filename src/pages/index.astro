@@ -32,20 +32,39 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
 
 const heroVideos = siteContent.videos.slice(0, 3).map((video) => ({
   title: video.title,
-  thumb: `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`,
+  thumbWebp: `https://i.ytimg.com/vi_webp/${video.youtubeId}/hqdefault.webp`,
+  thumbJpg: `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`,
 }));
 
-const heroPhotos = [
+const homepagePhotoSources = {
+  claudiuFlorentina: {
+    avifSrcSet: '/images/galerie-foto-site/placerea-scenei-claudiu-florentina-500.avif 500w, /images/galerie-foto-site/placerea-scenei-claudiu-florentina-1000.avif 1000w',
+    webpSrcSet: '/images/galerie-foto-site/placerea-scenei-claudiu-florentina-500.webp 500w, /images/galerie-foto-site/placerea-scenei-claudiu-florentina-1000.webp 1000w',
+    fallbackSrc: '/images/galerie-foto-site/placerea-scenei-claudiu-florentina.jpg',
+  },
+  panoramica2: {
+    avifSrcSet: '/images/galerie-foto-site/placerea-scenei-panoramica-2-500.avif 500w, /images/galerie-foto-site/placerea-scenei-panoramica-2-1000.avif 1000w',
+    webpSrcSet: '/images/galerie-foto-site/placerea-scenei-panoramica-2-500.webp 500w, /images/galerie-foto-site/placerea-scenei-panoramica-2-1000.webp 1000w',
+    fallbackSrc: '/images/galerie-foto-site/placerea-scenei-panoramica-2.jpg',
+  },
+  grupArabesc: {
+    avifSrcSet: '/images/galerie-foto-site/placerea-scenei-grup-arabesc-500.avif 500w, /images/galerie-foto-site/placerea-scenei-grup-arabesc-1000.avif 1000w',
+    webpSrcSet: '/images/galerie-foto-site/placerea-scenei-grup-arabesc-500.webp 500w, /images/galerie-foto-site/placerea-scenei-grup-arabesc-1000.webp 1000w',
+    fallbackSrc: '/images/galerie-foto-site/placerea-scenei-grup-arabesc.jpg',
+  },
+} as const;
+
+const heroPhotos: Array<{ variant: keyof typeof homepagePhotoSources; alt: string }> = [
   {
-    src: '/images/galerie-foto-site/placerea-scenei-panoramica-2.jpg',
+    variant: 'panoramica2',
     alt: 'Formația Florentina Pană în plin show live pe scenă',
   },
   {
-    src: '/images/galerie-foto-site/placerea-scenei-claudiu-florentina.jpg',
+    variant: 'claudiuFlorentina',
     alt: 'Moment live în duet pe scenă la un eveniment premium',
   },
   {
-    src: '/images/galerie-foto-site/placerea-scenei-grup-arabesc.jpg',
+    variant: 'grupArabesc',
     alt: 'Invitați pe ringul de dans la un moment live energic',
   },
 ];
@@ -202,14 +221,26 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
   <section class="hp-meet-teaser section-container" aria-label="Cunoaște Formația Florentina Pană">
     <div class="hp-meet-wrap reveal-on-scroll from-bottom" style="--reveal-delay: 30ms">
       <div class="hp-meet-media">
-        <img
-          src="/images/galerie-foto-site/placerea-scenei-claudiu-florentina.jpg"
-          alt="Florentina și Claudiu în timpul unui moment live"
-          loading="lazy"
-          decoding="async"
-          width="720"
-          height="460"
-        />
+        <picture>
+          <source
+            type="image/avif"
+            srcset={homepagePhotoSources.claudiuFlorentina.avifSrcSet}
+            sizes="(max-width: 1024px) 92vw, 496px"
+          />
+          <source
+            type="image/webp"
+            srcset={homepagePhotoSources.claudiuFlorentina.webpSrcSet}
+            sizes="(max-width: 1024px) 92vw, 496px"
+          />
+          <img
+            src={homepagePhotoSources.claudiuFlorentina.fallbackSrc}
+            alt="Florentina și Claudiu în timpul unui moment live"
+            loading="lazy"
+            decoding="async"
+            width="500"
+            height="889"
+          />
+        </picture>
       </div>
       <div class="hp-meet-content">
         <p class="hp-meet-kicker">Conexiune reală</p>
@@ -261,7 +292,26 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
 
     <div class="hp-team-grid">
       <article class="hp-team-card reveal-on-scroll from-left" style="--reveal-delay: 80ms">
-        <img src="/images/galerie-foto-site/placerea-scenei-claudiu-florentina.jpg" alt="Florentina și Claudiu în timpul unui show live" loading="lazy" decoding="async" width="720" height="460" />
+        <picture>
+          <source
+            type="image/avif"
+            srcset={homepagePhotoSources.claudiuFlorentina.avifSrcSet}
+            sizes="(max-width: 767px) 92vw, 485px"
+          />
+          <source
+            type="image/webp"
+            srcset={homepagePhotoSources.claudiuFlorentina.webpSrcSet}
+            sizes="(max-width: 767px) 92vw, 485px"
+          />
+          <img
+            src={homepagePhotoSources.claudiuFlorentina.fallbackSrc}
+            alt="Florentina și Claudiu în timpul unui show live"
+            loading="lazy"
+            decoding="async"
+            width="500"
+            height="889"
+          />
+        </picture>
         <div class="hp-team-overlay" aria-hidden="true"></div>
         <div class="hp-team-content">
           <p class="hp-team-role">Voce & Show Direction</p>
@@ -271,7 +321,26 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
       </article>
 
       <article class="hp-team-card reveal-on-scroll from-right" style="--reveal-delay: 150ms">
-        <img src="/images/galerie-foto-site/placerea-scenei-panoramica-2.jpg" alt="Claudiu coordonând atmosfera live la eveniment" loading="lazy" decoding="async" width="720" height="460" />
+        <picture>
+          <source
+            type="image/avif"
+            srcset={homepagePhotoSources.panoramica2.avifSrcSet}
+            sizes="(max-width: 767px) 92vw, 485px"
+          />
+          <source
+            type="image/webp"
+            srcset={homepagePhotoSources.panoramica2.webpSrcSet}
+            sizes="(max-width: 767px) 92vw, 485px"
+          />
+          <img
+            src={homepagePhotoSources.panoramica2.fallbackSrc}
+            alt="Claudiu coordonând atmosfera live la eveniment"
+            loading="lazy"
+            decoding="async"
+            width="500"
+            height="287"
+          />
+        </picture>
         <div class="hp-team-overlay" aria-hidden="true"></div>
         <div class="hp-team-content">
           <p class="hp-team-role">Coordonare & Energie Live</p>
@@ -358,7 +427,10 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
           style={`--reveal-delay: ${index * 90}ms`}
           aria-label={`Vezi videoclipuri live: ${video.title}`}
         >
-          <img src={video.thumb} alt={video.title} loading="lazy" decoding="async" width="640" height="360" />
+          <picture>
+            <source type="image/webp" srcset={video.thumbWebp} />
+            <img src={video.thumbJpg} alt={video.title} loading="lazy" decoding="async" width="640" height="360" />
+          </picture>
           <span class="hp-cine-overlay" aria-hidden="true"></span>
           <span class="hp-cine-chip" aria-hidden="true">LIVE</span>
           <span class="hp-cine-play" aria-hidden="true">▶</span>
@@ -378,18 +450,32 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
         </div>
       </div>
 
-      {heroPhotos.map((photo, index) => (
+      {heroPhotos.map((photo, index) => {
+        const source = homepagePhotoSources[photo.variant];
+        return (
         <a
           href="/galerie-foto/"
           class="hp-cine-card hp-cine-card--photo reveal-on-scroll from-right"
           style={`--reveal-delay: ${160 + index * 100}ms`}
           aria-label="Vezi mai multe fotografii din galerie"
         >
-          <img src={photo.src} alt={photo.alt} loading="lazy" decoding="async" width="800" height="500" />
+          <picture>
+            <source
+              type="image/avif"
+              srcset={source.avifSrcSet}
+              sizes="(max-width: 767px) 92vw, 399px"
+            />
+            <source
+              type="image/webp"
+              srcset={source.webpSrcSet}
+              sizes="(max-width: 767px) 92vw, 399px"
+            />
+            <img src={source.fallbackSrc} alt={photo.alt} loading="lazy" decoding="async" width="500" height={photo.variant === 'panoramica2' ? '287' : '889'} />
+          </picture>
           <span class="hp-cine-overlay" aria-hidden="true"></span>
           <span class="hp-cine-caption">Cadru autentic de la eveniment</span>
         </a>
-      ))}
+      );})}
 
       <div class="hp-cine-editorial reveal-on-scroll from-left" style="--reveal-delay: 210ms">
         <p class="hp-cine-editorial-kicker">Semnătura noastră</p>
@@ -1538,6 +1624,12 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
     transition: transform 340ms ease;
   }
 
+  .hp-team-card picture {
+    position: absolute;
+    inset: 0;
+    display: block;
+  }
+
   .hp-team-overlay {
     position: absolute;
     inset: 0;
@@ -1730,6 +1822,12 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
     object-fit: cover;
     display: block;
     filter: saturate(1.04) contrast(1.03);
+  }
+
+  .hp-meet-media picture {
+    width: 100%;
+    height: 100%;
+    display: block;
   }
 
   .hp-meet-content {
@@ -2607,6 +2705,12 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
     object-fit: cover;
     display: block;
     transition: transform 420ms ease;
+  }
+
+  .hp-cine-card picture {
+    display: block;
+    width: 100%;
+    height: 100%;
   }
 
   .hp-cine-overlay {

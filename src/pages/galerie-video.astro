@@ -84,17 +84,21 @@ const videosByCategory = (cat: string) =>
             <div class="video-grid">
               {videos.map((video) => {
                 const slug = videoSlug(video);
-                const thumb = `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`;
+                const thumbWebp = `https://i.ytimg.com/vi_webp/${video.youtubeId}/hqdefault.webp`;
+                const thumbJpg = `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`;
                 return (
                   <a href={`/video/${slug}/`} class="video-card" title={video.title} aria-label={`Redă: ${video.title}`}>
                     <div class="thumb-shell">
-                      <img
-                        src={thumb}
-                        alt={video.title}
-                        class="thumb-img"
-                        loading="lazy"
-                        decoding="async"
-                      />
+                      <picture>
+                        <source type="image/webp" srcset={thumbWebp} />
+                        <img
+                          src={thumbJpg}
+                          alt={video.title}
+                          class="thumb-img"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </picture>
                       <div class="thumb-overlay" aria-hidden="true">
                         <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                           <circle cx="12" cy="12" r="12" fill="rgba(0,0,0,0.55)" />
@@ -197,6 +201,12 @@ const videosByCategory = (cat: string) =>
     object-fit: cover;
     display: block;
     transition: transform 320ms ease;
+  }
+
+  .thumb-shell picture {
+    display: block;
+    width: 100%;
+    height: 100%;
   }
 
   .video-card:hover .thumb-img {
