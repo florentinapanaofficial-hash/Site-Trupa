@@ -20,9 +20,10 @@ interface Props {
   datePublished?: string;
   dateModified?: string;
   noindex?: boolean;
+  hideFooter?: boolean;
 }
 
-const { title, description, ogType = 'website', ogVideoUrl, ogVideoSecureUrl, ogVideoType = 'text/html', ogVideoWidth = '1280', ogVideoHeight = '720', datePublished, dateModified, noindex = false } = Astro.props as Props;
+const { title, description, ogType = 'website', ogVideoUrl, ogVideoSecureUrl, ogVideoType = 'text/html', ogVideoWidth = '1280', ogVideoHeight = '720', datePublished, dateModified, noindex = false, hideFooter = false } = Astro.props as Props;
 
 const SITE_FALLBACK = 'https://www.florentinapanaofficial.ro';
 const site = Astro.site?.toString().replace(/\/$/, '') ?? SITE_FALLBACK;
@@ -401,8 +402,8 @@ const mobileNavAllItems = [
 
       <main id="continut" class="flex-1 min-w-0 pt-40 sm:pt-44 lg:pt-0 flex flex-col min-h-[100dvh]">
         <slot />
-        <div class="flex-1" aria-hidden="true"></div>
-        <Footer />
+        {!hideFooter && <div class="flex-1" aria-hidden="true"></div>}
+        {!hideFooter && <Footer />}
       </main>
     </div>
 
