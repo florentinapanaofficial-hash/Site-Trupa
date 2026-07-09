@@ -3,13 +3,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import BackButton from '../components/BackButton.astro';
 import EmbedSnippet from '../components/EmbedSnippet.astro';
 import PhotoGallery from '../components/PhotoGallery.astro';
+import { readdir, stat } from 'node:fs/promises';
 
 /* ── Date galerie: toate pozele din colecție ──
    REGULĂ: Pozele NOI se adaugă ÎNTOTDEAUNA la începutul array-ului (sus),
    în blocul "🆕 ULTIMELE ADĂUGATE". Astfel vizitatorii văd primii cele mai
    recente momente. Pozele vechi rămân în blocul de mai jos, în ordinea lor. */
 const base = "/images/galerie-foto-site";
-const photos = [
+const basePhotos = [
   // ═══ DOAR PRIMELE 5 — restul pozelor sunt afișate pe pagina /membri/ ═══
   { src: `${base}/Eveniment%20Arabesc.jpg`, alt: "Formația Florentina Pană cu trupa Arabesc la eveniment live", cat: "evenimente" },
   { src: `${base}/Eveniment%20Grup%20Arabesc.jpg`, alt: "Moment de grup cu membrii trupei Arabesc la petrecere", cat: "evenimente" },
@@ -17,6 +18,42 @@ const photos = [
   { src: `${base}/Galerie Evenimente 1.jpg`, alt: "Eveniment live cu Formația Florentina Pană", cat: "evenimente" },
   { src: `${base}/Galerie Evenimente 2.jpg`, alt: "Scenă completă la eveniment live", cat: "evenimente" },
 ];
+
+const extraPhotoDir = new URL('../../public/images/poze 09.07.2026/', import.meta.url);
+const allowedExt = new Set(['.jpg', '.jpeg', '.png', '.webp', '.avif']);
+let latestPhotos = [];
+
+try {
+  const entries = await readdir(extraPhotoDir, { withFileTypes: true });
+  const filesWithMeta = await Promise.all(
+    entries
+      .filter((entry) => entry.isFile())
+      .map(async (entry) => {
+        const name = entry.name;
+        const ext = name.includes('.') ? `.${name.split('.').pop()?.toLowerCase()}` : '';
+        if (!allowedExt.has(ext)) return null;
+        const fileUrl = new URL(name, extraPhotoDir);
+        const meta = await stat(fileUrl);
+        return { name, mtimeMs: meta.mtimeMs };
+      }),
+  );
+
+  latestPhotos = filesWithMeta
+    .filter(Boolean)
+    .sort((a, b) => b.mtimeMs - a.mtimeMs)
+    .map(({ name }) => {
+      const cleanName = name.replace(/\.[^.]+$/, '').replace(/[\-_]+/g, ' ').trim();
+      return {
+        src: `/images/poze 09.07.2026/${encodeURIComponent(name)}`,
+        alt: `Foto eveniment Formația Florentina Pană - ${cleanName || 'live'}`,
+        cat: 'evenimente',
+      };
+    });
+} catch {
+  latestPhotos = [];
+}
+
+const photos = [...latestPhotos, ...basePhotos];
 
 
 ---
@@ -73,9 +110,8 @@ const photos = [
           <span class="gal-montage-bpm-val" data-montage-bpm-val>118</span>
         </div>
         <div class="gal-montage-controls-row gal-montage-controls-row--audio">
-          <label class="gal-montage-file" for="montage-audio-file">Alege audio</label>
-          <input id="montage-audio-file" class="gal-montage-file-input" type="file" accept="audio/*" data-montage-audio-file />
-          <button type="button" class="gal-montage-btn" data-montage-audio-play aria-label="Redă sau oprește muzica">Play Audio</button>
+          <span class="gal-montage-file" aria-hidden="true">Melodie presetată</span>
+          <span class="gal-montage-audio-hint">Muzica pornește automat când apeși Play.</span>
           <label class="gal-montage-label" for="montage-sense">Sens</label>
           <input id="montage-sense" class="gal-montage-range gal-montage-range--short" type="range" min="105" max="180" step="1" value="130" data-montage-sense aria-label="Sensibilitate detectare beat" />
           <span class="gal-montage-bpm-val" data-montage-sense-val>1.30x</span>
@@ -124,7 +160,7 @@ const photos = [
       <p style="font-size:0.85rem;color:rgba(255,255,255,0.7);margin-bottom:1rem;">Fiecare fotografie are link unic. Distribuie pe WhatsApp sau Facebook, sau copiază link-ul pentru a genera backlinks!</p>
       <PhotoGallery
         images={photos.map((p) => ({ src: p.src, alt: p.alt, caption: p.alt }))}
-        pagePath="/galerie-foto"
+        pagePath="/galerie-foto/"
       />
     </div>
 
@@ -179,8 +215,6 @@ const photos = [
   const montageBpmVal = document.querySelector('[data-montage-bpm-val]');
   const montageSense = document.querySelector('[data-montage-sense]');
   const montageSenseVal = document.querySelector('[data-montage-sense-val]');
-  const montageAudioFile = document.querySelector('[data-montage-audio-file]');
-  const montageAudioPlay = document.querySelector('[data-montage-audio-play]');
   const montageAudio = document.querySelector('[data-montage-audio]');
   const beatBars = Array.from(document.querySelectorAll('[data-beat-bar]'));
   let montageIndex = 0;
@@ -199,7 +233,6 @@ const photos = [
   let lastAutoPresetAt = 0;
   let lastEnergyTarget = 'elegant';
   let energyTargetStreak = 0;
-  let audioObjectUrl = '';
   const lowEnergyHistory = [];
   const totalEnergyHistory = [];
 
@@ -366,6 +399,25 @@ const photos = [
     renderMontage(montageIndex + 1);
   }
 
+  async function playMontageAudio() {
+    if (!montageAudio || !montageAudio.src) return;
+    try {
+      await ensureAudioGraph();
+      if (montageAudio.paused) {
+        await montageAudio.play();
+      }
+      startBeatDetection();
+    } catch {
+      stopBeatDetection();
+    }
+  }
+
+  function pauseMontageAudio() {
+    if (!montageAudio) return;
+    if (!montageAudio.paused) montageAudio.pause();
+    stopBeatDetection();
+  }
+
   function startMontage() {
     if (!montageSlides.length) return;
     stopMontage();
@@ -404,7 +456,13 @@ const photos = [
     });
 
     montagePlay?.addEventListener('click', () => {
-      montagePlaying ? stopMontage() : startMontage();
+      if (montagePlaying) {
+        stopMontage();
+        pauseMontageAudio();
+      } else {
+        startMontage();
+        void playMontageAudio();
+      }
     });
 
     montageBeat?.addEventListener('click', () => {
@@ -434,46 +492,7 @@ const photos = [
       if (montageSenseVal) montageSenseVal.textContent = `${getBeatSensitivity().toFixed(2)}x`;
     });
 
-    montageAudioFile?.addEventListener('change', async () => {
-      const file = montageAudioFile.files && montageAudioFile.files[0];
-      if (!file || !montageAudio) return;
-      if (audioObjectUrl) URL.revokeObjectURL(audioObjectUrl);
-      const nextSrc = URL.createObjectURL(file);
-      audioObjectUrl = nextSrc;
-      montageAudio.src = nextSrc;
-      montageAudio.currentTime = 0;
-      try {
-        await ensureAudioGraph();
-        await montageAudio.play();
-        if (montageAudioPlay) montageAudioPlay.textContent = 'Pause Audio';
-        startBeatDetection();
-        if (montagePlaying) startMontage();
-      } catch {
-        if (montageAudioPlay) montageAudioPlay.textContent = 'Play Audio';
-      }
-    });
-
-    montageAudioPlay?.addEventListener('click', async () => {
-      if (!montageAudio || !montageAudio.src) return;
-      try {
-        await ensureAudioGraph();
-        if (montageAudio.paused) {
-          await montageAudio.play();
-          montageAudioPlay.textContent = 'Pause Audio';
-          startBeatDetection();
-        } else {
-          montageAudio.pause();
-          montageAudioPlay.textContent = 'Play Audio';
-          stopBeatDetection();
-        }
-        if (montagePlaying) startMontage();
-      } catch {
-        montageAudioPlay.textContent = 'Play Audio';
-      }
-    });
-
     montageAudio?.addEventListener('ended', () => {
-      if (montageAudioPlay) montageAudioPlay.textContent = 'Play Audio';
       stopBeatDetection();
       if (montagePlaying) startMontage();
     });
@@ -487,7 +506,10 @@ const photos = [
     });
 
     document.addEventListener('visibilitychange', () => {
-      if (document.hidden) stopMontage();
+      if (document.hidden) {
+        stopMontage();
+        pauseMontageAudio();
+      }
       else if (montagePlaying || (montagePlay && montagePlay.textContent === 'Pause')) startMontage();
     });
 
@@ -827,15 +849,14 @@ const photos = [
     font-family: 'Oswald', sans-serif;
     letter-spacing: 0.05em;
     text-transform: uppercase;
-    cursor: pointer;
+    cursor: default;
   }
 
-  .gal-montage-file-input {
-    width: 0;
-    height: 0;
-    opacity: 0;
-    position: absolute;
-    pointer-events: none;
+  .gal-montage-audio-hint {
+    font-size: 0.68rem;
+    color: rgba(230, 238, 255, 0.78);
+    letter-spacing: 0.02em;
+    line-height: 1.25;
   }
 
   .gal-montage-select,
@@ -878,9 +899,7 @@ const photos = [
   }
 
   .gal-montage-btn:hover,
-  .gal-montage-btn:focus-visible,
-  .gal-montage-file:hover,
-  .gal-montage-file:focus-visible {
+  .gal-montage-btn:focus-visible {
     border-color: rgba(0, 200, 255, 0.55);
     background: rgba(0, 200, 255, 0.16);
   }
