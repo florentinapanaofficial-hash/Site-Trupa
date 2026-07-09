@@ -332,10 +332,15 @@ function formatDate(date) {
     .pub-grid {
       display: grid;
       gap: 1.4rem;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+      align-items: stretch;
+      max-width: var(--container-max);
+      margin: 0 auto;
     }
 
     .pub-card {
+      display: flex;
+      flex-direction: column;
       overflow: hidden;
       border-radius: 1.35rem;
       border: 1px solid rgba(255, 255, 255, 0.09);
@@ -369,6 +374,10 @@ function formatDate(date) {
 
     .pub-card__body {
       padding: 1rem 1rem 1.15rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      flex: 1;
     }
 
     .pub-card__meta {
@@ -385,7 +394,9 @@ function formatDate(date) {
 
     .pub-card__title {
       margin: 0;
-      font-size: 1.45rem;
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.16rem;
+      line-height: 1.25;
       color: #ffffff;
     }
 
@@ -399,8 +410,9 @@ function formatDate(date) {
     }
 
     .pub-card__excerpt {
-      margin: 0.7rem 0 0;
+      margin: 0;
       color: rgba(255, 255, 255, 0.78);
+      font-size: 0.92rem;
       line-height: 1.65;
       /* Limitează vizual la 4 rânduri, restul … */
       display: -webkit-box;
@@ -419,7 +431,7 @@ function formatDate(date) {
       display: inline-flex;
       align-items: center;
       gap: 0.35rem;
-      margin-top: 0.9rem;
+      margin-top: auto;
       padding: 0.5rem 0;
       font-family: 'Oswald', sans-serif;
       font-size: 0.92rem;

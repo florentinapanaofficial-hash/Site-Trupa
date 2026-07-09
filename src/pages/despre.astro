@@ -237,7 +237,7 @@ const cineMembers: Array<{src:string; name:string; role:string}> = [
 
   .cine-img {
     width: 100%; height: 100%;
-    object-fit: cover; object-position: center top;  /* landscape container → cap sus */
+    object-fit: cover; object-position: center 18%;  /* panorama → păstrează mai bine fețele în cadru */
     display: block;
   }
   .cine-slide.is-active .cine-img {
@@ -250,12 +250,12 @@ const cineMembers: Array<{src:string; name:string; role:string}> = [
   }
 
   /* Per-member photo alignment — landscape container 21:7 */
-  .cine-img[src*="oprea-marian"]     { object-position: center 10%; }   /* portret înalt */
-  .cine-img[src*="catalin-matei"]    { object-position: center top; }   /* portret standard */
-  .cine-img[src*="cristian-ograbek"] { object-position: center 25%; }   /* landscape → ceva mai sus decât centru */
-  .cine-img[src*="Claudiu"]          { object-position: center 25%; }   /* landscape → ceva mai sus decât centru */
-  .cine-img[src*="Florentina Pan"]   { object-position: center top; }   /* portret standard */
-  .cine-img[src*="Alexia%201"]       { object-position: center top; }   /* headshot → cap în vârf */
+  .cine-slide[data-name="Oprea Marian"] .cine-img     { object-position: center 10%; }   /* portret înalt */
+  .cine-slide[data-name="Cătălin Matei"] .cine-img     { object-position: center top; }   /* portret standard */
+  .cine-slide[data-name="Cristian Ograbek"] .cine-img  { object-position: center 25%; }   /* landscape → ceva mai sus decât centru */
+  .cine-slide[data-name="Claudiu Pană"] .cine-img      { object-position: center 25%; }   /* landscape → ceva mai sus decât centru */
+  .cine-slide[data-name="Florentina Pană"] .cine-img   { object-position: center top; }   /* portret standard */
+  .cine-slide[data-name="Alexia Țircomnicu"] .cine-img { object-position: center top; }   /* headshot → cap în vârf */
 
   /* ── Letterbox bars (cinematic) ── */
   .cine-lb {
