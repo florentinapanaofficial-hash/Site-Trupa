@@ -84,21 +84,17 @@ const videosByCategory = (cat: string) =>
             <div class="video-grid">
               {videos.map((video) => {
                 const slug = videoSlug(video);
-                const thumbWebp = `https://i.ytimg.com/vi_webp/${video.youtubeId}/hqdefault.webp`;
                 const thumbJpg = `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`;
                 return (
                   <a href={`/video/${slug}/`} class="video-card" title={video.title} aria-label={`Redă: ${video.title}`}>
                     <div class="thumb-shell">
-                      <picture>
-                        <source type="image/webp" srcset={thumbWebp} />
-                        <img
-                          src={thumbJpg}
-                          alt={video.title}
-                          class="thumb-img"
-                          loading="lazy"
-                          decoding="async"
-                        />
-                      </picture>
+                      <img
+                        src={thumbJpg}
+                        alt={video.title}
+                        class="thumb-img"
+                        loading="lazy"
+                        decoding="async"
+                      />
                       <div class="thumb-overlay" aria-hidden="true">
                         <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                           <circle cx="12" cy="12" r="12" fill="rgba(0,0,0,0.55)" />

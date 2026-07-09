@@ -32,7 +32,6 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
 
 const heroVideos = siteContent.videos.slice(0, 3).map((video) => ({
   title: video.title,
-  thumbWebp: `https://i.ytimg.com/vi_webp/${video.youtubeId}/hqdefault.webp`,
   thumbJpg: `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`,
 }));
 
@@ -427,10 +426,7 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
           style={`--reveal-delay: ${index * 90}ms`}
           aria-label={`Vezi videoclipuri live: ${video.title}`}
         >
-          <picture>
-            <source type="image/webp" srcset={video.thumbWebp} />
-            <img src={video.thumbJpg} alt={video.title} loading="lazy" decoding="async" width="640" height="360" />
-          </picture>
+          <img src={video.thumbJpg} alt={video.title} loading="lazy" decoding="async" width="640" height="360" />
           <span class="hp-cine-overlay" aria-hidden="true"></span>
           <span class="hp-cine-chip" aria-hidden="true">LIVE</span>
           <span class="hp-cine-play" aria-hidden="true">▶</span>
