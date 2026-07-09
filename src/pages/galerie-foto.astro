@@ -4,6 +4,7 @@ import BackButton from '../components/BackButton.astro';
 import EmbedSnippet from '../components/EmbedSnippet.astro';
 import PhotoGallery from '../components/PhotoGallery.astro';
 import { readdir, stat } from 'node:fs/promises';
+import path from 'node:path';
 
 /* ── Date galerie: toate pozele din colecție ──
    REGULĂ: Pozele NOI se adaugă ÎNTOTDEAUNA la începutul array-ului (sus),
@@ -19,12 +20,13 @@ const basePhotos = [
   { src: `${base}/Galerie Evenimente 2.jpg`, alt: "Scenă completă la eveniment live", cat: "evenimente" },
 ];
 
-const extraPhotoDir = new URL('../../public/images/poze 09.07.2026/', import.meta.url);
+// Folosim process.cwd() + path.join pentru a evita probleme cu spații în new URL()
+const extraPhotoDirPath = path.join(process.cwd(), 'public', 'images', 'poze 09.07.2026');
 const allowedExt = new Set(['.jpg', '.jpeg', '.png', '.webp', '.avif']);
 let latestPhotos = [];
 
 try {
-  const entries = await readdir(extraPhotoDir, { withFileTypes: true });
+  const entries = await readdir(extraPhotoDirPath, { withFileTypes: true });
   const filesWithMeta = await Promise.all(
     entries
       .filter((entry) => entry.isFile())
@@ -32,8 +34,8 @@ try {
         const name = entry.name;
         const ext = name.includes('.') ? `.${name.split('.').pop()?.toLowerCase()}` : '';
         if (!allowedExt.has(ext)) return null;
-        const fileUrl = new URL(name, extraPhotoDir);
-        const meta = await stat(fileUrl);
+        const filePath = path.join(extraPhotoDirPath, name);
+        const meta = await stat(filePath);
         return { name, mtimeMs: meta.mtimeMs };
       }),
   );
@@ -44,7 +46,7 @@ try {
     .map(({ name }) => {
       const cleanName = name.replace(/\.[^.]+$/, '').replace(/[\-_]+/g, ' ').trim();
       return {
-        src: `/images/poze 09.07.2026/${encodeURIComponent(name)}`,
+        src: `/images/poze%2009.07.2026/${encodeURIComponent(name)}`,
         alt: `Foto eveniment Formația Florentina Pană - ${cleanName || 'live'}`,
         cat: 'evenimente',
       };
@@ -93,7 +95,7 @@ const photos = [...latestPhotos, ...basePhotos];
       <div class="gal-montage-controls" aria-label="Controale montaj">
         <div class="gal-montage-controls-row">
           <button type="button" class="gal-montage-btn" data-montage-prev aria-label="Imaginea anterioară">◀</button>
-          <button type="button" class="gal-montage-btn" data-montage-play aria-label="Pauză montaj">Pause</button>
+          <button type="button" class="gal-montage-btn" data-montage-play aria-label="Pornire muzică">▶ Muzică</button>
           <button type="button" class="gal-montage-btn" data-montage-next aria-label="Imaginea următoare">▶</button>
           <button type="button" class="gal-montage-btn" data-montage-beat aria-label="Activează sau dezactivează sincronizarea pe beat" aria-pressed="true">Beat ON</button>
           <button type="button" class="gal-montage-btn" data-montage-autobeat aria-label="Activează detectarea automată a beat-ului" aria-pressed="true">Sync AUTO</button>
@@ -425,7 +427,6 @@ const photos = [...latestPhotos, ...basePhotos];
       montageTimer = setInterval(nextMontage, getSlideDuration());
     }
     montagePlaying = true;
-    if (montagePlay) montagePlay.textContent = 'Pause';
 
     if (beatEnabled && beatBars.length && !syncUsesAudioBeats()) {
       const beatMs = Math.round(60000 / getBpm());
@@ -441,7 +442,6 @@ const photos = [...latestPhotos, ...basePhotos];
     montageTimer = null;
     beatTimer = null;
     montagePlaying = false;
-    if (montagePlay) montagePlay.textContent = 'Play';
   }
 
   if (montageSlides.length) {
@@ -456,12 +456,23 @@ const photos = [...latestPhotos, ...basePhotos];
     });
 
     montagePlay?.addEventListener('click', () => {
-      if (montagePlaying) {
-        stopMontage();
+      if (!montageAudio || !montageAudio.paused) {
+        // Audio joacă → pauză
         pauseMontageAudio();
+        if (montagePlay) montagePlay.textContent = '▶ Muzică';
       } else {
-        startMontage();
-        void playMontageAudio();
+        // Pornire audio SINCRONĂ din gestul utilizatorului (evită blocarea autoplay)
+        const playPromise = montageAudio.play();
+        if (montagePlay) montagePlay.textContent = '⏸ Muzică';
+        if (playPromise !== undefined) {
+          playPromise.then(async () => {
+            await ensureAudioGraph();
+            startBeatDetection();
+          }).catch(() => {
+            stopBeatDetection();
+            if (montagePlay) montagePlay.textContent = '▶ Muzică';
+          });
+        }
       }
     });
 
