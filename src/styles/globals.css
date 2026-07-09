@@ -2445,12 +2445,12 @@ details:focus-visible {
   ══════════════════════════════════════════════════════════════ */
 
   body.is-homepage main#continut>section {
-    min-height: 100dvh !important;
+    min-height: auto !important;
     overflow-x: clip !important;
     overflow-y: visible !important;
     touch-action: pan-y !important;
-    padding-top: calc(var(--mob-nav-h, 72px) + 1rem) !important;
-    padding-bottom: calc(var(--section-pad-y) + 0.5rem) !important;
+    padding-top: 1.1rem !important;
+    padding-bottom: 1.1rem !important;
     padding-left: var(--container-pad-x) !important;
     padding-right: var(--container-pad-x) !important;
   }
@@ -2701,5 +2701,111 @@ select:focus-visible {
   .left-side-menu .left-side-link,
   .left-side-menu .left-side-link .nav-icon {
     transition: none !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Tipografie globală unitară — lizibilitate + consistență vizuală
+   pe toate paginile din conținutul principal.
+────────────────────────────────────────────────────────────── */
+:root {
+  --readable-body-size: clamp(1.02rem, 0.38vw + 0.96rem, 1.1rem);
+  --readable-heading-1: clamp(2.05rem, 4.9vw, 3.5rem);
+  --readable-heading-2: clamp(1.65rem, 3.6vw, 2.62rem);
+  --readable-heading-3: clamp(1.32rem, 2.5vw, 1.92rem);
+  --luxury-title-a: #fff6dc;
+  --luxury-title-b: #ffe08f;
+  --luxury-title-c: #f6c655;
+}
+
+#continut h1,
+#continut h2,
+#continut h3 {
+  color: var(--title);
+  font-weight: 700;
+  letter-spacing: 0.015em;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.08),
+    0 3px 10px rgba(0, 0, 0, 0.56),
+    0 0 26px rgba(255, 215, 0, 0.11);
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+
+  #continut h1,
+  #continut h2,
+  #continut h3 {
+    background-image: linear-gradient(170deg, var(--luxury-title-a) 8%, var(--luxury-title-b) 53%, var(--luxury-title-c) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+#continut h1 {
+  font-size: var(--readable-heading-1);
+  line-height: 1.12;
+}
+
+#continut h2 {
+  font-size: var(--readable-heading-2);
+  line-height: 1.18;
+}
+
+#continut h3 {
+  font-size: var(--readable-heading-3);
+  line-height: 1.24;
+}
+
+#continut p,
+#continut li,
+#continut label,
+#continut .section-copy,
+#continut .section-description,
+#continut .hp-seo-text,
+#continut .hp-faq-answer {
+  font-size: var(--readable-body-size);
+  line-height: 1.84;
+  color: #e9effa;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+}
+
+#continut small,
+#continut .text-xs {
+  font-size: clamp(0.9rem, 0.3vw + 0.86rem, 0.96rem);
+  line-height: 1.65;
+}
+
+#continut .btn-solid,
+#continut .btn-outline,
+#continut .btn-whatsapp,
+#continut .hero-cta-primary,
+#continut .hero-cta-secondary,
+#continut .hp-convert-btn {
+  font-size: clamp(0.92rem, 0.25vw + 0.88rem, 1rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 767px) {
+
+  #continut p,
+  #continut li,
+  #continut label,
+  #continut .section-copy,
+  #continut .section-description,
+  #continut .hp-seo-text,
+  #continut .hp-faq-answer {
+    font-size: clamp(1.03rem, 4.05vw, 1.12rem);
+    line-height: 1.88;
+  }
+
+  #continut .btn-solid,
+  #continut .btn-outline,
+  #continut .btn-whatsapp,
+  #continut .hero-cta-primary,
+  #continut .hero-cta-secondary,
+  #continut .hp-convert-btn {
+    font-size: clamp(0.94rem, 3.5vw, 1.02rem);
   }
 }

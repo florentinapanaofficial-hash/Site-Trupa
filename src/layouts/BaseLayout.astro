@@ -42,12 +42,41 @@ const ga4Id = import.meta.env.PUBLIC_GA4_ID;
 const gscVerification = import.meta.env.PUBLIC_GSC_VERIFICATION;
 const telHref = `tel:${siteContent.contact.phoneRaw}`;
 const waFloatHref = `https://wa.me/${siteContent.contact.phoneRaw.replace('+', '')}?text=Bun%C4%83!%20Vreau%20o%20ofert%C4%83%20pentru%20Forma%C8%9Bia%20Florentina%20Pan%C4%83.`;
+const logoPngUrl = `${site}/images/logo-512.png`;
 
 const jsonLd = {
   ...seoContent.schema,
   url: site || seoContent.schema.url,
-  logo: `${site}/images/sigla-fp-band.webp`,
+  logo: {
+    "@type": "ImageObject",
+    "url": logoPngUrl,
+    "width": 512,
+    "height": 512
+  },
+  image: logoPngUrl,
   foundingDate: '2014',
+};
+
+const organizationLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": seoContent.schema.name,
+  "url": site,
+  "logo": {
+    "@type": "ImageObject",
+    "url": logoPngUrl,
+    "width": 512,
+    "height": 512
+  },
+  "sameAs": seoContent.schema.sameAs
+};
+
+const webSiteLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": seoContent.schema.name,
+  "url": site,
+  "inLanguage": "ro-RO"
 };
 
 // Schema LocalBusiness + MusicGroup — SEO local, Google Maps, Knowledge Panel
@@ -61,8 +90,13 @@ const localBusinessLd = {
   "url": site,
   "telephone": seoContent.schema.telephone,
   "email": seoContent.schema.email,
-  "image": `${site}/images/sigla-fp-band.webp`,
-  "logo": `${site}/images/sigla-fp-band.webp`,
+  "image": logoPngUrl,
+  "logo": {
+    "@type": "ImageObject",
+    "url": logoPngUrl,
+    "width": 512,
+    "height": 512
+  },
   "foundingDate": "2014",
   "address": {
     "@type": "PostalAddress",
@@ -112,7 +146,9 @@ const webPageLd = {
     "url": site,
     "logo": {
       "@type": "ImageObject",
-      "url": `${site}/images/sigla-fp-band.webp`
+      "url": logoPngUrl,
+      "width": 512,
+      "height": 512
     }
   },
   ...(datePublished ? { "datePublished": datePublished } : {}),
@@ -252,9 +288,15 @@ const mobileNavAllItems = [
     <link rel="preload" href="/fonts/inter-latin-ext.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/oswald-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/oswald-latin-ext.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png" />
     <link rel="icon" type="image/svg+xml" href="/images/logo-fp-stage.svg" />
-    <link rel="apple-touch-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(organizationLd)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(webSiteLd)} />
     {isHomePage && <script is:inline type="application/ld+json" set:html={JSON.stringify(localBusinessLd)} />}
     <script is:inline type="application/ld+json" set:html={JSON.stringify(webPageLd)} />
     {!isHomePage && <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />}

@@ -946,12 +946,24 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
     -webkit-text-fill-color: transparent;
   }
 
+  @media (max-width: 767px) {
+    .hero-kicker-text {
+      font-size: clamp(1.86rem, 3.15vw, 2.58rem);
+      letter-spacing: 0.16em;
+      margin-bottom: 0.12rem;
+    }
+
+    .hero-title-gold {
+      font-size: clamp(2.48rem, 6.7vw, 4.95rem);
+    }
+  }
+
   /* Lead text */
   .hero-lead {
     max-width: 50ch;
     margin: 0;
-    font-size: clamp(0.82rem, 1.6vw, 0.95rem);
-    line-height: 1.75;
+    font-size: clamp(0.95rem, 2.5vw, 1.05rem);
+    line-height: 1.8;
     color: #ffffff !important;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.50);
     text-align: center;
@@ -1257,8 +1269,13 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
     .hp-hero-wrap {
       padding-inline: 0.5rem;
     }
+    .hero-kicker-text {
+      font-size: clamp(1.62rem, 6.25vw, 2.08rem);
+      letter-spacing: 0.14em;
+      margin-bottom: 0.1rem;
+    }
     .hero-title-gold {
-      font-size: clamp(2rem, 8vw, 3rem);
+      font-size: clamp(2.06rem, 8.2vw, 3.1rem);
     }
     .kicker-badge {
       font-size: 0.7rem;
@@ -1572,15 +1589,17 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
     align-items: center;
     justify-content: center;
     gap: 0.35rem;
-    min-height: 44px;
-    padding: 0.5rem 0.78rem;
+    min-height: 48px;
+    padding: 0.56rem 0.88rem;
     border-radius: 0.72rem;
     text-decoration: none;
     font-family: 'Oswald', sans-serif;
-    font-size: 0.7rem;
-    letter-spacing: 0.06em;
+    font-size: 0.82rem;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
-    font-weight: 700;
+    font-weight: 800;
+    line-height: 1.2;
+    text-shadow: none;
     transition: transform 180ms ease, filter 180ms ease, border-color 180ms ease;
   }
 
@@ -1590,27 +1609,32 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
   }
 
   .hp-convert-btn--call {
-    color: #daf0ff;
-    border: 1px solid rgba(11, 188, 214, 0.42);
-    background: rgba(11, 188, 214, 0.16);
+    color: #f4fdff;
+    border: 1px solid rgba(109, 236, 255, 0.92);
+    background: linear-gradient(145deg, rgba(8, 90, 112, 0.96) 0%, rgba(4, 58, 76, 0.96) 100%);
   }
 
   .hp-convert-btn--wa {
-    color: #10281a;
-    border: 1px solid rgba(55, 207, 120, 0.48);
-    background: linear-gradient(135deg, #38de8a 0%, #28be72 100%);
+    color: #f4fff8;
+    border: 1px solid rgba(167, 255, 210, 0.92);
+    background: linear-gradient(135deg, #158a4a 0%, #0f6c39 100%);
   }
 
   .hp-convert-btn--offer {
-    color: #2a1700;
-    border: 1px solid rgba(245, 166, 35, 0.44);
-    background: linear-gradient(135deg, #ffd166 0%, #f5a623 100%);
+    color: #fff8ec;
+    border: 1px solid rgba(255, 225, 153, 0.94);
+    background: linear-gradient(135deg, #8f6110 0%, #6b4608 100%);
   }
 
   .hp-convert-btn:hover,
   .hp-convert-btn:focus-visible {
     transform: translateY(-1px);
     filter: brightness(1.03) saturate(1.04);
+  }
+
+  .hp-convert-btn:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.95);
+    outline-offset: 2px;
   }
 
   .hp-convert-btn--wa {
@@ -1940,10 +1964,13 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
     .hp-convert-actions {
       width: 100%;
       justify-content: stretch;
+      gap: 0.62rem;
     }
 
     .hp-convert-btn {
       width: 100%;
+      font-size: 0.9rem;
+      min-height: 52px;
     }
 
     .hp-meet-media {
