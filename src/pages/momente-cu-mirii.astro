@@ -37,7 +37,17 @@ const site = Astro.site?.toString().replace(/\/$/, '') ?? SITE_FALLBACK;
 const eventsJsonLd = realMoments.events
   .filter((ev: any) => ev.startDate)
   .map((ev: any) => {
-    const isCompleted = ev.eventStatus === 'https://schema.org/EventCompleted';
+    const validEventStatuses = new Set([
+      'https://schema.org/EventScheduled',
+      'https://schema.org/EventCancelled',
+      'https://schema.org/EventPostponed',
+      'https://schema.org/EventRescheduled',
+      'https://schema.org/EventMovedOnline',
+    ]);
+    const normalizedEventStatus = validEventStatuses.has(ev.eventStatus)
+      ? ev.eventStatus
+      : 'https://schema.org/EventScheduled';
+    const isCompleted = Boolean(ev.endDate && new Date(ev.endDate).getTime() < Date.now());
     return {
       '@context': 'https://schema.org',
       '@type': 'MusicEvent',
@@ -45,7 +55,7 @@ const eventsJsonLd = realMoments.events
       description: ev.description || `Eveniment live cu ${brand.name} — ${ev.couple}, ${ev.city}`,
       startDate: ev.startDate,
       ...(ev.endDate && { endDate: ev.endDate }),
-      eventStatus: ev.eventStatus || 'https://schema.org/EventScheduled',
+      eventStatus: normalizedEventStatus,
       eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
       location: {
         '@type': 'Place',
