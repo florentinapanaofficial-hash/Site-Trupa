@@ -1,4 +1,4 @@
----
+﻿---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import siteContent from '../data/siteContent.json';
 import BackButton from '../components/BackButton.astro';
@@ -25,397 +25,255 @@ function initiale(name: string): string {
   title="Membrii Formației Florentina Pană | Trupă Profesionistă Nuntă Pitești, Argeș"
   description="Cunoaște echipa formației Florentina Pană — soliști vocali și instrumentiști cu experiență de peste 20 ani. Formație nuntă Pitești și Argeș, disponibilă pentru nunți, botezuri și evenimente în toată România."
 >
-  <section class="membri-page-wrap">
-  <div class="mb-6 px-4 pt-6 max-w-6xl mx-auto">
-    <BackButton href="/" label="Acasă" />
-  </div>
+<div class="stage-wrap">
+  <div class="stage-back"><BackButton href="/" label="Acasă" /></div>
 
-  <!-- ═══ HEADER PAGINĂ ═══ -->
-  <header class="section-head mx-auto text-center mb-10 pt-8 anim-on-scroll max-w-6xl px-4 sm:px-6 lg:px-8">
-    <p class="kicker">Echipa noastră</p>
-    <h1 class="section-title">Membrii Formației — Formație Nuntă Pitești</h1>
-    <p class="section-copy">Soliști vocali, instrumentiști și colaboratori cu experiență de peste 10 ani, disponibili pentru nunți, botezuri și evenimente în Pitești, Argeș și toată România.</p>
+  <!-- ═══ STAGE PAGE HEADER ═══ -->
+  <header class="sph" aria-label="Prezentare echipă">
+    <div class="sph-beams" aria-hidden="true">
+      <div class="sph-beam b1"></div><div class="sph-beam b2"></div>
+      <div class="sph-beam b3"></div><div class="sph-beam b4"></div>
+      <div class="sph-beam b5"></div>
+    </div>
+    <div class="sph-lines" aria-hidden="true"></div>
+    <div class="sph-content">
+      <p class="sph-eyebrow">Formația Florentina Pană</p>
+      <h1 class="sph-title">Echipa Noastră</h1>
+      <p class="sph-sub">Soliști vocali, instrumentiști și colaboratori cu experiență de peste 10 ani pentru nunți, botezuri și evenimente în toată România.</p>
+    </div>
+    <div class="sph-floor" aria-hidden="true"></div>
   </header>
 
   <!-- ═══ SOLIȘTI VOCALI ═══ -->
-  <section class="mem-section" aria-labelledby="sec-solisti">
-    <div class="mem-sec-head">
-      <h2 class="mem-sec-title" id="sec-solisti">Soliști Vocali</h2>
-      <div class="mem-sec-line" aria-hidden="true"></div>
+  <section class="stage-section" aria-labelledby="sec-solisti">
+    <div class="stl-row" role="presentation">
+      <span class="stl-line" aria-hidden="true"></span>
+      <div class="stl-center">
+        <svg class="stl-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+        <span class="stl-text" id="sec-solisti">Soliști Vocali</span>
+      </div>
+      <span class="stl-line stl-line--r" aria-hidden="true"></span>
     </div>
-
-    {solisti.map((m: any, i: number) => (
-      <div class="member-card-wrap anim-on-scroll" data-index={i} style={`transition-delay: ${i * 0.12}s`}>
-        <article class="member-card">
-          <!-- FOTO -->
-          <div class="mc-photo-col">
-            {m.imagine && m.imagine.trim() !== '' ? (
-              <img
-                src={m.imagine}
-                alt={`${m.nume} - ${m.rol} - Formația Florentina Pană Pitești`}
-                class="mc-photo-img anim-img-hover"
-                loading="lazy"
-                decoding="async"
-                width="400"
-                height="800"
-              />
-            ) : (
-              <div class="mc-photo-ph" aria-hidden="true">
-                <span class="mc-initials">{initiale(m.nume)}</span>
-                <span class="mc-ph-label">Foto în curând</span>
-              </div>
-            )}
-          </div>
-
-          <!-- CONȚINUT -->
-          <div class="mc-content-col">
-            <span class="mc-cat-badge mc-cat-badge--solist">Solist Vocal</span>
-            <h3 class="mc-name">{m.nume}</h3>
-            <p class="mc-spec">{m.specialitate}</p>
-            {m.experienta && m.experienta.trim() !== '' && (
-              <p class="mc-exp">⭐ {m.experienta}</p>
-            )}
-
-            <!-- Galerie foto -->
-            {areGalerieFoto(m) ? (
-              <div class="mc-gallery-wrap">
-                <div class="mc-gallery" role="list" aria-label={`Galerie foto ${m.nume}`}>
-                  {m.galpisFoto.map((foto: any, n: number) => (
-                    <div
-                      class="mc-gallery-ph gallery-thumb"
-                      role="listitem"
-                      data-fx={String((n % 6) + 1)}
-                      data-src={foto.src}
-                      data-alt={foto.alt ?? `${m.nume} la eveniment - Formația Florentina Pană`}
-                      data-member={m.nume}
-                      tabindex="0"
-                      title="Click pentru previzualizare"
-                    >
-                      <img src={foto.src} alt={foto.alt ?? `${m.nume} la eveniment`} class="mc-gal-thumb-img" loading="lazy" width="300" height="200" />
-                      <span class="mc-gal-overlay" aria-hidden="true">🔍</span>
-                    </div>
-                  ))}
-                </div>
-                {m.galpisFoto.length > 1 && (
-                  <div class="mc-gallery-indicator" aria-hidden="true">
-                    {m.galpisFoto.map((_: any, n: number) => (
-                      <span class={`dot${n === 0 ? ' active' : ''}`}></span>
+    <div class="ac-grid ac-grid--duo">
+      {solisti.map((m: any, i: number) => (
+        <div class="member-card-wrap">
+          <article class={`ac ac--solist${areGalerieFoto(m) ? ' has-gal' : ''}`} data-member={m.nume}>
+            <div class="ac-photos">
+              {m.imagine && m.imagine.trim() !== '' ? (
+                <img class="ac-photo is-active" src={m.imagine} alt={`${m.nume} — ${m.rol}, Formația Florentina Pană Pitești`} loading="eager" decoding="async" width="560" height="840" />
+              ) : (
+                <div class="ac-ph"><div class="ac-ph-light" aria-hidden="true"></div><span class="ac-initials">{initiale(m.nume)}</span></div>
+              )}
+              {areGalerieFoto(m) && m.galpisFoto.slice(1, 7).map((foto: any, n: number) => (
+                <img class="ac-photo" src={foto.src} alt={foto.alt ?? m.nume} loading="lazy" decoding="async" width="560" height="840" data-slide={n + 1} />
+              ))}
+            </div>
+            <div class="ac-scanlines" aria-hidden="true"></div>
+            <div class="ac-grad" aria-hidden="true"></div>
+            <div class="ac-beam" aria-hidden="true"></div>
+            <div class="ac-top">
+              <span class="ac-badge ac-b--solist">Solist Vocal</span>
+              {m.experienta && m.experienta.trim() !== '' && <span class="ac-star">★ {m.experienta}</span>}
+            </div>
+            <div class="ac-body">
+              <p class="ac-spec">{m.specialitate}</p>
+              <h3 class="ac-name">{m.nume}</h3>
+              <div class="ac-reveal">
+                {m.citat && <blockquote class="ac-citat"><p>{m.citat}</p></blockquote>}
+                {areGalerieFoto(m) && (
+                  <div class="ac-strip" role="list" aria-label={`Galerie ${m.nume}`}>
+                    {m.galpisFoto.slice(0, 5).map((foto: any, n: number) => (
+                      <button class="ac-th gallery-thumb" type="button" role="listitem"
+                        data-src={foto.src} data-alt={foto.alt ?? m.nume} data-member={m.nume}
+                        data-fx={String((n % 6) + 1)} tabindex="-1" aria-label={foto.alt ?? `Foto ${n + 1}`}>
+                        <img src={foto.src} alt="" loading="lazy" width="72" height="72" />
+                      </button>
                     ))}
                   </div>
                 )}
-                {m.galpisFoto.length > 1 && (
-                  <div class="mc-gallery-hint" aria-hidden="true">
-                    <span>Glisează</span>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
-                  </div>
-                )}
               </div>
-            ) : (
-              <div class="mc-gallery mc-gallery--soon" aria-label="Galerie foto în curând">
-                <div class="mc-gallery-coming">
-                  <span class="mc-gal-icon" aria-hidden="true">📸</span>
-                  <small class="mc-gal-soon-label">Galerie foto în curând</small>
-                </div>
-              </div>
-            )}
-
-            <!-- Buton BIO circular -->
-            <button
-              class="bio-btn"
-              type="button"
-              aria-expanded="false"
-              aria-controls={`bio-panel-s${i}`}
-              aria-label={`Biografie ${m.nume}`}
-            >
+            </div>
+            <button class="bio-btn" type="button" aria-expanded="false" aria-controls={`bio-s${i}`} aria-label={`Biografie ${m.nume}`}>
               <span class="bio-btn-text">BIO</span>
             </button>
+          </article>
+          <div class="bio-panel" id={`bio-s${i}`} aria-hidden="true">
+            {m.citat && <blockquote class="bio-quote"><p>{m.citat}</p></blockquote>}
+            <p class="bio-text">{m.bio}</p>
+            {m.taguri && m.taguri.length > 0 && (
+              <div class="bio-tags" aria-label="Specializări">
+                {m.taguri.map((tag: string) => <span class="bio-tag">{tag}</span>)}
+              </div>
+            )}
           </div>
-        </article>
-
-        <!-- Panel biografie -->
-        <div class="bio-panel" id={`bio-panel-s${i}`} aria-hidden="true">
-          {m.citat && (
-            <blockquote class="bio-quote">
-              <p>{m.citat}</p>
-            </blockquote>
-          )}
-          <p class="bio-text">{m.bio}</p>
-          {m.taguri && m.taguri.length > 0 && (
-            <div class="bio-tags" aria-label="Specializări">
-              {m.taguri.map((tag: string) => (
-                <span class="bio-tag">{tag}</span>
-              ))}
-            </div>
-          )}
         </div>
-      </div>
-    ))}
+      ))}
+    </div>
   </section>
 
-  <!-- ═══ HINT SCROLL ═══ -->
   <div class="scroll-hint-wrap" aria-hidden="true">
     <a href="#sec-instr" class="scroll-hint-btn">
       <span class="scroll-hint-text">Instrumentiști</span>
-      <svg class="scroll-hint-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      <svg class="scroll-hint-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
     </a>
   </div>
 
-  <!-- ═══ DIVIDER ═══ -->
-  <div class="mem-divider" aria-hidden="true"></div>
-
   <!-- ═══ INSTRUMENTIȘTI ═══ -->
-  <section class="mem-section" aria-labelledby="sec-instr">
-    <div class="mem-sec-head">
-      <h2 class="mem-sec-title" id="sec-instr">Instrumentiști</h2>
-      <div class="mem-sec-line" aria-hidden="true"></div>
+  <section class="stage-section" aria-labelledby="sec-instr">
+    <div class="stl-row" role="presentation">
+      <span class="stl-line" aria-hidden="true"></span>
+      <div class="stl-center">
+        <svg class="stl-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        <span class="stl-text" id="sec-instr">Instrumentiști</span>
+      </div>
+      <span class="stl-line stl-line--r" aria-hidden="true"></span>
     </div>
-
-    {instrumentisti.map((m: any, i: number) => (
-      <div class="member-card-wrap anim-on-scroll" data-index={i} style={`transition-delay: ${i * 0.12}s`}>
-        <article class="member-card">
-          <!-- FOTO -->
-          <div class="mc-photo-col">
-            {m.imagine && m.imagine.trim() !== '' ? (
-              <img
-                src={m.imagine}
-                alt={`${m.nume} - ${m.rol} - ${m.specialitate} - Formația Florentina Pană Pitești`}
-                class="mc-photo-img anim-img-hover"
-                loading="lazy"
-                decoding="async"
-                width="400"
-                height="800"
-              />
-            ) : (
-              <div class="mc-photo-ph" aria-hidden="true">
-                <span class="mc-initials">{initiale(m.nume)}</span>
-                <span class="mc-ph-label">Foto în curând</span>
-              </div>
-            )}
-          </div>
-
-          <!-- CONȚINUT -->
-          <div class="mc-content-col">
-            <span class="mc-cat-badge mc-cat-badge--instr">Instrumentist</span>
-            <h3 class="mc-name">{m.nume}</h3>
-            <p class="mc-spec">{m.specialitate}</p>
-
-            <!-- Galerie foto -->
-            {areGalerieFoto(m) ? (
-              <div class="mc-gallery-wrap">
-                <div class="mc-gallery" role="list" aria-label={`Galerie foto ${m.nume}`}>
-                  {m.galpisFoto.map((foto: any, n: number) => (
-                    <div
-                      class="mc-gallery-ph gallery-thumb"
-                      role="listitem"
-                      data-fx={String((n % 6) + 1)}
-                      data-src={foto.src}
-                      data-alt={foto.alt ?? `${m.nume} la eveniment - Formația Florentina Pană`}
-                      data-member={m.nume}
-                      tabindex="0"
-                      title="Click pentru previzualizare"
-                    >
-                      <img src={foto.src} alt={foto.alt ?? `${m.nume} la eveniment`} class="mc-gal-thumb-img" loading="lazy" width="300" height="200" />
-                      <span class="mc-gal-overlay" aria-hidden="true">🔍</span>
-                    </div>
-                  ))}
-                </div>
-                {m.galpisFoto.length > 1 && (
-                  <div class="mc-gallery-indicator" aria-hidden="true">
-                    {m.galpisFoto.map((_: any, n: number) => (
-                      <span class={`dot${n === 0 ? ' active' : ''}`}></span>
+    <div class="ac-grid ac-grid--trio">
+      {instrumentisti.map((m: any, i: number) => (
+        <div class="member-card-wrap">
+          <article class={`ac ac--instr${areGalerieFoto(m) ? ' has-gal' : ''}`} data-member={m.nume}>
+            <div class="ac-photos">
+              {m.imagine && m.imagine.trim() !== '' ? (
+                <img class="ac-photo is-active" src={m.imagine} alt={`${m.nume} — ${m.specialitate}, Formația Florentina Pană`} loading="lazy" decoding="async" width="560" height="840" />
+              ) : (
+                <div class="ac-ph"><div class="ac-ph-light" aria-hidden="true"></div><span class="ac-initials">{initiale(m.nume)}</span></div>
+              )}
+              {areGalerieFoto(m) && m.galpisFoto.slice(1, 7).map((foto: any, n: number) => (
+                <img class="ac-photo" src={foto.src} alt={foto.alt ?? m.nume} loading="lazy" decoding="async" width="560" height="840" data-slide={n + 1} />
+              ))}
+            </div>
+            <div class="ac-scanlines" aria-hidden="true"></div>
+            <div class="ac-grad" aria-hidden="true"></div>
+            <div class="ac-beam" aria-hidden="true"></div>
+            <div class="ac-top">
+              <span class="ac-badge ac-b--instr">Instrumentist</span>
+              {m.specialitate && <span class="ac-instr-pill">{m.specialitate}</span>}
+            </div>
+            <div class="ac-body">
+              <h3 class="ac-name">{m.nume}</h3>
+              <div class="ac-reveal">
+                {m.citat && <blockquote class="ac-citat"><p>{m.citat}</p></blockquote>}
+                {areGalerieFoto(m) && (
+                  <div class="ac-strip" role="list" aria-label={`Galerie ${m.nume}`}>
+                    {m.galpisFoto.slice(0, 5).map((foto: any, n: number) => (
+                      <button class="ac-th gallery-thumb" type="button" role="listitem"
+                        data-src={foto.src} data-alt={foto.alt ?? m.nume} data-member={m.nume}
+                        data-fx={String((n % 6) + 1)} tabindex="-1" aria-label={foto.alt ?? `Foto ${n + 1}`}>
+                        <img src={foto.src} alt="" loading="lazy" width="72" height="72" />
+                      </button>
                     ))}
                   </div>
                 )}
-                {m.galpisFoto.length > 1 && (
-                  <div class="mc-gallery-hint" aria-hidden="true">
-                    <span>Glisează</span>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
-                  </div>
-                )}
               </div>
-            ) : (
-              <div class="mc-gallery mc-gallery--soon" aria-label="Galerie foto în curând">
-                <div class="mc-gallery-coming">
-                  <span class="mc-gal-icon" aria-hidden="true">📸</span>
-                  <small class="mc-gal-soon-label">Galerie foto în curând</small>
-                </div>
-              </div>
-            )}
-
-            <!-- Buton BIO circular -->
-            <button
-              class="bio-btn"
-              type="button"
-              aria-expanded="false"
-              aria-controls={`bio-panel-in${i}`}
-              aria-label={`Biografie ${m.nume}`}
-            >
+            </div>
+            <button class="bio-btn" type="button" aria-expanded="false" aria-controls={`bio-in${i}`} aria-label={`Biografie ${m.nume}`}>
               <span class="bio-btn-text">BIO</span>
             </button>
+          </article>
+          <div class="bio-panel" id={`bio-in${i}`} aria-hidden="true">
+            {m.citat && <blockquote class="bio-quote"><p>{m.citat}</p></blockquote>}
+            <p class="bio-text">{m.bio}</p>
+            {m.taguri && m.taguri.length > 0 && (
+              <div class="bio-tags" aria-label="Specializări">
+                {m.taguri.map((tag: string) => <span class="bio-tag">{tag}</span>)}
+              </div>
+            )}
           </div>
-        </article>
-
-        <!-- Panel biografie -->
-        <div class="bio-panel" id={`bio-panel-in${i}`} aria-hidden="true">
-          {m.citat && (
-            <blockquote class="bio-quote">
-              <p>{m.citat}</p>
-            </blockquote>
-          )}
-          <p class="bio-text">{m.bio}</p>
-          {m.taguri && m.taguri.length > 0 && (
-            <div class="bio-tags" aria-label="Specializări">
-              {m.taguri.map((tag: string) => (
-                <span class="bio-tag">{tag}</span>
-              ))}
-            </div>
-          )}
         </div>
-      </div>
-    ))}
+      ))}
+    </div>
   </section>
 
-  <!-- ═══ HINT SCROLL ═══ -->
   <div class="scroll-hint-wrap" aria-hidden="true">
     <a href="#sec-colab" class="scroll-hint-btn">
       <span class="scroll-hint-text">Colaboratori</span>
-      <svg class="scroll-hint-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      <svg class="scroll-hint-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
     </a>
   </div>
 
-  <!-- ═══ DIVIDER ═══ -->
-  <div class="mem-divider" aria-hidden="true"></div>
-
   <!-- ═══ COLABORATORI ═══ -->
-  <section class="mem-section" aria-labelledby="sec-colab">
-    <div class="mem-sec-head">
-      <h2 class="mem-sec-title" id="sec-colab">Colaboratori</h2>
-      <div class="mem-sec-line" aria-hidden="true"></div>
+  <section class="stage-section" aria-labelledby="sec-colab">
+    <div class="stl-row" role="presentation">
+      <span class="stl-line" aria-hidden="true"></span>
+      <div class="stl-center">
+        <svg class="stl-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span class="stl-text" id="sec-colab">Colaboratori</span>
+      </div>
+      <span class="stl-line stl-line--r" aria-hidden="true"></span>
     </div>
-    {colaboratori.map((m: any, i: number) => (
-      <div class="member-card-wrap" data-index={i}>
-        <article class="member-card">
-          <!-- FOTO -->
-          <div class="mc-photo-col">
-            {m.imagine && m.imagine.trim() !== '' ? (
-              <img
-                src={m.imagine}
-                alt={`${m.nume} - ${m.specialitate} - Formația Florentina Pană Pitești`}
-                class="mc-photo-img"
-                loading="lazy"
-                decoding="async"
-                width="400"
-                height="800"
-              />
-            ) : (
-              <div class="mc-photo-ph" aria-hidden="true">
-                <span class="mc-initials">{initiale(m.nume)}</span>
-                <span class="mc-ph-label">Foto în curând</span>
-              </div>
-            )}
-          </div>
-
-          <!-- CONȚINUT -->
-          <div class="mc-content-col">
-            <span class="mc-cat-badge mc-cat-badge--colab">Colaborator</span>
-            <h3 class="mc-name">{m.nume}</h3>
-            <p class="mc-spec">{m.specialitate}</p>
-            {m.experienta && m.experienta.trim() !== '' && (
-              <p class="mc-exp">⭐ {m.experienta}</p>
-            )}
-
-            <!-- Galerie foto -->
-            {areGalerieFoto(m) ? (
-              <div class="mc-gallery-wrap">
-                <div class="mc-gallery" role="list" aria-label={`Galerie foto ${m.nume}`}>
-                  {m.galpisFoto.map((foto: any, n: number) => (
-                    <div
-                      class="mc-gallery-ph gallery-thumb"
-                      role="listitem"
-                      data-fx={String((n % 6) + 1)}
-                      data-src={foto.src}
-                      data-alt={foto.alt ?? `${m.nume} la eveniment - Formația Florentina Pană`}
-                      data-member={m.nume}
-                      tabindex="0"
-                      title="Click pentru previzualizare"
-                    >
-                      <img src={foto.src} alt={foto.alt ?? `${m.nume} la eveniment`} class="mc-gal-thumb-img" loading="lazy" width="300" height="200" />
-                      <span class="mc-gal-overlay" aria-hidden="true">🔍</span>
-                    </div>
-                  ))}
-                </div>
-                {m.galpisFoto.length > 1 && (
-                  <div class="mc-gallery-indicator" aria-hidden="true">
-                    {m.galpisFoto.map((_: any, n: number) => (
-                      <span class={`dot${n === 0 ? ' active' : ''}`}></span>
+    <div class="ac-grid ac-grid--auto">
+      {colaboratori.map((m: any, i: number) => (
+        <div class="member-card-wrap">
+          <article class={`ac ac--colab${areGalerieFoto(m) ? ' has-gal' : ''}`} data-member={m.nume}>
+            <div class="ac-photos">
+              {m.imagine && m.imagine.trim() !== '' ? (
+                <img class="ac-photo is-active" src={m.imagine} alt={`${m.nume} — ${m.specialitate}, colaborator Formația Florentina Pană`} loading="lazy" decoding="async" width="560" height="840" />
+              ) : (
+                <div class="ac-ph"><div class="ac-ph-light" aria-hidden="true"></div><span class="ac-initials">{initiale(m.nume)}</span></div>
+              )}
+              {areGalerieFoto(m) && m.galpisFoto.slice(1, 7).map((foto: any, n: number) => (
+                <img class="ac-photo" src={foto.src} alt={foto.alt ?? m.nume} loading="lazy" decoding="async" width="560" height="840" data-slide={n + 1} />
+              ))}
+            </div>
+            <div class="ac-scanlines" aria-hidden="true"></div>
+            <div class="ac-grad" aria-hidden="true"></div>
+            <div class="ac-beam" aria-hidden="true"></div>
+            <div class="ac-top">
+              <span class="ac-badge ac-b--colab">Colaborator</span>
+              {m.experienta && m.experienta.trim() !== '' && <span class="ac-star">★ {m.experienta}</span>}
+            </div>
+            <div class="ac-body">
+              <p class="ac-spec">{m.specialitate}</p>
+              <h3 class="ac-name">{m.nume}</h3>
+              <div class="ac-reveal">
+                {m.citat && <blockquote class="ac-citat"><p>{m.citat}</p></blockquote>}
+                {areGalerieFoto(m) && (
+                  <div class="ac-strip" role="list" aria-label={`Galerie ${m.nume}`}>
+                    {m.galpisFoto.slice(0, 5).map((foto: any, n: number) => (
+                      <button class="ac-th gallery-thumb" type="button" role="listitem"
+                        data-src={foto.src} data-alt={foto.alt ?? m.nume} data-member={m.nume}
+                        data-fx={String((n % 6) + 1)} tabindex="-1" aria-label={foto.alt ?? `Foto ${n + 1}`}>
+                        <img src={foto.src} alt="" loading="lazy" width="72" height="72" />
+                      </button>
                     ))}
                   </div>
                 )}
-                {m.galpisFoto.length > 1 && (
-                  <div class="mc-gallery-hint" aria-hidden="true">
-                    <span>Glisează</span>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
-                  </div>
-                )}
               </div>
-            ) : (
-              <div class="mc-gallery mc-gallery--soon" aria-label="Galerie foto în curând">
-                <div class="mc-gallery-coming">
-                  <span class="mc-gal-icon" aria-hidden="true">📸</span>
-                  <small class="mc-gal-soon-label">Galerie foto în curând</small>
-                </div>
-              </div>
-            )}
-
-            <!-- Buton BIO circular -->
-            <button
-              class="bio-btn"
-              type="button"
-              aria-expanded="false"
-              aria-controls={`bio-panel-co${i}`}
-              aria-label={`Biografie ${m.nume}`}
-            >
+            </div>
+            <button class="bio-btn" type="button" aria-expanded="false" aria-controls={`bio-co${i}`} aria-label={`Biografie ${m.nume}`}>
               <span class="bio-btn-text">BIO</span>
             </button>
+          </article>
+          <div class="bio-panel" id={`bio-co${i}`} aria-hidden="true">
+            {m.citat && <blockquote class="bio-quote"><p>{m.citat}</p></blockquote>}
+            <p class="bio-text">{m.bio}</p>
+            {m.taguri && m.taguri.length > 0 && (
+              <div class="bio-tags" aria-label="Specializări">
+                {m.taguri.map((tag: string) => <span class="bio-tag">{tag}</span>)}
+              </div>
+            )}
           </div>
-        </article>
-
-        <!-- Panel biografie -->
-        <div class="bio-panel" id={`bio-panel-co${i}`} aria-hidden="true">
-          {m.citat && (
-            <blockquote class="bio-quote">
-              <p>{m.citat}</p>
-            </blockquote>
-          )}
-          <p class="bio-text">{m.bio}</p>
-          {m.taguri && m.taguri.length > 0 && (
-            <div class="bio-tags" aria-label="Specializări">
-              {m.taguri.map((tag: string) => (
-                <span class="bio-tag">{tag}</span>
-              ))}
-            </div>
-          )}
         </div>
-      </div>
-    ))}
+      ))}
+    </div>
   </section>
 
-  <!-- ═══ GALLERY POPUP OVERLAY ═══ -->
+  <!-- ═══ GALLERY POPUP ═══ -->
   <div id="gallery-popup" role="dialog" aria-modal="true" aria-label="Foto mărit">
     <button id="gallery-popup-close" type="button" aria-label="Închide galeria">✕</button>
     <button id="gallery-popup-prev" type="button" class="gallery-popup-nav gallery-popup-prev" aria-label="Foto anterioară">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
     </button>
-    <div id="gallery-popup-inner">
-      <img id="gallery-popup-img" src="" alt="" />
-    </div>
+    <div id="gallery-popup-inner"><img id="gallery-popup-img" src="" alt="" /></div>
     <button id="gallery-popup-next" type="button" class="gallery-popup-nav gallery-popup-next" aria-label="Foto următoare">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
     </button>
     <div id="gallery-popup-counter" class="gallery-popup-counter" aria-live="polite"></div>
   </div>
-  </section>
+
+</div>
 </BaseLayout>
+
 
 <script is:inline>
   // ═══ Mut popup-ul galerie la <body> — evită containment-ul
@@ -727,6 +585,26 @@ function initiale(name: string): string {
       if (dragMoved) galleryDragged = true;
     });
   });
+
+  // ── Photo cycling on hover (membrii cu galerie) ──
+  document.querySelectorAll('.ac.has-gal').forEach(function(card) {
+    var photos = Array.from(card.querySelectorAll('.ac-photo'));
+    if (photos.length < 2) return;
+    var timer = null;
+    var idx = 0;
+    card.addEventListener('mouseenter', function() {
+      timer = setInterval(function() {
+        photos[idx].classList.remove('is-active');
+        idx = (idx + 1) % photos.length;
+        photos[idx].classList.add('is-active');
+      }, 2400);
+    });
+    card.addEventListener('mouseleave', function() {
+      clearInterval(timer); timer = null;
+      photos.forEach(function(p, i) { p.classList.toggle('is-active', i === 0); });
+      idx = 0;
+    });
+  });
 </script>
 
 <!-- Override-urile mobile sunt acum în globals.css (secțiunile 5 & 6 = vertical by default). -->
@@ -976,773 +854,406 @@ function initiale(name: string): string {
 </style>
 
 <style>
-  /* ══════════════════════════════════════════
-     SECȚIUNI PAGINĂ — simetrie cu section-container (72rem)
-  ══════════════════════════════════════════ */
-  .mem-section {
-    padding-block: var(--section-pad-y);
-    padding-inline: var(--container-pad-x);
-    max-width: var(--container-max);
+  /* ══ WRAPPER ══ */
+  .stage-wrap { width: 100%; overflow-x: hidden; }
+
+  .stage-back {
+    max-width: var(--container-max, 1200px);
     margin-inline: auto;
-    box-sizing: border-box;
-    overflow-x: clip;
+    padding: 1.5rem var(--container-pad-x, 1.25rem) 0;
   }
 
-  .mem-sec-head {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
-  }
-
-  .mem-sec-title {
-    font-family: 'Oswald', sans-serif;
-    font-size: clamp(1rem, 2vw, 1.15rem);
-    font-weight: 700;
-    letter-spacing: 0.20em;
-    text-transform: uppercase;
-    color: rgba(0, 200, 255, 0.85);
-    white-space: nowrap;
-    margin: 0;
-  }
-
-  .mem-sec-line {
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(to right, rgba(0,200,255,0.35), transparent);
-  }
-
-  /* ── Divider entre secțiuni ── */
-  .mem-divider {
-    height: 1px;
-    background: rgba(255,255,255,0.05);
-    max-width: 900px;
-    margin: 0 auto clamp(1.5rem, 3vw, 2.5rem);
-  }
-
-  /* ── Scroll hint button ── */
-  .scroll-hint-wrap {
-    display: flex;
-    justify-content: center;
-    padding: 1.2rem 0 0.4rem;
-  }
-
-  .scroll-hint-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.4rem 1.1rem 0.4rem 1.2rem;
-    border-radius: 9999px;
-    border: 1px solid rgba(0, 200, 255, 0.25);
-    background: rgba(0, 200, 255, 0.06);
-    color: rgba(160, 230, 255, 0.85);
-    text-decoration: none;
-    font-family: 'Oswald', sans-serif;
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    backdrop-filter: blur(6px);
-    transition: background 200ms, border-color 200ms, color 200ms;
-  }
-
-  .scroll-hint-btn:hover {
-    background: rgba(0, 200, 255, 0.14);
-    border-color: rgba(0, 200, 255, 0.5);
-    color: #fff;
-  }
-
-  .scroll-hint-arrow {
-    flex-shrink: 0;
-    animation: bounce-down 1.6s ease-in-out infinite;
-  }
-
-  @keyframes bounce-down {
-    0%, 100% { transform: translateY(0); }
-    50%      { transform: translateY(4px); }
-  }
-
-  /* ══════════════════════════════════════════
-     WRAPPER CARD COMPLET (card + bio panel)
-  ══════════════════════════════════════════ */
-  .member-card-wrap {
-    margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
-    border-radius: 1.25rem;
-    overflow: visible;
-    max-width: 100%;
-  }
-
-  /* ══════════════════════════════════════════
-     CARD — 2 coloane desktop
-  ══════════════════════════════════════════ */
-  .member-card {
-    position: relative;
-    display: grid;
-    grid-template-columns: 35% 65%;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.10);
-    border-bottom: none;
-    border-radius: 1.25rem 1.25rem 0 0;
-    overflow: hidden;
-    transition:
-      transform 300ms cubic-bezier(0.22, 1, 0.36, 1),
-      box-shadow 300ms ease,
-      border-color 300ms ease;
-  }
-
-  /* hover doar pe dispozitive cu pointer precis — evită sticky-hover pe touch */
-  @media (hover: hover) and (pointer: fine) {
-    .member-card-wrap:hover .member-card {
-      transform: translateY(-4px);
-      border-color: rgba(0, 200, 255, 0.40);
-      box-shadow:
-        0 0 0 1px rgba(0, 200, 255, 0.22),
-        0 0 28px rgba(0, 200, 255, 0.14),
-        0 12px 40px rgba(0, 80, 160, 0.30);
-    }
-  }
-
-  .member-card-wrap:focus-within .member-card {
-    transform: translateY(-4px);
-    border-color: rgba(0, 200, 255, 0.40);
-    box-shadow:
-      0 0 0 1px rgba(0, 200, 255, 0.22),
-      0 0 28px rgba(0, 200, 255, 0.14),
-      0 12px 40px rgba(0, 80, 160, 0.30);
-  }
-
-  /* ── Coloana foto ── */
-  .mc-photo-col {
+  /* ══ STAGE PAGE HEADER ══ */
+  .sph {
     position: relative;
     overflow: hidden;
-    min-height: 500px;
-    background: linear-gradient(160deg, #0f2545 0%, #142f5a 60%, #0a1a35 100%);
-  }
-
-  .mc-photo-img {
-    width: 100%;
-    height: 100%;
-    max-width: 100%;
-    object-fit: cover;
-    object-position: center 15%;
-    display: block;
-    transition: transform 600ms ease;
-  }
-
-  /* Ajustări per-membru (când poza are capul aproape de marginea de sus) */
-  .mc-photo-img[src*="oprea-marian"] {
-    object-position: center 5%;
-  }
-
-  .member-card-wrap:hover .mc-photo-img {
-    transform: scale(1.05);
-  }
-
-  /* Placeholder foto */
-  .mc-photo-ph {
-    width: 100%;
-    height: 100%;
-    min-height: 500px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    background: linear-gradient(160deg, #0f2545 0%, #1d3f78 45%, #0f2545 100%);
-  }
-
-  .mc-initials {
-    font-family: 'Oswald', sans-serif;
-    font-size: clamp(3rem, 7vw, 5rem);
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    background: linear-gradient(135deg, #e8c85b 0%, #ffeaa0 50%, #e8c85b 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: brightness(1.2);
-    line-height: 1;
-  }
-
-  .mc-ph-label {
-    font-size: 0.62rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.28);
-  }
-
-  /* ── Coloana conținut ── */
-  .mc-content-col {
-    position: relative;
-    padding: 1.5rem 4rem 1.5rem 1.5rem; /* dreapta: spațiu pentru buton BIO */
-    display: flex;
-    flex-direction: column;
-    gap: 0.7rem;
-    min-width: 0; /* previne blowout grid — permite overflow-x pe galerie */
-  }
-
-  /* Badge categorie */
-  .mc-cat-badge {
-    display: inline-block;
-    font-size: 0.58rem;
-    font-weight: 700;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    padding: 0.28em 0.85em;
-    border-radius: 9999px;
-    align-self: flex-start;
-  }
-
-  .mc-cat-badge--solist {
-    background: rgba(220, 160, 40, 0.12);
-    color: rgba(241, 220, 140, 0.92);
-    border: 1px solid rgba(220, 175, 80, 0.30);
-  }
-
-  .mc-cat-badge--instr {
-    background: rgba(0, 200, 255, 0.10);
-    color: rgba(0, 220, 255, 0.88);
-    border: 1px solid rgba(0, 200, 255, 0.25);
-  }
-
-  .mc-cat-badge--colab {
-    background: rgba(168, 85, 247, 0.12);
-    color: rgba(210, 160, 255, 0.92);
-    border: 1px solid rgba(168, 85, 247, 0.28);
-  }
-
-  /* Nume */
-  .mc-name {
-    font-family: 'Oswald', sans-serif;
-    font-size: clamp(1.4rem, 2.8vw, 2rem);
-    font-weight: 700;
-    letter-spacing: 0.03em;
-    color: #ffffff;
-    margin: 0;
-    line-height: 1.1;
-  }
-
-  /* Specialitate */
-  .mc-spec {
-    font-size: clamp(0.82rem, 1.1vw, 0.92rem);
-    line-height: 1.5;
-    color: rgba(180, 200, 235, 0.78);
-    margin: 0;
-    font-style: italic;
-  }
-
-  /* Experiență */
-  .mc-exp {
-    font-size: clamp(0.75rem, 1vw, 0.85rem);
-    line-height: 1.5;
-    color: rgba(200, 215, 240, 0.65);
-    margin: 0;
-  }
-
-  /* ── Mini galerie — slider orizontal ── */
-  .mc-gallery {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x proximity;
-    gap: 0.5rem;
-    margin-top: auto;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(6, 214, 255, 0.45) rgba(255, 255, 255, 0.06);
-    cursor: grab;
-    padding-bottom: 0.5rem;
-  }
-
-  .mc-gallery::-webkit-scrollbar {
-    height: 6px;
-  }
-
-  .mc-gallery::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.06);
-    border-radius: 3px;
-  }
-
-  .mc-gallery::-webkit-scrollbar-thumb {
-    background: rgba(6, 214, 255, 0.45);
-    border-radius: 3px;
-    transition: background 0.2s;
-  }
-
-  .mc-gallery::-webkit-scrollbar-thumb:hover {
-    background: rgba(6, 214, 255, 0.7);
-  }
-
-  .mc-gallery-ph {
-    position: relative;
-    flex: 0 0 clamp(100px, 28%, 180px);
-    width: clamp(100px, 28%, 180px);
-    max-width: none;
-    scroll-snap-align: center;
-    background: rgba(255, 255, 255, 0.035);
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 0.5rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.2rem;
-    cursor: pointer;
-    overflow: hidden;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-
-  .mc-gallery-ph.gallery-thumb:hover,
-  .mc-gallery-ph.gallery-thumb:focus {
-    border-color: rgba(232, 200, 91, 0.5);
-    box-shadow: 0 0 8px rgba(232, 200, 91, 0.35);
-  }
-
-  .mc-gallery-ph.gallery-thumb:focus-visible {
-    outline: 2px solid rgba(232, 200, 91, 0.8);
-    outline-offset: 2px;
-  }
-
-  .mc-gal-icon { font-size: 1rem; line-height: 1; }
-
-  .mc-gal-label {
-    font-size: 0.44rem;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.20);
     text-align: center;
-    padding: 0 0.25rem;
-    line-height: 1.2;
+    padding: clamp(3.5rem, 8vw, 6rem) var(--container-pad-x, 1.25rem) clamp(3rem, 6vw, 4.5rem);
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(6, 214, 255, 0.10) 0%, transparent 60%),
+      radial-gradient(ellipse at 20% 50%, rgba(245, 166, 35, 0.05) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 50%, rgba(168, 85, 247, 0.05) 0%, transparent 50%);
   }
 
-  .mc-gal-overlay {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.3rem;
-    background: rgba(0, 0, 0, 0.38);
-    border-radius: inherit;
-    opacity: 0;
-    transition: opacity 0.18s;
+  .sph-lines {
+    position: absolute; inset: 0; pointer-events: none; z-index: 1;
+    background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.05) 2px, rgba(0,0,0,0.05) 3px);
+  }
+
+  .sph-beams { position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+
+  .sph-beam {
+    position: absolute; top: 0;
+    width: 140px; height: 100%;
+    transform-origin: 50% 0%;
+    clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%);
+  }
+
+  .b1 { left: 3%; background: linear-gradient(to bottom, rgba(6,214,255,0.20), transparent 80%); transform: rotate(-16deg); animation: beam-flicker 5s ease-in-out infinite; }
+  .b2 { left: 22%; background: linear-gradient(to bottom, rgba(245,166,35,0.11), transparent 80%); transform: rotate(-6deg); animation: beam-flicker 7s ease-in-out infinite 1.2s; }
+  .b3 { left: 50%; transform: translateX(-50%); background: linear-gradient(to bottom, rgba(255,255,255,0.07), transparent 70%); animation: beam-flicker 8s ease-in-out infinite 2.8s; }
+  .b4 { right: 22%; left: auto; background: linear-gradient(to bottom, rgba(245,166,35,0.11), transparent 80%); transform: rotate(6deg); animation: beam-flicker 7s ease-in-out infinite 0.6s; }
+  .b5 { right: 3%; left: auto; background: linear-gradient(to bottom, rgba(6,214,255,0.20), transparent 80%); transform: rotate(16deg); animation: beam-flicker 5s ease-in-out infinite 1.8s; }
+
+  @keyframes beam-flicker {
+    0%, 100% { opacity: 1; }
+    35% { opacity: 0.55; }
+    65% { opacity: 0.90; }
+  }
+
+  .sph-content { position: relative; z-index: 2; max-width: 56ch; margin-inline: auto; }
+
+  .sph-eyebrow {
+    display: inline-block;
+    font-size: 0.60rem; font-weight: 700; letter-spacing: 0.28em; text-transform: uppercase;
+    color: rgba(6,214,255,0.82); margin-bottom: 0.85rem;
+    padding: 0.3em 1em; border: 1px solid rgba(6,214,255,0.22); border-radius: 999px;
+    background: rgba(6,214,255,0.06);
+  }
+
+  .sph-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(2.4rem, 6vw, 4.5rem); font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase; color: #ffffff;
+    line-height: 1; margin: 0 0 1.1rem;
+    text-shadow: 0 0 50px rgba(6,214,255,0.25), 0 2px 20px rgba(0,0,0,0.5);
+  }
+
+  .sph-sub {
+    font-size: clamp(0.82rem, 1.4vw, 0.96rem);
+    color: rgba(180,205,240,0.72); line-height: 1.65; margin: 0;
+  }
+
+  .sph-floor {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 80px;
+    background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.22));
     pointer-events: none;
   }
 
-  .mc-gallery-ph:hover .mc-gal-overlay,
-  .mc-gallery-ph:focus .mc-gal-overlay {
-    opacity: 1;
+  /* ══ SECTION LABEL ══ */
+  .stage-section {
+    padding-block: clamp(1.5rem, 4vw, 3rem);
+    padding-inline: var(--container-pad-x, 1.25rem);
+    max-width: var(--container-max, 1200px);
+    margin-inline: auto; box-sizing: border-box;
   }
 
-  /* ── Thumbnail real image ── */
-  .mc-gal-thumb-img {
-    width: 100%;
-    aspect-ratio: 3 / 2;
-    object-fit: cover;
-    /* `center top` păstrează capul personajului vizibil în toate pozele portret;
-       pozele peisagistice rămân centrate orizontal. */
-    object-position: center top;
-    display: block;
-    border-radius: inherit;
+  .stl-row { display: flex; align-items: center; gap: 1.25rem; margin-bottom: clamp(1.5rem, 3.5vw, 2.5rem); }
+
+  .stl-line {
+    flex: 1; height: 1px;
+    background: linear-gradient(to right, transparent, rgba(6,214,255,0.45));
+  }
+  .stl-line--r {
+    background: linear-gradient(to left, transparent, rgba(6,214,255,0.45));
   }
 
-  /* Ajustări per-poză când `center top` taie fruntea sau nu încadrează corect */
-  .mc-gal-thumb-img[src*="Alexia%20Galerie%202"],
-  .mc-gal-thumb-img[src*="Alexia Galerie 2"] {
-    object-position: center 25%;
+  .stl-center {
+    display: flex; align-items: center; gap: 0.55rem;
+    padding: 0.4rem 1.25rem;
+    border: 1px solid rgba(6,214,255,0.22); border-radius: 6px;
+    background: rgba(6,214,255,0.04); white-space: nowrap;
   }
 
-  /* ── Slider indicator luminos (toate breakpoints) ── */
-  .mc-gallery-indicator {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.4rem;
-    padding-top: 0.5rem;
+  .stl-icon { color: rgba(6,214,255,0.75); flex-shrink: 0; }
+
+  .stl-text {
+    font-family: 'Oswald', sans-serif; font-size: 0.65rem; font-weight: 700;
+    letter-spacing: 0.22em; text-transform: uppercase; color: rgba(6,214,255,0.85);
   }
 
-  .mc-gallery-indicator .dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.35);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    transition: background 0.3s, box-shadow 0.3s, transform 0.3s;
-  }
+  /* ══ GRIDS ══ */
+  .ac-grid { display: grid; gap: clamp(1rem, 2.5vw, 1.5rem); }
+  .ac-grid--duo { grid-template-columns: repeat(2, 1fr); }
+  .ac-grid--trio { grid-template-columns: repeat(3, 1fr); }
+  .ac-grid--auto { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
 
-  .mc-gallery-indicator .dot.active {
-    background: rgba(6, 214, 255, 0.95);
-    border-color: rgba(6, 214, 255, 0.5);
-    box-shadow: 0 0 8px rgba(6, 214, 255, 0.7), 0 0 18px rgba(6, 214, 255, 0.35);
-    transform: scale(1.4);
-  }
-
-  /* Hint swipe cu săgeată animată */
-  .mc-gallery-hint {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.3rem;
-    padding-top: 0.25rem;
-    font-size: 0.55rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: rgba(6, 214, 255, 0.5);
-    animation: hintPulse 2s ease-in-out infinite;
-  }
-
-  .mc-gallery-hint svg {
-    width: 14px;
-    height: 14px;
-    animation: hintSlide 1.5s ease-in-out infinite;
-  }
-
-  @keyframes hintPulse {
-    0%, 100% { opacity: 0.5; }
-    50% { opacity: 1; }
-  }
-
-  @keyframes hintSlide {
-    0%, 100% { transform: translateX(0); }
-    50% { transform: translateX(4px); }
-  }
-
-  /* Spațiu de respiro la final de galerie */
-  .mc-gallery::after {
-    content: '';
-    flex: 0 0 0.6rem;
-  }
-
-  /* ══════════════════════════════════════════
-     GALERIE MOBIL — containment robust
-     (izolată de overflow-ul părinților — rezistă la
-      orice modificare SEO pe layout-ul global)
-  ══════════════════════════════════════════ */
+  @media (max-width: 1023px) { .ac-grid--trio { grid-template-columns: repeat(2, 1fr); } }
   @media (max-width: 767px) {
-    /* ── Containment: card-ul taie orice overflow orizontal ── */
-    .member-card-wrap {
-      overflow-x: clip;
-      max-width: 100%;
-    }
+    .ac-grid--duo { grid-template-columns: repeat(2, 1fr); }
+    .ac-grid--trio { grid-template-columns: repeat(2, 1fr); }
+    .ac-grid--auto { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 480px) {
+    .ac-grid--duo, .ac-grid--trio, .ac-grid--auto { grid-template-columns: 1fr; }
+  }
 
-    .member-card {
-      overflow: hidden !important;
-    }
+  /* ══ ARTIST CARD ══ */
+  .member-card-wrap { position: relative; }
 
-    /* ── Galeria: scroll propriu, independent de ancestors ── */
-    .mc-gallery {
-      overflow-x: auto !important;
-      overflow-y: hidden !important;
-      -webkit-overflow-scrolling: touch !important;
-      overscroll-behavior-x: contain;
-      scroll-snap-type: none;
-      /* Permitem AMBELE axe: browser-ul alege după direcția dominantă —
-         swipe orizontal derulează galeria, swipe vertical derulează pagina.
-         Fără pan-y, degetul fix pe galerie bloca scroll-ul paginii. */
-      touch-action: pan-x pan-y pinch-zoom;
-      gap: 0.6rem;
-      /* Galeria iese simetric din padding-ul părinte */
-      margin-left: -1rem;
-      margin-right: -1rem;
-      padding-left: 1rem;
-      padding-right: 1rem;
-      position: relative;
-      scrollbar-width: thin;
-      scrollbar-color: rgba(6, 214, 255, 0.45) rgba(255, 255, 255, 0.06);
-    }
+  .ac {
+    position: relative; aspect-ratio: 2 / 3;
+    border-radius: 1.1rem; overflow: hidden; cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.09);
+    transition: transform 380ms cubic-bezier(0.22,1,0.36,1), border-color 380ms ease, box-shadow 380ms ease;
+    isolation: isolate;
+  }
 
-    .mc-gallery::-webkit-scrollbar {
-      height: 5px;
+  @media (hover: hover) and (pointer: fine) {
+    .ac--solist:hover {
+      transform: translateY(-6px) scale(1.012);
+      border-color: rgba(232,200,91,0.60);
+      box-shadow: 0 0 0 1px rgba(232,200,91,0.18), 0 0 36px rgba(232,200,91,0.20), 0 18px 55px rgba(0,0,0,0.42);
     }
-
-    .mc-gallery::-webkit-scrollbar-track {
-      background: rgba(255, 255, 255, 0.06);
-      border-radius: 3px;
+    .ac--instr:hover {
+      transform: translateY(-6px) scale(1.012);
+      border-color: rgba(6,214,255,0.60);
+      box-shadow: 0 0 0 1px rgba(6,214,255,0.18), 0 0 36px rgba(6,214,255,0.20), 0 18px 55px rgba(0,0,0,0.42);
     }
-
-    .mc-gallery::-webkit-scrollbar-thumb {
-      background: rgba(6, 214, 255, 0.45);
-      border-radius: 3px;
-    }
-
-    .mc-gallery-ph {
-      flex: 0 0 min(70vw, 320px);
-      width: min(70vw, 320px);
-      scroll-snap-align: none;
-      border-radius: 0.75rem;
-    }
-
-    .mc-gal-thumb-img {
-      aspect-ratio: 4 / 3;
-    }
-
-    .mc-gallery-indicator {
-      margin-left: 0;
-    }
-
-    .mc-gallery-hint {
-      margin-left: 0;
+    .ac--colab:hover {
+      transform: translateY(-6px) scale(1.012);
+      border-color: rgba(168,85,247,0.60);
+      box-shadow: 0 0 0 1px rgba(168,85,247,0.18), 0 0 36px rgba(168,85,247,0.20), 0 18px 55px rgba(0,0,0,0.42);
     }
   }
 
-  /* ── Galerie "în curând" ── */
-  .mc-gallery--soon {
-    display: flex;
-    grid-template-columns: unset;
+  .ac:focus-within { outline: 2px solid rgba(6,214,255,0.65); outline-offset: 3px; }
+
+  /* ── Photos ── */
+  .ac-photos { position: absolute; inset: 0; }
+
+  .ac-photo {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: center 15%;
+    opacity: 0;
+    transition: opacity 900ms ease;
   }
 
-  .mc-gallery-coming {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.85rem 1rem;
-    background: rgba(255, 255, 255, 0.025);
-    border: 1px dashed rgba(255, 255, 255, 0.08);
-    border-radius: 0.5rem;
+  .ac-photo.is-active {
+    opacity: 1;
+    animation: ac-kenburns 12s ease-in-out infinite alternate;
   }
 
-  .mc-gal-soon-label {
-    font-size: 0.6rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.25);
+  @keyframes ac-kenburns {
+    0%   { transform: scale(1.04) translate(0%, 0%); }
+    50%  { transform: scale(1.09) translate(-1.2%, -0.6%); }
+    100% { transform: scale(1.04) translate(1.2%, 0.6%); }
   }
 
-  /* ══════════════════════════════════════════
-     BUTON BIO CIRCULAR PULSANT
-  ══════════════════════════════════════════ */
+  .ac-photo[src*="oprea-marian"] { object-position: center 5%; }
+  .ac-photo[src*="catalin-matei"] { object-position: center 20%; }
+
+  /* ── Placeholder ── */
+  .ac-ph {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(160deg, #0c1e44 0%, #17305a 45%, #0c1e44 100%);
+  }
+
+  .ac-ph-light {
+    position: absolute; top: -30%; left: 50%; transform: translateX(-50%);
+    width: 160%; height: 160%;
+    background: radial-gradient(ellipse at 50% 0%, rgba(6,214,255,0.14) 0%, transparent 55%);
+    pointer-events: none;
+  }
+
+  .ac-initials {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(3.5rem, 8vw, 5.5rem); font-weight: 700; letter-spacing: 0.04em;
+    background: linear-gradient(135deg, #e8c85b 0%, #fff3a0 55%, #e8c85b 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 20px rgba(232,200,91,0.40));
+    line-height: 1;
+  }
+
+  /* ── Atmosphere overlays ── */
+  .ac-scanlines {
+    position: absolute; inset: 0; pointer-events: none; z-index: 1;
+    background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 3px);
+  }
+
+  .ac-grad {
+    position: absolute; inset: 0; pointer-events: none; z-index: 2;
+    background: linear-gradient(to bottom, transparent 0%, transparent 22%, rgba(0,2,12,0.22) 52%, rgba(0,2,12,0.90) 80%, rgba(0,2,12,0.97) 100%);
+  }
+
+  .ac-beam {
+    position: absolute; top: -20%; left: 50%; transform: translateX(-50%);
+    width: 70%; height: 90%;
+    clip-path: polygon(28% 0%, 72% 0%, 100% 100%, 0% 100%);
+    pointer-events: none; z-index: 1;
+    opacity: 0; transition: opacity 500ms ease;
+  }
+
+  .ac--solist .ac-beam { background: linear-gradient(to bottom, rgba(255,230,80,0.14), transparent); }
+  .ac--instr  .ac-beam { background: linear-gradient(to bottom, rgba(6,214,255,0.14), transparent); }
+  .ac--colab  .ac-beam { background: linear-gradient(to bottom, rgba(168,85,247,0.14), transparent); }
+
+  @media (hover: hover) and (pointer: fine) { .ac:hover .ac-beam { opacity: 1; } }
+
+  /* ── Top badge row ── */
+  .ac-top {
+    position: absolute; top: 0.85rem; left: 0.85rem; right: 0.85rem;
+    display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; z-index: 5;
+  }
+
+  .ac-badge {
+    font-size: 0.52rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+    padding: 0.25em 0.75em; border-radius: 999px;
+  }
+
+  .ac-b--solist { background: rgba(232,200,91,0.14); color: rgba(255,240,160,0.95); border: 1px solid rgba(232,200,91,0.35); }
+  .ac-b--instr  { background: rgba(6,214,255,0.10);  color: rgba(100,240,255,0.95); border: 1px solid rgba(6,214,255,0.28); }
+  .ac-b--colab  { background: rgba(168,85,247,0.12); color: rgba(210,160,255,0.95); border: 1px solid rgba(168,85,247,0.30); }
+
+  .ac-star {
+    font-size: 0.50rem; letter-spacing: 0.08em; color: rgba(255,230,120,0.80);
+    background: rgba(255,200,50,0.08); border: 1px solid rgba(255,200,50,0.20);
+    padding: 0.22em 0.65em; border-radius: 999px;
+  }
+
+  .ac-instr-pill {
+    font-size: 0.50rem; letter-spacing: 0.06em; color: rgba(100,240,255,0.80);
+    background: rgba(6,214,255,0.08); border: 1px solid rgba(6,214,255,0.20);
+    padding: 0.22em 0.65em; border-radius: 999px;
+  }
+
+  /* ── Bottom content ── */
+  .ac-body {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 1.1rem 3.8rem 1.1rem 1.1rem;
+    z-index: 5; display: flex; flex-direction: column; gap: 0.32rem;
+  }
+
+  .ac-spec {
+    font-size: 0.68rem; letter-spacing: 0.06em;
+    color: rgba(160,200,240,0.80); font-style: italic; margin: 0; line-height: 1.4;
+  }
+
+  .ac-name {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(1.1rem, 2.2vw, 1.6rem); font-weight: 700;
+    letter-spacing: 0.04em; color: #ffffff; margin: 0; line-height: 1.1;
+    text-shadow: 0 2px 14px rgba(0,0,0,0.65);
+    transition: transform 380ms ease;
+  }
+
+  @media (hover: hover) and (pointer: fine) { .ac:hover .ac-name { transform: translateY(-2px); } }
+
+  /* ── Hover reveal (citat + gallery) ── */
+  .ac-reveal {
+    overflow: hidden; max-height: 0; opacity: 0; transform: translateY(8px);
+    transition: max-height 480ms cubic-bezier(0.22,1,0.36,1), opacity 380ms ease 80ms, transform 380ms ease 80ms;
+    display: flex; flex-direction: column; gap: 0.55rem;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .ac:hover .ac-reveal { max-height: 280px; opacity: 1; transform: translateY(0); }
+  }
+
+  .ac-citat { margin: 0; padding-left: 0.65rem; border-left: 2px solid rgba(6,214,255,0.55); }
+  .ac--solist .ac-citat { border-left-color: rgba(232,200,91,0.60); }
+  .ac--colab  .ac-citat { border-left-color: rgba(168,85,247,0.60); }
+
+  .ac-citat p {
+    font-size: 0.70rem; font-style: italic; color: rgba(200,225,255,0.82); line-height: 1.55; margin: 0;
+  }
+
+  .ac-strip { display: flex; gap: 0.35rem; flex-wrap: nowrap; overflow: hidden; }
+
+  .ac-th {
+    flex: 0 0 52px; width: 52px; height: 52px; border-radius: 0.4rem; overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.14); padding: 0; cursor: pointer;
+    background: transparent; transition: border-color 200ms, transform 200ms;
+  }
+
+  .ac-th img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  @media (hover: hover) and (pointer: fine) {
+    .ac-th:hover { border-color: rgba(6,214,255,0.70); transform: scale(1.1); }
+  }
+
+  /* ══ BIO BUTTON ══ */
   @keyframes bio-pulse {
     0%, 100% { box-shadow: 0 0 0 0 rgba(0,200,255,0.60); }
     50%       { box-shadow: 0 0 0 10px rgba(0,200,255,0.00); }
   }
 
   .bio-btn {
-    position: absolute;
-    bottom: 1rem;
-    right: 1rem;
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
+    position: absolute; bottom: 0.85rem; right: 0.85rem;
+    width: 48px; height: 48px; border-radius: 50%;
     background: linear-gradient(135deg, #00c8ff 0%, #0066ff 100%);
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
     color: #ffffff;
-    animation: bio-pulse 2s ease-in-out infinite;
-    transition:
-      background 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-      transform   0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: bio-pulse 2.2s ease-in-out infinite;
+    transition: background 0.35s cubic-bezier(0.34,1.56,0.64,1), transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
     z-index: 10;
   }
 
-  .bio-btn:hover {
-    transform: scale(1.12);
-  }
+  .bio-btn:hover { transform: scale(1.14); }
 
   .bio-btn.active {
     background: linear-gradient(135deg, #ff4060 0%, #cc0033 100%);
-    animation: none;
-    transform: rotate(45deg) scale(1.08);
+    animation: none; transform: rotate(45deg) scale(1.08);
   }
 
-  .bio-btn-text {
-    font-size: 0.65rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    pointer-events: none;
-    transition: inherit;
-  }
+  .bio-btn-text { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; pointer-events: none; }
+  .bio-btn.active .bio-btn-text::before { content: '×'; font-size: 1.2rem; font-weight: 400; letter-spacing: 0; }
+  .bio-btn.active .bio-btn-text { font-size: 0; }
 
-  .bio-btn.active .bio-btn-text::before {
-    content: '×';
-    font-size: 1.2rem;
-    font-weight: 400;
-    letter-spacing: 0;
-  }
-
-  .bio-btn.active .bio-btn-text {
-    font-size: 0;
-  }
-
-  /* ══════════════════════════════════════════
-     PANEL BIOGRAFIE — efect balon spring
-  ══════════════════════════════════════════ */
+  /* ══ BIO PANEL ══ */
   .bio-panel {
-    max-height: 0;
-    overflow: hidden;
-    opacity: 0;
-    transform: scaleY(0.85) translateY(-10px);
-    transform-origin: top center;
-    background: rgba(4, 12, 32, 0.72);
-    border: 1px solid rgba(0, 200, 255, 0.18);
-    border-top: none;
-    border-radius: 0 0 1.25rem 1.25rem;
-    padding: 0 1.75rem;
+    max-height: 0; overflow: hidden; opacity: 0;
+    transform: scaleY(0.85) translateY(-10px); transform-origin: top center;
+    background: rgba(4,12,32,0.72);
+    border: 1px solid rgba(0,200,255,0.18); border-top: none;
+    border-radius: 0 0 1.1rem 1.1rem; padding: 0 1.75rem;
     transition:
-      max-height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+      max-height 0.5s cubic-bezier(0.34,1.56,0.64,1),
       opacity    0.35s ease,
-      transform  0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+      transform  0.5s cubic-bezier(0.34,1.56,0.64,1),
       padding    0.35s ease;
   }
 
   .bio-panel.open {
-    max-height: 1000px;
-    opacity: 1;
+    max-height: 1000px; opacity: 1;
     transform: scaleY(1) translateY(0);
     padding: 1.5rem 1.75rem 2rem;
   }
 
-  @media (max-width: 767px) {
-    .bio-panel.open {
-      padding: 1.25rem 1.25rem 1.5rem;
-    }
-  }
+  @media (max-width: 767px) { .bio-panel.open { padding: 1.25rem 1.25rem 1.5rem; } }
 
-  /* Citat */
-  .bio-quote {
-    margin: 0 0 1rem;
-    padding-left: 1rem;
-    border-left: 3px solid rgba(0, 200, 255, 0.65);
-  }
+  .bio-quote { margin: 0 0 1rem; padding-left: 1rem; border-left: 3px solid rgba(0,200,255,0.65); }
+  .bio-quote p { font-size: clamp(0.88rem, 1.1vw, 0.98rem); font-style: italic; color: rgba(180,215,255,0.85); line-height: 1.75; margin: 0; }
 
-  .bio-quote p {
-    font-size: clamp(0.88rem, 1.1vw, 0.98rem);
-    font-style: italic;
-    color: rgba(180, 215, 255, 0.85);
-    line-height: 1.75;
-    margin: 0;
-    text-wrap: pretty;
-  }
+  .bio-text { font-size: clamp(0.85rem, 1.1vw, 0.95rem); line-height: 1.82; color: rgba(210,225,245,0.85); margin: 0 0 1rem; }
 
-  /* Text bio */
-  .bio-text {
-    font-size: clamp(0.85rem, 1.1vw, 0.95rem);
-    line-height: 1.82;
-    color: rgba(210, 225, 245, 0.85);
-    margin: 0 0 1rem;
-    text-wrap: pretty;
-  }
-
-  /* Taguri pill */
-  .bio-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-  }
+  .bio-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 
   .bio-tag {
-    font-size: 0.60rem;
-    font-weight: 700;
-    letter-spacing: 0.10em;
-    text-transform: uppercase;
-    padding: 0.26em 0.75em;
-    border-radius: 9999px;
-    background: rgba(0, 200, 255, 0.08);
-    color: rgba(0, 220, 255, 0.75);
-    border: 1px solid rgba(0, 200, 255, 0.20);
+    font-size: 0.60rem; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
+    padding: 0.26em 0.75em; border-radius: 9999px;
+    background: rgba(0,200,255,0.08); color: rgba(0,220,255,0.75); border: 1px solid rgba(0,200,255,0.20);
   }
 
+  /* ══ SCROLL HINT ══ */
+  .scroll-hint-wrap { display: flex; justify-content: center; padding: 0.75rem 0 0; }
 
-
-  /* ══════════════════════════════════════════
-     TABLETĂ (600–1023px): 2 coloane, foto compactă
-     ── include atât tabletele portrait (≈768) cât și
-        landscape (≈1024), unde layout-ul desktop cu
-        poză min-height:500px provoca stretch + suprapuneri
-        între BIO btn și hint/indicator galerie. ──
-  ══════════════════════════════════════════ */
-  @media (min-width: 600px) and (max-width: 1023px) {
-    .member-card {
-      grid-template-columns: 32% 1fr;
-    }
-    .mc-photo-col {
-      min-height: clamp(240px, 42vw, 380px);
-    }
-    /* placeholder trebuie să urmeze aceeași înălțime */
-    .mc-photo-ph {
-      min-height: clamp(240px, 42vw, 380px);
-    }
-    .mc-photo-img {
-      object-position: center 20%;
-    }
-    /* Spațiu jos pentru butonul BIO (absolute, 52px + 1rem offset)
-       ca să nu mai acopere indicatorul de dots sau hint-ul "Glisează". */
-    .mc-content-col {
-      padding: 1.25rem 1.25rem 4.5rem 1.25rem;
-    }
-    /* Galeria: itemi ceva mai mici ca să intre uniform în coloana îngustă */
-    .mc-gallery-ph {
-      flex: 0 0 clamp(110px, 32%, 160px);
-      width: clamp(110px, 32%, 160px);
-    }
+  .scroll-hint-btn {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    padding: 0.4rem 1.1rem 0.4rem 1.2rem; border-radius: 9999px;
+    border: 1px solid rgba(6,214,255,0.25); background: rgba(6,214,255,0.06);
+    color: rgba(160,230,255,0.85); text-decoration: none;
+    font-family: 'Oswald', sans-serif; font-size: 0.72rem; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    transition: background 200ms, border-color 200ms, color 200ms;
   }
 
-  /* ══════════════════════════════════════════
-     TABLETĂ (600–767px): 2 coloane, foto 30%
-  ══════════════════════════════════════════ */
-  @media (min-width: 600px) and (max-width: 767px) {
-    .member-card {
-      grid-template-columns: 30% 1fr;
-    }
-    .mc-photo-col {
-      min-height: 240px;
-    }
-    /* placeholder trebuie să urmeze aceeași înălțime */
-    .mc-photo-ph {
-      min-height: 240px;
-    }
+  .scroll-hint-btn:hover { background: rgba(6,214,255,0.14); border-color: rgba(6,214,255,0.5); color: #fff; }
+
+  .scroll-hint-arrow { animation: bounce-down 1.6s ease-in-out infinite; }
+
+  @keyframes bounce-down {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(4px); }
   }
 
-  /* ══════════════════════════════════════════
-     MOBIL (<600px)
-  ══════════════════════════════════════════ */
-  @media (max-width: 599px) {
-    .member-card {
-      grid-template-columns: 1fr;
-    }
-
-    .mc-photo-col {
-      min-height: unset;
-      aspect-ratio: 3 / 4;
-      max-height: 70dvh;
-    }
-
-    .mc-photo-img {
-      width: 100%;
-      height: 100%;
-      max-width: 100%;
-      object-fit: cover;
-    }
-
-    .mc-photo-ph {
-      min-height: unset;
-      aspect-ratio: 3 / 4;
-    }
-
-    .mc-content-col {
-      /* dreapta: 56px buton + 0.75rem offset + 0.5rem gap = ~4.5rem
-         jos:    56px buton + 0.75rem offset + 0.5rem gap = ~5rem  */
-      padding: 1.25rem 4.5rem 5rem 1rem;
-      max-width: 100%;
-      /* !important — protejat de cascade SEO; galeria are nevoie de visible
-         ca să iasă cu margin negativ până la marginea card-ului */
-      overflow-x: visible !important;
-      overflow-y: visible !important;
-      box-sizing: border-box;
-    }
-
-    .bio-btn {
-      bottom: 0.75rem;
-      right: 0.75rem;
-      width: 56px;
-      height: 56px;
-    }
+  /* ══ MOBILE ══ */
+  @media (max-width: 767px) {
+    .ac-body { padding: 0.9rem 3.5rem 0.9rem 0.9rem; }
+    .ac-name { font-size: clamp(0.95rem, 4vw, 1.25rem); }
+    .bio-btn { width: 44px; height: 44px; bottom: 0.7rem; right: 0.7rem; }
   }
-
 </style>
