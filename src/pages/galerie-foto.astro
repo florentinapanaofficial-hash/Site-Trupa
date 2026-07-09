@@ -37,6 +37,53 @@ const photos = [
       <p class="gal-subtitle">Momente autentice de dans, energie și emoție, surprinse la evenimentele noastre din toată România</p>
     </header>
 
+    <!-- ═══ MONTAJ CINEMATIC (stil Canva) ═══ -->
+    <section class="gal-montage" aria-label="Montaj foto cinematic" data-montage-root>
+      <div class="gal-montage-stage" data-montage-stage data-preset="elegant">
+        {photos.map((p, i) => (
+          <figure class={`gal-montage-slide${i === 0 ? ' is-active' : ''}`} data-montage-slide data-index={i}>
+            <img src={p.src} alt={p.alt} loading={i === 0 ? 'eager' : 'lazy'} decoding="async" width="1400" height="900" />
+            <figcaption>{p.alt}</figcaption>
+          </figure>
+        ))}
+        <div class="gal-montage-overlay" aria-hidden="true"></div>
+        <div class="gal-montage-beatbars" aria-hidden="true">
+          <span data-beat-bar></span><span data-beat-bar></span><span data-beat-bar></span><span data-beat-bar></span>
+          <span data-beat-bar></span><span data-beat-bar></span><span data-beat-bar></span><span data-beat-bar></span>
+        </div>
+      </div>
+
+      <div class="gal-montage-controls" aria-label="Controale montaj">
+        <div class="gal-montage-controls-row">
+          <button type="button" class="gal-montage-btn" data-montage-prev aria-label="Imaginea anterioară">◀</button>
+          <button type="button" class="gal-montage-btn" data-montage-play aria-label="Pauză montaj">Pause</button>
+          <button type="button" class="gal-montage-btn" data-montage-next aria-label="Imaginea următoare">▶</button>
+          <button type="button" class="gal-montage-btn" data-montage-beat aria-label="Activează sau dezactivează sincronizarea pe beat" aria-pressed="true">Beat ON</button>
+          <button type="button" class="gal-montage-btn" data-montage-autobeat aria-label="Activează detectarea automată a beat-ului" aria-pressed="true">Sync AUTO</button>
+        </div>
+        <div class="gal-montage-controls-row gal-montage-controls-row--secondary">
+          <label class="gal-montage-label" for="montage-preset">Preset</label>
+          <select id="montage-preset" class="gal-montage-select" data-montage-preset>
+            <option value="elegant" selected>Elegant</option>
+            <option value="party">Party</option>
+            <option value="romantic">Romantic</option>
+          </select>
+          <label class="gal-montage-label" for="montage-bpm">BPM</label>
+          <input id="montage-bpm" class="gal-montage-range" type="range" min="80" max="160" step="1" value="118" data-montage-bpm aria-label="Ritm beat per minut" />
+          <span class="gal-montage-bpm-val" data-montage-bpm-val>118</span>
+        </div>
+        <div class="gal-montage-controls-row gal-montage-controls-row--audio">
+          <label class="gal-montage-file" for="montage-audio-file">Alege audio</label>
+          <input id="montage-audio-file" class="gal-montage-file-input" type="file" accept="audio/*" data-montage-audio-file />
+          <button type="button" class="gal-montage-btn" data-montage-audio-play aria-label="Redă sau oprește muzica">Play Audio</button>
+          <label class="gal-montage-label" for="montage-sense">Sens</label>
+          <input id="montage-sense" class="gal-montage-range gal-montage-range--short" type="range" min="105" max="180" step="1" value="130" data-montage-sense aria-label="Sensibilitate detectare beat" />
+          <span class="gal-montage-bpm-val" data-montage-sense-val>1.30x</span>
+        </div>
+      </div>
+      <audio data-montage-audio preload="metadata" class="gal-montage-audio" src="/Audio/Captain%20Joz%20-%20Stunts%20Cheer%20-%20Instrumental%20version.mp3"></audio>
+    </section>
+
     <!-- ═══ GRID MASONRY ═══ -->
     <div class="gal-masonry" role="list" aria-label="Galerie fotografii">
       {photos.map((p, i) => (
@@ -117,6 +164,340 @@ const photos = [
 ═══════════════════════════════════════════ -->
 <script is:inline>
   const items = document.querySelectorAll('.gal-item');
+
+  // ── Montaj cinematic autoplay ──
+  const montageRoot = document.querySelector('[data-montage-root]');
+  const montageSlides = Array.from(document.querySelectorAll('[data-montage-slide]'));
+  const montageStage = document.querySelector('[data-montage-stage]');
+  const montagePrev = document.querySelector('[data-montage-prev]');
+  const montageNext = document.querySelector('[data-montage-next]');
+  const montagePlay = document.querySelector('[data-montage-play]');
+  const montageBeat = document.querySelector('[data-montage-beat]');
+  const montageAutoBeat = document.querySelector('[data-montage-autobeat]');
+  const montagePreset = document.querySelector('[data-montage-preset]');
+  const montageBpm = document.querySelector('[data-montage-bpm]');
+  const montageBpmVal = document.querySelector('[data-montage-bpm-val]');
+  const montageSense = document.querySelector('[data-montage-sense]');
+  const montageSenseVal = document.querySelector('[data-montage-sense-val]');
+  const montageAudioFile = document.querySelector('[data-montage-audio-file]');
+  const montageAudioPlay = document.querySelector('[data-montage-audio-play]');
+  const montageAudio = document.querySelector('[data-montage-audio]');
+  const beatBars = Array.from(document.querySelectorAll('[data-beat-bar]'));
+  let montageIndex = 0;
+  let montageTimer = null;
+  let beatTimer = null;
+  let montagePlaying = true;
+  let beatEnabled = true;
+  let autoBeatEnabled = true;
+  let currentPreset = 'elegant';
+  let beatBarIdx = 0;
+  let audioCtx = null;
+  let analyser = null;
+  let sourceNode = null;
+  let beatRaf = 0;
+  let lastDetectedAt = 0;
+  let lastAutoPresetAt = 0;
+  let lastEnergyTarget = 'elegant';
+  let energyTargetStreak = 0;
+  let audioObjectUrl = '';
+  const lowEnergyHistory = [];
+  const totalEnergyHistory = [];
+
+  function getBeatSensitivity() {
+    const raw = Number(montageSense?.value || 130);
+    return Number.isFinite(raw) ? raw / 100 : 1.3;
+  }
+
+  function syncUsesAudioBeats() {
+    return beatEnabled && autoBeatEnabled && !!analyser && !!montageAudio && !montageAudio.paused;
+  }
+
+  function triggerBeatBar() {
+    if (!beatBars.length) return;
+    const bar = beatBars[beatBarIdx % beatBars.length];
+    beatBarIdx += 1;
+    if (!bar) return;
+    bar.classList.remove('is-hit');
+    void bar.offsetWidth;
+    bar.classList.add('is-hit');
+  }
+
+  function setMontagePreset(nextPreset) {
+    const normalized = nextPreset || 'elegant';
+    if (currentPreset === normalized) return;
+    currentPreset = normalized;
+    if (montagePreset && montagePreset.value !== normalized) {
+      montagePreset.value = normalized;
+    }
+    if (montageStage) montageStage.setAttribute('data-preset', currentPreset);
+    renderMontage(montageIndex);
+  }
+
+  async function ensureAudioGraph() {
+    if (!montageAudio || !window.AudioContext) return;
+    if (!audioCtx) audioCtx = new window.AudioContext();
+    if (!analyser) {
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 1024;
+      analyser.smoothingTimeConstant = 0.82;
+    }
+    if (!sourceNode) {
+      sourceNode = audioCtx.createMediaElementSource(montageAudio);
+      sourceNode.connect(analyser);
+      analyser.connect(audioCtx.destination);
+    }
+    if (audioCtx.state === 'suspended') {
+      await audioCtx.resume();
+    }
+  }
+
+  function stopBeatDetection() {
+    if (beatRaf) cancelAnimationFrame(beatRaf);
+    beatRaf = 0;
+    lowEnergyHistory.length = 0;
+    totalEnergyHistory.length = 0;
+    energyTargetStreak = 0;
+  }
+
+  function startBeatDetection() {
+    if (!analyser || !montageAudio) return;
+    const freq = new Uint8Array(analyser.frequencyBinCount);
+    const minGapMs = 220;
+
+    const loop = () => {
+      analyser.getByteFrequencyData(freq);
+      const lowBins = Math.max(10, Math.floor(freq.length * 0.1));
+      const midStart = lowBins;
+      const midEnd = Math.max(midStart + 10, Math.floor(freq.length * 0.42));
+      const highStart = midEnd;
+      const highEnd = Math.max(highStart + 10, Math.floor(freq.length * 0.82));
+      let lowEnergy = 0;
+      let midEnergy = 0;
+      let highEnergy = 0;
+      for (let i = 0; i < lowBins; i += 1) lowEnergy += freq[i];
+      for (let i = midStart; i < midEnd; i += 1) midEnergy += freq[i];
+      for (let i = highStart; i < highEnd; i += 1) highEnergy += freq[i];
+      lowEnergy /= lowBins;
+      midEnergy /= Math.max(1, midEnd - midStart);
+      highEnergy /= Math.max(1, highEnd - highStart);
+
+      const totalEnergy = (lowEnergy * 0.62) + (midEnergy * 0.28) + (highEnergy * 0.10);
+
+      lowEnergyHistory.push(lowEnergy);
+      if (lowEnergyHistory.length > 44) lowEnergyHistory.shift();
+      totalEnergyHistory.push(totalEnergy);
+      if (totalEnergyHistory.length > 44) totalEnergyHistory.shift();
+      const avg = lowEnergyHistory.reduce((sum, v) => sum + v, 0) / (lowEnergyHistory.length || 1);
+      const avgTotal = totalEnergyHistory.reduce((sum, v) => sum + v, 0) / (totalEnergyHistory.length || 1);
+      const threshold = avg * getBeatSensitivity();
+      const energyRatio = totalEnergy / Math.max(1, avgTotal);
+      const now = performance.now();
+
+      if (syncUsesAudioBeats()) {
+        let energyTarget = 'elegant';
+        if (energyRatio > 1.22 && lowEnergy > 74) energyTarget = 'party';
+        else if (energyRatio < 0.93 || lowEnergy < 54) energyTarget = 'romantic';
+
+        if (energyTarget === lastEnergyTarget) energyTargetStreak += 1;
+        else {
+          lastEnergyTarget = energyTarget;
+          energyTargetStreak = 1;
+        }
+
+        if (
+          energyTargetStreak >= 14
+          && energyTarget !== currentPreset
+          && now - lastAutoPresetAt > 2400
+        ) {
+          lastAutoPresetAt = now;
+          setMontagePreset(energyTarget);
+        }
+      }
+
+      if (lowEnergy > threshold && now - lastDetectedAt > minGapMs) {
+        lastDetectedAt = now;
+        triggerBeatBar();
+        if (syncUsesAudioBeats() && montagePlaying) {
+          nextMontage();
+        }
+      }
+
+      if (!montageAudio.paused && montageAudio.ended === false) {
+        beatRaf = requestAnimationFrame(loop);
+      }
+    };
+
+    stopBeatDetection();
+    beatRaf = requestAnimationFrame(loop);
+  }
+
+  function getBpm() {
+    const raw = Number(montageBpm?.value || 118);
+    return Number.isFinite(raw) ? raw : 118;
+  }
+
+  function getSlideDuration() {
+    if (!beatEnabled) return 3600;
+    const beatMs = 60000 / getBpm();
+    return Math.round(beatMs * 8);
+  }
+
+  function getFxClass(idx) {
+    const map = {
+      elegant: ['fx-kenburns', 'fx-pan-left', 'fx-pan-right'],
+      party: ['fx-punch', 'fx-sweep-left', 'fx-sweep-right', 'fx-spin-micro'],
+      romantic: ['fx-soft-zoom', 'fx-drift-left', 'fx-drift-right'],
+    };
+    const list = map[currentPreset] || map.elegant;
+    return list[idx % list.length];
+  }
+
+  function renderMontage(index) {
+    if (!montageSlides.length) return;
+    montageIndex = (index + montageSlides.length) % montageSlides.length;
+    montageSlides.forEach((slide, i) => {
+      slide.classList.toggle('is-active', i === montageIndex);
+      slide.classList.remove('fx-kenburns', 'fx-pan-left', 'fx-pan-right', 'fx-punch', 'fx-sweep-left', 'fx-sweep-right', 'fx-spin-micro', 'fx-soft-zoom', 'fx-drift-left', 'fx-drift-right');
+      if (i === montageIndex) slide.classList.add(getFxClass(i));
+    });
+  }
+
+  function nextMontage() {
+    renderMontage(montageIndex + 1);
+  }
+
+  function startMontage() {
+    if (!montageSlides.length) return;
+    stopMontage();
+    if (!syncUsesAudioBeats()) {
+      montageTimer = setInterval(nextMontage, getSlideDuration());
+    }
+    montagePlaying = true;
+    if (montagePlay) montagePlay.textContent = 'Pause';
+
+    if (beatEnabled && beatBars.length && !syncUsesAudioBeats()) {
+      const beatMs = Math.round(60000 / getBpm());
+      beatTimer = setInterval(() => {
+        triggerBeatBar();
+      }, beatMs);
+    }
+  }
+
+  function stopMontage() {
+    if (montageTimer) clearInterval(montageTimer);
+    if (beatTimer) clearInterval(beatTimer);
+    montageTimer = null;
+    beatTimer = null;
+    montagePlaying = false;
+    if (montagePlay) montagePlay.textContent = 'Play';
+  }
+
+  if (montageSlides.length) {
+    montagePrev?.addEventListener('click', () => {
+      renderMontage(montageIndex - 1);
+      if (montagePlaying) startMontage();
+    });
+
+    montageNext?.addEventListener('click', () => {
+      renderMontage(montageIndex + 1);
+      if (montagePlaying) startMontage();
+    });
+
+    montagePlay?.addEventListener('click', () => {
+      montagePlaying ? stopMontage() : startMontage();
+    });
+
+    montageBeat?.addEventListener('click', () => {
+      beatEnabled = !beatEnabled;
+      montageBeat.textContent = beatEnabled ? 'Beat ON' : 'Beat OFF';
+      montageBeat.setAttribute('aria-pressed', beatEnabled ? 'true' : 'false');
+      if (montagePlaying) startMontage();
+    });
+
+    montageAutoBeat?.addEventListener('click', () => {
+      autoBeatEnabled = !autoBeatEnabled;
+      montageAutoBeat.textContent = autoBeatEnabled ? 'Sync AUTO' : 'Sync BPM';
+      montageAutoBeat.setAttribute('aria-pressed', autoBeatEnabled ? 'true' : 'false');
+      if (montagePlaying) startMontage();
+    });
+
+    montagePreset?.addEventListener('change', () => {
+      setMontagePreset(montagePreset.value || 'elegant');
+    });
+
+    montageBpm?.addEventListener('input', () => {
+      if (montageBpmVal) montageBpmVal.textContent = String(getBpm());
+      if (montagePlaying) startMontage();
+    });
+
+    montageSense?.addEventListener('input', () => {
+      if (montageSenseVal) montageSenseVal.textContent = `${getBeatSensitivity().toFixed(2)}x`;
+    });
+
+    montageAudioFile?.addEventListener('change', async () => {
+      const file = montageAudioFile.files && montageAudioFile.files[0];
+      if (!file || !montageAudio) return;
+      if (audioObjectUrl) URL.revokeObjectURL(audioObjectUrl);
+      const nextSrc = URL.createObjectURL(file);
+      audioObjectUrl = nextSrc;
+      montageAudio.src = nextSrc;
+      montageAudio.currentTime = 0;
+      try {
+        await ensureAudioGraph();
+        await montageAudio.play();
+        if (montageAudioPlay) montageAudioPlay.textContent = 'Pause Audio';
+        startBeatDetection();
+        if (montagePlaying) startMontage();
+      } catch {
+        if (montageAudioPlay) montageAudioPlay.textContent = 'Play Audio';
+      }
+    });
+
+    montageAudioPlay?.addEventListener('click', async () => {
+      if (!montageAudio || !montageAudio.src) return;
+      try {
+        await ensureAudioGraph();
+        if (montageAudio.paused) {
+          await montageAudio.play();
+          montageAudioPlay.textContent = 'Pause Audio';
+          startBeatDetection();
+        } else {
+          montageAudio.pause();
+          montageAudioPlay.textContent = 'Play Audio';
+          stopBeatDetection();
+        }
+        if (montagePlaying) startMontage();
+      } catch {
+        montageAudioPlay.textContent = 'Play Audio';
+      }
+    });
+
+    montageAudio?.addEventListener('ended', () => {
+      if (montageAudioPlay) montageAudioPlay.textContent = 'Play Audio';
+      stopBeatDetection();
+      if (montagePlaying) startMontage();
+    });
+
+    montageRoot?.addEventListener('mouseenter', () => {
+      if (window.matchMedia('(hover: hover)').matches) stopMontage();
+    });
+
+    montageRoot?.addEventListener('mouseleave', () => {
+      if (window.matchMedia('(hover: hover)').matches) startMontage();
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stopMontage();
+      else if (montagePlaying || (montagePlay && montagePlay.textContent === 'Pause')) startMontage();
+    });
+
+    currentPreset = montagePreset?.value || 'elegant';
+    if (montageStage) montageStage.setAttribute('data-preset', currentPreset);
+    if (montageBpmVal) montageBpmVal.textContent = String(getBpm());
+    if (montageSenseVal) montageSenseVal.textContent = `${getBeatSensitivity().toFixed(2)}x`;
+    renderMontage(0);
+    startMontage();
+  }
 
   // ── Lightbox ──
   const lb = document.getElementById('gal-lightbox');
@@ -268,6 +649,296 @@ const photos = [
     text-align: center;
     margin: 0 auto clamp(1.75rem, 4vw, 2.75rem);
     max-width: 62ch;
+  }
+
+  .gal-montage {
+    margin: 0 auto clamp(1.4rem, 3vw, 2.1rem);
+    max-width: 74rem;
+  }
+
+  .gal-montage-stage {
+    position: relative;
+    border-radius: 1rem;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.34);
+    background: #090f21;
+    isolation: isolate;
+  }
+
+  .gal-montage-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 720ms ease;
+    pointer-events: none;
+    transform-origin: center;
+  }
+
+  .gal-montage-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.02);
+  }
+
+  .gal-montage-slide figcaption {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 1.35rem 1.1rem 0.95rem;
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.92);
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.75));
+    line-height: 1.45;
+    text-align: center;
+    letter-spacing: 0.02em;
+  }
+
+  .gal-montage-slide.is-active {
+    opacity: 1;
+  }
+
+  .gal-montage-slide.is-active img {
+    animation-duration: 3.6s;
+    animation-fill-mode: forwards;
+    animation-timing-function: ease;
+  }
+
+  .gal-montage-slide.fx-kenburns img { animation-name: gal-kenburns; }
+  .gal-montage-slide.fx-pan-left img { animation-name: gal-pan-left; }
+  .gal-montage-slide.fx-pan-right img { animation-name: gal-pan-right; }
+  .gal-montage-slide.fx-soft-zoom img { animation-name: gal-soft-zoom; }
+  .gal-montage-slide.fx-drift-left img { animation-name: gal-drift-left; }
+  .gal-montage-slide.fx-drift-right img { animation-name: gal-drift-right; }
+  .gal-montage-slide.fx-punch img { animation-name: gal-punch; }
+  .gal-montage-slide.fx-sweep-left img { animation-name: gal-sweep-left; }
+  .gal-montage-slide.fx-sweep-right img { animation-name: gal-sweep-right; }
+  .gal-montage-slide.fx-spin-micro img { animation-name: gal-spin-micro; }
+
+  .gal-montage-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 18% 18%, rgba(0, 200, 255, 0.14), transparent 38%),
+      radial-gradient(circle at 82% 80%, rgba(245, 166, 35, 0.13), transparent 36%);
+  }
+
+  .gal-montage-stage[data-preset="party"] .gal-montage-overlay {
+    background:
+      radial-gradient(circle at 14% 22%, rgba(255, 75, 130, 0.22), transparent 38%),
+      radial-gradient(circle at 84% 18%, rgba(0, 220, 255, 0.22), transparent 34%),
+      radial-gradient(circle at 78% 84%, rgba(255, 200, 72, 0.2), transparent 36%);
+  }
+
+  .gal-montage-stage[data-preset="romantic"] .gal-montage-overlay {
+    background:
+      radial-gradient(circle at 18% 18%, rgba(255, 178, 205, 0.2), transparent 40%),
+      radial-gradient(circle at 80% 82%, rgba(255, 220, 174, 0.2), transparent 35%);
+  }
+
+  .gal-montage-beatbars {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0.35rem 0.45rem;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  .gal-montage-beatbars span {
+    width: 6px;
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.24);
+    transition: height 140ms ease, background 140ms ease, box-shadow 140ms ease;
+  }
+
+  .gal-montage-beatbars span.is-hit {
+    height: 18px;
+    background: rgba(0, 225, 255, 0.92);
+    box-shadow: 0 0 10px rgba(0, 225, 255, 0.45);
+  }
+
+  .gal-montage-controls {
+    margin-top: 0.7rem;
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .gal-montage-controls-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+  }
+
+  .gal-montage-controls-row--secondary {
+    gap: 0.38rem;
+  }
+
+  .gal-montage-controls-row--audio {
+    gap: 0.35rem;
+  }
+
+  .gal-montage-btn {
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.07);
+    color: #f4f8ff;
+    border-radius: 999px;
+    min-width: 72px;
+    min-height: 40px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: border-color 220ms ease, background 220ms ease;
+  }
+
+  .gal-montage-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(230, 238, 255, 0.86);
+    font-weight: 700;
+    font-family: 'Oswald', sans-serif;
+  }
+
+  .gal-montage-file {
+    height: 36px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.06);
+    color: #f4f8ff;
+    padding: 0 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-family: 'Oswald', sans-serif;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .gal-montage-file-input {
+    width: 0;
+    height: 0;
+    opacity: 0;
+    position: absolute;
+    pointer-events: none;
+  }
+
+  .gal-montage-select,
+  .gal-montage-range,
+  .gal-montage-bpm-val {
+    height: 36px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.06);
+    color: #f4f8ff;
+  }
+
+  .gal-montage-select {
+    padding: 0 0.8rem;
+    min-width: 118px;
+    font-size: 0.74rem;
+    font-family: 'Oswald', sans-serif;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .gal-montage-range {
+    width: 120px;
+    accent-color: #06d6ff;
+    padding: 0 0.35rem;
+  }
+
+  .gal-montage-range--short {
+    width: 92px;
+  }
+
+  .gal-montage-bpm-val {
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.76rem;
+    letter-spacing: 0.05em;
+  }
+
+  .gal-montage-btn:hover,
+  .gal-montage-btn:focus-visible,
+  .gal-montage-file:hover,
+  .gal-montage-file:focus-visible {
+    border-color: rgba(0, 200, 255, 0.55);
+    background: rgba(0, 200, 255, 0.16);
+  }
+
+  .gal-montage-audio {
+    display: none;
+  }
+
+  @keyframes gal-kenburns {
+    from { transform: scale(1.02) translate3d(0, 0, 0); }
+    to { transform: scale(1.08) translate3d(-1.2%, -0.8%, 0); }
+  }
+
+  @keyframes gal-pan-left {
+    from { transform: scale(1.04) translate3d(1.6%, 0, 0); }
+    to { transform: scale(1.1) translate3d(-1.6%, -0.7%, 0); }
+  }
+
+  @keyframes gal-pan-right {
+    from { transform: scale(1.04) translate3d(-1.6%, 0, 0); }
+    to { transform: scale(1.1) translate3d(1.6%, -0.7%, 0); }
+  }
+
+  @keyframes gal-soft-zoom {
+    from { transform: scale(1.01); }
+    to { transform: scale(1.06); }
+  }
+
+  @keyframes gal-drift-left {
+    from { transform: scale(1.03) translate3d(0, 1.2%, 0); }
+    to { transform: scale(1.08) translate3d(-1.4%, -1.1%, 0); }
+  }
+
+  @keyframes gal-drift-right {
+    from { transform: scale(1.03) translate3d(0, 1.2%, 0); }
+    to { transform: scale(1.08) translate3d(1.4%, -1.1%, 0); }
+  }
+
+  @keyframes gal-punch {
+    0% { transform: scale(1.02); }
+    22% { transform: scale(1.09); }
+    45% { transform: scale(1.06); }
+    100% { transform: scale(1.1); }
+  }
+
+  @keyframes gal-sweep-left {
+    from { transform: scale(1.03) translate3d(2.2%, 0, 0); }
+    to { transform: scale(1.11) translate3d(-2.2%, -0.6%, 0); }
+  }
+
+  @keyframes gal-sweep-right {
+    from { transform: scale(1.03) translate3d(-2.2%, 0, 0); }
+    to { transform: scale(1.11) translate3d(2.2%, -0.6%, 0); }
+  }
+
+  @keyframes gal-spin-micro {
+    from { transform: scale(1.04) rotate(-0.45deg); }
+    to { transform: scale(1.1) rotate(0.45deg); }
   }
 
   .gal-badge {
@@ -592,6 +1263,31 @@ const photos = [
      MOBILE — lightbox nav mai strâns
   ══════════════════════════════════════════ */
   @media (max-width: 767px) {
+    .gal-montage-stage {
+      aspect-ratio: 4 / 3;
+    }
+
+    .gal-montage-slide figcaption {
+      font-size: 0.72rem;
+      padding: 1rem 0.8rem 0.7rem;
+    }
+
+    .gal-montage-controls-row--secondary {
+      gap: 0.3rem;
+    }
+
+    .gal-montage-controls-row--audio {
+      gap: 0.3rem;
+    }
+
+    .gal-montage-range {
+      width: 104px;
+    }
+
+    .gal-montage-range--short {
+      width: 90px;
+    }
+
     .lb-prev { left: 0.25rem; width: 44px; height: 44px; }
     .lb-next { right: 0.25rem; width: 44px; height: 44px; }
     .lb-close { top: 0.75rem; right: 0.75rem; width: 44px; height: 44px; }
