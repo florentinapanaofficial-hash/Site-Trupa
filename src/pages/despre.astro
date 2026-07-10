@@ -29,6 +29,8 @@ const cineMembers: Array<{src:string; name:string; role:string}> = [
       <div class="cine-montage mb-14" aria-label="Montaj cinematic — membrii Formației Florentina Pană">
         {cineMembers.map((m, i) => (
           <div class={`cine-slide${i === 0 ? ' is-active' : ''}`} data-index={String(i)} data-name={m.name} data-role={m.role}>
+            <img class="cine-bg" src={m.src} alt="" aria-hidden="true"
+              loading={i === 0 ? 'eager' : 'lazy'} decoding="async" width="1200" height="400" />
             <img class="cine-img" src={m.src} alt={`${m.name} — ${m.role}`}
               loading={i === 0 ? 'eager' : 'lazy'} decoding="async" width="1200" height="400" />
           </div>
@@ -53,6 +55,29 @@ const cineMembers: Array<{src:string; name:string; role:string}> = [
             <button type="button" class={`cine-dot${i === 0 ? ' is-active' : ''}`} data-dot={String(i)}></button>
           ))}
         </div>
+        <div class="cine-audio-ui">
+          <div class="cine-audio-panel">
+            <button type="button" id="cine-audio-toggle" class="cine-audio-btn" aria-pressed="false" aria-label="Pornește muzica de fundal">
+              Porneste muzica
+            </button>
+            <label class="cine-audio-vol-wrap" for="cine-audio-volume">
+              <span class="cine-audio-vol-label">Vol</span>
+              <input
+                id="cine-audio-volume"
+                class="cine-audio-vol"
+                type="range"
+                min="0"
+                max="100"
+                value="22"
+                step="1"
+                aria-label="Volum muzica de fundal"
+              />
+            </label>
+          </div>
+        </div>
+        <audio id="cine-bg-audio" loop preload="metadata">
+          <source src="/Audio/Captain%20Joz%20-%20Stunts%20Cheer%20-%20Instrumental%20version.mp3" type="audio/mpeg" />
+        </audio>
       </div>
     )}
 
@@ -235,20 +260,53 @@ const cineMembers: Array<{src:string; name:string; role:string}> = [
   }
   .cine-slide.is-active { opacity: 1; }
 
+  .cine-bg {
+    position: absolute;
+    inset: -8%;
+    width: 116%;
+    height: 116%;
+    object-fit: cover;
+    object-position: center center;
+    filter: blur(22px) saturate(1.08) brightness(0.42);
+    transform: scale(1.05);
+    opacity: 0.92;
+    pointer-events: none;
+  }
+
   .cine-img {
+    position: relative;
+    z-index: 2;
     width: 100%; height: 100%;
     object-fit: contain;
     object-position: center center;
     display: block;
-    background: #020611;
+    background: linear-gradient(135deg, rgba(2, 6, 17, 0.88), rgba(4, 8, 20, 0.82));
+    padding: clamp(0.25rem, 1.2vw, 0.7rem);
   }
   .cine-slide.is-active .cine-img {
     animation: cine-kenburns 12s ease-in-out both;
+  }
+  .cine-slide.is-active .cine-bg {
+    animation: cine-bg-float 12s ease-in-out both;
   }
   @keyframes cine-kenburns {
     0%   { transform: scale(1.05) translate(1%, 0.5%); }
     50%  { transform: scale(1.10) translate(-1%, -0.5%); }
     100% { transform: scale(1.05) translate(0.5%, 0.3%); }
+  }
+  @keyframes cine-bg-float {
+    0%   { transform: scale(1.08) translate(-1%, 0); }
+    50%  { transform: scale(1.14) translate(1%, -0.5%); }
+    100% { transform: scale(1.08) translate(0, 0.5%); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cine-slide,
+    .cine-slide.is-active .cine-img,
+    .cine-slide.is-active .cine-bg {
+      animation: none !important;
+      transition: none !important;
+    }
   }
 
   /* ── Letterbox bars (cinematic) ── */
@@ -354,6 +412,81 @@ const cineMembers: Array<{src:string; name:string; role:string}> = [
     background: rgba(6,214,255,0.90);
     border-color: rgba(6,214,255,0.50);
     box-shadow: 0 0 8px rgba(6,214,255,0.55);
+  }
+
+  /* ── Control audio fundal ── */
+  .cine-audio-ui {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 8;
+  }
+  .cine-audio-panel {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(2, 8, 22, 0.52);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 9999px;
+    padding: 0.3rem 0.4rem 0.3rem 0.45rem;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .cine-audio-btn {
+    border: 1px solid rgba(212, 175, 55, 0.5);
+    background: rgba(2, 8, 22, 0.68);
+    color: #f5d67a;
+    border-radius: 9999px;
+    padding: 0.42rem 0.82rem;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: background 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease;
+  }
+  .cine-audio-btn:hover {
+    background: rgba(5, 14, 34, 0.86);
+    border-color: rgba(212, 175, 55, 0.72);
+    transform: translateY(-1px);
+  }
+  .cine-audio-btn[aria-pressed="true"] {
+    background: rgba(212, 175, 55, 0.16);
+    border-color: rgba(212, 175, 55, 0.9);
+    color: #ffe6a2;
+  }
+  .cine-audio-vol-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding-right: 0.2rem;
+  }
+  .cine-audio-vol-label {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(245, 214, 122, 0.85);
+  }
+  .cine-audio-vol {
+    width: clamp(72px, 10vw, 96px);
+    accent-color: #d4af37;
+    cursor: pointer;
+    transform: translateY(1px);
+  }
+  @media (max-width: 767px) {
+    .cine-audio-panel {
+      gap: 0.4rem;
+      padding: 0.25rem 0.34rem 0.25rem 0.4rem;
+    }
+    .cine-audio-btn {
+      font-size: 0.62rem;
+      padding: 0.38rem 0.62rem;
+    }
+    .cine-audio-vol {
+      width: 66px;
+    }
   }
 
   /* ── Intro two-col ── */
@@ -741,6 +874,9 @@ const cineMembers: Array<{src:string; name:string; role:string}> = [
     var infoEl  = document.getElementById('cine-info');
     var nameEl  = document.getElementById('cine-name');
     var roleEl  = document.getElementById('cine-role');
+    var audioEl = document.getElementById('cine-bg-audio');
+    var audioBtn = document.getElementById('cine-audio-toggle');
+    var audioVolume = document.getElementById('cine-audio-volume');
     if (!slides.length) return;
 
     var members = slides.map(function(s) {
@@ -749,11 +885,37 @@ const cineMembers: Array<{src:string; name:string; role:string}> = [
     var current = 0;
     var INTERVAL = 4600;
     var timer = null;
+    var isVisible = true;
+    var userUnlockedAudio = false;
+    var manuallyPausedAudio = false;
+
+    function setAudioUI(isPlaying) {
+      if (!audioBtn) return;
+      audioBtn.setAttribute('aria-pressed', isPlaying ? 'true' : 'false');
+      audioBtn.setAttribute('aria-label', isPlaying ? 'Pune pe pauza muzica de fundal' : 'Porneste muzica de fundal');
+      audioBtn.textContent = isPlaying ? 'Pauza muzica' : 'Porneste muzica';
+    }
+
+    function startBgAudio() {
+      if (!audioEl) return;
+      audioEl.play().then(function() {
+        setAudioUI(true);
+      }).catch(function() {
+        setAudioUI(false);
+      });
+    }
+
+    function pauseBgAudio() {
+      if (!audioEl) return;
+      audioEl.pause();
+      setAudioUI(false);
+    }
 
     function reveal() {
       if (infoEl) infoEl.classList.add('is-visible');
     }
     function goTo(idx) {
+      if (!isVisible) return;
       slides[current].classList.remove('is-active');
       if (dots[current]) dots[current].classList.remove('is-active');
       if (infoEl) infoEl.classList.remove('is-visible');
@@ -768,6 +930,47 @@ const cineMembers: Array<{src:string; name:string; role:string}> = [
     if (nameEl) nameEl.textContent = members[0].name;
     if (roleEl) roleEl.textContent = members[0].role;
     setTimeout(reveal, 600);
+
+    if (audioEl) {
+      var initialVolume = 0.22;
+      if (audioVolume) {
+        initialVolume = Math.max(0, Math.min(1, Number(audioVolume.value || 22) / 100));
+      }
+      audioEl.volume = initialVolume;
+      setAudioUI(false);
+    }
+
+    if (audioVolume && audioEl) {
+      audioVolume.addEventListener('input', function() {
+        var nextVolume = Math.max(0, Math.min(1, Number(audioVolume.value || 0) / 100));
+        audioEl.volume = nextVolume;
+      });
+    }
+
+    if (audioBtn && audioEl) {
+      audioBtn.addEventListener('click', function() {
+        userUnlockedAudio = true;
+        if (audioEl.paused) {
+          manuallyPausedAudio = false;
+          startBgAudio();
+        } else {
+          manuallyPausedAudio = true;
+          pauseBgAudio();
+        }
+      });
+    }
+
+    function unlockAndMaybePlay() {
+      if (!audioEl || userUnlockedAudio) return;
+      userUnlockedAudio = true;
+      if (!document.hidden && isVisible && !manuallyPausedAudio) {
+        startBgAudio();
+      }
+    }
+
+    document.addEventListener('pointerdown', unlockAndMaybePlay, { once: true });
+    document.addEventListener('keydown', unlockAndMaybePlay, { once: true });
+
     // Dots click
     dots.forEach(function(dot, i) {
       dot.addEventListener('click', function() {
@@ -783,13 +986,42 @@ const cineMembers: Array<{src:string; name:string; role:string}> = [
     if (montage) {
       montage.addEventListener('mouseenter', function() { clearInterval(timer); });
       montage.addEventListener('mouseleave', function() {
+        clearInterval(timer);
         timer = setInterval(function() { goTo(current + 1); }, INTERVAL);
       });
+
+      // Pause autoplay when montage exits viewport for better UX/perf.
+      if ('IntersectionObserver' in window) {
+        var observer = new IntersectionObserver(function(entries) {
+          entries.forEach(function(entry) {
+            isVisible = entry.isIntersecting;
+            if (!isVisible) {
+              clearInterval(timer);
+              if (audioEl) pauseBgAudio();
+            } else {
+              clearInterval(timer);
+              timer = setInterval(function() { goTo(current + 1); }, INTERVAL);
+              if (audioEl && userUnlockedAudio && !manuallyPausedAudio && !document.hidden) {
+                startBgAudio();
+              }
+            }
+          });
+        }, { threshold: 0.35 });
+        observer.observe(montage);
+      }
     }
     // Save resources when tab hidden
     document.addEventListener('visibilitychange', function() {
-      if (document.hidden) { clearInterval(timer); }
-      else { timer = setInterval(function() { goTo(current + 1); }, INTERVAL); }
+      if (document.hidden) {
+        clearInterval(timer);
+        if (audioEl) pauseBgAudio();
+      } else {
+        clearInterval(timer);
+        timer = setInterval(function() { goTo(current + 1); }, INTERVAL);
+        if (audioEl && userUnlockedAudio && isVisible && !manuallyPausedAudio) {
+          startBgAudio();
+        }
+      }
     });
   })();
 </script>
