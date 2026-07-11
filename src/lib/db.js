@@ -4,22 +4,14 @@ import mysql from 'mysql2/promise';
 let pool;
 
 function getDbConfig() {
-  const host = process.env.DB_HOST || 'localhost';
-  const user = process.env.DB_USER;
-  const password = process.env.DB_PASS;
-  const database = process.env.DB_NAME;
-  const port = Number(process.env.DB_PORT || 3306);
+  const mysqlUrl = process.env.MYSQL_URL;
 
-  if (!user || !database) {
-    throw new Error('Lipsesc variabile obligatorii pentru DB: DB_USER, DB_NAME.');
+  if (!mysqlUrl) {
+    throw new Error('Lipsește variabila obligatorie pentru DB: MYSQL_URL.');
   }
 
   return {
-    host,
-    user,
-    password,
-    database,
-    port,
+    uri: mysqlUrl,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
