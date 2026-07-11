@@ -14,7 +14,7 @@ const whatsappHref = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
   description="Prețuri formație nuntă 2026-2027: pachet muzică live complet, repertoriu personalizat, sunet profesional. Cere oferta personalizată acum — răspuns rapid."
 >
   <Fragment slot="head">
-    <script is:inline type="application/ld+json">{JSON.stringify([
+    <script is:inline type="application/ld+json" set:html={JSON.stringify([
     {
       "@context": "https://schema.org",
       "@type": "FAQPage",
@@ -79,7 +79,7 @@ const whatsappHref = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
       },
       "url": "https://www.florentinapanaofficial.ro/oferta-premium/"
     }
-    ])}</script>
+    ])} />
   </Fragment>
   <section class="section-container premium-page py-12">
     <div class="mb-5"><BackButton href="/contact/" label="Înapoi la contact" /></div>
