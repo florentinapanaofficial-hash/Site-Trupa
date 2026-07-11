@@ -86,7 +86,8 @@ const server = createServer((req, res) => {
         const urlPath = (req.url || '/').split('?')[0];
         const search = (req.url || '').includes('?') ? '?' + (req.url || '').split('?')[1] : '';
         // Adaugă trailing slash direct dacă e nevoie (evită lanț de redirect-uri)
-        const needsSlash = !urlPath.endsWith('/') && !urlPath.includes('.');
+        const isApiRoute = urlPath.startsWith('/api/');
+        const needsSlash = !isApiRoute && !urlPath.endsWith('/') && !urlPath.includes('.');
         const finalPath = needsSlash ? `${urlPath}/` : urlPath;
         const dest = `https://${CANONICAL_HOST}${finalPath}${search}`;
         res.writeHead(301, { Location: dest });
@@ -108,7 +109,7 @@ const server = createServer((req, res) => {
     // ── Trailing slash redirect (match Astro trailingSlash: 'always') ──
     // SSR pages don't have static index.html; sirv can't add the slash for them.
     const urlPath = (req.url || '/').split('?')[0];
-    if (!urlPath.endsWith('/') && !urlPath.includes('.')) {
+    if (!urlPath.startsWith('/api/') && !urlPath.endsWith('/') && !urlPath.includes('.')) {
         const search = (req.url || '').includes('?') ? '?' + (req.url || '').split('?')[1] : '';
         res.writeHead(301, { Location: `${urlPath}/${search}` });
         return res.end();
