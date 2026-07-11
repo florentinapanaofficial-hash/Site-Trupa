@@ -131,7 +131,7 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
           <input type="hidden" name="PlanificatorData" id="planificator-data" />
           <input type="hidden" name="PlanificatorOras" id="planificator-oras" />
           <h2 class="text-sm font-extrabold text-white">Cere o ofertă personalizată</h2>
-          <p class="mt-1 text-[11px] text-white/90">Completezi câmpurile esențiale, iar noi revenim rapid cu o ofertă premium, construită pe bugetul indicat și pe specificul evenimentului dvs.</p>
+          <p class="mt-1 text-[11px] text-white/90">Completezi câmpurile esențiale, iar noi revenim rapid cu o ofertă premium, construită pe bugetul alocat și pe specificul evenimentului dvs.</p>
 
           <div class="form-grid mt-3">
             <label class="form-label">
@@ -168,16 +168,18 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
               <input class="input-glass" type="date" name="Data" required />
             </label>
             <label class="form-label">
-              Care este bugetul estimat pentru partea artistică?
-              <select class="input-glass" name="Buget">
-                <option value="">Îl stabilim împreună</option>
-                <option>Până la 4.000 lei</option>
-                <option>4.000–6.000 lei</option>
-                <option>6.000–8.000 lei</option>
-                <option>Peste 8.000 lei</option>
-              </select>
+              Care este bugetul alocat pentru evenimentul dvs.?
+              <input
+                class="input-glass"
+                type="text"
+                name="Buget"
+                placeholder="Ex: 1.500 €"
+                inputmode="decimal"
+                autocomplete="off"
+                maxlength="20"
+              />
               <span class="text-[11px] font-normal normal-case leading-snug text-white/65">
-                Ne ajută să alegem formula potrivită de trupă și să vă trimitem o propunere aliniată la bugetul indicat.
+                Câmp opțional. Ne ajută să alegem formula potrivită de trupă și să vă trimitem o propunere aliniată la bugetul alocat.
               </span>
             </label>
             <label class="form-label form-label-full">
@@ -589,10 +591,11 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
             body: new FormData(form),
           });
 
+          const contentType = res.headers.get('content-type') || '';
           const responseText = await res.text();
 
           let json = null;
-          if (responseText) {
+          if (contentType.includes('application/json') && responseText) {
             try {
               json = JSON.parse(responseText);
             } catch {
@@ -609,7 +612,9 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
             showSuccessFeedback('Mesajul a fost trimis cu succes. Revenim către tine în cel mai scurt timp.');
           } else {
             trackLeadEvent('lead_submit_error');
-            const serverMessage = json?.error || responseText.trim() || `Serverul a răspuns cu status ${res.status}.`;
+            const trimmedResponse = responseText.trim();
+            const looksLikeHtml = /^<!doctype html/i.test(trimmedResponse) || /^<html/i.test(trimmedResponse) || trimmedResponse.startsWith('<');
+            const serverMessage = json?.error || (!looksLikeHtml && trimmedResponse && trimmedResponse.length < 180 ? trimmedResponse : '') || `Serverul a răspuns cu status ${res.status}. Încearcă din nou sau contactează-ne direct.`;
             showFormFeedback(serverMessage, true);
           }
         } catch (error) {

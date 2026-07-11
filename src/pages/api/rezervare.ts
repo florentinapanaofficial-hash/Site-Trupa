@@ -95,7 +95,7 @@ export const POST: APIRoute = async ({ request }) => {
     const telefon = san(formData.get('Telefon'), 20);
     const eveniment = san(formData.get('Eveniment'), 50);
     const data = san(formData.get('Data'), 20);
-    const buget = san(formData.get('Buget'), 60);
+    const buget = san(formData.get('Buget'), 30);
     const mesaj = san(formData.get('Mesaj'), 1000);
 
     // Validare câmpuri obligatorii
@@ -122,7 +122,7 @@ export const POST: APIRoute = async ({ request }) => {
     // Salvare în baza de date
     try {
         const mesajSalvat = [
-            buget ? `Buget estimat pentru partea artistică: ${buget}.` : '',
+            buget ? `Buget alocat pentru eveniment: ${buget}.` : '',
             mesaj,
         ].filter(Boolean).join('\n');
 
