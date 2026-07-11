@@ -26,8 +26,8 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
           <h1 class="section-title">{contactSeo.h1}</h1>
           <p class="section-copy">{contactSeo.descriere}</p>
           <p class="mt-3 text-sm text-white/85">
-            Pentru cereri de tip <strong>formație nuntă preț</strong> și <strong>prețuri formație nuntă București</strong>,
-            trimite data, locația și intervalul orar, iar revenim cu un pachet clar, adaptat evenimentului tău.
+            Dacă sunteți în etapa în care comparați opțiuni și căutați o <strong>formație nuntă preț</strong> sau <strong>prețuri formație nuntă București</strong>,
+            trimiteți data, locația și bugetul estimat, iar noi revenim cu o ofertă personalizată, calibrată pe stilul evenimentului dvs.
           </p>
 
           <div class="lead-wizard mt-4" id="lead-wizard" data-step="1" aria-label="Planificator rapid în 3 pași">
@@ -130,8 +130,8 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
           <input type="hidden" name="PlanificatorEveniment" id="planificator-eveniment" />
           <input type="hidden" name="PlanificatorData" id="planificator-data" />
           <input type="hidden" name="PlanificatorOras" id="planificator-oras" />
-          <h2 class="text-sm font-extrabold text-white">Rezervare rapidă</h2>
-          <p class="mt-1 text-[11px] text-white/90">Completezi câmpurile, iar noi revenim cu ofertă personalizată.</p>
+          <h2 class="text-sm font-extrabold text-white">Cere o ofertă personalizată</h2>
+          <p class="mt-1 text-[11px] text-white/90">Completezi câmpurile esențiale, iar noi revenim rapid cu o ofertă premium, construită pe bugetul indicat și pe specificul evenimentului dvs.</p>
 
           <div class="form-grid mt-3">
             <label class="form-label">
@@ -167,6 +167,19 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
               Data evenimentului
               <input class="input-glass" type="date" name="Data" required />
             </label>
+            <label class="form-label">
+              Care este bugetul estimat pentru partea artistică?
+              <select class="input-glass" name="Buget">
+                <option value="">Îl stabilim împreună</option>
+                <option>Până la 4.000 lei</option>
+                <option>4.000–6.000 lei</option>
+                <option>6.000–8.000 lei</option>
+                <option>Peste 8.000 lei</option>
+              </select>
+              <span class="text-[11px] font-normal normal-case leading-snug text-white/65">
+                Ne ajută să alegem formula potrivită de trupă și să vă trimitem o propunere aliniată la bugetul indicat.
+              </span>
+            </label>
             <label class="form-label form-label-full">
               Mesaj
               <textarea class="input-glass min-h-24 resize-y" name="Mesaj" placeholder="Spune-ne locația și atmosfera dorită" maxlength="1000"></textarea>
@@ -191,7 +204,7 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
             </span>
           </label>
 
-          <button type="submit" class="btn-solid btn-compact mt-3 w-full justify-center">Trimite solicitarea</button>
+          <button type="submit" class="btn-solid btn-compact mt-3 w-full justify-center">Cere oferta personalizată</button>
           <p class="mt-2 text-[11px] leading-relaxed text-white/60">
             Datele sunt prelucrate conform
             <a href="/politica-confidentialitate/" class="gdpr-form-link">Politicii de confidențialitate</a>.
@@ -323,6 +336,17 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
         feedbackEl.style.color = '';
       }
 
+      feedbackEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    };
+
+    const showSuccessFeedback = (message) => {
+      if (!feedbackEl) return;
+
+      feedbackEl.textContent = message;
+      feedbackEl.classList.remove('hidden');
+      feedbackEl.style.borderColor = 'rgba(74,222,128,0.45)';
+      feedbackEl.style.background = 'rgba(20,83,45,0.28)';
+      feedbackEl.style.color = '#bbf7d0';
       feedbackEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
     };
 
@@ -565,18 +589,40 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
             body: new FormData(form),
           });
 
-          const json = await res.json();
+          const responseText = await res.text();
 
-          if (res.ok && json.ok) {
+          let json = null;
+          if (responseText) {
+            try {
+              json = JSON.parse(responseText);
+            } catch {
+              json = null;
+            }
+          }
+
+          if (res.ok && json?.ok) {
             trackLeadEvent('lead_submit_success');
-            window.location.href = '/contact/?trimis=rezervare#contact';
+            if (form instanceof HTMLFormElement) {
+              form.reset();
+            }
+
+            showSuccessFeedback('Mesajul a fost trimis cu succes. Revenim către tine în cel mai scurt timp.');
           } else {
             trackLeadEvent('lead_submit_error');
-            showFormFeedback(json.error ?? 'Eroare la trimitere. Încearcă din nou.', true);
+            const serverMessage = json?.error || responseText.trim() || `Serverul a răspuns cu status ${res.status}.`;
+            showFormFeedback(serverMessage, true);
           }
-        } catch {
+        } catch (error) {
           trackLeadEvent('lead_submit_network_error');
-          showFormFeedback('Eroare de rețea. Verifică conexiunea și încearcă din nou.', true);
+
+          if (typeof form.submit === 'function') {
+            showFormFeedback('Nu am putut trimite prin JavaScript. Folosesc trimiterea clasică a formularului.', true);
+            form.submit();
+            return;
+          }
+
+          console.error('[/contact] submit error:', error);
+          showFormFeedback('Nu am putut trimite formularul. Încearcă din nou sau contactează-ne direct.', true);
         } finally {
           if (submitBtn) {
             submitBtn.disabled = false;

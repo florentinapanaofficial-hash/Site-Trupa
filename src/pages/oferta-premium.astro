@@ -11,7 +11,7 @@ const whatsappHref = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
 
 <BaseLayout
   title="Prețuri & Ofertă Formație Nuntă 2026 | Florentina Pană"
-  description="Prețuri formație nuntă 2026-2027: pachet muzică live complet, repertoriu personalizat, sunet profesional. Cere oferta personalizată acum — răspuns rapid."
+  description="Prețuri formație nuntă 2026-2027: spune bugetul estimat și primești ofertă personalizată, pachet muzică live complet și răspuns rapid."
 >
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={JSON.stringify([
@@ -88,10 +88,17 @@ const whatsappHref = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
       <p class="premium-kicker">Pachet Signature — Muzică Live Nuntă 2026-2027</p>
       <h1 class="premium-title">Prețuri și ofertă formație nuntă adaptată evenimentului tău</h1>
       <p class="premium-lead">
-        Cauți o <strong>formație de nuntă cu prețuri clare și pachet complet</strong>? Florentina Pană oferă muzică live
-        de calitate premium pentru nunți, botezuri și aniversări — repertoriu personalizat, sunet profesional și
-        o echipă care ține ritmul serii de la primul dans până la ultimul bis.
+        Cauți o <strong>formație de nuntă cu prețuri clare și pachet complet</strong>? Spune-ne bugetul estimat, iar noi
+        îți propunem formula potrivită de trupă și o ofertă personalizată pentru nunți, botezuri și aniversări —
+        repertoriu adaptat, sunet profesional și o echipă care ține ritmul serii de la primul dans până la ultimul bis.
       </p>
+
+      <div class="premium-budget-callout mt-5" aria-label="Ofertă în funcție de buget">
+        <p>
+          Majoritatea cuplurilor caută o trupă care se potrivește bugetului lor. Tocmai de aceea tratăm suma indicată ca reper
+          pentru a recomanda varianta de pachet cea mai potrivită evenimentului, fără compromisuri inutile.
+        </p>
+      </div>
 
       <div class="premium-grid mt-6">
         <section class="premium-card">
@@ -129,7 +136,7 @@ const whatsappHref = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
         <dl class="premium-faq-list">
           <div class="premium-faq-item">
             <dt>Cât costă o formație de nuntă în 2026?</dt>
-            <dd>Prețul variază în funcție de numărul de artiști, durata programului și locație. Trimite-ne data și orașul, iar noi revenim cu o ofertă clară, adaptată bugetului tău.</dd>
+            <dd>Prețul variază în funcție de numărul de artiști, durata programului și locație. Trimite-ne data, orașul și bugetul estimat, iar noi revenim cu o ofertă clară, adaptată evenimentului tău.</dd>
           </div>
           <div class="premium-faq-item">
             <dt>Ce include pachetul premium de muzică live?</dt>
@@ -147,7 +154,7 @@ const whatsappHref = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
       </section>
 
       <section class="premium-cta mt-6">
-        <p class="premium-cta-title">Vrei o ofertă personalizată în funcție de data și locația ta?</p>
+        <p class="premium-cta-title">Vrei o ofertă personalizată în funcție de data, locația și bugetul tău?</p>
         <div class="premium-cta-actions">
           <a
             class="btn-solid"
@@ -205,6 +212,20 @@ const whatsappHref = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
       color: rgba(234, 243, 255, 0.92);
       line-height: 1.65;
       font-size: 0.98rem;
+    }
+
+    .premium-budget-callout {
+      border-radius: 0.95rem;
+      border: 1px solid rgba(125, 211, 252, 0.22);
+      background: rgba(14, 37, 58, 0.68);
+      padding: 0.85rem 0.95rem;
+    }
+
+    .premium-budget-callout p {
+      margin: 0;
+      color: rgba(230, 244, 255, 0.88);
+      line-height: 1.6;
+      font-size: 0.9rem;
     }
 
     .premium-grid {

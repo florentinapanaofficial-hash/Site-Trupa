@@ -95,6 +95,7 @@ export const POST: APIRoute = async ({ request }) => {
     const telefon = san(formData.get('Telefon'), 20);
     const eveniment = san(formData.get('Eveniment'), 50);
     const data = san(formData.get('Data'), 20);
+    const buget = san(formData.get('Buget'), 60);
     const mesaj = san(formData.get('Mesaj'), 1000);
 
     // Validare câmpuri obligatorii
@@ -120,11 +121,16 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Salvare în baza de date
     try {
+        const mesajSalvat = [
+            buget ? `Buget estimat pentru partea artistică: ${buget}.` : '',
+            mesaj,
+        ].filter(Boolean).join('\n');
+
         await query(
             `INSERT INTO rezervari
          (nume, telefon, eveniment, data_eveniment, mesaj, gdpr_consent, creat_la)
        VALUES (?, ?, ?, ?, ?, 1, NOW())`,
-            [nume, telefon, eveniment, data, mesaj || null],
+            [nume, telefon, eveniment, data, mesajSalvat || null],
         );
     } catch (err) {
         console.error('[/api/rezervare] DB error:', err);

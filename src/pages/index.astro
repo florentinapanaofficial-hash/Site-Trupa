@@ -127,6 +127,10 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
         {acasa.hero.descriere}
       </p>
 
+      <p class="hero-pricing-note anim-hero-load anim-hero-d3">
+        Spune-ne bugetul estimat, iar noi îți propunem formula de trupă și oferta cea mai potrivită pentru evenimentul tău.
+      </p>
+
       {/* CTA-uri hero */}
       <div class="hero-cta-row anim-hero-load anim-hero-d4">
         <a href={`tel:${contact.phoneRaw}`} class="hero-cta-primary" onclick="window.gtag&&window.gtag('event','click_phone',{event_category:'hero'})">
@@ -260,7 +264,7 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
     <div class="hp-convert-wrap reveal-on-scroll from-bottom" style="--reveal-delay: 45ms">
       <div class="hp-convert-copy">
         <p class="hp-convert-kicker">Disponibilitate rapidă</p>
-        <h2 class="hp-convert-title">Spune-ne data, iar noi revenim rapid cu disponibilitate și ofertă.</h2>
+        <h2 class="hp-convert-title">Spune-ne data și bugetul, iar noi revenim rapid cu o ofertă clară.</h2>
       </div>
       <div class="hp-convert-actions">
         <a href={heroTelHref} class="hp-convert-btn hp-convert-btn--call" aria-label="Sună acum pentru ofertă" onclick="window.gtag&&window.gtag('event','click_phone',{event_category:'homepage',event_label:'convert-strip'})">
@@ -506,10 +510,10 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
   <section class="hp-proof section-container" aria-label="Recomandări reale de la cupluri">
     <div class="hp-proof-head reveal-on-scroll from-bottom" style="--reveal-delay: 35ms">
       <p class="hp-proof-kicker">Social Proof Real</p>
-      <h2 class="hp-proof-title">Recomandări autentice de la mirii care au trăit experiența completă</h2>
+      <h2 class="hp-proof-title">Recomandări autentice de la mirii care au ales o ofertă potrivită bugetului lor</h2>
       <p class="hp-proof-copy">
-        Atmosfera nu se explică doar în cuvintele noastre. Se vede în reacția cuplurilor care au dansat,
-        au trăit emoția și ne-au recomandat mai departe.
+        Atmosfera nu se explică doar în cuvintele noastre. Se vede în reacția cuplurilor care au spus bugetul,
+        au primit o formulă adaptată și ne-au recomandat mai departe.
       </p>
     </div>
 
@@ -534,9 +538,9 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
   <section class="hp-early-booking section-container py-8 sm:py-12" aria-label="Oferte Early Booking">
     <div class="rounded-2xl border border-amber-500/20 bg-gradient-to-r from-amber-500/10 to-orange-500/10 p-6 sm:p-8 text-center">
       <p class="text-xs sm:text-sm font-semibold text-amber-300 mb-2">⏰ Ofertă Limitată</p>
-      <h2 class="text-lg sm:text-xl font-extrabold text-white mb-3">Early Booking 2027 — Tarif Blocat pentru Data Ta</h2>
+      <h2 class="text-lg sm:text-xl font-extrabold text-white mb-3">Early Booking 2027 — ofertă personalizată și tarif blocat pentru data ta</h2>
       <p class="text-sm text-white/90 mb-4">
-        Calendarul se umple rapid. Cuplurile care rezervă acum beneficiază de tarif Early Booking blocat contractual, 
+        Calendarul se umple rapid. Spune-ne bugetul estimat, iar noi revenim cu o propunere premium și tarif blocat contractual,
         indiferent de evoluția costurilor pe piață. Zero surprize, doar profesionalism.
       </p>
       <a href="/publicatii/pret-formatie-nunta-2026/" class="btn-solid inline-block" onclick="window.gtag&&window.gtag('event','click_early_booking',{event_category:'homepage',event_label:'pricing-link'})">
@@ -648,6 +652,13 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
     <h2 class="hp-seo-title anim-on-scroll">Întrebări frecvente</h2>
 
     <div class="hp-faq-list anim-on-scroll anim-d1">
+      <details class="hp-faq-item">
+        <summary class="hp-faq-question">
+          <h3 class="hp-faq-q-text">Pot primi o ofertă în funcție de bugetul pe care îl avem?</h3>
+          <svg class="hp-faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </summary>
+        <p class="hp-faq-answer">Da. Spuneți-ne bugetul estimat, iar noi revenim cu o propunere de trupă și un pachet ajustat pe stilul evenimentului, fără costuri ascunse.</p>
+      </details>
       {faqItems.map((item) => (
         <details class="hp-faq-item">
           <summary class="hp-faq-question">
