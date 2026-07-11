@@ -118,12 +118,13 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
           class="form-shell"
           name="rezervare-rapida"
           method="POST"
+          action="/api/rezervare"
           novalidate
         >
           <p class="hidden" aria-hidden="true">
             <label>
               Nu completa acest câmp dacă ești om:
-              <input name="bot-field" autocomplete="off" tabindex="-1" />
+              <input name="bot-field" autocomplete="off" inputmode="none" tabindex="-1" />
             </label>
           </p>
           <input type="hidden" name="PlanificatorEveniment" id="planificator-eveniment" />
@@ -235,11 +236,22 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
     const feedbackEl = document.getElementById('form-feedback');
     const feedbackType = new URLSearchParams(window.location.search).get('trimis');
     const funnelSessionKey = 'lead_funnel_session_id';
-    const existingFunnelSession = window.sessionStorage?.getItem(funnelSessionKey);
+    let existingFunnelSession = null;
+
+    try {
+      existingFunnelSession = window.sessionStorage?.getItem(funnelSessionKey);
+    } catch {
+      existingFunnelSession = null;
+    }
+
     const funnelSessionId = existingFunnelSession || `funnel_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
     if (!existingFunnelSession) {
-      window.sessionStorage?.setItem(funnelSessionKey, funnelSessionId);
+      try {
+        window.sessionStorage?.setItem(funnelSessionKey, funnelSessionId);
+      } catch {
+        // Storage-ul poate fi blocat pe unele browsere mobile; nu oprim formularul.
+      }
     }
 
     const trackLeadEvent = (eventName, extra = {}) => {
@@ -259,6 +271,8 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
     }
 
     const phoneInput = document.querySelector('input[name="Telefon"]');
+    const gdprCheckbox = document.getElementById('gdpr-form-consent');
+    const gdprLabel = document.querySelector('.gdpr-form-label');
 
     if (phoneInput instanceof HTMLInputElement) {
       const phoneMessage = 'Numărul trebuie să fie în format 07xxxxxxxx sau +407xxxxxxxx.';
@@ -280,6 +294,106 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
     const wizard = document.getElementById('lead-wizard');
     let formStarted = false;
     const completedWizardSteps = new Set();
+
+    const clearFormErrorState = () => {
+      if (!(form instanceof HTMLFormElement)) return;
+
+      form.querySelectorAll('[aria-invalid="true"]').forEach((field) => {
+        field.setAttribute('aria-invalid', 'false');
+      });
+
+      if (gdprLabel instanceof HTMLElement) {
+        gdprLabel.classList.remove('is-invalid');
+      }
+    };
+
+    const showFormFeedback = (message, isError = false) => {
+      if (!feedbackEl) return;
+
+      feedbackEl.textContent = message;
+      feedbackEl.classList.remove('hidden');
+
+      if (isError) {
+        feedbackEl.style.borderColor = 'rgba(248,113,113,0.45)';
+        feedbackEl.style.background = 'rgba(127,29,29,0.28)';
+        feedbackEl.style.color = '#fecaca';
+      } else {
+        feedbackEl.style.borderColor = '';
+        feedbackEl.style.background = '';
+        feedbackEl.style.color = '';
+      }
+
+      feedbackEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    };
+
+    const validateForm = () => {
+      if (!(form instanceof HTMLFormElement)) {
+        return { ok: false, message: 'Formularul nu este disponibil.' };
+      }
+
+      clearFormErrorState();
+
+      const nameInput = form.querySelector('input[name="Nume"]');
+      const eventInput = form.querySelector('select[name="Eveniment"]');
+      const dateInput = form.querySelector('input[name="Data"]');
+      const messageInput = form.querySelector('textarea[name="Mesaj"]');
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const setInvalid = (field, message) => {
+        if (field instanceof HTMLInputElement || field instanceof HTMLSelectElement || field instanceof HTMLTextAreaElement) {
+          field.setAttribute('aria-invalid', 'true');
+        }
+
+        return message;
+      };
+
+      if (nameInput instanceof HTMLInputElement && !nameInput.value.trim()) {
+        return { ok: false, message: setInvalid(nameInput, 'Completează numele și prenumele.') };
+      }
+
+      if (phoneInput instanceof HTMLInputElement) {
+        const phoneValue = phoneInput.value.trim();
+        if (!phoneValue) {
+          return { ok: false, message: setInvalid(phoneInput, 'Completează numărul de telefon.') };
+        }
+
+        if (!/^(0[0-9]{9}|\+40[0-9]{9})$/.test(phoneValue)) {
+          return { ok: false, message: setInvalid(phoneInput, 'Numărul trebuie să fie în format 07xxxxxxxx sau +407xxxxxxxx.') };
+        }
+      }
+
+      if (eventInput instanceof HTMLSelectElement && !eventInput.value) {
+        return { ok: false, message: setInvalid(eventInput, 'Alege tipul evenimentului.') };
+      }
+
+      if (dateInput instanceof HTMLInputElement) {
+        const dateValue = dateInput.value.trim();
+        if (!dateValue) {
+          return { ok: false, message: setInvalid(dateInput, 'Selectează data evenimentului.') };
+        }
+
+        const selectedDate = new Date(`${dateValue}T00:00:00`);
+        if (Number.isNaN(selectedDate.getTime()) || selectedDate < today) {
+          return { ok: false, message: setInvalid(dateInput, 'Data evenimentului nu poate fi în trecut.') };
+        }
+      }
+
+      if (gdprCheckbox instanceof HTMLInputElement && !gdprCheckbox.checked) {
+        if (gdprLabel instanceof HTMLElement) {
+          gdprLabel.classList.add('is-invalid');
+        }
+
+        gdprCheckbox.setAttribute('aria-invalid', 'true');
+        return { ok: false, message: 'Trebuie să accepți Politica de confidențialitate pentru a trimite formularul.' };
+      }
+
+      if (messageInput instanceof HTMLTextAreaElement) {
+        messageInput.setAttribute('aria-invalid', 'false');
+      }
+
+      return { ok: true, message: '' };
+    };
 
     const setWizardStep = (step) => {
       if (!wizard) return;
@@ -415,6 +529,19 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
+        const validation = validateForm();
+        if (!validation.ok) {
+          showFormFeedback(validation.message, true);
+
+          const firstInvalid = form.querySelector('[aria-invalid="true"]');
+          if (firstInvalid instanceof HTMLElement) {
+            firstInvalid.focus({ preventScroll: true });
+          }
+
+          trackLeadEvent('lead_submit_validation_error');
+          return;
+        }
+
         trackLeadEvent('generate_lead', { event_label: 'form-submit-attempt' });
         trackLeadEvent('lead_submit_attempt');
 
@@ -427,6 +554,9 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
         if (feedbackEl) {
           feedbackEl.classList.add('hidden');
           feedbackEl.textContent = '';
+          feedbackEl.style.borderColor = '';
+          feedbackEl.style.background = '';
+          feedbackEl.style.color = '';
         }
 
         try {
@@ -442,20 +572,11 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
             window.location.href = '/contact/?trimis=rezervare#contact';
           } else {
             trackLeadEvent('lead_submit_error');
-            if (feedbackEl) {
-              feedbackEl.textContent = json.error ?? 'Eroare la trimitere. Încearcă din nou.';
-              feedbackEl.classList.remove('hidden');
-              feedbackEl.style.borderColor = 'rgba(255,100,100,0.35)';
-              feedbackEl.style.background = 'rgba(255,50,50,0.1)';
-              feedbackEl.style.color = '#fca5a5';
-            }
+            showFormFeedback(json.error ?? 'Eroare la trimitere. Încearcă din nou.', true);
           }
         } catch {
           trackLeadEvent('lead_submit_network_error');
-          if (feedbackEl) {
-            feedbackEl.textContent = 'Eroare de rețea. Verifică conexiunea și încearcă din nou.';
-            feedbackEl.classList.remove('hidden');
-          }
+          showFormFeedback('Eroare de rețea. Verifică conexiunea și încearcă din nou.', true);
         } finally {
           if (submitBtn) {
             submitBtn.disabled = false;
@@ -517,6 +638,19 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
       color: #0e2533;
       border-color: rgba(11, 188, 214, 0.5);
       background: linear-gradient(135deg, #7ef8ff 0%, #06d6ff 100%);
+    }
+
+    .form-shell [aria-invalid='true'] {
+      border-color: rgba(248, 113, 113, 0.95);
+      box-shadow: 0 0 0 1px rgba(248, 113, 113, 0.22);
+    }
+
+    .gdpr-form-label.is-invalid {
+      color: #fecaca;
+    }
+
+    .gdpr-form-label.is-invalid .gdpr-form-link {
+      color: #fca5a5;
     }
 
     .lead-step {
