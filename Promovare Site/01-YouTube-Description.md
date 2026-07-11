@@ -9,7 +9,6 @@ Descoperă povestea formației pe site-ul nostru: https://florentinapanaofficial
 👥 CUNOAȘTE MEMBRII ECHIPEI:
 🎤 Florentina Pană — Voce & Prezență Scenică
 🎹 Claudiu Pană — Coordonator & Energie Live
-🎷 Saxofonist Premium — Intervenții live elegante
 + Instrumentiști talentați (chitarist, bassist, toboșar)
 
 📸 GALERIILE NOASTRE - PESTE 500 NUNTȚI:

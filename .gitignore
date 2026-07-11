@@ -29,3 +29,9 @@ Thumbs.db
 
 # Imagini brute (neoptimizate)
 _raw_images/
+
+# Lighthouse reports (artefacte locale)
+lighthouse-*.report.html
+lighthouse-*.report.json
+lighthouse-live-*
+lighthouse-local-audit*
