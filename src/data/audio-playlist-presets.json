@@ -1,0 +1,35 @@
+{
+    "defaultPresetKey": "master",
+    "presets": [
+        {
+            "key": "master",
+            "label": "Master Playlist",
+            "description": "Selecția completă pentru toți clienții",
+            "includeGenres": []
+        },
+        {
+            "key": "populara",
+            "label": "Muzică Populară",
+            "description": "Doar piese cu vibe popular",
+            "includeGenres": [
+                "populara"
+            ]
+        },
+        {
+            "key": "manele",
+            "label": "Manele",
+            "description": "Selecție dedicată publicului de petrecere",
+            "includeGenres": [
+                "manele"
+            ]
+        },
+        {
+            "key": "pop",
+            "label": "Pop",
+            "description": "Hituri pop pentru energie modernă",
+            "includeGenres": [
+                "pop"
+            ]
+        }
+    ]
+}

@@ -20,6 +20,7 @@
     "seo:errors": "node seo-agent/gsc-errors.js",
     "seo:errors:dry": "node seo-agent/gsc-errors.js --dry-run",
     "seo:errors:only": "node seo-agent/gsc-errors.js --only-errors",
+    "audio:sync": "node scripts/sync-audio-catalog.mjs",
     "ferrari": "node ferrari.js"
   },
   "dependencies": {

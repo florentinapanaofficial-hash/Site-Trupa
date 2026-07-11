@@ -41,6 +41,11 @@
       "color": "cyan"
     },
     {
+      "href": "/muzica-non-stop/",
+      "label": "Muzică Non-Stop",
+      "color": "cyan"
+    },
+    {
       "href": "/live/",
       "label": "🔴 LIVE",
       "color": "cyan"

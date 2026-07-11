@@ -167,6 +167,7 @@ const breadcrumbLabels: Record<string, string> = {
   'membri': 'Membri',
   'galerie-video': 'Galerie Video',
   'galerie-foto': 'Galerie Foto',
+  'muzica-non-stop': 'Muzică Non-Stop',
   'momente-cu-mirii': 'Momente cu mirii',
   'comunitate': 'Comunitate',
   'aparitii-tv': 'Apariții TV',
@@ -201,6 +202,7 @@ const sideMenuTopItems = [
   { href: '/membri/', label: 'Membri', color: 'cyan', icon: 'users' },
   { href: '/galerie-video/', label: 'Galerie Video', color: 'cyan', icon: 'video' },
   { href: '/galerie-foto/', label: 'Galerie Foto', color: 'cyan', icon: 'camera' },
+  { href: '/muzica-non-stop/', label: 'Muzică Non-Stop', color: 'cyan', icon: 'music' },
   { href: '/comunitate/', label: 'Comunitate', color: 'cyan', icon: 'people' },
   { href: '/blog/', label: 'Blog', color: 'cyan', icon: 'book' },
   { href: '/vlog/', label: 'Vlog', color: 'cyan', icon: 'play' },
@@ -225,6 +227,7 @@ const mobileNavAllItems = [
   { href: '/membri/', label: 'Membri', color: 'cyan' },
   { href: '/galerie-video/', label: 'Galerie Video', color: 'cyan' },
   { href: '/galerie-foto/', label: 'Galerie Foto', color: 'cyan' },
+  { href: '/muzica-non-stop/', label: 'Muzică Non-Stop', color: 'cyan' },
   { href: '/comunitate/', label: 'Comunitate', color: 'cyan' },
   { href: '/blog/', label: 'Blog', color: 'cyan' },
   { href: '/vlog/', label: 'Vlog', color: 'cyan' },
@@ -345,6 +348,7 @@ const mobileNavAllItems = [
               {item.icon === 'people' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>}
               {item.icon === 'book' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>}
               {item.icon === 'play' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>}
+              {item.icon === 'music' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>}
               {item.icon === 'tv' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>}
               {item.icon === 'mail' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>}
             </span>
