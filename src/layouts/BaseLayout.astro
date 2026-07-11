@@ -83,7 +83,7 @@ const webSiteLd = {
 // Schema LocalBusiness + MusicGroup — SEO local, Google Maps, Knowledge Panel
 const localBusinessLd = {
   "@context": "https://schema.org",
-  "@type": ["LocalBusiness", "MusicGroup"],
+  "@type": ["LocalBusiness", "EntertainmentBusiness", "MusicGroup"],
   "name": seoContent.schema.name,
   "legalName": "Pană Claudiu-Gheorghe Întreprindere Individuală",
   "alternateName": seoContent.schema.alternateName,
@@ -115,6 +115,7 @@ const localBusinessLd = {
   "priceRange": "$$",
   "currenciesAccepted": "RON",
   "paymentAccepted": "Cash, Transfer bancar",
+  "serviceType": ["Muzică live pentru nunți", "Muzică live pentru botezuri", "Muzică de petrecere pentru evenimente private"],
   "areaServed": seoContent.schema.areaServed,
   "genre": seoContent.schema.genre,
   "sameAs": seoContent.schema.sameAs

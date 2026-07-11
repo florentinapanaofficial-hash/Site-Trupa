@@ -14,7 +14,6 @@
  */
 
 import type { APIRoute } from 'astro';
-import DOMPurify from 'isomorphic-dompurify';
 import { query } from '../../lib/db.js';
 
 export const prerender = false;
@@ -46,7 +45,13 @@ function isRateLimited(ip: string): boolean {
 // ── Sanitizare ────────────────────────────────────────────────────────────
 function san(val: FormDataEntryValue | null, maxLen = 255): string {
     if (!val || typeof val !== 'string') return '';
-    return DOMPurify.sanitize(val.trim()).slice(0, maxLen);
+    return val
+        .trim()
+        // Elimină control chars, normalizează spațiile și taie orice markup HTML.
+        .replace(/[\u0000-\u001F\u007F]/g, ' ')
+        .replace(/<[^>]*>/g, '')
+        .replace(/\s+/g, ' ')
+        .slice(0, maxLen);
 }
 
 function jsonErr(msg: string, status: number): Response {
