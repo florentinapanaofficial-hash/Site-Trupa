@@ -118,7 +118,7 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
           class="form-shell"
           name="rezervare-rapida"
           method="POST"
-          action="/api/rezervare"
+          action="/api/rezervare/"
           novalidate
         >
           <p class="hidden" aria-hidden="true">
@@ -586,7 +586,7 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
         }
 
         try {
-          const res = await fetch('/api/rezervare', {
+          const res = await fetch('/api/rezervare/', {
             method: 'POST',
             body: new FormData(form),
           });
