@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formația Florentina Pană - Producător Video AI</title>
+    <!-- Tailwind CSS & Google Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        syne: ['Syne', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            dark: '#040508',
+                            card: '#0c0e17',
+                            gold: '#D4AF37',
+                            goldGlow: 'rgba(212, 175, 55, 0.35)',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Ken Burns Cinematic Image Panning */
+        @keyframes kenburns {
+            0% { transform: scale(1.02) translate(0, 0); }
+            50% { transform: scale(1.1) translate(-0.5%, -0.5%); }
+            100% { transform: scale(1.02) translate(0, 0); }
+        }
+
+        .ken-burns-active {
+            animation: kenburns 12s ease-in-out infinite;
+        }
+
+        /* Video Slide Fade Transitions */
+        .video-slide {
+            transition: opacity 1.0s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Glassmorphism overlays */
+        .glass-overlay {
+            background: linear-gradient(to top, rgba(4, 5, 8, 0.98) 0%, rgba(4, 5, 8, 0.4) 50%, rgba(4, 5, 8, 0.85) 100%);
+        }
+
+        /* Equalizer bar animations */
+        @keyframes bounceBar {
+            0%, 100% { height: 4px; }
+            50% { height: 28px; }
+        }
+        .eq-bar {
+            width: 3px;
+            background-color: #D4AF37;
+            border-radius: 2px;
+            transition: height 0.15s ease;
+        }
+        .eq-active .eq-bar:nth-child(1) { animation: bounceBar 0.8s ease-in-out infinite 0.1s; }
+        .eq-active .eq-bar:nth-child(2) { animation: bounceBar 1.1s ease-in-out infinite 0.4s; }
+        .eq-active .eq-bar:nth-child(3) { animation: bounceBar 0.9s ease-in-out infinite 0.2s; }
+        .eq-active .eq-bar:nth-child(4) { animation: bounceBar 1.3s ease-in-out infinite 0.6s; }
+        .eq-active .eq-bar:nth-child(5) { animation: bounceBar 0.7s ease-in-out infinite 0.3s; }
+
+        /* Custom timeline track */
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 14px;
+            width: 14px;
+            border-radius: 50%;
+            background: #D4AF37;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.8);
+        }
+
+        /* Glass panels */
+        .glass-panel {
+            background: rgba(12, 14, 23, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-brand-dark text-slate-100 font-sans min-h-screen overflow-x-hidden flex flex-col justify-between select-none">
+
+    <!-- HEADER BAR -->
+    <header class="px-6 py-4 flex items-center justify-between border-b border-white/5 bg-black/40 backdrop-blur-md z-30">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-brand-gold flex items-center justify-center shadow-lg shadow-brand-goldGlow animate-pulse">
+                <i class="fa-solid fa-play text-brand-dark text-sm ml-0.5"></i>
+            </div>
+            <div>
+                <h1 class="font-syne font-bold text-sm tracking-widest uppercase text-brand-gold">Florentina Pană</h1>
+                <p class="text-[10px] text-slate-400 font-medium">Studio Video Interactiv cu Inteligență Artificială Gemini</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <span class="px-2.5 py-1 rounded bg-amber-500/10 border border-amber-500/20 text-brand-gold text-[10px] font-bold tracking-wider uppercase flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-brand-gold animate-ping"></span> AI CO-PRODUCER ACTIVE
+            </span>
+        </div>
+    </header>
+
+    <!-- MAIN INTERACTIVE STUDIO GRID -->
+    <main class="flex-1 w-full max-w-7xl mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- LEFT: THE VIDEO SIMULATOR CANVAS (Col-span 8) -->
+        <div class="lg:col-span-8 flex flex-col gap-4 w-full">
+            
+            <div id="video-container" class="relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-black group">
+                
+                <!-- SLIDE 1: INTRO / COPERTĂ -->
+                <div id="slide-0" class="video-slide absolute inset-0 opacity-100 z-10 flex items-center justify-center">
+                    <div class="absolute inset-0 bg-cover bg-center ken-burns-active opacity-60" style="background-image: url('1000011029.jpg');"></div>
+                    <div class="absolute inset-0 glass-overlay"></div>
+                    <div class="relative z-20 text-center px-6 max-w-2xl space-y-4">
+                        <span class="px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-brand-gold/20 text-brand-gold border border-brand-gold/30">SHOWREEL PREMIUM 2026</span>
+                        <h2 id="title-slide-0" class="font-syne font-extrabold text-3xl md:text-5xl tracking-tight uppercase leading-none">Formația<br><span class="text-brand-gold">Florentina Pană</span></h2>
+                        <p id="desc-slide-0" class="text-xs md:text-sm text-slate-300 font-light max-w-md mx-auto">Vizionează povestea muzicală din spatele celor mai reușite petreceri din România.</p>
+                    </div>
+                </div>
+
+                <!-- SLIDE 2: VOCALIST -->
+                <div id="slide-1" class="video-slide absolute inset-0 opacity-0 z-0 flex items-center justify-start">
+                    <div class="absolute inset-0 bg-cover bg-center ken-burns-active opacity-50" style="background-image: url('530c27a4-5278-4a47-a413-2dcceaf9c614-1_all_19103.jpg');"></div>
+                    <div class="absolute inset-0 glass-overlay"></div>
+                    <div class="relative z-20 text-left px-12 md:px-20 max-w-xl space-y-3">
+                        <span class="text-brand-gold font-bold text-xs uppercase tracking-wider block">SOLISTĂ VOCALĂ</span>
+                        <h2 id="title-slide-1" class="font-syne font-extrabold text-3xl md:text-4xl uppercase">Florentina Pană</h2>
+                        <p id="desc-slide-1" class="text-xs md:text-sm text-slate-300 font-light leading-relaxed">
+                            Vocea caldă care dă viață oricărei petreceri. Cu un stil interpretativ extrem de versatil, Florentina acoperă de la folclor tradițional pur până la hituri pop moderne.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- SLIDE 3: CLAUDIU CLAPE -->
+                <div id="slide-2" class="video-slide absolute inset-0 opacity-0 z-0 flex items-center justify-end">
+                    <div class="absolute inset-0 bg-cover bg-center ken-burns-active opacity-50" style="background-image: url('530c27a4-5278-4a47-a413-2dcceaf9c614-1_all_19297.jpg');"></div>
+                    <div class="absolute inset-0 glass-overlay"></div>
+                    <div class="relative z-20 text-right px-12 md:px-20 max-w-xl space-y-3">
+                        <span class="text-brand-gold font-bold text-xs uppercase tracking-wider block">CLAPE & ORCHESTRAȚIE</span>
+                        <h2 id="title-slide-2" class="font-syne font-extrabold text-3xl md:text-4xl uppercase">Claudiu Pană</h2>
+                        <p id="desc-slide-2" class="text-xs md:text-sm text-slate-300 font-light leading-relaxed">
+                            Armonia perfectă a fiecărui dans este asigurată de o orchestrație live de înaltă precizie și sunete digitale premium.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- SLIDE 4: ACORDEON -->
+                <div id="slide-3" class="video-slide absolute inset-0 opacity-0 z-0 flex items-center justify-start">
+                    <div class="absolute inset-0 bg-cover bg-center ken-burns-active opacity-50" style="background-image: url('1000009918.jpg');"></div>
+                    <div class="absolute inset-0 glass-overlay"></div>
+                    <div class="relative z-20 text-left px-12 md:px-20 max-w-xl space-y-3">
+                        <span class="text-brand-gold font-bold text-xs uppercase tracking-wider block">TRADIȚIE</span>
+                        <h2 id="title-slide-3" class="font-syne font-extrabold text-3xl md:text-4xl uppercase">Sufletul Petrecerii</h2>
+                        <p id="desc-slide-3" class="text-xs md:text-sm text-slate-300 font-light leading-relaxed">
+                            Acordurile clasice de acordeon aduc pe ringul de dans spiritul autentic al sârbelor și horilor românești de altădată.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- SLIDE 5: ATMOSPHERE GROUP -->
+                <div id="slide-4" class="video-slide absolute inset-0 opacity-0 z-0 flex items-center justify-center text-center">
+                    <div class="absolute inset-0 bg-cover bg-center ken-burns-active opacity-50" style="background-image: url('1000011007.jpg');"></div>
+                    <div class="absolute inset-0 glass-overlay"></div>
+                    <div class="relative z-20 px-6 max-w-2xl space-y-3">
+                        <span class="text-brand-gold font-bold text-xs uppercase tracking-wider block">EVENIMENTE REUȘITE</span>
+                        <h2 id="title-slide-4" class="font-syne font-extrabold text-3xl md:text-5xl uppercase leading-none">Ringul de Dans Plin</h2>
+                        <p id="desc-slide-4" class="text-xs md:text-sm text-slate-300 font-light max-w-md mx-auto">
+                            Interacțiune non-stop cu publicul și o energie incredibilă care îi ridică pe toți de la mese de la început până la final.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- SLIDE 6: SELFIE / DETALII -->
+                <div id="slide-5" class="video-slide absolute inset-0 opacity-0 z-0 flex items-center justify-end">
+                    <div class="absolute inset-0 bg-cover bg-center ken-burns-active opacity-50" style="background-image: url('1000010977.jpg');"></div>
+                    <div class="absolute inset-0 glass-overlay"></div>
+                    <div class="relative z-20 text-right px-12 md:px-20 max-w-xl space-y-3">
+                        <span class="text-brand-gold font-bold text-xs uppercase tracking-wider block">PASIUNE & ATENȚIE</span>
+                        <h2 id="title-slide-5" class="font-syne font-extrabold text-3xl md:text-4xl uppercase">Amintiri de Neuitat</h2>
+                        <p id="desc-slide-5" class="text-xs md:text-sm text-slate-300 font-light leading-relaxed">
+                            Fiecare zâmbet și fiecare secundă de fericire sunt completate de melodiile voastre preferate interpretate live.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- SLIDE 7: OUTRO / CONTACT -->
+                <div id="slide-6" class="video-slide absolute inset-0 opacity-0 z-0 flex items-center justify-center text-center">
+                    <div class="absolute inset-0 bg-cover bg-center ken-burns-active opacity-40" style="background-image: url('1000009900.jpg');"></div>
+                    <div class="absolute inset-0 glass-overlay"></div>
+                    <div class="relative z-20 px-6 max-w-xl space-y-4">
+                        <span class="text-brand-gold font-bold text-xs uppercase tracking-widest block">REPORTOFON REZERVĂRI</span>
+                        <h2 id="title-slide-6" class="font-syne font-extrabold text-3xl md:text-4xl uppercase">Hai să vorbim despre data ta!</h2>
+                        <div class="p-4 rounded-xl bg-black/50 border border-brand-gold/30 inline-block space-y-1">
+                            <p class="text-lg font-bold text-slate-100"><i class="fa-solid fa-phone text-brand-gold mr-1.5"></i> 0767.369.658</p>
+                            <p class="text-xs text-slate-400">Argeș, București și la nivel național</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WATERMARK OVERLAY -->
+                <div class="absolute top-4 left-4 z-20 bg-black/50 px-3 py-1.5 rounded-lg border border-white/10 backdrop-blur-md flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-brand-gold animate-ping"></div>
+                    <span class="font-mono text-[10px] tracking-wider text-slate-300 font-bold uppercase">REC - PROMO AI BUILDER</span>
+                </div>
+
+                <!-- DYNAMIC AI SUBTITLES CONTAINER -->
+                <div id="subtitles-container" class="absolute bottom-16 left-4 right-4 z-20 flex items-center justify-center">
+                    <div class="bg-black/80 px-4 py-2 rounded-xl border border-white/10 max-w-lg text-center transition-all duration-300 transform scale-100 opacity-90 backdrop-blur-md">
+                        <p class="text-[10px] font-mono text-brand-gold uppercase tracking-wider mb-0.5">NARAȚIUNE AI ACTIVĂ</p>
+                        <p id="live-subtitle-text" class="text-xs md:text-sm font-semibold text-slate-100 leading-snug">Vizionează povestea muzicală din spatele celor mai reușite petreceri din România.</p>
+                    </div>
+                </div>
+
+                <!-- PLAY/PAUSE INTERMEDIATE SCREEN FLASH -->
+                <div id="play-flash" class="absolute inset-0 bg-black/70 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300 z-30">
+                    <div class="w-16 h-16 rounded-full bg-brand-gold/20 border border-brand-gold text-brand-gold flex items-center justify-center text-3xl">
+                        <i class="fa-solid fa-play ml-1" id="flash-icon"></i>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- CINEMATIC VIDEO PLAYER CONTROLS BAR -->
+            <div class="px-6 py-4 bg-brand-card/80 border border-white/5 rounded-2xl backdrop-blur-md flex flex-col gap-3">
+                
+                <!-- Seek timeline control -->
+                <div class="w-full flex items-center gap-4">
+                    <span class="font-mono text-xs text-slate-400" id="time-elapsed">0:00</span>
+                    <div class="flex-1 relative flex items-center">
+                        <input type="range" id="video-timeline" min="0" max="70" value="0" step="1" 
+                               class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-brand-gold"
+                               oninput="seekVideo(this.value)">
+                        <!-- Visual buffered highlight -->
+                        <div id="timeline-progress" class="absolute h-1.5 bg-brand-gold rounded-l-lg pointer-events-none" style="width: 0%;"></div>
+                    </div>
+                    <span class="font-mono text-xs text-slate-400" id="time-total">1:10</span>
+                </div>
+
+                <!-- Secondary controls bar -->
+                <div class="w-full flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <!-- Play/Pause Button -->
+                        <button onclick="toggleVideoPlayback()" class="w-10 h-10 rounded-full bg-brand-gold hover:scale-105 active:scale-95 text-brand-dark flex items-center justify-center text-sm font-bold transition-all" id="play-control">
+                            <i class="fa-solid fa-pause"></i>
+                        </button>
+                        <!-- Prev Scene -->
+                        <button onclick="prevScene()" class="p-2 text-slate-400 hover:text-white transition-colors" title="Scena Anterioară">
+                            <i class="fa-solid fa-step-backward text-sm"></i>
+                        </button>
+                        <!-- Next Scene -->
+                        <button onclick="nextScene()" class="p-2 text-slate-400 hover:text-white transition-colors" title="Scena Următoare">
+                            <i class="fa-solid fa-step-forward text-sm"></i>
+                        </button>
+
+                        <!-- Track selector -->
+                        <div class="hidden sm:flex items-center gap-2 border-l border-white/10 pl-4 ml-2">
+                            <span class="text-xs text-slate-400">Melodie fundal:</span>
+                            <select id="track-selector" onchange="changeTrack(this.value)" class="bg-slate-900 border border-white/10 text-xs px-2.5 py-1.5 rounded-lg text-slate-200 focus:outline-none focus:border-brand-gold">
+                                <option value="Sârba de la Pitești (Live)">Sârba de la Pitești (Live)</option>
+                                <option value="Muzică Ușoară - Cover Dance">Muzică Ușoară - Cover Dance</option>
+                                <option value="Cafe-Concert / Welcoming Lounge">Cafe-Concert / Lounge</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Volume and Fullscreen controls -->
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <button onclick="toggleMute()" class="text-slate-400 hover:text-white transition-colors">
+                                <i class="fa-solid fa-volume-high" id="volume-icon"></i>
+                            </button>
+                            <input type="range" id="volume-slider" min="0" max="100" value="80" oninput="changeVolume(this.value)" class="w-16 h-1 bg-slate-700 accent-brand-gold rounded-lg appearance-none cursor-pointer">
+                        </div>
+                        
+                        <button onclick="toggleFullscreen()" class="p-2 text-slate-400 hover:text-white transition-colors" title="Ecran Complet">
+                            <i class="fa-solid fa-expand text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- RIGHT: THE AI PRODUCTION SUITE (Col-span 4) -->
+        <div class="lg:col-span-4 flex flex-col gap-4 w-full">
+            
+            <div class="glass-panel p-5 rounded-2xl flex flex-col gap-4">
+                <div class="flex items-center gap-2.5 pb-3 border-b border-white/5">
+                    <div class="w-8 h-8 rounded-lg bg-brand-gold/10 flex items-center justify-center text-brand-gold">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-syne font-bold text-sm tracking-wide">Panou Regizor AI</h3>
+                        <p class="text-[10px] text-slate-400">Personalizează videoclipul promoțional</p>
+                    </div>
+                </div>
+
+                <!-- API Key Configuration (Optional) -->
+                <div>
+                    <label class="block text-[10px] uppercase font-bold tracking-wider text-slate-400 mb-1.5">Cheie API Gemini (Opțional)</label>
+                    <div class="relative">
+                        <input type="password" id="api-key-input" placeholder="Lăsați gol pentru autoinjectare" class="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-brand-gold pr-10">
+                        <span class="absolute right-3 top-2.5 text-xs text-slate-500" title="Platforma asigură cheia implicită la runtime"><i class="fa-solid fa-circle-info"></i></span>
+                    </div>
+                </div>
+
+                <!-- Event details input prompt -->
+                <div>
+                    <label class="block text-[10px] uppercase font-bold tracking-wider text-slate-400 mb-1.5">Detaliile Evenimentului tău</label>
+                    <textarea id="event-prompt" rows="3" placeholder="Ex: Nunta lui Claudiu și Raluca din 15 August 2026, la Restaurant Magic Pitești. Atmosferă elegantă, muzică de petrecere românească." class="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-xs focus:outline-none focus:border-brand-gold resize-none"></textarea>
+                </div>
+
+                <!-- Select Voice styles -->
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[10px] uppercase font-bold tracking-wider text-slate-400 mb-1">Stil Voce Narator</label>
+                        <select id="voice-selector" class="w-full bg-black/40 border border-white/10 rounded-xl p-2 text-xs text-slate-200 focus:outline-none focus:border-brand-gold">
+                            <option value="Leda">Leda (Caldă)</option>
+                            <option value="Zephyr">Zephyr (Energetică)</option>
+                            <option value="Charon">Charon (Elegantă)</option>
+                            <option value="Puck">Puck (Veselă)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase font-bold tracking-wider text-slate-400 mb-1">Tempo Narațiune</label>
+                        <select id="tempo-selector" class="w-full bg-black/40 border border-white/10 rounded-xl p-2 text-xs text-slate-200 focus:outline-none focus:border-brand-gold">
+                            <option value="normal">Normal</option>
+                            <option value="cinematic">Cinematic (Lent)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Action Button 1: Script Generator -->
+                <button onclick="generateCustomScript()" id="gen-script-btn" class="w-full py-2.5 bg-gradient-to-r from-brand-gold to-amber-400 hover:brightness-110 active:scale-[0.98] transition-all text-brand-dark font-extrabold text-xs rounded-xl shadow-lg shadow-brand-goldGlow uppercase tracking-widest flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-magic"></i> Generează Scenariu AI
+                </button>
+
+                <!-- AI Production status indicator -->
+                <div id="ai-status-panel" class="hidden p-3 rounded-xl bg-brand-gold/5 border border-brand-gold/20 flex flex-col gap-2">
+                    <div class="flex items-center gap-2 text-xs text-brand-gold font-bold">
+                        <i class="fa-solid fa-circle-notch animate-spin"></i>
+                        <span id="ai-status-text">Analizăm evenimentul...</span>
+                    </div>
+                    <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                        <div id="ai-progress-bar" class="bg-brand-gold h-full w-0 transition-all duration-300"></div>
+                    </div>
+                </div>
+
+                <!-- Custom Script Editor Accordion -->
+                <div class="mt-2 border-t border-white/5 pt-4">
+                    <div class="flex items-center justify-between cursor-pointer" onclick="toggleScriptEditor()">
+                        <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Editează Textul Scenariului manual</span>
+                        <i id="editor-chevron" class="fa-solid fa-chevron-down text-xs text-slate-400"></i>
+                    </div>
+                    
+                    <div id="script-editor-fields" class="hidden mt-3 space-y-2.5 max-h-[180px] overflow-y-auto pr-1">
+                        <!-- Dynamically filled with input areas for each slide -->
+                    </div>
+                </div>
+
+                <!-- Action Button 2: Synthesize voiceover -->
+                <button onclick="synthesizeAllVoiceovers()" id="synth-voice-btn" disabled class="w-full py-2 bg-slate-800 text-slate-400 border border-white/5 cursor-not-allowed active:scale-[0.98] transition-all font-extrabold text-xs rounded-xl uppercase tracking-widest flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-volume-high"></i> Sintetizează Voce Narator
+                </button>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- CINEMATIC BACKGROUND MUSIC TRACK OVERLAY -->
+    <div class="absolute bottom-20 left-4 z-20 flex items-center gap-2 bg-black/60 px-3 py-1.5 rounded-lg border border-white/5 backdrop-blur-md">
+        <!-- Visual EQ -->
+        <div class="flex items-end gap-1 h-7 mr-2 eq-active" id="visual-eq">
+            <div class="eq-bar"></div>
+            <div class="eq-bar"></div>
+            <div class="eq-bar"></div>
+            <div class="eq-bar"></div>
+            <div class="eq-bar"></div>
+        </div>
+        <div class="text-right">
+            <p class="text-[9px] uppercase text-brand-gold font-bold">Piesă Fundal</p>
+            <p class="text-[10px] font-semibold text-slate-200" id="current-track-name">Sârba de la Pitești (Live)</p>
+        </div>
+    </div>
+
+    <!-- NOTIFICATION TOAST -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 glass-panel border border-brand-gold/30 rounded-2xl p-4 shadow-2xl max-w-xs transition-all duration-500 transform translate-y-24 opacity-0 flex items-center gap-4">
+        <div class="w-12 h-12 bg-brand-gold/10 rounded-xl flex items-center justify-center text-brand-gold">
+            <i id="toast-icon" class="fa-solid fa-circle-check text-xl"></i>
+        </div>
+        <div>
+            <h5 id="toast-title" class="text-xs font-bold text-slate-100">AI Director</h5>
+            <p id="toast-message" class="text-[10px] text-slate-400">Scenariul a fost adaptat cu succes!</p>
+        </div>
+    </div>
+
+    <!-- INTERACTIVE MUSIC GENERATOR / SOUND PLAYER (WEB AUDIO SIMULATION API) -->
+    <script>
+        // Slides and timeline timings (Each scene lasts 10 seconds)
+        const totalDuration = 70; // 7 slides * 10 seconds = 70 seconds total
+        const slideTiming = 10; // 10 seconds per scene
+        let currentTime = 0;
+        let isPlaying = true;
+        let playInterval = null;
+        let activeSlideIndex = 0;
+        let isMuted = false;
+
+        // Custom narrative scripting state (defaults)
+        let scriptData = {
+            scene0: "Vizionează povestea muzicală din spatele celor mai reușite petreceri din România.",
+            scene1: "Vocea caldă care dă viață oricărei petreceri, acoperind folclor tradițional și pop modern.",
+            scene2: "Claudiu Pană asigură armonia perfectă printr-o tehnică impecabilă la clape și claviaturi.",
+            scene3: "Acordurile clasice de acordeon aduc pe ringul de dans energia autentică românească.",
+            scene4: "Interacțiune non-stop cu publicul și un show grandios ce ține ringul plin permanent.",
+            scene5: "Cele mai moderne echipamente de sonorizare garantează un sound clar, echilibrat și premium.",
+            scene6: "Planifică-ți din timp data evenimentului. Sărbătorește alături de Formația Florentina Pană!"
+        };
+
+        // Synthesized audio buffers for the narrator voice
+        let voiceBuffers = {
+            scene0: null,
+            scene1: null,
+            scene2: null,
+            scene3: null,
+            scene4: null,
+            scene5: null,
+            scene6: null
+        };
+
+        // Active playing audio elements (to stop if slide changes)
+        let activeNarratorAudio = null;
+
+        window.onload = function() {
+            startVideoTimer();
+            setupInteractiveControls();
+            buildScriptFields();
+            updateSlidesUI();
+        };
+
+        // Build the manual script editor input fields
+        function buildScriptFields() {
+            const container = document.getElementById('script-editor-fields');
+            container.innerHTML = '';
+            for (let i = 0; i < 7; i++) {
+                const item = document.createElement('div');
+                item.className = 'space-y-1';
+                item.innerHTML = `
+                    <label class="block text-[10px] text-slate-400">Scena ${i + 1} (${getSceneName(i)})</label>
+                    <input type="text" id="script-input-scene${i}" onchange="updateScriptFromInput(${i}, this.value)" value="${scriptData['scene' + i]}" class="w-full bg-black/60 border border-white/5 rounded-lg px-2.5 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-brand-gold">
+                `;
+                container.appendChild(item);
+            }
+        }
+
+        function getSceneName(idx) {
+            const names = ["Copertă/Intro", "Solistă", "Clape/Orchestră", "Acordeon", "Atmosferă", "Tehnologie", "Outro/Contact"];
+            return names[idx] || "Scenă";
+        }
+
+        function updateScriptFromInput(idx, val) {
+            scriptData['scene' + idx] = val;
+            updateSlidesUI();
+        }
+
+        // Apply script data back to slides dynamically
+        function updateSlidesUI() {
+            for (let i = 0; i < 7; i++) {
+                const descEl = document.getElementById(`desc-slide-${i}`);
+                if (descEl) {
+                    descEl.innerText = scriptData[`scene${i}`];
+                }
+            }
+            // Update live subtitles text
+            document.getElementById('live-subtitle-text').innerText = scriptData[`scene${activeSlideIndex}`];
+        }
+
+        function toggleScriptEditor() {
+            const fields = document.getElementById('script-editor-fields');
+            const chevron = document.getElementById('editor-chevron');
+            if (fields.classList.contains('hidden')) {
+                fields.classList.remove('hidden');
+                chevron.classList.replace('fa-chevron-down', 'fa-chevron-up');
+            } else {
+                fields.classList.add('hidden');
+                chevron.classList.replace('fa-chevron-up', 'fa-chevron-down');
+            }
+        }
+
+        function startVideoTimer() {
+            if (playInterval) clearInterval(playInterval);
+            
+            playInterval = setInterval(() => {
+                if (isPlaying) {
+                    currentTime++;
+                    if (currentTime > totalDuration) {
+                        currentTime = 0; // Loop video automatically
+                    }
+                    updateTimelineDisplay();
+                    syncSlideWithTime();
+                }
+            }, 1000);
+        }
+
+        // Seek Bar Timeline handler
+        function seekVideo(val) {
+            currentTime = parseInt(val);
+            updateTimelineDisplay();
+            syncSlideWithTime(true);
+        }
+
+        function updateTimelineDisplay() {
+            const progressInput = document.getElementById('video-timeline');
+            const progressHighlight = document.getElementById('timeline-progress');
+            const elapsedText = document.getElementById('time-elapsed');
+
+            progressInput.value = currentTime;
+            
+            // Calc percentages for timeline track highlighting
+            const percentage = (currentTime / totalDuration) * 100;
+            progressHighlight.style.width = `${percentage}%`;
+
+            // Formats seconds into MM:SS format
+            const minutes = Math.floor(currentTime / 60);
+            const seconds = currentTime % 60;
+            elapsedText.innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }
+
+        function syncSlideWithTime(forced = false) {
+            const calculatedSlideIndex = Math.floor(currentTime / slideTiming);
+            if (calculatedSlideIndex !== activeSlideIndex && calculatedSlideIndex < 7) {
+                switchSlide(calculatedSlideIndex, forced);
+            } else if (forced) {
+                // If forced seek, still trigger narration playback
+                playNarrationForActiveSlide();
+            }
+        }
+
+        function switchSlide(index, forced = false) {
+            const oldSlide = document.getElementById(`slide-${activeSlideIndex}`);
+            const newSlide = document.getElementById(`slide-${index}`);
+
+            if (oldSlide && newSlide) {
+                // Fade out old slide
+                oldSlide.classList.remove('opacity-100', 'z-10');
+                oldSlide.classList.add('opacity-0', 'z-0');
+
+                // Fade in new slide
+                newSlide.classList.remove('opacity-0', 'z-0');
+                newSlide.classList.add('opacity-100', 'z-10');
+
+                activeSlideIndex = index;
+                
+                // Update live subtitles
+                document.getElementById('live-subtitle-text').innerText = scriptData[`scene${index}`];
+                
+                // Play synchronized voiceover
+                playNarrationForActiveSlide();
+            }
+        }
+
+        // Ducking logic: lower music volume when narrator speaks
+        function playNarrationForActiveSlide() {
+            // Stop any playing voiceover first
+            if (activeNarratorAudio) {
+                activeNarratorAudio.pause();
+                activeNarratorAudio = null;
+            }
+
+            const currentVoice = voiceBuffers[`scene${activeSlideIndex}`];
+            if (currentVoice) {
+                // We have a synthesized voice!
+                activeNarratorAudio = new Audio(currentVoice);
+                
+                // Duck music volume
+                duckBackgroundMusic(true);
+
+                activeNarratorAudio.onended = () => {
+                    duckBackgroundMusic(false);
+                };
+                activeNarratorAudio.onerror = () => {
+                    duckBackgroundMusic(false);
+                };
+
+                activeNarratorAudio.play().catch(e => {
+                    console.warn("Could not play synthesized audio (requires user interaction first):", e);
+                    duckBackgroundMusic(false);
+                });
+            }
+        }
+
+        function duckBackgroundMusic(duckOn) {
+            const slider = document.getElementById('volume-slider');
+            if (duckOn) {
+                // Simulating lowering background volume
+                console.log("Ducking music volume...");
+                changeVolume(15); // lower down to 15%
+            } else {
+                console.log("Restoring music volume...");
+                changeVolume(slider.value); // Restore original
+            }
+        }
+
+        // Video control buttons
+        function toggleVideoPlayback() {
+            const btn = document.getElementById('play-control');
+            const flash = document.getElementById('play-flash');
+            const flashIcon = document.getElementById('flash-icon');
+            const eq = document.getElementById('visual-eq');
+
+            if (isPlaying) {
+                isPlaying = false;
+                btn.innerHTML = `<i class="fa-solid fa-play ml-0.5"></i>`;
+                eq.classList.remove('eq-active');
+                if (activeNarratorAudio) activeNarratorAudio.pause();
+                
+                // Show temporary flash screen overlay
+                flashIcon.className = "fa-solid fa-pause";
+                flash.classList.remove('opacity-0', 'pointer-events-none');
+                flash.classList.add('opacity-100');
+            } else {
+                isPlaying = true;
+                btn.innerHTML = `<i class="fa-solid fa-pause"></i>`;
+                eq.classList.add('eq-active');
+                if (activeNarratorAudio) activeNarratorAudio.play().catch(() => {});
+
+                // Hide flash screen overlay
+                flashIcon.className = "fa-solid fa-play ml-0.5";
+                flash.classList.remove('opacity-100');
+                flash.classList.add('opacity-0', 'pointer-events-none');
+            }
+        }
+
+        function prevScene() {
+            let nextIndex = activeSlideIndex - 1;
+            if (nextIndex < 0) nextIndex = 6;
+            currentTime = nextIndex * slideTiming;
+            updateTimelineDisplay();
+            switchSlide(nextIndex);
+        }
+
+        function nextScene() {
+            let nextIndex = activeSlideIndex + 1;
+            if (nextIndex > 6) nextIndex = 0;
+            currentTime = nextIndex * slideTiming;
+            updateTimelineDisplay();
+            switchSlide(nextIndex);
+        }
+
+        // Interactive Audio Track Simulation
+        function changeTrack(trackName) {
+            document.getElementById('current-track-name').innerText = trackName;
+        }
+
+        function changeVolume(val) {
+            const icon = document.getElementById('volume-icon');
+            if (val == 0) {
+                icon.className = "fa-solid fa-volume-xmark";
+            } else if (val < 50) {
+                icon.className = "fa-solid fa-volume-low";
+            } else {
+                icon.className = "fa-solid fa-volume-high";
+            }
+        }
+
+        function toggleMute() {
+            const slider = document.getElementById('volume-slider');
+            const icon = document.getElementById('volume-icon');
+            const eq = document.getElementById('visual-eq');
+
+            if (isMuted) {
+                isMuted = false;
+                slider.value = 80;
+                icon.className = "fa-solid fa-volume-high";
+                eq.classList.add('eq-active');
+            } else {
+                isMuted = true;
+                slider.value = 0;
+                icon.className = "fa-solid fa-volume-xmark";
+                eq.classList.remove('eq-active');
+            }
+        }
+
+        function toggleFullscreen() {
+            const container = document.getElementById('video-container');
+            if (!document.fullscreenElement) {
+                container.requestFullscreen().catch(err => {
+                    showToast("Eroare Ecran Complet", `Nu s-a putut activa ecranul complet: ${err.message}`, "fa-circle-xmark", "text-red-500");
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        function setupInteractiveControls() {
+            // Spacebar handler to play/pause video
+            document.addEventListener('keydown', (e) => {
+                if (e.code === 'Space') {
+                    e.preventDefault();
+                    toggleVideoPlayback();
+                }
+            });
+        }
+
+        /* =========================================================================
+           GEMINI API WORKFLOW AND VOICE GENERATOR ENGINE
+           ========================================================================= */
+
+        // Unified trigger for user notifications
+        function showToast(title, message, iconClass = "fa-circle-check", textColorClass = "text-brand-gold") {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-message').innerText = message;
+            
+            const iconEl = document.getElementById('toast-icon');
+            iconEl.className = `fa-solid ${iconClass} ${textColorClass} text-xl`;
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 5000);
+        }
+
+        // Exponential Backoff helper for fetching
+        async function fetchWithBackoff(url, options, retries = 3, delay = 1000) {
+            try {
+                const response = await fetch(url, options);
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+                return response;
+            } catch (error) {
+                if (retries > 0) {
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    return fetchWithBackoff(url, options, retries - 1, delay * 2);
+                }
+                throw error;
+            }
+        }
+
+        // STEP 1: Generate customized script using gemini-3-flash-preview
+        async function generateCustomScript() {
+            const prompt = document.getElementById('event-prompt').value.trim();
+            const apiKey = document.getElementById('api-key-input').value.trim();
+            const btn = document.getElementById('gen-script-btn');
+            const statusPanel = document.getElementById('ai-status-panel');
+            const statusText = document.getElementById('ai-status-text');
+            const progressBar = document.getElementById('ai-progress-bar');
+
+            if (!prompt) {
+                showToast("Câmp Necesar", "Te rugăm să introduci detaliile evenimentului tău mai întâi!", "fa-circle-exclamation", "text-amber-500");
+                return;
+            }
+
+            // UI feedback
+            btn.disabled = true;
+            statusPanel.classList.remove('hidden');
+            statusText.innerText = "Inteligența Artificială gândește scenariul potrivit...";
+            progressBar.style.width = "25%";
+
+            const systemPrompt = `Ești regizor tehnic și copywriter profesionist pentru trupe live din România, în special pentru Formația Florentina Pană.
+Generați un scenariu narativ ultra-personalizat format din exact 7 replici scurte (una pentru fiecare scenă a videoclipului promoțional). 
+Fiecare replică trebuie să fie fluidă, festivă, caldă și concisă (maxim 10-15 cuvinte), optimizată pentru a fi vorbită în 10 secunde.
+Incorporează inteligent detaliile oferite de utilizator în mod natural.
+RĂSPUNDEȚI STRICT în format JSON valid cu următoarea schemă:
+{
+  "scene0": "descriere scurtă intro",
+  "scene1": "descriere solistă",
+  "scene2": "descriere clape",
+  "scene3": "descriere acordeon",
+  "scene4": "descriere atmosferă",
+  "scene5": "descriere sonorizare/tehnologie",
+  "scene6": "descriere final/outro/contact"
+}`;
+
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: `Vă rugăm să scrieți scenariul pe baza acestui eveniment: ${prompt}` }] }],
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            scene0: { type: "STRING" },
+                            scene1: { type: "STRING" },
+                            scene2: { type: "STRING" },
+                            scene3: { type: "STRING" },
+                            scene4: { type: "STRING" },
+                            scene5: { type: "STRING" },
+                            scene6: { type: "STRING" }
+                        },
+                        required: ["scene0", "scene1", "scene2", "scene3", "scene4", "scene5", "scene6"]
+                    }
+                },
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                }
+            };
+
+            try {
+                progressBar.style.width = "60%";
+                const response = await fetchWithBackoff(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                const textOutput = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (textOutput) {
+                    const parsedJson = JSON.parse(textOutput);
+                    scriptData = parsedJson;
+                    
+                    progressBar.style.width = "100%";
+                    setTimeout(() => {
+                        statusPanel.classList.add('hidden');
+                        btn.disabled = false;
+                        
+                        // Enable the Voice synthesis button
+                        const voiceBtn = document.getElementById('synth-voice-btn');
+                        voiceBtn.disabled = false;
+                        voiceBtn.className = "w-full py-2.5 bg-gradient-to-r from-emerald-500 to-teal-400 hover:brightness-110 active:scale-[0.98] transition-all text-slate-900 font-extrabold text-xs rounded-xl shadow-lg uppercase tracking-widest flex items-center justify-center gap-2 cursor-pointer";
+                        
+                        // Rebuild script editor fields with new values
+                        buildScriptFields();
+                        updateSlidesUI();
+                        
+                        showToast("Scenariu Generat!", "Apasă acum pe 'Sintetizează Voce Narator' pentru voceover!");
+                    }, 500);
+
+                } else {
+                    throw new Error("Invalid output format from Gemini");
+                }
+
+            } catch (error) {
+                console.error("Gemini API Error:", error);
+                progressBar.style.width = "0%";
+                statusPanel.classList.add('hidden');
+                btn.disabled = false;
+                showToast("Eroare Gemini", "Nu am putut genera scenariul. Verificați conexiunea sau cheia API.", "fa-circle-xmark", "text-red-500");
+            }
+        }
+
+        // STEP 2: Synthesize custom narrator voices for all 7 slides using gemini-2.5-flash-preview-tts
+        async function synthesizeAllVoiceovers() {
+            const apiKey = document.getElementById('api-key-input').value.trim();
+            const voiceStyle = document.getElementById('voice-selector').value;
+            const tempo = document.getElementById('tempo-selector').value;
+            const btn = document.getElementById('synth-voice-btn');
+            const statusPanel = document.getElementById('ai-status-panel');
+            const statusText = document.getElementById('ai-status-text');
+            const progressBar = document.getElementById('ai-progress-bar');
+
+            // Map styled selection to Gemini prebuilt voice names
+            // Leda (Youthful/Caldă), Zephyr (Bright/Energetică), Charon (Elegant/Informative), Puck (Upbeat/Veselă)
+            const voiceMap = {
+                "Leda": "Leda",
+                "Zephyr": "Zephyr",
+                "Charon": "Charon",
+                "Puck": "Puck"
+            };
+            const selectedVoice = voiceMap[voiceStyle] || "Leda";
+
+            btn.disabled = true;
+            statusPanel.classList.remove('hidden');
+            progressBar.style.width = "10%";
+
+            // Iterate and synthesize for each of the 7 scenes
+            for (let i = 0; i < 7; i++) {
+                statusText.innerText = `Sintetizăm vocea AI pentru Scena ${i + 1}/7...`;
+                const progressPercentage = Math.round(10 + (i * 12.8));
+                progressBar.style.width = `${progressPercentage}%`;
+
+                const sceneText = scriptData[`scene${i}`];
+                // Tone modifier for the prompt
+                const speechCommand = `Spune melodios, calm și cu accent românesc cald: "${sceneText}"`;
+
+                const payload = {
+                    contents: [{
+                        parts: [{ text: speechCommand }]
+                    }],
+                    generationConfig: {
+                        responseModalities: ["AUDIO"],
+                        speechConfig: {
+                            voiceConfig: {
+                                prebuiltVoiceConfig: { voiceName: selectedVoice }
+                            }
+                        }
+                    }
+                };
+
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
+
+                try {
+                    const response = await fetchWithBackoff(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const result = await response.json();
+                    const part = result?.candidates?.[0]?.content?.parts?.[0];
+                    const audioData = part?.inlineData?.data;
+                    const mimeType = part?.inlineData?.mimeType;
+
+                    if (audioData && mimeType && mimeType.startsWith("audio/")) {
+                        // Extract sample rate from mimeType (ex: "audio/pcm;rate=24000")
+                        const sampleRateMatch = mimeType.match(/rate=(\d+)/);
+                        const sampleRate = sampleRateMatch ? parseInt(sampleRateMatch[1], 10) : 24000;
+
+                        // Decode base64 to binary ArrayBuffer
+                        const pcmData = base64ToArrayBuffer(audioData);
+                        const pcm16 = new Int16Array(pcmData);
+                        
+                        // Convert PCM directly to playable WAV container Blob
+                        const wavBlob = pcmToWav(pcm16, sampleRate);
+                        const audioUrl = URL.createObjectURL(wavBlob);
+
+                        // Save url to buffer
+                        voiceBuffers[`scene${i}`] = audioUrl;
+                    } else {
+                        console.warn(`Could not synthesize voice for scene ${i}, using fallback.`);
+                    }
+
+                } catch (err) {
+                    console.error(`Error synthesizing scene ${i}:`, err);
+                }
+            }
+
+            progressBar.style.width = "100%";
+            setTimeout(() => {
+                statusPanel.classList.add('hidden');
+                btn.disabled = false;
+                
+                showToast("Voceover AI Finalizat!", "Narațiunea automată va fi redată odată cu rularea videoclipului!", "fa-circle-check", "text-emerald-400");
+                
+                // Immediately play narration for current slide
+                playNarrationForActiveSlide();
+            }, 500);
+        }
+
+        // Helper conversion: PCM16 to WAV ArrayBuffer
+        function pcmToWav(pcm16, sampleRate) {
+            const buffer = new ArrayBuffer(44 + pcm16.length * 2);
+            const view = new DataView(buffer);
+
+            /* RIFF identifier */
+            writeString(view, 0, 'RIFF');
+            /* file length */
+            view.setUint32(4, 36 + pcm16.length * 2, true);
+            /* RIFF type */
+            writeString(view, 8, 'WAVE');
+            /* format chunk identifier */
+            writeString(view, 12, 'fmt ');
+            /* format chunk length */
+            view.setUint32(16, 16, true);
+            /* sample format (raw PCM = 1) */
+            view.setUint16(20, 1, true);
+            /* channel count (mono = 1) */
+            view.setUint16(22, 1, true);
+            /* sample rate */
+            view.setUint32(24, sampleRate, true);
+            /* byte rate (sample rate * block align) */
+            view.setUint32(28, sampleRate * 2, true);
+            /* block align (channel count * bytes per sample) */
+            view.setUint16(32, 2, true);
+            /* bits per sample (PCM16 = 16 bits) */
+            view.setUint16(34, 16, true);
+            /* data chunk identifier */
+            writeString(view, 36, 'data');
+            /* data chunk length */
+            view.setUint32(40, pcm16.length * 2, true);
+
+            // Write raw PCM audio payload
+            for (let i = 0; i < pcm16.length; i++) {
+                view.setInt16(44 + i * 2, pcm16[i], true);
+            }
+
+            return new Blob([view], { type: 'audio/wav' });
+        }
+
+        function writeString(view, offset, string) {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
+        }
+
+        function base64ToArrayBuffer(base64) {
+            const binaryString = window.atob(base64);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+    </script>
+
+</body>
+</html>

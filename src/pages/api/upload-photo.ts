@@ -6,6 +6,7 @@ import { nanoid } from 'nanoid';
 import DOMPurify from 'isomorphic-dompurify';
 import { query } from '../../lib/db.js';
 import { checkOrigin } from '../../lib/cors.js';
+import { secureLogger } from '../../lib/secure-logger.js';
 
 export const prerender = false;
 
@@ -195,7 +196,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     return jsonResponse({ success: true, url: publicUrl, title, audioUrl }, 201, cors.origin);
   } catch (error) {
-    console.error('Eroare upload photo:', error);
+    secureLogger.error('Eroare upload photo:', error);
     return jsonResponse({ error: 'Eroare la procesarea imaginii.' }, 500, cors.origin);
   }
 };

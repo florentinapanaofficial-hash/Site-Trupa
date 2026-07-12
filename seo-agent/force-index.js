@@ -99,7 +99,6 @@ async function main() {
     console.log('\n╔══════════════════════════════════════════════════════════════╗');
     console.log('║         GOOGLE INDEXING API — Forțare Indexare              ║');
     console.log('╚══════════════════════════════════════════════════════════════╝\n');
-    console.log(`  Service Account: ${clientEmail}`);
     console.log(`  URL-uri de indexat: ${urls.length}\n`);
 
     const results = [];

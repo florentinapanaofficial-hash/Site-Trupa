@@ -23,6 +23,7 @@
 import type { APIRoute } from 'astro';
 import { query } from '../../lib/db.js';
 import { checkOrigin } from '../../lib/cors.js';
+import { secureLogger } from '../../lib/secure-logger.js';
 
 // Astro SSR – endpoint nu se pre-randează
 export const prerender = false;
@@ -244,14 +245,14 @@ export const POST: APIRoute = async ({ request }) => {
         );
     } catch (dbError) {
         // Logăm eroarea complet server-side, dar NU expunem detalii clientului
-        console.error('[GDPR] Eroare DB la salvare consimțământ:', JSON.stringify({
+        secureLogger.error('[GDPR] Eroare DB la salvare consimțământ:', {
             eroare: dbError instanceof Error ? dbError.message : String(dbError),
             tip: tipConsimtamant,
             canal,
             // Logăm doar primii 4 octeți pentru a putea corelat fără a expune IP-ul complet
             ip_hint: `${clientIp.slice(0, 4)}***`,
             timestamp: new Date().toISOString(),
-        }));
+        });
 
         return jsonResponse(
             { eroare: 'Eroare internă la salvarea consimțământului. Te rugăm să încerci din nou.' },
@@ -261,8 +262,8 @@ export const POST: APIRoute = async ({ request }) => {
 
     // ── 7. Log structurat JSON server-side ──────────────────────
     // Format parsabil de SIEM/Splunk/Datadog/orice agregator de loguri.
-    // NB: console.log pe server Astro Node ajunge în stdout → fișier de log.
-    console.log(JSON.stringify({
+    // Log JSON structurat prin secure logger (cu redacție automată).
+    secureLogger.info({
         eveniment: 'gdpr_consimtamant_salvat',
         timestamp: new Date().toISOString(),
         tip_consimtamant: tipConsimtamant,
@@ -273,7 +274,7 @@ export const POST: APIRoute = async ({ request }) => {
         referer: referer || null,
         versiune_politica: VERSIUNE_POLITICA,
         status: 'SUCCESS',
-    }));
+    });
 
     // ── 8. Răspuns 200 cu confirmare ────────────────────────────
     return jsonResponse(

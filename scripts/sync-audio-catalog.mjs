@@ -1,6 +1,7 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { secureLogger } from '../src/lib/secure-logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -129,11 +130,11 @@ async function generateCatalog() {
     await fs.mkdir(path.dirname(outputPath), { recursive: true });
     await fs.writeFile(outputPath, `${JSON.stringify(catalog, null, 2)}\n`, 'utf8');
 
-    console.log(`Catalog sincronizat: ${catalog.totalTracks} piese în ${catalog.categories.length} categorii.`);
-    console.log(`Fișier: ${outputPath}`);
+    secureLogger.info(`Catalog sincronizat: ${catalog.totalTracks} piese în ${catalog.categories.length} categorii.`);
+    secureLogger.info(`Fișier: ${outputPath}`);
 }
 
 generateCatalog().catch((error) => {
-    console.error('Eroare la generarea catalogului audio:', error);
+    secureLogger.error('Eroare la generarea catalogului audio:', error);
     process.exitCode = 1;
 });

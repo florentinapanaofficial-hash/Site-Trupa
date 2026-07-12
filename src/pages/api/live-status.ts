@@ -20,6 +20,7 @@
 
 import type { APIRoute } from 'astro';
 import { checkOrigin } from '../../lib/cors.js';
+import { secureLogger } from '../../lib/secure-logger.js';
 
 export const prerender = false;
 
@@ -66,15 +67,6 @@ const getFallbackPayload = (replayId: string | null, customerCode: string | null
     return cachedLiveStatus ?? buildOfflinePayload(replayId, customerCode);
 };
 
-const readErrorText = async (res: Response): Promise<string> => {
-    try {
-        const text = await res.text();
-        return text.length > 300 ? `${text.slice(0, 300)}...` : text;
-    } catch {
-        return '';
-    }
-};
-
 const fetchLiveStatusFromCloudflare = async (
     accountId: string,
     liveInputId: string,
@@ -99,13 +91,11 @@ const fetchLiveStatusFromCloudflare = async (
         });
 
         if (!statusRes.ok) {
-            const responseText = await readErrorText(statusRes);
-            console.error(
-                `[api/live-status] Cloudflare live_inputs/{id} endpoint error: status=${statusRes.status} liveInputId=${liveInputId} response=${responseText || 'empty'}`
+            secureLogger.error(
+                `[api/live-status] Cloudflare live_inputs endpoint error: status=${statusRes.status}`
             );
         } else {
             const statusData = await statusRes.json() as any;
-            console.log(`[api/live-status] Live input status response:`, JSON.stringify(statusData, null, 2));
 
             if (statusData?.success && statusData.result) {
                 const liveInput = statusData.result;
@@ -122,7 +112,6 @@ const fetchLiveStatusFromCloudflare = async (
                     liveInput?.meta?.live === true;
 
                 if (isLiveActive) {
-                    console.log(`[api/live-status] ✓ LIVE DETECTED - state: ${currentState}`);
 
                     // Dacă e active, obținem video UID din endpoint-ul de videos
                     const videosUrl = `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(accountId)}/stream/live_inputs/${encodeURIComponent(liveInputId)}/videos?limit=1`;
@@ -140,7 +129,6 @@ const fetchLiveStatusFromCloudflare = async (
                         const currentVideo = videosData?.result?.[0];
 
                         if (currentVideo?.uid) {
-                            console.log(`[api/live-status] ✓ Video UID: ${currentVideo.uid}`);
                             return {
                                 isLive: true,
                                 videoId: currentVideo.uid,
@@ -150,10 +138,8 @@ const fetchLiveStatusFromCloudflare = async (
                             };
                         }
                     } else {
-                        console.error(`[api/live-status] Failed to fetch videos: status=${videosRes.status}`);
+                        secureLogger.error(`[api/live-status] Failed to fetch videos: status=${videosRes.status}`);
                     }
-                } else {
-                    console.log(`[api/live-status] Live input not active - state: ${currentState}`);
                 }
             }
         }
@@ -171,12 +157,10 @@ const fetchLiveStatusFromCloudflare = async (
 
         if (fallbackRes.ok) {
             const fallbackData = (await fallbackRes.json()) as CloudflareLiveVideosResponse;
-            console.log(`[api/live-status] Videos endpoint response:`, JSON.stringify(fallbackData, null, 2));
 
             if (fallbackData?.success && Array.isArray(fallbackData.result)) {
                 const liveVideo = fallbackData.result.find((video) => video?.status?.state === 'live-inprogress');
                 if (liveVideo?.uid) {
-                    console.log(`[api/live-status] ✓ Found live video (state=live-inprogress): ${liveVideo.uid}`);
                     return {
                         isLive: true,
                         videoId: liveVideo.uid,
@@ -188,14 +172,13 @@ const fetchLiveStatusFromCloudflare = async (
             }
         }
 
-        console.log(`[api/live-status] No active live session found`);
         return buildOfflinePayload(replayId, customerCode);
     } catch (error) {
         if (error instanceof DOMException && error.name === 'AbortError') {
-            console.error(`[api/live-status] Cloudflare Stream API timeout after ${CLOUDFLARE_FETCH_TIMEOUT_MS}ms liveInputId=${liveInputId}`);
+            secureLogger.error(`[api/live-status] Cloudflare Stream API timeout after ${CLOUDFLARE_FETCH_TIMEOUT_MS}ms`);
         } else {
             const message = error instanceof Error ? error.message : 'unknown error';
-            console.error(`[api/live-status] Cloudflare Stream API request failed: liveInputId=${liveInputId} error=${message}`);
+            secureLogger.error(`[api/live-status] Cloudflare Stream API request failed: ${message}`);
         }
         return getFallbackPayload(replayId, customerCode);
     } finally {

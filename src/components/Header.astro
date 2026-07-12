@@ -82,7 +82,10 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
           aria-controls="top-menu-panel"
           aria-label="Deschide meniul principal"
         >
-          <span class="hamburger-icon pulse-icon" aria-hidden="true">☰</span>
+          <span class="hamburger-icon pulse-icon" aria-hidden="true">
+            <span class="hamburger-glyph">☰</span>
+            <span class="hamburger-label">MENIU</span>
+          </span>
           <span class="close-icon" aria-hidden="true">✕</span>
         </button>
       )}
@@ -148,6 +151,46 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
   {hasExpandableTopMenu && (
     <div class="mobile-menu-backdrop" data-menu-backdrop></div>
     <div id="top-menu-panel" class="top-menu-panel" data-top-menu-panel>
+      <button type="button" class="mobile-overlay-close" data-top-menu-close aria-label="Închide meniul principal">✕</button>
+
+      <div class="mobile-overlay-content">
+        <img
+          src="/images/sigla-fp-band-110.webp"
+          alt="Sigla Formația Florentina Pană"
+          class="mobile-overlay-logo"
+          loading="lazy"
+          decoding="async"
+          width="150"
+          height="80"
+        />
+
+        <!-- Mobil: listă verticală cu toate paginile -->
+        <nav class="nav-mobile-grid" aria-label="Navigație mobilă">
+          {mobileFullNavigation.map((item) => (
+            <a href={item.href} class={`left-side-link nav-link-mobile${item.color ? ` nav-btn-${item.color}` : ''}`} data-nav-link data-live-link={item.href === '/live/' ? 'true' : undefined}>
+              <span class="nav-label">{item.label}</span>
+            </a>
+          ))}
+        </nav>
+
+        <!-- Buton apreciere Google Review în meniu -->
+        <div class="menu-review-wrap">
+          <a
+            href="https://g.page/r/Ca7MqSu2OLysEAE/review"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="menu-review-btn"
+            aria-label="Oferă o recenzie Google pentru Formația Florentina Pană"
+          >
+            <span class="menu-review-stars" aria-hidden="true">★★★★★</span>
+            <span class="menu-review-text">
+              <span class="menu-review-main">Oferă o recenzie</span>
+              <span class="menu-review-sub">Cât de mult ți-a plăcut alături de noi?</span>
+            </span>
+          </a>
+        </div>
+      </div>
+
       <!-- Desktop: bară orizontală cu scroll -->
       <nav class="no-scrollbar section-container nav-desktop-bar flex min-w-0 items-center justify-start gap-4 overflow-x-auto pb-3 text-sm font-medium text-white/90 xl:justify-center" aria-label="Navigație principală">
         {desktopNavigation.map((item) => (
@@ -156,31 +199,6 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
           </a>
         ))}
       </nav>
-      <!-- Mobil: grilă verticală cu toate paginile -->
-      <nav class="nav-mobile-grid" aria-label="Navigație mobilă">
-        {mobileFullNavigation.map((item) => (
-          <a href={item.href} class={`left-side-link nav-link-mobile${item.color ? ` nav-btn-${item.color}` : ''}`} data-nav-link data-live-link={item.href === '/live/' ? 'true' : undefined}>
-            <span class="nav-label">{item.label}</span>
-          </a>
-        ))}
-      </nav>
-
-      <!-- Buton apreciere Google Review în meniu -->
-      <div class="menu-review-wrap">
-        <a
-          href="https://g.page/r/Ca7MqSu2OLysEAE/review"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="menu-review-btn"
-          aria-label="Oferă o recenzie Google pentru Formația Florentina Pană"
-        >
-          <span class="menu-review-stars" aria-hidden="true">★★★★★</span>
-          <span class="menu-review-text">
-            <span class="menu-review-main">Oferă o recenzie</span>
-            <span class="menu-review-sub">Cât de mult ți-a plăcut alături de noi?</span>
-          </span>
-        </a>
-      </div>
     </div>
   )}
 </header>
@@ -189,12 +207,13 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
   const initScrollSpy = () => {
     const headerEl = document.querySelector('[data-top-header]');
     const menuToggle = document.querySelector('[data-top-menu-toggle]');
+    const menuCloseButton = document.querySelector('[data-top-menu-close]');
     const menuBackdrop = document.querySelector('[data-menu-backdrop]');
     const mobileMq = window.matchMedia('(max-width: 767px)');
     const isMobileViewport = () => mobileMq.matches;
     const desktopNav = document.querySelector('.nav-desktop-bar');
     const mobileNav = document.querySelector('.nav-mobile-grid');
-    const topMenuNav = document.querySelector('#top-menu-panel nav');
+    const topMenuNavList = Array.from(document.querySelectorAll('#top-menu-panel nav'));
     let lastScrollY = window.scrollY;
     const MENU_KEY = 'top-menu-open';
     let inertRaf = 0;
@@ -287,6 +306,10 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       // Click pe backdrop → închide meniul
       if (menuBackdrop) {
         menuBackdrop.addEventListener('click', closeMenu);
+      }
+
+      if (menuCloseButton) {
+        menuCloseButton.addEventListener('click', closeMenu);
       }
 
       // Click pe orice link din meniu → închide meniul (și pe mobil)
@@ -485,10 +508,10 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       });
 
       // has-active pe containerul nav din top-menu-panel
-      if (topMenuNav) {
+      topMenuNavList.forEach((topMenuNav) => {
         const anyActive = routeLinkMap.some((item) => item.pathname === pathname);
         topMenuNav.classList.toggle('has-active', anyActive);
-      }
+      });
     };
 
     const sectionMap = links
@@ -545,7 +568,9 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       lastActiveHref = activeHref;
 
       // has-active pe containerul nav din top-menu-panel
-      if (topMenuNav) topMenuNav.classList.toggle('has-active', Boolean(activeHref));
+      topMenuNavList.forEach((topMenuNav) => {
+        topMenuNav.classList.toggle('has-active', Boolean(activeHref));
+      });
     };
 
     const getHeaderSpyOffset = () => {

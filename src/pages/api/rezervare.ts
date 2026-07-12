@@ -15,6 +15,7 @@
 
 import type { APIRoute } from 'astro';
 import { query } from '../../lib/db.js';
+import { secureLogger } from '../../lib/secure-logger.js';
 
 export const prerender = false;
 
@@ -133,7 +134,7 @@ export const POST: APIRoute = async ({ request }) => {
             [nume, telefon, eveniment, data, mesajSalvat || null],
         );
     } catch (err) {
-        console.error('[/api/rezervare] DB error:', err);
+        secureLogger.error('[/api/rezervare] DB error:', err);
         return jsonErr('Eroare server. Încearcă din nou sau contactează-ne direct la +40767369658.', 500);
     }
 

@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import DOMPurify from 'isomorphic-dompurify';
+import { secureLogger } from '../../lib/secure-logger.js';
 
 export const prerender = false;
 
@@ -108,7 +109,7 @@ export const POST: APIRoute = async ({ request }) => {
             return json({ error: 'Povestea trebuie să aibă între 10 și 5000 de caractere.' }, 400);
         }
         // In production, this would save to DB or file. For now, log it.
-        console.log(`[couple-upload] Story from ${couple.names}: ${story.substring(0, 100)}...`);
+        secureLogger.info(`[couple-upload] Story from ${couple.names}: ${story.substring(0, 100)}...`);
         return json({ success: true, message: 'Povestea a fost trimisă! O vom publica în curând.' }, 200);
     }
 
@@ -121,7 +122,7 @@ export const POST: APIRoute = async ({ request }) => {
         }
         const rawSource = typeof formData.get('source') === 'string' ? String(formData.get('source')) : '';
         sanitize(rawSource);
-        console.log(`[couple-upload] Recommendation from ${couple.names}: ${rec.substring(0, 100)}...`);
+        secureLogger.info(`[couple-upload] Recommendation from ${couple.names}: ${rec.substring(0, 100)}...`);
         return json({ success: true, message: 'Recomandarea a fost trimisă! Mulțumim frumos!' }, 200);
     }
 
@@ -132,7 +133,7 @@ export const POST: APIRoute = async ({ request }) => {
         if (!videoUrl || !videoUrl.startsWith('https://')) {
             return json({ error: 'Link-ul video trebuie să fie un URL valid (https://).' }, 400);
         }
-        console.log(`[couple-upload] Video from ${couple.names}: ${videoUrl}`);
+        secureLogger.info(`[couple-upload] Video from ${couple.names}: ${videoUrl}`);
         return json({ success: true, message: 'Link-ul video a fost trimis!' }, 200);
     }
 

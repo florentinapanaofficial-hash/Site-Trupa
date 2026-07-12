@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import DOMPurify from 'isomorphic-dompurify';
 import { query } from '../../lib/db.js';
 import { checkOrigin } from '../../lib/cors.js';
+import { secureLogger } from '../../lib/secure-logger.js';
 
 export const prerender = false;
 
@@ -145,7 +146,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     return jsonResponse({ success: true }, 201, cors.origin);
   } catch (error) {
-    console.error('Eroare la salvarea comentariului:', error);
+    secureLogger.error('Eroare la salvarea comentariului:', error);
     return jsonResponse({ error: 'Eroare interna la salvarea comentariului.' }, 500, cors.origin);
   }
 };
@@ -182,7 +183,7 @@ export const GET: APIRoute = async ({ url, request }) => {
 
     return jsonResponse({ comments: rows }, 200, cors.origin);
   } catch (error) {
-    console.error('Eroare la citirea comentariilor:', error);
+    secureLogger.error('Eroare la citirea comentariilor:', error);
     return jsonResponse({ error: 'Eroare interna la citirea comentariilor.' }, 500, cors.origin);
   }
 };

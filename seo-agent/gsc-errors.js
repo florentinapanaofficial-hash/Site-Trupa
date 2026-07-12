@@ -199,7 +199,6 @@ async function main() {
 
     const searchConsole = google.searchconsole({ version: 'v1', auth });
 
-    console.log(`   🔑 Service Account: ${clientEmail}`);
     console.log(`   🌐 Site: ${SITE_URL}`);
     console.log(`   🆔 Proprietate GSC: ${GSC_PROPERTY}\n`);
 

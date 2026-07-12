@@ -199,7 +199,6 @@ async function main() {
 
     const indexing = google.indexing({ version: 'v3', auth });
 
-    console.log(`  🔑 Service Account: ${clientEmail}`);
     console.log(`  🌐 Site: ${SITE_URL}\n`);
 
     // ── Trimitere URL-uri ────────────────────────────────
