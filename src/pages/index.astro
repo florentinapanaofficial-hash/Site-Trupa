@@ -998,6 +998,11 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
     margin: 0; padding: 0; overflow-x: hidden;
   }
 
+  :root {
+    --hp-section-pad: clamp(1rem, 2.4vw, 1.6rem);
+    --hp-section-pad-compact: clamp(0.9rem, 2vw, 1.3rem);
+  }
+
   .hero-slider {
     width: min(100%, 1120px);
     margin: 0.35rem auto 0;
@@ -1675,7 +1680,7 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
     gap: 1.5rem;
     max-width: var(--container-max);
     padding: 1.5rem var(--container-pad-x);
-    margin: -5rem auto clamp(2.5rem, 6vw, 4rem);
+    margin: -5rem auto clamp(1.25rem, 3.5vw, 2.2rem);
     position: relative;
     z-index: 4;
   }
@@ -1782,25 +1787,25 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
   .hp-trust-ribbon {
     max-width: var(--container-max);
     margin: 0 auto;
-    padding-block: clamp(1rem, 2.5vw, 1.35rem);
+    padding-block: var(--hp-section-pad-compact);
   }
 
   .hp-meet-teaser {
     max-width: var(--container-max);
     margin: 0 auto;
-    padding-block: clamp(1.1rem, 2.6vw, 1.8rem);
+    padding-block: var(--hp-section-pad);
   }
 
   .hp-convert-strip {
     max-width: var(--container-max);
     margin: 0 auto;
-    padding-block: clamp(0.55rem, 1.8vw, 1rem);
+    padding-block: var(--hp-section-pad-compact);
   }
 
   .hp-team-spotlight {
     max-width: var(--container-max);
     margin: 0 auto;
-    padding-block: clamp(1rem, 2.4vw, 1.6rem);
+    padding-block: var(--hp-section-pad);
   }
 
   .hp-team-head {
@@ -2112,7 +2117,7 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
   .hp-signature-flow {
     max-width: var(--container-max);
     margin: 0 auto;
-    padding-block: clamp(1.2rem, 2.8vw, 1.9rem);
+    padding-block: var(--hp-section-pad);
   }
 
   .hp-signature-head {
@@ -2712,7 +2717,7 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
   .hp-seo-section {
     max-width: var(--container-max);
     margin-inline: auto;
-    padding-block: var(--section-pad-y);
+    padding-block: var(--hp-section-pad);
     padding-inline: var(--container-pad-x);
   }
 
@@ -2861,7 +2866,7 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
   .hp-cinematic {
     max-width: var(--container-max);
     margin: 0 auto;
-    padding-block: clamp(2rem, 5vw, 3.5rem);
+    padding-block: var(--hp-section-pad);
   }
 
   .hp-cinematic-head {
@@ -3146,7 +3151,7 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
   .hp-proof {
     max-width: var(--container-max);
     margin: 0 auto;
-    padding-block: clamp(1.3rem, 3vw, 2rem);
+    padding-block: var(--hp-section-pad);
   }
 
   .hp-proof-head {

@@ -53,7 +53,7 @@ const mobileFullNavigation = [
 const hasExpandableTopMenu = mobileFullNavigation.length > 1;
 ---
 
-<header class="top-header fixed inset-x-0 top-0 z-40 border-b border-white/20 bg-ink" data-top-header>
+<header class="top-header fixed inset-x-0 top-0 z-[1200] border-b border-white/20 bg-ink" data-top-header>
   <div class="section-container header-bar flex items-center justify-between gap-2 py-3">
     <a href={isHomePage ? '#acasa' : '/#acasa'} class="inline-flex items-center gap-3" aria-label="Mergi la începutul paginii">
       <img
@@ -92,7 +92,7 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       )}
 
       <!-- YouTube — roșu brand oficial -->
-      {socialLinks.youtube && (
+      {!isHomePage && socialLinks.youtube && (
       <a href={socialLinks.youtube}
         class="social-btn social-btn--yt social-btn--prominent hidden h-9 w-9 sm:inline-grid sm:h-10 sm:w-10"
         target="_blank" rel="noopener noreferrer" aria-label="Deschide YouTube">
@@ -105,7 +105,7 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       )}
 
       <!-- Facebook — albastru brand oficial (ascuns pe mobil, vizibil sm+) -->
-      {socialLinks.facebook && (
+      {!isHomePage && socialLinks.facebook && (
       <a href={socialLinks.facebook}
         class="social-btn social-btn--fb social-btn--prominent hidden h-9 w-9 sm:inline-grid sm:h-10 sm:w-10"
         target="_blank" rel="noopener noreferrer" aria-label="Deschide Facebook">
@@ -117,7 +117,7 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       )}
 
       <!-- Instagram — gradient brand oficial -->
-      {socialLinks.instagram && (
+      {!isHomePage && socialLinks.instagram && (
       <a href={socialLinks.instagram}
         class="social-btn social-btn--ig social-btn--prominent hidden h-9 w-9 sm:inline-grid sm:h-10 sm:w-10"
         target="_blank" rel="noopener noreferrer" aria-label="Deschide Instagram">
@@ -131,7 +131,7 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       )}
 
       <!-- TikTok — negru brand + efect neon cyan/roșu (ascuns pe mobil, vizibil sm+) -->
-      {socialLinks.tiktok && (
+      {!isHomePage && socialLinks.tiktok && (
       <a href={socialLinks.tiktok}
         class="social-btn social-btn--tt social-btn--prominent h-9 w-9 sm:h-10 sm:w-10 hidden sm:inline-grid"
         target="_blank" rel="noopener noreferrer" aria-label="Deschide TikTok">
