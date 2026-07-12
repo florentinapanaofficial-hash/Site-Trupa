@@ -7,13 +7,6 @@ import couplesData from '../data/couples.json';
 import heroImg from '../assets/card-1-panoramica.jpg';
 
 const optimizedHero = await getImage({ src: heroImg, format: 'webp', width: 320, height: 213 });
-const optimizedHeroSliderFirst = await getImage({ src: heroImg, format: 'webp', width: 800, quality: 80 });
-
-const heroSliderPhotos = [
-  { src: heroImg, alt: 'Formația Florentina Pană pe scenă la un eveniment live' },
-  { src: heroImg, alt: 'Atmosferă de petrecere cu formația live în Pitești' },
-  { src: heroImg, alt: 'Moment artistic live pentru nuntă în Argeș' },
-];
 
 const { acasa } = seo;
 const { contact } = siteContent;
@@ -60,6 +53,24 @@ const homepagePhotoSources = {
   },
 } as const;
 
+const heroSliderPhotos = [
+  {
+    ...homepagePhotoSources.panoramica2,
+    alt: 'Formația Florentina Pană în plin show live pe scenă',
+    position: 'center 38%',
+  },
+  {
+    ...homepagePhotoSources.claudiuFlorentina,
+    alt: 'Moment live în duet pe scenă la un eveniment premium',
+    position: 'center 26%',
+  },
+  {
+    ...homepagePhotoSources.grupArabesc,
+    alt: 'Invitați pe ringul de dans la un moment live energic',
+    position: 'center 34%',
+  },
+] as const;
+
 const heroPhotos: Array<{ variant: keyof typeof homepagePhotoSources; alt: string }> = [
   {
     variant: 'panoramica2',
@@ -91,41 +102,38 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
 
 <BaseLayout title={acasa.meta.title} description={acasa.meta.description} ogImage={siteContent.seo.ogImage}>
   <Fragment slot="head">
-    <link rel="preload" as="image" href={optimizedHeroSliderFirst.src} type="image/webp" fetchpriority="high" />
     <script is:inline type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>
 
   <section class="hero-slider" aria-label="Galerie automată cu imagini live Formația Florentina Pană">
-    <div class="hero-slider-track" data-hero-slider>
-      <div class="hero-slider-slide is-active" data-hero-slide>
-        <Image
-          src={heroSliderPhotos[0].src}
-          alt={heroSliderPhotos[0].alt}
-          widths={[360, 480, 640, 800]}
-          sizes="(max-width: 767px) 92vw, 800px"
-          quality={80}
-          format="webp"
-          class="hero-slider-image"
-          loading="eager"
-          fetchpriority="high"
-          decoding="sync"
-        />
+    <div class="hero-slider-track" data-hero-slider data-ready="false">
+      <div class="hero-slider-placeholder" aria-hidden="true">
+        Momente live autentice — se încarcă galeria foto
       </div>
 
-      {heroSliderPhotos.slice(1).map((slide) => (
-        <div class="hero-slider-slide" data-hero-slide>
-          <Image
-            src={slide.src}
-            alt={slide.alt}
-            widths={[480, 640, 800, 1024, 1280]}
-            sizes="(max-width: 767px) 92vw, (max-width: 1280px) 100vw, 1120px"
-            quality={80}
-            format="webp"
-            class="hero-slider-image"
-            loading="lazy"
-            fetchpriority="low"
-            decoding="async"
-          />
+      {heroSliderPhotos.map((slide, index) => (
+        <div class={`hero-slider-slide${index === 0 ? ' is-active' : ''}`} data-hero-slide style={`--slide-pos: ${slide.position};`}>
+          <picture>
+            <source
+              type="image/avif"
+              srcset={slide.avifSrcSet}
+              sizes="(max-width: 767px) 92vw, (max-width: 1280px) 96vw, 1120px"
+            />
+            <source
+              type="image/webp"
+              srcset={slide.webpSrcSet}
+              sizes="(max-width: 767px) 92vw, (max-width: 1280px) 96vw, 1120px"
+            />
+            <img
+              src={slide.fallbackSrc}
+              alt={slide.alt}
+              class="hero-slider-image"
+              loading="lazy"
+              decoding="async"
+              width="1000"
+              height="560"
+            />
+          </picture>
         </div>
       ))}
     </div>
@@ -805,11 +813,37 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
       if (!slider) return;
 
       const slides = Array.from(slider.querySelectorAll('[data-hero-slide]'));
+      if (slides.length < 1) return;
+
+      const REVEAL_DELAY_MS = 3200;
+      const AUTOPLAY_DELAY_AFTER_REVEAL_MS = 1200;
+
+      const revealSlider = () => {
+        slider.setAttribute('data-ready', 'true');
+      };
+
+      const scheduleReveal = () => {
+        if ('requestIdleCallback' in window) {
+          window.requestIdleCallback(() => {
+            window.setTimeout(revealSlider, REVEAL_DELAY_MS);
+          }, { timeout: 2200 });
+        } else {
+          window.setTimeout(revealSlider, REVEAL_DELAY_MS);
+        }
+      };
+
+      if (document.readyState === 'complete') {
+        scheduleReveal();
+      } else {
+        window.addEventListener('load', scheduleReveal, { once: true });
+      }
+
       if (slides.length < 2) return;
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
       let activeIndex = 0;
       const startSlider = () => {
+        if (slider.getAttribute('data-ready') !== 'true') return;
         slider.setAttribute('data-running', 'true');
         window.setInterval(() => {
           slides[activeIndex].classList.remove('is-active');
@@ -818,8 +852,8 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
         }, 4200);
       };
 
-      // Primul frame rămâne static pentru LCP, apoi pornim sliderul.
-      window.setTimeout(startSlider, 3600);
+      // Sliderul pornește după ce zona devine vizibilă și pagina trece de faza critică.
+      window.setTimeout(startSlider, REVEAL_DELAY_MS + AUTOPLAY_DELAY_AFTER_REVEAL_MS);
     })();
   </script>
 
@@ -981,11 +1015,41 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
     background: rgba(6, 12, 29, 0.8);
   }
 
+  .hero-slider-placeholder {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1rem;
+    text-align: center;
+    color: rgba(236, 244, 255, 0.9);
+    font-size: clamp(0.78rem, 1.8vw, 0.92rem);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background:
+      linear-gradient(160deg, rgba(5, 13, 31, 0.98), rgba(9, 22, 48, 0.98)),
+      radial-gradient(circle at 80% 14%, rgba(245, 166, 35, 0.2), transparent 44%);
+    transition: opacity 380ms ease;
+  }
+
+  .hero-slider-track[data-ready='true'] .hero-slider-placeholder {
+    opacity: 0;
+    pointer-events: none;
+  }
+
   .hero-slider-slide {
     position: absolute;
     inset: 0;
     opacity: 0;
     transition: none;
+    display: none;
+  }
+
+  .hero-slider-track[data-ready='true'] .hero-slider-slide {
+    display: block;
   }
 
   .hero-slider-track[data-running='true'] .hero-slider-slide {
@@ -1000,7 +1064,7 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center 30%;
+    object-position: var(--slide-pos, center center);
     display: block;
   }
 
