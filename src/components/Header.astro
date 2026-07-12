@@ -54,7 +54,7 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
 ---
 
 <header class="top-header fixed inset-x-0 top-0 z-40 border-b border-white/20 bg-ink" data-top-header>
-  <div class="section-container header-bar flex items-center justify-between gap-3 py-3">
+  <div class="section-container header-bar flex items-center justify-between gap-2 py-3">
     <a href={isHomePage ? '#acasa' : '/#acasa'} class="inline-flex items-center gap-3" aria-label="Mergi la începutul paginii">
       <img
         src="/images/sigla-fp-band-110.webp"
@@ -66,7 +66,8 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
         height="60"
       />
       <span class="leading-tight">
-        <span class="block text-sm font-bold tracking-tight text-white sm:text-base">{brand.name}</span>
+        <span class="block text-xs font-bold tracking-tight text-white sm:hidden">FP Band</span>
+        <span class="hidden text-sm font-bold tracking-tight text-white sm:block sm:text-base">{brand.name}</span>
         <span class="hidden text-xs text-white/85 sm:block">Live Band Premium</span>
         <span class="header-premium-pill hidden sm:inline-flex">Rezervări 2026-2027</span>
       </span>
@@ -93,7 +94,7 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       <!-- YouTube — roșu brand oficial -->
       {socialLinks.youtube && (
       <a href={socialLinks.youtube}
-        class="social-btn social-btn--yt social-btn--prominent h-9 w-9 sm:h-10 sm:w-10"
+        class="social-btn social-btn--yt social-btn--prominent hidden h-9 w-9 sm:inline-grid sm:h-10 sm:w-10"
         target="_blank" rel="noopener noreferrer" aria-label="Deschide YouTube">
         <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" role="img" aria-hidden="true">
           <rect x="2" y="6" width="20" height="13" rx="4" fill="#fff"/>
@@ -106,7 +107,7 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       <!-- Facebook — albastru brand oficial (ascuns pe mobil, vizibil sm+) -->
       {socialLinks.facebook && (
       <a href={socialLinks.facebook}
-        class="social-btn social-btn--fb social-btn--prominent h-9 w-9 sm:h-10 sm:w-10"
+        class="social-btn social-btn--fb social-btn--prominent hidden h-9 w-9 sm:inline-grid sm:h-10 sm:w-10"
         target="_blank" rel="noopener noreferrer" aria-label="Deschide Facebook">
         <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" role="img" aria-hidden="true">
           <path d="M13.5 21V14.3H16l.4-2.85H13.5V9.7c0-.82.38-1.2 1.38-1.2H16.5V5.85C16.05 5.77 15.1 5.7 14 5.7c-2.65 0-4.05 1.4-4.05 4.15v1.6H8v2.85h1.95V21H13.5z" fill="#fff"/>
@@ -118,7 +119,7 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       <!-- Instagram — gradient brand oficial -->
       {socialLinks.instagram && (
       <a href={socialLinks.instagram}
-        class="social-btn social-btn--ig social-btn--prominent h-9 w-9 sm:h-10 sm:w-10"
+        class="social-btn social-btn--ig social-btn--prominent hidden h-9 w-9 sm:inline-grid sm:h-10 sm:w-10"
         target="_blank" rel="noopener noreferrer" aria-label="Deschide Instagram">
         <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" role="img" aria-hidden="true">
           <rect x="2.5" y="2.5" width="19" height="19" rx="5.5" stroke="#fff" stroke-width="2.1"/>
@@ -144,6 +145,32 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
         </svg>
         <span class="sr-only">TikTok Formația Florentina Pană</span>
       </a>
+      )}
+    </div>
+  </div>
+
+  <div class="section-container social-strip-mobile sm:hidden" aria-label="Canale social media">
+    <span class="social-strip-mobile__label">Vizionează-ne pe</span>
+    <div class="social-strip-mobile__links">
+      {socialLinks.youtube && (
+        <a href={socialLinks.youtube} class="social-strip-mobile__link" target="_blank" rel="noopener noreferrer" aria-label="Deschide YouTube">
+          YouTube
+        </a>
+      )}
+      {socialLinks.facebook && (
+        <a href={socialLinks.facebook} class="social-strip-mobile__link" target="_blank" rel="noopener noreferrer" aria-label="Deschide Facebook">
+          Facebook
+        </a>
+      )}
+      {socialLinks.instagram && (
+        <a href={socialLinks.instagram} class="social-strip-mobile__link" target="_blank" rel="noopener noreferrer" aria-label="Deschide Instagram">
+          Instagram
+        </a>
+      )}
+      {socialLinks.tiktok && (
+        <a href={socialLinks.tiktok} class="social-strip-mobile__link" target="_blank" rel="noopener noreferrer" aria-label="Deschide TikTok">
+          TikTok
+        </a>
       )}
     </div>
   </div>

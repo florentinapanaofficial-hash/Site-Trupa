@@ -141,11 +141,70 @@
   border: 1.5px solid rgba(255, 255, 255, 0.55);
 }
 
+.social-strip-mobile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding-top: 0.1rem;
+  padding-bottom: 0.55rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.social-strip-mobile__label {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.73rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.social-strip-mobile__links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.social-strip-mobile__link {
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-decoration: none;
+  padding-inline: 0.48rem;
+  line-height: 1.2;
+}
+
+.social-strip-mobile__link+.social-strip-mobile__link {
+  border-left: 1px solid rgba(255, 255, 255, 0.34);
+}
+
+.social-strip-mobile__link:hover,
+.social-strip-mobile__link:focus-visible {
+  color: #ffe7a8;
+}
+
 /* Zonă tactilă min 44px pe mobil */
 @media (max-width: 767px) {
   .social-btn {
     min-width: 44px;
     min-height: 44px;
+  }
+
+  .social-strip-mobile {
+    gap: 0.4rem;
+    padding-bottom: 0.45rem;
+  }
+
+  .social-strip-mobile__label {
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+  }
+
+  .social-strip-mobile__link {
+    font-size: 0.75rem;
+    padding-inline: 0.4rem;
   }
 }
 
