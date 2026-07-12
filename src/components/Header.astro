@@ -236,16 +236,43 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
     const menuToggle = document.querySelector('[data-top-menu-toggle]');
     const menuCloseButton = document.querySelector('[data-top-menu-close]');
     const menuBackdrop = document.querySelector('[data-menu-backdrop]');
-    const mobileMq = window.matchMedia('(max-width: 767px)');
+    const menuPanel = document.querySelector('[data-top-menu-panel]');
+    const mobileMq = window.matchMedia('(max-width: 1024px)');
     const isMobileViewport = () => mobileMq.matches;
     const desktopNav = document.querySelector('.nav-desktop-bar');
     const mobileNav = document.querySelector('.nav-mobile-grid');
     const topMenuNavList = Array.from(document.querySelectorAll('#top-menu-panel nav'));
     let lastScrollY = window.scrollY;
     const MENU_KEY = 'top-menu-open';
+    const ENABLE_GESTURE_CLOSE = false;
     let inertRaf = 0;
     let cachedHeaderSpyOffset = 0;
     let cachedOrderedSections = [];
+    let bodyScrollLockY = 0;
+
+    const lockMobileBodyScroll = () => {
+      if (!isMobileViewport()) return;
+      bodyScrollLockY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${bodyScrollLockY}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
+    };
+
+    const unlockMobileBodyScroll = () => {
+      const offset = Math.abs(parseInt(document.body.style.top || '0', 10)) || bodyScrollLockY;
+      document.body.style.removeProperty('position');
+      document.body.style.removeProperty('top');
+      document.body.style.removeProperty('left');
+      document.body.style.removeProperty('right');
+      document.body.style.removeProperty('width');
+      document.body.style.removeProperty('overflow');
+      if (isMobileViewport()) {
+        window.scrollTo(0, offset);
+      }
+    };
 
     const recalcHeaderSpyOffset = () => {
       cachedHeaderSpyOffset = (headerEl?.offsetHeight ?? 0) + 8;
@@ -264,6 +291,12 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
     const syncTopMenuBodyClass = (isOpen) => {
       document.body.classList.toggle('top-menu-expanded', Boolean(isOpen));
       document.body.classList.toggle('mobile-menu-open', Boolean(isOpen) && isMobileViewport());
+
+      if (Boolean(isOpen) && isMobileViewport()) {
+        lockMobileBodyScroll();
+      } else {
+        unlockMobileBodyScroll();
+      }
 
       /* Marchează nav-ul inactiv ca inert (scos din tab order + accesibilitate)
          pentru a nu încărca DOM-ul cu elemente duplicate desktop/mobil */
@@ -317,12 +350,14 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
 
       // Salvează scrollY la deschidere (pt scroll-close)
       let menuOpenScrollY = window.scrollY;
+      let menuOpenedAt = 0;
 
       menuToggle.addEventListener('click', () => {
         const willOpen = !headerEl.classList.contains('menu-open');
         if (willOpen) {
           openMenu();
           menuOpenScrollY = window.scrollY;
+          menuOpenedAt = Date.now();
           requestAnimationFrame(recalcHeaderSpyOffset);
         } else {
           closeMenu();
@@ -343,7 +378,7 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       const navLinks = document.querySelectorAll('#top-menu-panel [data-nav-link]');
       navLinks.forEach((link) => {
         link.addEventListener('click', () => {
-          if (headerEl.classList.contains('menu-open')) {
+          if (!isMobileViewport() && headerEl.classList.contains('menu-open')) {
             closeMenu();
           }
         });
@@ -366,9 +401,11 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       let isScrollClosing = false;
 
       const triggerScrollClose = () => {
+        if (!ENABLE_GESTURE_CLOSE) return;
         if (isScrollClosing) return;
         if (!isMobileViewport()) return;
         if (!headerEl.classList.contains('menu-open')) return;
+        if (Date.now() - menuOpenedAt < 450) return;
         isScrollClosing = true;
         headerEl.classList.add('scroll-closing');
         setTimeout(() => { closeMenu(); }, 80);
@@ -381,34 +418,42 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       // Metoda 1: window scroll — threshold absolut, nu delta
       // Închide dacă user a scrollat >8px față de când s-a deschis meniul
       window.addEventListener('scroll', () => {
+        if (!ENABLE_GESTURE_CLOSE) return;
         if (!isMobileViewport()) return;
         if (!headerEl.classList.contains('menu-open')) return;
-        if (window.scrollY > menuOpenScrollY + 8) {
+        if (window.scrollY > menuOpenScrollY + 36) {
           triggerScrollClose();
         }
       }, { passive: true });
 
       // Metoda 2: touchmove — detectează swipe-up chiar dacă pagina nu scrollează
       let touchStartY = 0;
+      let touchStartedInsideMenu = false;
       window.addEventListener('touchstart', (e) => {
-        if (e.touches.length) touchStartY = e.touches[0].clientY;
+        if (!e.touches.length) return;
+        touchStartY = e.touches[0].clientY;
+        touchStartedInsideMenu = Boolean(menuPanel && menuPanel.contains(e.target));
       }, { passive: true });
 
       window.addEventListener('touchmove', (e) => {
+        if (!ENABLE_GESTURE_CLOSE) return;
         if (!isMobileViewport()) return;
         if (!headerEl.classList.contains('menu-open')) return;
+        if (touchStartedInsideMenu) return;
         if (!e.touches.length) return;
         const deltaY = touchStartY - e.touches[0].clientY;
-        if (deltaY > 8) {
+        if (deltaY > 28) {
           triggerScrollClose();
         }
       }, { passive: true });
 
       // Metoda 3: wheel event — unele browsere mobile emit wheel în loc de scroll
       window.addEventListener('wheel', (e) => {
+        if (!ENABLE_GESTURE_CLOSE) return;
         if (!isMobileViewport()) return;
         if (!headerEl.classList.contains('menu-open')) return;
-        if (e.deltaY > 5) {
+        if (menuPanel && menuPanel.contains(e.target)) return;
+        if (e.deltaY > 24) {
           triggerScrollClose();
         }
       }, { passive: true });

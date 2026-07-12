@@ -598,7 +598,7 @@ function initiale(name: string): string {
         photos[idx].classList.remove('is-active');
         idx = (idx + 1) % photos.length;
         photos[idx].classList.add('is-active');
-      }, 2400);
+      }, 4200);
     });
     card.addEventListener('mouseleave', function() {
       clearInterval(timer); timer = null;
@@ -1258,6 +1258,42 @@ function initiale(name: string): string {
   }
 
   /* ══ MOBILE ══ */
+  @media (max-width: 1024px) {
+    .ac {
+      aspect-ratio: auto;
+      min-height: unset;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .ac-photos {
+      position: relative;
+      inset: auto;
+      width: 100%;
+      aspect-ratio: 2 / 3;
+      min-height: 300px;
+      flex: none;
+    }
+
+    .ac-body {
+      position: relative;
+      left: auto;
+      right: auto;
+      bottom: auto;
+      padding: 0.9rem 3.6rem 0.95rem 0.9rem;
+      background: linear-gradient(180deg, rgba(4, 10, 25, 0.14), rgba(4, 10, 25, 0.9));
+    }
+
+    .ac-name {
+      line-height: 1.15;
+      text-shadow: none;
+    }
+
+    .ac-spec {
+      line-height: 1.5;
+    }
+  }
+
   @media (max-width: 767px) {
     .ac-body { padding: 0.9rem 3.5rem 0.9rem 0.9rem; }
     .ac-name { font-size: clamp(0.95rem, 4vw, 1.25rem); }
