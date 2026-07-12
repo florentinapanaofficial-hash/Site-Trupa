@@ -141,6 +141,11 @@
   border: 1.5px solid rgba(255, 255, 255, 0.55);
 }
 
+/* Homepage: iconițele social din header nu trebuie afișate */
+body.is-homepage .header-bar .social-btn--prominent {
+  display: none !important;
+}
+
 .social-strip-mobile {
   display: flex;
   align-items: center;
@@ -1318,7 +1323,7 @@ html::-webkit-scrollbar-thumb:hover {
 /* ── Onboarding: puls PROEMINENT pe iconița hamburger ──
    Ring auriu expandat + scale + glow intens + wiggle ușor pentru a atrage clar atenția. */
 .pulse-icon.pulse-animation {
-  animation: menuPulse 1.4s ease-in-out infinite;
+  animation: menuPulse 2.6s ease-in-out infinite;
   position: relative;
   z-index: 1;
 }
@@ -1332,11 +1337,11 @@ html::-webkit-scrollbar-thumb:hover {
   border-radius: inherit;
   border: 2px solid rgba(212, 175, 55, 0.85);
   pointer-events: none;
-  animation: menuRipple 1.8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  animation: menuRipple 3.2s cubic-bezier(0.22, 1, 0.36, 1) infinite;
 }
 
 .hamburger-btn:has(.pulse-icon.pulse-animation)::after {
-  animation-delay: 0.9s;
+  animation-delay: 1.6s;
 }
 
 /* Evidențiem și butonul: chenar auriu + fundal subtil aurit */
@@ -1356,19 +1361,19 @@ html::-webkit-scrollbar-thumb:hover {
   }
 
   35% {
-    transform: scale(1.28) rotate(-6deg);
+    transform: scale(1.12) rotate(-2deg);
     text-shadow: 0 0 14px rgba(212, 175, 55, 0.9);
     color: #f5d76e;
   }
 
   55% {
-    transform: scale(1.28) rotate(6deg);
+    transform: scale(1.12) rotate(2deg);
     text-shadow: 0 0 14px rgba(212, 175, 55, 0.9);
     color: #f5d76e;
   }
 
   75% {
-    transform: scale(1.18) rotate(0deg);
+    transform: scale(1.06) rotate(0deg);
     text-shadow: 0 0 10px rgba(212, 175, 55, 0.7);
     color: #f5d76e;
   }
@@ -2514,13 +2519,13 @@ details:focus-visible {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 2.75rem;
+    width: 2.15rem;
     min-width: 44px;
-    height: 6rem;
+    height: 4.6rem;
     min-height: 44px;
     border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(255, 255, 255, 0.07);
-    color: rgba(255, 255, 255, 0.50);
+    background: rgba(8, 20, 44, 0.46);
+    color: rgba(225, 236, 255, 0.62);
     cursor: pointer;
     pointer-events: auto;
     transition:
@@ -2530,13 +2535,13 @@ details:focus-visible {
   }
 
   .mob-arrow--prev {
-    left: 0;
+    left: max(2px, env(safe-area-inset-left));
     border-left: none;
     border-radius: 0 1.25rem 1.25rem 0;
   }
 
   .mob-arrow--next {
-    right: 0;
+    right: max(2px, env(safe-area-inset-right));
     border-right: none;
     border-radius: 1.25rem 0 0 1.25rem;
   }

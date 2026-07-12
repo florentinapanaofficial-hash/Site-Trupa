@@ -1004,15 +1004,21 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
   }
 
   .hero-slider {
-    width: min(100%, 1120px);
+    width: 100%;
+    max-width: 1120px;
     margin: 0.35rem auto 0;
     padding-inline: clamp(0.5rem, 2vw, 1rem);
+    box-sizing: border-box;
+    overflow: clip;
   }
 
   .hero-slider-track {
     position: relative;
+    width: 100%;
+    max-width: 100%;
     border-radius: 1.35rem;
     overflow: hidden;
+    box-sizing: border-box;
     aspect-ratio: 16 / 6.8;
     min-height: clamp(190px, 26vw, 360px);
     border: 1px solid rgba(255, 255, 255, 0.16);
@@ -1091,6 +1097,7 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
     .hero-slider {
       margin-top: 0.2rem;
       padding-inline: 0.5rem;
+      max-width: 100%;
     }
 
     .hero-slider-track {
@@ -1103,6 +1110,33 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
       font-size: clamp(2rem, 8vw, 3rem);
       line-height: 1.12;
     }
+  }
+
+  @media (max-width: 374px) {
+    .hero-slider {
+      padding-inline: 0.35rem;
+    }
+
+    .hero-slider-track {
+      border-radius: 0.9rem;
+    }
+  }
+
+  .hp-cinematic-grid,
+  .hp-team-grid,
+  .hp-seo-grid,
+  .hp-seo-grid--3,
+  .hp-proof-grid {
+    min-width: 0;
+  }
+
+  .hp-cine-card,
+  .hp-cine-story,
+  .hp-cine-editorial,
+  .hp-team-card,
+  .hp-seo-block,
+  .hp-proof-card {
+    min-width: 0;
   }
 
   /* ════════════════════════════════════════════════════════════════
