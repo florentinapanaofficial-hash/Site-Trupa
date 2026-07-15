@@ -43,7 +43,6 @@ const STATIC_PAGES = [
     '/comunitate/',
     '/aparitii-tv/',
     '/contact/',
-    '/blog/',
     '/vlog/',
     '/publicatii/',
     '/politica-confidentialitate/',

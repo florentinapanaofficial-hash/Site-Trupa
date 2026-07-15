@@ -35,6 +35,7 @@ export default defineConfig({
         `${siteUrl}/momente-cu-mirii/`,
         `${siteUrl}/membri/`,
         `${siteUrl}/aparitii-tv/`,
+        `${siteUrl}/vlog/`,
         `${siteUrl}/formatie-nunta/curtea-de-arges/`,
       ],
       filter: (page) => {
