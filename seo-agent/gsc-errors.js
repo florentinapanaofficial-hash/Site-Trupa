@@ -50,7 +50,6 @@ const STATIC_PAGES = [
     '/politica-cookie/',
     '/termeni-conditii/',
     '/colaboratori/saxofon/',
-    '/colaboratori/tambal/',
 ];
 
 // ── Încarcă .env manual ──────────────────────────────────
