@@ -34,9 +34,10 @@ interface Props {
   youtubeId: string;
   title: string;
   class?: string;
+  miniOnScroll?: boolean;
 }
 
-const { youtubeId, title, class: className = '' } = Astro.props;
+const { youtubeId, title, class: className = '', miniOnScroll = false } = Astro.props;
 
 const thumbJpg = `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
 const embedSrc = `https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0`;
@@ -48,6 +49,7 @@ const ytLink = `https://www.youtube.com/watch?v=${youtubeId}`;
   data-yt-id={youtubeId}
   data-yt-title={title}
   data-yt-src={embedSrc}
+  data-yt-mini-on-scroll={miniOnScroll ? 'true' : undefined}
   role="figure"
   aria-label={title}
 >
@@ -93,6 +95,12 @@ const ytLink = `https://www.youtube.com/watch?v=${youtubeId}`;
       </a>
     </div>
   </div>
+
+  {miniOnScroll && (
+    <button class="yt-gate__mini-return" type="button" aria-label="Revino la videoclip">
+      Revino la video
+    </button>
+  )}
 </div>
 
 <script is:inline>
@@ -105,6 +113,68 @@ const ytLink = `https://www.youtube.com/watch?v=${youtubeId}`;
     
     var YT_PAUSE = JSON.stringify({ event: 'command', func: 'pauseVideo', args: '' });
     var YT_ORIGIN = 'https://www.youtube-nocookie.com';
+    var MINI_GATE_SELECTOR = '.yt-gate[data-yt-mini-on-scroll="true"]';
+    var miniObserver = null;
+
+    function hasMiniOnScroll(gate) {
+      return gate && gate.getAttribute('data-yt-mini-on-scroll') === 'true';
+    }
+
+    function findMiniGateBySource(sourceWindow) {
+      if (!sourceWindow) return null;
+      var miniIframes = document.querySelectorAll(MINI_GATE_SELECTOR + ' iframe[src*="youtube"]');
+      for (var i = 0; i < miniIframes.length; i += 1) {
+        var iframe = miniIframes[i];
+        if (iframe.contentWindow === sourceWindow) {
+          return iframe.closest('.yt-gate');
+        }
+      }
+      return null;
+    }
+
+    function syncMiniDocumentState() {
+      var hasMini = document.querySelector('.yt-gate--mini') !== null;
+      document.documentElement.classList.toggle('yt-mini-active', hasMini);
+    }
+
+    function syncMiniGate(gate) {
+      if (!hasMiniOnScroll(gate)) return;
+      var isPlaying = gate.getAttribute('data-yt-playing') === 'true';
+      var isOutOfView = gate.getAttribute('data-yt-out-of-view') === 'true';
+      gate.classList.toggle('yt-gate--mini', isPlaying && isOutOfView);
+      syncMiniDocumentState();
+    }
+
+    function ensureMiniObserver() {
+      if (miniObserver || !('IntersectionObserver' in window)) return;
+
+      miniObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          var gate = entry.target;
+          var outOfView = !entry.isIntersecting || entry.intersectionRatio < 0.35;
+          gate.setAttribute('data-yt-out-of-view', outOfView ? 'true' : 'false');
+          syncMiniGate(gate);
+        });
+      }, {
+        threshold: [0, 0.35, 0.7, 1],
+      });
+    }
+
+    function registerMiniGate(gate) {
+      if (!hasMiniOnScroll(gate)) return;
+
+      if (!gate.hasAttribute('data-yt-playing')) {
+        gate.setAttribute('data-yt-playing', 'false');
+      }
+      if (!gate.hasAttribute('data-yt-out-of-view')) {
+        gate.setAttribute('data-yt-out-of-view', 'false');
+      }
+
+      ensureMiniObserver();
+      if (miniObserver) {
+        miniObserver.observe(gate);
+      }
+    }
 
     /**
      * Pauzează TOȚI playerele YouTube de pe pagină mai puțin cel activ
@@ -138,8 +208,25 @@ const ytLink = `https://www.youtube.com/watch?v=${youtubeId}`;
       }
 
       // YouTube trimite playerState: 1 (playing) prin evenimentul infoDelivery
-      if (data.event === 'infoDelivery' && data.info && data.info.playerState === 1) {
-        pauseAllExcept(e.source);
+      if (data.event === 'infoDelivery' && data.info && typeof data.info.playerState === 'number') {
+        var playerState = data.info.playerState;
+        var activeMiniGate = findMiniGateBySource(e.source);
+
+        if (activeMiniGate) {
+          activeMiniGate.setAttribute('data-yt-playing', playerState === 1 ? 'true' : 'false');
+          syncMiniGate(activeMiniGate);
+        }
+
+        if (playerState === 1) {
+          pauseAllExcept(e.source);
+
+          document.querySelectorAll(MINI_GATE_SELECTOR).forEach(function (gate) {
+            if (gate !== activeMiniGate) {
+              gate.setAttribute('data-yt-playing', 'false');
+              syncMiniGate(gate);
+            }
+          });
+        }
       }
     });
 
@@ -164,6 +251,7 @@ const ytLink = `https://www.youtube.com/watch?v=${youtubeId}`;
       iframe.setAttribute('loading', 'lazy');
       iframe.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:0;';
       gate.appendChild(iframe);
+      registerMiniGate(gate);
     }
 
     /** Activează TOATE embed-urile de pe pagină */
@@ -188,6 +276,19 @@ const ytLink = `https://www.youtube.com/watch?v=${youtubeId}`;
       try { localStorage.setItem('cookie_consent', 'granted'); } catch (_) {}
       window.dispatchEvent(new CustomEvent('cookie:granted'));
     });
+
+    document.addEventListener('click', function (e) {
+      var returnBtn = (e.target).closest?.('.yt-gate__mini-return');
+      if (!returnBtn) return;
+
+      var gate = returnBtn.closest('.yt-gate');
+      if (!gate) return;
+
+      gate.classList.remove('yt-gate--mini');
+      gate.setAttribute('data-yt-out-of-view', 'false');
+      syncMiniDocumentState();
+      gate.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
   })();
 </script>
 
@@ -200,6 +301,63 @@ const ytLink = `https://www.youtube.com/watch?v=${youtubeId}`;
     /* Asigurăm aspect-ratio 16/9 când nu e furnizat din exterior */
     aspect-ratio: 16 / 9;
     background: #0a0d1c;
+  }
+
+  .yt-gate__mini-return {
+    position: absolute;
+    top: 0.6rem;
+    left: 0.6rem;
+    z-index: 20;
+    border: 1px solid rgba(255, 255, 255, 0.32);
+    border-radius: 999px;
+    background: rgba(7, 14, 32, 0.8);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    padding: 0.3rem 0.7rem;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-4px);
+    transition: opacity 180ms ease, transform 180ms ease, background 180ms ease;
+  }
+
+  .yt-gate__mini-return:hover {
+    background: rgba(9, 20, 44, 0.95);
+  }
+
+  .yt-gate--mini {
+    position: fixed;
+    right: max(0.8rem, env(safe-area-inset-right));
+    bottom: max(0.8rem, calc(env(safe-area-inset-bottom) + 0.8rem));
+    width: min(34vw, 360px);
+    min-width: 220px;
+    max-width: calc(100vw - 1.6rem);
+    border-radius: 0.9rem;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.5);
+    z-index: 90;
+    isolation: isolate;
+  }
+
+  .yt-gate--mini .yt-gate__mini-return {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .yt-gate--mini .yt-gate__consent {
+    display: none;
+  }
+
+  @media (max-width: 640px) {
+    .yt-gate--mini {
+      width: min(64vw, 280px);
+      min-width: 180px;
+      right: max(0.55rem, env(safe-area-inset-right));
+      bottom: max(0.55rem, calc(env(safe-area-inset-bottom) + 0.55rem));
+    }
   }
 
   /* Asigurăm că iframe-ul generat de JS umple tot spațiul */

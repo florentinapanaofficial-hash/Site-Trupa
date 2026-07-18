@@ -2894,7 +2894,7 @@ details:focus-visible {
        se ascunde/apare la scroll, deci săgeata nu mai sare cu câțiva milimetri. */
     top: 50svh;
     transform: translateY(-50%);
-    z-index: 50;
+    z-index: 2605;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2907,6 +2907,8 @@ details:focus-visible {
     color: rgba(225, 236, 255, 0.62);
     cursor: pointer;
     pointer-events: auto;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
     transition:
       opacity 300ms ease,
       background 200ms ease,
