@@ -36,6 +36,7 @@ const desktopNavigation = topNavigation;
 // Navigare completă pentru panoul hamburger mobil
 const mobileFullNavigation = [
   { href: '/', label: 'Acasă', color: 'cyan' },
+  { href: '/cauti-formatie-nunta/', label: 'Cauți formație?', color: 'gold' },
   { href: '/despre/', label: 'Despre', color: 'cyan' },
   { href: '/povestea-noastra/', label: 'Povestea noastră', color: 'cyan' },
   { href: '/membri/', label: 'Membri', color: 'cyan' },
@@ -235,8 +236,20 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       menuAudio.currentTime = 0;
     };
 
+    const hasOtherPlayingAudio = () => {
+      const allAudio = Array.from(document.querySelectorAll('audio'));
+      return allAudio.some((audioEl) => {
+        if (!(audioEl instanceof HTMLMediaElement)) return false;
+        if (audioEl === menuAudio) return false;
+        return !audioEl.paused && !audioEl.ended;
+      });
+    };
+
     const playMenuAudio = async () => {
       if (!menuAudio) return false;
+      if (hasOtherPlayingAudio()) {
+        return false;
+      }
       menuAudio.volume = 0.16;
       try {
         await menuAudio.play();

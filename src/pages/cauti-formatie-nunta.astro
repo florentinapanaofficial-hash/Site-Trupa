@@ -10,7 +10,7 @@ const pageTitle = 'Cauți formație de nuntă? Video, repertoriu și ofertă';
 const pageDescription = 'Vezi video reale, repertoriu și cere o ofertă în funcție de bugetul alocat. Formația Florentina Pană răspunde rapid pentru nunți și botezuri.';
 
 const whatsappNumber = contact.phoneRaw.replace(/\D/g, '');
-const whatsappText = encodeURIComponent('Bună ziua! Am văzut pagina din Facebook și vreau o ofertă pentru evenimentul meu.');
+const whatsappText = encodeURIComponent('Bună ziua! Am văzut pagina și vreau o ofertă pentru evenimentul meu.');
 const whatsappHref = `https://wa.me/${whatsappNumber}?text=${whatsappText}`;
 
 const slugify = (value: string) =>
@@ -24,6 +24,7 @@ const slugify = (value: string) =>
 const videoSlug = (video: { title: string; youtubeId: string }) => `${slugify(video.title)}-${video.youtubeId.toLowerCase()}`;
 
 const featuredVideo = videos[0];
+const ogImage = '/images/galerie-foto-site/placerea-scenei-panoramica-2.jpg';
 const secondaryVideos = videos.slice(1, 4).map((video) => ({
   ...video,
   slug: videoSlug(video),
@@ -38,7 +39,7 @@ const repertoireCards = repertoire.map((item: { icon: string; label: string; det
 const quickFaq = faq;
 ---
 
-<BaseLayout title={pageTitle} description={pageDescription}>
+<BaseLayout title={pageTitle} description={pageDescription} ogImage={ogImage}>
   <section class="response-hero section-container py-12 sm:py-16">
     <div class="mb-5">
       <BackButton href="/" label="Acasă" />
@@ -50,10 +51,10 @@ const quickFaq = faq;
 
       <div class="response-grid">
         <div class="response-copy">
-          <p class="response-kicker">Răspuns pentru Facebook</p>
+          <p class="response-kicker">Răspuns rapid</p>
           <h1 class="response-title">Cauți formație de nuntă sau botez? Vezi ce oferim înainte să ceri oferta.</h1>
           <p class="response-lead">
-            Pagina asta este gândită pentru cei care caută direct preț, video și repertoriu. Vezi materiale reale, spune-ne bugetul alocat și îți răspundem cu o propunere potrivită evenimentului tău.
+            Suntem trupa de care ai nevoie pentru un eveniment reușit: experiență, profesionalism și adaptabilitate în funcție de publicul tău. Oferim calitate autentică la un preț accesibil, cu video reale, repertoriu variat și o propunere clară, adaptată bugetului tău.
           </p>
 
           <div class="response-pills" aria-label="Beneficii rapide">
@@ -72,6 +73,11 @@ const quickFaq = faq;
           <div class="response-notes">
             <p>Program artistic de aproximativ 9 ore, cu oferte în care cântăm fără pauze, în funcție de pachetul ales.</p>
             <p>Lucrăm clar, pe obiectiv: dacă ai un buget alocat, îl folosim ca reper pentru varianta de trupă potrivită.</p>
+          </div>
+
+          <div class="response-notes response-notes--accent">
+            <p>Abordăm toate genurile de muzică: grecească, arabescă, machedonească, manele vechi și manele noi.</p>
+            <p>Ne adaptăm după cerințele clientului, cântăm fără pauze între programe și folosim accesorii vestimentare plus elemente de percuție pentru entertainment.</p>
           </div>
         </div>
 
@@ -213,7 +219,7 @@ const quickFaq = faq;
     </div>
 
     <div class="response-footer-cta">
-      <p>Dacă ai văzut pagina asta din Facebook, trimite acum data și bugetul alocat. Îți răspundem cu o ofertă concretă, nu cu mesaje generale.</p>
+      <p>Dacă ai ajuns aici și vrei o ofertă clară, trimite acum data și bugetul alocat. Îți răspundem cu o propunere concretă, nu cu mesaje generale.</p>
       <div class="response-footer-actions">
         <a href="#formular" class="btn-solid">Înapoi la formular</a>
         <a href={socialLinks.youtube} class="btn-outline" target="_blank" rel="noopener noreferrer">Canal YouTube</a>
@@ -407,6 +413,11 @@ const quickFaq = faq;
       border-radius: 1rem;
       border: 1px solid rgba(255, 255, 255, 0.1);
       background: rgba(255, 255, 255, 0.05);
+    }
+
+    .response-notes--accent {
+      border-color: rgba(245, 166, 35, 0.26);
+      background: linear-gradient(135deg, rgba(245, 166, 35, 0.12), rgba(11, 188, 214, 0.08));
     }
 
     .response-form-card {

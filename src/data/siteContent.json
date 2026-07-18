@@ -26,6 +26,11 @@
   },
   "navigation": [
     {
+      "href": "/cauti-formatie-nunta/",
+      "label": "Cauți formație?",
+      "color": "gold"
+    },
+    {
       "href": "/comunitate/",
       "label": "Comunitate",
       "color": "cyan"

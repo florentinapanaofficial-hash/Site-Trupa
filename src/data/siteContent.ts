@@ -24,6 +24,7 @@ export const siteContent = {
   },
   navigation: [
     { href: '#acasa', label: 'Acasă' },
+    { href: '/cauti-formatie-nunta/', label: 'Cauți formație?', color: 'gold' },
     { href: '/comunitate/', label: 'Noutăți' },
     { href: '#servicii', label: 'Servicii' },
     { href: '#membri', label: 'Membri' },
