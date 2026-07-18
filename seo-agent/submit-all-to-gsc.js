@@ -52,7 +52,6 @@ const STATIC_PAGES = [
     '/politica-cookie/',
     '/termeni-conditii/',
     '/colaboratori/saxofon/',
-    '/colaboratori/tambal/',
     '/oferta-premium/',
 ];
 
@@ -121,18 +120,34 @@ async function requestIndexing(indexing, url) {
 async function submitSitemap(auth) {
     const searchConsole = google.searchconsole({ version: 'v1', auth });
     const sitemapUrl = `${SITE_URL}/sitemap-index.xml`;
-    try {
-        await searchConsole.sitemaps.submit({
-            siteUrl: SITE_URL,
-            feedpath: sitemapUrl,
-        });
-        console.log(`  ✅ Sitemap trimis: ${sitemapUrl}`);
-        return { url: sitemapUrl, status: 'OK' };
-    } catch (err) {
-        const message = err.response?.data?.error?.message || err.message;
-        console.log(`  ❌ Eroare sitemap: ${message}`);
-        return { url: sitemapUrl, status: 'EROARE', error: message };
+    const hostname = new URL(SITE_URL).hostname;
+    const bareDomain = hostname.replace(/^www\./, '');
+    const propertyCandidates = [
+        SITE_URL,
+        `${SITE_URL}/`,
+        SITE_URL.replace('://www.', '://'),
+        `${SITE_URL.replace('://www.', '://')}/`,
+        `sc-domain:${bareDomain}`,
+    ];
+
+    let lastError = 'Permisiune insuficienta pentru proprietatile GSC testate.';
+
+    for (const siteUrl of propertyCandidates) {
+        try {
+            await searchConsole.sitemaps.submit({
+                siteUrl,
+                feedpath: sitemapUrl,
+            });
+            console.log(`  ✅ Sitemap trimis: ${sitemapUrl}`);
+            console.log(`     Proprietate GSC folosita: ${siteUrl}`);
+            return { url: sitemapUrl, status: 'OK', siteUrl };
+        } catch (err) {
+            lastError = err.response?.data?.error?.message || err.message;
+        }
     }
+
+    console.log(`  ❌ Eroare sitemap: ${lastError}`);
+    return { url: sitemapUrl, status: 'EROARE', error: lastError };
 }
 
 // ── Main ─────────────────────────────────────────────────

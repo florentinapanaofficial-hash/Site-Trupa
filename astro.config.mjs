@@ -42,6 +42,8 @@ export default defineConfig({
         // Exclude pagina de redirect /comunitatea-noastra/ (301 → /comunitate/)
         const url = new URL(page);
         if (url.pathname === '/comunitatea-noastra/') return false;
+        // Exclude pagina eliminata /colaboratori/tambal/ (redirect + noindex)
+        if (url.pathname === '/colaboratori/tambal/') return false;
         // Exclude /live-preview/ — pagină de campanie (teaser 60s), nu trebuie indexată
         if (url.pathname === '/live-preview/') return false;
         // Exclude /mini-tv/ — redirect 301 → /live/ (pagina a fost integrată)
