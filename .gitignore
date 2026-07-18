@@ -35,3 +35,6 @@ lighthouse-*.report.html
 lighthouse-*.report.json
 lighthouse-live-*
 lighthouse-local-audit*
+
+# Temporary local artifacts
+.tmp-lh/
