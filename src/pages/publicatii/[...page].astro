@@ -146,8 +146,13 @@ export async function getStaticPaths() {
   const filteredJsonBlog = jsonBlogEntries.filter((e: any) => !supabaseSlugs.has(e.slug));
   const filteredLocal = localEntries.filter((e: any) => !supabaseSlugs.has(e.slug));
 
+  const PINNED_BLOG_SLUG = 'cristina-si-manu-povestea-noastra';
   const allEntries = [...supabaseEntries, ...filteredJsonBlog, ...filteredLocal]
-    .sort((a, b) => new Date(b.dataPublicarii).getTime() - new Date(a.dataPublicarii).getTime());
+    .sort((a, b) => {
+      if (a.slug === PINNED_BLOG_SLUG && b.slug !== PINNED_BLOG_SLUG) return -1;
+      if (b.slug === PINNED_BLOG_SLUG && a.slug !== PINNED_BLOG_SLUG) return 1;
+      return new Date(b.dataPublicarii).getTime() - new Date(a.dataPublicarii).getTime();
+    });
 
   // Paginare manuală (10 per pagină)
   const pageSize = 10;

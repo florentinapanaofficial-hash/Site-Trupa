@@ -223,6 +223,25 @@
     "consentNote": "Foto-video publicate cu acordul beneficiarilor.",
     "events": [
       {
+        "title": "Eveniment Cristina & Manu",
+        "couple": "Cristina & Manu",
+        "city": "Pitești",
+        "date": "18 Iulie 2026",
+        "startDate": "2026-07-18T18:00:00+03:00",
+        "endDate": "2026-07-19T03:00:00+03:00",
+        "locationName": "Restaurant Star Events",
+        "locationAddress": "Pitești, Argeș, România",
+        "description": "Nuntă live cu Formația Florentina Pană — povestea Cristina & Manu, de pe băncile școlii până la altar.",
+        "eventStatus": "https://schema.org/EventScheduled",
+        "image": "",
+        "audioUrl": "",
+        "youtubeUrl": "",
+        "coupleQuote": "\"Te iubesc foarte mult și am să fiu lângă tine în orice situație a vieții. Nu am să te las niciodată, dragul meu soț!\"",
+        "accentColor": "#e8325a",
+        "accentGlow": "rgba(232,50,90,0.35)",
+        "blogSlug": "cristina-si-manu-povestea-noastra"
+      },
+      {
         "title": "Eveniment Andreea & Radu",
         "couple": "Andreea & Radu",
         "city": "Mioveni",

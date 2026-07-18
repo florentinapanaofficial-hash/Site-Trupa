@@ -1,6 +1,26 @@
 {
     "couples": [
         {
+            "slug": "cristina-si-manu",
+            "names": "Cristina & Manu",
+            "city": "Pitești",
+            "date": "18 Iulie 2026",
+            "isoDate": "2026-07-18",
+            "locationName": "Restaurant Star Events",
+            "locationAddress": "Pitești, Argeș, România",
+            "coverPhoto": "",
+            "accentColor": "#e8325a",
+            "accentGlow": "rgba(232,50,90,0.35)",
+            "loveStory": "De pe băncile școlii, direct în fața altarului. Povestea lor a început în adolescență și a crescut frumos, cu răbdare, loialitate și multă iubire, până la ziua în care au spus „DA”.",
+            "recommendation": "Te iubesc foarte mult și am să fiu lângă tine în orice situație a vieții. Nu am să te las niciodată, dragul meu soț!",
+            "recommendationSource": "Cristina",
+            "danceVideoUrl": "",
+            "photos": [],
+            "blogSlug": "cristina-si-manu-povestea-noastra",
+            "uploadToken": "tkn_CristinaManu_9y4m2q",
+            "driveUploadUrl": ""
+        },
+        {
             "slug": "andreea-si-radu",
             "names": "Andreea & Radu",
             "city": "Mioveni",

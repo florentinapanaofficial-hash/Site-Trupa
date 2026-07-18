@@ -8,7 +8,12 @@ import BackButton from '../../components/BackButton.astro';
 export const prerender = true;
 
 const { brand, seo, contact } = siteContent;
-const couples = couplesData.couples;
+const PINNED_COUPLE_SLUG = 'cristina-si-manu';
+const couples = [...couplesData.couples].sort((a, b) => {
+  if (a.slug === PINNED_COUPLE_SLUG && b.slug !== PINNED_COUPLE_SLUG) return -1;
+  if (b.slug === PINNED_COUPLE_SLUG && a.slug !== PINNED_COUPLE_SLUG) return 1;
+  return (b.isoDate || '').localeCompare(a.isoDate || '');
+});
 const whatsappNumber = contact.phoneRaw.replace(/\D/g, '');
 
 const pageTitle = `Mirii Noștri — Comunitate | ${brand.name}`;
