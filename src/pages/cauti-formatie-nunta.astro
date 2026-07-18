@@ -20,7 +20,7 @@ const slugify = (value: string) =>
 const videoSlug = (video: { title: string; youtubeId: string }) => `${slugify(video.title)}-${video.youtubeId.toLowerCase()}`;
 
 const featuredVideo = videos[0];
-const ogImage = '/images/og-cauti-formatie-2027-2028.jpg';
+const ogImage = '/Cauti Formatie/Gemini_Generated_Image_wiap94wiap94wiap.png';
 const secondaryVideos = videos.slice(1, 4).map((video) => ({
   ...video,
   slug: videoSlug(video),
