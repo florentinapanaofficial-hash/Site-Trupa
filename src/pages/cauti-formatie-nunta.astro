@@ -1,0 +1,730 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BackButton from '../components/BackButton.astro';
+import YoutubeEmbed from '../components/YoutubeEmbed.astro';
+import siteContent from '../data/siteContent.json';
+
+const { contact, repertoire, videos, faq, socialLinks } = siteContent;
+
+const pageTitle = 'Cauți formație de nuntă? Video, repertoriu și ofertă';
+const pageDescription = 'Vezi video reale, repertoriu și cere o ofertă în funcție de bugetul alocat. Formația Florentina Pană răspunde rapid pentru nunți și botezuri.';
+
+const whatsappNumber = contact.phoneRaw.replace(/\D/g, '');
+const whatsappText = encodeURIComponent('Bună ziua! Am văzut pagina din Facebook și vreau o ofertă pentru evenimentul meu.');
+const whatsappHref = `https://wa.me/${whatsappNumber}?text=${whatsappText}`;
+
+const slugify = (value: string) =>
+  value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+const videoSlug = (video: { title: string; youtubeId: string }) => `${slugify(video.title)}-${video.youtubeId.toLowerCase()}`;
+
+const featuredVideo = videos[0];
+const secondaryVideos = videos.slice(1, 4).map((video) => ({
+  ...video,
+  slug: videoSlug(video),
+  thumbJpg: `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`,
+}));
+
+const repertoireCards = repertoire.map((item: { icon: string; label: string; details: string }) => ({
+  ...item,
+  preview: item.details.split('\n').slice(1, 5).join(' · '),
+}));
+
+const quickFaq = faq;
+---
+
+<BaseLayout title={pageTitle} description={pageDescription}>
+  <section class="response-hero section-container py-12 sm:py-16">
+    <div class="mb-5">
+      <BackButton href="/" label="Acasă" />
+    </div>
+
+    <div class="response-shell">
+      <div class="response-shell__glow response-shell__glow--cyan" aria-hidden="true"></div>
+      <div class="response-shell__glow response-shell__glow--gold" aria-hidden="true"></div>
+
+      <div class="response-grid">
+        <div class="response-copy">
+          <p class="response-kicker">Răspuns pentru Facebook</p>
+          <h1 class="response-title">Cauți formație de nuntă sau botez? Vezi ce oferim înainte să ceri oferta.</h1>
+          <p class="response-lead">
+            Pagina asta este gândită pentru cei care caută direct preț, video și repertoriu. Vezi materiale reale, spune-ne bugetul alocat și îți răspundem cu o propunere potrivită evenimentului tău.
+          </p>
+
+          <div class="response-pills" aria-label="Beneficii rapide">
+            <span>Video reale</span>
+            <span>Repertoriu variat</span>
+            <span>Ofertă după buget</span>
+            <span>Răspuns rapid</span>
+          </div>
+
+          <div class="response-actions">
+            <a href="#formular" class="btn-solid">Cere ofertă</a>
+            <a href="#video" class="btn-outline">Vezi video</a>
+            <a href={whatsappHref} class="btn-outline" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+          </div>
+
+          <div class="response-notes">
+            <p>Program artistic de aproximativ 9 ore, cu oferte în care cântăm fără pauze, în funcție de pachetul ales.</p>
+            <p>Lucrăm clar, pe obiectiv: dacă ai un buget alocat, îl folosim ca reper pentru varianta de trupă potrivită.</p>
+          </div>
+        </div>
+
+        <div class="response-form-card" id="formular">
+          <p class="response-form-kicker">Cere o ofertă</p>
+          <h2 class="response-form-title">Trimite detaliile și revenim cu propunere</h2>
+          <p class="response-form-copy">Completează câmpurile de bază. Câmpul de buget ne ajută să trimitem o ofertă realistă și potrivită pentru evenimentul tău.</p>
+
+          <div id="response-feedback" class="response-feedback hidden" role="status" aria-live="polite"></div>
+
+          <form id="response-form" class="response-form" method="POST" action="/api/rezervare/" novalidate>
+            <p class="hidden" aria-hidden="true">
+              <label>
+                Nu completa acest câmp dacă ești om:
+                <input name="bot-field" autocomplete="off" inputmode="none" tabindex="-1" />
+              </label>
+            </p>
+
+            <label class="response-field">
+              <span>Nume complet</span>
+              <input type="text" name="Nume" placeholder="Ex: Ionescu Andreea" autocomplete="name" maxlength="90" required />
+            </label>
+
+            <label class="response-field">
+              <span>Telefon</span>
+              <input type="tel" name="Telefon" placeholder="07xx xxx xxx" autocomplete="tel" inputmode="tel" pattern="^(0[0-9]{9}|\+40[0-9]{9})$" required />
+            </label>
+
+            <div class="response-row">
+              <label class="response-field">
+                <span>Tip eveniment</span>
+                <select name="Eveniment" required>
+                  <option value="">Alege opțiunea</option>
+                  <option>Nuntă</option>
+                  <option>Botez</option>
+                  <option>Aniversare</option>
+                  <option>Corporate</option>
+                  <option>Alt tip</option>
+                </select>
+              </label>
+
+              <label class="response-field">
+                <span>Data evenimentului</span>
+                <input type="date" name="Data" required />
+              </label>
+            </div>
+
+            <label class="response-field">
+              <span>Care este bugetul alocat pentru eveniment?</span>
+              <input type="text" name="Buget" placeholder="Ex: 1.500 €" inputmode="decimal" maxlength="20" />
+              <small>Spune-ne bugetul și îți recomandăm pachetul care vă avantajează.</small>
+            </label>
+
+            <label class="response-field">
+              <span>Mesaj</span>
+              <textarea name="Mesaj" rows="4" placeholder="Spune-ne locația și atmosfera dorită" maxlength="1000"></textarea>
+            </label>
+
+            <label class="response-consent" for="response-gdpr-consent">
+              <input type="checkbox" id="response-gdpr-consent" name="gdpr-consent" value="da" required />
+              <span>
+                Sunt de acord cu <a href="/politica-confidentialitate/" target="_blank" rel="noopener noreferrer">Politica de confidențialitate</a> și să fiu contactat(ă) pentru solicitarea mea.
+              </span>
+            </label>
+
+            <button type="submit" class="btn-solid response-submit">Cere oferta personalizată</button>
+            <p class="response-mini-note">Datele sunt folosite doar pentru a răspunde solicitării tale.</p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="response-section section-container pb-8">
+    <div class="response-section-head">
+      <p class="response-section-kicker">Video reale</p>
+      <h2>Vezi cum sună și cum arată trupa</h2>
+      <p>Am pus un clip principal mai jos și încă trei momente reale ca să îți faci rapid o idee clară despre vibe, sunet și prezență scenică.</p>
+    </div>
+
+    <div id="video" class="response-video-feature">
+      {featuredVideo && (
+        <YoutubeEmbed youtubeId={featuredVideo.youtubeId} title={featuredVideo.title} class="response-featured-embed" />
+      )}
+    </div>
+
+    <div class="response-video-grid">
+      {secondaryVideos.map((video) => (
+        <a href={`/video/${video.slug}/`} class="response-video-card" aria-label={`Vezi ${video.title}`}>
+          <div class="response-video-thumb">
+            <img src={video.thumbJpg} alt={video.title} loading="lazy" decoding="async" />
+            <span class="response-video-play" aria-hidden="true">▶</span>
+          </div>
+          <p>{video.title}</p>
+        </a>
+      ))}
+    </div>
+
+    <div class="response-inline-actions">
+      <a href="/galerie-video/" class="btn-outline">Deschide galeria video</a>
+      <a href="/contact/" class="btn-solid">Cere ofertă din site</a>
+    </div>
+  </section>
+
+  <section class="response-section section-container pb-8">
+    <div class="response-section-head">
+      <p class="response-section-kicker">Repertoriu</p>
+      <h2>Pe scurt, ce putem cânta</h2>
+      <p>Ai mai jos categoriile principale. Dacă ai preferințe, le putem adapta direct în ofertă și în programul evenimentului.</p>
+    </div>
+
+    <div class="response-repertoire-grid">
+      {repertoireCards.map((item) => (
+        <article class="response-repertoire-card">
+          <p class="response-repertoire-icon" aria-hidden="true">{item.icon}</p>
+          <h3>{item.label}</h3>
+          <p>{item.preview}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="response-section section-container pb-10">
+    <div class="response-section-head">
+      <p class="response-section-kicker">Întrebări rapide</p>
+      <h2>Ca să fie clar de la început</h2>
+    </div>
+
+    <div class="response-faq-list">
+      {quickFaq.map((item) => (
+        <details class="response-faq-item">
+          <summary>
+            <span>{item.question}</span>
+            <span aria-hidden="true">+</span>
+          </summary>
+          <p>{item.answer}</p>
+        </details>
+      ))}
+    </div>
+
+    <div class="response-footer-cta">
+      <p>Dacă ai văzut pagina asta din Facebook, trimite acum data și bugetul alocat. Îți răspundem cu o ofertă concretă, nu cu mesaje generale.</p>
+      <div class="response-footer-actions">
+        <a href="#formular" class="btn-solid">Înapoi la formular</a>
+        <a href={socialLinks.youtube} class="btn-outline" target="_blank" rel="noopener noreferrer">Canal YouTube</a>
+      </div>
+    </div>
+  </section>
+
+  <script is:inline>
+    (function () {
+      var form = document.getElementById('response-form');
+      var feedback = document.getElementById('response-feedback');
+
+      if (!(form instanceof HTMLFormElement) || !(feedback instanceof HTMLElement)) return;
+
+      var submitBtn = form.querySelector('button[type="submit"]');
+      var gdprCheckbox = document.getElementById('response-gdpr-consent');
+
+      function setMessage(message, isError) {
+        feedback.textContent = message;
+        feedback.classList.remove('hidden');
+        feedback.classList.toggle('is-error', Boolean(isError));
+        feedback.classList.toggle('is-success', !isError);
+      }
+
+      form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        if (gdprCheckbox instanceof HTMLInputElement && !gdprCheckbox.checked) {
+          setMessage('Trebuie să accepți politica de confidențialitate înainte de trimitere.', true);
+          return;
+        }
+
+        if (submitBtn instanceof HTMLButtonElement) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Se trimite...';
+        }
+
+        try {
+          var response = await fetch('/api/rezervare/', {
+            method: 'POST',
+            body: new FormData(form),
+          });
+
+          var payload = await response.json().catch(function () { return null; });
+
+          if (response.ok && payload && payload.ok) {
+            form.reset();
+            setMessage('Solicitarea a fost trimisă cu succes. Revenim către tine în cel mai scurt timp.', false);
+            form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            return;
+          }
+
+          setMessage((payload && payload.error) || 'Nu am putut trimite formularul. Încearcă din nou sau contactează-ne direct.', true);
+        } catch (error) {
+          setMessage('Nu am putut trimite formularul. Încearcă din nou sau contactează-ne direct.', true);
+        } finally {
+          if (submitBtn instanceof HTMLButtonElement) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Cere oferta personalizată';
+          }
+        }
+      });
+    })();
+  </script>
+
+  <style>
+    .response-shell {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 1.5rem;
+      padding: clamp(1rem, 2vw, 1.5rem);
+      background:
+        radial-gradient(circle at 12% 20%, rgba(11, 188, 214, 0.16), transparent 36%),
+        radial-gradient(circle at 88% 10%, rgba(245, 166, 35, 0.14), transparent 30%),
+        linear-gradient(160deg, rgba(5, 13, 29, 0.98), rgba(9, 20, 44, 0.96));
+      box-shadow:
+        0 24px 64px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .response-shell__glow {
+      position: absolute;
+      border-radius: 999px;
+      pointer-events: none;
+      filter: blur(24px);
+    }
+
+    .response-shell__glow--cyan {
+      top: -1rem;
+      left: -1rem;
+      width: 8rem;
+      height: 8rem;
+      background: rgba(11, 188, 214, 0.18);
+    }
+
+    .response-shell__glow--gold {
+      right: -1rem;
+      bottom: -1rem;
+      width: 8.5rem;
+      height: 8.5rem;
+      background: rgba(245, 166, 35, 0.16);
+    }
+
+    .response-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 1rem;
+    }
+
+    @media (min-width: 1024px) {
+      .response-grid {
+        grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+        align-items: start;
+        gap: 1.25rem;
+      }
+    }
+
+    .response-copy {
+      display: grid;
+      gap: 1rem;
+      align-content: start;
+    }
+
+    .response-kicker,
+    .response-form-kicker,
+    .response-section-kicker {
+      margin: 0;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #8cf0ff;
+    }
+
+    .response-title {
+      margin: 0;
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(2rem, 5vw, 4rem);
+      line-height: 0.95;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #f8fbff;
+      text-wrap: balance;
+    }
+
+    .response-lead,
+    .response-notes,
+    .response-form-copy,
+    .response-section-head p,
+    .response-faq-item p,
+    .response-repertoire-card p,
+    .response-footer-cta p,
+    .response-mini-note {
+      color: rgba(235, 244, 255, 0.84);
+      line-height: 1.7;
+    }
+
+    .response-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .response-pills span {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.36rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.06);
+      color: #f8fdff;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .response-actions,
+    .response-inline-actions,
+    .response-footer-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+    }
+
+    .response-notes {
+      display: grid;
+      gap: 0.5rem;
+      padding: 0.95rem 1rem;
+      border-radius: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .response-form-card {
+      position: relative;
+      z-index: 1;
+      border-radius: 1.25rem;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(7, 18, 42, 0.84);
+      padding: 1rem;
+      box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+    }
+
+    .response-form-title {
+      margin: 0.25rem 0 0;
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(1.4rem, 2.8vw, 2rem);
+      line-height: 1.05;
+      color: #fff;
+    }
+
+    .response-form-copy {
+      margin: 0.55rem 0 0;
+      font-size: 0.92rem;
+    }
+
+    .response-feedback {
+      margin-top: 0.8rem;
+      border-radius: 0.95rem;
+      border: 1px solid rgba(11, 188, 214, 0.3);
+      background: rgba(11, 188, 214, 0.12);
+      padding: 0.75rem 0.85rem;
+      font-size: 0.9rem;
+      color: #dffcff;
+    }
+
+    .response-feedback.is-error {
+      border-color: rgba(248, 113, 113, 0.38);
+      background: rgba(127, 29, 29, 0.28);
+      color: #fecaca;
+    }
+
+    .response-feedback.is-success {
+      border-color: rgba(74, 222, 128, 0.38);
+      background: rgba(20, 83, 45, 0.28);
+      color: #bbf7d0;
+    }
+
+    .response-form {
+      margin-top: 0.85rem;
+      display: grid;
+      gap: 0.8rem;
+    }
+
+    .response-row {
+      display: grid;
+      gap: 0.8rem;
+    }
+
+    @media (min-width: 640px) {
+      .response-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .response-field {
+      display: grid;
+      gap: 0.35rem;
+      color: #e9f7ff;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .response-field input,
+    .response-field select,
+    .response-field textarea {
+      width: 100%;
+      border-radius: 0.95rem;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.05);
+      color: #f8fbff;
+      padding: 0.78rem 0.9rem;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+    }
+
+    .response-field input::placeholder,
+    .response-field textarea::placeholder {
+      color: rgba(233, 245, 255, 0.45);
+    }
+
+    .response-field input:focus-visible,
+    .response-field select:focus-visible,
+    .response-field textarea:focus-visible {
+      border-color: rgba(11, 188, 214, 0.56);
+      box-shadow: 0 0 0 3px rgba(11, 188, 214, 0.15);
+      transform: translateY(-1px);
+    }
+
+    .response-field small {
+      text-transform: none;
+      letter-spacing: 0;
+      font-weight: 500;
+      color: rgba(228, 238, 248, 0.66);
+      line-height: 1.5;
+    }
+
+    .response-consent {
+      display: flex;
+      gap: 0.65rem;
+      align-items: flex-start;
+      font-size: 0.8rem;
+      line-height: 1.5;
+      color: rgba(233, 243, 255, 0.82);
+      cursor: pointer;
+    }
+
+    .response-consent input {
+      margin-top: 0.2rem;
+      width: 1rem;
+      height: 1rem;
+      accent-color: #06d6ff;
+      flex-shrink: 0;
+    }
+
+    .response-consent a {
+      color: #8cf0ff;
+      text-decoration: underline;
+    }
+
+    .response-submit {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .response-mini-note {
+      margin: 0;
+      font-size: 0.72rem;
+    }
+
+    .response-section-head {
+      max-width: 56rem;
+      margin: 0 auto 1.25rem;
+      text-align: center;
+    }
+
+    .response-section-head h2 {
+      margin: 0.2rem 0 0;
+      font-family: 'Oswald', sans-serif;
+      color: #fff;
+      font-size: clamp(1.6rem, 3vw, 2.3rem);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .response-video-feature {
+      margin: 0 auto;
+      max-width: 62rem;
+    }
+
+    .response-featured-embed {
+      border-radius: 1.25rem;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.28);
+    }
+
+    .response-video-grid {
+      margin-top: 1rem;
+      display: grid;
+      gap: 0.9rem;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    }
+
+    .response-video-card {
+      display: grid;
+      gap: 0.55rem;
+      text-decoration: none;
+      border-radius: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 0.75rem;
+      transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    }
+
+    .response-video-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(245, 166, 35, 0.45);
+      box-shadow: 0 16px 34px rgba(0, 0, 0, 0.22);
+    }
+
+    .response-video-thumb {
+      position: relative;
+      overflow: hidden;
+      border-radius: 0.85rem;
+      aspect-ratio: 16 / 9;
+      background: #0b1220;
+    }
+
+    .response-video-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .response-video-play {
+      position: absolute;
+      inset: 50% auto auto 50%;
+      transform: translate(-50%, -50%);
+      display: inline-grid;
+      place-items: center;
+      width: 3rem;
+      height: 3rem;
+      border-radius: 999px;
+      background: rgba(5, 13, 29, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 1rem;
+      box-shadow: 0 0 24px rgba(11, 188, 214, 0.2);
+    }
+
+    .response-video-card p {
+      margin: 0;
+      color: #f8fbff;
+      font-size: 0.92rem;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .response-repertoire-grid {
+      display: grid;
+      gap: 0.9rem;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    }
+
+    .response-repertoire-card {
+      border-radius: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1rem;
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.16);
+    }
+
+    .response-repertoire-icon {
+      margin: 0 0 0.35rem;
+      font-size: 1.5rem;
+    }
+
+    .response-repertoire-card h3 {
+      margin: 0;
+      color: #fff;
+      font-size: 1.02rem;
+      line-height: 1.35;
+    }
+
+    .response-repertoire-card p {
+      margin: 0.45rem 0 0;
+      font-size: 0.88rem;
+      white-space: pre-line;
+    }
+
+    .response-faq-list {
+      display: grid;
+      gap: 0.7rem;
+      max-width: 62rem;
+      margin: 0 auto;
+    }
+
+    .response-faq-item {
+      border-radius: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 0.15rem 0.95rem;
+    }
+
+    .response-faq-item summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.9rem 0;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .response-faq-item summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .response-faq-item p {
+      margin: 0 0 0.9rem;
+      font-size: 0.92rem;
+    }
+
+    .response-footer-cta {
+      max-width: 62rem;
+      margin: 1.25rem auto 0;
+      padding: 1rem 1.1rem;
+      border-radius: 1rem;
+      border: 1px solid rgba(245, 166, 35, 0.24);
+      background: linear-gradient(135deg, rgba(245, 166, 35, 0.12), rgba(11, 188, 214, 0.08));
+      text-align: center;
+    }
+
+    .response-footer-cta p {
+      margin: 0;
+      max-width: 56ch;
+      margin-inline: auto;
+    }
+
+    .response-footer-actions {
+      margin-top: 0.85rem;
+      justify-content: center;
+    }
+  </style>
+</BaseLayout>
