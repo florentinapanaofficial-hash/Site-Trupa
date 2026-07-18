@@ -268,7 +268,7 @@ export const siteContent = {
         },
         {
             question: 'Cât durează un program complet?',
-            answer: 'Prestație artistică fără pauze, aproximativ 7-8 ore',
+            answer: 'Prestația artistică durează, de regulă, aproximativ 9 ore. În funcție de pachetul ales, avem și oferte în care cântăm fără pauze.',
         },
     ],
 };

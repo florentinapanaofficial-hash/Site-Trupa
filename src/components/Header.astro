@@ -181,15 +181,9 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       <button type="button" class="mobile-overlay-close" data-top-menu-close aria-label="Închide meniul principal">✕</button>
 
       <div class="mobile-overlay-content">
-        <img
-          src="/images/sigla-fp-band-110.webp"
-          alt="Sigla Formația Florentina Pană"
-          class="mobile-overlay-logo"
-          loading="lazy"
-          decoding="async"
-          width="150"
-          height="80"
-        />
+        <audio data-menu-audio preload="none" loop>
+          <source src="/Audio/Captain%20Joz%20-%20Stunts%20Cheer%20-%20Instrumental%20version.mp3" type="audio/mpeg" />
+        </audio>
 
         <!-- Mobil: listă verticală cu toate paginile -->
         <nav class="nav-mobile-grid" aria-label="Navigație mobilă">
@@ -200,22 +194,6 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
           ))}
         </nav>
 
-        <!-- Buton apreciere Google Review în meniu -->
-        <div class="menu-review-wrap">
-          <a
-            href="https://g.page/r/Ca7MqSu2OLysEAE/review"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="menu-review-btn"
-            aria-label="Oferă o recenzie Google pentru Formația Florentina Pană"
-          >
-            <span class="menu-review-stars" aria-hidden="true">★★★★★</span>
-            <span class="menu-review-text">
-              <span class="menu-review-main">Oferă o recenzie</span>
-              <span class="menu-review-sub">Cât de mult ți-a plăcut alături de noi?</span>
-            </span>
-          </a>
-        </div>
       </div>
 
       <!-- Desktop: bară orizontală cu scroll -->
@@ -241,6 +219,7 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
     const isMobileViewport = () => mobileMq.matches;
     const desktopNav = document.querySelector('.nav-desktop-bar');
     const mobileNav = document.querySelector('.nav-mobile-grid');
+    const menuAudio = document.querySelector('[data-menu-audio]');
     const topMenuNavList = Array.from(document.querySelectorAll('#top-menu-panel nav'));
     let lastScrollY = window.scrollY;
     const MENU_KEY = 'top-menu-open';
@@ -249,6 +228,23 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
     let cachedHeaderSpyOffset = 0;
     let cachedOrderedSections = [];
     let bodyScrollLockY = 0;
+
+    const pauseMenuAudio = () => {
+      if (!menuAudio) return;
+      menuAudio.pause();
+      menuAudio.currentTime = 0;
+    };
+
+    const playMenuAudio = async () => {
+      if (!menuAudio) return false;
+      menuAudio.volume = 0.16;
+      try {
+        await menuAudio.play();
+        return true;
+      } catch (_) {
+        return false;
+      }
+    };
 
     const lockMobileBodyScroll = () => {
       if (!isMobileViewport()) return;
@@ -320,6 +316,7 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       menuToggle.setAttribute('aria-expanded', 'false');
       menuToggle.setAttribute('aria-label', 'Deschide meniul principal');
       syncTopMenuBodyClass(false);
+      pauseMenuAudio();
       sessionStorage.setItem(MENU_KEY, 'false');
     };
 
@@ -330,6 +327,9 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       menuToggle.setAttribute('aria-label', 'Închide meniul principal');
       syncTopMenuBodyClass(true);
       sessionStorage.setItem(MENU_KEY, 'true');
+      if (isMobileViewport()) {
+        void playMenuAudio();
+      }
     };
 
     /* ── Fix forced reflow: READ înainte de WRITE la init.

@@ -17,7 +17,7 @@ export const siteContent = {
     city: 'Argeș/Pitești, disponibilitate națională',
   },
   socialLinks: {
-    youtube: 'https://www.youtube.com/@FlorentinaPanaPitesti',
+    youtube: 'https://www.youtube.com/@FlorentinaPanaPitesti/videos',
     facebook: 'https://www.facebook.com/florentinapanaofficial/?locale=ro_RO',
     instagram: 'https://www.instagram.com/florentinaformatie/',
     tiktok: '',
@@ -309,7 +309,8 @@ export const siteContent = {
     },
     {
       question: 'Cât durează un program complet?',
-      answer: 'Prestație artistică fără pauze, aproximativ 7-8 ore',
+      answer:
+        'Prestația artistică durează, de regulă, aproximativ 9 ore. În funcție de pachetul ales, avem și oferte în care cântăm fără pauze.',
     },
   ],
 } as const;
