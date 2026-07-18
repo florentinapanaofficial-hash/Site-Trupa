@@ -41,34 +41,29 @@ const homepagePhotoSources = {
     webpSrcSet: '/images/galerie-foto-site/placerea-scenei-claudiu-florentina-500.webp 500w, /images/galerie-foto-site/placerea-scenei-claudiu-florentina-700.webp 700w, /images/galerie-foto-site/placerea-scenei-claudiu-florentina-1000.webp 1000w',
     fallbackSrc: '/images/galerie-foto-site/placerea-scenei-claudiu-florentina.jpg',
   },
-  panoramica2: {
-    avifSrcSet: '/images/galerie-foto-site/placerea-scenei-panoramica-2-500.avif 500w, /images/galerie-foto-site/placerea-scenei-panoramica-2-700.avif 700w, /images/galerie-foto-site/placerea-scenei-panoramica-2-1000.avif 1000w',
-    webpSrcSet: '/images/galerie-foto-site/placerea-scenei-panoramica-2-500.webp 500w, /images/galerie-foto-site/placerea-scenei-panoramica-2-700.webp 700w, /images/galerie-foto-site/placerea-scenei-panoramica-2-1000.webp 1000w',
-    fallbackSrc: '/images/galerie-foto-site/placerea-scenei-panoramica-2.jpg',
-  },
 } as const;
 
 const heroSliderPhotos = [
   {
-    ...homepagePhotoSources.panoramica2,
+    ...homepagePhotoSources.claudiuFlorentina,
     alt: 'Formația Florentina Pană în plin show live pe scenă',
-    position: 'center 38%',
+    position: '42% 24%',
   },
   {
     ...homepagePhotoSources.claudiuFlorentina,
     alt: 'Moment live în duet pe scenă la un eveniment premium',
-    position: 'center 26%',
+    position: '42% 24%',
   },
   {
-    ...homepagePhotoSources.panoramica2,
+    ...homepagePhotoSources.claudiuFlorentina,
     alt: 'Public și formație într-un moment live energic pe scenă',
-    position: 'center 44%',
+    position: '42% 24%',
   }
 ] as const;
 
 const heroPhotos: Array<{ variant: keyof typeof homepagePhotoSources; alt: string }> = [
   {
-    variant: 'panoramica2',
+    variant: 'claudiuFlorentina',
     alt: 'Formația Florentina Pană în plin show live pe scenă',
   },
   {
@@ -76,7 +71,7 @@ const heroPhotos: Array<{ variant: keyof typeof homepagePhotoSources; alt: strin
     alt: 'Moment live în duet pe scenă la un eveniment premium',
   },
   {
-    variant: 'panoramica2',
+    variant: 'claudiuFlorentina',
     alt: 'Public și formație într-un moment live energic pe scenă',
   },
 ];
@@ -374,16 +369,16 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
         <picture>
           <source
             type="image/avif"
-            srcset={homepagePhotoSources.panoramica2.avifSrcSet}
+            srcset={homepagePhotoSources.claudiuFlorentina.avifSrcSet}
             sizes="(max-width: 767px) 92vw, 485px"
           />
           <source
             type="image/webp"
-            srcset={homepagePhotoSources.panoramica2.webpSrcSet}
+            srcset={homepagePhotoSources.claudiuFlorentina.webpSrcSet}
             sizes="(max-width: 767px) 92vw, 485px"
           />
           <img
-            src={homepagePhotoSources.panoramica2.fallbackSrc}
+            src={homepagePhotoSources.claudiuFlorentina.fallbackSrc}
             alt="Claudiu coordonând atmosfera live la eveniment"
             loading="lazy"
             decoding="async"
@@ -517,7 +512,7 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
               srcset={source.webpSrcSet}
               sizes="(max-width: 767px) 92vw, 399px"
             />
-            <img src={source.fallbackSrc} alt={photo.alt} loading="lazy" decoding="async" width="500" height={photo.variant === 'panoramica2' ? '287' : '889'} />
+            <img src={source.fallbackSrc} alt={photo.alt} loading="lazy" decoding="async" width="500" height="889" />
           </picture>
           <span class="hp-cine-overlay" aria-hidden="true"></span>
           <span class="hp-cine-caption">Cadru autentic de la eveniment</span>
