@@ -17,8 +17,6 @@ type DirPhotoMeta = { name: string; mtimeMs: number };
 const basePhotos = [
   // ═══ DOAR PRIMELE 5 — restul pozelor sunt afișate pe pagina /membri/ ═══
   { src: `${base}/Eveniment%20Arabesc.jpg`, alt: "Formația Florentina Pană cu trupa Arabesc la eveniment live", cat: "evenimente" },
-  { src: `${base}/Eveniment%20Grup%20Arabesc.jpg`, alt: "Moment de grup cu membrii trupei Arabesc la petrecere", cat: "evenimente" },
-  { src: `${base}/Eveniment%20Grup%20Selfie.jpg`, alt: "Selfie de grup la eveniment — Formația Florentina Pană", cat: "evenimente" },
   { src: `${base}/Galerie Evenimente 1.jpg`, alt: "Eveniment live cu Formația Florentina Pană", cat: "evenimente" },
   { src: `${base}/Galerie Evenimente 2.jpg`, alt: "Scenă completă la eveniment live", cat: "evenimente" },
 ];
@@ -26,6 +24,7 @@ const basePhotos = [
 // Folosim process.cwd() + path.join pentru a evita probleme cu spații în new URL()
 const extraPhotoDirPath = path.join(process.cwd(), 'public', 'images', 'poze 09.07.2026');
 const allowedExt = new Set(['.jpg', '.jpeg', '.png', '.webp', '.avif']);
+const blockedPhotoTokens = ['grup 1', 'grup 2', 'grup selfi', 'grup arabesc'];
 let latestPhotos: GalleryPhoto[] = [];
 
 try {
@@ -35,6 +34,8 @@ try {
       .filter((entry) => entry.isFile())
       .map(async (entry) => {
         const name = entry.name;
+        const lowerName = name.toLowerCase();
+        if (blockedPhotoTokens.some((token) => lowerName.includes(token))) return null;
         const ext = name.includes('.') ? `.${name.split('.').pop()?.toLowerCase()}` : '';
         if (!allowedExt.has(ext)) return null;
         const filePath = path.join(extraPhotoDirPath, name);
