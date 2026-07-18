@@ -24,7 +24,7 @@ const slugify = (value: string) =>
 const videoSlug = (video: { title: string; youtubeId: string }) => `${slugify(video.title)}-${video.youtubeId.toLowerCase()}`;
 
 const featuredVideo = videos[0];
-const ogImage = '/images/galerie-foto-site/placerea-scenei-panoramica-2.jpg';
+const ogImage = '/images/galerie-foto-site/placerea-scenei-claudiu-florentina.jpg';
 const secondaryVideos = videos.slice(1, 4).map((video) => ({
   ...video,
   slug: videoSlug(video),

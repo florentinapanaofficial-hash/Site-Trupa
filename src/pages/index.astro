@@ -46,11 +46,6 @@ const homepagePhotoSources = {
     webpSrcSet: '/images/galerie-foto-site/placerea-scenei-panoramica-2-500.webp 500w, /images/galerie-foto-site/placerea-scenei-panoramica-2-700.webp 700w, /images/galerie-foto-site/placerea-scenei-panoramica-2-1000.webp 1000w',
     fallbackSrc: '/images/galerie-foto-site/placerea-scenei-panoramica-2.jpg',
   },
-  grupArabesc: {
-    avifSrcSet: '/images/galerie-foto-site/placerea-scenei-grup-arabesc-500.avif 500w, /images/galerie-foto-site/placerea-scenei-grup-arabesc-1000.avif 1000w',
-    webpSrcSet: '/images/galerie-foto-site/placerea-scenei-grup-arabesc-500.webp 500w, /images/galerie-foto-site/placerea-scenei-grup-arabesc-1000.webp 1000w',
-    fallbackSrc: '/images/galerie-foto-site/placerea-scenei-grup-arabesc.jpg',
-  },
 } as const;
 
 const heroSliderPhotos = [
@@ -65,10 +60,10 @@ const heroSliderPhotos = [
     position: 'center 26%',
   },
   {
-    ...homepagePhotoSources.grupArabesc,
-    alt: 'Invitați pe ringul de dans la un moment live energic',
-    position: 'center 34%',
-  },
+    ...homepagePhotoSources.panoramica2,
+    alt: 'Public și formație într-un moment live energic pe scenă',
+    position: 'center 44%',
+  }
 ] as const;
 
 const heroPhotos: Array<{ variant: keyof typeof homepagePhotoSources; alt: string }> = [
@@ -81,8 +76,8 @@ const heroPhotos: Array<{ variant: keyof typeof homepagePhotoSources; alt: strin
     alt: 'Moment live în duet pe scenă la un eveniment premium',
   },
   {
-    variant: 'grupArabesc',
-    alt: 'Invitați pe ringul de dans la un moment live energic',
+    variant: 'panoramica2',
+    alt: 'Public și formație într-un moment live energic pe scenă',
   },
 ];
 
