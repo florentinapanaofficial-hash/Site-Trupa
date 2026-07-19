@@ -36,6 +36,7 @@ export default defineConfig({
         `${siteUrl}/membri/`,
         `${siteUrl}/aparitii-tv/`,
         `${siteUrl}/vlog/`,
+        `${siteUrl}/cauti-formatie-nunta/`,
         `${siteUrl}/formatie-nunta/curtea-de-arges/`,
       ],
       filter: (page) => {

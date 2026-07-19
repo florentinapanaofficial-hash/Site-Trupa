@@ -24,6 +24,7 @@ const ogImage = '/images/og-cauti-formatie-custom.webp';
 const secondaryVideos = videos.slice(1, 9).map((video) => ({
   ...video,
   slug: videoSlug(video),
+  thumbWebp: `https://i.ytimg.com/vi_webp/${video.youtubeId}/hqdefault.webp`,
   thumbJpg: `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`,
 }));
 
@@ -122,7 +123,18 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
         {secondaryVideos.slice(0, processCards.length).map((video, index) => (
           <a href={`/video/${video.slug}/`} class="response-video-card" role="listitem" aria-label={`Vezi ${video.title}`} style={`--card-delay:${index * 80}ms`}>
             <div class="response-video-thumb">
-              <img src={video.thumbJpg} alt={video.title} loading="lazy" decoding="async" />
+              <img
+                src="data:image/gif;base64,R0lGODlhAQABAAAAACw="
+                data-src={video.thumbWebp}
+                data-fallback-src={video.thumbJpg}
+                alt={video.title}
+                loading="lazy"
+                decoding="async"
+                fetchpriority="low"
+                width="480"
+                height="360"
+                class="response-lazy-thumb"
+              />
               <span class="response-video-index" aria-hidden="true">{String(index + 5).padStart(2, '0')}</span>
               <span class="response-video-play" aria-hidden="true">▶</span>
             </div>
@@ -746,6 +758,15 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
       display: block;
     }
 
+    .response-lazy-thumb {
+      opacity: 0.72;
+      transition: opacity 220ms ease;
+    }
+
+    .response-lazy-thumb.is-loaded {
+      opacity: 1;
+    }
+
     .response-video-play {
       position: absolute;
       inset: auto 0.65rem 0.65rem auto;
@@ -995,6 +1016,25 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
         border-radius: 1.1rem;
       }
 
+      .btn-call,
+      .btn-wa,
+      .response-actions .btn-solid {
+        min-height: 2.45rem;
+        padding: 0.58rem 0.34rem;
+        font-size: 0.82rem;
+        letter-spacing: 0.01em;
+        gap: 0.2rem;
+      }
+
+      .response-actions a span:last-child {
+        line-height: 1.04;
+        text-wrap: balance;
+      }
+
+      .btn-wa span:last-child {
+        font-size: 0.76rem;
+      }
+
       .response-scroll-shell {
         grid-template-columns: 1fr;
       }
@@ -1030,6 +1070,21 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
       }
     }
 
+    @media (max-width: 24rem) {
+      .btn-call,
+      .btn-wa,
+      .response-actions .btn-solid {
+        font-size: 0.74rem;
+        padding-inline: 0.25rem;
+      }
+
+      .btn-call span:first-child,
+      .btn-wa span:first-child,
+      .response-actions .btn-solid span:first-child {
+        display: none;
+      }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       .response-copy,
       .response-video-card,
@@ -1058,6 +1113,53 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
   </style>
 
   <script>
+    const lazyThumbs = Array.from(document.querySelectorAll('.response-lazy-thumb'));
+
+    const loadThumb = (img) => {
+      if (!(img instanceof HTMLImageElement) || img.dataset.loaded === 'true') {
+        return;
+      }
+
+      const webpSrc = img.dataset.src;
+      const jpgFallback = img.dataset.fallbackSrc;
+      if (!webpSrc) {
+        return;
+      }
+
+      img.src = webpSrc;
+      img.dataset.loaded = 'true';
+
+      img.addEventListener('load', () => {
+        img.classList.add('is-loaded');
+      }, { once: true });
+
+      img.addEventListener('error', () => {
+        if (jpgFallback && img.src !== jpgFallback) {
+          img.src = jpgFallback;
+          return;
+        }
+        img.classList.add('is-loaded');
+      }, { once: true });
+    };
+
+    if ('IntersectionObserver' in window) {
+      const thumbObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) {
+            return;
+          }
+          loadThumb(entry.target);
+          observer.unobserve(entry.target);
+        });
+      }, {
+        rootMargin: '220px 0px',
+      });
+
+      lazyThumbs.forEach((img) => thumbObserver.observe(img));
+    } else {
+      lazyThumbs.forEach(loadThumb);
+    }
+
     const tickerTrack = document.querySelector('[data-ticker-track]');
 
     if (tickerTrack && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
