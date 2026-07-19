@@ -96,7 +96,7 @@ const isHomePage = Astro.url.pathname === '/';
   <!-- Zone acoperite — internal linking automat -->
   <ZoneAcoperite />
 
-  <div class="section-container grid gap-4 py-4 sm:gap-5 md:gap-4 text-sm md:grid-cols-3 md:items-center md:text-sm sm:text-xs">
+  <div class="section-container ftr-bottom grid gap-4 py-4 sm:gap-5 md:gap-4 text-sm md:grid-cols-3 md:items-center md:text-sm sm:text-xs">
     {/* Coloana 1: Logo + copyright */}
     <div class="flex flex-col items-start gap-2 sm:items-start md:items-start">
       <img
@@ -255,7 +255,10 @@ const isHomePage = Astro.url.pathname === '/';
      safe-area-inset sau bara browserului mobil. */
   footer {
     position: relative;
-    box-shadow: 0 100vh 0 100vh #0C080F;
+    background:
+      radial-gradient(circle at 20% -10%, rgba(27, 72, 188, 0.18), transparent 48%),
+      linear-gradient(180deg, #080d21 0%, #070a18 38%, #060612 100%);
+    box-shadow: 0 100vh 0 100vh #060612;
     padding-bottom: calc(env(safe-area-inset-bottom, 0px));
   }
 
@@ -286,7 +289,7 @@ const isHomePage = Astro.url.pathname === '/';
     width: 100%;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.7rem 1rem;
+    padding: 0.82rem 1rem;
     background: none;
     border: none;
     cursor: pointer;
@@ -311,11 +314,11 @@ const isHomePage = Astro.url.pathname === '/';
 
   .ftr-tab-text {
     flex: 1;
-    font-size: 0.72rem;
+    font-size: 0.86rem;
     font-weight: 700;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
-    color: rgba(255,255,255,0.7);
+    color: rgba(236,244,255,0.88);
   }
 
   .ftr-tab-chevron {
@@ -350,15 +353,28 @@ const isHomePage = Astro.url.pathname === '/';
 
   /* Borduri subtile pe secțiuni pe subpagini */
   .footer--accordion .ftr-section {
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 0.6rem;
-    margin: 0.25rem 0.5rem;
-    background: rgba(255,255,255,0.015);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 0.82rem;
+    margin: 0.35rem 0.55rem;
+    background: linear-gradient(180deg, rgba(12, 18, 42, 0.82), rgba(9, 14, 34, 0.86));
+    box-shadow: inset 0 0 0 1px rgba(105, 140, 255, 0.06);
   }
 
   .footer--accordion .ftr-section:not(.ftr-section--collapsed) {
-    border-color: rgba(245,166,35,0.15);
-    background: rgba(245,166,35,0.02);
+    border-color: rgba(245,166,35,0.28);
+    background: linear-gradient(180deg, rgba(18, 24, 48, 0.9), rgba(13, 19, 40, 0.9));
+  }
+
+  .ftr-bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 0.55rem;
+    padding-top: 0.95rem;
+  }
+
+  .social-btn {
+    border-radius: 0.82rem;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
   }
 </style>
 

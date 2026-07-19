@@ -41,23 +41,32 @@ const homepagePhotoSources = {
     webpSrcSet: '/images/galerie-foto-site/placerea-scenei-claudiu-florentina-500.webp 500w, /images/galerie-foto-site/placerea-scenei-claudiu-florentina-700.webp 700w, /images/galerie-foto-site/placerea-scenei-claudiu-florentina-1000.webp 1000w',
     fallbackSrc: '/images/galerie-foto-site/placerea-scenei-claudiu-florentina.jpg',
   },
+  anaFlorentina: {
+    fallbackSrc: '/images/galerie-foto-site/placerea-scenei-ana-florentina.jpg',
+  },
+  evenimentOne: {
+    fallbackSrc: '/images/galerie-foto-site/Galerie Evenimente 1.jpg',
+  },
+  claudiuTwo: {
+    fallbackSrc: '/images/galerie-foto-site/Claudiu 2.jpg',
+  },
 } as const;
 
 const heroSliderPhotos = [
   {
     ...homepagePhotoSources.claudiuFlorentina,
     alt: 'Formația Florentina Pană în plin show live pe scenă',
-    position: '42% 24%',
+    position: '40% 30%',
   },
   {
-    ...homepagePhotoSources.claudiuFlorentina,
-    alt: 'Moment live în duet pe scenă la un eveniment premium',
-    position: '42% 24%',
+    ...homepagePhotoSources.anaFlorentina,
+    alt: 'Moment live de scenă la un eveniment premium',
+    position: '50% 14%',
   },
   {
-    ...homepagePhotoSources.claudiuFlorentina,
+    ...homepagePhotoSources.evenimentOne,
     alt: 'Public și formație într-un moment live energic pe scenă',
-    position: '42% 24%',
+    position: '38% 16%',
   }
 ] as const;
 
@@ -67,11 +76,11 @@ const heroPhotos: Array<{ variant: keyof typeof homepagePhotoSources; alt: strin
     alt: 'Formația Florentina Pană în plin show live pe scenă',
   },
   {
-    variant: 'claudiuFlorentina',
+    variant: 'anaFlorentina',
     alt: 'Moment live în duet pe scenă la un eveniment premium',
   },
   {
-    variant: 'claudiuFlorentina',
+    variant: 'claudiuTwo',
     alt: 'Public și formație într-un moment live energic pe scenă',
   },
 ];
@@ -104,16 +113,20 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
       {heroSliderPhotos.map((slide, index) => (
         <div class={`hero-slider-slide${index === 0 ? ' is-active' : ''}`} data-hero-slide style={`--slide-pos: ${slide.position};`}>
           <picture>
-            <source
-              type="image/avif"
-              srcset={slide.avifSrcSet}
-              sizes="(max-width: 767px) 92vw, (max-width: 1280px) 96vw, 1120px"
-            />
-            <source
-              type="image/webp"
-              srcset={slide.webpSrcSet}
-              sizes="(max-width: 767px) 92vw, (max-width: 1280px) 96vw, 1120px"
-            />
+            {slide.avifSrcSet && (
+              <source
+                type="image/avif"
+                srcset={slide.avifSrcSet}
+                sizes="(max-width: 767px) 92vw, (max-width: 1280px) 96vw, 1120px"
+              />
+            )}
+            {slide.webpSrcSet && (
+              <source
+                type="image/webp"
+                srcset={slide.webpSrcSet}
+                sizes="(max-width: 767px) 92vw, (max-width: 1280px) 96vw, 1120px"
+              />
+            )}
             <img
               src={slide.fallbackSrc}
               alt={slide.alt}
@@ -267,18 +280,8 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
     <div class="hp-meet-wrap reveal-on-scroll from-bottom" style="--reveal-delay: 30ms">
       <div class="hp-meet-media">
         <picture>
-          <source
-            type="image/avif"
-            srcset={homepagePhotoSources.claudiuFlorentina.avifSrcSet}
-            sizes="(max-width: 1024px) 92vw, 496px"
-          />
-          <source
-            type="image/webp"
-            srcset={homepagePhotoSources.claudiuFlorentina.webpSrcSet}
-            sizes="(max-width: 1024px) 92vw, 496px"
-          />
           <img
-            src={homepagePhotoSources.claudiuFlorentina.fallbackSrc}
+            src="/images/galerie-foto-site/placerea-scenei-ana-florentina.jpg"
             alt="Florentina și Claudiu în timpul unui moment live"
             loading="lazy"
             decoding="async"
@@ -367,18 +370,8 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
 
       <article class="hp-team-card reveal-on-scroll from-right" style="--reveal-delay: 150ms">
         <picture>
-          <source
-            type="image/avif"
-            srcset={homepagePhotoSources.claudiuFlorentina.avifSrcSet}
-            sizes="(max-width: 767px) 92vw, 485px"
-          />
-          <source
-            type="image/webp"
-            srcset={homepagePhotoSources.claudiuFlorentina.webpSrcSet}
-            sizes="(max-width: 767px) 92vw, 485px"
-          />
           <img
-            src={homepagePhotoSources.claudiuFlorentina.fallbackSrc}
+            src="/images/galerie-foto-site/Claudiu 2.jpg"
             alt="Claudiu coordonând atmosfera live la eveniment"
             loading="lazy"
             decoding="async"
@@ -3078,6 +3071,14 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
     min-height: 0;
   }
 
+  .hp-cine-card--photo {
+    aspect-ratio: 4 / 5;
+  }
+
+  .hp-cine-card--photo img {
+    object-position: center 24%;
+  }
+
   .hp-cine-story {
     grid-column: span 6;
     padding: 1.4rem;
@@ -3384,6 +3385,15 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
     .hp-cine-card,
     .hp-cine-story {
       min-height: 210px;
+    }
+
+    .hp-cine-card--photo {
+      aspect-ratio: 3 / 4;
+      min-height: 280px;
+    }
+
+    .hp-cine-card--photo img {
+      object-position: center 22%;
     }
 
     .hp-proof-grid {

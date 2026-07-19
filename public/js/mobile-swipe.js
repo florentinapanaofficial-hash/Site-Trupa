@@ -34,7 +34,14 @@
     });
 
     var slides = Array.from(main.querySelectorAll(':scope > section'));
-    if (!slides.length) return;
+    if (!slides.length) {
+        /* Unele pagini (ex: /membri/) au secțiunile într-un wrapper intern,
+           nu direct copil în #continut. Fallback-ul menține navigarea cu aripi activă. */
+        slides = Array.from(main.querySelectorAll('section'));
+    }
+    if (!slides.length) {
+        slides = [main];
+    }
 
     var navBtns = Array.from(document.querySelectorAll('[data-mb]'));
     var arrowPrev = document.getElementById('mob-arrow-prev');

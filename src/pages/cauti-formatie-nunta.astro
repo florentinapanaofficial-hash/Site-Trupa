@@ -21,11 +21,34 @@ const videoSlug = (video: { title: string; youtubeId: string }) => `${slugify(vi
 
 const featuredVideo = videos[0];
 const ogImage = '/images/og-cauti-formatie-custom.webp';
-const secondaryVideos = videos.slice(1, 4).map((video) => ({
+const secondaryVideos = videos.slice(1, 9).map((video) => ({
   ...video,
   slug: videoSlug(video),
   thumbJpg: `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`,
 }));
+
+const processCards = [
+  {
+    title: 'Personalizăm Experiența',
+    text: 'Playlist dedicat, momente speciale, detalii tehnice impecabile.',
+  },
+  {
+    title: 'Plan Clar Al Serii',
+    text: 'Construim ritmul evenimentului cu accentele voastre preferate.',
+  },
+  {
+    title: 'Coordonare Live',
+    text: 'Ne sincronizăm cu organizatorii pentru tranziții fără blocaje.',
+  },
+  {
+    title: 'Energie Controlată',
+    text: 'Alternăm inteligent momentele tari cu secvențe elegante.',
+  },
+  {
+    title: 'Final Memorabil',
+    text: 'Închidem seara în forță, pe piesele care rămân în minte.',
+  },
+];
 
 const shortRepertoire = [
   'Muzică populară de petrecere',
@@ -33,86 +56,117 @@ const shortRepertoire = [
   'Manele mai vechi și noi',
 ];
 
+const splitRepertoireItem = (item: string) => {
+  const [main, ...rest] = item.split(':');
+  return {
+    main: main.trim(),
+    detail: rest.join(':').trim(),
+  };
+};
+
 const quickFaq = faq;
+
+const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care știe să facă atmosferă, iată ce îți oferim pentru o seară memorabilă: Show Live 100% cu energie pură, voci remarcabile și conexiune autentică; repertoriu pentru toți, de la cafe-concert elegant și hituri internaționale moderne până la folclor autentic și muzică de petrecere; sunet premium cu echipamente de top pentru claritate impecabilă, adaptată perfect sălii. Hai să scriem împreună soundtrack-ul nunții tale! Contactează-ne și hai să transformăm petrecerea voastră într-o amintire de neuitat.';
 ---
 
 <BaseLayout title={pageTitle} description={pageDescription} ogImage={ogImage}>
-  <section class="response-section section-container pt-12 pb-8 sm:pt-16">
+  <section class="response-hero response-ref section-container pt-12 pb-10 sm:pt-16 sm:pb-12">
     <div class="mb-5">
       <BackButton href="/" label="Acasă" />
     </div>
 
-    <p class="response-top-announcement">Formația Florentina Pană este pregătită pentru evenimentul dvs / vezi oferta de preț pentru sezonul 2027-2028</p>
-
-    <div id="video" class="response-video-feature">
-      {featuredVideo && (
-        <YoutubeEmbed youtubeId={featuredVideo.youtubeId} title={featuredVideo.title} class="response-featured-embed" miniOnScroll={true} />
-      )}
-    </div>
-
-    <div class="response-video-grid">
-      {secondaryVideos.map((video) => (
-        <a href={`/video/${video.slug}/`} class="response-video-card" aria-label={`Vezi ${video.title}`}>
-          <div class="response-video-thumb">
-            <img src={video.thumbJpg} alt={video.title} loading="lazy" decoding="async" />
-            <span class="response-video-play" aria-hidden="true">▶</span>
-          </div>
-          <p>{video.title}</p>
-        </a>
-      ))}
-    </div>
-
-    <div class="response-inline-actions">
-        <a href="/contact/" class="btn-solid">Cere ofertă</a>
-    </div>
-  </section>
-
-  <section class="response-hero section-container py-12 sm:py-16">
     <div class="response-shell">
       <div class="response-shell__glow response-shell__glow--cyan" aria-hidden="true"></div>
       <div class="response-shell__glow response-shell__glow--gold" aria-hidden="true"></div>
 
+      <div class="response-top-announcement-wrap" aria-label="Mesaj informativ">
+        <div class="response-top-announcement-track" data-ticker-track>
+          <p class="response-top-announcement" data-ticker-item>{topTickerText}</p>
+        </div>
+      </div>
+
       <div class="response-grid">
         <div class="response-copy">
-          <h1 class="response-title">Cauți formație de nuntă sau botez? Vezi ce oferim înainte să ceri oferta.</h1>
+          <p class="response-kicker">Formație live pentru nuntă, botez și evenimente private</p>
+          <h1 class="response-title">Vrei să facem Show și să ne distrăm împreună?</h1>
           <p class="response-lead">
-            Suntem trupa de care ai nevoie pentru un eveniment reușit: experiență, profesionalism și adaptabilitate în funcție de publicul tău. Oferim calitate autentică la un preț accesibil, cu video reale, repertoriu variat și o propunere clară, adaptată bugetului tău.
+            La noi nu primești promisiuni generale. Primești exemple video reale, repertoriu clar și o propunere personalizată în funcție de stilul petrecerii și bugetul tău.
           </p>
 
           <div class="response-pills" aria-label="Beneficii rapide">
             <span>Video reale</span>
             <span>Repertoriu variat</span>
-            <span>Ofertă după buget</span>
-            <span>Răspuns rapid</span>
+            <span>Program adaptat invitaților</span>
+            <span>Răspuns rapid la cerere</span>
           </div>
 
           <div class="response-actions">
-            <a href="/contact/" class="btn-solid">Cere ofertă</a>
+            <a href="tel:+40767369658" class="btn-call"><span aria-hidden="true">☎</span><span>Sună Acum</span></a>
+            <a href="https://wa.me/40767369658" class="btn-wa"><span aria-hidden="true">◉</span><span>WhatsApp</span></a>
+            <a href="/contact/" class="btn-solid"><span aria-hidden="true">◇</span><span>Ofertă</span></a>
           </div>
         </div>
-
       </div>
+    </div>
+  </section>
+
+  <section class="response-section section-container pb-8" id="video">
+    <div class="response-section-head">
+      <p class="response-section-kicker">Flow de eveniment</p>
+      <h2>Glisează și vezi pașii experienței</h2>
+    </div>
+
+    <div class="response-scroll-shell" data-scroll-shell>
+      <button class="response-scroll-btn response-scroll-btn--prev" type="button" data-scroll-prev aria-label="Clipul anterior">‹</button>
+      <div class="response-video-grid" id="video-lane" role="list" aria-label="Carduri experiență, scroll orizontal">
+        {secondaryVideos.slice(0, processCards.length).map((video, index) => (
+          <a href={`/video/${video.slug}/`} class="response-video-card" role="listitem" aria-label={`Vezi ${video.title}`} style={`--card-delay:${index * 80}ms`}>
+            <div class="response-video-thumb">
+              <img src={video.thumbJpg} alt={video.title} loading="lazy" decoding="async" />
+              <span class="response-video-index" aria-hidden="true">{String(index + 5).padStart(2, '0')}</span>
+              <span class="response-video-play" aria-hidden="true">▶</span>
+            </div>
+            <p>{processCards[index].title}</p>
+            <span class="response-video-copy">{processCards[index].text}</span>
+          </a>
+        ))}
+      </div>
+      <button class="response-scroll-btn response-scroll-btn--next" type="button" data-scroll-next aria-label="Clipul următor">›</button>
+    </div>
+
+    <div class="response-inline-actions">
+      <a href="/contact/" class="btn-solid">Vreau ofertă personalizată</a>
     </div>
   </section>
 
   <section class="response-section section-container pb-8">
     <div class="response-section-head">
       <p class="response-section-kicker">Repertoriu</p>
-      <h2>Pe scurt, ce putem cânta</h2>
-      <p>Acestea sunt direcțiile principale pe care le abordăm la evenimente.</p>
+      <h2>Ce putem cânta pe scurt</h2>
+      <p>Adaptăm seara pe profilul invitaților, nu cântăm mecanic aceeași listă.</p>
     </div>
 
-    <ul class="response-repertoire-list" aria-label="Repertoriu pe scurt">
-      {shortRepertoire.map((item) => (
-        <li>{item}</li>
-      ))}
-    </ul>
+    <div class="response-scroll-shell" data-scroll-shell>
+      <button class="response-scroll-btn response-scroll-btn--prev" type="button" data-scroll-prev aria-label="Element anterior">‹</button>
+      <ul class="response-repertoire-list" aria-label="Repertoriu pe scurt, scroll orizontal">
+        {shortRepertoire.map((item) => {
+          const parts = splitRepertoireItem(item);
+          return (
+            <li>
+              <span class="response-repertoire-main">{parts.main}</span>
+              {parts.detail && <span class="response-repertoire-sub">{parts.detail}</span>}
+            </li>
+          );
+        })}
+      </ul>
+      <button class="response-scroll-btn response-scroll-btn--next" type="button" data-scroll-next aria-label="Element următor">›</button>
+    </div>
   </section>
 
   <section class="response-section section-container pb-10">
     <div class="response-section-head">
       <p class="response-section-kicker">Întrebări rapide</p>
-      <h2>Ca să fie clar de la început</h2>
+      <h2>Detalii utile înainte să ne contactezi</h2>
     </div>
 
     <div class="response-faq-list">
@@ -128,7 +182,7 @@ const quickFaq = faq;
     </div>
 
     <div class="response-footer-cta">
-      <p>Dacă ai ajuns aici și vrei o ofertă clară, trimite acum data și bugetul alocat. Îți răspundem cu o propunere concretă, nu cu mesaje generale.</p>
+      <p>Dacă ți se potrivește direcția noastră, trimite data evenimentului și intervalul de buget. Revenim rapid cu o propunere clară și realistă.</p>
       <div class="response-footer-actions">
         <a href="/contact/" class="btn-solid">Cere ofertă</a>
       </div>
@@ -136,19 +190,51 @@ const quickFaq = faq;
   </section>
 
   <style>
+    .response-hero,
+    .response-section {
+      position: relative;
+      z-index: 1;
+    }
+
+    .response-ref {
+      background: linear-gradient(180deg, rgba(3, 7, 15, 0.96), rgba(3, 7, 15, 0.52));
+      border-radius: 1.25rem;
+      margin-top: 0.4rem;
+    }
+
+    .response-kicker {
+      margin: 0;
+      color: #f5a623;
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+    }
+
     .response-shell {
       position: relative;
       overflow: hidden;
       border: 1px solid rgba(255, 255, 255, 0.16);
       border-radius: 1.5rem;
-      padding: clamp(1rem, 2vw, 1.5rem);
+      padding: clamp(1rem, 2vw, 1.65rem);
       background:
-        radial-gradient(circle at 12% 20%, rgba(11, 188, 214, 0.16), transparent 36%),
-        radial-gradient(circle at 88% 10%, rgba(245, 166, 35, 0.14), transparent 30%),
-        linear-gradient(160deg, rgba(5, 13, 29, 0.98), rgba(9, 20, 44, 0.96));
+        radial-gradient(circle at 12% 20%, rgba(11, 188, 214, 0.18), transparent 38%),
+        radial-gradient(circle at 88% 10%, rgba(245, 166, 35, 0.16), transparent 31%),
+        linear-gradient(155deg, rgba(5, 13, 29, 0.98), rgba(9, 20, 44, 0.96));
       box-shadow:
         0 24px 64px rgba(0, 0, 0, 0.4),
         inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .response-shell::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image: linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 28px 28px;
+      mask-image: radial-gradient(circle at 50% 45%, rgba(0, 0, 0, 0.72), transparent 80%);
+      opacity: 0.6;
     }
 
     .response-shell__glow {
@@ -174,44 +260,194 @@ const quickFaq = faq;
       background: rgba(245, 166, 35, 0.16);
     }
 
+    .response-grid {
+      position: relative;
+      display: grid;
+      gap: 0.8rem;
+      grid-template-columns: 1fr;
+      isolation: isolate;
+    }
+
+    .response-copy {
+      display: grid;
+      gap: 0.85rem;
+      max-width: 58rem;
+      margin-inline: auto;
+      text-align: center;
+      animation: rise-fade 600ms ease both;
+    }
+
     .response-repertoire-list {
       margin: 0;
       padding: 0;
       list-style: none;
-      display: grid;
-      gap: 0.52rem;
+      display: flex;
+      gap: 0.75rem;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(245, 166, 35, 0.55) rgba(255, 255, 255, 0.08);
+      padding-top: 0.35rem;
+      padding-bottom: 0.4rem;
     }
 
     .response-repertoire-list li {
+      flex: 0 0 clamp(14.5rem, 30vw, 20rem);
+      scroll-snap-align: start;
       margin: 0;
+      display: grid;
+      gap: 0.28rem;
+      position: relative;
+      isolation: isolate;
+      --rep-neon: rgba(0, 224, 255, 0.9);
+      --rep-neon-soft: rgba(0, 224, 255, 0.45);
       border-radius: 0.9rem;
-      border: 1px solid rgba(255, 255, 255, 0.14);
+      border: 1px solid var(--rep-neon-soft);
       background: rgba(255, 255, 255, 0.04);
       padding: 0.72rem 0.9rem;
       color: rgba(235, 244, 255, 0.88);
       line-height: 1.55;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.08),
+        0 0 24px var(--rep-neon-soft),
+        0 10px 24px rgba(0, 0, 0, 0.2);
     }
 
     .response-repertoire-list li::before {
-      content: '- ';
-      color: #f5a623;
-      font-weight: 800;
+      content: '';
+      position: absolute;
+      inset: -12px;
+      border-radius: 1.08rem;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 50% 50%, var(--rep-neon) 0%, transparent 64%);
+      filter: blur(16px) saturate(1.25);
+      opacity: 0.95;
+      animation: neon-pulse-soft 2.8s ease-in-out infinite;
     }
 
-    .response-title {
-      font-size: clamp(2rem, 5vw, 4rem);
-      line-height: 0.95;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      color: #f8fbff;
+    .response-repertoire-list li:nth-child(6n + 1) { --rep-neon: rgba(0, 224, 255, 0.9); --rep-neon-soft: rgba(0, 224, 255, 0.45); }
+    .response-repertoire-list li:nth-child(6n + 2) { --rep-neon: rgba(255, 210, 74, 0.9); --rep-neon-soft: rgba(255, 210, 74, 0.45); }
+    .response-repertoire-list li:nth-child(6n + 3) { --rep-neon: rgba(255, 106, 186, 0.9); --rep-neon-soft: rgba(255, 106, 186, 0.45); }
+    .response-repertoire-list li:nth-child(6n + 4) { --rep-neon: rgba(167, 112, 255, 0.9); --rep-neon-soft: rgba(167, 112, 255, 0.45); }
+    .response-repertoire-list li:nth-child(6n + 5) { --rep-neon: rgba(82, 255, 166, 0.9); --rep-neon-soft: rgba(82, 255, 166, 0.45); }
+    .response-repertoire-list li:nth-child(6n + 6) { --rep-neon: rgba(255, 134, 66, 0.9); --rep-neon-soft: rgba(255, 134, 66, 0.45); }
+
+    @media (hover: hover) and (pointer: fine) {
+      .response-repertoire-list li:hover {
+        border-color: var(--rep-neon);
+        box-shadow:
+          0 0 0 1px rgba(255, 255, 255, 0.14),
+          0 0 34px var(--rep-neon),
+          0 12px 30px rgba(0, 0, 0, 0.24);
+      }
+
+      .response-repertoire-list li:hover::before {
+        filter: blur(20px) saturate(1.36);
+        opacity: 1;
+      }
+
+      .response-repertoire-list li.is-center {
+        border-color: var(--rep-neon);
+        box-shadow:
+          0 0 0 1px rgba(255, 255, 255, 0.16),
+          0 0 40px var(--rep-neon),
+          0 0 84px var(--rep-neon-soft),
+          0 14px 30px rgba(0, 0, 0, 0.24);
+        transform: none;
+      }
+
+      .response-repertoire-list li.is-center::before {
+        filter: blur(22px) saturate(1.42);
+        opacity: 1;
+      }
+    }
+
+    .response-repertoire-main {
+      display: block;
+      font-weight: 700;
+      color: #f1f6ff;
+      letter-spacing: 0.01em;
+      line-height: 1.4;
       text-wrap: balance;
     }
 
+    .response-repertoire-sub {
+      display: block;
+      color: rgba(209, 224, 248, 0.86);
+      font-size: 0.93em;
+      line-height: 1.45;
+      text-wrap: pretty;
+    }
+
+    .response-title {
+      margin: 0;
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(2.15rem, 6.6vw, 4.35rem);
+      line-height: 0.92;
+      letter-spacing: 0.01em;
+      text-transform: none;
+      color: #f6f8fc;
+      text-wrap: balance;
+      max-width: 14ch;
+      margin-inline: auto;
+    }
+
+    .response-title span {
+      color: #ff5a1e;
+      text-shadow: 0 0 18px rgba(255, 90, 30, 0.2);
+    }
+
+    .response-top-announcement-wrap {
+      margin: 0 0 1rem;
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      border-radius: 999px;
+      border: 1px solid rgba(245, 166, 35, 0.45);
+      background: linear-gradient(140deg, rgba(245, 166, 35, 0.18), rgba(8, 20, 44, 0.92));
+      box-shadow:
+        inset 0 0 0 1px rgba(0, 216, 255, 0.12),
+        0 0 26px rgba(245, 166, 35, 0.2);
+    }
+
+    .response-top-announcement-wrap::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 3.4rem;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .response-top-announcement-wrap::before {
+      left: 0;
+      background: linear-gradient(to right, rgba(7, 17, 37, 0.98), rgba(7, 17, 37, 0));
+    }
+
+    .response-top-announcement-track {
+      display: block;
+      width: 100%;
+      overflow: hidden;
+      will-change: transform;
+    }
+
     .response-top-announcement {
-      margin: 0 0 0.9rem;
+      margin: 0;
+      display: inline-block;
       color: #f5fbff;
       font-weight: 700;
-      line-height: 1.6;
+      line-height: 1.2;
+      white-space: nowrap;
+      padding: 0.62rem 1.2rem;
+      letter-spacing: 0.01em;
+      text-shadow: 0 0 10px rgba(245, 166, 35, 0.16), 0 1px 0 rgba(0, 0, 0, 0.4);
+      will-change: transform;
     }
 
     .response-lead,
@@ -219,13 +455,15 @@ const quickFaq = faq;
     .response-faq-item p,
     .response-footer-cta p {
       color: rgba(235, 244, 255, 0.84);
-      line-height: 1.7;
+      line-height: 1.55;
+      font-size: 0.98rem;
     }
 
     .response-pills {
       display: flex;
       flex-wrap: wrap;
       gap: 0.5rem;
+      justify-content: center;
     }
 
     .response-pills span {
@@ -239,6 +477,7 @@ const quickFaq = faq;
       font-size: 0.78rem;
       font-weight: 700;
       letter-spacing: 0.04em;
+      animation: rise-fade 700ms ease both;
     }
 
     .response-actions,
@@ -247,11 +486,95 @@ const quickFaq = faq;
       display: flex;
       flex-wrap: wrap;
       gap: 0.65rem;
+      justify-content: center;
+    }
+
+    .response-actions {
+      width: min(100%, 33rem);
+      margin-inline: auto;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.55rem;
+      background: rgba(5, 10, 20, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 0.95rem;
+      padding: 0.45rem;
+    }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 2.8rem;
+      padding: 0.68rem 1.25rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      color: #f8fbff;
+      text-decoration: none;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      background: rgba(255, 255, 255, 0.03);
+      transition: transform 180ms ease, border-color 180ms ease, background-color 180ms ease;
+    }
+
+    .btn-call,
+    .btn-wa {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 2.58rem;
+      padding: 0.64rem 0.74rem;
+      border-radius: 0.82rem;
+      text-decoration: none;
+      font-family: 'Oswald', sans-serif;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      color: #eff6ff;
+      font-size: 0.97rem;
+      gap: 0.34rem;
+    }
+
+    .btn-call {
+      background: rgba(10, 36, 86, 0.68);
+    }
+
+    .btn-wa {
+      background: linear-gradient(135deg, rgba(22, 212, 125, 0.98), rgba(89, 255, 170, 0.88));
+      color: #02140e;
+      border-color: rgba(89, 255, 170, 0.5);
+    }
+
+    .btn-call span:first-child,
+    .btn-wa span:first-child,
+    .btn-solid span:first-child {
+      font-size: 0.95rem;
+      line-height: 1;
+    }
+
+    .btn-solid {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.34rem;
+      min-height: 2.58rem;
+      border-radius: 0.82rem;
+      font-family: 'Oswald', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      font-size: 0.97rem;
+      padding: 0.64rem 0.74rem;
+    }
+
+    .btn-ghost:hover {
+      transform: translateY(-2px);
+      border-color: rgba(245, 166, 35, 0.5);
+      background: rgba(245, 166, 35, 0.09);
     }
 
     .response-section-head {
       max-width: 56rem;
-      margin: 0 auto 1.25rem;
+      margin: 0 auto 0.8rem;
       text-align: center;
     }
 
@@ -277,35 +600,143 @@ const quickFaq = faq;
     }
 
     .response-video-grid {
-      margin-top: 1rem;
-      display: grid;
+      margin-top: 0.1rem;
+      display: flex;
       gap: 0.9rem;
-      grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x proximity;
+      padding-top: 0.35rem;
+      padding-bottom: 0.45rem;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(245, 166, 35, 0.55) rgba(255, 255, 255, 0.08);
     }
 
     .response-video-card {
+      flex: 0 0 clamp(16rem, 48vw, 21rem);
+      scroll-snap-align: start;
       display: grid;
       gap: 0.55rem;
+      position: relative;
+      isolation: isolate;
+      --card-neon: rgba(0, 224, 255, 0.92);
+      --card-neon-soft: rgba(0, 224, 255, 0.5);
       text-decoration: none;
-      border-radius: 1rem;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(255, 255, 255, 0.05);
+      border-radius: 1.12rem;
+      border: 1px solid var(--card-neon-soft);
+      background: linear-gradient(180deg, rgba(6, 10, 19, 0.96), rgba(3, 7, 14, 0.99));
       padding: 0.75rem;
       transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+      animation: rise-fade 500ms ease both;
+      animation-delay: var(--card-delay, 0ms);
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.1),
+        0 0 28px var(--card-neon-soft),
+        0 14px 30px rgba(0, 0, 0, 0.3);
     }
+
+    .response-video-card::before {
+      content: '';
+      position: absolute;
+      inset: -14px;
+      border-radius: 1.3rem;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 50% 15%, var(--card-neon) 0%, transparent 48%),
+        radial-gradient(circle at 50% 90%, var(--card-neon-soft) 0%, transparent 66%);
+      filter: blur(18px) saturate(1.24);
+      opacity: 0.95;
+      transform: translateY(2px) scale(1);
+      transition: filter 180ms ease, opacity 180ms ease, transform 180ms ease;
+      animation: neon-pulse-strong 2.4s ease-in-out infinite;
+    }
+
+    .response-video-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      z-index: 1;
+      background:
+        linear-gradient(115deg, transparent 0%, rgba(255, 255, 255, 0.16) 46%, transparent 58%);
+      transform: translateX(-125%);
+      opacity: 0;
+      transition: opacity 220ms ease, transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .response-video-card:nth-child(6n + 1) { --card-neon: rgba(0, 224, 255, 0.92); --card-neon-soft: rgba(0, 224, 255, 0.5); }
+    .response-video-card:nth-child(6n + 2) { --card-neon: rgba(255, 210, 74, 0.92); --card-neon-soft: rgba(255, 210, 74, 0.5); }
+    .response-video-card:nth-child(6n + 3) { --card-neon: rgba(255, 106, 186, 0.92); --card-neon-soft: rgba(255, 106, 186, 0.5); }
+    .response-video-card:nth-child(6n + 4) { --card-neon: rgba(167, 112, 255, 0.92); --card-neon-soft: rgba(167, 112, 255, 0.5); }
+    .response-video-card:nth-child(6n + 5) { --card-neon: rgba(82, 255, 166, 0.92); --card-neon-soft: rgba(82, 255, 166, 0.5); }
+    .response-video-card:nth-child(6n + 6) { --card-neon: rgba(255, 134, 66, 0.92); --card-neon-soft: rgba(255, 134, 66, 0.5); }
 
     .response-video-card:hover {
       transform: translateY(-3px);
-      border-color: rgba(245, 166, 35, 0.45);
-      box-shadow: 0 16px 34px rgba(0, 0, 0, 0.22);
+      border-color: var(--card-neon);
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.14),
+        0 0 34px var(--card-neon),
+        0 0 70px var(--card-neon-soft),
+        0 16px 34px rgba(0, 0, 0, 0.26);
+    }
+
+    .response-video-card:hover::before {
+      filter: blur(22px) saturate(1.38);
+      opacity: 1;
+      transform: translateY(0) scale(1.02);
+    }
+
+    .response-video-card.is-center {
+      border-color: var(--card-neon);
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.16),
+        0 0 44px var(--card-neon),
+        0 0 92px var(--card-neon-soft),
+        0 18px 38px rgba(0, 0, 0, 0.3);
+      transform: scale(1.015);
+    }
+
+    .response-video-card.is-center::before {
+      filter: blur(26px) saturate(1.48);
+      opacity: 1;
+      transform: translateY(0) scale(1.04);
+    }
+
+    .response-video-card:hover::after {
+      opacity: 1;
+      transform: translateX(125%);
     }
 
     .response-video-thumb {
       position: relative;
       overflow: hidden;
       border-radius: 0.85rem;
-      aspect-ratio: 16 / 9;
+      aspect-ratio: 4 / 5;
       background: #0b1220;
+    }
+
+    .response-video-thumb::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(4, 8, 16, 0.1) 35%, rgba(4, 8, 16, 0.78) 100%);
+      pointer-events: none;
+    }
+
+    .response-video-index {
+      position: absolute;
+      top: 0.4rem;
+      left: 0.5rem;
+      color: rgba(255, 255, 255, 0.78);
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(2.6rem, 8vw, 3.6rem);
+      line-height: 1;
+      letter-spacing: 0.03em;
+      text-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+      z-index: 1;
     }
 
     .response-video-thumb img {
@@ -317,73 +748,140 @@ const quickFaq = faq;
 
     .response-video-play {
       position: absolute;
-      inset: 50% auto auto 50%;
-      transform: translate(-50%, -50%);
+      inset: auto 0.65rem 0.65rem auto;
+      transform: none;
       display: inline-grid;
       place-items: center;
-      width: 3rem;
-      height: 3rem;
+      width: 2.4rem;
+      height: 2.4rem;
       border-radius: 999px;
       background: rgba(5, 13, 29, 0.78);
       border: 1px solid rgba(255, 255, 255, 0.2);
       color: #fff;
       font-size: 1rem;
       box-shadow: 0 0 24px rgba(11, 188, 214, 0.2);
+      z-index: 2;
     }
 
     .response-video-card p {
       margin: 0;
-      color: #f8fbff;
-      font-size: 0.92rem;
-      font-weight: 700;
-      line-height: 1.45;
-    }
-
-    .response-repertoire-grid {
-      display: grid;
-      gap: 0.9rem;
-      grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
-    }
-
-    .response-repertoire-card {
-      border-radius: 1rem;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(255, 255, 255, 0.05);
-      padding: 1rem;
-      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.16);
-    }
-
-    .response-repertoire-icon {
-      margin: 0 0 0.35rem;
-      font-size: 1.5rem;
-    }
-
-    .response-repertoire-card h3 {
-      margin: 0;
-      color: #fff;
+      color: #ff6a1a;
       font-size: 1.02rem;
-      line-height: 1.35;
+      font-weight: 800;
+      line-height: 1.45;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      min-height: 2.65em;
     }
 
-    .response-repertoire-card p {
-      margin: 0.45rem 0 0;
-      font-size: 0.88rem;
-      white-space: pre-line;
+    .response-video-copy {
+      color: rgba(238, 245, 255, 0.92);
+      font-size: 0.89rem;
+      line-height: 1.55;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      min-height: 3.1em;
+      display: block;
+    }
+
+    .response-inline-actions {
+      margin-top: 1rem;
+      justify-content: center;
+    }
+
+    .response-scroll-shell {
+      position: relative;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.9rem;
+    }
+
+    .response-scroll-btn {
+      width: 2.2rem;
+      height: 2.2rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      background: rgba(5, 13, 29, 0.82);
+      color: #fff;
+      font-size: 1.55rem;
+      line-height: 1;
+      display: inline-grid;
+      place-items: center;
+      cursor: pointer;
+      transition: transform 180ms ease, border-color 180ms ease;
+    }
+
+    .response-scroll-btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(245, 166, 35, 0.62);
+    }
+
+    .response-video-grid::-webkit-scrollbar,
+    .response-repertoire-list::-webkit-scrollbar {
+      height: 0.48rem;
+    }
+
+    .response-video-grid::-webkit-scrollbar-track,
+    .response-repertoire-list::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+    }
+
+    .response-video-grid::-webkit-scrollbar-thumb,
+    .response-repertoire-list::-webkit-scrollbar-thumb {
+      background: linear-gradient(90deg, rgba(11, 188, 214, 0.9), rgba(245, 166, 35, 0.92));
+      border-radius: 999px;
     }
 
     .response-faq-list {
       display: grid;
-      gap: 0.7rem;
+      gap: 0.55rem;
       max-width: 62rem;
       margin: 0 auto;
     }
 
     .response-faq-item {
-      border-radius: 1rem;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(255, 255, 255, 0.05);
-      padding: 0.15rem 0.95rem;
+      position: relative;
+      isolation: isolate;
+      --faq-neon: rgba(111, 197, 255, 0.76);
+      border-radius: 0.95rem;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: linear-gradient(180deg, rgba(12, 20, 46, 0.78), rgba(10, 18, 40, 0.84));
+      box-shadow:
+        inset 0 0 0 1px rgba(126, 155, 255, 0.08),
+        0 0 20px rgba(126, 155, 255, 0.24);
+      padding: 0.08rem 0.9rem;
     }
+
+    .response-faq-item::before {
+      content: '';
+      position: absolute;
+      inset: -10px;
+      border-radius: 1rem;
+      z-index: -1;
+      pointer-events: none;
+      background: radial-gradient(circle at 50% 50%, var(--faq-neon) 0%, transparent 68%);
+      filter: blur(14px);
+      opacity: 0.82;
+      animation: neon-pulse-soft 3s ease-in-out infinite;
+    }
+
+    .response-faq-item summary {
+      text-shadow: 0 0 12px rgba(255, 255, 255, 0.08);
+    }
+
+    .response-faq-item:nth-child(6n + 1) { --faq-neon: rgba(0, 224, 255, 0.72); }
+    .response-faq-item:nth-child(6n + 2) { --faq-neon: rgba(255, 210, 74, 0.72); }
+    .response-faq-item:nth-child(6n + 3) { --faq-neon: rgba(255, 106, 186, 0.72); }
+    .response-faq-item:nth-child(6n + 4) { --faq-neon: rgba(167, 112, 255, 0.72); }
+    .response-faq-item:nth-child(6n + 5) { --faq-neon: rgba(82, 255, 166, 0.72); }
+    .response-faq-item:nth-child(6n + 6) { --faq-neon: rgba(255, 134, 66, 0.72); }
 
     .response-faq-item summary {
       list-style: none;
@@ -392,9 +890,10 @@ const quickFaq = faq;
       align-items: center;
       justify-content: space-between;
       gap: 1rem;
-      padding: 0.9rem 0;
+      padding: 0.78rem 0;
       color: #fff;
       font-weight: 700;
+      font-size: 0.97rem;
     }
 
     .response-faq-item summary::-webkit-details-marker {
@@ -402,29 +901,304 @@ const quickFaq = faq;
     }
 
     .response-faq-item p {
-      margin: 0 0 0.9rem;
-      font-size: 0.92rem;
+      margin: 0 0 0.82rem;
+      font-size: 0.9rem;
     }
 
     .response-footer-cta {
       max-width: 62rem;
-      margin: 1.25rem auto 0;
-      padding: 1rem 1.1rem;
-      border-radius: 1rem;
-      border: 1px solid rgba(245, 166, 35, 0.24);
-      background: linear-gradient(135deg, rgba(245, 166, 35, 0.12), rgba(11, 188, 214, 0.08));
+      margin: 1rem auto 0;
+      padding: 1.05rem 1rem;
+      border-radius: 1.1rem;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: inset 0 0 0 1px rgba(112, 146, 255, 0.08);
+      background: linear-gradient(170deg, rgba(21, 65, 127, 0.42), rgba(12, 43, 96, 0.58));
       text-align: center;
     }
 
     .response-footer-cta p {
       margin: 0;
-      max-width: 56ch;
+      max-width: 43ch;
       margin-inline: auto;
+      font-size: 1.02rem;
+      font-weight: 700;
+      color: rgba(241, 246, 255, 0.94);
     }
 
     .response-footer-actions {
-      margin-top: 0.85rem;
+      margin-top: 0.92rem;
       justify-content: center;
     }
+
+    @keyframes rise-fade {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes neon-pulse-strong {
+      0%, 100% {
+        opacity: 0.85;
+        filter: blur(16px) saturate(1.15);
+      }
+      50% {
+        opacity: 1;
+        filter: blur(24px) saturate(1.45);
+      }
+    }
+
+    @keyframes neon-pulse-soft {
+      0%, 100% {
+        opacity: 0.72;
+        filter: blur(13px) saturate(1.1);
+      }
+      50% {
+        opacity: 0.95;
+        filter: blur(18px) saturate(1.32);
+      }
+    }
+
+    @media (min-width: 64rem) {
+      .response-grid {
+        grid-template-columns: 1fr;
+        align-items: center;
+      }
+
+      .response-copy {
+        padding-right: 0;
+        text-align: center;
+        margin-inline: auto;
+      }
+
+      .response-title {
+        margin-inline: auto;
+      }
+
+      .response-pills,
+      .response-actions {
+        justify-content: center;
+      }
+
+      .response-top-announcement-wrap {
+        margin-inline: auto;
+      }
+    }
+
+    @media (max-width: 48rem) {
+      .response-shell {
+        border-radius: 1.1rem;
+      }
+
+      .response-scroll-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .response-scroll-btn {
+        display: none;
+      }
+
+      .response-video-card {
+        flex-basis: min(74vw, 17rem);
+      }
+
+      .response-actions {
+        width: 100%;
+      }
+
+      .response-repertoire-list li {
+        flex-basis: min(85vw, 18rem);
+      }
+
+      .response-top-announcement {
+        font-size: 0.88rem;
+      }
+
+      .response-video-card::before {
+        opacity: 1;
+        filter: blur(20px) saturate(1.34);
+      }
+
+      .response-repertoire-list li::before,
+      .response-faq-item::before {
+        opacity: 0.92;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .response-copy,
+      .response-video-card,
+      .response-pills span {
+        animation: none;
+      }
+
+      .response-top-announcement-track {
+        transform: none !important;
+        width: 100%;
+        display: block;
+      }
+
+      .response-top-announcement {
+        white-space: normal;
+        padding: 0.62rem 0.9rem;
+      }
+
+      .response-video-card::before,
+      .response-video-card::after,
+      .response-repertoire-list li::before,
+      .response-faq-item::before {
+        animation: none;
+      }
+    }
   </style>
+
+  <script>
+    const tickerTrack = document.querySelector('[data-ticker-track]');
+
+    if (tickerTrack && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const tickerItem = tickerTrack.querySelector('[data-ticker-item]');
+
+      if (tickerItem) {
+        let rafId = 0;
+        let resizeRaf = 0;
+        let lastTime = performance.now();
+        let offset = 0;
+        let loopDistance = 0;
+        let startOffset = 0;
+        const speedPxPerSecond = 96;
+
+        const measureTicker = () => {
+          const wrapWidth = tickerTrack.clientWidth;
+          const itemWidth = tickerItem.scrollWidth;
+          if (!wrapWidth || !itemWidth) {
+            return;
+          }
+
+          startOffset = wrapWidth;
+          loopDistance = itemWidth;
+          offset = startOffset;
+          tickerItem.style.transform = `translateX(${offset}px)`;
+          lastTime = performance.now();
+        };
+
+        const tick = (time) => {
+          const dt = (time - lastTime) / 1000;
+          lastTime = time;
+
+          if (loopDistance > 0) {
+            offset -= speedPxPerSecond * dt;
+            if (offset <= -loopDistance - 12) {
+              offset = startOffset;
+            }
+            tickerItem.style.transform = `translateX(${offset}px)`;
+          }
+
+          rafId = requestAnimationFrame(tick);
+        };
+
+        measureTicker();
+        rafId = requestAnimationFrame(tick);
+
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(() => {
+            measureTicker();
+          });
+        }
+
+        window.addEventListener('resize', () => {
+          if (resizeRaf) {
+            cancelAnimationFrame(resizeRaf);
+          }
+          resizeRaf = requestAnimationFrame(measureTicker);
+        }, { passive: true });
+
+        if ('ResizeObserver' in window) {
+          const ro = new ResizeObserver(() => {
+            if (resizeRaf) {
+              cancelAnimationFrame(resizeRaf);
+            }
+            resizeRaf = requestAnimationFrame(measureTicker);
+          });
+          ro.observe(tickerTrack);
+          ro.observe(tickerItem);
+        }
+      }
+    }
+
+    const shells = document.querySelectorAll('[data-scroll-shell]');
+
+    function initCenterHighlight(lane) {
+      const cards = lane.matches('.response-video-grid')
+        ? Array.from(lane.querySelectorAll('.response-video-card'))
+        : Array.from(lane.querySelectorAll('li'));
+
+      if (!cards.length) {
+        return;
+      }
+
+      let rafId = 0;
+
+      const updateCenterCard = () => {
+        rafId = 0;
+        const laneRect = lane.getBoundingClientRect();
+        const laneCenter = laneRect.left + laneRect.width / 2;
+
+        let closest = null;
+        let minDistance = Number.POSITIVE_INFINITY;
+
+        cards.forEach((card) => {
+          const rect = card.getBoundingClientRect();
+          const cardCenter = rect.left + rect.width / 2;
+          const distance = Math.abs(cardCenter - laneCenter);
+          if (distance < minDistance) {
+            minDistance = distance;
+            closest = card;
+          }
+        });
+
+        cards.forEach((card) => card.classList.remove('is-center'));
+        if (closest) {
+          closest.classList.add('is-center');
+        }
+      };
+
+      const requestUpdate = () => {
+        if (rafId) {
+          return;
+        }
+        rafId = requestAnimationFrame(updateCenterCard);
+      };
+
+      lane.addEventListener('scroll', requestUpdate, { passive: true });
+      window.addEventListener('resize', requestUpdate, { passive: true });
+      requestUpdate();
+    }
+
+    shells.forEach((shell) => {
+      const lane = shell.querySelector('.response-video-grid, .response-repertoire-list');
+      const prev = shell.querySelector('[data-scroll-prev]');
+      const next = shell.querySelector('[data-scroll-next]');
+
+      if (!lane || !prev || !next) {
+        return;
+      }
+
+      const step = () => Math.max(260, lane.clientWidth * 0.75);
+
+      prev.addEventListener('click', () => {
+        lane.scrollBy({ left: -step(), behavior: 'smooth' });
+      });
+
+      next.addEventListener('click', () => {
+        lane.scrollBy({ left: step(), behavior: 'smooth' });
+      });
+
+      initCenterHighlight(lane);
+    });
+  </script>
 </BaseLayout>
