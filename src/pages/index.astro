@@ -294,8 +294,8 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
         <p class="hp-meet-kicker">Conexiune reală</p>
         <h2 class="hp-meet-title">Vrei să ne cunoști înainte de eveniment? Exact așa lucrăm.</h2>
         <p class="hp-meet-copy">
-          Discutăm direct cu voi, înțelegem atmosfera dorită și construim împreună planul serii.
-          Ne pasă de oameni, nu doar de playlist.
+          Instrumentiștii noștri includ orgă, vioară, acordeon și saxofon, iar vocile serii sunt Florentina Pană și Cătălin Matei.
+          Asigurăm sonorizare de top, schelă de lumini și momentul potrivit pentru obiceiurile de zi.
         </p>
         <div class="hp-meet-actions">
           <a href="/despre/" class="btn-outline" onclick="window.gtag&&window.gtag('event','click_about',{event_category:'homepage',event_label:'meet-section'})">Cunoaște-ne mai bine</a>
@@ -339,7 +339,7 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
     </div>
 
     <div class="hp-team-grid">
-      <article class="hp-team-card reveal-on-scroll from-left" style="--reveal-delay: 80ms">
+      <article class="hp-team-card hp-team-card--portrait reveal-on-scroll from-left" style="--reveal-delay: 80ms">
         <picture>
           <source
             type="image/avif"
@@ -1866,44 +1866,56 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
 
   .hp-team-card {
     position: relative;
+    display: flex;
+    flex-direction: column;
     border-radius: 1rem;
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.16);
     min-height: 280px;
+    background: linear-gradient(180deg, rgba(4, 10, 25, 0.18), rgba(4, 10, 25, 0.76));
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
   }
 
+  .hp-team-card picture {
+    position: relative;
+    inset: auto;
+    display: block;
+    flex: 0 0 auto;
+    aspect-ratio: 16 / 10;
+  }
+
+  .hp-team-card--portrait picture {
+    aspect-ratio: 5 / 7;
+  }
+
   .hp-team-card img {
-    position: absolute;
-    inset: 0;
+    position: relative;
+    inset: auto;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center 18%;
     filter: saturate(1.05) contrast(1.04);
     transition: transform 340ms ease;
   }
 
-  .hp-team-card picture {
-    position: absolute;
-    inset: 0;
-    display: block;
+  .hp-team-card--portrait img {
+    object-fit: contain;
+    object-position: center center;
+    background: radial-gradient(circle at 50% 30%, rgba(12, 28, 61, 0.18), rgba(4, 10, 25, 0.05));
+    padding: 0.4rem;
   }
 
   .hp-team-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, rgba(4, 10, 25, 0.2) 0%, rgba(4, 10, 25, 0.75) 76%, rgba(4, 10, 25, 0.9) 100%);
-    z-index: 1;
+    display: none;
   }
 
   .hp-team-content {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 2;
-    padding: 0.85rem 0.9rem 0.95rem;
+    position: relative;
+    z-index: 1;
+    padding: 0.95rem 1rem 1.05rem;
+    background: linear-gradient(180deg, rgba(4, 10, 25, 0.12), rgba(4, 10, 25, 0.84));
   }
 
   .hp-team-role {
@@ -2361,17 +2373,21 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
     }
 
     .hp-team-card {
-      display: flex;
-      flex-direction: column;
-      min-height: 250px;
+      min-height: 0;
     }
 
     .hp-team-card img {
-      position: relative;
-      inset: auto;
       height: auto;
       aspect-ratio: 16 / 10;
       flex: none;
+    }
+
+    .hp-team-card--portrait picture {
+      aspect-ratio: 5 / 7;
+    }
+
+    .hp-team-card--portrait img {
+      aspect-ratio: 5 / 7;
     }
 
     .hp-team-overlay {
@@ -2379,11 +2395,6 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
     }
 
     .hp-team-content {
-      position: relative;
-      left: auto;
-      right: auto;
-      bottom: auto;
-      background: linear-gradient(180deg, rgba(4, 10, 25, 0.10), rgba(4, 10, 25, 0.82));
       padding: 0.75rem 0.8rem 0.85rem;
     }
 
@@ -2447,20 +2458,18 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
 
   @media (max-width: 1024px) {
     .hp-team-card {
-      display: flex;
-      flex-direction: column;
-      min-height: 250px;
+      min-height: 0;
     }
 
     .hp-team-card picture {
-      position: relative;
-      inset: auto;
-      display: block;
+      aspect-ratio: 16 / 10;
+    }
+
+    .hp-team-card--portrait picture {
+      aspect-ratio: 5 / 7;
     }
 
     .hp-team-card img {
-      position: relative;
-      inset: auto;
       width: 100%;
       height: auto;
       aspect-ratio: 16 / 10;
@@ -2468,15 +2477,15 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
       object-fit: cover;
     }
 
+    .hp-team-card--portrait img {
+      aspect-ratio: 5 / 7;
+    }
+
     .hp-team-overlay {
       display: none;
     }
 
     .hp-team-content {
-      position: relative;
-      left: auto;
-      right: auto;
-      bottom: auto;
       background: linear-gradient(180deg, rgba(4, 10, 25, 0.12), rgba(4, 10, 25, 0.84));
       padding: 0.85rem 0.9rem 0.95rem;
     }

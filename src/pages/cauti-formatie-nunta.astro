@@ -51,6 +51,8 @@ const processCards = [
   },
 ];
 
+const visibleProcessCards = processCards.slice(0, 4);
+
 const shortRepertoire = [
   'Muzică populară de petrecere',
   'Muzică internațională: grecească, arăbească, machedonească',
@@ -91,20 +93,25 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
           <p class="response-kicker">Formație live pentru nuntă, botez și evenimente private</p>
           <h1 class="response-title">Vrei să facem Show și să ne distrăm împreună?</h1>
           <p class="response-lead">
-            La noi nu primești promisiuni generale. Primești exemple video reale, repertoriu clar și o propunere personalizată în funcție de stilul petrecerii și bugetul tău.
+            Venim cu instrumentiști la orgă, vioară, acordeon și saxofon, alături de soliștii vocali Florentina Pană și Cătălin Matei.
+            Oferim sonorizare de top, schelă de lumini și asigurăm și obiceiurile de zi, pentru un program complet și bine pus la punct.
           </p>
 
           <div class="response-pills" aria-label="Beneficii rapide">
-            <span>Video reale</span>
-            <span>Repertoriu variat</span>
-            <span>Program adaptat invitaților</span>
-            <span>Răspuns rapid la cerere</span>
+            <span>Instrumentiști: orgă, vioară, acordeon, saxofon</span>
+            <span>Soliști vocali: Florentina Pană & Cătălin Matei</span>
+            <span>Sonorizare de top</span>
+            <span>Schelă de lumini + obiceiurile de zi</span>
           </div>
 
           <div class="response-actions">
             <a href="tel:+40767369658" class="btn-call"><span aria-hidden="true">☎</span><span>Sună Acum</span></a>
             <a href="https://wa.me/40767369658" class="btn-wa"><span aria-hidden="true">◉</span><span>WhatsApp</span></a>
             <a href="/contact/" class="btn-solid"><span aria-hidden="true">◇</span><span>Ofertă</span></a>
+          </div>
+
+          <div class="response-members-cta">
+            <a href="/membri/" class="response-members-link"><span aria-hidden="true">✦</span><span>Vezi Membri Formației</span></a>
           </div>
         </div>
       </div>
@@ -120,30 +127,32 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
     <div class="response-scroll-shell" data-scroll-shell>
       <button class="response-scroll-btn response-scroll-btn--prev" type="button" data-scroll-prev aria-label="Clipul anterior">‹</button>
       <div class="response-video-grid" id="video-lane" role="list" aria-label="Carduri experiență, scroll orizontal">
-        {secondaryVideos.slice(0, processCards.length).map((video, index) => (
+        {secondaryVideos.slice(0, visibleProcessCards.length).map((video, index) => (
           <a href={`/video/${video.slug}/`} class="response-video-card" role="listitem" aria-label={`Vezi ${video.title}`} style={`--card-delay:${index * 80}ms`}>
             <div class="response-video-thumb">
               <img
-                src="data:image/gif;base64,R0lGODlhAQABAAAAACw="
-                data-src={video.thumbWebp}
-                data-fallback-src={video.thumbJpg}
+                src={video.thumbJpg}
                 alt={video.title}
-                loading="lazy"
+                loading={index === 0 ? 'eager' : 'lazy'}
                 decoding="async"
-                fetchpriority="low"
+                fetchpriority={index === 0 ? 'high' : 'low'}
                 width="480"
                 height="360"
-                class="response-lazy-thumb"
+                class="response-video-image"
               />
               <span class="response-video-index" aria-hidden="true">{String(index + 5).padStart(2, '0')}</span>
               <span class="response-video-play" aria-hidden="true">▶</span>
             </div>
-            <p>{processCards[index].title}</p>
-            <span class="response-video-copy">{processCards[index].text}</span>
+              <p>{visibleProcessCards[index].title}</p>
+              <span class="response-video-copy">{visibleProcessCards[index].text}</span>
           </a>
         ))}
       </div>
       <button class="response-scroll-btn response-scroll-btn--next" type="button" data-scroll-next aria-label="Clipul următor">›</button>
+    </div>
+
+    <div class="response-more-videos">
+      <a href="/galerie-video/" class="response-more-videos-link">Vezi toate videoclipurile</a>
     </div>
 
     <div class="response-inline-actions">
@@ -161,10 +170,10 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
     <div class="response-scroll-shell" data-scroll-shell>
       <button class="response-scroll-btn response-scroll-btn--prev" type="button" data-scroll-prev aria-label="Element anterior">‹</button>
       <ul class="response-repertoire-list" aria-label="Repertoriu pe scurt, scroll orizontal">
-        {shortRepertoire.map((item) => {
+        {shortRepertoire.map((item, index) => {
           const parts = splitRepertoireItem(item);
           return (
-            <li>
+            <li style={`--rep-delay:${index * 90}ms`}>
               <span class="response-repertoire-main">{parts.main}</span>
               {parts.detail && <span class="response-repertoire-sub">{parts.detail}</span>}
             </li>
@@ -309,7 +318,8 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
       scroll-snap-align: start;
       margin: 0;
       display: grid;
-      gap: 0.28rem;
+      place-items: center;
+      gap: 0.34rem;
       position: relative;
       isolation: isolate;
       --rep-neon: rgba(0, 224, 255, 0.9);
@@ -322,10 +332,13 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
       line-height: 1.55;
       overflow-wrap: anywhere;
       word-break: break-word;
+      text-align: center;
       box-shadow:
         0 0 0 1px rgba(255, 255, 255, 0.08),
         0 0 24px var(--rep-neon-soft),
         0 10px 24px rgba(0, 0, 0, 0.2);
+      animation: rise-fade 680ms ease both;
+      animation-delay: var(--rep-delay, 0ms);
     }
 
     .response-repertoire-list li::before {
@@ -394,6 +407,7 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
       font-size: 0.93em;
       line-height: 1.45;
       text-wrap: pretty;
+      text-align: center;
     }
 
     .response-title {
@@ -505,12 +519,53 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
       width: min(100%, 33rem);
       margin-inline: auto;
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 0.55rem;
       background: rgba(5, 10, 20, 0.78);
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 0.95rem;
       padding: 0.45rem;
+    }
+
+    .response-actions > a {
+      display: grid;
+      place-items: center;
+      text-align: center;
+      text-wrap: balance;
+      animation: rise-fade 620ms ease both;
+      min-height: 3.25rem;
+    }
+
+    .response-actions > a:nth-child(1) { animation-delay: 40ms; }
+    .response-actions > a:nth-child(2) { animation-delay: 110ms; }
+    .response-actions > a:nth-child(3) { animation-delay: 180ms; }
+    .response-actions > a:nth-child(4) { animation-delay: 250ms; }
+
+    .response-members-cta {
+      margin-top: 0.75rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .response-members-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      min-height: 2.8rem;
+      padding: 0.68rem 1rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: linear-gradient(135deg, rgba(245, 166, 35, 0.28), rgba(255, 209, 102, 0.18));
+      color: #fff7df;
+      text-decoration: none;
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.88rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      animation: rise-fade 700ms ease both;
+      animation-delay: 320ms;
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
     }
 
     .btn-ghost {
@@ -531,9 +586,9 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
 
     .btn-call,
     .btn-wa {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+      display: grid;
+      grid-auto-flow: column;
+      place-items: center;
       min-height: 2.58rem;
       padding: 0.64rem 0.74rem;
       border-radius: 0.82rem;
@@ -565,9 +620,9 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
     }
 
     .btn-solid {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+      display: grid;
+      grid-auto-flow: column;
+      place-items: center;
       gap: 0.34rem;
       min-height: 2.58rem;
       border-radius: 0.82rem;
@@ -576,6 +631,16 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
       letter-spacing: 0.02em;
       font-size: 0.97rem;
       padding: 0.64rem 0.74rem;
+    }
+
+    .btn-call span:last-child,
+    .btn-wa span:last-child,
+    .btn-solid span:last-child {
+      display: block;
+      text-align: center;
+      line-height: 1.12;
+      max-width: 100%;
+      white-space: normal;
     }
 
     .btn-ghost:hover {
@@ -758,12 +823,7 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
       display: block;
     }
 
-    .response-lazy-thumb {
-      opacity: 0.72;
-      transition: opacity 220ms ease;
-    }
-
-    .response-lazy-thumb.is-loaded {
+    .response-video-image {
       opacity: 1;
     }
 
@@ -1031,6 +1091,18 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
         text-wrap: balance;
       }
 
+      .response-actions > a {
+        min-height: 3.35rem;
+      }
+
+      .response-actions > a:nth-child(4) {
+        grid-column: 1 / -1;
+      }
+
+      .response-actions .btn-solid {
+        min-height: 3rem;
+      }
+
       .btn-wa span:last-child {
         font-size: 0.76rem;
       }
@@ -1044,15 +1116,57 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
       }
 
       .response-video-card {
-        flex-basis: min(74vw, 17rem);
+        flex-basis: min(84vw, 18rem);
+      }
+
+      .response-video-card:nth-child(n + 4) {
+        display: none;
+      }
+
+      .response-more-videos {
+        margin-top: 0.65rem;
+        display: flex;
+        justify-content: center;
+      }
+
+      .response-more-videos-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 2.65rem;
+        padding: 0.65rem 1rem;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        background: rgba(255, 255, 255, 0.06);
+        color: #f8fbff;
+        text-decoration: none;
+        font-family: 'Oswald', sans-serif;
+        font-size: 0.86rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
       }
 
       .response-actions {
         width: 100%;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .response-members-cta {
+        margin-top: 0.85rem;
+      }
+
+      .response-members-link {
+        width: 100%;
+        min-height: 3rem;
+        font-size: 0.84rem;
       }
 
       .response-repertoire-list li {
         flex-basis: min(85vw, 18rem);
+      }
+
+      .response-repertoire-list li:nth-child(n) {
+        animation-delay: calc(var(--rep-delay, 0ms) + 40ms);
       }
 
       .response-top-announcement {
@@ -1062,6 +1176,35 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
       .response-video-card::before {
         opacity: 1;
         filter: blur(20px) saturate(1.34);
+      }
+
+      .response-video-card,
+      .response-video-card:hover,
+      .response-video-card.is-center {
+        transform: none;
+      }
+
+      .response-video-card::after,
+      .response-video-card:hover::after {
+        opacity: 0;
+        transform: none;
+      }
+
+      .response-video-thumb {
+        aspect-ratio: 16 / 11;
+      }
+
+      .response-video-thumb img {
+        object-position: center top;
+      }
+
+      .response-video-play {
+        width: 2.1rem;
+        height: 2.1rem;
+      }
+
+      .response-video-index {
+        font-size: clamp(2.15rem, 11vw, 3rem);
       }
 
       .response-repertoire-list li::before,
@@ -1113,53 +1256,6 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
   </style>
 
   <script>
-    const lazyThumbs = Array.from(document.querySelectorAll('.response-lazy-thumb'));
-
-    const loadThumb = (img) => {
-      if (!(img instanceof HTMLImageElement) || img.dataset.loaded === 'true') {
-        return;
-      }
-
-      const webpSrc = img.dataset.src;
-      const jpgFallback = img.dataset.fallbackSrc;
-      if (!webpSrc) {
-        return;
-      }
-
-      img.src = webpSrc;
-      img.dataset.loaded = 'true';
-
-      img.addEventListener('load', () => {
-        img.classList.add('is-loaded');
-      }, { once: true });
-
-      img.addEventListener('error', () => {
-        if (jpgFallback && img.src !== jpgFallback) {
-          img.src = jpgFallback;
-          return;
-        }
-        img.classList.add('is-loaded');
-      }, { once: true });
-    };
-
-    if ('IntersectionObserver' in window) {
-      const thumbObserver = new IntersectionObserver((entries, observer) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) {
-            return;
-          }
-          loadThumb(entry.target);
-          observer.unobserve(entry.target);
-        });
-      }, {
-        rootMargin: '220px 0px',
-      });
-
-      lazyThumbs.forEach((img) => thumbObserver.observe(img));
-    } else {
-      lazyThumbs.forEach(loadThumb);
-    }
-
     const tickerTrack = document.querySelector('[data-ticker-track]');
 
     if (tickerTrack && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -1235,6 +1331,10 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
     const shells = document.querySelectorAll('[data-scroll-shell]');
 
     function initCenterHighlight(lane) {
+      if (window.matchMedia('(max-width: 48rem)').matches) {
+        return;
+      }
+
       const cards = lane.matches('.response-video-grid')
         ? Array.from(lane.querySelectorAll('.response-video-card'))
         : Array.from(lane.querySelectorAll('li'));
