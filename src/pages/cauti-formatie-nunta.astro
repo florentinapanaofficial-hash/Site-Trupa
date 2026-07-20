@@ -21,6 +21,7 @@ const videoSlug = (video: { title: string; youtubeId: string }) => `${slugify(vi
 
 const featuredVideo = videos[0];
 const ogImage = '/images/og-cauti-formatie-custom.webp';
+const whatsappBudgetOfferHref = 'https://wa.me/40767369658?text=Buna%21%20Spune-ne%20ce%20buget%20ai%20si%20noi%20iti%20facem%20o%20oferta%20pentru%20eveniment.';
 const secondaryVideos = videos.slice(1, 9).map((video) => ({
   ...video,
   slug: videoSlug(video),
@@ -67,7 +68,21 @@ const splitRepertoireItem = (item: string) => {
   };
 };
 
-const quickFaq = faq;
+const quickFaq = [
+  ...faq,
+  {
+    question: 'Aveți oferte și pentru buget redus?',
+    answer: 'Da. Avem pachete flexibile și putem configura un program adaptat bugetului vostru, fără compromis la energie și profesionalism.',
+  },
+  {
+    question: 'Asigurați și obiceiurile de zi?',
+    answer: 'Da, asigurăm și obiceiurile de zi, alături de sonorizare și coordonare, pentru un program complet cap-coadă.',
+  },
+  {
+    question: 'Cântați și manele?',
+    answer: 'Da. La cerere, includem manele vechi și noi în repertoriu, dozate corect în funcție de invitați și de dinamica petrecerii.',
+  },
+];
 
 const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care știe să facă atmosferă, iată ce îți oferim pentru o seară memorabilă: Show Live 100% cu energie pură, voci remarcabile și conexiune autentică; repertoriu pentru toți, de la cafe-concert elegant și hituri internaționale moderne până la folclor autentic și muzică de petrecere; sunet premium cu echipamente de top pentru claritate impecabilă, adaptată perfect sălii. Hai să scriem împreună soundtrack-ul nunții tale! Contactează-ne și hai să transformăm petrecerea voastră într-o amintire de neuitat.';
 ---
@@ -93,13 +108,18 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
           <p class="response-kicker">Formație live pentru nuntă, botez și evenimente private</p>
           <h1 class="response-title">Vrei să facem Show și să ne distrăm împreună?</h1>
           <p class="response-lead">
-            Venim cu instrumentiști la orgă, vioară, acordeon și saxofon, alături de soliștii vocali Florentina Pană și Cătălin Matei.
+            Venim cu instrumentiști la orgă, vioară, acordeon și saxofon, alături de soliștii vocali Florentina Pană, Cătălin Matei și Alexia Țircomnicu.
             Oferim sonorizare de top, schelă de lumini și asigurăm și obiceiurile de zi, pentru un program complet și bine pus la punct.
           </p>
 
+          <div class="response-offer-highlight" aria-label="Repertoriu și preț orientativ">
+            <p class="response-offer-highlight__genres"><strong>Cântăm toate genurile muzicale</strong>, adaptate pe invitații voștri și pe energia evenimentului.</p>
+            <p class="response-offer-highlight__price">Preț orientativ: <span>2.500€ - 4.000€</span>, în funcție de numărul de membri din formulă.</p>
+          </div>
+
           <div class="response-pills" aria-label="Beneficii rapide">
             <span>Instrumentiști: orgă, vioară, acordeon, saxofon</span>
-            <span>Soliști vocali: Florentina Pană & Cătălin Matei</span>
+            <span>Soliști vocali: Florentina Pană, Cătălin Matei & Alexia Țircomnicu</span>
             <span>Sonorizare de top</span>
             <span>Schelă de lumini + obiceiurile de zi</span>
           </div>
@@ -107,7 +127,7 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
           <div class="response-actions">
             <a href="tel:+40767369658" class="btn-call"><span aria-hidden="true">☎</span><span>Sună Acum</span></a>
             <a href="https://wa.me/40767369658" class="btn-wa"><span aria-hidden="true">◉</span><span>WhatsApp</span></a>
-            <a href="/contact/" class="btn-solid"><span aria-hidden="true">◇</span><span>Ofertă</span></a>
+            <a href={whatsappBudgetOfferHref} class="btn-solid" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">◇</span><span>Buget pe WhatsApp</span></a>
           </div>
 
           <div class="response-members-cta">
@@ -136,6 +156,7 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
                 loading={index === 0 ? 'eager' : 'lazy'}
                 decoding="async"
                 fetchpriority={index === 0 ? 'high' : 'low'}
+                draggable="false"
                 width="480"
                 height="360"
                 class="response-video-image"
@@ -156,7 +177,7 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
     </div>
 
     <div class="response-inline-actions">
-      <a href="/contact/" class="btn-solid">Vreau ofertă personalizată</a>
+      <a href={whatsappBudgetOfferHref} class="btn-solid" target="_blank" rel="noopener noreferrer">Spune-ne bugetul și îți facem oferta pe WhatsApp</a>
     </div>
   </section>
 
@@ -205,7 +226,12 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
     <div class="response-footer-cta">
       <p>Dacă ți se potrivește direcția noastră, trimite data evenimentului și intervalul de buget. Revenim rapid cu o propunere clară și realistă.</p>
       <div class="response-footer-actions">
-        <a href="/contact/" class="btn-solid">Cere ofertă</a>
+        <a
+          href={whatsappBudgetOfferHref}
+          class="btn-solid"
+          target="_blank"
+          rel="noopener noreferrer"
+        >Spune-ne bugetul și îți facem oferta pe WhatsApp</a>
       </div>
     </div>
   </section>
@@ -492,6 +518,38 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
       justify-content: center;
     }
 
+    .response-offer-highlight {
+      width: min(100%, 44rem);
+      margin-inline: auto;
+      padding: 0.75rem 0.95rem;
+      border-radius: 1rem;
+      border: 1px solid rgba(245, 166, 35, 0.42);
+      background: linear-gradient(150deg, rgba(245, 166, 35, 0.16), rgba(10, 24, 52, 0.82));
+      box-shadow:
+        inset 0 0 0 1px rgba(0, 224, 255, 0.14),
+        0 0 24px rgba(245, 166, 35, 0.2);
+      text-align: center;
+    }
+
+    .response-offer-highlight__genres,
+    .response-offer-highlight__price {
+      margin: 0;
+      color: rgba(242, 248, 255, 0.94);
+      font-size: 0.92rem;
+      line-height: 1.48;
+    }
+
+    .response-offer-highlight__genres {
+      margin-bottom: 0.28rem;
+    }
+
+    .response-offer-highlight__price span {
+      color: #ffd16e;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-shadow: 0 0 16px rgba(245, 166, 35, 0.2);
+    }
+
     .response-pills span {
       display: inline-flex;
       align-items: center;
@@ -681,16 +739,25 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
       display: flex;
       gap: 0.9rem;
       overflow-x: auto;
+      overflow-y: hidden;
       overscroll-behavior-x: contain;
       scroll-snap-type: x proximity;
-      padding-top: 0.35rem;
-      padding-bottom: 0.45rem;
+      padding-top: 0.55rem;
+      padding-bottom: 0.7rem;
+      padding-inline: 0.65rem;
+      scroll-padding-inline: 0.65rem;
+      border-radius: 1.55rem;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: linear-gradient(170deg, rgba(7, 16, 34, 0.88), rgba(4, 10, 24, 0.94));
+      box-shadow:
+        inset 0 0 0 1px rgba(109, 173, 255, 0.08),
+        0 10px 24px rgba(0, 0, 0, 0.22);
       scrollbar-width: thin;
       scrollbar-color: rgba(245, 166, 35, 0.55) rgba(255, 255, 255, 0.08);
     }
 
     .response-video-card {
-      flex: 0 0 clamp(16rem, 48vw, 21rem);
+      flex: 0 0 clamp(14.5rem, 42vw, 19rem);
       scroll-snap-align: start;
       display: grid;
       gap: 0.55rem;
@@ -699,10 +766,10 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
       --card-neon: rgba(0, 224, 255, 0.92);
       --card-neon-soft: rgba(0, 224, 255, 0.5);
       text-decoration: none;
-      border-radius: 1.12rem;
+      border-radius: 1.45rem;
       border: 1px solid var(--card-neon-soft);
       background: linear-gradient(180deg, rgba(6, 10, 19, 0.96), rgba(3, 7, 14, 0.99));
-      padding: 0.75rem;
+      padding: 0.68rem;
       transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
       animation: rise-fade 500ms ease both;
       animation-delay: var(--card-delay, 0ms);
@@ -715,8 +782,8 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
     .response-video-card::before {
       content: '';
       position: absolute;
-      inset: -14px;
-      border-radius: 1.3rem;
+      inset: -16px;
+      border-radius: 1.75rem;
       z-index: -1;
       pointer-events: none;
       background:
@@ -790,7 +857,7 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
     .response-video-thumb {
       position: relative;
       overflow: hidden;
-      border-radius: 0.85rem;
+      border-radius: 1.05rem;
       aspect-ratio: 4 / 5;
       background: #0b1220;
     }
@@ -1116,7 +1183,13 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
       }
 
       .response-video-card {
-        flex-basis: min(84vw, 18rem);
+        flex-basis: min(78vw, 16.5rem);
+      }
+
+      .response-video-grid {
+        padding-inline: 0.58rem;
+        scroll-padding-inline: 0.58rem;
+        border-radius: 1.25rem;
       }
 
       .response-video-card:nth-child(n + 4) {
@@ -1169,6 +1242,16 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
         animation-delay: calc(var(--rep-delay, 0ms) + 40ms);
       }
 
+      .response-offer-highlight {
+        padding: 0.66rem 0.72rem;
+        border-radius: 0.9rem;
+      }
+
+      .response-offer-highlight__genres,
+      .response-offer-highlight__price {
+        font-size: 0.86rem;
+      }
+
       .response-top-announcement {
         font-size: 0.88rem;
       }
@@ -1210,6 +1293,30 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
       .response-repertoire-list li::before,
       .response-faq-item::before {
         opacity: 0.92;
+      }
+    }
+
+    @media (hover: none) and (pointer: coarse) {
+      .response-video-grid {
+        touch-action: pan-x;
+      }
+
+      .response-video-card,
+      .response-video-card:hover,
+      .response-video-card:active,
+      .response-video-card:focus,
+      .response-video-card:focus-visible {
+        transform: none !important;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+
+      .response-video-thumb img {
+        -webkit-user-drag: none;
+        user-select: none;
+        -webkit-user-select: none;
       }
     }
 

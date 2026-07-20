@@ -102,10 +102,10 @@
             if (!ptrActive) return;
             ptrLastY = e.touches[0].clientY;
             var dy = ptrLastY - ptrStartY;
-            if (dy > 30 && dy < 150) {
+            if (dy > 24 && dy < 150) {
                 var ind = createIndicator();
                 ind.style.transform = 'translateX(-50%) translateY(' + Math.min(dy * 0.4, 40) + 'px)';
-                ind.textContent = dy > 90 ? '↓ Eliberează pentru refresh' : '↓ Trage pentru refresh';
+                ind.textContent = dy > 72 ? '↓ Eliberează pentru refresh' : '↓ Trage pentru refresh';
             }
         }, { passive: true });
 
@@ -116,7 +116,7 @@
                 ? e.changedTouches[0].clientY
                 : ptrLastY;
             var dy = endY - ptrStartY;
-            if (dy > 90) {
+            if (dy > 72) {
                 if (ptrIndicator) ptrIndicator.textContent = '⟳ Se reîncarcă…';
                 location.reload();
             } else if (ptrIndicator) {
@@ -151,11 +151,13 @@
        (mobileNavAllItems din BaseLayout.astro). */
     var SITE_PAGE_ORDER = [
         '/',
+        '/cauti-formatie-nunta/',
         '/despre/',
         '/povestea-noastra/',
         '/membri/',
         '/galerie-video/',
         '/galerie-foto/',
+        '/muzica-non-stop/',
         '/comunitate/',
         '/blog/',
         '/vlog/',
@@ -283,8 +285,8 @@
         function hpHandleSwipeEnd(endX, endY) {
             var dx = endX - hpTX;
             var dy = endY - hpTY;
-            if (Math.abs(dx) < 50) return;
-            if (Math.abs(dy) > Math.abs(dx)) return;
+            if (Math.abs(dx) < 34) return;
+            if (Math.abs(dy) > Math.abs(dx) * 1.35) return;
             if (dx < 0 && hpPageIdx < hpPageOrder.length - 1) {
                 hpNavigatePage(hpPageOrder[hpPageIdx + 1]);
             } else if (dx > 0 && hpPageIdx > 0) {
@@ -304,6 +306,10 @@
         document.addEventListener('touchend', function (e) {
             if (hpSkipTouch) { hpSkipTouch = false; return; }
             hpHandleSwipeEnd(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+        }, { passive: true });
+
+        document.addEventListener('touchcancel', function () {
+            hpSkipTouch = false;
         }, { passive: true });
 
         var hpMouseDown = false;
@@ -390,11 +396,15 @@
         if (tSkipSwipe) { tSkipSwipe = false; return; }
         var dx = e.changedTouches[0].clientX - tStartX;
         var dy = e.changedTouches[0].clientY - tStartY;
-        if (Math.abs(dx) < 50 || Math.abs(dy) > Math.abs(dx)) return;
+        if (Math.abs(dx) < 34 || Math.abs(dy) > Math.abs(dx) * 1.35) return;
         if (dx < 0 && pageIdx !== -1 && pageIdx < pageOrder.length - 1) {
             navigatePage(pageOrder[pageIdx + 1]);
         } else if (dx > 0 && pageIdx > 0) {
             navigatePage(pageOrder[pageIdx - 1]);
         }
+    }, { passive: true });
+
+    document.addEventListener('touchcancel', function () {
+        tSkipSwipe = false;
     }, { passive: true });
 })();
