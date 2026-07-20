@@ -9,6 +9,9 @@ const rootDir = path.resolve(__dirname, '..');
 const audioDir = path.join(rootDir, 'public', 'Audio');
 const outputPath = path.join(rootDir, 'src', 'data', 'audio-catalog.generated.json');
 const defaultArtist = process.env.AUDIO_DEFAULT_ARTIST || 'Formația Florentina Pană';
+const excludedAudioFiles = new Set([
+    'Captain Joz - Stunts Cheer - Instrumental version.mp3',
+]);
 
 const supportedExtensions = new Set(['.mp3', '.wav', '.m4a', '.aac', '.ogg', '.flac']);
 
@@ -96,6 +99,9 @@ async function generateCatalog() {
 
     for (const item of files) {
         const relative = path.relative(audioDir, item.fullPath).split(path.sep).join('/');
+        if (excludedAudioFiles.has(relative) || excludedAudioFiles.has(path.basename(relative))) {
+            continue;
+        }
         const parts = relative.split('/');
         const categoryRaw = parts.length > 1 ? parts[0] : 'Selecție Generală';
         const categoryId = slugify(categoryRaw);

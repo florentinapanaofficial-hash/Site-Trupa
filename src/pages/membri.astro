@@ -1112,13 +1112,21 @@ function initiale(name: string): string {
   .ac:focus-within { outline: 2px solid rgba(6,214,255,0.65); outline-offset: 3px; }
 
   /* ── Photos ── */
-  .ac-photos { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; }
+  .ac-photos {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: inherit;
+    background: rgba(4, 10, 25, 0.72);
+  }
 
   .ac-photo {
     position: absolute; inset: 0;
     width: 100%; height: 100%;
     object-fit: cover; object-position: center top;
     opacity: 0;
+    border-radius: inherit;
+    clip-path: inset(0 round inherit);
     transition: opacity 900ms ease;
   }
 
@@ -1400,15 +1408,18 @@ function initiale(name: string): string {
       min-height: unset;
       display: flex;
       flex-direction: column;
+      border-radius: 1.45rem;
     }
 
     .ac-photos {
       position: relative;
       inset: auto;
       width: 100%;
-      aspect-ratio: 2 / 3;
-      min-height: 300px;
+      aspect-ratio: 4 / 5;
+      min-height: clamp(260px, 58vw, 360px);
       flex: none;
+      border-radius: 1.45rem 1.45rem 0 0;
+      background: rgba(4, 10, 25, 0.72);
     }
 
     .ac-body {
@@ -1418,6 +1429,7 @@ function initiale(name: string): string {
       bottom: auto;
       padding: 0.9rem 3.6rem 0.95rem 0.9rem;
       background: linear-gradient(180deg, rgba(4, 10, 25, 0.14), rgba(4, 10, 25, 0.9));
+      border-radius: 0 0 1.45rem 1.45rem;
     }
 
     .ac-name {
@@ -1440,12 +1452,100 @@ function initiale(name: string): string {
     .ac-spec {
       line-height: 1.5;
     }
+
+    .ac-photo {
+      pointer-events: none;
+      border-radius: inherit;
+      clip-path: inset(0 round inherit);
+    }
+
+    .ac-photos,
+    .ac-ph,
+    .ac-scanlines,
+    .ac-grad,
+    .ac-beam {
+      border-radius: inherit;
+    }
+
+    .ac-beam {
+      clip-path: inset(0 round 1.45rem 1.45rem 0 0);
+    }
   }
 
   @media (max-width: 767px) {
+    :global(html) {
+      scrollbar-width: none !important;
+      scrollbar-color: transparent transparent !important;
+    }
+
+    :global(body.page-shell) {
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+      scrollbar-color: transparent transparent !important;
+    }
+
+    :global(main#continut),
+    :global(#continut) {
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+      scrollbar-color: transparent transparent !important;
+    }
+
+    :global(html::-webkit-scrollbar) {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+    }
+
+    :global(body.page-shell::-webkit-scrollbar) {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+    }
+
+    :global(main#continut::-webkit-scrollbar),
+    :global(#continut::-webkit-scrollbar) {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+    }
+
     .ac-photos {
       aspect-ratio: 3 / 4;
       min-height: clamp(280px, 68vw, 420px);
+    }
+
+    .ac,
+    .ac-photos,
+    .ac-body,
+    .bio-panel {
+      border-radius: 1.35rem;
+    }
+
+    .stage-wrap,
+    .stage-section,
+    .ac-grid,
+    .member-card-wrap,
+    .ac,
+    .bio-panel {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
+    .member-card-wrap,
+    .ac,
+    .ac-photos,
+    .bio-btn,
+    .gallery-thumb {
+      touch-action: pan-y pinch-zoom;
+    }
+
+    .ac-body {
+      padding: 0.85rem 3.15rem 0.9rem 0.85rem;
+    }
+
+    .ac-photo {
+      touch-action: pan-y pinch-zoom;
     }
 
     /* Pe telefon eliminam drift-ul lateral ca subiectul sa nu "iasa" din cadru. */
@@ -1461,19 +1561,22 @@ function initiale(name: string): string {
       object-position: center 36%;
     }
 
-    .ac-body { padding: 0.9rem 3.5rem 0.9rem 0.9rem; }
+    .ac-photo[src*="oprea-marian"] {
+      object-position: center 12%;
+    }
+
     .ac-name { font-size: clamp(0.95rem, 4vw, 1.25rem); }
     .bio-btn { width: 44px; height: 44px; bottom: 0.7rem; right: 0.7rem; }
 
     .ac::before {
-      opacity: 0.95;
+      opacity: 0.6;
     }
 
     .member-card-wrap::before {
-      inset: -10px;
-      opacity: 1;
-      filter: blur(20px) saturate(1.3);
-      transform: translateY(2px) scale(1);
+      inset: -8px;
+      opacity: 0.14;
+      filter: blur(10px) saturate(1.08);
+      transform: translateY(0) scale(1);
     }
   }
 
