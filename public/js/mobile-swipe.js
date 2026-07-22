@@ -12,6 +12,25 @@
         };
     }
 
+    function shouldSkipGlobalTouch(target) {
+        if (!target || !target.closest) return false;
+        return Boolean(
+            target.closest('.mob-nav') ||
+            target.closest('.mc-gallery') ||
+            target.closest('.mc-gallery-wrap') ||
+            target.closest('.gal-masonry') ||
+            target.closest('.community-gallery-grid') ||
+            target.closest('[data-lightbox-src]') ||
+            target.closest('#gal-lightbox') ||
+            target.closest('.photo-lightbox') ||
+            target.closest('.chero-grid') ||
+            target.closest('#gallery-popup') ||
+            target.closest('.response-scroll-shell') ||
+            target.closest('.response-video-grid') ||
+            target.closest('.response-repertoire-list')
+        );
+    }
+
     var main = document.getElementById('continut');
     if (!main) return;
 
@@ -89,7 +108,7 @@
         }
 
         document.addEventListener('touchstart', function (e) {
-            if (e.target.closest && (e.target.closest('.mob-nav') || e.target.closest('.mc-gallery') || e.target.closest('.mc-gallery-wrap') || e.target.closest('.gal-masonry') || e.target.closest('.community-gallery-grid') || e.target.closest('[data-lightbox-src]') || e.target.closest('#gal-lightbox') || e.target.closest('.photo-lightbox') || e.target.closest('.chero-grid') || e.target.closest('#gallery-popup'))) {
+            if (shouldSkipGlobalTouch(e.target)) {
                 ptrActive = false; return;
             }
             if (!isAtTop()) { ptrActive = false; return; }
@@ -295,7 +314,7 @@
         }
 
         document.addEventListener('touchstart', function (e) {
-            if (e.target.closest && (e.target.closest('.mob-nav') || e.target.closest('.mc-gallery') || e.target.closest('.mc-gallery-wrap') || e.target.closest('.gal-masonry') || e.target.closest('.community-gallery-grid') || e.target.closest('[data-lightbox-src]') || e.target.closest('#gal-lightbox') || e.target.closest('.photo-lightbox') || e.target.closest('.chero-grid') || e.target.closest('#gallery-popup'))) {
+            if (shouldSkipGlobalTouch(e.target)) {
                 hpSkipTouch = true; return;
             }
             hpSkipTouch = false;
@@ -384,7 +403,7 @@
     var tStartX = 0, tStartY = 0, tSkipSwipe = false;
 
     document.addEventListener('touchstart', function (e) {
-        if (e.target.closest && (e.target.closest('.mob-nav') || e.target.closest('.mc-gallery') || e.target.closest('.mc-gallery-wrap') || e.target.closest('.gal-masonry') || e.target.closest('.community-gallery-grid') || e.target.closest('[data-lightbox-src]') || e.target.closest('#gal-lightbox') || e.target.closest('.photo-lightbox') || e.target.closest('.chero-grid') || e.target.closest('#gallery-popup'))) {
+        if (shouldSkipGlobalTouch(e.target)) {
             tSkipSwipe = true; return;
         }
         tSkipSwipe = false;
