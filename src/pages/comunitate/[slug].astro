@@ -51,6 +51,37 @@ if (couple.danceVideoUrl) {
   }
 }
 
+let montageEmbedUrl = '';
+let montageOpenUrl = couple.capcutMontageUrl || '';
+let montageOpenLabel = 'Deschide în aplicație';
+if (couple.capcutMontageUrl) {
+  try {
+    const montageUrl = new URL(couple.capcutMontageUrl);
+    const host = montageUrl.hostname.toLowerCase().replace('www.', '');
+    let montageId = '';
+
+    if (host === 'youtube.com' || host === 'm.youtube.com' || host === 'youtu.be') {
+      montageOpenLabel = 'Deschide pe YouTube';
+      if (host === 'youtu.be') {
+        montageId = montageUrl.pathname.split('/').filter(Boolean).pop() || '';
+      } else if (montageUrl.pathname.startsWith('/shorts/')) {
+        montageId = montageUrl.pathname.split('/').filter(Boolean).pop() || '';
+      } else {
+        montageId = montageUrl.searchParams.get('v') || montageUrl.pathname.split('/').filter(Boolean).pop() || '';
+      }
+    }
+
+    if (montageId) {
+      montageEmbedUrl = `https://www.youtube.com/embed/${montageId}?rel=0&modestbranding=1`;
+      montageOpenUrl = `https://www.youtube.com/watch?v=${montageId}`;
+    } else {
+      montageEmbedUrl = couple.capcutMontageUrl;
+    }
+  } catch {
+    montageEmbedUrl = couple.capcutMontageUrl;
+  }
+}
+
 const pageTitle = `${couple.names} — Povestea lor | ${brand.name}`;
 const pageDescription = `Descoperă povestea de dragoste a perechii ${couple.names} din ${couple.city}. Recomandare, galerie foto și dansul mirilor — ${brand.name}.`;
 
@@ -183,10 +214,13 @@ const reviewLd = {
         <div class="couple-montage" data-montage-wrapper>
           <div class="couple-montage__phone">
             <iframe
-              src={couple.capcutMontageUrl}
+              src={montageEmbedUrl}
               title={`Montaj foto — ${couple.names}`}
-              allow="autoplay; encrypted-media; picture-in-picture; web-share"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowfullscreen
+              webkitallowfullscreen
+              mozallowfullscreen
+              referrerpolicy="strict-origin-when-cross-origin"
               loading="lazy"
             ></iframe>
           </div>
@@ -194,8 +228,8 @@ const reviewLd = {
             <button type="button" class="couple-montage__fullscreen" data-montage-fullscreen>
               Vezi fullscreen
             </button>
-            <a href={couple.capcutMontageUrl} target="_blank" rel="noopener noreferrer" class="couple-montage__open">
-              Deschide în aplicație
+            <a href={montageOpenUrl} target="_blank" rel="noopener noreferrer" class="couple-montage__open">
+              {montageOpenLabel}
             </a>
           </div>
         </div>
@@ -222,13 +256,75 @@ const reviewLd = {
       (function () {
         var button = document.querySelector('[data-montage-fullscreen]');
         var wrapper = document.querySelector('[data-montage-wrapper]');
+        var iframe = wrapper ? wrapper.querySelector('iframe') : null;
+        var openLink = wrapper ? wrapper.querySelector('.couple-montage__open') : null;
         if (!button || !wrapper) return;
 
+        var isMobile = window.matchMedia('(max-width: 767px)').matches;
+        var inlineFullscreenClass = 'couple-montage--inline-fullscreen';
+
+        function setButtonLabel() {
+          var nativeFs = document.fullscreenElement === wrapper;
+          var inlineFs = wrapper.classList.contains(inlineFullscreenClass);
+          button.textContent = nativeFs || inlineFs ? 'Ieși din fullscreen' : 'Vezi fullscreen';
+        }
+
+        function requestFs(el) {
+          if (!el) return false;
+          if (el.requestFullscreen) {
+            el.requestFullscreen().catch(function () {});
+            return true;
+          }
+          if (el.webkitRequestFullscreen) {
+            el.webkitRequestFullscreen();
+            return true;
+          }
+          if (el.msRequestFullscreen) {
+            el.msRequestFullscreen();
+            return true;
+          }
+          return false;
+        }
+
+        function exitFs() {
+          if (document.fullscreenElement && document.exitFullscreen) {
+            document.exitFullscreen().catch(function () {});
+            return true;
+          }
+          return false;
+        }
+
+        function toggleInlineFullscreen() {
+          var willOpen = !wrapper.classList.contains(inlineFullscreenClass);
+          wrapper.classList.toggle(inlineFullscreenClass, willOpen);
+          document.body.classList.toggle('couple-inline-fs-open', willOpen);
+          setButtonLabel();
+        }
+
+        document.addEventListener('fullscreenchange', setButtonLabel);
+
         button.addEventListener('click', function () {
-          if (wrapper.requestFullscreen) {
-            wrapper.requestFullscreen().catch(function () {});
+          if (document.fullscreenElement === wrapper) {
+            exitFs();
+            return;
+          }
+
+          if (wrapper.classList.contains(inlineFullscreenClass)) {
+            toggleInlineFullscreen();
+            return;
+          }
+
+          var opened = requestFs(wrapper) || requestFs(iframe);
+          if (!opened && isMobile) {
+            toggleInlineFullscreen();
+            return;
+          }
+          if (!opened && openLink && openLink.href) {
+            window.location.href = openLink.href;
           }
         });
+
+        setButtonLabel();
       })();
     </script>
   </main>
@@ -365,6 +461,39 @@ const reviewLd = {
   .couple-montage__open:hover {
     border-color: var(--section-accent);
     color: var(--section-accent);
+  }
+
+  .couple-montage.couple-montage--inline-fullscreen {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .couple-montage.couple-montage--inline-fullscreen .couple-montage__phone {
+    width: 100vw;
+    max-width: none;
+    height: 100dvh;
+    aspect-ratio: auto;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+  }
+
+  .couple-montage.couple-montage--inline-fullscreen .couple-montage__actions {
+    position: fixed;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+  }
+
+  :global(body.couple-inline-fs-open) {
+    overflow: hidden;
   }
 
   .couple-dance__empty {
