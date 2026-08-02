@@ -37,6 +37,7 @@ const initials = names
     </div>
 
     <h1 class="couple-hero__title">{names}</h1>
+    <p class="couple-hero__badge">Poveste reală • Nuntă {date}</p>
     <p class="couple-hero__meta">
       <span>📍 {city}</span>
       <span>📅 {date}</span>
@@ -122,11 +123,33 @@ const initials = names
 
   .couple-hero__title {
     font-family: 'Oswald', sans-serif;
-    font-size: clamp(2rem, 5vw, 3rem);
+    font-size: clamp(2.05rem, 5.2vw, 3.25rem);
     font-weight: 700;
-    color: var(--hero-accent);
+    letter-spacing: 0.025em;
+    line-height: 1.05;
+    color: transparent;
+    background: linear-gradient(180deg, #fff7d6 0%, #ffe79a 38%, #e7c66f 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-stroke: 0.5px rgba(19, 30, 62, 0.45);
     margin: 0 0 1rem;
-    text-shadow: 0 0 30px var(--hero-glow);
+    text-shadow:
+      0 0 12px color-mix(in srgb, var(--hero-glow) 72%, transparent),
+      0 3px 10px rgba(0, 0, 0, 0.32);
+    position: relative;
+    display: inline-block;
+    padding: 0 0.3rem 0.2rem;
+  }
+
+  .couple-hero__title::after {
+    content: '';
+    display: block;
+    width: min(190px, 72%);
+    height: 2px;
+    margin: 0.45rem auto 0;
+    border-radius: 999px;
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--hero-accent) 62%, #ffe49e), transparent);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--hero-glow) 56%, transparent);
   }
 
   .couple-hero__meta {
@@ -138,6 +161,21 @@ const initials = names
     color: rgba(255, 255, 255, 0.7);
     margin: 0;
     flex-wrap: wrap;
+  }
+
+  .couple-hero__badge {
+    margin: 0 auto 0.85rem;
+    width: fit-content;
+    max-width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 999px;
+    padding: 0.38rem 0.78rem;
+    font-size: 0.76rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: rgba(247, 235, 197, 0.96);
+    background: linear-gradient(135deg, rgba(14, 24, 52, 0.75), rgba(18, 30, 62, 0.72));
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.24);
   }
 
   @media (max-width: 767px) {
@@ -153,6 +191,16 @@ const initials = names
     .couple-hero__meta {
       flex-direction: column;
       gap: 0.5rem;
+    }
+
+    .couple-hero__badge {
+      font-size: 0.7rem;
+      padding: 0.34rem 0.68rem;
+    }
+
+    .couple-hero__title {
+      letter-spacing: 0.015em;
+      padding-inline: 0.15rem;
     }
   }
 </style>

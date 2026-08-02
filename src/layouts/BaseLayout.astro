@@ -124,6 +124,7 @@ const localBusinessLd = {
 
 const isHomePage = Astro.url.pathname === '/';
 const hasYouTube = ['/galerie-video', '/aparitii-tv', '/video/', '/colaboratori/', '/comunitate', '/live'].some(p => Astro.url.pathname.startsWith(p));
+const isCommunityDetailPage = /^\/comunitate\/[^/]+\/$/.test(Astro.url.pathname);
 
 // JSON-LD: WebPage — fiecare pagină primește schema WebPage
 const webPageLd = {
@@ -314,7 +315,7 @@ const mobileNavAllItems = [
     {/* GA4 NU se încarcă în <head> — se injectează dinamic DUPĂ consimțământul
         utilizatorului prin CookieBanner, conform Rec. 30 & 32 RGPD / ePrivacy */}
   </head>
-  <body class={`page-shell${isHomePage ? ' is-homepage' : ''}`}>
+  <body class={`page-shell${isHomePage ? ' is-homepage' : ''}${isCommunityDetailPage ? ' is-community-detail' : ''}`}>
     <div class="scroll-progress" aria-hidden="true"></div>
     <a href="#continut" class="skip-link">Sari la conținut</a>
     <SkyBackground />
@@ -945,6 +946,11 @@ const mobileNavAllItems = [
       @media (prefers-reduced-motion: reduce) {
         .wa-float { animation: none; }
         .quick-dock { animation: none; }
+      }
+
+      body.is-community-detail .wa-float,
+      body.is-community-detail .quick-dock {
+        display: none !important;
       }
     </style>
 
