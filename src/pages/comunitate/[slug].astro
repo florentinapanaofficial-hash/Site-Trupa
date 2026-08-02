@@ -24,6 +24,7 @@ interface Couple {
   recommendation: string;
   recommendationSource: string;
   danceVideoUrl: string;
+  capcutMontageUrl?: string;
   photos: string[];
   blogSlug: string;
   uploadToken: string;
@@ -40,14 +41,21 @@ const { couple } = Astro.props as { couple: Couple };
 
 const { brand } = siteContent;
 
-const youtubeId = couple.danceVideoUrl
-  ? new URL(couple.danceVideoUrl).searchParams.get('v') || ''
-  : '';
+let youtubeId = '';
+if (couple.danceVideoUrl) {
+  try {
+    const url = new URL(couple.danceVideoUrl);
+    youtubeId = url.searchParams.get('v') || url.pathname.split('/').filter(Boolean).pop() || '';
+  } catch {
+    youtubeId = '';
+  }
+}
 
 const pageTitle = `${couple.names} — Povestea lor | ${brand.name}`;
 const pageDescription = `Descoperă povestea de dragoste a perechii ${couple.names} din ${couple.city}. Recomandare, galerie foto și dansul mirilor — ${brand.name}.`;
 
 const SITE = 'https://www.florentinapanaofficial.ro';
+const pageUrl = `${SITE}/comunitate/${couple.slug}/`;
 const coupleOgImage = couple.coverPhoto
   ? encodeURI(decodeURI(couple.coverPhoto.startsWith('http') ? couple.coverPhoto : `${SITE}${couple.coverPhoto}`))
   : undefined;
@@ -90,7 +98,16 @@ const reviewLd = {
   title={pageTitle}
   description={pageDescription}
   ogImage={coupleOgImage}
+  ogType="article"
 >
+  <Fragment slot="head">
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    {coupleOgImage && <meta property="og:image" content={coupleOgImage} />}
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:type" content="article" />
+  </Fragment>
+
   <main class="couple-page">
     <BackButton href="/comunitate/" label="← Comunitate" />
 
@@ -111,6 +128,7 @@ const reviewLd = {
       <a href="#recomandare" class="couple-page__nav-link" style={`--nav-accent: ${couple.accentColor};`}>💬 Recomandare</a>
       <a href="#galerie" class="couple-page__nav-link" style={`--nav-accent: ${couple.accentColor};`}>📸 Galerie</a>
       <a href="#dans" class="couple-page__nav-link" style={`--nav-accent: ${couple.accentColor};`}>💃 Dansul Mirilor</a>
+      <a href="#montaj" class="couple-page__nav-link" style={`--nav-accent: ${couple.accentColor};`}>📱 Montaj Foto</a>
     </nav>
 
     <!-- 1. Povestea de dragoste -->
@@ -158,6 +176,36 @@ const reviewLd = {
       )}
     </section>
 
+    <section class="couple-section" id="montaj" style={`--section-accent: ${couple.accentColor};`}>
+      <h2 class="couple-section__title">📱 Montaj Foto (Format Reels)</h2>
+
+      {couple.capcutMontageUrl ? (
+        <div class="couple-montage" data-montage-wrapper>
+          <div class="couple-montage__phone">
+            <iframe
+              src={couple.capcutMontageUrl}
+              title={`Montaj foto — ${couple.names}`}
+              allow="autoplay; encrypted-media; picture-in-picture; web-share"
+              allowfullscreen
+              loading="lazy"
+            ></iframe>
+          </div>
+          <div class="couple-montage__actions">
+            <button type="button" class="couple-montage__fullscreen" data-montage-fullscreen>
+              Vezi fullscreen
+            </button>
+            <a href={couple.capcutMontageUrl} target="_blank" rel="noopener noreferrer" class="couple-montage__open">
+              Deschide în aplicație
+            </a>
+          </div>
+        </div>
+      ) : (
+        <div class="couple-dance__empty">
+          <p>📷 Montajul foto vertical va fi adăugat în curând.</p>
+        </div>
+      )}
+    </section>
+
     <!-- CTA -->
     {couple.blogSlug && (
       <div class="couple-page__cta">
@@ -170,6 +218,19 @@ const reviewLd = {
     <!-- JSON-LD -->
     <script is:inline type="application/ld+json" set:html={JSON.stringify(eventLd)} />
     <script is:inline type="application/ld+json" set:html={JSON.stringify(reviewLd)} />
+    <script is:inline>
+      (function () {
+        var button = document.querySelector('[data-montage-fullscreen]');
+        var wrapper = document.querySelector('[data-montage-wrapper]');
+        if (!button || !wrapper) return;
+
+        button.addEventListener('click', function () {
+          if (wrapper.requestFullscreen) {
+            wrapper.requestFullscreen().catch(function () {});
+          }
+        });
+      })();
+    </script>
   </main>
 </BaseLayout>
 
@@ -256,6 +317,54 @@ const reviewLd = {
     height: 100%;
     border: none;
     border-radius: 1rem;
+  }
+
+  .couple-montage {
+    display: grid;
+    gap: 0.9rem;
+    justify-items: center;
+  }
+
+  .couple-montage__phone {
+    width: min(100%, 380px);
+    aspect-ratio: 9 / 16;
+    border-radius: 1rem;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(0, 0, 0, 0.25);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.38);
+  }
+
+  .couple-montage__phone iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  .couple-montage__actions {
+    display: flex;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .couple-montage__fullscreen,
+  .couple-montage__open {
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.92);
+    text-decoration: none;
+    border-radius: 999px;
+    padding: 0.5rem 0.95rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .couple-montage__fullscreen:hover,
+  .couple-montage__open:hover {
+    border-color: var(--section-accent);
+    color: var(--section-accent);
   }
 
   .couple-dance__empty {

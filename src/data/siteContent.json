@@ -5,7 +5,7 @@
     "tagline": "Formație muzică live pentru nuntă, botez și evenimente — Pitești, Argeș, toată România.",
     "bandPhoto": "/images/galerie-foto-site/Florentina%20Pan%C4%83%2011.jpg",
     "aboutIntro": "este o trupă profesionistă de muzică live din Pitești, județul Argeș, cu experiență vastă în nunți, botezuri, aniversări și evenimente corporate din toată România. Punem accent pe energie, emoție și profesionalism, oferind un spectacol complet care ridică publicul în picioare.",
-    "aboutIntro2": "Repertoriul acoperă muzică populară românească, ușoară, cover-uri internaționale, muzică de petrecere și momente speciale personalizate. Suntem alegerea ideală ca ansamblu muzical pentru nuntă în Pitești, Argeș și întreaga zonă a Munteniei."
+    "aboutIntro2": "Repertoriul acoperă muzică ușoară românească și internațională, pop & cover, dance, cafe-concert, muzică de petrecere și populară. Suntem alegerea ideală ca Formație Nuntă & Cover Band Live în Pitești, Argeș și întreaga zonă a Munteniei."
   },
   "seo": {
     "title": "Formația Florentina Pană | Formație Nuntă Pitești, Argeș — Muzică Live România",
@@ -217,8 +217,8 @@
   },
   "realMoments": {
     "stats": {
-      "events": "150+",
-      "reviews": "100+"
+      "events": "1",
+      "reviews": "1"
     },
     "consentNote": "Foto-video publicate cu acordul beneficiarilor.",
     "events": [
@@ -236,86 +236,10 @@
         "image": "/Blog/Cristina%20si%20manu.png",
         "audioUrl": "",
         "youtubeUrl": "",
-        "coupleQuote": "\"Te iubesc foarte mult și am să fiu lângă tine în orice situație a vieții. Nu am să te las niciodată, dragul meu soț!\"",
+        "coupleQuote": "\"Formația Florentina Pană ne-a făcut nunta exact cum am visat: repertoriu variat, energie superbă și comunicare impecabilă cu invitații. Îi recomandăm din tot sufletul!\"",
         "accentColor": "#e8325a",
         "accentGlow": "rgba(232,50,90,0.35)",
         "blogSlug": "cristina-si-manu-povestea-noastra"
-      },
-      {
-        "title": "Eveniment Andreea & Radu",
-        "couple": "Andreea & Radu",
-        "city": "Mioveni",
-        "date": "7 Iunie 2025",
-        "startDate": "2025-06-07T18:00:00+03:00",
-        "endDate": "2025-06-08T03:00:00+03:00",
-        "locationName": "Restaurant Cotyso",
-        "locationAddress": "Mioveni, Argeș, România",
-        "description": "Nuntă live cu Formația Florentina Pană — muzică populară, ușoară și de petrecere pentru Andreea & Radu la Restaurant Cotyso, Mioveni.",
-        "eventStatus": "https://schema.org/EventScheduled",
-        "image": "",
-        "audioUrl": "",
-        "youtubeUrl": "https://www.youtube.com/watch?v=HQfVn98caic",
-        "coupleQuote": "\"A fost exact cum ne-am dorit: tradiție, eleganță și o atmosferă incredibilă pe ringul de dans.\"",
-        "accentColor": "#e8325a",
-        "accentGlow": "rgba(232,50,90,0.35)",
-        "blogSlug": "andreea-si-radu-povestea-lor"
-      },
-      {
-        "title": "Eveniment Bianca & Mihai",
-        "couple": "Bianca & Mihai",
-        "city": "Curtea de Argeș",
-        "date": "21 Iunie 2025",
-        "startDate": "2025-06-21T18:00:00+03:00",
-        "endDate": "2025-06-22T03:00:00+03:00",
-        "locationName": "Restaurant Curtea Veche",
-        "locationAddress": "Curtea de Argeș, Argeș, România",
-        "description": "Nuntă live cu Formația Florentina Pană — energie și profesionalism pentru Bianca & Mihai la Restaurant Curtea Veche, Curtea de Argeș.",
-        "eventStatus": "https://schema.org/EventScheduled",
-        "image": "",
-        "audioUrl": "",
-        "youtubeUrl": "https://www.youtube.com/watch?v=7MQIWMj_W0g",
-        "coupleQuote": "\"Invitații au dansat toată noaptea. Formația a avut energie, profesionalism și comunicare perfectă.\"",
-        "accentColor": "#f5a623",
-        "accentGlow": "rgba(245,166,35,0.35)",
-        "blogSlug": "bianca-si-mihai-povestea-lor"
-      },
-      {
-        "title": "Eveniment Ioana & Cătălin",
-        "couple": "Ioana & Cătălin",
-        "city": "București",
-        "date": "5 Iulie 2025",
-        "startDate": "2025-07-05T18:00:00+03:00",
-        "endDate": "2025-07-06T03:00:00+03:00",
-        "locationName": "Restaurant Hanu' lui Manuc",
-        "locationAddress": "București, România",
-        "description": "Nuntă live cu Formația Florentina Pană — atmosferă premium pentru Ioana & Cătălin la Restaurant Hanu' lui Manuc, București.",
-        "eventStatus": "https://schema.org/EventScheduled",
-        "image": "",
-        "audioUrl": "",
-        "youtubeUrl": "https://www.youtube.com/watch?v=GRwVkbUGVPs",
-        "coupleQuote": "\"Ne-au ascultat toate dorințele muzicale și au creat o atmosferă premium de la început până la final.\"",
-        "accentColor": "#0bbcd6",
-        "accentGlow": "rgba(11,188,214,0.30)",
-        "blogSlug": "ioana-si-catalin-povestea-lor"
-      },
-      {
-        "title": "Eveniment Alina & Ștefan",
-        "couple": "Alina & Ștefan",
-        "city": "Brașov",
-        "date": "19 Iulie 2025",
-        "startDate": "2025-07-19T18:00:00+03:00",
-        "endDate": "2025-07-20T03:00:00+03:00",
-        "locationName": "Restaurant Sergiana Mureșenilor",
-        "locationAddress": "Brașov, România",
-        "description": "Nuntă live cu Formația Florentina Pană — show memorabil pentru Alina & Ștefan la Restaurant Sergiana Mureșenilor, Brașov.",
-        "eventStatus": "https://schema.org/EventScheduled",
-        "image": "",
-        "audioUrl": "",
-        "youtubeUrl": "https://www.youtube.com/watch?v=HQfVn98caic",
-        "coupleQuote": "\"O echipă de nota 10! Au ridicat sala în picioare și au făcut din seara noastră o amintire de neuitat.\"",
-        "accentColor": "#a855f7",
-        "accentGlow": "rgba(168,85,247,0.30)",
-        "blogSlug": "alina-si-stefan-povestea-lor"
       }
     ]
   },
@@ -436,8 +360,8 @@
     "vocalists": [
       {
         "name": "Florentina Pană",
-        "role": "Interpretă de muzică populară și ușoară",
-        "description": "Voce cu timbru cald, prezență scenică elegantă și repertoriu construit pe dinamica evenimentului. Coordonează momentele-cheie astfel încât invitații să rămână conectați de la început până la final.",
+        "role": "Solistă Principală & Imaginea Trupei",
+        "description": "Solistă principală cu timbru cald și prezență scenică elegantă. Interpretează toate genurile muzicale (pop, ușoară, latino, party, populară) și coordonează momentele-cheie ale serii.",
         "image": "https://placehold.co/400x400/112245/e9f5ff?text=Florentina+Pan%C4%83",
         "photos": [
           "",
@@ -451,7 +375,7 @@
       {
         "name": "Cătălin Matei",
         "role": "Interpret de Muzică Populară de Petrecere",
-        "description": "Voce puternică și energie de petrecere autentică. Interacționează natural cu publicul și ridică atmosfera în momentele de dans și tradiție.",
+        "description": "Membru al trupei responsabil de programele speciale de muzică populară de petrecere și jocuri tradiționale. Interacționează natural cu publicul și ridică atmosfera pe ring.",
         "image": "/images/catalin-matei.webp",
         "photos": [
           "",
@@ -564,7 +488,7 @@
       "specialitate": "Muzică Populară și Ușoară",
       "experienta": "20+ ani experiență",
       "citat": "Muzica nu se cântă — se simte. Fiecare eveniment are sufletul lui, și noi îl purtăm pe scenă.",
-      "bio": "Voce cu timbru cald și prezență scenică elegantă, Florentina Pană interpretează muzică populară și ușoară cu emoție autentică. Cu peste 20 de ani de experiență pe scenele din România, coordonează momentele-cheie ale evenimentelor astfel încât invitații să rămână conectați de la început până la final. A colaborat cu orchestre renumite și a interpretat pe scene din toată țara, aducând de fiecare dată acea combinație unică de profesionalism și căldură umană care transformă un eveniment în amintire.",
+      "bio": "Voce cu timbru cald și prezență scenică elegantă, Florentina Pană este solista principală și imaginea trupei. Interpretează toate genurile muzicale (pop, ușoară, latino, party, populară) și coordonează momentele-cheie ale evenimentelor astfel încât invitații să rămână conectați de la început până la final.",
       "taguri": [
         "Muzică Populară",
         "Muzică Ușoară",
@@ -609,7 +533,7 @@
         },
         {
           "src": "/images/galerie-foto-site/Florentina Pan%C4%83 09.jpg",
-          "alt": "Florentina Pană — prezență scenică ansamblu muzical evenimente"
+          "alt": "Florentina Pană — prezență scenică formație live evenimente"
         },
         {
           "src": "/images/galerie-foto-site/Florentina Pan%C4%83 10.jpg",
@@ -651,7 +575,7 @@
       "specialitate": "Muzică Populară de Petrecere",
       "experienta": "Experiență vastă",
       "citat": "Când publicul ridică mâinile și dansează, știu că am făcut treabă bună.",
-      "bio": "Cătălin Matei impresionează prin voce puternică și energie de petrecere autentică. Interpret de muzică populară de petrecere, interacționează natural cu publicul și ridică atmosfera în momentele de dans și tradiție. Cu un repertoriu bogat și o prezență scenică dinamică, Cătălin știe să citească sala și să adapteze momentul astfel încât energia să rămână la maximum pe toată durata evenimentului.",
+      "bio": "Cătălin Matei este membru al trupei și coordonează programele speciale de muzică populară de petrecere și jocuri tradiționale. Cu voce puternică și prezență scenică dinamică, citește sala și adaptează momentul pentru energie constantă pe ring.",
       "taguri": [
         "Muzică de Petrecere",
         "Populară",
@@ -730,11 +654,11 @@
       "specialitate": "Acordeon",
       "experienta": "",
       "citat": "Acordeonul are suflet. Îl simți în piept, nu doar în urechi.",
-      "bio": "Cristian Ograbek completează sunetul formației cu acordeonul, instrument emblematic al muzicii populare românești. Tehnica sa rafinată adaugă căldură și autenticitate fiecărui moment muzical. Prezent pe zeci de scene din județul Argeș și din toată România, Cristian aduce cu fiecare apariție acea savoare specifică muzicii tradiționale care conectează generații diferite în aceeași bucurie a petrecerii.",
+      "bio": "Cristian Ograbek completează sunetul formației cu acordeonul, într-un repertoriu versatil de petrecere și dans. Tehnica sa rafinată adaugă căldură fiecărui moment muzical, iar intervențiile sale conectează natural generații diferite pe ring.",
       "taguri": [
         "Acordeon",
-        "Muzică Tradițională",
-        "Autenticitate"
+        "Muzică de Petrecere",
+        "Jocuri Tradiționale"
       ],
       "categorie": "instrumentisti",
       "imagine": "/images/cristian-ograbek.webp",

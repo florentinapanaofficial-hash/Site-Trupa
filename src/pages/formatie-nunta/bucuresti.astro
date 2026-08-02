@@ -19,11 +19,11 @@ const SLUG           = 'bucuresti';
 const LAT            = 44.4268;
 const LNG            = 26.1025;
 const INTRO          = 'Cauți o formație de nuntă pentru un eveniment în București? Formația Florentina Pană se deplasează frecvent în capitală, oferind spectacole live de excepție la cele mai prestigioase locații din oraș.';
-const PARAGRAF2      = 'Ne-am construit o reputație solidă în fața cuplurilor din București prin show-uri pline de energie, un repertoriu vast — de la muzică populară tradițională la hituri de petrecere — și o atitudine profesionistă impecabilă. Peste 100 de nunți organizate cu succes în București și Ilfov.';
+const PARAGRAF2      = 'Ne-am construit o reputație solidă în fața cuplurilor din București prin show-uri pline de energie, un repertoriu vast — de la muzică ușoară, pop & cover și dance, la muzică de petrecere și jocuri tradiționale — și o atitudine profesionistă impecabilă. Peste 100 de nunți organizate cu succes în București și Ilfov.';
 const PARAGRAF3      = 'Fie că este vorba de o nuntă elegantă într-un hotel de 5 stele sau o petrecere vibrantă într-un restaurant cu tradiție, ne adaptăm perfect stilului evenimentului tău. Transportul și logistica sunt incluse — tu te bucuri doar de muzică.';
-const CONTENT_INTRO    = 'Nunta ta în București merită cea mai bună coloană sonoră. Noi suntem Formația Florentina Pană și de peste 10 ani aducem energie, emoție și profesionalism la cele mai frumoase evenimente din zonă.';
-const CONTENT_SERVICES = 'Ce ne face diferiți? Ascultăm. Fiecare cuplu din București primește un program muzical unic, construit împreună cu noi. Combinăm muzica populară românească cu hituri moderne, piese de petrecere și momente speciale — totul live, fără playback.';
-const CONTENT_OUTRO    = 'Ești gata să transformi nunta ta din București într-o poveste de neuitat? Formația Florentina Pană este aici pentru tine. Cere o ofertă personalizată — fără obligații, cu drag.';
+const CONTENT_INTRO    = 'Visezi la o nuntă perfectă în București? Totul începe cu muzica potrivită. Formația Florentina Pană creează momente magice prin muzică live — adaptată stilului tău, gusturilor invitaților și atmosferei locației.';
+const CONTENT_SERVICES = 'Suntem recunoscuți ca top formații nuntă București datorită energiei de pe scenă și atenției la detalii. Fiecare eveniment din București este unic, iar noi construim programul muzical împreună cu mirii — de la repertoriu la momentele speciale ale serii.';
+const CONTENT_OUTRO    = 'Am pus suflet în fiecare eveniment din București și continuăm să o facem. Hai să discutăm despre nunta ta — completează formularul de contact sau dă-ne un telefon. Primele 3 date din sezon se rezervă cel mai repede!';
 const LOCATII_POP    = ["Palatul Snagov","Hanul Drumeților","Ballrooms by Bamboo"];
 const ZONE_ACOPERITE = ["Sector 1–6","Otopeni","Voluntari","Snagov","Buftea"];
 const META_DESC      = '';
@@ -40,11 +40,19 @@ const localBusinessLd = {
   "@context": "https://schema.org",
   "@type": ["LocalBusiness", "MusicGroup"],
   "name": brand.name,
-  "description": `${KEYWORD} — muzică live premium pentru nunți și evenimente în ${ORAS}`,
+  "description": `${KEYWORD} — Formație Nuntă & Cover Band Live, Show Live 100%: muzică ușoară, pop & cover, dance & party, muzică de petrecere și muzică populară în ${ORAS}`,
   "url": `https://www.florentinapanaofficial.ro/formatie-nunta/${SLUG}/`,
   "telephone": contact.phoneRaw,
   "image": "https://www.florentinapanaofficial.ro/images/sigla-fp-band.webp",
   "priceRange": "$$",
+  "genre": ["Muzica Greceasca", "Muzica Arabeasca", "Muzica Latino", "Muzica Machedoneasca", "Manele", "Muzica Populara de Petrecere"],
+  "knowsAbout": [
+    "Pop live",
+    "Muzică ușoară românească și internațională",
+    "Muzică de petrecere și jocuri tradiționale",
+    "Cafe-concert",
+    "Muzică party și de petrecere"
+  ],
   "address": {
     "@type": "PostalAddress",
     "addressLocality": ORAS,

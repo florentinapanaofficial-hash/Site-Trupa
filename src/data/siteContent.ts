@@ -88,50 +88,20 @@ export const siteContent = {
   },
   realMoments: {
     stats: {
-      events: '150+',
-      reviews: '100+',
+      events: '1',
+      reviews: '1',
     },
     consentNote: 'Foto-video publicate cu acordul beneficiarilor.',
     events: [
       {
-        title: 'Eveniment Andreea & Radu',
-        couple: 'Andreea & Radu',
+        title: 'Eveniment Cristina și Manu',
+        couple: 'Cristina și Manu',
         city: 'Pitești',
-        date: 'Septembrie 2025',
-        image: '',
-        youtubeUrl: 'https://www.youtube.com/watch?v=HQfVn98caic',
+        date: '25 Iulie 2026',
+        image: '/Blog/Cristina%20si%20manu.png',
+        youtubeUrl: '',
         coupleQuote:
-          '"A fost exact cum ne-am dorit: tradiție, eleganță și o atmosferă incredibilă pe ringul de dans."',
-      },
-      {
-        title: 'Eveniment Bianca & Mihai',
-        couple: 'Bianca & Mihai',
-        city: 'Curtea de Argeș',
-        date: 'Iulie 2025',
-        image: '',
-        youtubeUrl: 'https://www.youtube.com/watch?v=7MQIWMj_W0g',
-        coupleQuote:
-          '"Invitații au dansat toată noaptea. Formația a avut energie, profesionalism și comunicare perfectă."',
-      },
-      {
-        title: 'Eveniment Ioana & Cătălin',
-        couple: 'Ioana & Cătălin',
-        city: 'București',
-        date: 'Iunie 2025',
-        image: '',
-        youtubeUrl: 'https://www.youtube.com/watch?v=GRwVkbUGVPs',
-        coupleQuote:
-          '"Ne-au ascultat toate dorințele muzicale și au creat o atmosferă premium de la început până la final."',
-      },
-      {
-        title: 'Eveniment Alina & Ștefan',
-        couple: 'Alina & Ștefan',
-        city: 'Brașov',
-        date: 'Mai 2025',
-        image: '',
-        youtubeUrl: 'https://www.youtube.com/watch?v=HQfVn98caic',
-        coupleQuote:
-          '"O echipă de nota 10! Au ridicat sala în picioare și au făcut din seara noastră o amintire de neuitat."',
+          '"Formația Florentina Pană ne-a făcut nunta exact cum am visat: repertoriu variat, energie superbă și comunicare impecabilă cu invitații. Îi recomandăm din tot sufletul!"',
       },
     ],
   },
@@ -247,16 +217,16 @@ export const siteContent = {
     vocalists: [
       {
         name: 'Florentina Pană',
-        role: 'Interpretă de muzică populară și ușoară',
+        role: 'Solistă Principală & Imaginea Trupei',
         description:
-          'Voce cu timbru cald, prezență scenică elegantă și repertoriu construit pe dinamica evenimentului. Coordonează momentele-cheie astfel încât invitații să rămână conectați de la început până la final.',
+          'Solistă principală cu timbru cald și prezență scenică elegantă. Interpretează toate genurile muzicale (pop, ușoară, latino, party, populară) și coordonează momentele-cheie ale serii.',
         image: '',
       },
       {
         name: 'Cătălin Matei',
-        role: 'Interpret de Muzică Populară de Petrecere',
+        role: 'Membru al trupei - Muzică Populară de Petrecere',
         description:
-          'Voce puternică și energie de petrecere autentică. Interacționează natural cu publicul și ridică atmosfera în momentele de dans și tradiție.',
+          'Membru al trupei responsabil de programele speciale de muzică populară de petrecere și jocuri tradiționale. Interacționează natural cu publicul și ridică atmosfera pe ring.',
         image: '',
       },
     ],
@@ -284,10 +254,6 @@ export const siteContent = {
       {
         instrument: 'Saxofon',
         description: 'Invitat special pentru intervenții live cu timbru cald și expresiv.',
-      },
-      {
-        instrument: 'Țambal',
-        description: 'Textură ritmică autentică pentru momente de folclor.',
       },
     ],
   },

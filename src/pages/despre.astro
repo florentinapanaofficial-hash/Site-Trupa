@@ -2,10 +2,12 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import siteContent from '../data/siteContent.json';
 import seo from '../data/seo-content.json';
+import couplesData from '../data/couples.json';
 import BackButton from '../components/BackButton.astro';
 
 const { contact, brand, services, repertoire, membri, colaboratori: colaboratoriData } = siteContent as any;
 const despre = seo.despre;
+const featuredCouple = couplesData.couples[0];
 const hasBandPhoto = typeof brand.bandPhoto === 'string' && brand.bandPhoto.trim() !== '';
 const cineMembers: Array<{src:string; name:string; role:string}> = [
   ...((membri ?? []) as any[]).filter((m: any) => m.imagine?.trim()),
@@ -91,11 +93,20 @@ const cineMembers: Array<{src:string; name:string; role:string}> = [
       </div>
       <div class="dp-intro-right">
         <p class="dp-intro-lead">
-          Formația <strong class="dp-intro-name">Florentina Pană</strong> {despre.aboutIntro}
+          <strong class="dp-intro-name">Formația Florentina Pană</strong> oferă un show muzical complet și dinamic pentru orice tip de eveniment. <strong>Florentina Pană</strong>, solista principală și imaginea trupei, acoperă un repertoriu impresionant ce include toate genurile muzicale - de la muzică ușoară românească și internațională, la cafe-concert, muzică de petrecere și dance.
         </p>
-        <p class="dp-intro-body">{despre.aboutIntro2}</p>
+        <p class="dp-intro-body">Din componența trupei face parte și <strong>Cătălin Matei</strong>, membru al trupei responsabil de programele speciale de muzică populară de petrecere și jocuri tradiționale, aducând pe scenă energie alături de orchestra noastră live (orgă, vioară, acordeon).</p>
       </div>
     </header>
+
+    {featuredCouple && (
+      <section class="mb-14 rounded-2xl border border-white/14 bg-white/5 p-5 sm:p-7" aria-label="Povești reale ale mirilor">
+        <p class="kicker mb-2">Comunitatea noastră</p>
+        <h2 class="section-title mb-3" style="font-size:clamp(1.55rem,3.5vw,2rem)">Povești reale, din evenimente reale</h2>
+        <p class="text-white/75 mb-4">Descoperă cum a fost la nunta lui {featuredCouple.names} și vezi de ce experiența live face diferența pe ring.</p>
+        <a href={`/comunitate/${featuredCouple.slug}/`} class="btn-solid">Vezi povestea lui {featuredCouple.names}</a>
+      </section>
+    )}
 
     {/* ── Servicii ── */}
     <div class="dp-block">

@@ -18,12 +18,12 @@ const KEYWORD        = 'Formație Nuntă Curtea de Argeș';
 const SLUG           = 'curtea-de-arges';
 const LAT            = 45.1386;
 const LNG            = 24.6814;
-const INTRO          = 'Curtea de Argeș — orașul Mănăstirii și al tradițiilor — este unul dintre locurile noastre preferate pentru evenimente live. Formația Florentina Pană aduce muzică autentică la nunțile din această zonă pitorească a județului Argeș.';
-const PARAGRAF2      = 'Știm ce înseamnă o nuntă cu adevărat românească: horă la intrarea mirilor, muzică populară autentică, momente emoționante și petrecere până în zori. Repertoriul nostru e construit special pentru a onora tradițiile locale, combinându-le cu energia muzicii moderne.';
+const INTRO          = 'Curtea de Argeș — orașul Mănăstirii și al tradițiilor — este unul dintre locurile noastre preferate pentru evenimente live. Formația Florentina Pană aduce Show Live 100% la nunțile din această zonă pitorească a județului Argeș.';
+const PARAGRAF2      = 'Știm ce înseamnă o nuntă cu adevărat românească: horă la intrarea mirilor, muzică de petrecere, momente emoționante și dans până în zori. Repertoriul nostru e construit special pentru a onora jocurile tradiționale, combinându-le cu energia muzicii moderne.';
 const PARAGRAF3      = 'Zonele montane din jurul Curții de Argeș oferă locații de nuntă spectaculoase. Noi ne ocupăm de tot ce ține de muzică — sonorizare, lumini și un program muzical pe gustul vostru, discutat cu cel puțin două săptămâni înainte de eveniment.';
-const CONTENT_INTRO    = 'Curtea de Argeș este un loc special pentru noi. Am cântat la zeci de nunți memorabile aici și știm exact cum să facem ca fiecare eveniment să fie unic. Formația Florentina Pană — muzică live care se simte.';
-const CONTENT_SERVICES = 'Suntem recunoscuți ca top formații nuntă Curtea de Argeș datorită energiei de pe scenă și atenției la detalii. Fiecare eveniment din Curtea de Argeș este unic, iar noi construim programul muzical împreună cu mirii — de la repertoriu la momentele speciale ale serii.';
-const CONTENT_OUTRO    = 'Am pus suflet în fiecare eveniment din Curtea de Argeș și continuăm să o facem. Hai să discutăm despre nunta ta — completează formularul de contact sau dă-ne un telefon. Primele 3 date din sezon se rezervă cel mai repede!';
+const CONTENT_INTRO    = 'Visezi la o nuntă perfectă în Curtea de Argeș? Totul începe cu muzica potrivită. Formația Florentina Pană creează momente magice prin muzică live — adaptată stilului tău, gusturilor invitaților și atmosferei locației.';
+const CONTENT_SERVICES = 'Fie că vrei o nuntă tradițională, un vibe elegant de cafe-concert sau o petrecere modernă cu hituri internaționale, noi livrăm un repertoriu complet și echilibrat. Pachetele noastre de Formație Nuntă Curtea de Argeș includ consultanță muzicală gratuită, echipament profesional și flexibilitate totală în programul serii.';
+const CONTENT_OUTRO    = 'Fiecare nuntă din Curtea de Argeș la care am cântat ne-a confirmat un lucru: muzica bună face diferența între un eveniment reușit și unul de neuitat. Sună-ne sau scrie-ne pe WhatsApp — răspundem în mai puțin de 2 ore.';
 const LOCATII_POP    = ["Conacul Manasia","Complex Marami","Hanul Posada"];
 const ZONE_ACOPERITE = ["Curtea de Argeș","Câmpulung","Domnești","Corbeni","Arefu"];
 const META_DESC      = '';
@@ -40,11 +40,19 @@ const localBusinessLd = {
   "@context": "https://schema.org",
   "@type": ["LocalBusiness", "MusicGroup"],
   "name": brand.name,
-  "description": `${KEYWORD} — muzică live premium pentru nunți și evenimente în ${ORAS}`,
+  "description": `${KEYWORD} — Formație Nuntă & Cover Band Live, Show Live 100%: muzică ușoară, pop & cover, dance & party, muzică de petrecere și muzică populară în ${ORAS}`,
   "url": `https://www.florentinapanaofficial.ro/formatie-nunta/${SLUG}/`,
   "telephone": contact.phoneRaw,
   "image": "https://www.florentinapanaofficial.ro/images/sigla-fp-band.webp",
   "priceRange": "$$",
+  "genre": ["Muzica Greceasca", "Muzica Arabeasca", "Muzica Latino", "Muzica Machedoneasca", "Manele", "Muzica Populara de Petrecere"],
+  "knowsAbout": [
+    "Pop live",
+    "Muzică ușoară românească și internațională",
+    "Muzică de petrecere și jocuri tradiționale",
+    "Cafe-concert",
+    "Muzică party și de petrecere"
+  ],
   "address": {
     "@type": "PostalAddress",
     "addressLocality": ORAS,

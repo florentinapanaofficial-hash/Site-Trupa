@@ -102,8 +102,10 @@ REGULI STRICTE DE BUSINESS:
 2. IERARHIA BRANDULUI:
    - Florentina Pană („Vocea Piteștiului") este LIDERUL ABSOLUT și imaginea centrală a trupei.
    - Ea cântă ABSOLUT TOATE genurile muzicale.
-   - Cătălin Matei intervine DOAR ca invitat special pentru programe scurte de muzică populară / folclor autentic.
+    - Cătălin Matei intervine ca membru al trupei pentru programe speciale de muzică populară de petrecere și jocuri tradiționale.
    - Formația are acompaniament live: orgă, vioară, acordeon.
+    - Evită formulări de nișă rigidă (autentic/tradiționalism exclusiv, taraf, ansamblu).
+    - Poziționează trupa ca „Formație Nuntă & Cover Band Live" cu „Show Live 100%".
 
 3. SEO LOCAL: Folosește cu strictețe locația „${locatie}" pentru a atrage mirii din acea zonă.
 
@@ -120,7 +122,8 @@ GENEREAZĂ EXACT URMĂTORUL OUTPUT (în limba română, cu diacritice):
 2. DESCRIERE SCURTĂ: 2-3 propoziții cu hook puternic + call-to-action către site-ul ${SITE_LINK}.
 
 3. TAG-URI SEO: O listă de cuvinte cheie relevante, separate prin virgulă (minim 10 tag-uri).
-   Obligatoriu includ variații cu: formație nuntă, muzică evenimente, ${locatie}, ${gen}.${galleryBlock}
+    Obligatoriu includ variații cu: formație nuntă, cover band live, event band, muzică ușoară live, dance & party, muzică de petrecere, ${locatie}, ${gen}.
+    Prioritizează primele tag-uri în această ordine: Cover Band, Event Band, Muzică ușoară live, Dance & Party, Muzică de petrecere.${galleryBlock}
 
 Răspunde DOAR cu textul structurat (fără JSON, fără markdown).`;
 }

@@ -8,27 +8,42 @@
             "includeGenres": []
         },
         {
+            "key": "usoara",
+            "label": "Muzică Ușoară / Pop",
+            "description": "Piese ușoare, pop și evergreen pentru flux modern",
+            "includeGenres": [
+                "usoara",
+                "pop",
+                "evergreen"
+            ]
+        },
+        {
             "key": "populara",
-            "label": "Muzică Populară",
-            "description": "Doar piese cu vibe popular",
+            "label": "Populară & Folclor",
+            "description": "Selecție de muzică populară de petrecere și jocuri tradiționale",
             "includeGenres": [
-                "populara"
+                "populara",
+                "folclor"
             ]
         },
         {
-            "key": "manele",
-            "label": "Manele",
-            "description": "Selecție dedicată publicului de petrecere",
+            "key": "cafe-concert",
+            "label": "Cafe-Concert",
+            "description": "Atmosferă elegantă pentru recepție și momente rafinate",
             "includeGenres": [
-                "manele"
+                "cafe-concert",
+                "chill"
             ]
         },
         {
-            "key": "pop",
-            "label": "Pop",
-            "description": "Hituri pop pentru energie modernă",
+            "key": "party",
+            "label": "Party",
+            "description": "Energie de petrecere: dance, manele și ritm susținut",
             "includeGenres": [
-                "pop"
+                "party",
+                "dance",
+                "manele",
+                "petrecere"
             ]
         }
     ]

@@ -3,8 +3,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import BackButton from '../components/BackButton.astro';
 import YoutubeEmbed from '../components/YoutubeEmbed.astro';
 import siteContent from '../data/siteContent.json';
+import couplesData from '../data/couples.json';
 
 const { videos, faq } = siteContent;
+const featuredCouple = couplesData.couples[0];
 
 const pageTitle = 'Cauți formație de nuntă? Video, repertoriu și ofertă';
 const pageDescription = 'Vezi video reale, repertoriu și cere o ofertă în funcție de bugetul alocat. Formația Florentina Pană răspunde rapid pentru nunți și botezuri.';
@@ -84,7 +86,7 @@ const quickFaq = [
   },
 ];
 
-const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care știe să facă atmosferă, iată ce îți oferim pentru o seară memorabilă: Show Live 100% cu energie pură, voci remarcabile și conexiune autentică; repertoriu pentru toți, de la cafe-concert elegant și hituri internaționale moderne până la folclor autentic și muzică de petrecere; sunet premium cu echipamente de top pentru claritate impecabilă, adaptată perfect sălii. Hai să scriem împreună soundtrack-ul nunții tale! Contactează-ne și hai să transformăm petrecerea voastră într-o amintire de neuitat.';
+const topTickerText = 'Dacă ești în căutarea unei Formații Nuntă & Cover Band Live care știe să facă atmosferă, iată ce îți oferim pentru o seară memorabilă: Show Live 100% cu energie pură, voci remarcabile și conexiune directă; repertoriu complet pentru toți, de la muzică ușoară, pop și dance, la cafe-concert, muzică de petrecere și jocuri tradiționale; sunet premium cu echipamente de top pentru claritate impecabilă, adaptată perfect sălii. Hai să scriem împreună soundtrack-ul nunții tale! Contactează-ne și hai să transformăm petrecerea voastră într-o amintire de neuitat.';
 ---
 
 <BaseLayout title={pageTitle} description={pageDescription} ogImage={ogImage}>
@@ -108,8 +110,7 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
           <p class="response-kicker">Formație live pentru nuntă, botez și evenimente private</p>
           <h1 class="response-title">Vrei să facem Show și să ne distrăm împreună?</h1>
           <p class="response-lead">
-            Venim cu instrumentiști la orgă, vioară, acordeon și saxofon, alături de soliștii vocali Florentina Pană, Cătălin Matei și Alexia Țircomnicu.
-            Oferim sonorizare de top, schelă de lumini și asigurăm și obiceiurile de zi, pentru un program complet și bine pus la punct.
+            Îți oferim o formulă clară, echilibrată și profesionistă, construită pentru un eveniment reușit cap-coadă.
           </p>
 
           <div class="response-offer-highlight" aria-label="Repertoriu și preț orientativ">
@@ -117,11 +118,10 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
             <p class="response-offer-highlight__price">Preț orientativ: <span>2.500€ - 4.000€</span>, în funcție de numărul de membri din formulă.</p>
           </div>
 
-          <div class="response-pills" aria-label="Beneficii rapide">
-            <span>Instrumentiști: orgă, vioară, acordeon, saxofon</span>
-            <span>Soliști vocali: Florentina Pană, Cătălin Matei & Alexia Țircomnicu</span>
-            <span>Sonorizare de top</span>
-            <span>Schelă de lumini + obiceiurile de zi</span>
+          <div class="response-pills" aria-label="Servicii și pachete">
+            <span><strong>Solistă Principală (Toate genurile):</strong> Florentina Pană - asigură diversitatea muzicală pe tot parcursul nopții (muzică ușoară, pop, evergreen, de petrecere).</span>
+            <span><strong>Muzică Populară de Petrecere:</strong> Cătălin Matei - membru al trupei, responsabil de programele speciale de muzică populară de petrecere și jocuri tradiționale.</span>
+            <span><strong>Acompaniament Live:</strong> Orchestră completă (orgă, vioară, acordeon) + sonorizare profesională cu inginer de sunet propriu.</span>
           </div>
 
           <div class="response-actions">
@@ -133,6 +133,15 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
           <div class="response-members-cta">
             <a href="/membri/" class="response-members-link"><span aria-hidden="true">✦</span><span>Vezi Membri Formației</span></a>
           </div>
+
+          {featuredCouple && (
+            <div class="response-proof-card" aria-label="Dovadă socială mirii noștri">
+              <p class="response-proof-card__kicker">Dovadă Socială</p>
+              <h2 class="response-proof-card__title">Vezi cum a fost la nunta lui {featuredCouple.names}</h2>
+              <p class="response-proof-card__text">Poveste reală, recomandare autentică și materiale din eveniment, gata de distribuit pe Facebook.</p>
+              <a href={`/comunitate/${featuredCouple.slug}/`} class="response-proof-card__link">Deschide pagina mirilor →</a>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -313,6 +322,50 @@ const topTickerText = 'Dacă ești în căutarea unei Formații de nuntă care �
       gap: 0.8rem;
       grid-template-columns: 1fr;
       isolation: isolate;
+    }
+
+    .response-proof-card {
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 0.9rem;
+      display: grid;
+      gap: 0.45rem;
+    }
+
+    .response-proof-card__kicker {
+      margin: 0;
+      font-size: 0.75rem;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #f5a623;
+    }
+
+    .response-proof-card__title {
+      margin: 0;
+      font-size: clamp(1rem, 2.3vw, 1.2rem);
+      color: #f7fbff;
+      line-height: 1.35;
+    }
+
+    .response-proof-card__text {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 0.92rem;
+      line-height: 1.52;
+    }
+
+    .response-proof-card__link {
+      width: fit-content;
+      color: #0bbcd6;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .response-proof-card__link:hover {
+      color: #7fe6f2;
+      text-decoration: underline;
     }
 
     .response-copy {

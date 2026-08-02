@@ -102,7 +102,7 @@ const schemas = [collectionPageLd, aggregateRatingLd];
           type="search"
           id="coupleSearch"
           class="community-search__input"
-          placeholder="Caută după numele mirilor, oraș sau dată..."
+          placeholder="Caută după nume, locație sau an (ex: Cristina, Manu, 2026)..."
           autocomplete="off"
         />
         <span class="community-search__count" id="searchCount">{couples.length} rezultate</span>
@@ -117,6 +117,8 @@ const schemas = [collectionPageLd, aggregateRatingLd];
           data-couple-name={couple.names.toLowerCase()}
           data-couple-city={couple.city.toLowerCase()}
           data-couple-date={couple.date.toLowerCase()}
+          data-couple-location={(couple.locationName || '').toLowerCase()}
+          data-couple-year={(couple.isoDate || '').slice(0, 4)}
         >
           <CoupleCard
             slug={couple.slug}
@@ -198,7 +200,9 @@ const schemas = [collectionPageLd, aggregateRatingLd];
           var name = item.getAttribute('data-couple-name') || '';
           var city = item.getAttribute('data-couple-city') || '';
           var date = item.getAttribute('data-couple-date') || '';
-          var haystack = name + ' ' + city + ' ' + date;
+          var location = item.getAttribute('data-couple-location') || '';
+          var year = item.getAttribute('data-couple-year') || '';
+          var haystack = name + ' ' + city + ' ' + date + ' ' + location + ' ' + year;
 
           var match = !query || haystack.indexOf(query) !== -1;
           item.style.display = match ? '' : 'none';
