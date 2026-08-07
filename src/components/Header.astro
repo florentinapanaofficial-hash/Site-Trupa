@@ -319,6 +319,7 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
     };
 
     const syncTopMenuBodyClass = (isOpen) => {
+      document.documentElement.classList.toggle('mobile-menu-open', Boolean(isOpen) && isMobileViewport());
       document.body.classList.toggle('top-menu-expanded', Boolean(isOpen));
       document.body.classList.toggle('mobile-menu-open', Boolean(isOpen) && isMobileViewport());
 

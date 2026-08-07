@@ -5,31 +5,23 @@ import YoutubeEmbed from '../components/YoutubeEmbed.astro';
 import siteContent from '../data/siteContent.json';
 import couplesData from '../data/couples.json';
 
-const { videos, faq } = siteContent;
+const { faq } = siteContent;
 const featuredCouple = couplesData.couples[0];
 
 const pageTitle = 'Cauți formație de nuntă? Video, repertoriu și ofertă';
 const pageDescription = 'Vezi video reale, repertoriu și cere o ofertă în funcție de bugetul alocat. Formația Florentina Pană răspunde rapid pentru nunți și botezuri.';
 
-const slugify = (value: string) =>
-  value
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-
-const videoSlug = (video: { title: string; youtubeId: string }) => `${slugify(video.title)}-${video.youtubeId.toLowerCase()}`;
-
-const featuredVideo = videos[0];
 const ogImage = '/images/og-cauti-formatie-custom.webp';
 const whatsappBudgetOfferHref = 'https://wa.me/40767369658?text=Buna%21%20Spune-ne%20ce%20buget%20ai%20si%20noi%20iti%20facem%20o%20oferta%20pentru%20eveniment.';
-const secondaryVideos = videos.slice(1, 9).map((video) => ({
-  ...video,
-  slug: videoSlug(video),
-  thumbWebp: `https://i.ytimg.com/vi_webp/${video.youtubeId}/hqdefault.webp`,
-  thumbJpg: `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`,
-}));
+const featuredPlaylist = siteContent.youtubePlaylists?.cautiFormatie;
+const hasFeaturedPlaylist = Boolean(featuredPlaylist?.playlistId);
+const featuredPlaylistUrl = featuredPlaylist?.playlistId
+  ? `https://www.youtube.com/playlist?list=${featuredPlaylist.playlistId}`
+  : siteContent.youtubePlaylists?.channelPlaylistsUrl || siteContent.socialLinks.youtube;
+const featuredPlaylistThumb = featuredPlaylist?.thumbnailVideoId
+  ? `https://img.youtube.com/vi/${featuredPlaylist.thumbnailVideoId}/hqdefault.jpg`
+  : '/images/logo-fp-stage.svg';
+const featuredPlaylistRedirectHref = `/youtube-redirect/?to=${encodeURIComponent(featuredPlaylistUrl)}&back=${encodeURIComponent('/cauti-formatie-nunta/')}`;
 
 const processCards = [
   {
@@ -120,9 +112,18 @@ const topTickerText = 'Dacă ești în căutarea unei Formații Nuntă & Cover B
           </div>
 
           <div class="response-pills" aria-label="Servicii și pachete">
-            <span><strong>Solistă Principală (Toate genurile):</strong> Florentina Pană - asigură diversitatea muzicală pe tot parcursul nopții: populară de petrecere, grecească, arăbească, machedonească, latino, muzică românească și manele.</span>
-            <span><strong>Muzică Populară de Petrecere:</strong> Cătălin Matei - membru al trupei, responsabil de programele speciale de muzică populară de petrecere și jocuri tradiționale.</span>
-            <span><strong>Acompaniament Live:</strong> Orchestră completă (orgă, vioară, acordeon) + sonorizare profesională cu inginer de sunet propriu, fără DJ sau MC.</span>
+            <div class="response-pill-card">
+              <strong class="response-pill-card__title">Solistă principală</strong>
+              <p class="response-pill-card__text">Toate genurile. Florentina Pană susține diversitatea muzicală pe tot parcursul nopții: populară de petrecere, grecească, arăbească, machedonească, latino, muzică românească și manele.</p>
+            </div>
+            <div class="response-pill-card">
+              <strong class="response-pill-card__title">Muzică populară de petrecere</strong>
+              <p class="response-pill-card__text">Cătălin Matei, membru al trupei, interpretează programe de muzică populară și folclor autentic, construite pentru momente cu identitate și energie românească.</p>
+            </div>
+            <div class="response-pill-card">
+              <strong class="response-pill-card__title">Acompaniament live</strong>
+              <p class="response-pill-card__text">Orchestră completă, cu orgă, vioară și acordeon, plus sonorizare profesională cu inginer de sunet propriu, fără DJ sau MC.</p>
+            </div>
           </div>
 
           <div class="response-actions">
@@ -151,36 +152,39 @@ const topTickerText = 'Dacă ești în căutarea unei Formații Nuntă & Cover B
   <section class="response-section section-container pb-8" id="video">
     <div class="response-section-head">
       <p class="response-section-kicker">Flow de eveniment</p>
-      <h2>Glisează și vezi pașii experienței</h2>
+      <h2>Playlist YouTube actualizat automat</h2>
     </div>
 
-    <div class="response-scroll-shell" data-scroll-shell>
-      <button class="response-scroll-btn response-scroll-btn--prev" type="button" data-scroll-prev aria-label="Clipul anterior">‹</button>
-      <div class="response-video-grid" id="video-lane" role="list" aria-label="Carduri experiență, scroll orizontal">
-        {secondaryVideos.slice(0, visibleProcessCards.length).map((video, index) => (
-          <a href={`/video/${video.slug}/`} class="response-video-card" role="listitem" aria-label={`Vezi ${video.title}`} style={`--card-delay:${index * 80}ms`}>
-            <div class="response-video-thumb">
-              <img
-                src={video.thumbJpg}
-                alt={video.title}
-                loading={index === 0 ? 'eager' : 'lazy'}
-                decoding="async"
-                fetchpriority={index === 0 ? 'high' : 'low'}
-                draggable="false"
-                width="480"
-                height="360"
-                class="response-video-image"
-              />
-              <span class="response-video-index" aria-hidden="true">{String(index + 5).padStart(2, '0')}</span>
-              <span class="response-video-play" aria-hidden="true">▶</span>
-            </div>
-              <p>{visibleProcessCards[index].title}</p>
-              <span class="response-video-copy">{visibleProcessCards[index].text}</span>
-          </a>
-        ))}
+    {hasFeaturedPlaylist ? (
+      <div class="response-playlist-wrap">
+        <YoutubeEmbed
+          playlistId={featuredPlaylist?.playlistId}
+          title={featuredPlaylist?.title || 'Playlist Formația Florentina Pană'}
+          thumbnailSrc={featuredPlaylistThumb}
+          youtubeUrl={featuredPlaylistUrl}
+          class="response-featured-embed"
+        />
+
+        <div class="response-playlist-meta">
+          <p class="response-playlist-note">Actualizezi playlist-ul pe YouTube și selecția apare automat și în această pagină.</p>
+          <a href={featuredPlaylistRedirectHref} class="response-playlist-link">Deschide playlistul pe YouTube</a>
+        </div>
+
+        <div class="response-process-grid" role="list" aria-label="Pașii experienței noastre">
+          {visibleProcessCards.map((item, index) => (
+            <article class="response-process-card" role="listitem" style={`--card-delay:${index * 80}ms`}>
+              <span class="response-process-card__index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </article>
+          ))}
+        </div>
       </div>
-      <button class="response-scroll-btn response-scroll-btn--next" type="button" data-scroll-next aria-label="Clipul următor">›</button>
-    </div>
+    ) : (
+      <div class="response-playlist-wrap">
+        <p class="response-playlist-note">Playlistul principal este în curs de configurare pe YouTube. După setarea ID-ului, secțiunea se actualizează automat.</p>
+      </div>
+    )}
 
     <div class="response-more-videos">
       <a href="/galerie-video/" class="response-more-videos-link">Vezi toate videoclipurile</a>
@@ -566,10 +570,11 @@ const topTickerText = 'Dacă ești în căutarea unei Formații Nuntă & Cover B
     }
 
     .response-pills {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      justify-content: center;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.8rem;
+      width: min(100%, 58rem);
+      margin-inline: auto;
     }
 
     .response-offer-highlight {
@@ -604,18 +609,41 @@ const topTickerText = 'Dacă ești în căutarea unei Formații Nuntă & Cover B
       text-shadow: 0 0 16px rgba(245, 166, 35, 0.2);
     }
 
-    .response-pills span {
-      display: inline-flex;
-      align-items: center;
-      padding: 0.36rem 0.75rem;
-      border-radius: 999px;
+    .response-pill-card {
+      display: grid;
+      align-content: start;
+      gap: 0.46rem;
+      min-height: 100%;
+      padding: 0.95rem 1rem;
+      border-radius: 1.15rem;
       border: 1px solid rgba(255, 255, 255, 0.16);
-      background: rgba(255, 255, 255, 0.06);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
       color: #f8fdff;
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.04em;
+      text-align: left;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.12),
+        0 10px 24px rgba(0, 0, 0, 0.18);
       animation: rise-fade 700ms ease both;
+    }
+
+    .response-pill-card__title {
+      display: block;
+      color: #ffd16e;
+      font-size: 0.84rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      line-height: 1.28;
+      text-transform: uppercase;
+    }
+
+    .response-pill-card__text {
+      margin: 0;
+      color: rgba(245, 251, 255, 0.92);
+      font-size: 0.92rem;
+      font-weight: 600;
+      line-height: 1.58;
+      letter-spacing: 0;
+      text-wrap: pretty;
     }
 
     .response-actions,
@@ -786,6 +814,93 @@ const topTickerText = 'Dacă ești în căutarea unei Formații Nuntă & Cover B
       overflow: hidden;
       border: 1px solid rgba(255, 255, 255, 0.14);
       box-shadow: 0 18px 42px rgba(0, 0, 0, 0.28);
+    }
+
+    .response-playlist-wrap {
+      max-width: 62rem;
+      margin: 0 auto;
+      display: grid;
+      gap: 1rem;
+    }
+
+    .response-playlist-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+
+    .response-playlist-note {
+      margin: 0;
+      color: rgba(235, 244, 255, 0.78);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    .response-playlist-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 2.85rem;
+      padding: 0.7rem 1rem;
+      border-radius: 999px;
+      border: 1px solid rgba(245, 166, 35, 0.42);
+      background: rgba(245, 166, 35, 0.08);
+      color: #ffe4a5;
+      text-decoration: none;
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.86rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
+    }
+
+    .response-playlist-link:hover {
+      transform: translateY(-1px);
+      background: rgba(245, 166, 35, 0.14);
+      border-color: rgba(245, 166, 35, 0.64);
+    }
+
+    .response-process-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.85rem;
+    }
+
+    .response-process-card {
+      position: relative;
+      display: grid;
+      gap: 0.45rem;
+      padding: 0.9rem 0.95rem;
+      border-radius: 1.1rem;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: linear-gradient(180deg, rgba(9, 20, 44, 0.86), rgba(4, 10, 24, 0.96));
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.22);
+      animation: rise-fade 500ms ease both;
+      animation-delay: var(--card-delay, 0ms);
+    }
+
+    .response-process-card__index {
+      color: rgba(245, 166, 35, 0.92);
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .response-process-card h3 {
+      margin: 0;
+      color: #f8fdff;
+      font-size: 1rem;
+      line-height: 1.3;
+    }
+
+    .response-process-card p {
+      margin: 0;
+      color: rgba(235, 244, 255, 0.78);
+      font-size: 0.9rem;
+      line-height: 1.55;
     }
 
     .response-video-grid {
@@ -1197,6 +1312,38 @@ const topTickerText = 'Dacă ești în căutarea unei Formații Nuntă & Cover B
         border-radius: 1.1rem;
       }
 
+      .response-pills {
+        grid-template-columns: 1fr;
+        gap: 0.72rem;
+      }
+
+      .response-playlist-meta {
+        align-items: stretch;
+      }
+
+      .response-playlist-link {
+        width: 100%;
+      }
+
+      .response-process-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .response-pill-card {
+        padding: 0.88rem 0.92rem;
+        border-radius: 1rem;
+      }
+
+      .response-pill-card__title {
+        font-size: 0.8rem;
+        letter-spacing: 0.035em;
+      }
+
+      .response-pill-card__text {
+        font-size: 0.88rem;
+        line-height: 1.5;
+      }
+
       .btn-call,
       .btn-wa,
       .response-actions .btn-solid {
@@ -1392,7 +1539,7 @@ const topTickerText = 'Dacă ești în căutarea unei Formații Nuntă & Cover B
     @media (prefers-reduced-motion: reduce) {
       .response-copy,
       .response-video-card,
-      .response-pills span {
+      .response-pill-card {
         animation: none;
       }
 

@@ -33,6 +33,7 @@ const rawPath = Astro.url.pathname.replace(/\/$/, '') || '';
 const canonicalPath = rawPath === '' ? '/' : `${rawPath}/`;
 const canonicalURL = new URL(canonicalPath, Astro.site ?? SITE_FALLBACK);
 const canonical = canonicalURL.href;
+const isAboutPage = Astro.url.pathname === '/despre/';
 
 // OG image: transformă calea relativă în URL absolut + encode spații
 const rawOgImage = Astro.props.ogImage ?? '/images/og-default-1200x630.jpg';
@@ -407,7 +408,7 @@ const mobileNavAllItems = [
     {/* GA4 NU se încarcă în <head> — se injectează dinamic DUPĂ consimțământul
         utilizatorului prin CookieBanner, conform Rec. 30 & 32 RGPD / ePrivacy */}
   </head>
-  <body class={`page-shell${isHomePage ? ' is-homepage' : ''}${isCommunityDetailPage ? ' is-community-detail' : ''}`}>
+  <body class={`page-shell${isHomePage ? ' is-homepage' : ''}${isCommunityDetailPage ? ' is-community-detail' : ''}${isAboutPage ? ' is-about-page' : ''}`}>
     <div class="scroll-progress" aria-hidden="true"></div>
     <a href="#continut" class="skip-link">Sari la conținut</a>
     <SkyBackground />
@@ -1014,6 +1015,10 @@ const mobileNavAllItems = [
       @media (max-width: 767px) {
         .quick-dock {
           display: flex;
+        }
+
+        body.is-about-page .wa-float {
+          display: none;
         }
       }
 

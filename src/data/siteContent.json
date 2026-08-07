@@ -24,6 +24,41 @@
     "instagram": "https://www.instagram.com/florentinaformatie/",
     "tiktok": ""
   },
+  "youtubePlaylists": {
+    "channelPlaylistsUrl": "https://www.youtube.com/@FlorentinaPanaPitesti/playlists",
+    "cautiFormatie": {
+      "title": "Playlist Formația Florentina Pană",
+      "playlistId": "",
+      "thumbnailVideoId": "KEimXtkZb1M"
+    },
+    "galerieVideo": {
+      "populara": {
+        "title": "Muzică Populară Live la Nuntă",
+        "playlistId": "PLA2uJhhkHzIFSyS6gmimhw3YF_bdy1dQg",
+        "thumbnailVideoId": "nW84J3eTL_M"
+      },
+      "usoara": {
+        "title": "Muzică Ușoară Live pentru Nuntă",
+        "playlistId": "PLHj4yam5zkPY",
+        "thumbnailVideoId": "KEimXtkZb1M"
+      },
+      "tineret": {
+        "title": "Muzică de Petrecere pentru Tineret",
+        "playlistId": "",
+        "thumbnailVideoId": "HQfVn98caic"
+      },
+      "instrumentala": {
+        "title": "Muzică Instrumentală",
+        "playlistId": "PLA2uJhhkHzIGwMQGyVMPNPYTF7yFppWtM",
+        "thumbnailVideoId": "7Dk2oIHgOaI"
+      },
+      "dans-miri": {
+        "title": "Dansul Mirilor",
+        "playlistId": "",
+        "thumbnailVideoId": "GRwVkbUGVPs"
+      }
+    }
+  },
   "navigation": [
     {
       "href": "/cauti-formatie-nunta/",

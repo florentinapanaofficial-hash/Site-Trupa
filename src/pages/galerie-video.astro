@@ -3,56 +3,49 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import siteContent from '../data/siteContent.json';
 import seo from '../data/seo-content.json';
 import BackButton from '../components/BackButton.astro';
+import YoutubeEmbed from '../components/YoutubeEmbed.astro';
 
 const videoSeo = seo.galerieVideo;
-const slugify = (value: string) =>
-  value
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
 
-const videoSlug = (video: { title: string; youtubeId: string }) => {
-  const baseSlug = slugify(video.title);
-  return `${baseSlug}-${video.youtubeId.toLowerCase()}`;
-};
+const channelPlaylistsUrl = siteContent.youtubePlaylists?.channelPlaylistsUrl ?? siteContent.socialLinks.youtube;
+
+const playlistConfigBySection = siteContent.youtubePlaylists?.galerieVideo ?? {};
+
+const playlistThumb = (videoId?: string) => videoId
+  ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+  : '/images/logo-fp-stage.svg';
+
+const youtubeRedirectHref = (youtubeUrl: string) => `/youtube-redirect/?to=${encodeURIComponent(youtubeUrl)}&back=${encodeURIComponent('/galerie-video/')}`;
 
 const sections = [
   {
     id: 'populara',
     title: 'Muzică Populară Live la Nuntă',
-    category: 'petrecere',
     kicker: 'Tradiție & energie',
   },
   {
     id: 'usoara',
     title: 'Muzică Ușoară Live pentru Nuntă',
-    category: 'usoara-diverse',
     kicker: 'Melodii de suflet',
   },
   {
     id: 'tineret',
     title: 'Muzică de Petrecere pentru Tineret',
-    category: 'tineret-manele',
     kicker: 'Vibe de petrecere',
   },
   {
     id: 'instrumentala',
     title: 'Muzică Instrumentală',
-    category: 'instrumentala',
     kicker: 'Sunete pure',
   },
   {
     id: 'dans-miri',
     title: 'Dansul Mirilor',
-    category: 'dans-miri',
     kicker: 'Momentul magic',
   },
 ];
 
-const videosByCategory = (cat: string) =>
-  siteContent.videos.filter((v) => v.category === cat);
+const sectionsWithPlaylists = sections.filter((section) => Boolean(playlistConfigBySection?.[section.id]?.playlistId));
 ---
 
 <BaseLayout
@@ -69,8 +62,11 @@ const videosByCategory = (cat: string) =>
       </p>
     </header>
 
-    {sections.map((section) => {
-      const videos = videosByCategory(section.category);
+    {sectionsWithPlaylists.map((section) => {
+      const playlist = playlistConfigBySection?.[section.id];
+      const playlistUrl = playlist?.playlistId
+        ? `https://www.youtube.com/playlist?list=${playlist.playlistId}`
+        : channelPlaylistsUrl;
       return (
         <div class="section-block" id={section.id}>
           <div class="section-label-row">
@@ -78,36 +74,20 @@ const videosByCategory = (cat: string) =>
             <h2 class="section-h2">{section.title}</h2>
           </div>
 
-          {videos.length === 0 ? (
-            <p class="empty-note">Clipuri în curând. Revino pentru actualizări.</p>
-          ) : (
-            <div class="video-grid">
-              {videos.map((video) => {
-                const slug = videoSlug(video);
-                const thumbJpg = `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`;
-                return (
-                  <a href={`/video/${slug}/`} class="video-card" title={video.title} aria-label={`Redă: ${video.title}`}>
-                    <div class="thumb-shell">
-                      <img
-                        src={thumbJpg}
-                        alt={video.title}
-                        class="thumb-img"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                      <div class="thumb-overlay" aria-hidden="true">
-                        <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                          <circle cx="12" cy="12" r="12" fill="rgba(0,0,0,0.55)" />
-                          <polygon points="10,8 18,12 10,16" fill="white" />
-                        </svg>
-                      </div>
-                    </div>
-                    <p class="video-title">{video.title}</p>
-                  </a>
-                );
-              })}
+          <div class="playlist-block">
+            <YoutubeEmbed
+              playlistId={playlist.playlistId}
+              title={playlist.title || section.title}
+              thumbnailSrc={playlistThumb(playlist.thumbnailVideoId)}
+              youtubeUrl={playlistUrl}
+              class="playlist-embed"
+            />
+
+            <div class="playlist-actions">
+              <p class="playlist-note">Playlist-ul se sincronizează automat cu YouTube. Orice modificare făcută acolo apare și aici.</p>
+              <a href={youtubeRedirectHref(playlistUrl)} class="btn-outline">Deschide playlistul pe YouTube</a>
             </div>
-          )}
+          </div>
         </div>
       );
     })}
@@ -152,99 +132,41 @@ const videosByCategory = (cat: string) =>
     margin: 0;
   }
 
-  .video-grid {
+  .playlist-block {
     display: grid;
-    gap: clamp(1rem, 2vw, 1.5rem);
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
-    align-items: stretch; /* înălțimi egale pe rând */
+    gap: 1rem;
   }
 
-  .video-card {
-    display: flex;
-    flex-direction: column;
-    border-radius: 1rem;
+  .playlist-embed {
+    border-radius: 1.2rem;
     overflow: hidden;
-    border: 1px solid var(--line, rgba(255,255,255,0.1));
-    background: var(--surface, rgba(255,255,255,0.04));
-    text-decoration: none;
-    transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
-    height: 100%; /* card-ul umple celula → toate cardurile au aceeași înălțime */
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.3);
   }
 
-  .video-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 45px rgba(245, 166, 35, 0.18);
-    border-color: rgba(245, 166, 35, 0.45);
-  }
-
-  .video-card:focus-visible {
-    outline: 2px solid rgba(245, 166, 35, 0.8);
-    outline-offset: 2px;
-    border-color: rgba(245, 166, 35, 0.45);
-    box-shadow: 0 0 0 4px rgba(245, 166, 35, 0.15);
-  }
-
-  .thumb-shell {
-    position: relative;
-    aspect-ratio: 16/9;
-    overflow: hidden;
-    background: #0e0e1a;
-  }
-
-  .thumb-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    transition: transform 320ms ease;
-  }
-
-  .thumb-shell picture {
-    display: block;
-    width: 100%;
-    height: 100%;
-  }
-
-  .video-card:hover .thumb-img {
-    transform: scale(1.04);
-  }
-
-  .thumb-overlay {
-    position: absolute;
-    inset: 0;
+  .playlist-actions {
     display: flex;
     align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 220ms ease;
+    justify-content: space-between;
+    gap: 0.9rem;
+    flex-wrap: wrap;
   }
 
-  .video-card:hover .thumb-overlay {
-    opacity: 1;
-  }
-
-  .play-icon {
-    width: 3rem;
-    height: 3rem;
-    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.6));
-  }
-
-  .video-title {
-    padding: 0.75rem 1rem 0.85rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #e0ecff;
+  .playlist-note {
     margin: 0;
-    line-height: 1.4;
-    flex: 1; /* împinge titlul să umple spațiul rămas → baze aliniate pe rând */
-    display: flex;
-    align-items: flex-start;
+    color: rgba(224, 236, 255, 0.78);
+    font-size: 0.92rem;
+    line-height: 1.5;
   }
 
-  .empty-note {
-    color: var(--muted, rgba(255,255,255,0.45));
-    font-size: 0.9rem;
-    font-style: italic;
-    padding: 1rem 0;
+  @media (max-width: 48rem) {
+    .playlist-actions {
+      align-items: stretch;
+    }
+
+    .playlist-actions .btn-outline {
+      width: 100%;
+      justify-content: center;
+    }
   }
 </style>

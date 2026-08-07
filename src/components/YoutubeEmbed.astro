@@ -22,6 +22,7 @@
  *
  * Utilizare:
  *   <YoutubeEmbed youtubeId="aDB9Aa9cFLY" title="Titlul videoclipului" />
+ *   <YoutubeEmbed playlistId="PL_xxx" title="Playlist YouTube" thumbnailSrc="/images/logo-fp-stage.svg" />
  *
  *   Cu clase Tailwind pe wrapper (ex. pentru aspect-video w-full):
  *   <YoutubeEmbed youtubeId="..." title="..." class="aspect-video w-full rounded-xl" />
@@ -31,21 +32,42 @@
  */
 
 interface Props {
-  youtubeId: string;
+  youtubeId?: string;
+  playlistId?: string;
   title: string;
   class?: string;
   miniOnScroll?: boolean;
+  thumbnailSrc?: string;
+  youtubeUrl?: string;
 }
 
-const { youtubeId, title, class: className = '', miniOnScroll = false } = Astro.props;
+const {
+  youtubeId,
+  playlistId,
+  title,
+  class: className = '',
+  miniOnScroll = false,
+  thumbnailSrc,
+  youtubeUrl,
+} = Astro.props;
 
-const thumbJpg = `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
-const embedSrc = `https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0`;
-const ytLink = `https://www.youtube.com/watch?v=${youtubeId}`;
+const hasPlaylist = typeof playlistId === 'string' && playlistId.length > 0;
+const hasVideo = typeof youtubeId === 'string' && youtubeId.length > 0;
+const consentButtonLabel = hasPlaylist ? 'Redă playlistul' : 'Acceptă și vizionează';
+
+const thumbJpg = thumbnailSrc || (hasVideo
+  ? `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`
+  : '/images/logo-fp-stage.svg');
+const embedSrc = hasPlaylist
+  ? `https://www.youtube-nocookie.com/embed/videoseries?list=${playlistId}&rel=0`
+  : `https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0`;
+const ytLink = youtubeUrl || (hasPlaylist
+  ? `https://www.youtube.com/playlist?list=${playlistId}`
+  : `https://www.youtube.com/watch?v=${youtubeId}`);
 ---
 
 <div
-  class={`yt-gate${className ? ' ' + className : ''}`}
+  class={`yt-gate${hasPlaylist ? ' yt-gate--playlist' : ''}${className ? ' ' + className : ''}`}
   data-yt-id={youtubeId}
   data-yt-title={title}
   data-yt-src={embedSrc}
@@ -75,24 +97,28 @@ const ytLink = `https://www.youtube.com/watch?v=${youtubeId}`;
         </svg>
       </div>
 
-      <p class="yt-gate__msg">
-        <strong>Cookie-uri YouTube</strong><br>
-        Vizionarea activează cookie-uri de urmărire<br>
-        (<code>VISITOR_INFO1_LIVE</code>, <code>VISITOR_PRIVACY_METADATA</code>).
-      </p>
+      {!hasPlaylist && (
+        <p class="yt-gate__msg">
+          <strong>Cookie-uri YouTube</strong><br>
+          Vizionarea activează cookie-uri de urmărire<br>
+          (<code>VISITOR_INFO1_LIVE</code>, <code>VISITOR_PRIVACY_METADATA</code>).
+        </p>
+      )}
 
       <button class="yt-gate__btn-accept" type="button">
-        Acceptă și vizionează
+        {consentButtonLabel}
       </button>
 
-      <a
-        href={ytLink}
-        class="yt-gate__btn-yt"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Deschide pe YouTube ↗
-      </a>
+      {!hasPlaylist && (
+        <a
+          href={ytLink}
+          class="yt-gate__btn-yt"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Deschide pe YouTube ↗
+        </a>
+      )}
     </div>
   </div>
 
@@ -451,6 +477,22 @@ const ytLink = `https://www.youtube.com/watch?v=${youtubeId}`;
 
   .yt-gate__btn-yt:hover {
     color: rgba(255, 255, 255, 0.9);
+  }
+
+  .yt-gate--playlist .yt-gate__consent {
+    gap: 0.4rem;
+  }
+
+  .yt-gate--playlist .yt-gate__btn-accept {
+    min-height: 2.9rem;
+    padding-inline: 1.2rem;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #0bbcd6 0%, #1346a8 100%);
+    box-shadow: 0 10px 24px rgba(11, 188, 214, 0.26);
+  }
+
+  .yt-gate--playlist .yt-gate__btn-accept:hover {
+    background: linear-gradient(135deg, #11c9e4 0%, #1958c6 100%);
   }
 
   /* ── Dimensiuni reduse pe carduri mici ───────────────────── */
