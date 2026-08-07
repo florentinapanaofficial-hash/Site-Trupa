@@ -181,13 +181,13 @@ export const siteContent = {
             {
                 name: 'Florentina Pană',
                 role: 'Solistă Principală & Imaginea Trupei',
-                description: 'Solistă principală cu timbru cald și prezență scenică elegantă. Interpretează toate genurile muzicale (pop, ușoară, latino, party, populară) și coordonează momentele-cheie ale serii.',
+                description: 'Solistă principală cu timbru cald și prezență scenică elegantă. Interpretează toate tipurile de muzică: populară de petrecere, grecească, arăbească, machedonească, latino, muzică românească și manele, iar trupa cântă fără pauze.',
                 image: 'https://placehold.co/400x400/112245/e9f5ff?text=Florentina+Pan%C4%83',
             },
             {
                 name: 'Cătălin Matei',
                 role: 'Membru al trupei - Muzică Populară de Petrecere',
-                description: 'Membru al trupei responsabil de programele speciale de muzică populară de petrecere și jocuri tradiționale. Interacționează natural cu publicul și ridică atmosfera pe ring.',
+                description: 'Membru al trupei responsabil de programele speciale de muzică populară de petrecere și jocuri tradiționale. Împreună alternăm programele artistice în funcție de specificul fiecărui eveniment, exclusiv live, fără DJ sau MC.',
                 image: 'https://placehold.co/400x400/1b2c52/e9f5ff?text=C%C4%83t%C4%83lin+Matei',
             },
         ],

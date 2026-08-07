@@ -19,11 +19,11 @@ const SLUG           = 'pitesti';
 const LAT            = 44.8565;
 const LNG            = 24.8692;
 const INTRO          = 'Formația Florentina Pană este una dintre cele mai căutate formații de nuntă din Pitești. Cu sediul chiar în inima orașului, oferim muzică live premium la nunți, botezuri și evenimente corporate în tot județul Argeș.';
-const PARAGRAF2      = 'Repertoriul nostru acoperă muzică ușoară românească și internațională, pop & cover, dance, cafe-concert, muzică de petrecere și folclor de petrecere — totul adaptat gusturilor mirilor și atmosferei evenimentului. Am cântat la cele mai frumoase restaurante din Pitești și împrejurimi: de la saloane elegante de nunți la locații rustice de vis.';
+const PARAGRAF2      = 'Repertoriul nostru acoperă toate tipurile de muzică: muzică populară de petrecere, muzică grecească, arăbească, machedonească, latino, muzică românească și manele — totul adaptat gusturilor mirilor și atmosferei evenimentului. Cântăm fără pauze, alternăm programele artistice și nu folosim DJ sau MC.';
 const PARAGRAF3      = 'Echipa noastră știe exact cum să mențină ringul de dans plin de la prima secundă până la ultimul cântec. Fiecare eveniment beneficiază de sonorizare profesională, lumini de atmosferă și un program muzical personalizat, discutat în detaliu cu mirii.';
-const CONTENT_INTRO    = 'Pitești este un loc special pentru noi. Am cântat la zeci de nunți memorabile aici și știm exact cum să facem ca fiecare eveniment să fie unic. Formația Florentina Pană — muzică live care se simte.';
-const CONTENT_SERVICES = 'Ce ne face diferiți? Ascultăm. Fiecare cuplu din Pitești primește un program muzical unic, construit împreună cu noi. Combinăm muzica populară românească cu hituri moderne, piese de petrecere și momente speciale — totul live, fără playback.';
-const CONTENT_OUTRO    = 'Ești gata să transformi nunta ta din Pitești într-o poveste de neuitat? Formația Florentina Pană este aici pentru tine. Cere o ofertă personalizată — fără obligații, cu drag.';
+const CONTENT_INTRO    = 'Nunta ta în Pitești merită cea mai bună coloană sonoră. Noi suntem Formația Florentina Pană și de peste 10 ani aducem energie, emoție și profesionalism la cele mai frumoase evenimente din zonă.';
+const CONTENT_SERVICES = 'Fie că vrei o nuntă tradițională, un vibe elegant de cafe-concert sau o petrecere modernă, noi livrăm repertoriul complet cerut: populară de petrecere, grecească, arăbească, machedonească, latino, românească și manele. Pachetele noastre de Formație Nuntă Pitești includ consultanță muzicală gratuită, echipament profesional și flexibilitate totală în programul serii.';
+const CONTENT_OUTRO    = 'Fiecare nuntă din Pitești la care am cântat ne-a confirmat un lucru: muzica bună face diferența între un eveniment reușit și unul de neuitat. Sună-ne sau scrie-ne pe WhatsApp — răspundem în mai puțin de 2 ore.';
 const LOCATII_POP    = ["Restaurant & Events Noblesse","La Noblesse Events","Pensiunea Flowers"];
 const ZONE_ACOPERITE = ["Pitești","Mioveni","Ștefănești","Bascov","Bradu"];
 const META_DESC      = 'Cauți formații nuntă Pitești? Alege Trupa Florentina Pană — muzică live premium la nunți, botezuri și evenimente. 10+ ani experiență. Cere ofertă acum!';
@@ -40,18 +40,20 @@ const localBusinessLd = {
   "@context": "https://schema.org",
   "@type": ["LocalBusiness", "MusicGroup"],
   "name": brand.name,
-  "description": `${KEYWORD} — Formație Nuntă & Cover Band Live, Show Live 100%: muzică ușoară, pop & cover, dance & party, muzică de petrecere și muzică populară în ${ORAS}`,
+  "description": `${KEYWORD} — Formație Nuntă & Cover Band Live, Show Live 100% cu repertoriu complet: muzică populară de petrecere, grecească, arăbească, machedonească, latino, muzică românească și manele în ${ORAS}. Fără DJ sau MC.`,
   "url": `https://www.florentinapanaofficial.ro/formatie-nunta/${SLUG}/`,
   "telephone": contact.phoneRaw,
   "image": "https://www.florentinapanaofficial.ro/images/sigla-fp-band.webp",
   "priceRange": "$$",
   "genre": ["Muzica Greceasca", "Muzica Arabeasca", "Muzica Latino", "Muzica Machedoneasca", "Manele", "Muzica Populara de Petrecere"],
   "knowsAbout": [
-    "Pop live",
-    "Muzică ușoară românească și internațională",
-    "Muzică de petrecere și jocuri tradiționale",
-    "Cafe-concert",
-    "Muzică party și de petrecere"
+    "Muzică populară de petrecere",
+    "Muzică grecească",
+    "Muzică arăbească",
+    "Muzică machedonească",
+    "Muzică latino",
+    "Muzică românească",
+    "Manele"
   ],
   "address": {
     "@type": "PostalAddress",
@@ -107,7 +109,7 @@ const localBusinessLd = {
     <div class="mt-8 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-6 sm:p-8">
       <h2 class="text-lg font-extrabold text-white mb-4">💰 Prețuri Formație Nuntă {ORAS} — Ofertă Early Booking 2027</h2>
       <p class="text-sm text-white/90 leading-relaxed mb-4">Calendarul 2027 pentru evenimente în {ORAS} și județele limitrofe se completează rapid — cuplurile care semnează acum beneficiază de tarif Early Booking blocat contractual, la nivelul sezonului 2026.</p>
-      <p class="text-sm text-white/90 leading-relaxed mb-4">Ce primești: formație live cu 5-6 artiști, sonorizare profesională premium, program muzical personalizat, MC experimentat, și garanție scrisă pe echipament backup. Zero playback, 100% live pe scenă.</p>
+      <p class="text-sm text-white/90 leading-relaxed mb-4">Ce primești: formație live cu 5-6 artiști, sonorizare profesională premium, program muzical personalizat, alternanță artistică după specificul evenimentului și garanție scrisă pe echipament backup. Cântăm fără pauze, fără DJ sau MC. Zero playback, 100% live pe scenă.</p>
       <div class="mt-4 rounded-xl bg-white/5 p-4 border border-white/10">
         <p class="text-xs text-white/70 mb-2">📞 Contactează-ne pentru ofertă personalizată:</p>
         <div class="flex flex-wrap gap-2">

@@ -10,7 +10,7 @@
             "descriere": "Formația Florentina Pană este alegerea ideală când cauți o formație de nuntă în Pitești: show 100% live, repertoriu non-stop și energie reală pentru nunți și botezuri în Argeș.",
             "bullets": [
                 "Sonorizare profesională la cele mai bune locații din Argeș și din toată țara",
-                "Program muzical personalizat: muzică ușoară, pop & cover, dance și muzică de petrecere",
+                "Program muzical personalizat: populară de petrecere, grecească, arăbească, machedonească, latino, românească și manele",
                 "Show complet pe scenă — lumini, energie și coregrafie, nu doar muzică de fundal"
             ]
         },
@@ -27,7 +27,7 @@
             },
             {
                 "question": "Ce genuri muzicale interpretați la evenimente?",
-                "answer": "Avem un repertoriu complet: muzică ușoară românească și internațională, pop & cover, dance, cafe-concert, muzică de petrecere și populară. Adaptăm fiecare setlist la atmosfera evenimentului și la preferințele voastre."
+                "answer": "Avem un repertoriu complet cu toate tipurile de muzică: muzică populară de petrecere, muzică grecească, arăbească, machedonească, latino, muzică românească și manele. Cântăm fără pauze și alternăm programele artistice în funcție de eveniment."
             },
             {
                 "question": "Vă deplasați și în afara județului Argeș?",
@@ -46,7 +46,7 @@
         },
         "h1": "Povestea Formației Florentina Pană",
         "aboutIntro": "este una dintre cele mai apreciate soliste de muzică live din județul Argeș, cu peste un deceniu de experiență pe scenele celor mai frumoase evenimente din România. Alături de o echipă de instrumentiști virtuoși, Florentina transformă fiecare nuntă, botez sau gală într-un spectacol plin de emoție, eleganță și energie.",
-        "aboutIntro2": "De la primirea invitaților cu acorduri de vioară la dansul mirilor, de la momente elegante de cafe-concert până la seturi de party cu hituri internaționale — trupa noastră acoperă fiecare moment al serii. Peste 500 de cupluri din Argeș, București și din toată țara ne-au ales să le facă evenimentul de neuitat. Repertoriul nostru include muzică ușoară, pop & cover, dance, muzică de petrecere și populară. Fiecare program muzical este construit exclusiv pe dorințele clientului.",
+        "aboutIntro2": "De la primirea invitaților cu acorduri de vioară la dansul mirilor, de la momente elegante de cafe-concert până la seturi de party cu hituri internaționale — trupa noastră acoperă fiecare moment al serii. Peste 500 de cupluri din Argeș, București și din toată țara ne-au ales să le facă evenimentul de neuitat. Repertoriul nostru include muzică populară de petrecere, muzică grecească, arăbească, machedonească, latino, muzică românească și manele. Cântăm fără pauze, alternăm programele artistice după specificul evenimentului și nu folosim DJ sau MC.",
         "bio": "Florentina Pană — solistă recunoscută pentru timbrul vocal cald, prezența scenică elegantă și capacitatea de a citi atmosfera sălii în timp real. Coordonează fiecare moment-cheie — de la intrarea mirilor la ora de dans — oferind un spectacol live care menține invitații pe ring toată noaptea."
     },
     "servicii": {
@@ -67,7 +67,7 @@
             "descriere": "Oferim prezență scenică profesionistă pentru gale, petreceri de firmă și evenimente business. Setlist premium cu piese internaționale, jazz, lounge și momente interactive adaptate culturii organizaționale. Sonorizare de calitate și punctualitate de rigoare."
         },
         "repertoriu": {
-            "descriere": "Repertoriul Formației Florentina Pană acoperă toate genurile muzicale: muzică ușoară românească și internațională, pop & cover, dance, cafe-concert, muzică de petrecere și populară. Toate piesele sunt interpretate live, cu aranjamente proprii care aduc un plus de energie și eleganță. Mirii pot personaliza lista de piese conform preferințelor."
+            "descriere": "Repertoriul Formației Florentina Pană acoperă toate tipurile de muzică: muzică populară de petrecere, muzică grecească, arăbească, machedonească, latino, muzică românească și manele. Cântăm 100% live fără pauze, alternăm programele artistice după specificul evenimentului și nu folosim DJ sau MC."
         }
     },
     "galerie": {
@@ -122,7 +122,7 @@
             "description": "Muzică nuntă live în clipuri reale de la nunți 2026. Ascultă repertoriul complet al Formației Florentina Pană și rezervă data ta acum!"
         },
         "h1": "Muzică Nuntă Live — Videoclipuri de la Evenimente Reale",
-        "subtitle": "Ascultă muzică de nuntă live în clipuri reale: ușoară, pop & cover, dance, petrecere și momente speciale cu Formația Florentina Pană."
+        "subtitle": "Ascultă muzică de nuntă live în clipuri reale: muzică populară de petrecere, grecească, arăbească, machedonească, latino, muzică românească și manele."
     },
     "comunitate": {
         "meta": {
@@ -168,7 +168,7 @@
         "@type": "MusicGroup",
         "name": "Formația Florentina Pană",
         "alternateName": "Florentina Pană",
-        "description": "Formație Nuntă & Cover Band Live din Pitești, Argeș — Show Live 100% cu repertoriu complet: muzică ușoară, pop & cover, dance & party, muzică de petrecere și muzică populară.",
+        "description": "Formație Nuntă & Cover Band Live din Pitești, Argeș — Show Live 100% cu repertoriu complet: muzică populară de petrecere, grecească, arăbească, machedonească, latino, muzică românească și manele. Fără DJ sau MC.",
         "url": "https://florentinapanaofficial.ro",
         "telephone": "+40767369658",
         "email": "contact@florentinapanaofficial.ro",
@@ -213,11 +213,13 @@
             "Muzica Populara de Petrecere"
         ],
         "knowsAbout": [
-            "Pop live",
-            "Muzică ușoară românească și internațională",
-            "Muzică de petrecere și jocuri tradiționale",
-            "Cafe-concert",
-            "Muzică party și de petrecere"
+            "Muzică populară de petrecere",
+            "Muzică grecească",
+            "Muzică arăbească",
+            "Muzică machedonească",
+            "Muzică latino",
+            "Muzică românească",
+            "Manele"
         ],
         "sameAs": [
             "https://www.youtube.com/@FlorentinaPanaPitesti/videos",

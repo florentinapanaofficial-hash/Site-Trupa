@@ -19,10 +19,10 @@ const SLUG           = 'bucuresti';
 const LAT            = 44.4268;
 const LNG            = 26.1025;
 const INTRO          = 'Cauți o formație de nuntă pentru un eveniment în București? Formația Florentina Pană se deplasează frecvent în capitală, oferind spectacole live de excepție la cele mai prestigioase locații din oraș.';
-const PARAGRAF2      = 'Ne-am construit o reputație solidă în fața cuplurilor din București prin show-uri pline de energie, un repertoriu vast — de la muzică ușoară, pop & cover și dance, la muzică de petrecere și jocuri tradiționale — și o atitudine profesionistă impecabilă. Peste 100 de nunți organizate cu succes în București și Ilfov.';
+const PARAGRAF2      = 'Ne-am construit o reputație solidă în fața cuplurilor din București prin show-uri pline de energie și un repertoriu vast: muzică populară de petrecere, muzică grecească, arăbească, machedonească, latino, muzică românească și manele. Cântăm fără pauze, alternăm programele artistice după specificul fiecărui eveniment și nu folosim DJ sau MC.';
 const PARAGRAF3      = 'Fie că este vorba de o nuntă elegantă într-un hotel de 5 stele sau o petrecere vibrantă într-un restaurant cu tradiție, ne adaptăm perfect stilului evenimentului tău. Transportul și logistica sunt incluse — tu te bucuri doar de muzică.';
-const CONTENT_INTRO    = 'Visezi la o nuntă perfectă în București? Totul începe cu muzica potrivită. Formația Florentina Pană creează momente magice prin muzică live — adaptată stilului tău, gusturilor invitaților și atmosferei locației.';
-const CONTENT_SERVICES = 'Suntem recunoscuți ca top formații nuntă București datorită energiei de pe scenă și atenției la detalii. Fiecare eveniment din București este unic, iar noi construim programul muzical împreună cu mirii — de la repertoriu la momentele speciale ale serii.';
+const CONTENT_INTRO    = 'Dacă ești în căutarea unei atmosfere de neuitat în București, ai ajuns unde trebuie. Formația Florentina Pană transformă fiecare eveniment într-o experiență muzicală de excepție — de la primul dans și până la ultimul cântec al serii.';
+const CONTENT_SERVICES = 'Repertoriul nostru este complet 100% live: muzică populară de petrecere, muzică grecească, arăbească, machedonească, latino, muzică românească și manele, toate dozate corect pentru energia serii în București. Cântăm fără pauze, alternăm programele artistice după specificul evenimentului și nu folosim DJ sau MC.';
 const CONTENT_OUTRO    = 'Am pus suflet în fiecare eveniment din București și continuăm să o facem. Hai să discutăm despre nunta ta — completează formularul de contact sau dă-ne un telefon. Primele 3 date din sezon se rezervă cel mai repede!';
 const LOCATII_POP    = ["Palatul Snagov","Hanul Drumeților","Ballrooms by Bamboo"];
 const ZONE_ACOPERITE = ["Sector 1–6","Otopeni","Voluntari","Snagov","Buftea"];
@@ -40,18 +40,20 @@ const localBusinessLd = {
   "@context": "https://schema.org",
   "@type": ["LocalBusiness", "MusicGroup"],
   "name": brand.name,
-  "description": `${KEYWORD} — Formație Nuntă & Cover Band Live, Show Live 100%: muzică ușoară, pop & cover, dance & party, muzică de petrecere și muzică populară în ${ORAS}`,
+  "description": `${KEYWORD} — Formație Nuntă & Cover Band Live, Show Live 100% cu repertoriu complet: muzică populară de petrecere, grecească, arăbească, machedonească, latino, muzică românească și manele în ${ORAS}. Fără DJ sau MC.`,
   "url": `https://www.florentinapanaofficial.ro/formatie-nunta/${SLUG}/`,
   "telephone": contact.phoneRaw,
   "image": "https://www.florentinapanaofficial.ro/images/sigla-fp-band.webp",
   "priceRange": "$$",
   "genre": ["Muzica Greceasca", "Muzica Arabeasca", "Muzica Latino", "Muzica Machedoneasca", "Manele", "Muzica Populara de Petrecere"],
   "knowsAbout": [
-    "Pop live",
-    "Muzică ușoară românească și internațională",
-    "Muzică de petrecere și jocuri tradiționale",
-    "Cafe-concert",
-    "Muzică party și de petrecere"
+    "Muzică populară de petrecere",
+    "Muzică grecească",
+    "Muzică arăbească",
+    "Muzică machedonească",
+    "Muzică latino",
+    "Muzică românească",
+    "Manele"
   ],
   "address": {
     "@type": "PostalAddress",
@@ -107,7 +109,7 @@ const localBusinessLd = {
     <div class="mt-8 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-6 sm:p-8">
       <h2 class="text-lg font-extrabold text-white mb-4">💰 Prețuri Formație Nuntă {ORAS} — Ofertă Early Booking 2027</h2>
       <p class="text-sm text-white/90 leading-relaxed mb-4">Calendarul 2027 pentru evenimente în {ORAS} și județele limitrofe se completează rapid — cuplurile care semnează acum beneficiază de tarif Early Booking blocat contractual, la nivelul sezonului 2026.</p>
-      <p class="text-sm text-white/90 leading-relaxed mb-4">Ce primești: formație live cu 5-6 artiști, sonorizare profesională premium, program muzical personalizat, MC experimentat, și garanție scrisă pe echipament backup. Zero playback, 100% live pe scenă.</p>
+      <p class="text-sm text-white/90 leading-relaxed mb-4">Ce primești: formație live cu 5-6 artiști, sonorizare profesională premium, program muzical personalizat, alternanță artistică după specificul evenimentului și garanție scrisă pe echipament backup. Cântăm fără pauze, fără DJ sau MC. Zero playback, 100% live pe scenă.</p>
       <div class="mt-4 rounded-xl bg-white/5 p-4 border border-white/10">
         <p class="text-xs text-white/70 mb-2">📞 Contactează-ne pentru ofertă personalizată:</p>
         <div class="flex flex-wrap gap-2">

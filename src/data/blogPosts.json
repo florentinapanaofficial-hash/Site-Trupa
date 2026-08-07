@@ -1,1058 +1,831 @@
 {
-    "items": [
+  "items": [
+    {
+      "slug": "placerea-de-a-canta-pe-scena",
+      "category": "🎵 Jurnal FP Band",
+      "categoryAccent": "rose",
+      "title": "Plăcerea de a Cânta, de a Fi pe Scenă: Cum Trăiește Formația Florentina Pană Fiecare Seară Live",
+      "excerpt": "Între lumini, microfoane și priviri emoționate, scena nu este un loc de muncă — este locul în care ne simțim cel mai natural. Povestea sinceră despre plăcerea de a cânta live, despre adrenalina primului acord și despre de ce muzica rămâne pasiunea noastră de o viață.",
+      "coverImage": "/images/galerie-foto-site/placerea-scenei-panoramica-1.jpg",
+      "coverEmoji": "🎤",
+      "readTime": "6 min",
+      "date": "2026-04-23",
+      "author": "Florentina Pană",
+      "content": [
         {
-            "slug": "placerea-de-a-canta-pe-scena",
-            "category": "🎵 Jurnal FP Band",
-            "categoryAccent": "rose",
-            "title": "Plăcerea de a Cânta, de a Fi pe Scenă: Cum Trăiește Formația Florentina Pană Fiecare Seară Live",
-            "excerpt": "Între lumini, microfoane și priviri emoționate, scena nu este un loc de muncă — este locul în care ne simțim cel mai natural. Povestea sinceră despre plăcerea de a cânta live, despre adrenalina primului acord și despre de ce muzica rămâne pasiunea noastră de o viață.",
-            "coverImage": "/images/galerie-foto-site/placerea-scenei-panoramica-1.jpg",
-            "coverEmoji": "🎤",
-            "readTime": "6 min",
-            "date": "2026-04-23",
-            "author": "Florentina Pană",
-            "content": [
-                {
-                    "type": "paragraph",
-                    "text": "Sunt seri în care, înainte să urc pe scenă, mă opresc câteva secunde în culise și ascult sala. Zgomotul pahrelor, hohotele de râs, muzica de fundal — toate se amestecă într-un murmur cald, plin de așteptare. Și, de fiecare dată, simt același lucru pe care îl simțeam la prima mea nuntă cântată acum mai bine de două decenii: o emoție curată, un fior natural pe care nicio repetiție, nicio experiență și niciun număr de evenimente nu îl pot toci. Despre asta vreau să scriu astăzi — despre plăcerea de a cânta, despre ce înseamnă, cu adevărat, să fii pe scenă cu Formația Florentina Pană."
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Nu este un articol SEO cu cuvinte-cheie îndesate între paragrafe. Este, simplu, o confesiune despre motivul pentru care fac asta de atâția ani și de ce cred că muzica live rămâne, chiar și în era playback-urilor și a DJ-ilor automați, singura formă onestă de a sărbători un moment important din viață."
-                },
-                {
-                    "type": "image",
-                    "src": "/images/galerie-foto-site/placerea-scenei-panoramica-1.jpg",
-                    "caption": "Scena la final de refren — momentul în care sala și formația respiră la unison. Aici se întâmplă magia muzicii live."
-                },
-                {
-                    "type": "heading",
-                    "text": "Primul acord: momentul în care totul se liniștește"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Mulți mă întreabă dacă mai am emoții înainte să cânt. Răspunsul este da, mereu. Dar emoția aceea nu este frică — este un fel de concentrare adâncă, aproape meditativă. Când atac primul acord al serii, tot zgomotul din cap dispare: griji, oboseală, gânduri, tot. Rămâne doar scena, formația din spatele meu și privirile mirilor care așteaptă prima lor horă. Este plăcerea pură de a cânta, cea care mă ține la acest meșteșug de când eram copil."
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Pe scenă cu mine sunt oameni pe care îi consider familie. Claudiu, Alexia, instrumentiștii, soliștii — fiecare aduce ceva propriu și, împreună, formăm un organism care respiră muzică live. Nu există negative, nu există playback, nu există „o să dăm o bază că suntem obosiți”. Fiecare notă este cântată în clipa aceea, pentru oamenii care sunt în fața noastră, în seara aceea, la evenimentul lor. Este singurul mod în care știm să lucrăm."
-                },
-                {
-                    "type": "image",
-                    "src": "/images/galerie-foto-site/placerea-scenei-claudiu-florentina.jpg",
-                    "caption": "Claudiu și cu mine în timpul unui duet — dialogul de priviri pe care publicul nu-l vede, dar îl simte în sunet."
-                },
-                {
-                    "type": "heading",
-                    "text": "De ce scena este locul meu cel mai natural"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Cineva îmi spunea, acum câțiva ani, că mă vede altfel pe scenă decât în viața de zi cu zi. „Acolo sus parcă ești mai tu”, mi-a zis. Am stat multă vreme să mă gândesc la observația asta. Și cred că are dreptate. Scena nu mă transformă într-o altă persoană — mă scoate, pur și simplu, la suprafață. Acolo nu mai există pudoarea de a-ți arăta bucuria, nu mai există filtrul social care te face să-ți moderezi reacțiile, nu mai există teama de ridicol. Rămâne doar muzica și, cu ea, versiunea cea mai sinceră a mea."
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Plăcerea de a cânta nu vine din aplauze, deși aplauzele sunt frumoase. Vine din momentele în care vezi o bunică plângând pe o baladă veche, pentru că piesa aceea se cânta la nunta ei. Din clipa în care mirele își ia mireasa de mână la prima horă și uită complet că este filmat. Din privirea unui copil de șase ani care stă lipit de boxă, cu ochii mari, descoperind pentru prima oară în viața lui cum sună o tobă adevărată. Astea sunt răsplățile reale ale unui muzician live — nu banii, nu recunoașterea, ci emoția autentică pe care o produci în oameni reali."
-                },
-                {
-                    "type": "image",
-                    "src": "/images/galerie-foto-site/placerea-scenei-claudiu-florentina.jpg",
-                    "caption": "Cu Alexia, în pauza dintre două momente — cele mai frumoase râsete se întâmplă când microfoanele sunt închise."
-                },
-                {
-                    "type": "heading",
-                    "text": "Ritualul dinaintea fiecărui eveniment"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Ca orice artist care-și face treaba cu respect, am un ritual înainte de fiecare nuntă sau eveniment. Ajung la sală cu cel puțin trei ore înainte de primul invitat. Facem soundcheck-ul împreună cu băieții, calibrăm sonorizarea pentru spațiul respectiv, verificăm fiecare microfon, fiecare monitor, fiecare cablu. Apoi, cu jumătate de oră înainte, mă retrag în cabină. Beau un ceai cald, îmi încălzesc vocea cu exercițiile pe care le fac de douăzeci de ani, citesc încă o dată lista cu momentele speciale ale mirilor — piesa de intrare, dansul lor, melodia dedicată mamei sau a bunicii."
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Respectul față de scenă începe cu pregătirea. Nu există „improvizăm acolo”, nu există „vedem noi ce iese”. Fiecare seară este unică pentru cuplul care ne-a angajat — este ziua cea mai importantă din viața lor — iar eu tratez fiecare eveniment ca și cum ar fi singurul din acel an. Asta, cred eu, este diferența dintre o formație care cântă și o formație care celebrează."
-                },
-                {
-                    "type": "image",
-                    "src": "/images/galerie-foto-site/placerea-scenei-claudiu-florentina.jpg",
-                    "caption": "Moment live cu energie ridicată — formația și publicul în același vibe, pe ringul de dans."
-                },
-                {
-                    "type": "heading",
-                    "text": "Scena ne-a învățat ce nu poți învăța din manuale"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Anii petrecuți pe scenă mi-au dat lecții pe care nicio școală de muzică nu le predă. Am învățat să citesc o sală din primele zece minute — care masă vrea ritm, care masă vrea balade, unde stau bunicii care așteaptă hora bătrânească, unde stau tinerii care cer „ceva de pus în story”. Am învățat că tăcerea este, uneori, mai puternică decât sunetul: o pauză bine plasată, o respirație între două versuri, un moment în care lași sala să simtă, nu doar să audă. Am învățat că muzica live nu este o competiție de virtuozitate — este o conversație cu oamenii din fața ta."
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Și, poate cel mai important, am învățat că plăcerea de a cânta nu este o resursă care se consumă, ci una care se multiplică. Cu cât cânt mai mult, cu atât îmi place mai mult. Cu cât urc mai des pe scenă, cu atât scena devine mai prietenoasă. Este unul dintre puținele lucruri din viață care răsplătește, fără excepție, fiecare efort făcut pentru el."
-                },
-                {
-                    "type": "image",
-                    "src": "/images/galerie-foto-site/placerea-scenei-claudiu-florentina.jpg",
-                    "caption": "Final de seară — ultima piesă, luminile încă aprinse, sala care nu vrea să se oprească. Momentul pentru care facem tot ceea ce facem."
-                },
-                {
-                    "type": "heading",
-                    "text": "De ce muzica live nu poate fi înlocuită"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Trăim într-o eră în care orice se poate replica digital. Se poate pune un playback perfect, un DJ poate mixa orice combinație de piese, inteligența artificială poate compune linii melodice în câteva secunde. Și totuși, nimic din toate astea nu poate înlocui senzația unui solo de vioară cântat live la trei metri de tine, sau vibrația vocii care nu trece prin niciun filtru, sau tensiunea dintr-o formație care, chiar în clipa aia, decide împreună să prelungească un refren pentru că sala o cere. Muzica live este ultima formă de sărbătoare autentică. Și, atâta timp cât mai există oameni care vor să-și celebreze momentele importante cu adevăr, va exista plăcerea de a cânta pe scenă."
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Dacă pregătești o nuntă, un botez sau un eveniment privat și vrei să ai în seara aceea o formație care iubește, cu adevărat, ceea ce face, suntem aici. Nu vindem doar muzică — vindem plăcerea de a fi pe scenă, pentru tine, în ziua ta."
-                },
-                {
-                    "type": "cta",
-                    "variant": "whatsapp",
-                    "label": "Vrei muzică live cu suflet la evenimentul tău?",
-                    "text": "Scrie-ne pe WhatsApp data și locația — îți răspundem personal, fără formulare, fără roboți. Așa cum ne place nouă să lucrăm: direct, cald, de la om la om.",
-                    "ctaText": "Verifică disponibilitatea",
-                    "ctaHref": "https://wa.me/40767369658?text=Bun%C4%83%20ziua!%20A%C8%99%20dori%20s%C4%83%20verific%20disponibilitatea%20forma%C8%9Biei%20Florentina%20Pan%C4%83%20pentru%20evenimentul%20meu.",
-                    "ctaSecondaryText": "Vezi oferta completă",
-                    "ctaSecondaryHref": "/contact/"
-                },
-                {
-                    "type": "links",
-                    "items": [
-                        {
-                            "label": "Preț formație nuntă București & Argeș",
-                            "href": "/contact/"
-                        },
-                        {
-                            "label": "Muzică nuntă live: videoclipuri reale",
-                            "href": "/galerie-video/"
-                        }
-                    ]
-                }
-            ],
-            "faq": [
-                {
-                    "q": "Cântați 100% live sau folosiți și negative?",
-                    "a": "Cântăm exclusiv live, fără playback și fără baze preînregistrate. Fiecare voce, fiecare instrument, fiecare acord se întâmplă în clipa aceea, pe scenă, în fața invitaților tăi. Este o alegere pe care o facem de principiu și care se regăsește explicit în contract."
-                },
-                {
-                    "q": "Cum vă pregătiți pentru fiecare eveniment?",
-                    "a": "Ajungem la sală cu minimum trei ore înainte, facem soundcheck complet, calibrăm sonorizarea pentru acustica spațiului respectiv și studiem în detaliu lista de momente speciale ale mirilor — piesa de intrare, dansul mirilor, dedicațiile. Fiecare eveniment este tratat ca unicat, nu ca parte dintr-o serie."
-                },
-                {
-                    "q": "Ce zone acoperiți pentru evenimente live?",
-                    "a": "Cântăm în principal în Argeș (Pitești, Curtea de Argeș, Câmpulung, Mioveni), dar ne deplasăm și în București, Dâmbovița, Vâlcea și Olt. Pentru distanțe mai mari, detaliile de transport se discută la semnarea contractului."
-                },
-                {
-                    "q": "Pot să vă aud cântând live înainte să vă rezerv?",
-                    "a": "Da. Pe canalul nostru de YouTube și în galeria video a site-ului ai zeci de înregistrări live, filmate la evenimente reale, fără montaj și fără corecții în studio. Ce auzi acolo este exact ceea ce vei auzi și la evenimentul tău."
-                }
-            ]
+          "type": "paragraph",
+          "text": "Sunt seri în care, înainte să urc pe scenă, mă opresc câteva secunde în culise și ascult sala. Zgomotul pahrelor, hohotele de râs, muzica de fundal — toate se amestecă într-un murmur cald, plin de așteptare. Și, de fiecare dată, simt același lucru pe care îl simțeam la prima mea nuntă cântată acum mai bine de două decenii: o emoție curată, un fior natural pe care nicio repetiție, nicio experiență și niciun număr de evenimente nu îl pot toci. Despre asta vreau să scriu astăzi — despre plăcerea de a cânta, despre ce înseamnă, cu adevărat, să fii pe scenă cu Formația Florentina Pană."
         },
         {
-            "slug": "formatie-nunta-orhideea-events-pitesti",
-            "category": "🏰 Locații de Poveste",
-            "categoryAccent": "gold",
-            "title": "Formație Nuntă la Orhideea Events Pitești: Ghid Complet",
-            "excerpt": "Cum sună o nuntă live la Orhideea Events Pitești — acustică, setup-ul ideal al formației, sfaturi practice pentru miri și ce trebuie cerut explicit în contract pentru o seară fără compromisuri.",
-            "coverImage": "",
-            "coverEmoji": "🌸",
-            "readTime": "7 min",
-            "date": "2026-04-23",
-            "author": "Florentina Pană",
-            "content": [
-                {
-                    "type": "paragraph",
-                    "text": "Dacă ai început să cauți o locație pentru nunta ta în Argeș, numele Orhideea Events Pitești apare, aproape sigur, în primele trei variante. Restaurantul este una dintre cele mai căutate săli din zonă: decor elegant, capacitate generoasă, acces rapid din centrul Piteștiului și o echipă care știe exact cum se derulează un eveniment lung de 8-10 ore. Pentru noi, Formația Florentina Pană, Orhideea este de ani buni un „acasă” muzical — am cântat aici la zeci de nunți, botezuri și petreceri private, iar în acest ghid îți spun, sincer, ce trebuie să știi înainte să semnezi contractul pentru o nuntă Orhideea Pitești."
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Nu este un articol de vânzare. Este ghidul pe care l-aș da unei verișoare care m-ar întreba „ce să cer la Orhideea ca să iasă perfect?”. Vorbim despre acustică, despre unde se așază bine scena, despre ce clauze contează cu adevărat pentru muzica ta live și despre mici detalii practice pe care majoritatea formațiilor nu le menționează la prima discuție."
-                },
-                {
-                    "type": "heading",
-                    "text": "De ce Orhideea Events este o locație iubită de formațiile live"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Orhideea Events Pitești are trei calități pe care muzicienii le simt imediat ce intră în sală. Prima este înălțimea plafonului — suficient de generoasă încât sunetul să se dispersioneze uniform, fără acea senzație de „compresie” pe care o ai în sălile joase, unde basul lovește în tavan și revine neplăcut în urechile invitaților. A doua este forma sălii: un spațiu regulat, fără colțuri oarbe masive, ceea ce înseamnă că nicio masă nu rămâne „în zona moartă” a sunetului. A treia este scena dedicată, dimensionată corect pentru o formație completă de 5-6 artiști live plus echipamentul aferent, fără să ne obligăm să improvizăm."
-                },
-                {
-                    "type": "paragraph",
-                    "text": "În termeni practici, asta înseamnă că o formație nuntă Orhideea Events nu are nevoie de trucuri electronice ca să sune bine. Muzica rămâne caldă și plină la toate mesele, de la cea a mirilor până la cea din fundul sălii. Este genul de detaliu pe care invitații nu îl observă conștient, dar care face diferența dintre „a fost o nuntă frumoasă” și „n-o să uit niciodată nunta lor”."
-                },
-                {
-                    "type": "image",
-                    "src": "",
-                    "caption": "Orhideea Events Pitești — una dintre locațiile de top pentru nunți în Argeș, cu o scenă generoasă perfectă pentru formație live completă."
-                },
-                {
-                    "type": "heading",
-                    "text": "Cum setăm sonorizarea pentru acustica de la Orhideea"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Fiecare sală are „personalitatea” ei acustică, iar Orhideea nu face excepție. Pe baza zecilor de evenimente pe care le-am făcut aici, am ajuns la un protocol de setup pe care îl aplicăm de fiecare dată. Aducem sonorizare line-array proprie — nu folosim niciodată echipamentul „de casă” al locațiilor — și calibrăm sistemul astfel încât presiunea sonoră la nivelul meselor din centrul sălii să fie între 88 și 92 dB pe coloanele forte, suficient de prezent pentru atmosferă dar fără să forțeze invitații să strige ca să se audă."
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Pe plan tehnic, reducem basul cu 2-3 dB față de setarea standard, pentru că înălțimea sălii „umflă” natural frecvențele joase. Monitoarele in-ear ale muzicienilor sunt setate independent pentru fiecare artist, iar microfoanele de voce sunt Shure Beta — dinamice, rezistente la larsen și cu o claritate excelentă pe vocile feminine, care sunt esențiale în repertoriul nostru. Tot setup-ul este gata în 90-120 de minute de la sosire, cu soundcheck complet înainte de primul invitat."
-                },
-                {
-                    "type": "heading",
-                    "text": "Programul ideal al serii la o nuntă la Orhideea Pitești"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Nu există un singur program „corect” pentru o nuntă Orhideea Pitești, dar există o logică pe care o respectăm noi și care funcționează aproape de fiecare dată. Momentul de sosire al invitaților se acoperă cu muzică live de fundal (acoustic + chitară + voce), la 75-80 dB — conversațiile curg, nimeni nu trebuie să strige. Intrarea mirilor este punctul cel mai emoțional al serii și îl pregătim cu mirii din vreme: le ascultăm piesa preferată, o aranjăm pentru formație și o repetăm. Prima horă se dă după primul fel, când sala este caldă; hora mare vine în a doua jumătate, după tort, când energia este la vârf. Încheiem seara treptat, nu brusc — cu 30 de minute de ballad și ritmuri lente, ca invitații să plece cu „încă o piesă, una singură” în cap, nu cu oboseală."
-                },
-                {
-                    "type": "cta",
-                    "variant": "whatsapp",
-                    "label": "Verifică disponibilitatea la Orhideea",
-                    "text": "Ai deja rezervată sala la Orhideea Events? Trimite-ne data pe WhatsApp și îți confirmăm în aceeași zi dacă este liberă în calendarul nostru.",
-                    "ctaText": "Verifică disponibilitatea pentru 2026",
-                    "ctaHref": "https://wa.me/40767369658?text=Bun%C4%83%20ziua!%20Am%20rezervat%20Orhideea%20Events%20Pite%C8%99ti%20%C8%99i%20a%C8%99%20dori%20s%C4%83%20verific%20disponibilitatea%20forma%C8%9Biei%20Florentina%20Pan%C4%83%20pentru%20data%20evenimentului%20meu.",
-                    "ctaSecondaryText": "Solicită ofertă scrisă",
-                    "ctaSecondaryHref": "/contact/"
-                },
-                {
-                    "type": "heading",
-                    "text": "Ce să ceri explicit în contractul cu formația"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Indiferent dacă ne alegi pe noi sau pe altă formație nuntă Pitești, există trei clauze care merită să fie negru pe alb în contract atunci când cânți la Orhideea Events. Una: sonorizarea este adusă de formație și calibrată pentru sala respectivă — fără „închiriem noi la fața locului” și fără amestec de echipamente. Două: componența formației este exactă în contract (câți soliști, câți instrumentiști, ce instrumente live) — la prețuri mici, pe ultima sută de metri, dispar discret unul-doi muzicieni. Trei: clauză de backup pentru echipament — un microfon care se strică sau o consolă care pică nu trebuie să oprească seara ta, iar formația trebuie să aibă echipament dublat."
-                },
-                {
-                    "type": "paragraph",
-                    "text": "În contractul nostru pentru nunți la Orhideea Events Pitești 2026-2027, toate cele trei clauze sunt standard, scrise explicit, fără note de subsol. Adăugăm și prețul final fix, fără costuri ascunse pentru kilometraj sau ore suplimentare negociate în ultima clipă. Transparență totală, pentru că nunta se întâmplă o singură dată — vrem să dormi liniștit între momentul semnării și ziua evenimentului."
-                },
-                {
-                    "type": "heading",
-                    "text": "Sfaturi practice pentru mirii care aleg Orhideea"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Patru lucruri pe care le-am învățat după multe evenimente aici și pe care rareori le găsești într-un articol generic despre locații de nuntă Argeș. Primul: rezervă soundcheck-ul cu cel puțin 2 ore înainte de sosirea invitaților — Orhideea este un restaurant activ, iar montajul în grabă nu lasă timpul necesar calibrării. Al doilea: discută dinainte cu managerul sălii poziționarea exactă a scenei și a ringului de dans — mică rearanjare poate îmbunătăți spectaculos experiența sonoră. Al treilea: alege o formație care a mai cântat aici — diferența dintre un setup „pe nevăzute” și unul deja cunoscut se aude. Al patrulea: nu lăsa programul de muzică la nimereală — 30 de minute petrecute cu formația, cu două săptămâni înainte, transformă seara."
-                },
-                {
-                    "type": "heading",
-                    "text": "De ce ne aleg cuplurile care se căsătoresc la Orhideea"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Nu este despre noi. Este despre liniștea mirilor. Cuplurile care ne aleg ca formație nuntă Orhideea Events Pitești au trei lucruri în comun: vor un răspuns clar la toate întrebările tehnice, vor un contract care să nu ascundă surprize, și vor o echipă care cunoaște locația suficient de bine încât să nu „învețe pe banii lor” în ziua nunții. Asta oferim — plus 100% live, zero playback, zero compromisuri pe calitatea sunetului. Orhideea este o sală care merită o coloană sonoră la înălțime, iar noi suntem gata să o livrăm, weekend după weekend, cu aceeași seriozitate ca la primul nostru eveniment."
-                },
-                {
-                    "type": "cta",
-                    "variant": "whatsapp",
-                    "label": "Rezervare rapidă Orhideea",
-                    "text": "Blocăm împreună data ta la Orhideea Events Pitești — răspundem în câteva minute pe WhatsApp, cu tariful Early Booking exact pentru ziua evenimentului tău.",
-                    "ctaText": "Verifică disponibilitatea pentru 2026",
-                    "ctaHref": "https://wa.me/40767369658?text=Bun%C4%83%20ziua!%20A%C8%99%20dori%20o%20ofert%C4%84%20pentru%20forma%C8%9Bia%20Florentina%20Pan%C4%83%20la%20Orhideea%20Events%20Pite%C8%99ti.",
-                    "ctaSecondaryText": "Vezi galeria live",
-                    "ctaSecondaryHref": "/galerie-video/"
-                },
-                {
-                    "type": "links",
-                    "items": [
-                        {
-                            "label": "Solicită ofertă și preț pentru formație nuntă",
-                            "href": "/contact/"
-                        },
-                        {
-                            "label": "Vezi toate clipurile live de la evenimente",
-                            "href": "/galerie-video/"
-                        }
-                    ]
-                }
-            ],
-            "faq": [
-                {
-                    "q": "Cântați frecvent la Orhideea Events Pitești?",
-                    "a": "Da, Orhideea Events este una dintre locațiile unde Formația Florentina Pană cântă constant, de mai mulți ani. Cunoaștem în detaliu acustica sălii, poziționarea optimă a scenei și protocolul echipei locale, ceea ce ne permite să livrăm o experiență sonoră calibrată perfect pentru acest spațiu, fără „ajustări pe parcurs” în ziua evenimentului tău."
-                },
-                {
-                    "q": "Aduceți sonorizare proprie sau folosiți cea a locației?",
-                    "a": "Aducem întotdeauna sonorizarea noastră proprie — un sistem line-array profesional, mixer digital, microfoane Shure Beta și monitoare in-ear. Nu folosim niciodată echipamentul „de casă” al locațiilor, pentru că fiecare sală are nevoie de o calibrare specifică, iar calitatea sunetului nu poate fi lăsată la întâmplare. Această clauză este inclusă explicit în contract."
-                },
-                {
-                    "q": "Câți muzicieni live aduceți pentru o nuntă la Orhideea?",
-                    "a": "Formația completă pentru un eveniment standard la Orhideea Events Pitești include 5-6 artiști live: 2-3 soliști vocali (inclusiv Florentina Pană) plus instrumentiști pe clape, percuție, chitară și, opțional, saxofon. Componența exactă este stipulată în contract, fără reduceri de ultim moment."
-                },
-                {
-                    "q": "Cât durează montajul și soundcheck-ul la Orhideea?",
-                    "a": "Ajungem cu minim 2 ore înainte de sosirea invitaților. Montajul complet al sonorizării și instrumentelor durează aproximativ 90-120 de minute, iar soundcheck-ul integral — testarea fiecărui canal, a monitoarelor și a echilibrului în sală — ocupă ultimele 20-30 de minute. La momentul primei intrări a invitaților, totul este gata și calibrat."
-                },
-                {
-                    "q": "Cântați 100% live sau folosiți și negative?",
-                    "a": "Cântăm 100% live, fără niciun fel de playback sau negative. Fiecare instrument și fiecare voce sunt amplificate individual în timp real, prin mixer digital profesional. Această garanție este explicit în contract și se aplică inclusiv la horele și sârbele pentru care alte formații folosesc baze preînregistrate."
-                },
-                {
-                    "q": "Cum blochez data evenimentului meu la Orhideea?",
-                    "a": "Procesul durează sub 48 de ore. Ne scrii pe WhatsApp cu data și locația (Orhideea Events Pitești), verificăm pe loc disponibilitatea, îți trimitem oferta personalizată cu tariful Early Booking exact, iar contractul se semnează digital. Din momentul semnării, data este blocată și tariful rămâne fix până la eveniment."
-                }
-            ]
+          "type": "paragraph",
+          "text": "Nu este un articol SEO cu cuvinte-cheie îndesate între paragrafe. Este, simplu, o confesiune despre motivul pentru care fac asta de atâția ani și de ce cred că muzica live rămâne, chiar și în era playback-urilor și a DJ-ilor automați, singura formă onestă de a sărbători un moment important din viață."
         },
         {
-            "slug": "pret-formatie-nunta-2026",
-            "category": "💎 Ghid Rezervare",
-            "categoryAccent": "gold",
-            "title": "Preț Formație Nuntă 2026-2027: Calitate vs. Buget în Argeș",
-            "excerpt": "Ghid sincer despre cât costă o formație nuntă Pitești în 2026-2027, de ce prețul prea mic ascunde riscuri la eveniment și cum profiți de ofertele Early Booking blocate acum pentru Argeș.",
-            "coverImage": "",
-            "coverEmoji": "💎",
-            "readTime": "9 min",
-            "date": "2026-04-22",
-            "author": "Florentina Pană",
-            "content": [
-                {
-                    "type": "paragraph",
-                    "text": "Orice mireasă care începe să caute o formație nuntă Pitești ajunge, în prima săptămână, la aceeași întrebare: „bine, dar care este prețul corect?”. Pe grupurile de Facebook vezi oferte de la 800 € până la peste 4000 €, iar diferența dintre ele pare imposibil de explicat. Acest articol este scris exact pentru tine, cea sau cel care vrea un răspuns sincer — fără vânzare agresivă, fără promisiuni goale."
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Suntem Formația Florentina Pană, cântăm live de peste 15 ani în Argeș, București, Ilfov și împrejurimi, iar în 2026 am decis să deschidem calendarul pentru rezervările din 2026 și 2027 cu prețuri promoționale (Early Booking) care sunt, realist, cu 15-20% sub tarifele de sezon. Înainte să îți spun ce ai de câștigat, îți explic de ce un preț formație nuntă 2026 prea mic este, aproape întotdeauna, cea mai scumpă decizie pe care o iei."
-                },
-                {
-                    "type": "heading",
-                    "text": "De ce „prea ieftin” înseamnă, de fapt, risc la eveniment"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "O formație profesionistă nu plătește doar muzicienii. Plătește echipamentul de sonorizare (boxele, subbass-urile, consolele digitale, microfoanele dinamice de scenă), transportul, asigurările, costurile cu SABC și, cel mai important, miile de ore de repetiții care fac diferența între „e ok” și „a fost nunta vieții lor”. Când cineva îți oferă o formație nuntă Argeș sub 1000 €, una dintre aceste piese lipsește. Întrebarea nu este dacă — ci care."
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Ce am văzut, cu ochii noștri, la nunți unde colegi de scenă au fost chemați să „salveze evenimentul” în ultima clipă: boxe de 15 ani împrumutate de la un unchi, care distorsionează peste 85 dB; microfoane wireless fără redundanță care se oprec la primul dans; „formație live” care înseamnă de fapt un solist cu negative pe telefon, fără toba live. Niciunul dintre aceste compromisuri nu se vede în contract. Se aud în sală. Iar invitații le țin minte."
-                },
-                {
-                    "type": "heading",
-                    "text": "Ce plătești, de fapt, când alegi o formație premium"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Prețul corect pentru muzică evenimente Argeș are trei straturi pe care puțini furnizori le explică transparent. Primul strat, cel vizibil, este ora de cântat. Al doilea este echipamentul: o sonorizare line-array profesională de 8-10 kW, mixer digital Midas sau Allen&Heath, microfoane Shure Beta pentru voce, monitoare in-ear, sistem de backup complet. Al treilea strat, cel mai subtil, este experiența: capacitatea de a citi sala în primele 20 de minute, de a schimba pe loc programul când bunica mirelui cere „Ciobănașul” între două piese internaționale, de a susține atmosfera 6-8 ore fără ca energia să scadă."
-                },
-                {
-                    "type": "paragraph",
-                    "text": "O formație nuntă Pitești care face toate aceste trei lucruri are un cost operațional real per eveniment. Când vezi un preț mult sub pragul pieței, acela nu este „o ofertă bună” — este o sumă care nu acoperă costurile și, deci, se vor tăia colțuri undeva. De obicei la echipament și la numărul de muzicieni live."
-                },
-                {
-                    "type": "image",
-                    "src": "",
-                    "caption": "Setup-ul complet line-array pe care Formația Florentina Pană îl aduce la fiecare eveniment din Argeș, Pitești și zonele limitrofe."
-                },
-                {
-                    "type": "heading",
-                    "text": "Oferta Early Booking 2027 — de ce acum este momentul"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "În calendarul nostru, weekendurile din mai-septembrie 2027 se rezervă cu 10-14 luni înainte. Cine semnează acum, în primăvara 2026, pentru o dată din 2027, are acces la preț formație nuntă 2027 blocat la nivelul sezonului 2026 — deși costurile noastre reale vor crește. Facem această concesie pentru un singur motiv pragmatic: preferăm un calendar plin semnat din timp decât să umblăm după rezervări în ultimele luni. Tu câștigi liniște, noi câștigăm predictibilitate."
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Ce primești la formatie nunta preturi Early Booking 2027: tariful promoțional blocat contractual, aceeași echipă de 5-6 artiști live (fără reduceri la nr. muzicieni), aceeași sonorizare premium, aceleași garanții scrise. Ce nu se negociază niciodată, indiferent de tarif: calitatea. Cântăm 100% live (zero playback), sonorizarea este adusă mereu de noi (nu se închiriază la locație), iar în contract primești clauză explicită privind backup-ul de echipament."
-                },
-                {
-                    "type": "cta",
-                    "variant": "whatsapp",
-                    "label": "Early Booking 2027",
-                    "text": "Vezi pe loc dacă data ta este încă liberă în calendar — răspundem în câteva minute pe WhatsApp.",
-                    "ctaText": "Verifică disponibilitatea pentru 2027",
-                    "ctaHref": "https://wa.me/40767369658?text=Bun%C4%83%20ziua!%20V%C4%83%20contactez%20pentru%20oferta%20Early%20Booking%202026-2027.%20A%C8%99%20dori%20s%C4%83%20verific%20disponibilitatea%20pentru%20data%20evenimentului%20meu.",
-                    "ctaSecondaryText": "Solicită ofertă scrisă",
-                    "ctaSecondaryHref": "/contact/"
-                },
-                {
-                    "type": "links",
-                    "items": [
-                        {
-                            "label": "Compară prețuri formație nuntă și cere ofertă",
-                            "href": "/contact/"
-                        },
-                        {
-                            "label": "Ascultă muzică nuntă live în videoclipuri reale",
-                            "href": "/galerie-video/"
-                        }
-                    ]
-                },
-                {
-                    "type": "heading",
-                    "text": "Cele 3 întrebări corecte de pus oricărei formații înainte să semnezi"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Indiferent dacă ne alegi pe noi sau pe altcineva, folosește grila asta. Este grila pe care aș folosi-o eu dacă aș fi mireasă. Întâi: „Cântați 100% live sau folosiți negative pentru unele piese?”. Răspunsul corect este 100% live, fără ambiguitate. A doua: „Aduceți voi sonorizarea sau o închiriați de la locație?”. Răspunsul sănătos este „aducem noi, întotdeauna, pentru că o calibrăm pentru sala respectivă”. A treia: „Există clauză de backup în contract dacă se defectează un microfon sau o boxă?”. Dacă răspunsul este vag, prețul mic devine foarte scump în seara evenimentului."
-                },
-                {
-                    "type": "heading",
-                    "text": "De ce cuplurile din Argeș ne aleg — și ce găsești în contractul nostru"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "În ultimii 3 ani am cântat în săli premium precum Ramada Pitești, Star Plaza, Metropol Băbana, Garden Resort, dar și în locații intime de 80-100 de persoane din Curtea de Argeș, Mioveni și Câmpulung. Fiecare cuplu are povestea lui. Ce au în comun miresele care ne aleg: au vrut un răspuns clar, un contract scris, și un preț care să nu ascundă surprize în ziua nunții. Exact asta garantăm în scris."
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Contractul nostru pentru 2026-2027 include: preț final fix (fără costuri ascunse pentru kilometraj sau ore suplimentare negociate in-situ), componența exactă a formației, lista echipamentului de sonorizare, clauza de backup, programul orientativ al seratei și penalități clare în caz de anulare de oricare dintre părți. Transparență totală, pentru că nunta ta se întâmplă o singură dată."
-                },
-                {
-                    "type": "cta",
-                    "variant": "whatsapp",
-                    "label": "Rezervare rapidă",
-                    "text": "Trimite-ne data evenimentului pe WhatsApp și îți confirmăm în aceeași zi dacă este liberă — plus tariful Early Booking exact pentru data ta.",
-                    "ctaText": "Verifică disponibilitatea pentru 2026",
-                    "ctaHref": "https://wa.me/40767369658?text=Bun%C4%83%20ziua!%20A%C8%99%20dori%20s%C4%83%20verific%20disponibilitatea%20forma%C8%9Biei%20Florentina%20Pan%C4%83%20pentru%20evenimentul%20meu%20din%202026%2F2027.",
-                    "ctaSecondaryText": "Vezi galeria live",
-                    "ctaSecondaryHref": "/galerie-video/"
-                }
-            ],
-            "faq": [
-                {
-                    "q": "Cât costă în medie o formație nuntă Pitești în 2026-2027?",
-                    "a": "Tarifele corecte pentru o formație profesionistă cu sonorizare premium și 5-6 muzicieni live pornesc, realist, de la aproximativ 1800-2200 € pentru un eveniment complet de 6-8 ore în zona Argeș. Pentru contractele Early Booking semnate acum pentru 2026-2027, Formația Florentina Pană oferă prețuri promoționale blocate la nivelul sezonului anterior. Contactează-ne pe WhatsApp pentru tariful exact la data ta."
-                },
-                {
-                    "q": "De ce unele formații oferă prețuri mult mai mici?",
-                    "a": "Un preț formație nuntă 2026 semnificativ sub nivelul pieței înseamnă, în majoritatea cazurilor, compromisuri care nu apar în contract: echipament vechi sau închiriat în ultima clipă, număr redus de muzicieni live, utilizarea de negative pe unele piese sau lipsa unui sistem de backup. Întreabă întotdeauna explicit dacă se cântă 100% live și cine asigură sonorizarea."
-                },
-                {
-                    "q": "Ce include oferta Early Booking pentru 2026-2027?",
-                    "a": "Oferta Early Booking include tariful promoțional blocat contractual, întreaga formație live (5-6 artiști, fără reduceri de componență), sonorizare line-array profesională adusă de noi, microfoane dinamice de scenă, clauză de backup pentru echipament și un program personalizat pentru cei doi miri. Totul se stipulează în scris înainte de semnare."
-                },
-                {
-                    "q": "Cântați doar în Pitești sau și în afara județului Argeș?",
-                    "a": "Acoperim tot județul Argeș (Pitești, Mioveni, Curtea de Argeș, Câmpulung, Topoloveni, Ștefănești), București, Ilfov, Dâmbovița și Vâlcea. Pentru evenimentele din afara zonei Argeș, costurile de transport sunt incluse transparent în ofertă, fără costuri adăugate în ziua evenimentului."
-                },
-                {
-                    "q": "Cum blochez data evenimentului meu?",
-                    "a": "Data se blochează contractual în momentul semnării contractului și al plății unui avans de rezervare. Procesul complet durează sub 48 de ore: verificăm disponibilitatea pe WhatsApp, îți trimitem oferta personalizată, apoi contractul semnat digital. Din acel moment, data este a ta garantat, iar tariful Early Booking este blocat până la eveniment."
-                },
-                {
-                    "q": "Cântați 100% live sau folosiți și negative?",
-                    "a": "Cântăm 100% live, fără niciun fel de playback sau negative. Fiecare instrument (clape, chitară, bas, percuție) și fiecare voce sunt amplificate individual în timp real, prin mixer digital profesional. Acest lucru este garantat explicit în contract."
-                }
-            ]
+          "type": "image",
+          "src": "/images/galerie-foto-site/placerea-scenei-panoramica-1.jpg",
+          "caption": "Scena la final de refren — momentul în care sala și formația respiră la unison. Aici se întâmplă magia muzicii live."
         },
         {
-            "slug": "magia-sunetului-sub-cupola-metropol-babana",
-            "category": "🏰 Locații de Poveste",
-            "categoryAccent": "gold",
-            "title": "Magia sunetului sub cupola de la Metropol Băbana: Un ghid pentru mirii rafinați",
-            "excerpt": "Cum se transformă acustica spectaculoasă a salonului Metropol Băbana într-o experiență sonoră de neuitat — și de ce muzica live face toată diferența aici.",
-            "coverImage": "",
-            "coverEmoji": "🏰",
-            "readTime": "6 min",
-            "date": "2026-04-12",
-            "author": "Florentina Pană",
-            "content": [
-                {
-                    "type": "paragraph",
-                    "text": "Există locuri care par create pentru muzică live. Salonul Metropol Băbana, situat la câțiva kilometri de Pitești, în inima județului Argeș, este unul dintre ele. Cu tavanul său înalt în formă de cupolă, pereții eleganți și o capacitate generoasă pentru până la 350 de invitați, acest spațiu nu este doar o sală de nunți — este un amfiteatru natural, un loc unde fiecare acord reverberează cu o claritate aproape cinematografică."
-                },
-                {
-                    "type": "heading",
-                    "text": "De ce acustica face diferența la o nuntă"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Mulți miri aleg locația după decor, meniu sau preț. Puțini se gândesc la acustică — dar tocmai ea este cea care transformă o petrecere obișnuită într-un eveniment memorabil. La Metropol Băbana, cupola acționează ca un difuzor natural: sunetul urcă, se îmblânzește și coboară uniform peste întreaga sală. Ca formație nuntă Pitești cu experiență în zeci de evenimente aici, am învățat exact cum să calibrăm sunetul pentru acest spațiu. Setăm coloanele la unghi deschis, reducem basul cu 2–3 dB față de o sală standard și lăsăm roomul natural al cupolei să facă restul. Rezultatul? O muzică live Argeș care sună cald, plin și intim, fără să fie niciodată agresivă."
-                },
-                {
-                    "type": "image",
-                    "src": "",
-                    "caption": "Salonul Metropol Băbana — cupola elegantă și ambianța de poveste pentru cele mai frumoase locații de nuntă Argeș"
-                },
-                {
-                    "type": "heading",
-                    "text": "O scenă care inspiră artiștii"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Pentru noi, FP Band, a cânta la Metropol Băbana este întotdeauna o bucurie. Scena generoasă ne permite să aducem setup-ul complet — clape, percuție, chitară, bas și trei voci — fără compromisuri de spațiu. Iar lumina naturală care pătrunde prin ferestrele laterale în timpul golden hour-ului creează o atmosferă pe care niciun spot nu o poate replica. Am observat că invitații se ridică mai repede pe ringul de dans aici decât în orice alt loc din Argeș. Credem că este combinația subtilă dintre eleganța vizuală a sălii și calitatea sunetului live — când auzi vocea solistei cristalin, fără distorsiuni, instinctul este să te miști."
-                },
-                {
-                    "type": "heading",
-                    "text": "Sfaturi pentru mirii care aleg Metropol Băbana"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Dacă ați ales deja această locație superbă sau o aveți pe lista scurtă, iată ce vă recomandăm din experiența noastră directă: programați soundcheck-ul cu cel puțin două ore înainte, pentru a profita la maximum de acustica specială. Discutați cu formația despre momentele forte ale serii — intrarea mirilor, dansul mirilor, hora mare — și lăsați-le timp să adapteze aranjamentele pentru reverberația naturală a sălii. Alegeți o formație nuntă Pitești care cunoaște deja spațiul, pentru că diferența dintre un sunet calibrat și unul generic este enormă. Metropol Băbana merită o coloană sonoră pe măsură — și noi suntem mereu pregătiți să o oferim."
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Vrei să vezi cum sună FP Band live? Vizitează vlog-ul nostru pentru momente filmate de la evenimente reale. Sau, dacă ești gata să rezervi formația pentru nunta ta la Metropol Băbana, contactează-ne direct — discutăm cu drag despre fiecare detaliu."
-                },
-                {
-                    "type": "links",
-                    "items": [
-                        {
-                            "label": "🎬 Vezi Vlog-ul nostru",
-                            "href": "/vlog/"
-                        },
-                        {
-                            "label": "📞 Contactează-ne",
-                            "href": "/contact/"
-                        }
-                    ]
-                }
-            ]
+          "type": "heading",
+          "text": "Primul acord: momentul în care totul se liniștește"
         },
         {
-            "slug": "din-culisele-unui-eveniment-live",
-            "category": "\ud83c\udfb5 Jurnal FP Band",
-            "categoryAccent": "cyan",
-            "title": "Din culisele unui eveniment live",
-            "excerpt": "Ce se întâmplă în spatele scenei înainte de a urca muzica la volumul maxim? Pregătirile, emoțiile și momentele care nu se văd de pe ring.",
-            "coverImage": "",
-            "coverEmoji": "🎬",
-            "readTime": "4 min",
-            "date": "2026-03-08",
-            "author": "Florentina Pană",
-            "content": [
-                {
-                    "type": "paragraph",
-                    "text": "Fiecare eveniment de succes începe cu ore bune de pregătire invizibilă. Ajungem pe locație cu cel puțin două ore înainte de primul invitat — timp alocat montajului, verificării sunetului și calibrării microfoanelor pentru acustica specifică a sălii."
-                },
-                {
-                    "type": "heading",
-                    "text": "Soundcheck-ul — inima pregătirii"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Soundcheck-ul nu este un moft tehnic, ci o necesitate artistică. Fiecare sală are o acustică proprie: unele sunt vii și rezonante, altele absorb sunetul. Ajustăm EQ-ul live, setăm monitoarele scenice și testăm fiecare canal în parte — voce, instrumente, coloane de sală."
-                },
-                {
-                    "type": "image",
-                    "src": "",
-                    "caption": "Scenă în pregătire — cabluri, console și lumini calibrate înainte de sosirea invitaților"
-                },
-                {
-                    "type": "heading",
-                    "text": "Coordonarea cu clientul în ziua nunții"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Discuția finală cu mirii sau organizatorul are loc cu o zi înainte. Stabilim ordinea momentelor, piesele speciale, semnalele tactice — când să înceapă hora, intrarea tortului, surprizele. O nuntă reușită este o coregrafie muzicală precisă."
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Iar când se aprind luminile și primii acorduri umplu sala — toată oboseala dispare. Aceasta este magia muzicii live."
-                },
-                {
-                    "type": "links",
-                    "items": [
-                        {
-                            "label": "Cere preț formație nuntă în București și Argeș",
-                            "href": "/contact/"
-                        },
-                        {
-                            "label": "Vezi muzică nuntă live în videoclipuri reale",
-                            "href": "/galerie-video/"
-                        }
-                    ]
-                }
-            ]
+          "type": "paragraph",
+          "text": "Mulți mă întreabă dacă mai am emoții înainte să cânt. Răspunsul este da, mereu. Dar emoția aceea nu este frică — este un fel de concentrare adâncă, aproape meditativă. Când atac primul acord al serii, tot zgomotul din cap dispare: griji, oboseală, gânduri, tot. Rămâne doar scena, formația din spatele meu și privirile mirilor care așteaptă prima lor horă. Este plăcerea pură de a cânta, cea care mă ține la acest meșteșug de când eram copil."
         },
         {
-            "slug": "radacini-lautaresti-in-romania",
-            "category": "\ud83c\udfb5 Jurnal FP Band",
-            "categoryAccent": "cyan",
-            "title": "Rădăcini lăutărești în România",
-            "excerpt": "De la orchestrele de petrecere ale Bucureștiului interbelic la festivaluri internaționale — o călătorie prin istoria muzicii lăutărești românești.",
-            "coverImage": "",
-            "coverEmoji": "🎻",
-            "readTime": "6 min",
-            "date": "2026-02-14",
-            "author": "Florentina Pană",
-            "content": [
-                {
-                    "type": "paragraph",
-                    "text": "Muzica lăutărească românească este una dintre cele mai bogate tradiții muzicale din Europa de Est. Termenul lăutar derivă din laută — instrumentul cu coarde care a definit sonoritatea balcanică vreme de secole."
-                },
-                {
-                    "type": "heading",
-                    "text": "Originile și influențele"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Lăutarii au fost, secole la rând, purtătorii memoriei muzicale orale a poporului român. Ei nu citeau note — ci transmiteau repertoriul din generație în generație, adăugând improvizații și ornamente specifice fiecărei regiuni: Muntenia, Moldova, Oltenia, Banat."
-                },
-                {
-                    "type": "heading",
-                    "text": "Epoca de aur — perioada interbelică"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Anii 1920–1940 sunt considerați apogeul muzicii de mahala și al orchestrelor de petrecere bucureștene. Cârciumi ca La Iordache din Calea Victoriei erau neîncăpătoare. Grigoraș Dinicu, Maria Tănase și Ion Vasilescu au dus sunetul românesc pe scene internaționale."
-                },
-                {
-                    "type": "image",
-                    "src": "",
-                    "caption": "Portret simbolic al tradițiilor muzicale românești transmise din generație în generație"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Astăzi, formații ca a noastră păstrează vie această tradiție, aducând-o în festivaluri, nunți și gale — fără a pierde autenticitatea care o face unică în lume."
-                },
-                {
-                    "type": "links",
-                    "items": [
-                        {
-                            "label": "Solicită ofertă pentru formație de nuntă",
-                            "href": "/contact/"
-                        },
-                        {
-                            "label": "Ascultă repertoriul live al formației",
-                            "href": "/galerie-video/"
-                        }
-                    ]
-                }
-            ]
+          "type": "paragraph",
+          "text": "Pe scenă cu mine sunt oameni pe care îi consider familie. Claudiu, Alexia, instrumentiștii, soliștii — fiecare aduce ceva propriu și, împreună, formăm un organism care respiră muzică live. Nu există negative, nu există playback, nu există „o să dăm o bază că suntem obosiți”. Fiecare notă este cântată în clipa aceea, pentru oamenii care sunt în fața noastră, în seara aceea, la evenimentul lor. Este singurul mod în care știm să lucrăm."
         },
         {
-            "slug": "diferente-intre-hore-sarbe-si-geamparale",
-            "category": "\ud83c\udfb5 Jurnal FP Band",
-            "categoryAccent": "cyan",
-            "title": "Diferențe între hore, sârbe și geamparale",
-            "excerpt": "Trei ritmuri esențiale ale muzicii românești — cum le recunoști, ce energie transmit și în ce momente ale serii le programăm.",
-            "coverImage": "",
-            "coverEmoji": "💃",
-            "readTime": "5 min",
-            "date": "2026-01-20",
-            "author": "Florentina Pană",
-            "content": [
-                {
-                    "type": "paragraph",
-                    "text": "Pentru un neinițiat, muzica populară de petrecere poate părea uniformă. Dar pentru un lăutar sau un dansator experimentat, diferența dintre o horă, o sârbă și o geamparaua este la fel de clară ca diferența dintre jazz și reggae."
-                },
-                {
-                    "type": "heading",
-                    "text": "Hora — ritmul colectiv"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Hora are un ritm binar, în măsură de 2/4, cu accentul pe primul timp. Este dansul colectiv prin excelență — un cerc care unește comunitatea. Tempourile sunt moderate, propice pentru a lua publicul pe ring treptat, fără a epuiza energia devreme."
-                },
-                {
-                    "type": "heading",
-                    "text": "Sârba — energia explozivă"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Spre deosebire de horă, sârba este mai rapidă și mai sincopată, în măsură de 7/8 sau 2/4 accelerat. Este piesa de rezistență — se joacă în mijlocul serii, când energia publicului este la maxim și invitații vor să demonstreze că știu să danseze."
-                },
-                {
-                    "type": "heading",
-                    "text": "Geamparaua — ritmul oriental"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Geamparaua are influențe clare din muzica turcă și arabă — ritmuri asimetrice de 8/8 sau 9/8, ornamente vocale complexe. Este piesa care surprinde și captivează, rezervată de obicei momentelor de showcase sau invitaților cu afinitate pentru muzica orientală."
-                },
-                {
-                    "type": "image",
-                    "src": "",
-                    "caption": "Dansatori în cerc la o horă tradițională românească"
-                },
-                {
-                    "type": "links",
-                    "items": [
-                        {
-                            "label": "Verifică prețuri formație nuntă și disponibilitatea",
-                            "href": "/contact/"
-                        },
-                        {
-                            "label": "Urmărește momente live de horă și sârbă",
-                            "href": "/galerie-video/"
-                        }
-                    ]
-                }
-            ]
+          "type": "image",
+          "src": "/images/galerie-foto-site/placerea-scenei-claudiu-florentina.jpg",
+          "caption": "Claudiu și cu mine în timpul unui duet — dialogul de priviri pe care publicul nu-l vede, dar îl simte în sunet."
         },
         {
-            "slug": "cum-alegi-repertoriul-potrivit-pe-momente",
-            "category": "\ud83d\udca1 Sfaturi pentru Miri",
-            "categoryAccent": "gold",
-            "title": "Cum alegi repertoriul potrivit pe momente",
-            "excerpt": "Ghid practic pentru miri și organizatori: ce muzică merge la intrare, la dansul mirilor, la hora mare și la finalul serii.",
-            "coverImage": "",
-            "coverEmoji": "🎵",
-            "readTime": "7 min",
-            "date": "2025-12-05",
-            "author": "Florentina Pană",
-            "content": [
-                {
-                    "type": "paragraph",
-                    "text": "Alegerea repertoriului pentru o nuntă nu este o simplă listă de piese preferate — este construcția unui arc dramatic de 6–8 ore, cu momente de emoție, energie, surpriză și reconciliere. Fiecare piesă are locul ei."
-                },
-                {
-                    "type": "heading",
-                    "text": "Intrarea mirilor și a nașilor"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Intrarea mirilor este momentul de maximă tensiune pozitivă. Recomandăm melodii recognoscibile, cu un intro instrumental clar: A Thousand Years (Christina Perri), Perfect (Ed Sheeran) sau, pentru o notă mai solemnă, un marș de nuntă clasic adaptat pentru formație live."
-                },
-                {
-                    "type": "heading",
-                    "text": "Dansul mirilor — cel mai important moment"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Dansul mirilor trebuie să fie piesa care li se potrivește lor — nu neapărat ce e la modă. Discutăm întotdeauna cu mirii pentru a găsi acea melodie care spune povestea lor. Durata ideală: 3–4 minute, cu posibilitate de surpriză muzicală la mijloc."
-                },
-                {
-                    "type": "heading",
-                    "text": "Hora mare și sârbele — energia serii"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Hora mare se plasează după cina principală, când toată lumea este sătulă, relaxată și pregătită să danseze. Construim treptat — 2–3 hore moderate, urmate de sârbe din ce în ce mai rapide, până când ringul e plin și energia e maximă."
-                },
-                {
-                    "type": "image",
-                    "src": "",
-                    "caption": "Momentul tortului — un reper muzical gândit pentru surprize și emoție"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Finalul serii este la fel de important ca debutul. Ultimele 30 de minute trebuie să fie un crescendo emoțional — melodii care aduc lacrimi, îmbrățișări și amintiri pentru totdeauna."
-                },
-                {
-                    "type": "links",
-                    "items": [
-                        {
-                            "label": "Primește ofertă personalizată pentru evenimentul tău",
-                            "href": "/contact/"
-                        },
-                        {
-                            "label": "Vezi exemple reale de muzică nuntă live",
-                            "href": "/galerie-video/"
-                        }
-                    ]
-                }
-            ]
+          "type": "heading",
+          "text": "De ce scena este locul meu cel mai natural"
         },
         {
-            "slug": "andreea-si-radu-povestea-lor",
-            "coupleSlug": "andreea-si-radu",
-            "category": "🏰 Locații de Poveste",
-            "categoryAccent": "rose",
-            "title": "Andreea & Radu — tradiție, eleganță și un ring de dans de neuitat",
-            "excerpt": "O nuntă de septembrie la Pitești care a combinat tradițiile românești cu eleganța modernă. Cum am construit împreună atmosfera perfectă pentru Andreea și Radu.",
-            "coverImage": "",
-            "coverEmoji": "💍",
-            "readTime": "4 min",
-            "date": "2025-09-20",
-            "author": "Florentina Pană",
-            "content": [
-                {
-                    "type": "paragraph",
-                    "text": "Când Andreea și Radu ne-au contactat prima dată, Andreea știa exact ce vrea: «Vreau să simtă toată lumea că e la o nuntă românească adevărată, dar cu un vibe modern». O cerință pe care o înțelegem perfect — echilibrul dintre tradiție și contemporan este specialitatea noastră."
-                },
-                {
-                    "type": "heading",
-                    "text": "O pregătire ca la carte"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Ne-am întâlnit de trei ori înainte de eveniment. Am ascultat lista lor de piese preferate, am discutat despre momente speciale — dansul mirilor, intrarea nașilor, surpriza pentru părinți. Radu era mai rezervat, dar la a treia întâlnire a insistat personal pe două piese din repertoriul popular oltenesc pe care le cântase bunicul lui."
-                },
-                {
-                    "type": "heading",
-                    "text": "Seara care a rămas în suflete"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Septembrie 2025, Pitești. Sala s-a umplut de emoție încă de la intrarea mirilor. Dansul mirilor pe piesa aleasă de ei a adus lacrimi la mai mulți invitați. Iar când am trecut la repertoriul popular, ringul s-a umplut instantaneu — bătrâni și tineri, toți împreună."
-                },
-                {
-                    "type": "image",
-                    "src": "",
-                    "caption": "Andreea & Radu — Pitești, Septembrie 2025"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "«A fost exact cum ne-am dorit: tradiție, eleganță și o atmosferă incredibilă pe ringul de dans.» — Andreea. Suntem recunoscători că am putut face parte din povestea lor."
-                },
-                {
-                    "type": "links",
-                    "items": [
-                        {
-                            "label": "Cere preț pentru formație de nuntă",
-                            "href": "/contact/"
-                        },
-                        {
-                            "label": "Descoperă videoclipuri live de la nunți reale",
-                            "href": "/galerie-video/"
-                        }
-                    ]
-                }
-            ]
+          "type": "paragraph",
+          "text": "Cineva îmi spunea, acum câțiva ani, că mă vede altfel pe scenă decât în viața de zi cu zi. „Acolo sus parcă ești mai tu”, mi-a zis. Am stat multă vreme să mă gândesc la observația asta. Și cred că are dreptate. Scena nu mă transformă într-o altă persoană — mă scoate, pur și simplu, la suprafață. Acolo nu mai există pudoarea de a-ți arăta bucuria, nu mai există filtrul social care te face să-ți moderezi reacțiile, nu mai există teama de ridicol. Rămâne doar muzica și, cu ea, versiunea cea mai sinceră a mea."
         },
         {
-            "slug": "bianca-si-mihai-povestea-lor",
-            "coupleSlug": "bianca-si-mihai",
-            "category": "🏰 Locații de Poveste",
-            "categoryAccent": "gold",
-            "title": "Bianca & Mihai — o noapte întreagă pe ringul de dans din Curtea de Argeș",
-            "excerpt": "Energia, profesionalismul și comunicarea perfectă — cum am transformat nunta Biancăi și a lui Mihai într-o petrecere pe care invitații n-o vor uita.",
-            "coverImage": "",
-            "coverEmoji": "💒",
-            "readTime": "4 min",
-            "date": "2025-07-15",
-            "author": "Florentina Pană",
-            "content": [
-                {
-                    "type": "paragraph",
-                    "text": "Bianca și Mihai aveau o singură cerință principală: «Vrem ca invitații noștri să danseze toată noaptea». Sună simplu, dar în spatele acestui obiectiv stă o muncă serioasă de construcție a energiei, de citire a publicului și de tranziții muzicale inteligente."
-                },
-                {
-                    "type": "heading",
-                    "text": "Comunicarea — cheia unui eveniment reușit"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Mihai este un om organizat — ne-a trimis un document cu 40 de piese preferate, împărțite pe momente ale serii. Exact felul de colaborare pe care îl apreciem. Am rafinat lista împreună, am adăugat câteva surprize și am construit un program care curgea natural de la emoție la energie pură."
-                },
-                {
-                    "type": "heading",
-                    "text": "Iulie fierbinte, dans și mai fierbinte"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Curtea de Argeș, iulie 2025. Sala era plină, căldura verii se simțea, dar nimeni nu s-a oprit din dansat. Am avut momente în care toți invitații erau pe ring simultan — una dintre cele mai frumoase priveliști pe care le-am văzut în cariera noastră."
-                },
-                {
-                    "type": "image",
-                    "src": "",
-                    "caption": "Bianca & Mihai — Curtea de Argeș, Iulie 2025"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "«Invitații au dansat toată noaptea. Formația a avut energie, profesionalism și comunicare perfectă.» — Bianca. Mulțumim pentru încredere și pentru că ne-ați lăsat să fim parte din cea mai frumoasă zi a voastră."
-                },
-                {
-                    "type": "links",
-                    "items": [
-                        {
-                            "label": "Solicită ofertă rapidă pentru data nunții",
-                            "href": "/contact/"
-                        },
-                        {
-                            "label": "Vezi atmosfera live din evenimentele noastre",
-                            "href": "/galerie-video/"
-                        }
-                    ]
-                }
-            ]
+          "type": "paragraph",
+          "text": "Plăcerea de a cânta nu vine din aplauze, deși aplauzele sunt frumoase. Vine din momentele în care vezi o bunică plângând pe o baladă veche, pentru că piesa aceea se cânta la nunta ei. Din clipa în care mirele își ia mireasa de mână la prima horă și uită complet că este filmat. Din privirea unui copil de șase ani care stă lipit de boxă, cu ochii mari, descoperind pentru prima oară în viața lui cum sună o tobă adevărată. Astea sunt răsplățile reale ale unui muzician live — nu banii, nu recunoașterea, ci emoția autentică pe care o produci în oameni reali."
         },
         {
-            "slug": "ioana-si-catalin-povestea-lor",
-            "coupleSlug": "ioana-si-catalin",
-            "category": "🏰 Locații de Poveste",
-            "categoryAccent": "teal",
-            "title": "Ioana & Cătălin — o atmosferă premium de la primul acord până la ultimul",
-            "excerpt": "O nuntă bucureșteană cu standarde ridicate și dorințe muzicale precise. Cum am ascultat, adaptat și livrat exact ce și-au dorit Ioana și Cătălin.",
-            "coverImage": "",
-            "coverEmoji": "✨",
-            "readTime": "5 min",
-            "date": "2025-06-08",
-            "author": "Florentina Pană",
-            "content": [
-                {
-                    "type": "paragraph",
-                    "text": "Ioana este muziciană — cântă pian de la 7 ani. Cătălin a crescut la concerte de muzică clasică. Când un astfel de cuplu te alege pentru nunta lor, simți deopotrivă onoarea și responsabilitatea. Standardele lor erau ridicate și ne-am bucurat de fiecare detaliu al pregătirilor."
-                },
-                {
-                    "type": "heading",
-                    "text": "Dorințe muzicale exacte, livrate cu precizie"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Ioana ne-a adus spre studiu 6 piese internaționale pe care voia să le audă live — nu cover-uri banale, ci aranjamente fidele originalelor. Am repetat timp de două săptămâni. La soundcheck, când a auzit prima piesă, a plâns de fericire. Acela a fost momentul în care am știut că seara va fi perfectă."
-                },
-                {
-                    "type": "heading",
-                    "text": "București, iunie 2025 — eleganță și emoție"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Sala era amenajată impecabil, florile albe și lumânările creau o atmosferă de poveste. Muzica noastră a completat decorul — delicată la momente intime, puternică la momente de petrecere. Am simțit în fiecare moment că publicul era cu noi."
-                },
-                {
-                    "type": "image",
-                    "src": "",
-                    "caption": "Ioana & Cătălin — București, Iunie 2025"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "«Ne-au ascultat toate dorințele muzicale și au creat o atmosferă premium de la început până la final.» — Ioana. Acestea sunt cuvintele care ne motivează să creștem în fiecare zi."
-                },
-                {
-                    "type": "links",
-                    "items": [
-                        {
-                            "label": "Verifică disponibilitatea și prețul formației",
-                            "href": "/contact/"
-                        },
-                        {
-                            "label": "Ascultă muzica noastră live în videoclipuri",
-                            "href": "/galerie-video/"
-                        }
-                    ]
-                }
-            ]
+          "type": "image",
+          "src": "/images/galerie-foto-site/placerea-scenei-claudiu-florentina.jpg",
+          "caption": "Cu Alexia, în pauza dintre două momente — cele mai frumoase râsete se întâmplă când microfoanele sunt închise."
         },
         {
-            "slug": "alina-si-stefan-povestea-lor",
-            "coupleSlug": "alina-si-stefan",
-            "category": "🏰 Locații de Poveste",
-            "categoryAccent": "rose",
-            "title": "Alina & Ștefan — cum ridicăm o sală în picioare la Brașov",
-            "excerpt": "Nota 10 de la o nuntă brașoveană cu invitați pretențioși și așteptări mari. Energia, surprizele și amintirile de neuitat din mai 2025.",
-            "coverImage": "",
-            "coverEmoji": "🌟",
-            "readTime": "4 min",
-            "date": "2025-05-17",
-            "author": "Florentina Pană",
-            "content": [
-                {
-                    "type": "paragraph",
-                    "text": "Ștefan ne-a sunat cu 8 luni înainte de nuntă. «Am văzut cum ați cântat la nunta unui prieten și am știut pe loc că voi sunteți formația noastră.» Această încredere acordată din prima clipă ne-a responsabilizat în cel mai frumos mod."
-                },
-                {
-                    "type": "heading",
-                    "text": "Brașov — un public special"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Brașovenii sunt cunoscuți ca un public exigent — apreciază calitatea, sesizează detaliile și nu se ridică ușor de pe scaune. Tocmai de aceea am pregătit cu grijă fiecare tranziție, fiecare moment de surpriză, fiecare aranjament."
-                },
-                {
-                    "type": "heading",
-                    "text": "Surpriza care a spart gheața"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "La cererea Alinei, am pregătit în secret o medley a 5 piese preferate ale grupului lor de prieteni — pe care nimeni, nici Ștefan, nu o știa. Când am intonat primul acord, reacția sălii a fost electrizantă. Pe scenă simțeai cum energia crește, val după val, până când toată sala era în picioare."
-                },
-                {
-                    "type": "image",
-                    "src": "",
-                    "caption": "Alina & Ștefan — Brașov, Mai 2025"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "«O echipă de nota 10! Au ridicat sala în picioare și au făcut din seara noastră o amintire de neuitat.» — Alina & Ștefan. Notele de 10 se câștigă pe scenă, nu se promit în oferte. Suntem mândri că am meritat-o."
-                },
-                {
-                    "type": "links",
-                    "items": [
-                        {
-                            "label": "Solicită preț formație nuntă București & Argeș",
-                            "href": "/contact/"
-                        },
-                        {
-                            "label": "Vezi momente reale cu ringul de dans plin",
-                            "href": "/galerie-video/"
-                        }
-                    ]
-                }
-            ]
+          "type": "heading",
+          "text": "Ritualul dinaintea fiecărui eveniment"
         },
         {
-            "slug": "cristina-si-manu-povestea-noastra",
-            "category": "💍 Povești Reale",
-            "categoryAccent": "rose",
-            "title": "Cristina și Manu — Povestea noastră",
-            "excerpt": "De pe băncile școlii, direct în fața altarului.",
-            "coverImage": "/Blog/Cristina%20si%20manu.png",
-            "coverEmoji": "💞",
-            "readTime": "6 min",
-            "date": "2026-07-25",
-            "author": "Florentina Pană",
-            "content": [
-                {
-                    "type": "paragraph",
-                    "text": "De pe băncile școlii, direct în fața altarului"
-                },
-                {
-                    "type": "heading",
-                    "text": "🚌 Începutul: Fluturi în stomac și complici neașteptați"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Totul a început în anii de școală, pe vremea când Manu era în clasa a VIII-a, iar Cristina în clasa a VII-a. Acolo s-au remarcat pentru prima dată, însă destinul a avut nevoie de un mic complice: microbuzul școlar. Zi de zi, dimineața și după-amiaza, drumurile lor se intersectau sub privirile amuzate ale șoferului de atunci—cel care, printr-o întorsătură frumoasă a vieții, astăzi le este naș și care făcea mereu glume pe seama sentimentelor lor născânde."
-                },
-                {
-                    "type": "heading",
-                    "text": "🏫 Alarma de la profesori și marea ședință cu părinții"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Cum era de așteptat în anii adolescenței, fiorii primei iubiri nu au putut rămâne secreți pentru mult timp. Profesorii au intrat rapid pe fir, au dat „alarma” și au sunat imediat părinții lui „ginerică” pentru a le expune situația."
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Urmarea? O ședință cu părinții de neuitat! În timpul acelei ședințe, o colegă de clasă a ajutat-o pe Cristina să o descopere cu privirea pe viitoarea ei soacră. Totuși, cunoștința adevărată, oficială și de suflet s-a petrecut puțin mai târziu, într-un cadru cald de familie, chiar acasă la socrii săi."
-                },
-                {
-                    "type": "heading",
-                    "text": "📱 „Cine este, iubirea mea?” și prima întâlnire cu soacra"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Relația a ieșit la iveală acasă într-un mod de-a dreptul comic. Din cauza unui telefon blocat, Cristina a mers la mama ei să ceară ajutor. Exact în acel moment, Manu a sunat, iar pe ecran a apărut întrebarea care a dat totul în vileag. Cristina a avut curajul să recunoască: „Mamă, mi-am făcut o relație!”"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Prima întâlnire romantică de „afară” a venit la pachet cu o surpriză: mama Cristinei a fost de acord, însă cu o singură condiție... să meargă și ea! Astfel, prima lor întâlnire oficială a fost una în trei, mama venind special pentru a „discuta” cu viitorul ginere."
-                },
-                {
-                    "type": "heading",
-                    "text": "🚲 Tabloul roșu, plimbările cu bicicleta și testul devotamentului"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Amintirile lor de vară sunt pline de culoare. După o vacanță la mare, Cristina s-a întors și l-a găsit pe Manu așteptând-o pe bordura din fața bisericii, strângând la piept un tablou roșu cu o fotografie de-a lor."
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Ușor, ușor, au devenit de nedespărțit. Verile însemnau plimbări cu bicicleta, Cristina stând fără nicio grijă pe cadru în timp ce Manu pedala mândru. Însă viața i-a pus și la încercări: când Manu și-a rupt piciorul într-un accident cu motocultorul, Cristina i-a dovedit ce înseamnă dragostea adevărată. Chiar dacă el nu se putea mișca, ea mergea pe jos în fiecare zi la magazin ca să-i cumpere ce avea nevoie, doar pentru a petrece timp împreună și a-l îngriji."
-                },
-                {
-                    "type": "heading",
-                    "text": "🤍 Oameni dragi care le-au ghidat pașii"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "În drumul lor de 5 ani, doi oameni deosebiți au lăsat amprente adânci în inimile lor:"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Unchiul Marian: Unchiul lui Manu, care le-a fost extrem de apropiat. A fost șoferul lor de suflet în nenumărate călătorii și un sprijin de nădejde căruia îi mulțumesc din suflet că le este în continuare aproape."
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Unchiul Costel: Un om drag care astăzi veghează de sus, printre îngeri. Cristina și Manu i-au fost alături cu devotament în momentele grele de boală. El a fost cel care s-a îngrijit mereu de binele lor și de locul lor de muncă (al Cristinei și al Monei). Deși fizic lipsește de la nunta nepotului său, spiritul lui este cu siguranță prezent, împlinindu-și dorința de a-i vedea fericiți."
-                },
-                {
-                    "type": "heading",
-                    "text": "💍 5 Ani de Iubire Necondiționată: „Te iubesc, dragul meu soț!”"
-                },
-                {
-                    "type": "paragraph",
-                    "text": "Cu bune și cu rele, cu mici certuri trecătoare, dar cu o loialitate de nezdruncinat, Cristina și Manu au împlinit 5 ani de relație. Au fost mereu acolo unul pentru celălalt, fără să se despartă vreodată. Manu a fost stânca Cristinei—omul care a sprijinit-o în orice moment și nu a lăsat-o niciodată la greu."
-                },
-                {
-                    "type": "paragraph",
-                    "text": "„Te iubesc foarte mult și am să fiu lângă tine în orice situație a vieții. Nu am să te las niciodată, dragul meu soț!” – Cristina"
-                }
-            ]
+          "type": "paragraph",
+          "text": "Ca orice artist care-și face treaba cu respect, am un ritual înainte de fiecare nuntă sau eveniment. Ajung la sală cu cel puțin trei ore înainte de primul invitat. Facem soundcheck-ul împreună cu băieții, calibrăm sonorizarea pentru spațiul respectiv, verificăm fiecare microfon, fiecare monitor, fiecare cablu. Apoi, cu jumătate de oră înainte, mă retrag în cabină. Beau un ceai cald, îmi încălzesc vocea cu exercițiile pe care le fac de douăzeci de ani, citesc încă o dată lista cu momentele speciale ale mirilor — piesa de intrare, dansul lor, melodia dedicată mamei sau a bunicii."
+        },
+        {
+          "type": "paragraph",
+          "text": "Respectul față de scenă începe cu pregătirea. Nu există „improvizăm acolo”, nu există „vedem noi ce iese”. Fiecare seară este unică pentru cuplul care ne-a angajat — este ziua cea mai importantă din viața lor — iar eu tratez fiecare eveniment ca și cum ar fi singurul din acel an. Asta, cred eu, este diferența dintre o formație care cântă și o formație care celebrează."
+        },
+        {
+          "type": "image",
+          "src": "/images/galerie-foto-site/placerea-scenei-claudiu-florentina.jpg",
+          "caption": "Moment live cu energie ridicată — formația și publicul în același vibe, pe ringul de dans."
+        },
+        {
+          "type": "heading",
+          "text": "Scena ne-a învățat ce nu poți învăța din manuale"
+        },
+        {
+          "type": "paragraph",
+          "text": "Anii petrecuți pe scenă mi-au dat lecții pe care nicio școală de muzică nu le predă. Am învățat să citesc o sală din primele zece minute — care masă vrea ritm, care masă vrea balade, unde stau bunicii care așteaptă hora bătrânească, unde stau tinerii care cer „ceva de pus în story”. Am învățat că tăcerea este, uneori, mai puternică decât sunetul: o pauză bine plasată, o respirație între două versuri, un moment în care lași sala să simtă, nu doar să audă. Am învățat că muzica live nu este o competiție de virtuozitate — este o conversație cu oamenii din fața ta."
+        },
+        {
+          "type": "paragraph",
+          "text": "Și, poate cel mai important, am învățat că plăcerea de a cânta nu este o resursă care se consumă, ci una care se multiplică. Cu cât cânt mai mult, cu atât îmi place mai mult. Cu cât urc mai des pe scenă, cu atât scena devine mai prietenoasă. Este unul dintre puținele lucruri din viață care răsplătește, fără excepție, fiecare efort făcut pentru el."
+        },
+        {
+          "type": "image",
+          "src": "/images/galerie-foto-site/placerea-scenei-claudiu-florentina.jpg",
+          "caption": "Final de seară — ultima piesă, luminile încă aprinse, sala care nu vrea să se oprească. Momentul pentru care facem tot ceea ce facem."
+        },
+        {
+          "type": "heading",
+          "text": "De ce muzica live nu poate fi înlocuită"
+        },
+        {
+          "type": "paragraph",
+          "text": "Trăim într-o eră în care orice se poate replica digital. Se poate pune un playback perfect, un DJ poate mixa orice combinație de piese, inteligența artificială poate compune linii melodice în câteva secunde. Și totuși, nimic din toate astea nu poate înlocui senzația unui solo de vioară cântat live la trei metri de tine, sau vibrația vocii care nu trece prin niciun filtru, sau tensiunea dintr-o formație care, chiar în clipa aia, decide împreună să prelungească un refren pentru că sala o cere. Muzica live este ultima formă de sărbătoare autentică. Și, atâta timp cât mai există oameni care vor să-și celebreze momentele importante cu adevăr, va exista plăcerea de a cânta pe scenă."
+        },
+        {
+          "type": "paragraph",
+          "text": "Dacă pregătești o nuntă, un botez sau un eveniment privat și vrei să ai în seara aceea o formație care iubește, cu adevărat, ceea ce face, suntem aici. Nu vindem doar muzică — vindem plăcerea de a fi pe scenă, pentru tine, în ziua ta."
+        },
+        {
+          "type": "cta",
+          "variant": "whatsapp",
+          "label": "Vrei muzică live cu suflet la evenimentul tău?",
+          "text": "Scrie-ne pe WhatsApp data și locația — îți răspundem personal, fără formulare, fără roboți. Așa cum ne place nouă să lucrăm: direct, cald, de la om la om.",
+          "ctaText": "Verifică disponibilitatea",
+          "ctaHref": "https://wa.me/40767369658?text=Bun%C4%83%20ziua!%20A%C8%99%20dori%20s%C4%83%20verific%20disponibilitatea%20forma%C8%9Biei%20Florentina%20Pan%C4%83%20pentru%20evenimentul%20meu.",
+          "ctaSecondaryText": "Vezi oferta completă",
+          "ctaSecondaryHref": "/contact/"
+        },
+        {
+          "type": "links",
+          "items": [
+            {
+              "label": "Preț formație nuntă București & Argeș",
+              "href": "/contact/"
+            },
+            {
+              "label": "Muzică nuntă live: videoclipuri reale",
+              "href": "/galerie-video/"
+            }
+          ]
         }
-    ]
+      ],
+      "faq": [
+        {
+          "q": "Cântați 100% live sau folosiți și negative?",
+          "a": "Cântăm exclusiv live, fără playback și fără baze preînregistrate. Fiecare voce, fiecare instrument, fiecare acord se întâmplă în clipa aceea, pe scenă, în fața invitaților tăi. Este o alegere pe care o facem de principiu și care se regăsește explicit în contract."
+        },
+        {
+          "q": "Cum vă pregătiți pentru fiecare eveniment?",
+          "a": "Ajungem la sală cu minimum trei ore înainte, facem soundcheck complet, calibrăm sonorizarea pentru acustica spațiului respectiv și studiem în detaliu lista de momente speciale ale mirilor — piesa de intrare, dansul mirilor, dedicațiile. Fiecare eveniment este tratat ca unicat, nu ca parte dintr-o serie."
+        },
+        {
+          "q": "Ce zone acoperiți pentru evenimente live?",
+          "a": "Cântăm în principal în Argeș (Pitești, Curtea de Argeș, Câmpulung, Mioveni), dar ne deplasăm și în București, Dâmbovița, Vâlcea și Olt. Pentru distanțe mai mari, detaliile de transport se discută la semnarea contractului."
+        },
+        {
+          "q": "Pot să vă aud cântând live înainte să vă rezerv?",
+          "a": "Da. Pe canalul nostru de YouTube și în galeria video a site-ului ai zeci de înregistrări live, filmate la evenimente reale, fără montaj și fără corecții în studio. Ce auzi acolo este exact ceea ce vei auzi și la evenimentul tău."
+        }
+      ]
+    },
+    {
+      "slug": "formatie-nunta-orhideea-events-pitesti",
+      "category": "🏰 Locații de Poveste",
+      "categoryAccent": "gold",
+      "title": "Formație Nuntă la Orhideea Events Pitești: Ghid Complet",
+      "excerpt": "Cum sună o nuntă live la Orhideea Events Pitești — acustică, setup-ul ideal al formației, sfaturi practice pentru miri și ce trebuie cerut explicit în contract pentru o seară fără compromisuri.",
+      "coverImage": "",
+      "coverEmoji": "🌸",
+      "readTime": "7 min",
+      "date": "2026-04-23",
+      "author": "Florentina Pană",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "Dacă ai început să cauți o locație pentru nunta ta în Argeș, numele Orhideea Events Pitești apare, aproape sigur, în primele trei variante. Restaurantul este una dintre cele mai căutate săli din zonă: decor elegant, capacitate generoasă, acces rapid din centrul Piteștiului și o echipă care știe exact cum se derulează un eveniment lung de 8-10 ore. Pentru noi, Formația Florentina Pană, Orhideea este de ani buni un „acasă” muzical — am cântat aici la zeci de nunți, botezuri și petreceri private, iar în acest ghid îți spun, sincer, ce trebuie să știi înainte să semnezi contractul pentru o nuntă Orhideea Pitești."
+        },
+        {
+          "type": "paragraph",
+          "text": "Nu este un articol de vânzare. Este ghidul pe care l-aș da unei verișoare care m-ar întreba „ce să cer la Orhideea ca să iasă perfect?”. Vorbim despre acustică, despre unde se așază bine scena, despre ce clauze contează cu adevărat pentru muzica ta live și despre mici detalii practice pe care majoritatea formațiilor nu le menționează la prima discuție."
+        },
+        {
+          "type": "heading",
+          "text": "De ce Orhideea Events este o locație iubită de formațiile live"
+        },
+        {
+          "type": "paragraph",
+          "text": "Orhideea Events Pitești are trei calități pe care muzicienii le simt imediat ce intră în sală. Prima este înălțimea plafonului — suficient de generoasă încât sunetul să se dispersioneze uniform, fără acea senzație de „compresie” pe care o ai în sălile joase, unde basul lovește în tavan și revine neplăcut în urechile invitaților. A doua este forma sălii: un spațiu regulat, fără colțuri oarbe masive, ceea ce înseamnă că nicio masă nu rămâne „în zona moartă” a sunetului. A treia este scena dedicată, dimensionată corect pentru o formație completă de 5-6 artiști live plus echipamentul aferent, fără să ne obligăm să improvizăm."
+        },
+        {
+          "type": "paragraph",
+          "text": "În termeni practici, asta înseamnă că o formație nuntă Orhideea Events nu are nevoie de trucuri electronice ca să sune bine. Muzica rămâne caldă și plină la toate mesele, de la cea a mirilor până la cea din fundul sălii. Este genul de detaliu pe care invitații nu îl observă conștient, dar care face diferența dintre „a fost o nuntă frumoasă” și „n-o să uit niciodată nunta lor”."
+        },
+        {
+          "type": "image",
+          "src": "",
+          "caption": "Orhideea Events Pitești — una dintre locațiile de top pentru nunți în Argeș, cu o scenă generoasă perfectă pentru formație live completă."
+        },
+        {
+          "type": "heading",
+          "text": "Cum setăm sonorizarea pentru acustica de la Orhideea"
+        },
+        {
+          "type": "paragraph",
+          "text": "Fiecare sală are „personalitatea” ei acustică, iar Orhideea nu face excepție. Pe baza zecilor de evenimente pe care le-am făcut aici, am ajuns la un protocol de setup pe care îl aplicăm de fiecare dată. Aducem sonorizare line-array proprie — nu folosim niciodată echipamentul „de casă” al locațiilor — și calibrăm sistemul astfel încât presiunea sonoră la nivelul meselor din centrul sălii să fie între 88 și 92 dB pe coloanele forte, suficient de prezent pentru atmosferă dar fără să forțeze invitații să strige ca să se audă."
+        },
+        {
+          "type": "paragraph",
+          "text": "Pe plan tehnic, reducem basul cu 2-3 dB față de setarea standard, pentru că înălțimea sălii „umflă” natural frecvențele joase. Monitoarele in-ear ale muzicienilor sunt setate independent pentru fiecare artist, iar microfoanele de voce sunt Shure Beta — dinamice, rezistente la larsen și cu o claritate excelentă pe vocile feminine, care sunt esențiale în repertoriul nostru. Tot setup-ul este gata în 90-120 de minute de la sosire, cu soundcheck complet înainte de primul invitat."
+        },
+        {
+          "type": "heading",
+          "text": "Programul ideal al serii la o nuntă la Orhideea Pitești"
+        },
+        {
+          "type": "paragraph",
+          "text": "Nu există un singur program „corect” pentru o nuntă Orhideea Pitești, dar există o logică pe care o respectăm noi și care funcționează aproape de fiecare dată. Momentul de sosire al invitaților se acoperă cu muzică live de fundal (acoustic + chitară + voce), la 75-80 dB — conversațiile curg, nimeni nu trebuie să strige. Intrarea mirilor este punctul cel mai emoțional al serii și îl pregătim cu mirii din vreme: le ascultăm piesa preferată, o aranjăm pentru formație și o repetăm. Prima horă se dă după primul fel, când sala este caldă; hora mare vine în a doua jumătate, după tort, când energia este la vârf. Încheiem seara treptat, nu brusc — cu 30 de minute de ballad și ritmuri lente, ca invitații să plece cu „încă o piesă, una singură” în cap, nu cu oboseală."
+        },
+        {
+          "type": "cta",
+          "variant": "whatsapp",
+          "label": "Verifică disponibilitatea la Orhideea",
+          "text": "Ai deja rezervată sala la Orhideea Events? Trimite-ne data pe WhatsApp și îți confirmăm în aceeași zi dacă este liberă în calendarul nostru.",
+          "ctaText": "Verifică disponibilitatea pentru 2026",
+          "ctaHref": "https://wa.me/40767369658?text=Bun%C4%83%20ziua!%20Am%20rezervat%20Orhideea%20Events%20Pite%C8%99ti%20%C8%99i%20a%C8%99%20dori%20s%C4%83%20verific%20disponibilitatea%20forma%C8%9Biei%20Florentina%20Pan%C4%83%20pentru%20data%20evenimentului%20meu.",
+          "ctaSecondaryText": "Solicită ofertă scrisă",
+          "ctaSecondaryHref": "/contact/"
+        },
+        {
+          "type": "heading",
+          "text": "Ce să ceri explicit în contractul cu formația"
+        },
+        {
+          "type": "paragraph",
+          "text": "Indiferent dacă ne alegi pe noi sau pe altă formație nuntă Pitești, există trei clauze care merită să fie negru pe alb în contract atunci când cânți la Orhideea Events. Una: sonorizarea este adusă de formație și calibrată pentru sala respectivă — fără „închiriem noi la fața locului” și fără amestec de echipamente. Două: componența formației este exactă în contract (câți soliști, câți instrumentiști, ce instrumente live) — la prețuri mici, pe ultima sută de metri, dispar discret unul-doi muzicieni. Trei: clauză de backup pentru echipament — un microfon care se strică sau o consolă care pică nu trebuie să oprească seara ta, iar formația trebuie să aibă echipament dublat."
+        },
+        {
+          "type": "paragraph",
+          "text": "În contractul nostru pentru nunți la Orhideea Events Pitești 2026-2027, toate cele trei clauze sunt standard, scrise explicit, fără note de subsol. Adăugăm și prețul final fix, fără costuri ascunse pentru kilometraj sau ore suplimentare negociate în ultima clipă. Transparență totală, pentru că nunta se întâmplă o singură dată — vrem să dormi liniștit între momentul semnării și ziua evenimentului."
+        },
+        {
+          "type": "heading",
+          "text": "Sfaturi practice pentru mirii care aleg Orhideea"
+        },
+        {
+          "type": "paragraph",
+          "text": "Patru lucruri pe care le-am învățat după multe evenimente aici și pe care rareori le găsești într-un articol generic despre locații de nuntă Argeș. Primul: rezervă soundcheck-ul cu cel puțin 2 ore înainte de sosirea invitaților — Orhideea este un restaurant activ, iar montajul în grabă nu lasă timpul necesar calibrării. Al doilea: discută dinainte cu managerul sălii poziționarea exactă a scenei și a ringului de dans — mică rearanjare poate îmbunătăți spectaculos experiența sonoră. Al treilea: alege o formație care a mai cântat aici — diferența dintre un setup „pe nevăzute” și unul deja cunoscut se aude. Al patrulea: nu lăsa programul de muzică la nimereală — 30 de minute petrecute cu formația, cu două săptămâni înainte, transformă seara."
+        },
+        {
+          "type": "heading",
+          "text": "De ce ne aleg cuplurile care se căsătoresc la Orhideea"
+        },
+        {
+          "type": "paragraph",
+          "text": "Nu este despre noi. Este despre liniștea mirilor. Cuplurile care ne aleg ca formație nuntă Orhideea Events Pitești au trei lucruri în comun: vor un răspuns clar la toate întrebările tehnice, vor un contract care să nu ascundă surprize, și vor o echipă care cunoaște locația suficient de bine încât să nu „învețe pe banii lor” în ziua nunții. Asta oferim — plus 100% live, zero playback, zero compromisuri pe calitatea sunetului. Orhideea este o sală care merită o coloană sonoră la înălțime, iar noi suntem gata să o livrăm, weekend după weekend, cu aceeași seriozitate ca la primul nostru eveniment."
+        },
+        {
+          "type": "cta",
+          "variant": "whatsapp",
+          "label": "Rezervare rapidă Orhideea",
+          "text": "Blocăm împreună data ta la Orhideea Events Pitești — răspundem în câteva minute pe WhatsApp, cu tariful Early Booking exact pentru ziua evenimentului tău.",
+          "ctaText": "Verifică disponibilitatea pentru 2026",
+          "ctaHref": "https://wa.me/40767369658?text=Bun%C4%83%20ziua!%20A%C8%99%20dori%20o%20ofert%C4%84%20pentru%20forma%C8%9Bia%20Florentina%20Pan%C4%83%20la%20Orhideea%20Events%20Pite%C8%99ti.",
+          "ctaSecondaryText": "Vezi galeria live",
+          "ctaSecondaryHref": "/galerie-video/"
+        },
+        {
+          "type": "links",
+          "items": [
+            {
+              "label": "Solicită ofertă și preț pentru formație nuntă",
+              "href": "/contact/"
+            },
+            {
+              "label": "Vezi toate clipurile live de la evenimente",
+              "href": "/galerie-video/"
+            }
+          ]
+        }
+      ],
+      "faq": [
+        {
+          "q": "Cântați frecvent la Orhideea Events Pitești?",
+          "a": "Da, Orhideea Events este una dintre locațiile unde Formația Florentina Pană cântă constant, de mai mulți ani. Cunoaștem în detaliu acustica sălii, poziționarea optimă a scenei și protocolul echipei locale, ceea ce ne permite să livrăm o experiență sonoră calibrată perfect pentru acest spațiu, fără „ajustări pe parcurs” în ziua evenimentului tău."
+        },
+        {
+          "q": "Aduceți sonorizare proprie sau folosiți cea a locației?",
+          "a": "Aducem întotdeauna sonorizarea noastră proprie — un sistem line-array profesional, mixer digital, microfoane Shure Beta și monitoare in-ear. Nu folosim niciodată echipamentul „de casă” al locațiilor, pentru că fiecare sală are nevoie de o calibrare specifică, iar calitatea sunetului nu poate fi lăsată la întâmplare. Această clauză este inclusă explicit în contract."
+        },
+        {
+          "q": "Câți muzicieni live aduceți pentru o nuntă la Orhideea?",
+          "a": "Formația completă pentru un eveniment standard la Orhideea Events Pitești include 5-6 artiști live: 2-3 soliști vocali (inclusiv Florentina Pană) plus instrumentiști pe clape, percuție, chitară și, opțional, saxofon. Componența exactă este stipulată în contract, fără reduceri de ultim moment."
+        },
+        {
+          "q": "Cât durează montajul și soundcheck-ul la Orhideea?",
+          "a": "Ajungem cu minim 2 ore înainte de sosirea invitaților. Montajul complet al sonorizării și instrumentelor durează aproximativ 90-120 de minute, iar soundcheck-ul integral — testarea fiecărui canal, a monitoarelor și a echilibrului în sală — ocupă ultimele 20-30 de minute. La momentul primei intrări a invitaților, totul este gata și calibrat."
+        },
+        {
+          "q": "Cântați 100% live sau folosiți și negative?",
+          "a": "Cântăm 100% live, fără niciun fel de playback sau negative. Fiecare instrument și fiecare voce sunt amplificate individual în timp real, prin mixer digital profesional. Această garanție este explicit în contract și se aplică inclusiv la horele și sârbele pentru care alte formații folosesc baze preînregistrate."
+        },
+        {
+          "q": "Cum blochez data evenimentului meu la Orhideea?",
+          "a": "Procesul durează sub 48 de ore. Ne scrii pe WhatsApp cu data și locația (Orhideea Events Pitești), verificăm pe loc disponibilitatea, îți trimitem oferta personalizată cu tariful Early Booking exact, iar contractul se semnează digital. Din momentul semnării, data este blocată și tariful rămâne fix până la eveniment."
+        }
+      ]
+    },
+    {
+      "slug": "pret-formatie-nunta-2026",
+      "category": "💎 Ghid Rezervare",
+      "categoryAccent": "gold",
+      "title": "Preț Formație Nuntă 2026-2027: Calitate vs. Buget în Argeș",
+      "excerpt": "Ghid sincer despre cât costă o formație nuntă Pitești în 2026-2027, de ce prețul prea mic ascunde riscuri la eveniment și cum profiți de ofertele Early Booking blocate acum pentru Argeș.",
+      "coverImage": "",
+      "coverEmoji": "💎",
+      "readTime": "9 min",
+      "date": "2026-04-22",
+      "author": "Florentina Pană",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "Orice mireasă care începe să caute o formație nuntă Pitești ajunge, în prima săptămână, la aceeași întrebare: „bine, dar care este prețul corect?”. Pe grupurile de Facebook vezi oferte de la 800 € până la peste 4000 €, iar diferența dintre ele pare imposibil de explicat. Acest articol este scris exact pentru tine, cea sau cel care vrea un răspuns sincer — fără vânzare agresivă, fără promisiuni goale."
+        },
+        {
+          "type": "paragraph",
+          "text": "Suntem Formația Florentina Pană, cântăm live de peste 15 ani în Argeș, București, Ilfov și împrejurimi, iar în 2026 am decis să deschidem calendarul pentru rezervările din 2026 și 2027 cu prețuri promoționale (Early Booking) care sunt, realist, cu 15-20% sub tarifele de sezon. Înainte să îți spun ce ai de câștigat, îți explic de ce un preț formație nuntă 2026 prea mic este, aproape întotdeauna, cea mai scumpă decizie pe care o iei."
+        },
+        {
+          "type": "heading",
+          "text": "De ce „prea ieftin” înseamnă, de fapt, risc la eveniment"
+        },
+        {
+          "type": "paragraph",
+          "text": "O formație profesionistă nu plătește doar muzicienii. Plătește echipamentul de sonorizare (boxele, subbass-urile, consolele digitale, microfoanele dinamice de scenă), transportul, asigurările, costurile cu SABC și, cel mai important, miile de ore de repetiții care fac diferența între „e ok” și „a fost nunta vieții lor”. Când cineva îți oferă o formație nuntă Argeș sub 1000 €, una dintre aceste piese lipsește. Întrebarea nu este dacă — ci care."
+        },
+        {
+          "type": "paragraph",
+          "text": "Ce am văzut, cu ochii noștri, la nunți unde colegi de scenă au fost chemați să „salveze evenimentul” în ultima clipă: boxe de 15 ani împrumutate de la un unchi, care distorsionează peste 85 dB; microfoane wireless fără redundanță care se oprec la primul dans; „formație live” care înseamnă de fapt un solist cu negative pe telefon, fără toba live. Niciunul dintre aceste compromisuri nu se vede în contract. Se aud în sală. Iar invitații le țin minte."
+        },
+        {
+          "type": "heading",
+          "text": "Ce plătești, de fapt, când alegi o formație premium"
+        },
+        {
+          "type": "paragraph",
+          "text": "Prețul corect pentru muzică evenimente Argeș are trei straturi pe care puțini furnizori le explică transparent. Primul strat, cel vizibil, este ora de cântat. Al doilea este echipamentul: o sonorizare line-array profesională de 8-10 kW, mixer digital Midas sau Allen&Heath, microfoane Shure Beta pentru voce, monitoare in-ear, sistem de backup complet. Al treilea strat, cel mai subtil, este experiența: capacitatea de a citi sala în primele 20 de minute, de a schimba pe loc programul când bunica mirelui cere „Ciobănașul” între două piese internaționale, de a susține atmosfera 6-8 ore fără ca energia să scadă."
+        },
+        {
+          "type": "paragraph",
+          "text": "O formație nuntă Pitești care face toate aceste trei lucruri are un cost operațional real per eveniment. Când vezi un preț mult sub pragul pieței, acela nu este „o ofertă bună” — este o sumă care nu acoperă costurile și, deci, se vor tăia colțuri undeva. De obicei la echipament și la numărul de muzicieni live."
+        },
+        {
+          "type": "image",
+          "src": "",
+          "caption": "Setup-ul complet line-array pe care Formația Florentina Pană îl aduce la fiecare eveniment din Argeș, Pitești și zonele limitrofe."
+        },
+        {
+          "type": "heading",
+          "text": "Oferta Early Booking 2027 — de ce acum este momentul"
+        },
+        {
+          "type": "paragraph",
+          "text": "În calendarul nostru, weekendurile din mai-septembrie 2027 se rezervă cu 10-14 luni înainte. Cine semnează acum, în primăvara 2026, pentru o dată din 2027, are acces la preț formație nuntă 2027 blocat la nivelul sezonului 2026 — deși costurile noastre reale vor crește. Facem această concesie pentru un singur motiv pragmatic: preferăm un calendar plin semnat din timp decât să umblăm după rezervări în ultimele luni. Tu câștigi liniște, noi câștigăm predictibilitate."
+        },
+        {
+          "type": "paragraph",
+          "text": "Ce primești la formatie nunta preturi Early Booking 2027: tariful promoțional blocat contractual, aceeași echipă de 5-6 artiști live (fără reduceri la nr. muzicieni), aceeași sonorizare premium, aceleași garanții scrise. Ce nu se negociază niciodată, indiferent de tarif: calitatea. Cântăm 100% live (zero playback), sonorizarea este adusă mereu de noi (nu se închiriază la locație), iar în contract primești clauză explicită privind backup-ul de echipament."
+        },
+        {
+          "type": "cta",
+          "variant": "whatsapp",
+          "label": "Early Booking 2027",
+          "text": "Vezi pe loc dacă data ta este încă liberă în calendar — răspundem în câteva minute pe WhatsApp.",
+          "ctaText": "Verifică disponibilitatea pentru 2027",
+          "ctaHref": "https://wa.me/40767369658?text=Bun%C4%83%20ziua!%20V%C4%83%20contactez%20pentru%20oferta%20Early%20Booking%202026-2027.%20A%C8%99%20dori%20s%C4%83%20verific%20disponibilitatea%20pentru%20data%20evenimentului%20meu.",
+          "ctaSecondaryText": "Solicită ofertă scrisă",
+          "ctaSecondaryHref": "/contact/"
+        },
+        {
+          "type": "links",
+          "items": [
+            {
+              "label": "Compară prețuri formație nuntă și cere ofertă",
+              "href": "/contact/"
+            },
+            {
+              "label": "Ascultă muzică nuntă live în videoclipuri reale",
+              "href": "/galerie-video/"
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "text": "Cele 3 întrebări corecte de pus oricărei formații înainte să semnezi"
+        },
+        {
+          "type": "paragraph",
+          "text": "Indiferent dacă ne alegi pe noi sau pe altcineva, folosește grila asta. Este grila pe care aș folosi-o eu dacă aș fi mireasă. Întâi: „Cântați 100% live sau folosiți negative pentru unele piese?”. Răspunsul corect este 100% live, fără ambiguitate. A doua: „Aduceți voi sonorizarea sau o închiriați de la locație?”. Răspunsul sănătos este „aducem noi, întotdeauna, pentru că o calibrăm pentru sala respectivă”. A treia: „Există clauză de backup în contract dacă se defectează un microfon sau o boxă?”. Dacă răspunsul este vag, prețul mic devine foarte scump în seara evenimentului."
+        },
+        {
+          "type": "heading",
+          "text": "De ce cuplurile din Argeș ne aleg — și ce găsești în contractul nostru"
+        },
+        {
+          "type": "paragraph",
+          "text": "În ultimii 3 ani am cântat în săli premium precum Ramada Pitești, Star Plaza, Metropol Băbana, Garden Resort, dar și în locații intime de 80-100 de persoane din Curtea de Argeș, Mioveni și Câmpulung. Fiecare cuplu are povestea lui. Ce au în comun miresele care ne aleg: au vrut un răspuns clar, un contract scris, și un preț care să nu ascundă surprize în ziua nunții. Exact asta garantăm în scris."
+        },
+        {
+          "type": "paragraph",
+          "text": "Contractul nostru pentru 2026-2027 include: preț final fix (fără costuri ascunse pentru kilometraj sau ore suplimentare negociate in-situ), componența exactă a formației, lista echipamentului de sonorizare, clauza de backup, programul orientativ al seratei și penalități clare în caz de anulare de oricare dintre părți. Transparență totală, pentru că nunta ta se întâmplă o singură dată."
+        },
+        {
+          "type": "cta",
+          "variant": "whatsapp",
+          "label": "Rezervare rapidă",
+          "text": "Trimite-ne data evenimentului pe WhatsApp și îți confirmăm în aceeași zi dacă este liberă — plus tariful Early Booking exact pentru data ta.",
+          "ctaText": "Verifică disponibilitatea pentru 2026",
+          "ctaHref": "https://wa.me/40767369658?text=Bun%C4%83%20ziua!%20A%C8%99%20dori%20s%C4%83%20verific%20disponibilitatea%20forma%C8%9Biei%20Florentina%20Pan%C4%83%20pentru%20evenimentul%20meu%20din%202026%2F2027.",
+          "ctaSecondaryText": "Vezi galeria live",
+          "ctaSecondaryHref": "/galerie-video/"
+        }
+      ],
+      "faq": [
+        {
+          "q": "Cât costă în medie o formație nuntă Pitești în 2026-2027?",
+          "a": "Tarifele corecte pentru o formație profesionistă cu sonorizare premium și 5-6 muzicieni live pornesc, realist, de la aproximativ 1800-2200 € pentru un eveniment complet de 6-8 ore în zona Argeș. Pentru contractele Early Booking semnate acum pentru 2026-2027, Formația Florentina Pană oferă prețuri promoționale blocate la nivelul sezonului anterior. Contactează-ne pe WhatsApp pentru tariful exact la data ta."
+        },
+        {
+          "q": "De ce unele formații oferă prețuri mult mai mici?",
+          "a": "Un preț formație nuntă 2026 semnificativ sub nivelul pieței înseamnă, în majoritatea cazurilor, compromisuri care nu apar în contract: echipament vechi sau închiriat în ultima clipă, număr redus de muzicieni live, utilizarea de negative pe unele piese sau lipsa unui sistem de backup. Întreabă întotdeauna explicit dacă se cântă 100% live și cine asigură sonorizarea."
+        },
+        {
+          "q": "Ce include oferta Early Booking pentru 2026-2027?",
+          "a": "Oferta Early Booking include tariful promoțional blocat contractual, întreaga formație live (5-6 artiști, fără reduceri de componență), sonorizare line-array profesională adusă de noi, microfoane dinamice de scenă, clauză de backup pentru echipament și un program personalizat pentru cei doi miri. Totul se stipulează în scris înainte de semnare."
+        },
+        {
+          "q": "Cântați doar în Pitești sau și în afara județului Argeș?",
+          "a": "Acoperim tot județul Argeș (Pitești, Mioveni, Curtea de Argeș, Câmpulung, Topoloveni, Ștefănești), București, Ilfov, Dâmbovița și Vâlcea. Pentru evenimentele din afara zonei Argeș, costurile de transport sunt incluse transparent în ofertă, fără costuri adăugate în ziua evenimentului."
+        },
+        {
+          "q": "Cum blochez data evenimentului meu?",
+          "a": "Data se blochează contractual în momentul semnării contractului și al plății unui avans de rezervare. Procesul complet durează sub 48 de ore: verificăm disponibilitatea pe WhatsApp, îți trimitem oferta personalizată, apoi contractul semnat digital. Din acel moment, data este a ta garantat, iar tariful Early Booking este blocat până la eveniment."
+        },
+        {
+          "q": "Cântați 100% live sau folosiți și negative?",
+          "a": "Cântăm 100% live, fără niciun fel de playback sau negative. Fiecare instrument (clape, chitară, bas, percuție) și fiecare voce sunt amplificate individual în timp real, prin mixer digital profesional. Acest lucru este garantat explicit în contract."
+        }
+      ]
+    },
+    {
+      "slug": "magia-sunetului-sub-cupola-metropol-babana",
+      "category": "🏰 Locații de Poveste",
+      "categoryAccent": "gold",
+      "title": "Magia sunetului sub cupola de la Metropol Băbana: Un ghid pentru mirii rafinați",
+      "excerpt": "Cum se transformă acustica spectaculoasă a salonului Metropol Băbana într-o experiență sonoră de neuitat — și de ce muzica live face toată diferența aici.",
+      "coverImage": "",
+      "coverEmoji": "🏰",
+      "readTime": "6 min",
+      "date": "2026-04-12",
+      "author": "Florentina Pană",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "Există locuri care par create pentru muzică live. Salonul Metropol Băbana, situat la câțiva kilometri de Pitești, în inima județului Argeș, este unul dintre ele. Cu tavanul său înalt în formă de cupolă, pereții eleganți și o capacitate generoasă pentru până la 350 de invitați, acest spațiu nu este doar o sală de nunți — este un amfiteatru natural, un loc unde fiecare acord reverberează cu o claritate aproape cinematografică."
+        },
+        {
+          "type": "heading",
+          "text": "De ce acustica face diferența la o nuntă"
+        },
+        {
+          "type": "paragraph",
+          "text": "Mulți miri aleg locația după decor, meniu sau preț. Puțini se gândesc la acustică — dar tocmai ea este cea care transformă o petrecere obișnuită într-un eveniment memorabil. La Metropol Băbana, cupola acționează ca un difuzor natural: sunetul urcă, se îmblânzește și coboară uniform peste întreaga sală. Ca formație nuntă Pitești cu experiență în zeci de evenimente aici, am învățat exact cum să calibrăm sunetul pentru acest spațiu. Setăm coloanele la unghi deschis, reducem basul cu 2–3 dB față de o sală standard și lăsăm roomul natural al cupolei să facă restul. Rezultatul? O muzică live Argeș care sună cald, plin și intim, fără să fie niciodată agresivă."
+        },
+        {
+          "type": "image",
+          "src": "",
+          "caption": "Salonul Metropol Băbana — cupola elegantă și ambianța de poveste pentru cele mai frumoase locații de nuntă Argeș"
+        },
+        {
+          "type": "heading",
+          "text": "O scenă care inspiră artiștii"
+        },
+        {
+          "type": "paragraph",
+          "text": "Pentru noi, FP Band, a cânta la Metropol Băbana este întotdeauna o bucurie. Scena generoasă ne permite să aducem setup-ul complet — clape, percuție, chitară, bas și trei voci — fără compromisuri de spațiu. Iar lumina naturală care pătrunde prin ferestrele laterale în timpul golden hour-ului creează o atmosferă pe care niciun spot nu o poate replica. Am observat că invitații se ridică mai repede pe ringul de dans aici decât în orice alt loc din Argeș. Credem că este combinația subtilă dintre eleganța vizuală a sălii și calitatea sunetului live — când auzi vocea solistei cristalin, fără distorsiuni, instinctul este să te miști."
+        },
+        {
+          "type": "heading",
+          "text": "Sfaturi pentru mirii care aleg Metropol Băbana"
+        },
+        {
+          "type": "paragraph",
+          "text": "Dacă ați ales deja această locație superbă sau o aveți pe lista scurtă, iată ce vă recomandăm din experiența noastră directă: programați soundcheck-ul cu cel puțin două ore înainte, pentru a profita la maximum de acustica specială. Discutați cu formația despre momentele forte ale serii — intrarea mirilor, dansul mirilor, hora mare — și lăsați-le timp să adapteze aranjamentele pentru reverberația naturală a sălii. Alegeți o formație nuntă Pitești care cunoaște deja spațiul, pentru că diferența dintre un sunet calibrat și unul generic este enormă. Metropol Băbana merită o coloană sonoră pe măsură — și noi suntem mereu pregătiți să o oferim."
+        },
+        {
+          "type": "paragraph",
+          "text": "Vrei să vezi cum sună FP Band live? Vizitează vlog-ul nostru pentru momente filmate de la evenimente reale. Sau, dacă ești gata să rezervi formația pentru nunta ta la Metropol Băbana, contactează-ne direct — discutăm cu drag despre fiecare detaliu."
+        },
+        {
+          "type": "links",
+          "items": [
+            {
+              "label": "🎬 Vezi Vlog-ul nostru",
+              "href": "/vlog/"
+            },
+            {
+              "label": "📞 Contactează-ne",
+              "href": "/contact/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "din-culisele-unui-eveniment-live",
+      "category": "🎵 Jurnal FP Band",
+      "categoryAccent": "cyan",
+      "title": "Din culisele unui eveniment live",
+      "excerpt": "Ce se întâmplă în spatele scenei înainte de a urca muzica la volumul maxim? Pregătirile, emoțiile și momentele care nu se văd de pe ring.",
+      "coverImage": "",
+      "coverEmoji": "🎬",
+      "readTime": "4 min",
+      "date": "2026-03-08",
+      "author": "Florentina Pană",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "Fiecare eveniment de succes începe cu ore bune de pregătire invizibilă. Ajungem pe locație cu cel puțin două ore înainte de primul invitat — timp alocat montajului, verificării sunetului și calibrării microfoanelor pentru acustica specifică a sălii."
+        },
+        {
+          "type": "heading",
+          "text": "Soundcheck-ul — inima pregătirii"
+        },
+        {
+          "type": "paragraph",
+          "text": "Soundcheck-ul nu este un moft tehnic, ci o necesitate artistică. Fiecare sală are o acustică proprie: unele sunt vii și rezonante, altele absorb sunetul. Ajustăm EQ-ul live, setăm monitoarele scenice și testăm fiecare canal în parte — voce, instrumente, coloane de sală."
+        },
+        {
+          "type": "image",
+          "src": "",
+          "caption": "Scenă în pregătire — cabluri, console și lumini calibrate înainte de sosirea invitaților"
+        },
+        {
+          "type": "heading",
+          "text": "Coordonarea cu clientul în ziua nunții"
+        },
+        {
+          "type": "paragraph",
+          "text": "Discuția finală cu mirii sau organizatorul are loc cu o zi înainte. Stabilim ordinea momentelor, piesele speciale, semnalele tactice — când să înceapă hora, intrarea tortului, surprizele. O nuntă reușită este o coregrafie muzicală precisă."
+        },
+        {
+          "type": "paragraph",
+          "text": "Iar când se aprind luminile și primii acorduri umplu sala — toată oboseala dispare. Aceasta este magia muzicii live."
+        },
+        {
+          "type": "links",
+          "items": [
+            {
+              "label": "Cere preț formație nuntă în București și Argeș",
+              "href": "/contact/"
+            },
+            {
+              "label": "Vezi muzică nuntă live în videoclipuri reale",
+              "href": "/galerie-video/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "radacini-lautaresti-in-romania",
+      "category": "🎵 Jurnal FP Band",
+      "categoryAccent": "cyan",
+      "title": "Rădăcini lăutărești în România",
+      "excerpt": "De la orchestrele de petrecere ale Bucureștiului interbelic la festivaluri internaționale — o călătorie prin istoria muzicii lăutărești românești.",
+      "coverImage": "",
+      "coverEmoji": "🎻",
+      "readTime": "6 min",
+      "date": "2026-02-14",
+      "author": "Florentina Pană",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "Muzica lăutărească românească este una dintre cele mai bogate tradiții muzicale din Europa de Est. Termenul lăutar derivă din laută — instrumentul cu coarde care a definit sonoritatea balcanică vreme de secole."
+        },
+        {
+          "type": "heading",
+          "text": "Originile și influențele"
+        },
+        {
+          "type": "paragraph",
+          "text": "Lăutarii au fost, secole la rând, purtătorii memoriei muzicale orale a poporului român. Ei nu citeau note — ci transmiteau repertoriul din generație în generație, adăugând improvizații și ornamente specifice fiecărei regiuni: Muntenia, Moldova, Oltenia, Banat."
+        },
+        {
+          "type": "heading",
+          "text": "Epoca de aur — perioada interbelică"
+        },
+        {
+          "type": "paragraph",
+          "text": "Anii 1920–1940 sunt considerați apogeul muzicii de mahala și al orchestrelor de petrecere bucureștene. Cârciumi ca La Iordache din Calea Victoriei erau neîncăpătoare. Grigoraș Dinicu, Maria Tănase și Ion Vasilescu au dus sunetul românesc pe scene internaționale."
+        },
+        {
+          "type": "image",
+          "src": "",
+          "caption": "Portret simbolic al tradițiilor muzicale românești transmise din generație în generație"
+        },
+        {
+          "type": "paragraph",
+          "text": "Astăzi, formații ca a noastră păstrează vie această tradiție, aducând-o în festivaluri, nunți și gale — fără a pierde autenticitatea care o face unică în lume."
+        },
+        {
+          "type": "links",
+          "items": [
+            {
+              "label": "Solicită ofertă pentru formație de nuntă",
+              "href": "/contact/"
+            },
+            {
+              "label": "Ascultă repertoriul live al formației",
+              "href": "/galerie-video/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "diferente-intre-hore-sarbe-si-geamparale",
+      "category": "🎵 Jurnal FP Band",
+      "categoryAccent": "cyan",
+      "title": "Diferențe între hore, sârbe și geamparale",
+      "excerpt": "Trei ritmuri esențiale ale muzicii românești — cum le recunoști, ce energie transmit și în ce momente ale serii le programăm.",
+      "coverImage": "",
+      "coverEmoji": "💃",
+      "readTime": "5 min",
+      "date": "2026-01-20",
+      "author": "Florentina Pană",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "Pentru un neinițiat, muzica populară de petrecere poate părea uniformă. Dar pentru un lăutar sau un dansator experimentat, diferența dintre o horă, o sârbă și o geamparaua este la fel de clară ca diferența dintre jazz și reggae."
+        },
+        {
+          "type": "heading",
+          "text": "Hora — ritmul colectiv"
+        },
+        {
+          "type": "paragraph",
+          "text": "Hora are un ritm binar, în măsură de 2/4, cu accentul pe primul timp. Este dansul colectiv prin excelență — un cerc care unește comunitatea. Tempourile sunt moderate, propice pentru a lua publicul pe ring treptat, fără a epuiza energia devreme."
+        },
+        {
+          "type": "heading",
+          "text": "Sârba — energia explozivă"
+        },
+        {
+          "type": "paragraph",
+          "text": "Spre deosebire de horă, sârba este mai rapidă și mai sincopată, în măsură de 7/8 sau 2/4 accelerat. Este piesa de rezistență — se joacă în mijlocul serii, când energia publicului este la maxim și invitații vor să demonstreze că știu să danseze."
+        },
+        {
+          "type": "heading",
+          "text": "Geamparaua — ritmul oriental"
+        },
+        {
+          "type": "paragraph",
+          "text": "Geamparaua are influențe clare din muzica turcă și arabă — ritmuri asimetrice de 8/8 sau 9/8, ornamente vocale complexe. Este piesa care surprinde și captivează, rezervată de obicei momentelor de showcase sau invitaților cu afinitate pentru muzica orientală."
+        },
+        {
+          "type": "image",
+          "src": "",
+          "caption": "Dansatori în cerc la o horă tradițională românească"
+        },
+        {
+          "type": "links",
+          "items": [
+            {
+              "label": "Verifică prețuri formație nuntă și disponibilitatea",
+              "href": "/contact/"
+            },
+            {
+              "label": "Urmărește momente live de horă și sârbă",
+              "href": "/galerie-video/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "cum-alegi-repertoriul-potrivit-pe-momente",
+      "category": "💡 Sfaturi pentru Miri",
+      "categoryAccent": "gold",
+      "title": "Cum alegi repertoriul potrivit pe momente",
+      "excerpt": "Ghid practic pentru miri și organizatori: ce muzică merge la intrare, la dansul mirilor, la hora mare și la finalul serii.",
+      "coverImage": "",
+      "coverEmoji": "🎵",
+      "readTime": "7 min",
+      "date": "2025-12-05",
+      "author": "Florentina Pană",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "Alegerea repertoriului pentru o nuntă nu este o simplă listă de piese preferate — este construcția unui arc dramatic de 6–8 ore, cu momente de emoție, energie, surpriză și reconciliere. Fiecare piesă are locul ei."
+        },
+        {
+          "type": "heading",
+          "text": "Intrarea mirilor și a nașilor"
+        },
+        {
+          "type": "paragraph",
+          "text": "Intrarea mirilor este momentul de maximă tensiune pozitivă. Recomandăm melodii recognoscibile, cu un intro instrumental clar: A Thousand Years (Christina Perri), Perfect (Ed Sheeran) sau, pentru o notă mai solemnă, un marș de nuntă clasic adaptat pentru formație live."
+        },
+        {
+          "type": "heading",
+          "text": "Dansul mirilor — cel mai important moment"
+        },
+        {
+          "type": "paragraph",
+          "text": "Dansul mirilor trebuie să fie piesa care li se potrivește lor — nu neapărat ce e la modă. Discutăm întotdeauna cu mirii pentru a găsi acea melodie care spune povestea lor. Durata ideală: 3–4 minute, cu posibilitate de surpriză muzicală la mijloc."
+        },
+        {
+          "type": "heading",
+          "text": "Hora mare și sârbele — energia serii"
+        },
+        {
+          "type": "paragraph",
+          "text": "Hora mare se plasează după cina principală, când toată lumea este sătulă, relaxată și pregătită să danseze. Construim treptat — 2–3 hore moderate, urmate de sârbe din ce în ce mai rapide, până când ringul e plin și energia e maximă."
+        },
+        {
+          "type": "image",
+          "src": "",
+          "caption": "Momentul tortului — un reper muzical gândit pentru surprize și emoție"
+        },
+        {
+          "type": "paragraph",
+          "text": "Finalul serii este la fel de important ca debutul. Ultimele 30 de minute trebuie să fie un crescendo emoțional — melodii care aduc lacrimi, îmbrățișări și amintiri pentru totdeauna."
+        },
+        {
+          "type": "links",
+          "items": [
+            {
+              "label": "Primește ofertă personalizată pentru evenimentul tău",
+              "href": "/contact/"
+            },
+            {
+              "label": "Vezi exemple reale de muzică nuntă live",
+              "href": "/galerie-video/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "cristina-si-manu-povestea-noastra",
+      "category": "💍 Povești Reale",
+      "categoryAccent": "rose",
+      "title": "Cristina și Manu — Povestea noastră",
+      "excerpt": "De pe băncile școlii, direct în fața altarului.",
+      "coverImage": "/Blog/Cristina%20si%20manu.png",
+      "coverEmoji": "💞",
+      "readTime": "6 min",
+      "date": "2026-07-25",
+      "author": "Florentina Pană",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "De pe băncile școlii, direct în fața altarului"
+        },
+        {
+          "type": "heading",
+          "text": "🚌 Începutul: Fluturi în stomac și complici neașteptați"
+        },
+        {
+          "type": "paragraph",
+          "text": "Totul a început în anii de școală, pe vremea când Manu era în clasa a VIII-a, iar Cristina în clasa a VII-a. Acolo s-au remarcat pentru prima dată, însă destinul a avut nevoie de un mic complice: microbuzul școlar. Zi de zi, dimineața și după-amiaza, drumurile lor se intersectau sub privirile amuzate ale șoferului de atunci—cel care, printr-o întorsătură frumoasă a vieții, astăzi le este naș și care făcea mereu glume pe seama sentimentelor lor născânde."
+        },
+        {
+          "type": "heading",
+          "text": "🏫 Alarma de la profesori și marea ședință cu părinții"
+        },
+        {
+          "type": "paragraph",
+          "text": "Cum era de așteptat în anii adolescenței, fiorii primei iubiri nu au putut rămâne secreți pentru mult timp. Profesorii au intrat rapid pe fir, au dat „alarma” și au sunat imediat părinții lui „ginerică” pentru a le expune situația."
+        },
+        {
+          "type": "paragraph",
+          "text": "Urmarea? O ședință cu părinții de neuitat! În timpul acelei ședințe, o colegă de clasă a ajutat-o pe Cristina să o descopere cu privirea pe viitoarea ei soacră. Totuși, cunoștința adevărată, oficială și de suflet s-a petrecut puțin mai târziu, într-un cadru cald de familie, chiar acasă la socrii săi."
+        },
+        {
+          "type": "heading",
+          "text": "📱 „Cine este, iubirea mea?” și prima întâlnire cu soacra"
+        },
+        {
+          "type": "paragraph",
+          "text": "Relația a ieșit la iveală acasă într-un mod de-a dreptul comic. Din cauza unui telefon blocat, Cristina a mers la mama ei să ceară ajutor. Exact în acel moment, Manu a sunat, iar pe ecran a apărut întrebarea care a dat totul în vileag. Cristina a avut curajul să recunoască: „Mamă, mi-am făcut o relație!”"
+        },
+        {
+          "type": "paragraph",
+          "text": "Prima întâlnire romantică de „afară” a venit la pachet cu o surpriză: mama Cristinei a fost de acord, însă cu o singură condiție... să meargă și ea! Astfel, prima lor întâlnire oficială a fost una în trei, mama venind special pentru a „discuta” cu viitorul ginere."
+        },
+        {
+          "type": "heading",
+          "text": "🚲 Tabloul roșu, plimbările cu bicicleta și testul devotamentului"
+        },
+        {
+          "type": "paragraph",
+          "text": "Amintirile lor de vară sunt pline de culoare. După o vacanță la mare, Cristina s-a întors și l-a găsit pe Manu așteptând-o pe bordura din fața bisericii, strângând la piept un tablou roșu cu o fotografie de-a lor."
+        },
+        {
+          "type": "paragraph",
+          "text": "Ușor, ușor, au devenit de nedespărțit. Verile însemnau plimbări cu bicicleta, Cristina stând fără nicio grijă pe cadru în timp ce Manu pedala mândru. Însă viața i-a pus și la încercări: când Manu și-a rupt piciorul într-un accident cu motocultorul, Cristina i-a dovedit ce înseamnă dragostea adevărată. Chiar dacă el nu se putea mișca, ea mergea pe jos în fiecare zi la magazin ca să-i cumpere ce avea nevoie, doar pentru a petrece timp împreună și a-l îngriji."
+        },
+        {
+          "type": "heading",
+          "text": "🤍 Oameni dragi care le-au ghidat pașii"
+        },
+        {
+          "type": "paragraph",
+          "text": "În drumul lor de 5 ani, doi oameni deosebiți au lăsat amprente adânci în inimile lor:"
+        },
+        {
+          "type": "paragraph",
+          "text": "Unchiul Marian: Unchiul lui Manu, care le-a fost extrem de apropiat. A fost șoferul lor de suflet în nenumărate călătorii și un sprijin de nădejde căruia îi mulțumesc din suflet că le este în continuare aproape."
+        },
+        {
+          "type": "paragraph",
+          "text": "Unchiul Costel: Un om drag care astăzi veghează de sus, printre îngeri. Cristina și Manu i-au fost alături cu devotament în momentele grele de boală. El a fost cel care s-a îngrijit mereu de binele lor și de locul lor de muncă (al Cristinei și al Monei). Deși fizic lipsește de la nunta nepotului său, spiritul lui este cu siguranță prezent, împlinindu-și dorința de a-i vedea fericiți."
+        },
+        {
+          "type": "heading",
+          "text": "💍 5 Ani de Iubire Necondiționată: „Te iubesc, dragul meu soț!”"
+        },
+        {
+          "type": "paragraph",
+          "text": "Cu bune și cu rele, cu mici certuri trecătoare, dar cu o loialitate de nezdruncinat, Cristina și Manu au împlinit 5 ani de relație. Au fost mereu acolo unul pentru celălalt, fără să se despartă vreodată. Manu a fost stânca Cristinei—omul care a sprijinit-o în orice moment și nu a lăsat-o niciodată la greu."
+        },
+        {
+          "type": "paragraph",
+          "text": "„Te iubesc foarte mult și am să fiu lângă tine în orice situație a vieții. Nu am să te las niciodată, dragul meu soț!” – Cristina"
+        }
+      ]
+    }
+  ]
 }
+

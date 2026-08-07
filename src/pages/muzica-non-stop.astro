@@ -5,7 +5,7 @@ import audioCatalog from '../data/audio-catalog.generated.json';
 import playlistPresets from '../data/audio-playlist-presets.json';
 
 const pageTitle = 'Muzică de Petrecere Non-Stop | Streaming Audio';
-const pageDescription = 'Ascultă Muzică de Petrecere Non-Stop și alege instant playlistul: Ușoară/Pop, Populară, Cafe-Concert sau Party. Intră în vibe-ul potrivit pentru eveniment!';
+const pageDescription = 'Ascultă repertoriul live non-stop: muzică populară de petrecere, grecească, arăbească, machedonească, latino, muzică românească și manele. Fără DJ/MC.';
 const pageOgImage = '/images/og-default-1200x630.jpg';
 
 const configuredR2BaseUrl = import.meta.env.PUBLIC_R2_MUSIC_BASE_URL?.trim() || '';
@@ -114,7 +114,7 @@ const musicPlaylistSchema = {
   '@context': 'https://schema.org',
   '@type': 'MusicPlaylist',
   name: 'Muzică de Petrecere Non-Stop',
-  description: 'Master playlist cu piese pentru petreceri și evenimente, redat non-stop.',
+  description: 'Playlist non-stop cu repertoriu complet: muzică populară de petrecere, grecească, arăbească, machedonească, latino, muzică românească și manele. 100% live, fără DJ/MC.',
   numTracks: masterPlaylist.length,
   track: masterPlaylist.slice(0, 60).map((song) => ({
     '@type': 'MusicRecording',
@@ -237,10 +237,10 @@ const musicPlaylistSchema = {
         Muzică de Petrecere Non-Stop
       </h1>
       <p class="mt-3 max-w-2xl text-lg leading-relaxed text-white/75 sm:text-xl">
-        Muzică de petrecere pentru clienții care vor atmosferă, ritm și continuitate fără pauze.
+        Repertoriu complet pentru clienții care vor atmosferă, ritm și continuitate live fără pauze.
       </p>
       <p class="mt-3 max-w-3xl text-sm text-amber-200/80 sm:text-base">
-        Tu setezi playlistul pentru client: Master, Ușoară/Pop, Populară, Cafe-Concert sau Party. Preseturile se personalizează din fișierul de configurare.
+        Tu setezi playlistul pentru client cu genurile cerute: muzică populară de petrecere, grecească, arăbească, machedonească, latino, muzică românească și manele. Program live fără pauze, fără DJ sau MC.
       </p>
 
       {!hasConfiguredR2BaseUrl && (

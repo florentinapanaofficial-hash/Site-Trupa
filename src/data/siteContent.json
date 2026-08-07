@@ -5,7 +5,7 @@
     "tagline": "Formație muzică live pentru nuntă, botez și evenimente — Pitești, Argeș, toată România.",
     "bandPhoto": "/images/galerie-foto-site/Florentina%20Pan%C4%83%2011.jpg",
     "aboutIntro": "este o trupă profesionistă de muzică live din Pitești, județul Argeș, cu experiență vastă în nunți, botezuri, aniversări și evenimente corporate din toată România. Punem accent pe energie, emoție și profesionalism, oferind un spectacol complet care ridică publicul în picioare.",
-    "aboutIntro2": "Repertoriul acoperă muzică ușoară românească și internațională, pop & cover, dance, cafe-concert, muzică de petrecere și populară. Suntem alegerea ideală ca Formație Nuntă & Cover Band Live în Pitești, Argeș și întreaga zonă a Munteniei."
+    "aboutIntro2": "Repertoriul acoperă toate tipurile de muzică: muzică populară de petrecere, muzică grecească, arăbească, machedonească, latino, muzică românească și manele. Cântăm fără pauze, alternăm programele artistice în funcție de specificul fiecărui eveniment și nu folosim DJ sau MC."
   },
   "seo": {
     "title": "Formația Florentina Pană | Formație Nuntă Pitești, Argeș — Muzică Live România",
@@ -312,14 +312,14 @@
     {
       "icon": "💍",
       "title": "Formație Nuntă Pitești și Argeș",
-      "description": "Muzică live premium pentru nunta ta în Pitești, Mioveni sau Curtea de Argeș. Program complet pe momente-cheie: primirea invitaților cu muzică ambientală, dansul mirilor, hora tradițională argeșeană, momentele de petrecere și surprizele de la miezul nopții. Fiecare nuntă beneficiază de propriu repertoriu personalizat — cerem dorințele muzicale ale mirilor cu cel puțin 2 săptămâni înainte.",
-      "details": "Oferim un program complet pentru nunta voastră: primirea invitaților, cina, dansul mirilor, momente dedicate părinților, dansul la tăierea tortului și petrecerea de noapte. Colaborăm cu cuplul înainte de eveniment pentru a personaliza fiecare moment muzical. Durata standard: 6-8 ore cu pauze."
+      "description": "Muzică live premium pentru nunta ta în Pitești, Mioveni sau Curtea de Argeș. Program complet pe momente-cheie: primirea invitaților cu muzică ambientală, dansul mirilor, hora tradițională argeșeană, momentele de petrecere și surprizele de la miezul nopții. Repertoriul include toate tipurile de muzică: muzică populară de petrecere, muzică grecească, arăbească, machedonească, latino, muzică românească și manele.",
+      "details": "Oferim un program complet pentru nunta voastră: primirea invitaților, cina, dansul mirilor, momente dedicate părinților, dansul la tăierea tortului și petrecerea de noapte. Cântăm live fără pauze și alternăm programele artistice în funcție de specificul evenimentului. Nu avem DJ sau MC, iar fiecare moment muzical este personalizat împreună cu mirii."
     },
     {
       "icon": "🍼",
       "title": "Muzică Live la Botez în Pitești",
-      "description": "Creăm atmosfera perfectă pentru botezul copilului tău: un mix echilibrat de muzică populară argeșeană, piese ușoare pentru Familie și momente de petrecere pentru toți invitații. Repertoriu adaptat pentru public de toate vârstele — de la bunici până la tineret. Disponibili în Pitești, Argeș și localitățile învecinate.",
-      "details": "Creăm o atmosferă festivă și emoționantă potrivită pentru botez: muzică ușoară, piese populare &amp; romanțe pentru generații mai în vârstă și ritmuri moderne pentru tineri. Repertoriul este echilibrat pentru invitați de toate vârstele. Durata standard: 4-6 ore."
+      "description": "Creăm atmosfera perfectă pentru botezul copilului tău: un mix echilibrat pentru toate vârstele, de la muzică populară de petrecere și muzică românească, până la grecească, arăbească, machedonească, latino și manele. Repertoriu adaptat pentru public de toate vârstele. Disponibili în Pitești, Argeș și localitățile învecinate.",
+      "details": "Creăm o atmosferă festivă și emoționantă potrivită pentru botez, cu program live fără pauze. Alternăm programele artistice în funcție de invitați și dinamica serii, fără DJ sau MC."
     },
     {
       "icon": "🏢",
@@ -361,7 +361,7 @@
       {
         "name": "Florentina Pană",
         "role": "Solistă Principală & Imaginea Trupei",
-        "description": "Solistă principală cu timbru cald și prezență scenică elegantă. Interpretează toate genurile muzicale (pop, ușoară, latino, party, populară) și coordonează momentele-cheie ale serii.",
+        "description": "Solistă principală cu timbru cald și prezență scenică elegantă. Interpretează toate tipurile de muzică: populară de petrecere, grecească, arăbească, machedonească, latino, muzică românească și manele, iar trupa cântă fără pauze.",
         "image": "https://placehold.co/400x400/112245/e9f5ff?text=Florentina+Pan%C4%83",
         "photos": [
           "",
@@ -375,7 +375,7 @@
       {
         "name": "Cătălin Matei",
         "role": "Interpret de Muzică Populară de Petrecere",
-        "description": "Membru al trupei responsabil de programele speciale de muzică populară de petrecere și jocuri tradiționale. Interacționează natural cu publicul și ridică atmosfera pe ring.",
+        "description": "Membru al trupei responsabil de programele speciale de muzică populară de petrecere și jocuri tradiționale. Împreună alternăm programele artistice în funcție de specificul fiecărui eveniment, exclusiv live, fără DJ sau MC.",
         "image": "/images/catalin-matei.webp",
         "photos": [
           "",
@@ -478,7 +478,7 @@
     },
     {
       "question": "Cât durează un program complet?",
-      "answer": "Prestația artistică durează, de regulă, aproximativ 9 ore. În funcție de pachetul ales, avem și oferte în care cântăm fără pauze."
+      "answer": "Prestația artistică durează, de regulă, aproximativ 9 ore. Cântăm live fără pauze, alternăm programele artistice în funcție de specificul evenimentului și nu avem DJ sau MC."
     }
   ],
   "membri": [
@@ -488,7 +488,7 @@
       "specialitate": "Muzică Populară și Ușoară",
       "experienta": "20+ ani experiență",
       "citat": "Muzica nu se cântă — se simte. Fiecare eveniment are sufletul lui, și noi îl purtăm pe scenă.",
-      "bio": "Voce cu timbru cald și prezență scenică elegantă, Florentina Pană este solista principală și imaginea trupei. Interpretează toate genurile muzicale (pop, ușoară, latino, party, populară) și coordonează momentele-cheie ale evenimentelor astfel încât invitații să rămână conectați de la început până la final.",
+      "bio": "Voce cu timbru cald și prezență scenică elegantă, Florentina Pană este solista principală și imaginea trupei. Interpretează toate tipurile de muzică: muzică populară de petrecere, grecească, arăbească, machedonească, latino, muzică românească și manele, iar programele sunt alternate în funcție de fiecare eveniment.",
       "taguri": [
         "Muzică Populară",
         "Muzică Ușoară",
@@ -575,7 +575,7 @@
       "specialitate": "Muzică Populară de Petrecere",
       "experienta": "Experiență vastă",
       "citat": "Când publicul ridică mâinile și dansează, știu că am făcut treabă bună.",
-      "bio": "Cătălin Matei este membru al trupei și coordonează programele speciale de muzică populară de petrecere și jocuri tradiționale. Cu voce puternică și prezență scenică dinamică, citește sala și adaptează momentul pentru energie constantă pe ring.",
+      "bio": "Cătălin Matei este membru al trupei și coordonează programele speciale de muzică populară de petrecere și jocuri tradiționale. Cu voce puternică și prezență scenică dinamică, susține alături de trupă un program live fără pauze, fără DJ sau MC, adaptat fiecărui public.",
       "taguri": [
         "Muzică de Petrecere",
         "Populară",
