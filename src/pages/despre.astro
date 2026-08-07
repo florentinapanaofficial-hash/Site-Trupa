@@ -5,18 +5,13 @@ import seo from '../data/seo-content.json';
 import couplesData from '../data/couples.json';
 import BackButton from '../components/BackButton.astro';
 
-const { contact, brand, services, repertoire, membri, colaboratori: colaboratoriData } = siteContent as any;
+const { contact, services, repertoire } = siteContent as any;
 const despre = seo.despre;
 const featuredCouple = couplesData.couples[0];
-const hasBandPhoto = typeof brand.bandPhoto === 'string' && brand.bandPhoto.trim() !== '';
-const cineMembers: Array<{src:string; name:string; role:string}> = [
-  ...((membri ?? []) as any[]).filter((m: any) => m.imagine?.trim()),
-  ...((colaboratoriData ?? []) as any[]).filter((c: any) => c.imagine?.trim()),
-].map((m: any) => ({
-  src:  m.imagine as string,
-  name: m.nume   as string,
-  role: (m.categorie === 'instrumentisti' ? m.specialitate : m.rol) as string,
-}));
+const aboutMontageCloudflareUid = '';
+const aboutMontageCloudflareSrc = aboutMontageCloudflareUid.trim()
+  ? `https://iframe.videodelivery.net/${aboutMontageCloudflareUid.trim()}`
+  : '';
 ---
 
 <BaseLayout
@@ -26,60 +21,29 @@ const cineMembers: Array<{src:string; name:string; role:string}> = [
   <section class="section-container py-16">
     <div class="mb-8"><BackButton href="/" label="Acasă" /></div>
 
-    {/* ── Montaj cinematic membrii ── */}
-    {cineMembers.length > 0 && (
-      <div class="cine-montage mb-14" aria-label="Montaj cinematic — membrii Formației Florentina Pană">
-        {cineMembers.map((m, i) => (
-          <div class={`cine-slide${i === 0 ? ' is-active' : ''}`} data-index={String(i)} data-name={m.name} data-role={m.role}>
-            <img class="cine-bg" src={m.src} alt="" aria-hidden="true"
-              loading={i === 0 ? 'eager' : 'lazy'} decoding="async" width="1200" height="400" />
-            <img class="cine-img" src={m.src} alt={`${m.name} — ${m.role}`}
-              loading={i === 0 ? 'eager' : 'lazy'} decoding="async" width="1200" height="400" />
-          </div>
-        ))}
-        <div class="cine-scanlines"  aria-hidden="true"></div>
-        <div class="cine-vignette"   aria-hidden="true"></div>
-        <div class="cine-grad"       aria-hidden="true"></div>
-        <div class="cine-lb cine-lb--top" aria-hidden="true"></div>
-        <div class="cine-lb cine-lb--bot" aria-hidden="true"></div>
-        <div class="cine-beams" aria-hidden="true">
-          <div class="cine-beam cb1"></div>
-          <div class="cine-beam cb2"></div>
-          <div class="cine-beam cb3"></div>
-        </div>
-        <div class="cine-grain" aria-hidden="true"></div>
-        <div class="cine-info" id="cine-info" aria-hidden="true">
-          <span class="cine-role-txt" id="cine-role">{cineMembers[0]?.role ?? ''}</span>
-          <span class="cine-name-txt" id="cine-name">{cineMembers[0]?.name ?? ''}</span>
-        </div>
-        <div class="cine-progress" aria-hidden="true">
-          {cineMembers.map((_m, i) => (
-            <button type="button" class={`cine-dot${i === 0 ? ' is-active' : ''}`} data-dot={String(i)}></button>
-          ))}
-        </div>
-        <div class="cine-audio-ui">
-          <div class="cine-audio-panel">
-            <button type="button" id="cine-audio-toggle" class="cine-audio-btn" aria-pressed="false" aria-label="Pornește muzica de fundal">
-              Porneste muzica
-            </button>
-            <label class="cine-audio-vol-wrap" for="cine-audio-volume">
-              <span class="cine-audio-vol-label">Vol</span>
-              <input
-                id="cine-audio-volume"
-                class="cine-audio-vol"
-                type="range"
-                min="0"
-                max="100"
-                value="22"
-                step="1"
-                aria-label="Volum muzica de fundal"
-              />
-            </label>
-          </div>
-        </div>
-        <audio id="cine-bg-audio" loop preload="metadata"></audio>
-      </div>
-    )}
+    {/* ── Montaj video Despre ── */}
+    <div class="cine-montage mb-14" aria-label="Montaj video — Formația Florentina Pană">
+      {aboutMontageCloudflareSrc ? (
+        <iframe
+          src={aboutMontageCloudflareSrc}
+          title="Montaj video Formația Florentina Pană"
+          loading="lazy"
+          allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+          allowfullscreen
+          class="cine-video-player"
+        ></iframe>
+      ) : (
+        <video
+          class="cine-video-player"
+          controls
+          playsinline
+          preload="metadata"
+          poster="/videos/montaje/videop-1-catcup-despre-poster.webp"
+        >
+          <source src="/videos/montaje/videop-1-catcup-despre.mp4" type="video/mp4" />
+        </video>
+      )}
+    </div>
 
     {/* ── Despre noi ── */}
     <header class="dp-intro-block mb-14">
@@ -258,6 +222,15 @@ const cineMembers: Array<{src:string; name:string; role:string}> = [
   }
   @media (max-width: 479px) {
     .cine-montage { aspect-ratio: 4 / 3; border-radius: 1rem; }
+  }
+
+  .cine-video-player {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border: 0;
+    object-fit: cover;
+    background: #000;
   }
 
   /* ── Photo slides ── */
