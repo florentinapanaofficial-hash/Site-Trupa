@@ -122,6 +122,95 @@ const localBusinessLd = {
   "sameAs": seoContent.schema.sameAs
 };
 
+const serviceCatalogItems = (siteContent.services ?? []).map((service, index) => {
+  const serviceUrl = `${site}/contact/`;
+
+  return {
+    '@type': 'ListItem',
+    position: index + 1,
+    item: {
+      '@type': 'Service',
+      name: service.title,
+      description: service.description,
+      serviceType: service.title,
+      areaServed: seoContent.schema.areaServed,
+      provider: {
+        '@type': 'MusicGroup',
+        name: seoContent.schema.name,
+        url: site,
+      },
+      availableChannel: {
+        '@type': 'ServiceChannel',
+        serviceUrl,
+        availableLanguage: ['ro', 'en'],
+      },
+      offers: {
+        '@type': 'Offer',
+        url: serviceUrl,
+        availability: 'https://schema.org/InStock',
+        priceCurrency: 'RON',
+        category: 'Serviciu muzică live',
+      },
+    },
+  };
+});
+
+const offerCatalogLd = {
+  '@context': 'https://schema.org',
+  '@type': 'OfferCatalog',
+  name: 'Pachete și servicii muzică live',
+  url: `${site}/contact/`,
+  itemListElement: serviceCatalogItems,
+};
+
+const commercialServiceLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: 'Servicii muzică live pentru evenimente',
+  description: seoContent.schema.description,
+  provider: {
+    '@type': 'MusicGroup',
+    name: seoContent.schema.name,
+    url: site,
+  },
+  areaServed: seoContent.schema.areaServed,
+  serviceType: [
+    'Formație nuntă',
+    'Muzică live la botez',
+    'Evenimente corporate cu muzică live',
+    'Program muzical personalizat pentru evenimente private',
+  ],
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: offerCatalogLd.name,
+    url: offerCatalogLd.url,
+  },
+  availableChannel: {
+    '@type': 'ServiceChannel',
+    serviceUrl: `${site}/contact/`,
+    availableLanguage: ['ro', 'en'],
+  },
+  offers: {
+    '@type': 'Offer',
+    url: `${site}/oferta-premium/`,
+    availability: 'https://schema.org/InStock',
+    priceCurrency: 'RON',
+    category: 'Ofertă formație nuntă și evenimente',
+  },
+};
+
+const repertoireItemListLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'Genuri muzicale interpretate',
+  itemListElement: (siteContent.repertoire ?? []).map((item, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name: item.label,
+    description: item.details,
+  })),
+};
+
 const isHomePage = Astro.url.pathname === '/';
 const hasYouTube = ['/galerie-video', '/aparitii-tv', '/video/', '/colaboratori/', '/comunitate', '/live'].some(p => Astro.url.pathname.startsWith(p));
 const isCommunityDetailPage = /^\/comunitate\/[^/]+\/$/.test(Astro.url.pathname);
@@ -310,6 +399,9 @@ const mobileNavAllItems = [
     <script is:inline type="application/ld+json" set:html={JSON.stringify(organizationLd)} />
     <script is:inline type="application/ld+json" set:html={JSON.stringify(webSiteLd)} />
     {isHomePage && <script is:inline type="application/ld+json" set:html={JSON.stringify(localBusinessLd)} />}
+    {isHomePage && <script is:inline type="application/ld+json" set:html={JSON.stringify(commercialServiceLd)} />}
+    {isHomePage && <script is:inline type="application/ld+json" set:html={JSON.stringify(offerCatalogLd)} />}
+    {isHomePage && <script is:inline type="application/ld+json" set:html={JSON.stringify(repertoireItemListLd)} />}
     <script is:inline type="application/ld+json" set:html={JSON.stringify(webPageLd)} />
     {!isHomePage && <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />}
     {/* GA4 NU se încarcă în <head> — se injectează dinamic DUPĂ consimțământul

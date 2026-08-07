@@ -10,8 +10,23 @@ export const prerender = true;
 const { brand, seo } = siteContent;
 const couples = couplesData.couples;
 
+function normalizeCategory(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9\s]/g, ' ')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+const vlogCategoryTokens = ['vlog', 'jurnal fp band', 'culise'];
+
 const posts = [...((blogPostsRaw as any).items ?? [])]
-  .filter((p) => p.category === 'Vlog')
+  .filter((p) => {
+    const normalizedCategory = normalizeCategory(String(p.category ?? ''));
+    return vlogCategoryTokens.some((token) => normalizedCategory.includes(token));
+  })
   .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
 /* ─── Build couple slug lookup ─────────────────── */
@@ -40,9 +55,40 @@ function formatDate(dateStr: string): string {
 const pageTitle = `Vlog | ${brand.name}`;
 const pageDescription = `Vlog-uri din culise, pregătiri și momente speciale de la evenimentele ${brand.name}. Urmărește ce se întâmplă în spatele scenei.`;
 const SITE = 'https://www.florentinapanaofficial.ro';
+const pageUrl = `${SITE}/vlog/`;
+const collectionPageLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: pageTitle,
+  description: pageDescription,
+  url: pageUrl,
+  inLanguage: 'ro-RO',
+  isPartOf: { '@type': 'WebSite', name: brand.name, url: SITE },
+  about: {
+    '@type': 'MusicGroup',
+    name: brand.name,
+    url: SITE,
+  },
+};
+const vlogItemListLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'Articole Vlog și culise',
+  itemListElement: posts.map((post, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    url: `${SITE}/blog/${post.slug}/`,
+    name: post.title,
+    description: post.excerpt,
+  })),
+};
 ---
 
 <BaseLayout title={pageTitle} description={pageDescription} ogImage={seo.ogImage}>
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(collectionPageLd)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(vlogItemListLd)} />
+  </Fragment>
 
   <section class="section-container pt-8 pb-16 sm:pt-10 sm:pb-20">
     <div class="mb-6"><BackButton href="/" label="Acasă" /></div>
