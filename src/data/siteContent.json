@@ -34,18 +34,18 @@
     "galerieVideo": {
       "populara": {
         "title": "Muzică Populară Live la Nuntă",
-        "playlistId": "PLA2uJhhkHzIFSyS6gmimhw3YF_bdy1dQg",
-        "thumbnailVideoId": "nW84J3eTL_M"
+        "playlistId": "PLA2uJhhkHzIE6Jw2vdAzI6_yPoFXOd4nQ",
+        "thumbnailVideoId": "twJmWVqp12I"
       },
       "usoara": {
         "title": "Muzică Ușoară Live pentru Nuntă",
-        "playlistId": "PLHj4yam5zkPY",
-        "thumbnailVideoId": "KEimXtkZb1M"
+        "playlistId": "PLA2uJhhkHzIFSyS6gmimhw3YF_bdy1dQg",
+        "thumbnailVideoId": "nW84J3eTL_M"
       },
       "tineret": {
         "title": "Muzică de Petrecere pentru Tineret",
-        "playlistId": "",
-        "thumbnailVideoId": "HQfVn98caic"
+        "playlistId": "PLHj4yam5zkPY",
+        "thumbnailVideoId": "KEimXtkZb1M"
       },
       "instrumentala": {
         "title": "Muzică Instrumentală",

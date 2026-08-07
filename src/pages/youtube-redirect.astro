@@ -9,6 +9,31 @@ const rawBack = Astro.url.searchParams.get('back') ?? '/galerie-video/';
 const safeTo = sanitizeUrl(rawTo);
 const safeBack = rawBack.startsWith('/') ? rawBack : '/galerie-video/';
 
+const isYoutubeRedirectAllowed = (url: string) => {
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
+      return false;
+    }
+
+    const host = parsed.hostname.toLowerCase();
+    const allowedHosts = new Set([
+      'youtube.com',
+      'www.youtube.com',
+      'm.youtube.com',
+      'music.youtube.com',
+      'youtu.be',
+      'www.youtu.be',
+    ]);
+
+    return allowedHosts.has(host);
+  } catch {
+    return false;
+  }
+};
+
+const canContinueToYoutube = isYoutubeRedirectAllowed(safeTo);
+
 const pageTitle = 'Redirecționare YouTube | Formația Florentina Pană';
 const pageDescription = 'Confirmă redirecționarea către YouTube sau revino rapid în site-ul Formației Florentina Pană.';
 ---
@@ -28,7 +53,7 @@ const pageDescription = 'Confirmă redirecționarea către YouTube sau revino ra
         </p>
 
         <div class="mt-6 flex flex-wrap gap-3">
-          {safeTo.startsWith('https://www.youtube.com/') ? (
+          {canContinueToYoutube ? (
             <a
               href={safeTo}
               rel="noopener noreferrer"
