@@ -185,6 +185,28 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
         <audio data-menu-audio preload="none" loop>
         </audio>
 
+        <div class="mobile-overlay-hero" aria-hidden="true">
+          <div class="mobile-overlay-hero__badge">Live Band Premium</div>
+          <img
+            src="/images/sigla-fp-band-110.webp"
+            alt="Sigla Formația Florentina Pană"
+            class="mobile-overlay-logo"
+            loading="eager"
+            decoding="async"
+            width="110"
+            height="60"
+          />
+          <div class="mobile-overlay-hero__copy">
+            <p class="mobile-overlay-hero__title">{brand.name}</p>
+            <p class="mobile-overlay-hero__subtitle">Meniu rapid pentru rezervări, galerie, comunitate și ofertă premium.</p>
+          </div>
+          <div class="mobile-overlay-hero__lights">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+
         <!-- Mobil: listă verticală cu toate paginile -->
         <nav class="nav-mobile-grid" aria-label="Navigație mobilă">
           {mobileFullNavigation.map((item) => (
