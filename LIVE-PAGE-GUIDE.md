@@ -93,8 +93,8 @@ Pagina `/live/` acum are o experiență TV modernă cu interactivitate Realtime:
 - **Locație**: Script inline la sfârșitul `<script is:inline>` secțiuni
 - **Inițializare**:
   ```javascript
-  const supabaseUrl = 'https://uhqujllxujfbyvwrafzn.supabase.co';
-  const supabaseKey = 'sb_publishable_Pizn5TO9w3NpDGMtIKLuGg_TIlKCeCT';
+  const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+  const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
   const client = createClient(supabaseUrl, supabaseKey);
   ```
 - **Funcționalitate**:
@@ -109,7 +109,7 @@ Pagina `/live/` acum are o experiență TV modernă cu interactivitate Realtime:
 ### Pasul 1: Rulează Migrația SQL
 
 1. Mergi la **[Supabase Dashboard](https://app.supabase.com/projects)**
-2. Selectează proiectul: `uhqujllxujfbyvwrafzn`
+2. Selectează proiectul tău Supabase (project ref propriu)
 3. Click **SQL Editor** (left sidebar)
 4. Click **New Query**
 5. Copiază conținutul din fișierul: **`scripts/supabase-setup.sql`**

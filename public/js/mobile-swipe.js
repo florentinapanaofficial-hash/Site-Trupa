@@ -14,7 +14,12 @@
 
     function shouldSkipGlobalTouch(target) {
         if (!target || !target.closest) return false;
+        if (document.body.classList.contains('mobile-menu-open')) return true;
         return Boolean(
+            target.closest('#top-menu-panel') ||
+            target.closest('[data-top-menu-panel]') ||
+            target.closest('[data-top-menu-toggle]') ||
+            target.closest('[data-top-menu-close]') ||
             target.closest('.mob-nav') ||
             target.closest('.mc-gallery') ||
             target.closest('.mc-gallery-wrap') ||
@@ -66,8 +71,50 @@
     var arrowPrev = document.getElementById('mob-arrow-prev');
     var arrowNext = document.getElementById('mob-arrow-next');
     var hintsContainer = document.querySelector('.mob-swipe-hints');
+    var canShowPrevArrow = false;
+    var canShowNextArrow = false;
+    var arrowVisibilityTicking = false;
     var n = slides.length;
     var current = 0;
+
+    function isLowerPageReached() {
+        var scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
+        if (scrollableHeight <= 0) return true;
+        var progress = (window.scrollY || window.pageYOffset) / scrollableHeight;
+        return progress >= 0.8;
+    }
+
+    function applyArrowVisibilityByScroll() {
+        var showByScroll = isLowerPageReached();
+
+        if (arrowPrev) {
+            if (canShowPrevArrow && showByScroll) arrowPrev.classList.remove('is-hidden');
+            else arrowPrev.classList.add('is-hidden');
+        }
+
+        if (arrowNext) {
+            if (canShowNextArrow && showByScroll) arrowNext.classList.remove('is-hidden');
+            else arrowNext.classList.add('is-hidden');
+        }
+    }
+
+    function requestArrowVisibilityUpdate() {
+        if (arrowVisibilityTicking) return;
+        arrowVisibilityTicking = true;
+        requestAnimationFrame(function () {
+            applyArrowVisibilityByScroll();
+            arrowVisibilityTicking = false;
+        });
+    }
+
+    function setArrowEligibility(prevEligible, nextEligible) {
+        canShowPrevArrow = !!prevEligible;
+        canShowNextArrow = !!nextEligible;
+        applyArrowVisibilityByScroll();
+    }
+
+    window.addEventListener('scroll', requestArrowVisibilityUpdate, { passive: true });
+    window.addEventListener('resize', requestArrowVisibilityUpdate, { passive: true });
 
     /* Ascunde săgețile dacă sliderul are un singur element */
     if (n <= 1 && hintsContainer) {
@@ -344,15 +391,13 @@
         });
 
         /* ── Săgeți laterale pe homepage ── */
-        if (arrowPrev) arrowPrev.classList.add('is-hidden');
+        setArrowEligibility(false, hpPageIdx >= 0 && hpPageIdx < hpPageOrder.length - 1);
+
         if (arrowNext && hpPageIdx >= 0 && hpPageIdx < hpPageOrder.length - 1) {
-            arrowNext.classList.remove('is-hidden');
             arrowNext.classList.add('hint-pulse');
             arrowNext.addEventListener('click', function () {
                 hpNavigatePage(hpPageOrder[hpPageIdx + 1]);
             });
-        } else if (arrowNext) {
-            arrowNext.classList.add('is-hidden');
         }
 
         return;
@@ -376,26 +421,22 @@
     }
 
     /* ── Săgeți laterale pe subpagini ── */
+    setArrowEligibility(pageIdx > 0, pageIdx >= 0 && pageIdx < pageOrder.length - 1);
+
     if (arrowPrev) {
         if (pageIdx > 0) {
-            arrowPrev.classList.remove('is-hidden');
             arrowPrev.classList.add('hint-pulse');
             arrowPrev.addEventListener('click', function () {
                 navigatePage(pageOrder[pageIdx - 1]);
             });
-        } else {
-            arrowPrev.classList.add('is-hidden');
         }
     }
     if (arrowNext) {
         if (pageIdx >= 0 && pageIdx < pageOrder.length - 1) {
-            arrowNext.classList.remove('is-hidden');
             arrowNext.classList.add('hint-pulse');
             arrowNext.addEventListener('click', function () {
                 navigatePage(pageOrder[pageIdx + 1]);
             });
-        } else {
-            arrowNext.classList.add('is-hidden');
         }
     }
 

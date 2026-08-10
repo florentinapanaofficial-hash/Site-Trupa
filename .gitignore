@@ -1,7 +1,6 @@
 node_modules/
 dist/
 .astro/
-.env
 # dependencies
 node_modules/
 
@@ -14,6 +13,7 @@ dist/
 # environment variables (secrete)
 .env
 .env.*
+!.env.example
 
 # logs
 npm-debug.log*

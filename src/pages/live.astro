@@ -6,6 +6,8 @@ import liveReplays from '../data/liveReplays.json';
 const livePageTitle = 'Live cu Florentina Pană | Trupă Cover & Muzică Evenimente';
 const livePageDescription = 'Urmărește live stream-urile de la nunți, botezuri și evenimente cu Formația Florentina Pană. Simte energia FP Band în timp real.';
 const livePageOgImage = '/images/og-live-1200x630.jpg';
+const publicSupabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || '';
+const publicSupabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY || '';
 
 /* Replay-uri sortate descrescător după dată (newest-first) */
 const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
@@ -54,7 +56,7 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
       {/* Status format — detectare automată landscape / vertical */}
       <div class="mb-6 flex items-center justify-center">
         <p id="live-format-status" class="live-format-status" aria-live="polite">
-          Detectăm automat formatul video...
+          Pregătim redarea video...
         </p>
       </div>
 
@@ -125,7 +127,7 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
           class="inline-flex items-center gap-2 rounded-full border border-amber-500/40 bg-amber-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-amber-300 transition hover:border-amber-500/70 hover:bg-amber-500/20 hover:text-amber-200"
           style="display:none"
         >
-          Deschide într-o fereastră nouă
+          Deschide playerul separat
         </a>
       </div>
 
@@ -175,7 +177,7 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
 
       {/* Text descriptiv sub player */}
       <p class="mx-auto mt-8 max-w-xl text-center text-base leading-relaxed text-white/50">
-        Suntem pe scenă, dând viață momentelor magice. Dacă nu suntem live acum, poți vedea ultima noastră petrecere în player-ul de mai sus.
+        Urmărește atmosfera noastră live direct de pe scenă. Dacă acum nu transmitem, în player vezi cele mai recente momente din evenimente.
       </p>
 
       {/* ── Butoane distribuire socială ── */}
@@ -232,8 +234,8 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
     <div class="section-container">
       <div class="mx-auto max-w-3xl text-center mb-10">
         <p class="text-amber-400/70 text-xs font-bold uppercase tracking-widest mb-2">Replay</p>
-        <h2 class="font-serif text-3xl font-bold text-white sm:text-4xl">Ultimele Live-uri Înregistrate</h2>
-        <p class="mt-3 text-white/50 text-sm">Nu ai prins transmisiunea? Revezi evenimentele noastre în întregime.</p>
+        <h2 class="font-serif text-3xl font-bold text-white sm:text-4xl">Ultimele transmisiuni înregistrate</h2>
+        <p class="mt-3 text-white/50 text-sm">Nu ai prins live-ul? Poți revedea aici momente complete din evenimentele noastre.</p>
       </div>
       <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {replays.map((replay) => {
@@ -784,13 +786,18 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
   }
 </style>
 
-<script is:inline>
+<script is:inline define:vars={{ publicSupabaseUrl, publicSupabaseAnonKey }}>
   /* ═════════════════════════════════════════════════════════════════
      SUPABASE CLIENT — Inițializare cu PUBLIC_SUPABASE_URL și PUBLIC_SUPABASE_ANON_KEY
   ═════════════════════════════════════════════════════════════════ */
   (async function initSupabase() {
-    const supabaseUrl = 'https://uhqujllxujfbyvwrafzn.supabase.co';
-    const supabaseKey = 'sb_publishable_Pizn5TO9w3NpDGMtIKLuGg_TIlKCeCT';
+    const supabaseUrl = publicSupabaseUrl;
+    const supabaseKey = publicSupabaseAnonKey;
+
+    if (!supabaseUrl || !supabaseKey) {
+      console.warn('PUBLIC_SUPABASE_URL sau PUBLIC_SUPABASE_ANON_KEY lipsesc; live likes sunt dezactivate.');
+      return;
+    }
 
     // Importăm Supabase client din CDN
     try {

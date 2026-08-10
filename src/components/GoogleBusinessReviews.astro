@@ -1,0 +1,210 @@
+---
+type GoogleReviewItem = {
+  author: string;
+  context: string;
+  text: string;
+  sourceUrl?: string;
+};
+
+interface Props {
+  title?: string;
+  subtitle?: string;
+  googleProfileUrl: string;
+  googleWriteUrl: string;
+  reviews: GoogleReviewItem[];
+}
+
+const {
+  title = 'Recenzii Google Business',
+  subtitle = 'Recenzii reale de la clienți care au lucrat cu noi la evenimente.',
+  googleProfileUrl,
+  googleWriteUrl,
+  reviews,
+} = Astro.props;
+
+const safeReviews = Array.isArray(reviews)
+  ? reviews
+      .filter((item) => item?.author && item?.text)
+      .slice(0, 3)
+  : [];
+---
+
+<section class="gb-reviews" aria-label="Recenzii Google Business">
+  <div class="gb-reviews__head">
+    <p class="gb-reviews__kicker">Încredere verificabilă</p>
+    <h2>{title}</h2>
+    <p>{subtitle}</p>
+  </div>
+
+  {safeReviews.length > 0 ? (
+    <div class="gb-reviews__grid">
+      {safeReviews.map((review) => (
+        <article class="gb-reviews__card">
+          <div class="gb-reviews__stars" aria-label="5 stele din 5">★★★★★</div>
+          <blockquote>
+            <p>„{review.text}”</p>
+          </blockquote>
+          <footer>
+            <strong>{review.author}</strong>
+            <span>{review.context}</span>
+            {review.sourceUrl && (
+              <a href={review.sourceUrl} target="_blank" rel="noopener noreferrer">Vezi sursa</a>
+            )}
+          </footer>
+        </article>
+      ))}
+    </div>
+  ) : (
+    <p class="gb-reviews__empty">Recenziile Google vor apărea aici imediat ce sunt publicate sau sincronizate.</p>
+  )}
+
+  <div class="gb-reviews__actions">
+    <a href={googleProfileUrl} target="_blank" rel="noopener noreferrer" class="gb-reviews__btn gb-reviews__btn--primary">Vezi toate recenziile pe Google</a>
+    <a href={googleWriteUrl} target="_blank" rel="noopener noreferrer" class="gb-reviews__btn gb-reviews__btn--ghost">Lasă o recenzie</a>
+  </div>
+</section>
+
+<style>
+  .gb-reviews {
+    margin: 0 auto 2rem;
+    padding: 1.15rem 1rem 1.1rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 1.05rem;
+    background: linear-gradient(160deg, rgba(9, 20, 40, 0.86), rgba(8, 16, 32, 0.72));
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+  }
+
+  .gb-reviews__head {
+    margin-bottom: 0.9rem;
+  }
+
+  .gb-reviews__kicker {
+    margin: 0;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 224, 154, 0.92);
+    font-weight: 700;
+  }
+
+  .gb-reviews__head h2 {
+    margin: 0.35rem 0 0.35rem;
+    font-size: clamp(1.25rem, 3vw, 1.65rem);
+    color: #ffffff;
+  }
+
+  .gb-reviews__head p {
+    margin: 0;
+    color: rgba(236, 245, 255, 0.88);
+    line-height: 1.62;
+  }
+
+  .gb-reviews__grid {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+
+  .gb-reviews__card {
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    border-radius: 0.9rem;
+    padding: 0.75rem 0.78rem;
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03));
+  }
+
+  .gb-reviews__stars {
+    font-size: 0.86rem;
+    letter-spacing: 0.12em;
+    color: #ffd36f;
+    margin-bottom: 0.35rem;
+  }
+
+  .gb-reviews__card blockquote {
+    margin: 0 0 0.62rem;
+  }
+
+  .gb-reviews__card blockquote p {
+    margin: 0;
+    color: rgba(246, 250, 255, 0.96);
+    line-height: 1.58;
+    font-size: 0.95rem;
+  }
+
+  .gb-reviews__card footer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .gb-reviews__card strong {
+    color: #ffffff;
+    font-size: 0.92rem;
+  }
+
+  .gb-reviews__card span {
+    color: rgba(192, 222, 255, 0.9);
+    font-size: 0.8rem;
+  }
+
+  .gb-reviews__card a {
+    color: #ffd989;
+    font-size: 0.8rem;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    margin-top: 0.1rem;
+  }
+
+  .gb-reviews__empty {
+    margin: 0;
+    color: rgba(233, 246, 255, 0.88);
+    line-height: 1.56;
+    padding: 0.5rem 0;
+  }
+
+  .gb-reviews__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 0.9rem;
+  }
+
+  .gb-reviews__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.58rem 0.86rem;
+    border-radius: 0.72rem;
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 0.88rem;
+    transition: transform 160ms ease, box-shadow 160ms ease;
+  }
+
+  .gb-reviews__btn:hover,
+  .gb-reviews__btn:focus-visible {
+    transform: translateY(-1px);
+  }
+
+  .gb-reviews__btn--primary {
+    color: #1f1200;
+    background: linear-gradient(135deg, #ffd36f, #f5a623);
+    box-shadow: 0 6px 16px rgba(245, 166, 35, 0.32);
+  }
+
+  .gb-reviews__btn--ghost {
+    color: #f6fbff;
+    border: 1px solid rgba(203, 233, 255, 0.38);
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  @media (max-width: 767px) {
+    .gb-reviews {
+      padding: 1rem 0.85rem;
+      border-radius: 0.95rem;
+    }
+
+    .gb-reviews__head p {
+      font-size: 0.94rem;
+    }
+  }
+</style>

@@ -4,6 +4,7 @@ import siteContent from '../data/siteContent.json';
 import seo from '../data/seo-content.json';
 import couplesData from '../data/couples.json';
 import BackButton from '../components/BackButton.astro';
+import GoogleBusinessReviews from '../components/GoogleBusinessReviews.astro';
 
 const { contact, services, repertoire } = siteContent as any;
 const despre = seo.despre;
@@ -12,6 +13,25 @@ const aboutMontageCloudflareUid = 'a730f6e433418be5fe0c13e11af5728b';
 const aboutMontageCloudflareSrc = aboutMontageCloudflareUid.trim()
   ? `https://iframe.videodelivery.net/${aboutMontageCloudflareUid.trim()}`
   : '';
+
+const googleBusinessProfileUrl = 'https://g.page/r/Ca7MqSu2OLysEAE';
+const googleBusinessWriteUrl = 'https://g.page/r/Ca7MqSu2OLysEAE/review';
+
+const approvedComments = (siteContent as any)?.news?.approvedComments ?? [];
+const googleBusinessReviews = [
+  featuredCouple
+    ? {
+        author: featuredCouple.names,
+        context: `Nuntă • ${featuredCouple.city}`,
+        text: featuredCouple.recommendation,
+      }
+    : null,
+  ...approvedComments.slice(0, 2).map((comment: any) => ({
+    author: comment.author,
+    context: comment.relatedPost || 'Comentariu verificat',
+    text: comment.text,
+  })),
+].filter(Boolean);
 ---
 
 <BaseLayout
@@ -30,7 +50,7 @@ const aboutMontageCloudflareSrc = aboutMontageCloudflareUid.trim()
           loading="lazy"
           allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
           allowfullscreen
-          class="cine-video-player"
+          class="cine-video-player cine-video-player--embed"
         ></iframe>
       ) : (
         <video
@@ -71,6 +91,14 @@ const aboutMontageCloudflareSrc = aboutMontageCloudflareUid.trim()
         <a href={`/comunitate/${featuredCouple.slug}/`} class="btn-solid">Vezi povestea lui {featuredCouple.names}</a>
       </section>
     )}
+
+    <GoogleBusinessReviews
+      title="Recenzii Google pe scurt"
+      subtitle="Pe lângă poveștile din comunitate, poți verifica și feedback-ul public direct în profilul nostru Google Business."
+      googleProfileUrl={googleBusinessProfileUrl}
+      googleWriteUrl={googleBusinessWriteUrl}
+      reviews={googleBusinessReviews}
+    />
 
     {/* ── Servicii ── */}
     <div class="dp-block">
@@ -220,6 +248,7 @@ const aboutMontageCloudflareSrc = aboutMontageCloudflareUid.trim()
   }
   @media (max-width: 767px) {
     .cine-montage { width: min(100%, 380px); }
+    .cine-video-player--embed { pointer-events: none; }
   }
   @media (max-width: 479px) {
     .cine-montage { width: 100%; border-radius: 1rem; }

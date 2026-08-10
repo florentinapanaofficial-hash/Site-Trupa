@@ -173,7 +173,7 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
       </div>
 
       <h1 class="hero-title-xl anim-hero-load anim-hero-d2">
-        <span class="hero-title-gold hero-title-gold--compact">Formație Nuntă Pitești - Formația Florentina Pană</span>
+        <span class="hero-title-gold hero-title-gold--compact">Formație Nuntă Pitești | Florentina Pană</span>
       </h1>
 
       <p class="hero-lead anim-hero-load anim-hero-d3">
@@ -181,9 +181,9 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
       </p>
 
       <p class="hero-pricing-note anim-hero-load anim-hero-d3">
-        Pentru alegerea unei formații de nuntă în Pitești contează vibe-ul, repertoriul și modul în care ținem ringul plin de la primul dans până la final.
-        Dacă vrei o trupă de nunți în Argeș care livrează energie autentică și organizare clară, completează formularul de buget și revenim rapid cu o ofertă personalizată.
-        <a href="/contact/" class="hero-pricing-link">Completează formularul de buget</a>
+        Interval orientativ: 2.500-4.000 euro, în funcție de formulă, locație și program.
+        Trimite data și bugetul, iar revenim în maximum 24 de ore cu ofertă clară și disponibilitate.
+        <a href="/contact/" class="hero-pricing-link">Trimite data și bugetul</a>
       </p>
 
       {/* CTA-uri hero */}
@@ -1298,9 +1298,9 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
     max-width: 50ch;
     margin: 0;
     font-size: clamp(1rem, 2.8vw, 1.2rem);
-    line-height: 1.85;
-    color: #ffffff !important;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.60);
+    line-height: 1.72;
+    color: #fcfeff !important;
+    text-shadow: 0 2px 8px rgba(1, 6, 20, 0.62);
     text-align: center;
     text-wrap: pretty;
     position: relative;
@@ -1312,8 +1312,9 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
     max-width: 58ch;
     margin: 0.15rem auto 0;
     font-size: clamp(0.94rem, 2.4vw, 1.04rem);
-    line-height: 1.7;
-    color: rgba(241, 249, 255, 0.96);
+    line-height: 1.62;
+    color: rgba(252, 254, 255, 0.99);
+    text-shadow: 0 2px 8px rgba(1, 6, 20, 0.56);
     text-align: center;
     text-wrap: pretty;
     position: relative;
@@ -1331,6 +1332,22 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
 
   .hero-pricing-link:hover {
     color: #ffeeb3;
+  }
+
+  @media (max-width: 767px) {
+    .hero-lead,
+    .hero-pricing-note {
+      background: linear-gradient(180deg, rgba(14, 32, 58, 0.58), rgba(14, 32, 58, 0.36));
+      border: 1px solid rgba(196, 234, 255, 0.28);
+      border-radius: 0.95rem;
+      padding: 0.62rem 0.76rem;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    .hero-pricing-note {
+      margin-top: 0.45rem;
+    }
   }
 
   /* ════════════════════════════════════════════════════════════════

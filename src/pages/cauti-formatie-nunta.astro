@@ -2,11 +2,13 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BackButton from '../components/BackButton.astro';
 import YoutubeEmbed from '../components/YoutubeEmbed.astro';
+import GoogleBusinessReviews from '../components/GoogleBusinessReviews.astro';
 import siteContent from '../data/siteContent.json';
 import couplesData from '../data/couples.json';
 
 const { faq } = siteContent;
 const featuredCouple = couplesData.couples[0];
+const approvedComments = (siteContent as any)?.news?.approvedComments ?? [];
 
 const pageTitle = 'Cauți formație de nuntă? Video, repertoriu și ofertă';
 const pageDescription = 'Vezi video reale, repertoriu și cere o ofertă în funcție de bugetul alocat. Formația Florentina Pană răspunde rapid pentru nunți și botezuri.';
@@ -23,26 +25,54 @@ const featuredPlaylistThumb = featuredPlaylist?.thumbnailVideoId
   : '/images/logo-fp-stage.svg';
 const featuredPlaylistRedirectHref = `/youtube-redirect/?to=${encodeURIComponent(featuredPlaylistUrl)}&back=${encodeURIComponent('/cauti-formatie-nunta/')}`;
 
+const priorityVideoSections = [
+  'populara',
+  'usoara',
+  'tineret',
+  'instrumentala',
+] as const;
+
+const playlistConfigBySection = siteContent.youtubePlaylists?.galerieVideo ?? {};
+
+const priorityVideoPlayers = priorityVideoSections
+  .map((sectionId) => {
+    const playlist = playlistConfigBySection?.[sectionId];
+    if (!playlist?.playlistId) {
+      return null;
+    }
+
+    return {
+      id: sectionId,
+      title: playlist.title,
+      playlistId: playlist.playlistId,
+      thumbnailSrc: playlist.thumbnailVideoId
+        ? `https://img.youtube.com/vi/${playlist.thumbnailVideoId}/hqdefault.jpg`
+        : '/images/logo-fp-stage.svg',
+      playlistUrl: `https://www.youtube.com/playlist?list=${playlist.playlistId}`,
+    };
+  })
+  .filter((playlist): playlist is NonNullable<typeof playlist> => Boolean(playlist));
+
 const processCards = [
   {
-    title: 'Personalizăm Experiența',
-    text: 'Playlist dedicat, momente speciale, detalii tehnice impecabile.',
+    title: 'Discutăm ce vă place',
+    text: 'Alegem împreună genurile și momentele importante pentru invitații voștri.',
   },
   {
-    title: 'Plan Clar Al Serii',
-    text: 'Construim ritmul evenimentului cu accentele voastre preferate.',
+    title: 'Stabilim programul serii',
+    text: 'Punem cap la cap un program echilibrat, de la intrare până la final.',
   },
   {
-    title: 'Coordonare Live',
-    text: 'Ne sincronizăm cu organizatorii pentru tranziții fără blocaje.',
+    title: 'Ne coordonăm cu locația',
+    text: 'Colaborăm cu echipa locației pentru tranziții fluide și fără timpi morți.',
   },
   {
-    title: 'Energie Controlată',
-    text: 'Alternăm inteligent momentele tari cu secvențe elegante.',
+    title: 'Ținem atmosfera sus',
+    text: 'Alternăm live momentele de energie cu cele elegante, în ritmul invitaților.',
   },
   {
-    title: 'Final Memorabil',
-    text: 'Închidem seara în forță, pe piesele care rămân în minte.',
+    title: 'Final memorabil',
+    text: 'Închidem seara pe piesele care lasă invitații cu zâmbetul pe buze.',
   },
 ];
 
@@ -78,7 +108,23 @@ const quickFaq = [
   },
 ];
 
-const topTickerText = 'Dacă ești în căutarea unei Formații Nuntă & Cover Band Live care știe să facă atmosferă, iată ce îți oferim pentru o seară memorabilă: Show Live 100% cu energie pură, voci remarcabile și conexiune directă; repertoriu complet care include muzică populară de petrecere, grecească, arăbească, machedonească, latino, muzică românească și manele; cântăm fără pauze, alternăm programele artistice în funcție de eveniment și nu avem DJ sau MC. Hai să scriem împreună soundtrack-ul nunții tale! Contactează-ne și hai să transformăm petrecerea voastră într-o amintire de neuitat.';
+const topTickerText = 'Formație live pentru nunți și botezuri: show autentic, repertoriu complet și atmosferă de la primul dans până la ultimul bis. Spune-ne data evenimentului și primești rapid o ofertă potrivită bugetului vostru.';
+const googleBusinessProfileUrl = 'https://g.page/r/Ca7MqSu2OLysEAE';
+const googleBusinessWriteUrl = 'https://g.page/r/Ca7MqSu2OLysEAE/review';
+const googleBusinessReviews = [
+  featuredCouple
+    ? {
+        author: featuredCouple.names,
+        context: `Nuntă • ${featuredCouple.city}`,
+        text: featuredCouple.recommendation,
+      }
+    : null,
+  ...approvedComments.slice(0, 2).map((comment: any) => ({
+    author: comment.author,
+    context: comment.relatedPost || 'Comentariu verificat',
+    text: comment.text,
+  })),
+].filter(Boolean);
 ---
 
 <BaseLayout title={pageTitle} description={pageDescription} ogImage={ogImage}>
@@ -86,6 +132,31 @@ const topTickerText = 'Dacă ești în căutarea unei Formații Nuntă & Cover B
     <div class="mb-5">
       <BackButton href="/" label="Acasă" />
     </div>
+
+    {priorityVideoPlayers.length > 0 && (
+      <div class="response-top-players" aria-label="Playere video recomandate">
+        <div class="response-top-players__head">
+          <p class="response-section-kicker">Video live</p>
+          <h2>Clipuri live reprezentative</h2>
+          <p>Urmărește momente reale de nuntă: populară, ușoară, petrecere și instrumentală.</p>
+        </div>
+
+        <div class="response-top-players__grid">
+          {priorityVideoPlayers.map((player) => (
+            <article class="response-top-player-card" id={`video-${player.id}`}>
+              <h3>{player.title}</h3>
+              <YoutubeEmbed
+                playlistId={player.playlistId}
+                title={player.title}
+                thumbnailSrc={player.thumbnailSrc}
+                youtubeUrl={player.playlistUrl}
+                class="response-top-player-embed"
+              />
+            </article>
+          ))}
+        </div>
+      </div>
+    )}
 
     <div class="response-shell">
       <div class="response-shell__glow response-shell__glow--cyan" aria-hidden="true"></div>
@@ -100,9 +171,9 @@ const topTickerText = 'Dacă ești în căutarea unei Formații Nuntă & Cover B
       <div class="response-grid">
         <div class="response-copy">
           <p class="response-kicker">Formație live pentru nuntă, botez și evenimente private</p>
-          <h1 class="response-title">Vrei să facem Show și să ne distrăm împreună?</h1>
+          <h1 class="response-title">Vrei ringul plin toată noaptea?</h1>
           <p class="response-lead">
-            Îți oferim o formulă clară, echilibrată și profesionistă, construită pentru un eveniment reușit cap-coadă.
+            Îți oferim muzică live, repertoriu variat și coordonare profesionistă pentru un eveniment reușit de la început la final.
           </p>
 
           <div class="response-offer-highlight" aria-label="Repertoriu și preț orientativ">
@@ -140,7 +211,7 @@ const topTickerText = 'Dacă ești în căutarea unei Formații Nuntă & Cover B
             <div class="response-proof-card" aria-label="Dovadă socială mirii noștri">
               <p class="response-proof-card__kicker">Dovadă Socială</p>
               <h2 class="response-proof-card__title">Vezi cum a fost la nunta lui {featuredCouple.names}</h2>
-              <p class="response-proof-card__text">Poveste reală, recomandare autentică și materiale din eveniment, gata de distribuit pe Facebook.</p>
+              <p class="response-proof-card__text">Poveste reală, recomandare autentică și momente dintr-un eveniment complet.</p>
               <a href={`/comunitate/${featuredCouple.slug}/`} class="response-proof-card__link">Deschide pagina mirilor →</a>
             </div>
           )}
@@ -149,10 +220,20 @@ const topTickerText = 'Dacă ești în căutarea unei Formații Nuntă & Cover B
     </div>
   </section>
 
+  <section class="response-section section-container pb-8" id="recenzii-google">
+    <GoogleBusinessReviews
+      title="Recenzii Google la vedere"
+      subtitle="Dacă vrei confirmare rapidă înainte de ofertă, citește recenziile publice și verifică experiențele clienților noștri."
+      googleProfileUrl={googleBusinessProfileUrl}
+      googleWriteUrl={googleBusinessWriteUrl}
+      reviews={googleBusinessReviews}
+    />
+  </section>
+
   <section class="response-section section-container pb-8" id="video">
     <div class="response-section-head">
-      <p class="response-section-kicker">Flow de eveniment</p>
-      <h2>Playlist YouTube actualizat automat</h2>
+      <p class="response-section-kicker">Momente live</p>
+      <h2>Playlist live pentru evenimentul tău</h2>
     </div>
 
     {hasFeaturedPlaylist ? (
@@ -166,11 +247,11 @@ const topTickerText = 'Dacă ești în căutarea unei Formații Nuntă & Cover B
         />
 
         <div class="response-playlist-meta">
-          <p class="response-playlist-note">Actualizezi playlist-ul pe YouTube și selecția apare automat și în această pagină.</p>
+          <p class="response-playlist-note">Vezi momente live complete și alege direcția muzicală potrivită pentru evenimentul vostru.</p>
           <a href={featuredPlaylistRedirectHref} class="response-playlist-link">Deschide playlistul pe YouTube</a>
         </div>
 
-        <div class="response-process-grid" role="list" aria-label="Pașii experienței noastre">
+        <div class="response-process-grid" role="list" aria-label="Cum lucrăm pentru evenimentul vostru">
           {visibleProcessCards.map((item, index) => (
             <article class="response-process-card" role="listitem" style={`--card-delay:${index * 80}ms`}>
               <span class="response-process-card__index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
@@ -182,7 +263,7 @@ const topTickerText = 'Dacă ești în căutarea unei Formații Nuntă & Cover B
       </div>
     ) : (
       <div class="response-playlist-wrap">
-        <p class="response-playlist-note">Playlistul principal este în curs de configurare pe YouTube. După setarea ID-ului, secțiunea se actualizează automat.</p>
+        <p class="response-playlist-note">Selecția completă de playlist este în pregătire. Până atunci, poți urmări clipurile live de mai sus și ne poți cere oferta.</p>
       </div>
     )}
 
@@ -270,6 +351,88 @@ const topTickerText = 'Dacă ești în căutarea unei Formații Nuntă & Cover B
       font-weight: 800;
       letter-spacing: 0.11em;
       text-transform: uppercase;
+    }
+
+    .response-top-players {
+      margin: 0 0 0.85rem;
+      padding: 0.82rem;
+      border-radius: 1.2rem;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background:
+        radial-gradient(circle at 8% 8%, rgba(11, 188, 214, 0.15), transparent 34%),
+        linear-gradient(165deg, rgba(5, 12, 27, 0.94), rgba(8, 20, 44, 0.94));
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 16px 34px rgba(0, 0, 0, 0.2);
+    }
+
+    .response-top-players__head {
+      max-width: 56rem;
+      margin: 0 auto 0.8rem;
+      text-align: center;
+      display: grid;
+      gap: 0.35rem;
+    }
+
+    .response-top-players__head h2 {
+      margin: 0;
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(1.45rem, 2.85vw, 2.1rem);
+      line-height: 1.12;
+      color: #f8fcff;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .response-top-players__head p {
+      margin: 0;
+      color: rgba(235, 244, 255, 0.8);
+      font-size: 0.93rem;
+      line-height: 1.48;
+    }
+
+    .response-top-players__grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.72rem;
+    }
+
+    .response-top-player-card {
+      display: grid;
+      gap: 0.42rem;
+      border-radius: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: linear-gradient(180deg, rgba(8, 17, 37, 0.86), rgba(4, 10, 24, 0.94));
+      padding: 0.54rem;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    .response-top-player-card h3 {
+      margin: 0;
+      font-size: 0.96rem;
+      line-height: 1.38;
+      color: #ffd26f;
+      font-family: 'Oswald', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .response-top-player-embed {
+      border-radius: 0.85rem;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+      aspect-ratio: 16 / 10;
+    }
+
+    @media (min-width: 72rem) {
+      .response-top-players__grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .response-top-player-card h3 {
+        font-size: 0.84rem;
+      }
     }
 
     .response-shell {
@@ -1310,6 +1473,14 @@ const topTickerText = 'Dacă ești în căutarea unei Formații Nuntă & Cover B
     @media (max-width: 48rem) {
       .response-shell {
         border-radius: 1.1rem;
+      }
+
+      .response-top-players {
+        padding: 0.8rem;
+      }
+
+      .response-top-players__grid {
+        grid-template-columns: 1fr;
       }
 
       .response-pills {

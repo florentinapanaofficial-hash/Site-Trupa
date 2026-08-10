@@ -137,13 +137,33 @@ const ytLink = youtubeUrl || (hasPlaylist
     // ── Inițializare YouTube IFrame API + PostMessage Mutual Exclusion ────────────
     // Asigură că un singur player YouTube este activ pe pagină la orice moment
     
-    var YT_PAUSE = JSON.stringify({ event: 'command', func: 'pauseVideo', args: '' });
+    var YT_PAUSE = JSON.stringify({ event: 'command', func: 'pauseVideo', args: [] });
     var YT_ORIGIN = 'https://www.youtube-nocookie.com';
     var MINI_GATE_SELECTOR = '.yt-gate[data-yt-mini-on-scroll="true"]';
     var miniObserver = null;
 
     function hasMiniOnScroll(gate) {
       return gate && gate.getAttribute('data-yt-mini-on-scroll') === 'true';
+    }
+
+    function isTrustedYouTubeOrigin(origin) {
+      return origin === 'https://www.youtube-nocookie.com' || origin === 'https://www.youtube.com';
+    }
+
+    function extractPlayerState(messageData) {
+      if (!messageData || typeof messageData !== 'object') return null;
+
+      // infoDelivery format: { event: 'infoDelivery', info: { playerState: 1 } }
+      if (messageData.info && typeof messageData.info.playerState === 'number') {
+        return messageData.info.playerState;
+      }
+
+      // onStateChange format: { event: 'onStateChange', info: 1 }
+      if (messageData.event === 'onStateChange' && typeof messageData.info === 'number') {
+        return messageData.info;
+      }
+
+      return null;
     }
 
     function findMiniGateBySource(sourceWindow) {
@@ -224,7 +244,7 @@ const ytLink = youtubeUrl || (hasPlaylist
      */
     window.addEventListener('message', function (e) {
       if (!e.data || !e.source) return;
-      if (e.origin !== YT_ORIGIN) return;
+      if (!isTrustedYouTubeOrigin(e.origin)) return;
 
       var data;
       try {
@@ -233,9 +253,8 @@ const ytLink = youtubeUrl || (hasPlaylist
         return;
       }
 
-      // YouTube trimite playerState: 1 (playing) prin evenimentul infoDelivery
-      if (data.event === 'infoDelivery' && data.info && typeof data.info.playerState === 'number') {
-        var playerState = data.info.playerState;
+      var playerState = extractPlayerState(data);
+      if (typeof playerState === 'number') {
         var activeMiniGate = findMiniGateBySource(e.source);
 
         if (activeMiniGate) {

@@ -22,7 +22,7 @@ Accesează **Supabase Dashboard** > **SQL Editor** și rulează:
 ```
 
 Sau deschide link-ul direct:
-- URL: https://app.supabase.com/project/uhqujllxujfbyvwrafzn/sql/new
+- URL: https://app.supabase.com/project/<project-ref>/sql/new
 - Paste codul din `scripts/supabase-setup.sql`
 - Click **Run**
 
@@ -79,8 +79,8 @@ metadata        JSONB (opțional)      -- Date extra
 ## 🔧 Configurație Variabile (deja în `.env`)
 
 ```env
-PUBLIC_SUPABASE_URL=https://uhqujllxujfbyvwrafzn.supabase.co
-PUBLIC_SUPABASE_ANON_KEY=sb_publishable_Pizn5TO9w3NpDGMtIKLuGg_TIlKCeCT
+PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
+PUBLIC_SUPABASE_ANON_KEY=sb_publishable_xxxxxxxxxxxxxxxxxxxxx
 ```
 
 ---
