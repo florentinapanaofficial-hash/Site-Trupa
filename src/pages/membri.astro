@@ -362,8 +362,10 @@ function initiale(name: string): string {
     popupNext.style.display = total > 1 ? '' : 'none';
     popupPrev.disabled = !hasPrev;
     popupNext.disabled = !hasNext;
-    popupPrev.style.opacity = hasPrev ? '1' : '0.3';
-    popupNext.style.opacity = hasNext ? '1' : '0.3';
+    popupPrev.style.opacity = hasPrev ? '1' : '0';
+    popupNext.style.opacity = hasNext ? '1' : '0';
+    popupPrev.style.pointerEvents = hasPrev ? 'auto' : 'none';
+    popupNext.style.pointerEvents = hasNext ? 'auto' : 'none';
     popupCounter.textContent = total > 1 ? (currentIndex + 1) + ' / ' + total : '';
   }
 

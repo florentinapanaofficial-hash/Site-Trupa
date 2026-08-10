@@ -20,6 +20,7 @@ const hasFeaturedPlaylist = Boolean(featuredPlaylist?.playlistId);
 const featuredPlaylistUrl = featuredPlaylist?.playlistId
   ? `https://www.youtube.com/playlist?list=${featuredPlaylist.playlistId}`
   : siteContent.youtubePlaylists?.channelPlaylistsUrl || siteContent.socialLinks.youtube;
+const youtubeChannelUrl = siteContent.socialLinks.youtube || siteContent.youtubePlaylists?.channelPlaylistsUrl || 'https://www.youtube.com/';
 const featuredPlaylistThumb = featuredPlaylist?.thumbnailVideoId
   ? `https://img.youtube.com/vi/${featuredPlaylist.thumbnailVideoId}/hqdefault.jpg`
   : '/images/logo-fp-stage.svg';
@@ -262,13 +263,19 @@ const googleBusinessReviews = [
         </div>
       </div>
     ) : (
-      <div class="response-playlist-wrap">
-        <p class="response-playlist-note">Selecția completă de playlist este în pregătire. Până atunci, poți urmări clipurile live de mai sus și ne poți cere oferta.</p>
+      <div class="response-process-grid" role="list" aria-label="Cum lucrăm pentru evenimentul vostru">
+        {visibleProcessCards.map((item, index) => (
+          <article class="response-process-card" role="listitem" style={`--card-delay:${index * 80}ms`}>
+            <span class="response-process-card__index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+            <h3>{item.title}</h3>
+            <p>{item.text}</p>
+          </article>
+        ))}
       </div>
     )}
 
     <div class="response-more-videos">
-      <a href="/galerie-video/" class="response-more-videos-link">Vezi toate videoclipurile</a>
+      <a href={youtubeChannelUrl} class="response-more-videos-link" target="_blank" rel="noopener noreferrer">Vezi toate videoclipurile</a>
     </div>
 
     <div class="response-inline-actions">
@@ -1734,14 +1741,13 @@ const googleBusinessReviews = [
     }
   </style>
 
-  <script>
+  <script is:inline>
     const tickerTrack = document.querySelector('[data-ticker-track]');
 
     if (tickerTrack && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       const tickerItem = tickerTrack.querySelector('[data-ticker-item]');
 
       if (tickerItem) {
-        let rafId = 0;
         let resizeRaf = 0;
         let lastTime = performance.now();
         let offset = 0;
@@ -1775,11 +1781,11 @@ const googleBusinessReviews = [
             tickerItem.style.transform = `translateX(${offset}px)`;
           }
 
-          rafId = requestAnimationFrame(tick);
+          requestAnimationFrame(tick);
         };
 
         measureTicker();
-        rafId = requestAnimationFrame(tick);
+        requestAnimationFrame(tick);
 
         if (document.fonts && document.fonts.ready) {
           document.fonts.ready.then(() => {

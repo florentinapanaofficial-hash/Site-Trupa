@@ -250,6 +250,7 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
     let cachedHeaderSpyOffset = 0;
     let cachedOrderedSections = [];
     let bodyScrollLockY = 0;
+    let isBodyScrollLocked = false;
 
     const pauseMenuAudio = () => {
       if (!menuAudio) return;
@@ -281,7 +282,7 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
     };
 
     const lockMobileBodyScroll = () => {
-      if (!isMobileViewport()) return;
+      if (!isMobileViewport() || isBodyScrollLocked) return;
       bodyScrollLockY = window.scrollY;
       document.body.style.position = 'fixed';
       document.body.style.top = `-${bodyScrollLockY}px`;
@@ -289,9 +290,11 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       document.body.style.right = '0';
       document.body.style.width = '100%';
       document.body.style.overflow = 'hidden';
+      isBodyScrollLocked = true;
     };
 
     const unlockMobileBodyScroll = () => {
+      if (!isBodyScrollLocked) return;
       const offset = Math.abs(parseInt(document.body.style.top || '0', 10)) || bodyScrollLockY;
       document.body.style.removeProperty('position');
       document.body.style.removeProperty('top');
@@ -299,6 +302,7 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       document.body.style.removeProperty('right');
       document.body.style.removeProperty('width');
       document.body.style.removeProperty('overflow');
+      isBodyScrollLocked = false;
       if (isMobileViewport()) {
         window.scrollTo(0, offset);
       }
@@ -355,14 +359,15 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       sessionStorage.setItem(MENU_KEY, 'false');
     };
 
-    const openMenu = () => {
+    const openMenu = (options = {}) => {
       if (!headerEl || !menuToggle) return;
+      const restore = Boolean(options.restore);
       headerEl.classList.add('menu-open');
       menuToggle.setAttribute('aria-expanded', 'true');
       menuToggle.setAttribute('aria-label', 'Închide meniul principal');
       syncTopMenuBodyClass(true);
       sessionStorage.setItem(MENU_KEY, 'true');
-      if (isMobileViewport()) {
+      if (isMobileViewport() && !restore) {
         void playMenuAudio();
       }
     };
@@ -373,14 +378,15 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
     recalcHeaderSpyOffset();
     syncTopMenuBodyClass(false);
 
-    // Pe mobil, meniul pornește ÎNCHIS. Pe desktop, restaurăm starea din sessionStorage.
+    // Restaurăm starea meniului din sessionStorage și pe mobil,
+    // astfel refresh-ul nu îl închide dacă utilizatorul îl avea deschis.
     const wasOpen = sessionStorage.getItem(MENU_KEY) === 'true';
 
     if (headerEl && menuToggle) {
-      if (isMobileViewport()) {
+      if (wasOpen) {
+        openMenu({ restore: true });
+      } else {
         closeMenu();
-      } else if (wasOpen) {
-        openMenu();
       }
 
       // Salvează scrollY la deschidere (pt scroll-close)
@@ -412,10 +418,27 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       // Click pe orice link din meniu → închide meniul (și pe mobil)
       const navLinks = document.querySelectorAll('#top-menu-panel [data-nav-link]');
       navLinks.forEach((link) => {
-        link.addEventListener('click', () => {
-          if (!isMobileViewport() && headerEl.classList.contains('menu-open')) {
-            closeMenu();
+        link.addEventListener('click', (event) => {
+          const href = link.getAttribute('href') ?? '';
+          const hasModifierKey = event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
+          const isMainClick = event.button === 0;
+          const target = link.getAttribute('target') ?? '';
+          const isExternalProtocol = /^(https?:|mailto:|tel:)/i.test(href);
+          const isHashLink = href.startsWith('#');
+
+          // Respectăm comportamentele native (new tab, external, hash).
+          if (hasModifierKey || !isMainClick || target === '_blank' || isExternalProtocol || isHashLink) {
+            if (!isMobileViewport() && headerEl.classList.contains('menu-open')) {
+              closeMenu();
+            }
+            return;
           }
+
+          // Pentru linkurile interne, navigăm explicit — bypass pentru cazurile
+          // în care unele motoare mobile ignoră click-ul în overlay fixed.
+          event.preventDefault();
+          closeMenu();
+          window.location.assign(href);
         });
       });
 
@@ -742,6 +765,12 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
 
         if (headerEl && !isMobileViewport()) {
           const currentY = window.scrollY;
+          if (headerEl.classList.contains('menu-open')) {
+            headerEl.classList.remove('header-hidden');
+            lastScrollY = currentY;
+            ticking = false;
+            return;
+          }
           // La top pagină → mereu vizibil
           if (currentY < SCROLL_TOP_ZONE) {
             headerEl.classList.remove('header-hidden');

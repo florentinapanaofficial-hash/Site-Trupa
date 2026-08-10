@@ -522,8 +522,25 @@ const mobileNavAllItems = [
         if (window.__ytMutualExclusionInit) return;
         window.__ytMutualExclusionInit = true;
 
-        var YT_PAUSE = JSON.stringify({ event: 'command', func: 'pauseVideo', args: '' });
-        var YT_ORIGIN = 'https://www.youtube-nocookie.com';
+        var YT_PAUSE = JSON.stringify({ event: 'command', func: 'pauseVideo', args: [] });
+        var YT_ORIGINS = ['https://www.youtube-nocookie.com', 'https://www.youtube.com'];
+
+        function postYouTubeMessage(targetWindow, payload) {
+          if (!targetWindow) return;
+          var serialized = typeof payload === 'string' ? payload : JSON.stringify(payload);
+          YT_ORIGINS.forEach(function (origin) {
+            try { targetWindow.postMessage(serialized, origin); } catch (_) {}
+          });
+          try { targetWindow.postMessage(serialized, '*'); } catch (_) {}
+        }
+
+        function pauseNativeMediaExcept(activeMedia) {
+          document.querySelectorAll('audio, video').forEach(function (media) {
+            if (media !== activeMedia && !media.paused) {
+              media.pause();
+            }
+          });
+        }
 
         /**
          * Pauzează TOȚI playerele YouTube de pe pagină mai puțin cel activ
@@ -533,7 +550,7 @@ const mobileNavAllItems = [
           document.querySelectorAll('iframe[src*="youtube"]').forEach(function (iframe) {
             try {
               if (iframe.contentWindow && iframe.contentWindow !== activeSource) {
-                iframe.contentWindow.postMessage(YT_PAUSE, YT_ORIGIN);
+                postYouTubeMessage(iframe.contentWindow, YT_PAUSE);
               }
             } catch (err) {
               console.warn('Error pausing YouTube player:', err);
@@ -547,7 +564,7 @@ const mobileNavAllItems = [
          */
         window.addEventListener('message', function (e) {
           if (!e.data || !e.source) return;
-          if (e.origin !== YT_ORIGIN) return;
+          if (YT_ORIGINS.indexOf(e.origin) === -1) return;
 
           var data;
           try {
@@ -559,8 +576,22 @@ const mobileNavAllItems = [
           // YouTube trimite playerState: 1 (playing) prin evenimentul infoDelivery
           if (data.event === 'infoDelivery' && data.info && data.info.playerState === 1) {
             pauseAllExcept(e.source);
+            pauseNativeMediaExcept(null);
+          }
+
+          if (data.event === 'onStateChange' && Number(data.info) === 1) {
+            pauseAllExcept(e.source);
+            pauseNativeMediaExcept(null);
           }
         });
+
+        // Când pornește un audio/video HTML5, îl punem exclusiv.
+        document.addEventListener('play', function (event) {
+          var active = event.target;
+          if (!active || (active.tagName !== 'AUDIO' && active.tagName !== 'VIDEO')) return;
+          pauseNativeMediaExcept(active);
+          pauseAllExcept(null);
+        }, true);
       })();
     </script>
 

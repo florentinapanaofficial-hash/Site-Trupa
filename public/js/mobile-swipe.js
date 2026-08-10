@@ -79,7 +79,9 @@
 
     function isLowerPageReached() {
         var scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
-        if (scrollableHeight <= 0) return true;
+        // Pentru pagini foarte scurte, ascundem complet săgețile.
+        // Altfel ar rămâne permanent vizibile, deși nu există scroll util.
+        if (scrollableHeight <= 120) return false;
         var progress = (window.scrollY || window.pageYOffset) / scrollableHeight;
         return progress >= 0.8;
     }

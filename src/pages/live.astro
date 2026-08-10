@@ -272,7 +272,6 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
                   rel="noopener noreferrer"
                   class="live-card-share"
                   aria-label={`Distribuie ${replay.title} pe Facebook`}
-                  onclick="event.stopPropagation()"
                 >
                   Distribuie pe Facebook
                 </a>
@@ -818,7 +817,6 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
     const likeBtn = document.getElementById('btn-like');
     const likeCount = document.getElementById('like-count');
     const lowerThird = document.getElementById('lower-third');
-    const lowerThirdText = document.getElementById('lower-third-text');
     const client = window.supabaseClient;
     
     // Identifică stream-ul după data curentă
@@ -870,7 +868,7 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
 
     // ── Realtime listener — ascultă noi like-uri ──
     if (lowerThird && client) {
-      const channel = client
+      client
         .channel(`interactions:stream_id=eq.${streamId}`)
         .on(
           'postgres_changes',
@@ -1077,19 +1075,7 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
         if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
           navigator.share(shareData).catch(function () {});
         } else {
-          navigator.clipboard.writeText(url).then(showShareToast).catch(function () {
-            try {
-              var ta = document.createElement('textarea');
-              ta.value = url;
-              ta.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
-              document.body.appendChild(ta);
-              ta.focus();
-              ta.select();
-              document.execCommand('copy');
-              document.body.removeChild(ta);
-              showShareToast();
-            } catch (err) {}
-          });
+          navigator.clipboard.writeText(url).then(showShareToast).catch(function () {});
         }
       });
     }

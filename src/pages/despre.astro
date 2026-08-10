@@ -9,9 +9,9 @@ import GoogleBusinessReviews from '../components/GoogleBusinessReviews.astro';
 const { contact, services, repertoire } = siteContent as any;
 const despre = seo.despre;
 const featuredCouple = couplesData.couples[0];
-const aboutMontageCloudflareUid = 'a730f6e433418be5fe0c13e11af5728b';
+const aboutMontageCloudflareUid = (import.meta.env.PUBLIC_ABOUT_MONTAGE_CLOUDFLARE_UID ?? '').trim();
 const aboutMontageCloudflareSrc = aboutMontageCloudflareUid.trim()
-  ? `https://iframe.videodelivery.net/${aboutMontageCloudflareUid.trim()}`
+  ? `https://iframe.cloudflarestream.com/${aboutMontageCloudflareUid.trim()}`
   : '';
 
 const googleBusinessProfileUrl = 'https://g.page/r/Ca7MqSu2OLysEAE';

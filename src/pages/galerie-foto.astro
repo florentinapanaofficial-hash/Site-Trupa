@@ -405,19 +405,6 @@ const photos = [...latestPhotos, ...basePhotos];
     renderMontage(montageIndex + 1);
   }
 
-  async function playMontageAudio() {
-    if (!montageAudio || !montageAudio.src) return;
-    try {
-      await ensureAudioGraph();
-      if (montageAudio.paused) {
-        await montageAudio.play();
-      }
-      startBeatDetection();
-    } catch {
-      stopBeatDetection();
-    }
-  }
-
   function pauseMontageAudio() {
     if (!montageAudio) return;
     if (!montageAudio.paused) montageAudio.pause();

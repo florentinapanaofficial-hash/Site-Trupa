@@ -279,7 +279,7 @@ function formatDate(date: string | Date | undefined) {
     </div>
   </section>
 
-  <script type="application/json" id="blog-search-data" set:html={JSON.stringify(searchIndex)}></script>
+  <script is:inline type="application/json" id="blog-search-data" set:html={JSON.stringify(searchIndex)}></script>
   <script is:inline>
     (() => {
       const input = document.getElementById('blog-search');

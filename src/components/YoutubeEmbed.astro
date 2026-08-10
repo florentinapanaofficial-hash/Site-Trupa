@@ -138,7 +138,9 @@ const ytLink = youtubeUrl || (hasPlaylist
     // Asigură că un singur player YouTube este activ pe pagină la orice moment
     
     var YT_PAUSE = JSON.stringify({ event: 'command', func: 'pauseVideo', args: [] });
-    var YT_ORIGIN = 'https://www.youtube-nocookie.com';
+    var YT_LISTEN = JSON.stringify({ event: 'listening' });
+    var YT_ADD_STATE_LISTENER = JSON.stringify({ event: 'command', func: 'addEventListener', args: ['onStateChange'] });
+    var YT_ORIGINS = ['https://www.youtube-nocookie.com', 'https://www.youtube.com'];
     var MINI_GATE_SELECTOR = '.yt-gate[data-yt-mini-on-scroll="true"]';
     var miniObserver = null;
 
@@ -148,6 +150,30 @@ const ytLink = youtubeUrl || (hasPlaylist
 
     function isTrustedYouTubeOrigin(origin) {
       return origin === 'https://www.youtube-nocookie.com' || origin === 'https://www.youtube.com';
+    }
+
+    function postYouTubeMessage(targetWindow, payload) {
+      if (!targetWindow) return;
+      var serialized = typeof payload === 'string' ? payload : JSON.stringify(payload);
+
+      // Unele iframe-uri răspund doar pe origine strictă, altele pe wildcard.
+      YT_ORIGINS.forEach(function (origin) {
+        try {
+          targetWindow.postMessage(serialized, origin);
+        } catch (err) {}
+      });
+
+      try {
+        targetWindow.postMessage(serialized, '*');
+      } catch (err) {}
+    }
+
+    function pauseAllNativeMediaExcept(activeMedia) {
+      document.querySelectorAll('audio, video').forEach(function (media) {
+        if (media !== activeMedia && !media.paused) {
+          media.pause();
+        }
+      });
     }
 
     function extractPlayerState(messageData) {
@@ -230,7 +256,7 @@ const ytLink = youtubeUrl || (hasPlaylist
       document.querySelectorAll('iframe[src*="youtube"]').forEach(function (iframe) {
         try {
           if (iframe.contentWindow && iframe.contentWindow !== activeSource) {
-            iframe.contentWindow.postMessage(YT_PAUSE, YT_ORIGIN);
+            postYouTubeMessage(iframe.contentWindow, YT_PAUSE);
           }
         } catch (err) {
           console.warn('Error pausing YouTube player:', err);
@@ -264,6 +290,7 @@ const ytLink = youtubeUrl || (hasPlaylist
 
         if (playerState === 1) {
           pauseAllExcept(e.source);
+          pauseAllNativeMediaExcept(null);
 
           document.querySelectorAll(MINI_GATE_SELECTOR).forEach(function (gate) {
             if (gate !== activeMiniGate) {
@@ -288,13 +315,20 @@ const ytLink = youtubeUrl || (hasPlaylist
 
       var iframe = document.createElement('iframe');
       // Adaugă enablejsapi=1 pentru YouTube IFrame API și postMessage support
-      iframe.src = src + (src.includes('?') ? '&' : '?') + 'enablejsapi=1';
+      var separator = src.includes('?') ? '&' : '?';
+      var embedOrigin = encodeURIComponent(window.location.origin);
+      iframe.src = src + separator + 'enablejsapi=1&playsinline=1&origin=' + embedOrigin;
       iframe.title = title;
       iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
       iframe.setAttribute('allowfullscreen', '');
       iframe.setAttribute('referrerpolicy', 'origin');
       iframe.setAttribute('loading', 'lazy');
       iframe.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:0;';
+      iframe.addEventListener('load', function () {
+        if (!iframe.contentWindow) return;
+        postYouTubeMessage(iframe.contentWindow, YT_LISTEN);
+        postYouTubeMessage(iframe.contentWindow, YT_ADD_STATE_LISTENER);
+      });
       gate.appendChild(iframe);
       registerMiniGate(gate);
     }
@@ -318,6 +352,11 @@ const ytLink = youtubeUrl || (hasPlaylist
     document.addEventListener('click', function (e) {
       var btn = (e.target).closest?.('.yt-gate__btn-accept');
       if (!btn) return;
+
+      // Când utilizatorul pornește alt clip, oprim imediat celelalte surse.
+      pauseAllExcept(null);
+      pauseAllNativeMediaExcept(null);
+
       try { localStorage.setItem('cookie_consent', 'granted'); } catch (_) {}
       window.dispatchEvent(new CustomEvent('cookie:granted'));
     });

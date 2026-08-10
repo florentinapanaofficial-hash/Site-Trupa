@@ -9,7 +9,13 @@ const videoSeo = seo.galerieVideo;
 
 const channelPlaylistsUrl = siteContent.youtubePlaylists?.channelPlaylistsUrl ?? siteContent.socialLinks.youtube;
 
-const playlistConfigBySection = siteContent.youtubePlaylists?.galerieVideo ?? {};
+type PlaylistSectionConfig = {
+  title?: string;
+  playlistId?: string;
+  thumbnailVideoId?: string;
+};
+
+const playlistConfigBySection = (siteContent.youtubePlaylists?.galerieVideo ?? {}) as Record<string, PlaylistSectionConfig>;
 
 const playlistThumb = (videoId?: string) => videoId
   ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`

@@ -1,5 +1,5 @@
 ---
-import { Image, getImage } from 'astro:assets';
+import { getImage } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import siteContent from '../data/siteContent.json';
 import seo from '../data/seo-content.json';
@@ -35,7 +35,13 @@ const heroVideos = siteContent.videos.slice(0, 3).map((video) => ({
   thumbJpg: `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`,
 }));
 
-const homepagePhotoSources = {
+type HomepagePhotoSource = {
+  fallbackSrc: string;
+  avifSrcSet?: string;
+  webpSrcSet?: string;
+};
+
+const homepagePhotoSources: Record<'claudiuFlorentina' | 'anaFlorentina' | 'evenimentOne' | 'claudiuTwo', HomepagePhotoSource> = {
   claudiuFlorentina: {
     avifSrcSet: '/images/galerie-foto-site/placerea-scenei-claudiu-florentina-500.avif 500w, /images/galerie-foto-site/placerea-scenei-claudiu-florentina-700.avif 700w, /images/galerie-foto-site/placerea-scenei-claudiu-florentina-1000.avif 1000w',
     webpSrcSet: '/images/galerie-foto-site/placerea-scenei-claudiu-florentina-500.webp 500w, /images/galerie-foto-site/placerea-scenei-claudiu-florentina-700.webp 700w, /images/galerie-foto-site/placerea-scenei-claudiu-florentina-1000.webp 1000w',
@@ -495,16 +501,20 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
           aria-label="Vezi mai multe fotografii din galerie"
         >
           <picture>
-            <source
-              type="image/avif"
-              srcset={source.avifSrcSet}
-              sizes="(max-width: 767px) 92vw, 399px"
-            />
-            <source
-              type="image/webp"
-              srcset={source.webpSrcSet}
-              sizes="(max-width: 767px) 92vw, 399px"
-            />
+            {source.avifSrcSet && (
+              <source
+                type="image/avif"
+                srcset={source.avifSrcSet}
+                sizes="(max-width: 767px) 92vw, 399px"
+              />
+            )}
+            {source.webpSrcSet && (
+              <source
+                type="image/webp"
+                srcset={source.webpSrcSet}
+                sizes="(max-width: 767px) 92vw, 399px"
+              />
+            )}
             <img src={source.fallbackSrc} alt={photo.alt} loading="lazy" decoding="async" width="500" height="889" />
           </picture>
           <span class="hp-cine-overlay" aria-hidden="true"></span>
@@ -1274,11 +1284,27 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
     font-size: clamp(3rem, 7.5vw, 5.5rem);
     letter-spacing: 0.06em;
     line-height: 1.0;
-    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 35%, #ffc700 70%, #ffb700 100%);
+    background: linear-gradient(135deg, #fff6da 0%, #ffe18a 34%, #ffd056 64%, #f2b63f 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 2px 8px rgba(255, 215, 0, 0.3));
+    text-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.3),
+      0 0 9px rgba(255, 223, 125, 0.34),
+      0 0 16px rgba(244, 180, 58, 0.2);
+    filter: drop-shadow(0 2px 6px rgba(255, 205, 76, 0.24));
+    will-change: filter;
+  }
+
+  .hero-title-gold--compact {
+    background: linear-gradient(132deg, #fff7e2 0%, #ffe59b 36%, #ffd263 66%, #f4be46 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.34),
+      0 0 10px rgba(255, 223, 138, 0.36),
+      0 0 18px rgba(244, 184, 70, 0.24);
   }
 
   @media (max-width: 767px) {
@@ -1290,6 +1316,18 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
 
     .hero-title-gold {
       font-size: clamp(2.48rem, 6.7vw, 4.95rem);
+      text-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.4),
+        0 0 12px rgba(255, 228, 142, 0.4),
+        0 0 20px rgba(244, 184, 72, 0.28);
+      filter: drop-shadow(0 2px 7px rgba(255, 205, 84, 0.3));
+    }
+
+    .hero-title-gold--compact {
+      text-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.46),
+        0 0 12px rgba(255, 233, 156, 0.46),
+        0 0 22px rgba(244, 188, 78, 0.32);
     }
   }
 
