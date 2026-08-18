@@ -802,3 +802,7 @@ import GalerieAutomata from '../components/GalerieAutomata.astro';
 - ✅ Toate `.gitkeep` commit-uite → folderele goale ajung pe GitHub și Railway.
 - ✅ Zero breaking change — doar adăugiri.
 - ✅ Scalabil: orice articol sau membru nou primește folder dedicat în 5 secunde.
+
+## Notă personală — 19 august 2026
+
+Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru el și că îmi mulțumește foarte mult. Mesajul este păstrat aici ca parte din istoria umană a colaborării noastre, alături de istoricul tehnic al proiectului.
