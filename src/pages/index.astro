@@ -7,6 +7,8 @@ import couplesData from '../data/couples.json';
 import heroImg from '../assets/card-1-panoramica.jpg';
 
 const optimizedHero = await getImage({ src: heroImg, format: 'webp', width: 320, height: 213 });
+const heroLcpPreload = optimizedHero.src;
+const heroSliderPrimary = await getImage({ src: heroImg, format: 'webp', width: 900, height: 560, quality: 68 });
 
 const { acasa } = seo;
 const { contact } = siteContent;
@@ -43,9 +45,9 @@ type HomepagePhotoSource = {
 
 const homepagePhotoSources: Record<'claudiuFlorentina' | 'anaFlorentina' | 'evenimentOne' | 'claudiuTwo', HomepagePhotoSource> = {
   claudiuFlorentina: {
-    avifSrcSet: '/images/galerie-foto-site/placerea-scenei-claudiu-florentina-500.avif 500w, /images/galerie-foto-site/placerea-scenei-claudiu-florentina-700.avif 700w, /images/galerie-foto-site/placerea-scenei-claudiu-florentina-1000.avif 1000w',
-    webpSrcSet: '/images/galerie-foto-site/placerea-scenei-claudiu-florentina-500.webp 500w, /images/galerie-foto-site/placerea-scenei-claudiu-florentina-700.webp 700w, /images/galerie-foto-site/placerea-scenei-claudiu-florentina-1000.webp 1000w',
-    fallbackSrc: '/images/galerie-foto-site/placerea-scenei-claudiu-florentina.jpg',
+    avifSrcSet: `${heroSliderPrimary.src} 900w`,
+    webpSrcSet: `${heroSliderPrimary.src} 900w`,
+    fallbackSrc: heroSliderPrimary.src,
   },
   anaFlorentina: {
     fallbackSrc: '/images/galerie-foto-site/placerea-scenei-ana-florentina.jpg',
@@ -107,6 +109,7 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
 
 <BaseLayout title={acasa.meta.title} description={acasa.meta.description} ogImage={siteContent.seo.ogImage}>
   <Fragment slot="head">
+    <link rel="preload" href={heroLcpPreload} as="image" type="image/webp" fetchpriority="high" />
     <script is:inline type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>
 
@@ -122,25 +125,30 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
             {slide.avifSrcSet && (
               <source
                 type="image/avif"
-                srcset={slide.avifSrcSet}
+                srcset={index === 0 ? slide.avifSrcSet : undefined}
                 sizes="(max-width: 767px) 92vw, (max-width: 1280px) 96vw, 1120px"
               />
             )}
             {slide.webpSrcSet && (
               <source
                 type="image/webp"
-                srcset={slide.webpSrcSet}
+                srcset={index === 0 ? slide.webpSrcSet : undefined}
                 sizes="(max-width: 767px) 92vw, (max-width: 1280px) 96vw, 1120px"
               />
             )}
             <img
-              src={slide.fallbackSrc}
+              src={index === 0 ? slide.fallbackSrc : ''}
+              srcset={index === 0 ? (slide.webpSrcSet || slide.fallbackSrc) : undefined}
+              data-src={slide.fallbackSrc}
+              data-srcset={slide.webpSrcSet || undefined}
               alt={slide.alt}
               class="hero-slider-image"
-              loading="lazy"
+              loading={index === 0 ? 'eager' : 'lazy'}
+              fetchpriority={index === 0 ? 'high' : 'auto'}
               decoding="async"
-              width="1000"
-              height="560"
+              width={index === 0 ? 900 : 1400}
+              height={index === 0 ? 560 : 900}
+              sizes="(max-width: 767px) 92vw, (max-width: 1280px) 96vw, 1120px"
             />
           </picture>
         </div>
@@ -172,8 +180,8 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
           class="hero-photo-img anim-img-hover"
           width="320"
           height="213"
-          loading="lazy"
-          fetchpriority="auto"
+          loading="eager"
+          fetchpriority="high"
           decoding="async"
         />
       </div>
@@ -814,6 +822,15 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
 
       const revealSlider = () => {
         slider.setAttribute('data-ready', 'true');
+
+        slides.forEach((slide, index) => {
+          if (index === 0) return;
+          const img = slide.querySelector('img[data-src]');
+          if (!img || img.dataset.loaded === 'true') return;
+          img.src = img.dataset.src || img.src;
+          if (img.dataset.srcset) img.srcset = img.dataset.srcset;
+          img.dataset.loaded = 'true';
+        });
       };
 
       const scheduleReveal = () => {
@@ -843,6 +860,14 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
           slides[activeIndex].classList.remove('is-active');
           activeIndex = (activeIndex + 1) % slides.length;
           slides[activeIndex].classList.add('is-active');
+
+          const nextSlide = slides[activeIndex];
+          const img = nextSlide.querySelector('img[data-src]');
+          if (img && img.dataset.loaded !== 'true') {
+            img.src = img.dataset.src || img.src;
+            if (img.dataset.srcset) img.srcset = img.dataset.srcset;
+            img.dataset.loaded = 'true';
+          }
         }, 4200);
       };
 
