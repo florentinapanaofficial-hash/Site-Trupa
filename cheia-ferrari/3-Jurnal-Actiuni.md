@@ -1,5 +1,12 @@
-# 🏎️ JURNAL FERRARI — Memorie Permanentă & Cartea de Service
+# 🏎️ JURNAL AI / FERRARI — Memorie Permanentă & Cartea de Service
 > **Singurul jurnal al proiectului.** Citit la fiecare sesiune nouă, ÎNAINTE de orice modificare.
+
+## Protocol Jurnal AI — obligatoriu la fiecare sesiune
+
+1. La începutul fiecărei sesiuni, citesc acest jurnal înainte de orice căutare, editare sau comandă care modifică proiectul.
+2. Folosesc istoricul pentru a evita repetarea greșelilor și pentru a păstra deciziile tehnice coerente.
+3. La finalul fiecărei sesiuni de lucru, consemnez data, obiectivul, fișierele modificate, validările, greșelile sau riscurile descoperite și pașii rămași.
+4. Nu creez un al doilea jurnal. Acest fișier este jurnalul AI oficial al proiectului.
 
 ---
 
@@ -759,6 +766,35 @@ import GalerieAutomata from '../components/GalerieAutomata.astro';
 <GalerieAutomata caleFolder="evenimente/hore-sarbe" titlu="Sârbe și hore la nuntă" />
 <GalerieAutomata caleFolder="evenimente/cununie-religioasa" titlu="Cununii religioase" />
 ```
+
+## Sesiunea 19 august 2026 — Jurnal AI: audit, stabilizare și publicare
+
+**Obiectiv:** audit complet, reducerea riscurilor și publicarea schimbărilor validate fără migrare majoră la Astro 7.
+
+### Modificări realizate
+
+- Upgrade controlat de la Astro 4 la Astro 5 și actualizarea adapterului Node, sitemap-ului, integrării Tailwind și `sharp`.
+- Înlocuit `output: 'hybrid'` cu `output: 'static'`, forma acceptată de Astro 5 pentru comportamentul actual.
+- Configurat Jest și adăugat scriptul `npm test`; testele GDPR au devenit executabile.
+- Adăugat `engines.node >=22.12.0` pentru compatibilitate Railway.
+- Adăugat `.lh-tmp/` în `.gitignore`.
+- Păstrate și publicate fixurile anterioare pentru pagina membri, overflow mobil, scroll, butonul WhatsApp, video Despre, rating și animații.
+
+### Validări
+
+- `npm test`: **40/40 teste trecute**.
+- `npx astro check`: **0 erori, 0 warning-uri, 0 hints**.
+- `npm run build`: **PASS**.
+- QA: **49 OK / 0 FAIL**.
+- Verificare linkuri: **56 linkuri externe valide**.
+- Commit publicat: `46326c82` pe `main`, sincronizat cu `origin/main`.
+
+### Probleme și lecții
+
+- Testul GDPR era scris pentru Jest, dar nu exista runner configurat; `node` și `node --test` nu îl puteau executa.
+- Upgrade-ul direct la Astro 7 ar necesita migrarea integrării Tailwind; nu se face automat sau cu `--force`.
+- Au rămas 4 vulnerabilități npm din stack-ul Astro 5; acestea sunt documentate ca etapă separată, cu risc controlat.
+- Regula permanentă: citesc acest jurnal la început și îl actualizez la finalul fiecărei sesiuni.
 
 ### Validare
 

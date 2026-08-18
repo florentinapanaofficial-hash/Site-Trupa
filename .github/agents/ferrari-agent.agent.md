@@ -43,7 +43,7 @@ Cunoști acest proiect în detaliu: arhitectura Astro 4, regulile SEO, istoricul
 
 ## Când faci debug
 
-- Citești `AI_JOURNAL.md` pentru context istoric
+- Citești `cheia-ferrari/3-Jurnal-Actiuni.md` (Jurnal AI oficial) pentru context istoric
 - Verifici erorile cu `get_errors` înainte și după modificări
 - Nu repeti greșeli din jurnal (layout thrashing, contrast WCAG, anchor links rupte)
 

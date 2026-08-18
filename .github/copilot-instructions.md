@@ -169,7 +169,14 @@ seo-agent/
 
 ---
 
-## Jurnal Sesiuni Anterioare (Probleme Rezolvate)
+## Jurnal AI și sesiuni anterioare
+
+- Jurnalul oficial și unic este `cheia-ferrari/3-Jurnal-Actiuni.md`.
+- Se citește înainte de orice modificare.
+- La finalul fiecărei sesiuni se consemnează obiectivul, fișierele modificate, validările, greșelile/riscurile și pașii următori.
+- Nu se creează un fișier separat `AI_JOURNAL.md`.
+
+### Probleme Rezolvate
 
 | Data | Problemă | Fix |
 |------|----------|-----|
