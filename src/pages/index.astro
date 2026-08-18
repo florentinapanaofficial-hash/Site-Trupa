@@ -7,8 +7,8 @@ import couplesData from '../data/couples.json';
 import heroImg from '../assets/card-1-panoramica.jpg';
 
 const optimizedHero = await getImage({ src: heroImg, format: 'webp', width: 320, height: 213 });
-const heroLcpPreload = optimizedHero.src;
 const heroSliderPrimary = await getImage({ src: heroImg, format: 'webp', width: 900, height: 560, quality: 68 });
+const heroLcpPreload = heroSliderPrimary.src;
 
 const { acasa } = seo;
 const { contact } = siteContent;
