@@ -8,7 +8,7 @@ const siteUrl = process.env.SITE_URL || 'https://www.florentinapanaofficial.ro';
 export default defineConfig({
   site: siteUrl,
   devToolbar: { enabled: false },
-  output: 'hybrid',
+  output: 'static',
   trailingSlash: 'always',
   compressHTML: true,
   build: {

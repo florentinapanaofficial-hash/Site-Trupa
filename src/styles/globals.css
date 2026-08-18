@@ -2548,6 +2548,37 @@ details:focus-visible {
   }
 }
 
+@media (max-width: 380px),
+(max-height: 700px) {
+  .top-header .mobile-overlay-content {
+    gap: 0.65rem;
+    padding-top: 3.8rem;
+    padding-bottom: 0.8rem;
+  }
+
+  .top-header .mobile-overlay-hero {
+    width: calc(100vw - 2rem);
+    padding: 0.7rem 0.75rem 0.8rem;
+  }
+
+  .top-header .mobile-overlay-hero__subtitle {
+    font-size: 0.75rem;
+  }
+
+  .top-menu-panel .nav-mobile-grid {
+    gap: 0.45rem;
+  }
+
+  .top-menu-panel .nav-link-mobile {
+    width: min(calc(100vw - 2rem), 25rem);
+    min-height: 44px;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.82rem;
+    letter-spacing: 0.05em;
+    white-space: normal;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .btn-solid {
     animation: none !important;
@@ -2637,6 +2668,22 @@ details:focus-visible {
   transform: translateY(0);
 }
 
+/* Reveal comun pentru blocurile de conținut de pe paginile secundare. */
+.page-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--page-reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+.page-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 /* ═══════════════════════════════════════════════════════════════
    TEXT GOLD GRADIENT — gradient auriu/champagne pe text
    Contrast AA asigurat pe fundal #0C080F:
@@ -2652,7 +2699,9 @@ details:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .text-reveal {
+
+  .text-reveal,
+  .page-reveal {
     opacity: 1;
     transform: none;
     transition: none;
@@ -2665,13 +2714,16 @@ details:focus-visible {
    „salt al paginii cu câțiva milimetri în sus". Păstrăm doar fade-in,
    fără mișcare verticală — eliminăm complet senzația de jump. */
 @media (max-width: 767px) {
-  .text-reveal {
+
+  .text-reveal,
+  .page-reveal {
     transform: none;
     transition: opacity 0.45s ease-out;
-    transition-delay: var(--reveal-delay, 0ms);
+    transition-delay: var(--reveal-delay, var(--page-reveal-delay, 0ms));
   }
 
-  .text-reveal.is-visible {
+  .text-reveal.is-visible,
+  .page-reveal.is-visible {
     transform: none;
   }
 }

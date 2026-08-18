@@ -58,6 +58,11 @@ const safeReviews = Array.isArray(reviews)
     <p class="gb-reviews__empty">Recenziile Google vor apărea aici imediat ce sunt publicate sau sincronizate.</p>
   )}
 
+  <div class="gb-reviews__rating" aria-label="Evaluare de 5 stele din 5">
+    <span class="gb-reviews__rating-stars" aria-hidden="true">★★★★★</span>
+    <span class="gb-reviews__rating-label">Lasă-ne experiența ta pe Google</span>
+  </div>
+
   <div class="gb-reviews__actions">
     <a href={googleProfileUrl} target="_blank" rel="noopener noreferrer" class="gb-reviews__btn gb-reviews__btn--primary">Vezi toate recenziile pe Google</a>
     <a href={googleWriteUrl} target="_blank" rel="noopener noreferrer" class="gb-reviews__btn gb-reviews__btn--ghost">Lasă o recenzie</a>
@@ -161,6 +166,31 @@ const safeReviews = Array.isArray(reviews)
     padding: 0.5rem 0;
   }
 
+  .gb-reviews__rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.62rem;
+    margin-top: 0.85rem;
+    padding: 0.42rem 0.7rem;
+    border: 1px solid rgba(255, 211, 111, 0.2);
+    border-radius: 999px;
+    background: rgba(255, 211, 111, 0.07);
+  }
+
+  .gb-reviews__rating-stars {
+    color: #ffd36f;
+    font-size: 1.1rem;
+    letter-spacing: 0.13em;
+    line-height: 1;
+    text-shadow: 0 0 12px rgba(255, 211, 111, 0.42);
+  }
+
+  .gb-reviews__rating-label {
+    color: rgba(255, 239, 193, 0.92);
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+
   .gb-reviews__actions {
     display: flex;
     flex-wrap: wrap;
@@ -205,6 +235,14 @@ const safeReviews = Array.isArray(reviews)
 
     .gb-reviews__head p {
       font-size: 0.94rem;
+    }
+
+    .gb-reviews__rating {
+      max-width: 100%;
+    }
+
+    .gb-reviews__rating-label {
+      font-size: 0.73rem;
     }
   }
 </style>

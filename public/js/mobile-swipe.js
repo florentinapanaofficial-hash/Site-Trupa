@@ -412,6 +412,7 @@
     var pageOrder = SITE_PAGE_ORDER.slice();
     var currentPath = normalizePath(location.pathname);
     var pageIdx = pageOrder.indexOf(currentPath);
+    var isMembersPage = currentPath === '/membri/';
 
     /* Marchează butonul activ din navbar */
     setActiveHref(currentPath);
@@ -446,6 +447,10 @@
     var tStartX = 0, tStartY = 0, tSkipSwipe = false;
 
     document.addEventListener('touchstart', function (e) {
+        if (isMembersPage) {
+            tSkipSwipe = true;
+            return;
+        }
         if (shouldSkipGlobalTouch(e.target)) {
             tSkipSwipe = true; return;
         }

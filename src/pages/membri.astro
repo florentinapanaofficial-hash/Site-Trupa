@@ -65,7 +65,7 @@ function initiale(name: string): string {
               ) : (
                 <div class="ac-ph"><div class="ac-ph-light" aria-hidden="true"></div><span class="ac-initials">{initiale(m.nume)}</span></div>
               )}
-              {areGalerieFoto(m) && m.galpisFoto.slice(1, 7).map((foto: any, n: number) => (
+              {areGalerieFoto(m) && m.galpisFoto.slice(1).map((foto: any, n: number) => (
                 <img class="ac-photo" src={foto.src} alt={foto.alt ?? m.nume} loading="lazy" decoding="async" width="560" height="840" data-slide={n + 1} />
               ))}
             </div>
@@ -83,7 +83,7 @@ function initiale(name: string): string {
                 {m.citat && <blockquote class="ac-citat"><p>{m.citat}</p></blockquote>}
                 {areGalerieFoto(m) && (
                   <div class="ac-strip" role="list" aria-label={`Galerie ${m.nume}`}>
-                    {m.galpisFoto.slice(0, 5).map((foto: any, n: number) => (
+                    {m.galpisFoto.map((foto: any, n: number) => (
                       <button class="ac-th gallery-thumb" type="button" role="listitem"
                         data-src={foto.src} data-alt={foto.alt ?? m.nume} data-member={m.nume}
                         data-fx={String((n % 6) + 1)} tabindex="-1" aria-label={foto.alt ?? `Foto ${n + 1}`}>
@@ -139,7 +139,7 @@ function initiale(name: string): string {
               ) : (
                 <div class="ac-ph"><div class="ac-ph-light" aria-hidden="true"></div><span class="ac-initials">{initiale(m.nume)}</span></div>
               )}
-              {areGalerieFoto(m) && m.galpisFoto.slice(1, 7).map((foto: any, n: number) => (
+              {areGalerieFoto(m) && m.galpisFoto.slice(1).map((foto: any, n: number) => (
                 <img class="ac-photo" src={foto.src} alt={foto.alt ?? m.nume} loading="lazy" decoding="async" width="560" height="840" data-slide={n + 1} />
               ))}
             </div>
@@ -156,7 +156,7 @@ function initiale(name: string): string {
                 {m.citat && <blockquote class="ac-citat"><p>{m.citat}</p></blockquote>}
                 {areGalerieFoto(m) && (
                   <div class="ac-strip" role="list" aria-label={`Galerie ${m.nume}`}>
-                    {m.galpisFoto.slice(0, 5).map((foto: any, n: number) => (
+                    {m.galpisFoto.map((foto: any, n: number) => (
                       <button class="ac-th gallery-thumb" type="button" role="listitem"
                         data-src={foto.src} data-alt={foto.alt ?? m.nume} data-member={m.nume}
                         data-fx={String((n % 6) + 1)} tabindex="-1" aria-label={foto.alt ?? `Foto ${n + 1}`}>
@@ -212,7 +212,7 @@ function initiale(name: string): string {
               ) : (
                 <div class="ac-ph"><div class="ac-ph-light" aria-hidden="true"></div><span class="ac-initials">{initiale(m.nume)}</span></div>
               )}
-              {areGalerieFoto(m) && m.galpisFoto.slice(1, 7).map((foto: any, n: number) => (
+              {areGalerieFoto(m) && m.galpisFoto.slice(1).map((foto: any, n: number) => (
                 <img class="ac-photo" src={foto.src} alt={foto.alt ?? m.nume} loading="lazy" decoding="async" width="560" height="840" data-slide={n + 1} />
               ))}
             </div>
@@ -230,7 +230,7 @@ function initiale(name: string): string {
                 {m.citat && <blockquote class="ac-citat"><p>{m.citat}</p></blockquote>}
                 {areGalerieFoto(m) && (
                   <div class="ac-strip" role="list" aria-label={`Galerie ${m.nume}`}>
-                    {m.galpisFoto.slice(0, 5).map((foto: any, n: number) => (
+                    {m.galpisFoto.map((foto: any, n: number) => (
                       <button class="ac-th gallery-thumb" type="button" role="listitem"
                         data-src={foto.src} data-alt={foto.alt ?? m.nume} data-member={m.nume}
                         data-fx={String((n % 6) + 1)} tabindex="-1" aria-label={foto.alt ?? `Foto ${n + 1}`}>
@@ -968,10 +968,10 @@ function initiale(name: string): string {
   }
 
   /* ══ GRIDS ══ */
-  .ac-grid { display: grid; gap: clamp(1rem, 2.5vw, 1.5rem); min-width: 0; }
-  .ac-grid--duo { grid-template-columns: repeat(2, 1fr); }
-  .ac-grid--trio { grid-template-columns: repeat(3, 1fr); }
-  .ac-grid--auto { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+  .ac-grid { display: grid; gap: clamp(1rem, 2.5vw, 1.5rem); width: 100%; min-width: 0; }
+  .ac-grid--duo { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ac-grid--trio { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .ac-grid--auto { grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr)); }
 
   @media (max-width: 1023px) { .ac-grid--trio { grid-template-columns: repeat(2, 1fr); } }
   @media (max-width: 767px) {
@@ -986,7 +986,10 @@ function initiale(name: string): string {
   /* ══ ARTIST CARD ══ */
   .member-card-wrap {
     position: relative;
+    width: 100%;
     max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
     overflow-x: clip;
     --card-neon: rgba(6, 214, 255, 0.86);
     --card-neon-soft: rgba(6, 214, 255, 0.42);
@@ -1034,6 +1037,8 @@ function initiale(name: string): string {
     position: relative; aspect-ratio: 2 / 3;
     width: 100%;
     max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
     border-radius: 1.1rem; overflow: hidden; cursor: pointer;
     border: 1px solid rgba(255,255,255,0.10);
     background:
@@ -1475,6 +1480,14 @@ function initiale(name: string): string {
   }
 
   @media (max-width: 767px) {
+    :global(html),
+    :global(body.page-shell),
+    :global(main#continut),
+    .stage-wrap {
+      touch-action: pan-y pinch-zoom;
+      overflow-y: visible !important;
+    }
+
     :global(html) {
       scrollbar-width: none !important;
       scrollbar-color: transparent transparent !important;
@@ -1531,7 +1544,17 @@ function initiale(name: string): string {
     .ac,
     .bio-panel {
       max-width: 100%;
-      overflow-x: hidden;
+      box-sizing: border-box;
+    }
+
+    .stage-section {
+      overflow-x: clip !important;
+      overflow-y: visible;
+    }
+
+    .member-card-wrap {
+      overflow-x: clip;
+      overflow-y: visible;
     }
 
     .member-card-wrap,

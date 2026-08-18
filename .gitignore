@@ -39,3 +39,4 @@ lighthouse-local-audit*
 
 # Temporary local artifacts
 .tmp-lh/
+.lh-tmp/
