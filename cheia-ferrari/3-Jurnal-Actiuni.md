@@ -323,6 +323,85 @@ La sfârșitul fiecărei sesiuni, Ferrari execută automat:
 
 ---
 
+## 🏁 19 august 2026 — Verificare galerie foto
+
+### Validare
+- `npm run build` — reușit complet.
+- Serverul real `server.mjs` a răspuns cu `200 OK` pentru `/galerie-foto/`.
+- Au fost verificate 17 URL-uri de imagini din HTML; `IMAGE_FAILURES=0`.
+- Imaginile cu spații în nume, inclusiv `Nunta-1994.jpg` și `Eveniment Arabesc.jpg`, se încarcă prin URL-uri codificate.
+- `astro preview` a fost exclus din verdict deoarece configurația statică împreună cu adapterul middleware produce un fals 500; serverul real de deploy funcționează corect.
+
+---
+
+## 🏁 19 august 2026 — Eliminare meniu desktop duplicat
+
+### Problemă
+- În captură apăreau suplimentar `FP BAND // LIVE`, linkurile colorate și „Rezervă data”, peste meniul mobil dorit.
+
+### Fix
+- Eliminat blocul `desktop-command-nav` din `src/components/Header.astro`.
+- Meniul hamburger mobil și lista verticală din `nav-mobile-grid` au rămas intacte.
+
+### Validare
+- `npm run build` — reușit complet.
+- `get_errors` pentru `Header.astro` și `globals.css` — fără erori.
+
+---
+
+## 🏁 19 august 2026 — Corecție specificitate meniu mobil vertical
+
+### Problemă
+- În browser, bara cu casete orizontale rămânea vizibilă chiar după activarea meniului vertical.
+
+### Cauză și fix
+- Selectorii vechi `body.mobile-menu-open #top-menu-panel ...` aveau specificitate mai mare decât override-ul compact/vertical.
+- Au fost adăugați selectorii finali cu aceeași specificitate pentru a ascunde `nav-desktop-bar` și a afișa `nav-mobile-grid` într-o singură coloană.
+
+### Validare
+- `npm run build` — reușit complet.
+- `get_errors` pentru CSS și `Header.astro` — fără erori.
+
+---
+
+## 🏁 19 august 2026 — Meniu mobil vertical la deschidere
+
+### Obiectiv
+- Casetele meniului mobil să apară vertical, una sub alta, când Claudiu deschide hamburger-ul.
+
+### Ce s-a modificat
+- În `src/styles/globals.css`, panoul mobil revine la overlay full-screen cu scroll vertical.
+- `nav-mobile-grid` este afișat ca o singură coloană, iar `nav-desktop-bar` este ascuns pe mobil.
+- Este reactivat conținutul mobil existent, inclusiv butonul de închidere și casetele individuale.
+
+### Validări
+- `npm run build` — reușit complet; warning-urile `Astro.request.headers` sunt cele cunoscute.
+- `get_errors` pentru `src/styles/globals.css` și `src/components/Header.astro` — fără erori.
+
+---
+
+## 🏁 19 august 2026 — Corecție override-uri meniu mobil compact
+
+### Obiectiv
+- Repararea comportamentului meniului pe telefon/tabletă după revenirea la varianta compactă.
+
+### Cauză identificată
+- Override-urile finale din `src/styles/globals.css` forțau panoul `top-menu-panel` pe full-screen și reactivau overlay-ul vertical, anulând regulile compacte introduse în aceeași sesiune.
+
+### Ce s-a modificat
+- Adăugat un singur override final pentru `max-width: 1024px` care păstrează panoul sub header, cu scroll orizontal pentru linkuri.
+- Ascunse explicit componentele overlay-ului vertical pe mobil și păstrată bara `nav-desktop-bar` ca meniu compact.
+- Păstrată logica JavaScript existentă pentru toggle, scroll lock, închidere și navigare.
+
+### Validări
+- `npm run build` — reușit complet; warning-urile `Astro.request.headers` sunt cele cunoscute.
+- `get_errors` pentru `src/styles/globals.css` și `src/components/Header.astro` — fără erori.
+
+### Risc / pas următor
+- Este recomandată o verificare pe telefon real pentru deschidere, swipe orizontal, închidere și navigare după refresh.
+
+---
+
 ## 🏁 19 august 2026 — Revert meniu vertical pe mobil (desktop neschimbat)
 
 ### Obiectiv

@@ -3814,6 +3814,81 @@ select:focus-visible {
   }
 }
 
+@media (max-width: 1024px) {
+
+  .top-header .top-menu-panel,
+  .top-header.menu-open .top-menu-panel,
+  body.mobile-menu-open #top-menu-panel {
+    position: fixed !important;
+    inset: 0 !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100dvh !important;
+    max-width: 100% !important;
+    max-height: 100dvh !important;
+    z-index: 3300 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior-y: contain !important;
+    touch-action: pan-y pinch-zoom !important;
+    padding: 0 !important;
+    border-top: 0 !important;
+    border-bottom: 0 !important;
+    background:
+      radial-gradient(circle at 12% 10%, rgba(11, 188, 214, 0.28), transparent 26%),
+      radial-gradient(circle at 88% 14%, rgba(245, 166, 35, 0.22), transparent 24%),
+      linear-gradient(165deg, #03101f 0%, #07162c 34%, #0c2650 100%) !important;
+    transform: translateY(-8px);
+    transition: opacity 220ms ease, transform 220ms ease, visibility 0ms linear 220ms;
+  }
+
+  .top-header:not(.menu-open) .top-menu-panel {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  .top-header.menu-open .top-menu-panel,
+  body.mobile-menu-open #top-menu-panel {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transform: translateY(0) !important;
+    transition: opacity 220ms ease, transform 220ms ease, visibility 0ms linear 0ms;
+  }
+
+  body.mobile-menu-open #top-menu-panel .nav-desktop-bar,
+  .top-header.menu-open #top-menu-panel .nav-desktop-bar {
+    display: none !important;
+  }
+
+  .top-menu-panel .mobile-overlay-close {
+    display: inline-flex !important;
+  }
+
+  .top-menu-panel .mobile-overlay-content {
+    display: flex !important;
+  }
+
+  body.mobile-menu-open #top-menu-panel .nav-mobile-grid,
+  .top-header.menu-open #top-menu-panel .nav-mobile-grid {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    justify-items: center;
+    width: 100%;
+    gap: 0.6rem;
+    padding-inline: 1rem;
+  }
+
+  .top-menu-panel .nav-link-mobile {
+    display: inline-flex !important;
+    width: min(88vw, 25rem) !important;
+  }
+}
+
 .desktop-sf-menu {
   display: none;
 }

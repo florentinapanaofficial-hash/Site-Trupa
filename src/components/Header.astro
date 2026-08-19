@@ -184,28 +184,6 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
     </div>
   </div>
 
-  <nav class="desktop-command-nav" aria-label="Navigație principală desktop">
-    <div class="desktop-command-nav__layers" aria-hidden="true">
-      <span class="desktop-command-nav__layer desktop-command-nav__layer--cyan"></span>
-      <span class="desktop-command-nav__layer desktop-command-nav__layer--gold"></span>
-    </div>
-    <div class="desktop-command-nav__inner section-container">
-      <div class="desktop-command-nav__status" aria-hidden="true">
-        <span class="desktop-command-nav__status-dot"></span>
-        <span>FP BAND // LIVE</span>
-      </div>
-      <div class="desktop-command-nav__links">
-        {desktopNavigation.map((item) => (
-          <a href={item.href} class={`desktop-command-nav__link nav-btn-${item.color ?? 'cyan'}`} data-nav-link data-live-link={item.href === '/live/' ? 'true' : undefined}>
-            <span class="desktop-command-nav__link-back" aria-hidden="true"></span>
-            <span class="nav-label">{item.label}</span>
-          </a>
-        ))}
-      </div>
-      <a class="desktop-command-nav__cta" href="/contact/">Rezervă data</a>
-    </div>
-  </nav>
-
   <div class="section-container social-strip-mobile sm:hidden" aria-label="Canale social media">
     <span class="social-strip-mobile__label">Vizionează-ne pe</span>
     <div class="social-strip-mobile__links">
