@@ -705,23 +705,16 @@ body.mobile-menu-open .left-side-menu {
     display: none;
   }
 
-  /* ── Scroll lock pe html/body — elimină bara dublă de scroll ──
-     Doar main#continut scrollează pe desktop. html/body sunt blocate la
-     viewport, deci scrollbar-ul global de 18px (declarat mai sus) nu mai
-     are conținut de reprezentat și nu mai apare alături de cel din main. */
+  /* ── Scroll global desktop — conținutul curge sub headerul fix ── */
   html,
   body.page-shell {
-    height: 100dvh;
-    overflow: hidden;
+    height: auto;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
-  html::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* ── Layout: Flexbox curat — sidebar fix + scroll izolat în main ──
-      height: 100dvh + overflow: hidden pe shell → body nu mai scrollează.
-     Sidebar rămâne lipit, doar main#continut derulează. */
+  /* ── Layout desktop cu scroll natural ── */
   .layout-content-shell {
     display: block;
     height: auto;

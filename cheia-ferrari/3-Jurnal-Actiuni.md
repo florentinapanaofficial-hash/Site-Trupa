@@ -651,6 +651,13 @@ Axate pe cuvântul-cheie principal **„formație nuntă Pitești / Argeș”**:
 - `get_errors` pentru fișierele modificate → fără erori.
 - `git diff --check` → curat.
 
+### Fix ulterior — scroll desktop blocat
+
+- Cauză: regula desktop moștenită păstra `html` și `body.page-shell` cu `overflow: hidden` după eliminarea sidebar-ului.
+- Fix: scroll global natural pe desktop, cu `overflow-y: auto`; meniul mobil nu este afectat.
+- `npm run build` → succes.
+- `get_errors` pentru `src/styles/globals.css` → fără erori.
+
 ---
 
 ## 🏁 19 august 2026 — Regenerare sitemap pentru Google Search Console
