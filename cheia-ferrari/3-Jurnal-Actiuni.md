@@ -618,6 +618,58 @@ Axate pe cuvântul-cheie principal **„formație nuntă Pitești / Argeș”**:
 | Autopilot Ferrari instalat | ✅ |
 | Polish tehnic (0/0/0) | ✅ |
 | Audit SEO livrat | ✅ |
+
+---
+
+## 🏁 19 august 2026 — Prototip meniu desktop SF stabil
+
+### Obiectiv
+
+- Testarea unei navigații desktop orizontale, cu profunzime vizuală discretă și fără rotații.
+
+### Fișiere modificate
+
+- `src/components/Header.astro` — adăugat headerul desktop orizontal cu status live, linkuri principale și CTA pentru rezervare.
+- `src/styles/globals.css` — adăugate straturi vizuale cyan/auriu, hover stabil și layout desktop fără sidebar.
+
+### Validări
+
+- `npm run build` → succes.
+- `get_errors` pentru componentele modificate → fără erori.
+- Meniul mobil și panoul full-screen au rămas în cod și sunt limitate la viewport-urile mobile.
+- Server local pornit pentru previzualizare la `http://127.0.0.1:4321/`.
+
+### Risc / pas următor
+
+- Este un prototip local, nepublicabil încă. Se verifică vizual pe desktop înainte de acceptarea designului final.
+
+### Iterația 2 — Panou SF la click pe MENIU
+
+- `src/components/Header.astro` — adăugate modulele desktop `PREZENTARE`, `MEDIA` și `REZERVĂRI`, cu linkuri interne normalizate și buton de închidere.
+- `src/styles/globals.css` — adăugat overlay desktop stratificat, stabil, fără rotații; panoul mobil existent rămâne separat.
+- `npm run build` → succes.
+- `get_errors` pentru fișierele modificate → fără erori.
+- `git diff --check` → curat.
+
+---
+
+## 🏁 19 august 2026 — Regenerare sitemap pentru Google Search Console
+
+### Obiectiv
+
+- Regenerarea sitemap-urilor publicabile după build-ul actual al site-ului.
+
+### Rezultat
+
+- `npm run build` executat cu succes.
+- Generat `dist/client/sitemap-index.xml`, care pointează către `sitemap-0.xml`.
+- Sitemap-ul conține 58 URL-uri, toate cu trailing slash.
+- Verificate excluderile: `/comunitatea-noastra/`, `/colaboratori/tambal/`, `/live-preview/` și `/mini-tv/` nu apar.
+- `node scripts/qa-check.mjs` → **49 OK / 0 FAIL**.
+
+### URL pentru Google Search Console
+
+- `https://www.florentinapanaofficial.ro/sitemap-index.xml`
 | 3 idei clipuri YouTube livrate | ✅ |
 | Articol „Preț Formație Nuntă 2026-2027” publicat | ✅ |
 | Schema Article + FAQPage | ✅ |

@@ -51,6 +51,40 @@ const mobileFullNavigation = [
   { href: '/contact/', label: 'Contact', color: 'cyan' },
 ].map((item) => ({ ...item, href: normalizeNavHref(item.href) }));
 
+const desktopMenuModules = [
+  {
+    label: 'PREZENTARE',
+    accent: 'cyan',
+    links: [
+      { href: '/despre/', label: 'Despre noi' },
+      { href: '/povestea-noastra/', label: 'Povestea noastră' },
+      { href: '/membri/', label: 'Membri' },
+    ],
+  },
+  {
+    label: 'MEDIA',
+    accent: 'cyan',
+    links: [
+      { href: '/galerie-video/', label: 'Galerie Video' },
+      { href: '/galerie-foto/', label: 'Galerie Foto' },
+      { href: '/aparitii-tv/', label: 'Apariții TV' },
+      { href: '/blog/', label: 'Blog' },
+    ],
+  },
+  {
+    label: 'REZERVĂRI',
+    accent: 'gold',
+    links: [
+      { href: '/cauti-formatie-nunta/', label: 'Cauți formație?' },
+      { href: '/oferta-premium/', label: 'Ofertă Premium' },
+      { href: '/contact/', label: 'Contact' },
+    ],
+  },
+].map((module) => ({
+  ...module,
+  links: module.links.map((link) => ({ ...link, href: normalizeNavHref(link.href) })),
+}));
+
 const hasExpandableTopMenu = mobileFullNavigation.length > 1;
 ---
 
@@ -150,6 +184,28 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
     </div>
   </div>
 
+  <nav class="desktop-command-nav" aria-label="Navigație principală desktop">
+    <div class="desktop-command-nav__layers" aria-hidden="true">
+      <span class="desktop-command-nav__layer desktop-command-nav__layer--cyan"></span>
+      <span class="desktop-command-nav__layer desktop-command-nav__layer--gold"></span>
+    </div>
+    <div class="desktop-command-nav__inner section-container">
+      <div class="desktop-command-nav__status" aria-hidden="true">
+        <span class="desktop-command-nav__status-dot"></span>
+        <span>FP BAND // LIVE</span>
+      </div>
+      <div class="desktop-command-nav__links">
+        {desktopNavigation.map((item) => (
+          <a href={item.href} class={`desktop-command-nav__link nav-btn-${item.color ?? 'cyan'}`} data-nav-link data-live-link={item.href === '/live/' ? 'true' : undefined}>
+            <span class="desktop-command-nav__link-back" aria-hidden="true"></span>
+            <span class="nav-label">{item.label}</span>
+          </a>
+        ))}
+      </div>
+      <a class="desktop-command-nav__cta" href="/contact/">Rezervă data</a>
+    </div>
+  </nav>
+
   <div class="section-container social-strip-mobile sm:hidden" aria-label="Canale social media">
     <span class="social-strip-mobile__label">Vizionează-ne pe</span>
     <div class="social-strip-mobile__links">
@@ -179,7 +235,39 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
   {hasExpandableTopMenu && (
     <div class="mobile-menu-backdrop" data-menu-backdrop></div>
     <div id="top-menu-panel" class="top-menu-panel" data-top-menu-panel>
-      <button type="button" class="mobile-overlay-close" data-top-menu-close aria-label="Închide meniul principal">✕</button>
+      <button type="button" class="mobile-overlay-close desktop-overlay-close" data-top-menu-close aria-label="Închide meniul principal">✕</button>
+
+      <div class="desktop-sf-menu" aria-label="Module principale">
+        <div class="desktop-sf-menu__backdrop" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <div class="desktop-sf-menu__head">
+          <span class="desktop-sf-menu__eyebrow">FP BAND // SYSTEM ONLINE</span>
+          <span class="desktop-sf-menu__title">Selectează un modul</span>
+        </div>
+        <div class="desktop-sf-menu__modules">
+          {desktopMenuModules.map((module) => (
+            <section class={`desktop-sf-module desktop-sf-module--${module.accent}`}>
+              <h2>{module.label}</h2>
+              <div class="desktop-sf-module__links">
+                {module.links.map((link) => (
+                  <a href={link.href} class="desktop-sf-module__link" data-nav-link>
+                    <span class="desktop-sf-module__link-back" aria-hidden="true"></span>
+                    <span>{link.label}</span>
+                    <span class="desktop-sf-module__arrow" aria-hidden="true">→</span>
+                  </a>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+        <div class="desktop-sf-menu__footer">
+          <span>Live Band Premium · Pitești, Argeș</span>
+          <a href="/live/" data-nav-link data-live-link="true">Deschide canalul LIVE →</a>
+        </div>
+      </div>
 
       <div class="mobile-overlay-content">
         <audio data-menu-audio preload="none" loop>

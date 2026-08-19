@@ -547,9 +547,162 @@ body.mobile-menu-open .left-side-menu {
 
 @media (min-width: 1025px) {
 
-  /* ── Header ascuns pe desktop — sidebar-ul preia navigarea ── */
+  /* ── Command header desktop — navigație orizontală cu straturi stabile ── */
   .top-header {
-    display: none !important;
+    display: block !important;
+  }
+
+  .desktop-command-nav {
+    position: relative;
+    display: block;
+    min-height: 4rem;
+    overflow: hidden;
+    border-top: 1px solid rgba(111, 227, 243, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(3, 10, 25, 0.94);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+    isolation: isolate;
+  }
+
+  .desktop-command-nav__layers {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    transform: translateZ(0);
+  }
+
+  .desktop-command-nav__layer {
+    position: absolute;
+    top: 0.8rem;
+    bottom: 0.8rem;
+    width: 34%;
+    border: 1px solid currentColor;
+    opacity: 0.16;
+    transform: skewX(-18deg);
+  }
+
+  .desktop-command-nav__layer--cyan {
+    left: 7%;
+    color: #6fe3f3;
+  }
+
+  .desktop-command-nav__layer--gold {
+    right: 8%;
+    color: #f5c35c;
+  }
+
+  .desktop-command-nav__inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-height: 4rem;
+    padding-block: 0.65rem;
+  }
+
+  .desktop-command-nav__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    flex-shrink: 0;
+    color: rgba(232, 242, 255, 0.7);
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    white-space: nowrap;
+  }
+
+  .desktop-command-nav__status-dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 999px;
+    background: #ef4444;
+    box-shadow: 0 0 0.8rem rgba(239, 68, 68, 0.8);
+  }
+
+  .desktop-command-nav__links {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    min-width: 0;
+  }
+
+  .desktop-command-nav__link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.5rem;
+    padding: 0.55rem 0.75rem;
+    overflow: visible;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 0.55rem;
+    background: rgba(11, 25, 52, 0.78);
+    color: rgba(242, 248, 255, 0.9);
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    line-height: 1.1;
+    text-align: center;
+    white-space: nowrap;
+    transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+  }
+
+  .desktop-command-nav__link-back {
+    position: absolute;
+    inset: 0.22rem -0.24rem -0.22rem 0.24rem;
+    z-index: -1;
+    border: 1px solid rgba(111, 227, 243, 0.2);
+    border-radius: inherit;
+    background: rgba(11, 188, 214, 0.08);
+    opacity: 0.55;
+    transition: transform 180ms ease, opacity 180ms ease;
+  }
+
+  .desktop-command-nav__link:hover,
+  .desktop-command-nav__link:focus-visible {
+    transform: translateY(-2px);
+    border-color: rgba(111, 227, 243, 0.72);
+    background: rgba(11, 50, 78, 0.9);
+    box-shadow: 0 0 0 1px rgba(111, 227, 243, 0.12), 0 0 1.1rem rgba(11, 188, 214, 0.16);
+  }
+
+  .desktop-command-nav__link:hover .desktop-command-nav__link-back,
+  .desktop-command-nav__link:focus-visible .desktop-command-nav__link-back {
+    opacity: 1;
+    transform: translate(0.18rem, 0.12rem);
+  }
+
+  .desktop-command-nav__cta {
+    flex-shrink: 0;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid rgba(245, 195, 92, 0.72);
+    border-radius: 0.55rem;
+    background: rgba(133, 94, 25, 0.32);
+    color: #ffe7a8;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: transform 180ms ease, background 180ms ease, box-shadow 180ms ease;
+  }
+
+  .desktop-command-nav__cta:hover,
+  .desktop-command-nav__cta:focus-visible {
+    transform: translateY(-2px);
+    background: rgba(168, 122, 31, 0.52);
+    box-shadow: 0 0 1.2rem rgba(245, 166, 35, 0.22);
+  }
+
+  .left-side-menu {
+    display: none;
   }
 
   /* ── Scroll lock pe html/body — elimină bara dublă de scroll ──
@@ -570,29 +723,26 @@ body.mobile-menu-open .left-side-menu {
       height: 100dvh + overflow: hidden pe shell → body nu mai scrollează.
      Sidebar rămâne lipit, doar main#continut derulează. */
   .layout-content-shell {
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
-    height: 100dvh;
+    display: block;
+    height: auto;
     width: 100%;
     max-width: 100%;
     min-width: 0;
     padding-inline: 0;
     margin-left: 0;
     margin-right: 0;
-    overflow: hidden;
+    overflow: visible;
   }
 
   #continut {
-    flex: 1;
     display: flex;
     flex-direction: column;
     position: relative;
     width: 100%;
     min-width: 0;
-    max-width: calc(100vw - 280px);
-    height: 100dvh;
-    overflow-y: auto;
+    max-width: 100%;
+    height: auto;
+    overflow-y: visible;
     overflow-x: hidden;
     scroll-behavior: smooth;
     margin-inline: 0;
@@ -626,32 +776,6 @@ body.mobile-menu-open .left-side-menu {
   main#continut.pt-44,
   main#continut {
     padding-top: 1.5rem !important;
-  }
-
-  /* ── Sidebar fix — height: 100dvh, scroll intern propriu, nu se mișcă ── */
-  .left-side-menu {
-    position: relative;
-    width: 280px;
-    max-width: 280px;
-    flex-shrink: 0;
-    height: 100dvh;
-    z-index: 50;
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    gap: 0.15rem;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding: 0 0.7rem 0.5rem;
-    margin: 0;
-    border: none;
-    border-right: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 0;
-    background: rgba(0, 0, 20, 0.50);
-    backdrop-filter: blur(28px) saturate(1.5);
-    -webkit-backdrop-filter: blur(28px) saturate(1.5);
-    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.50);
-    scrollbar-width: none;
   }
 
   /* ── Hero — ocupă cel puțin un viewport, conținut centrat perfect ──
@@ -3644,5 +3768,244 @@ select:focus-visible {
 
   body.mobile-menu-open #top-menu-panel .nav-link-mobile {
     display: inline-flex !important;
+  }
+}
+
+.desktop-sf-menu {
+  display: none;
+}
+
+@media (min-width: 1025px) {
+  .top-header:not(.menu-open) .top-menu-panel {
+    display: none;
+  }
+
+  .top-header.menu-open .top-menu-panel {
+    display: block;
+    top: 8.1rem;
+    max-height: calc(100dvh - 8.1rem);
+    overflow-y: auto;
+    padding: 1.25rem 1.5rem 1.5rem;
+    border-top: 1px solid rgba(111, 227, 243, 0.28);
+    background:
+      linear-gradient(145deg, rgba(3, 10, 25, 0.98), rgba(5, 17, 39, 0.98)),
+      radial-gradient(circle at 16% 0%, rgba(11, 188, 214, 0.16), transparent 38%),
+      radial-gradient(circle at 88% 100%, rgba(245, 166, 35, 0.14), transparent 36%);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.74), 0 0 0 1px rgba(111, 227, 243, 0.08);
+  }
+
+  .top-menu-panel .nav-desktop-bar,
+  .top-menu-panel .mobile-overlay-content {
+    display: none;
+  }
+
+  .desktop-sf-menu {
+    position: relative;
+    display: block;
+    width: min(100%, 1080px);
+    margin-inline: auto;
+    isolation: isolate;
+  }
+
+  .desktop-sf-menu__backdrop {
+    position: absolute;
+    inset: 1rem 0.5rem 0.25rem;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .desktop-sf-menu__backdrop span {
+    position: absolute;
+    display: block;
+    border: 1px solid rgba(111, 227, 243, 0.18);
+    opacity: 0.5;
+    transform: skewX(-16deg);
+  }
+
+  .desktop-sf-menu__backdrop span:nth-child(1) {
+    inset: 1.5rem 4% 0.5rem 1%;
+  }
+
+  .desktop-sf-menu__backdrop span:nth-child(2) {
+    inset: 0.6rem 1% 1.5rem 4%;
+    border-color: rgba(245, 195, 92, 0.16);
+  }
+
+  .desktop-sf-menu__backdrop span:nth-child(3) {
+    inset: 2.4rem 10% 0;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .desktop-sf-menu__head,
+  .desktop-sf-menu__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .desktop-sf-menu__head {
+    padding: 0.1rem 0.2rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .desktop-sf-menu__eyebrow,
+  .desktop-sf-menu__footer {
+    color: rgba(232, 242, 255, 0.64);
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .desktop-sf-menu__title {
+    color: #f7fbff;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .desktop-sf-menu__modules {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.85rem;
+    padding: 1rem 0;
+  }
+
+  .desktop-sf-module {
+    position: relative;
+    min-width: 0;
+    padding: 0.85rem;
+    border: 1px solid rgba(111, 227, 243, 0.2);
+    border-radius: 0.7rem;
+    background: rgba(7, 24, 48, 0.72);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 12px 28px rgba(0, 0, 0, 0.24);
+  }
+
+  .desktop-sf-module--gold {
+    border-color: rgba(245, 195, 92, 0.34);
+    background: rgba(42, 29, 9, 0.42);
+  }
+
+  .desktop-sf-module h2 {
+    margin: 0 0 0.7rem;
+    color: #a9f3fb;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+  }
+
+  .desktop-sf-module--gold h2 {
+    color: #ffe7a8;
+  }
+
+  .desktop-sf-module__links {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .desktop-sf-module__link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 2.25rem;
+    gap: 0.5rem;
+    padding: 0.45rem 0.55rem;
+    overflow: visible;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0.45rem;
+    color: rgba(242, 248, 255, 0.88);
+    font-size: 0.82rem;
+    line-height: 1.2;
+    transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, color 180ms ease;
+  }
+
+  .desktop-sf-module__link-back {
+    position: absolute;
+    inset: 0.22rem -0.22rem -0.22rem 0.22rem;
+    z-index: -1;
+    border: 1px solid rgba(111, 227, 243, 0.18);
+    border-radius: inherit;
+    opacity: 0.45;
+    transition: transform 180ms ease, opacity 180ms ease;
+  }
+
+  .desktop-sf-module--gold .desktop-sf-module__link-back {
+    border-color: rgba(245, 195, 92, 0.24);
+  }
+
+  .desktop-sf-module__link:hover,
+  .desktop-sf-module__link:focus-visible {
+    transform: translateY(-2px);
+    border-color: rgba(111, 227, 243, 0.6);
+    background: rgba(11, 188, 214, 0.12);
+    color: #ffffff;
+  }
+
+  .desktop-sf-module--gold .desktop-sf-module__link:hover,
+  .desktop-sf-module--gold .desktop-sf-module__link:focus-visible {
+    border-color: rgba(245, 195, 92, 0.72);
+    background: rgba(245, 166, 35, 0.14);
+  }
+
+  .desktop-sf-module__link:hover .desktop-sf-module__link-back,
+  .desktop-sf-module__link:focus-visible .desktop-sf-module__link-back {
+    opacity: 1;
+    transform: translate(0.16rem, 0.12rem);
+  }
+
+  .desktop-sf-module__arrow {
+    color: rgba(169, 243, 251, 0.7);
+    font-size: 1rem;
+  }
+
+  .desktop-sf-module--gold .desktop-sf-module__arrow {
+    color: #ffe7a8;
+  }
+
+  .desktop-sf-menu__footer {
+    padding: 0.75rem 0.2rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+  }
+
+  .desktop-sf-menu__footer a {
+    color: #a9f3fb;
+    transition: color 180ms ease, transform 180ms ease;
+  }
+
+  .desktop-sf-menu__footer a:hover,
+  .desktop-sf-menu__footer a:focus-visible {
+    color: #ffffff;
+    transform: translateX(2px);
+  }
+
+  .desktop-overlay-close {
+    position: absolute;
+    top: 0.9rem;
+    right: 1.5rem;
+    z-index: 3;
+    display: inline-flex;
+    width: 2.3rem;
+    height: 2.3rem;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 0.55rem;
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 1rem;
+  }
+
+  .desktop-overlay-close:hover,
+  .desktop-overlay-close:focus-visible {
+    border-color: rgba(111, 227, 243, 0.7);
+    background: rgba(11, 188, 214, 0.14);
   }
 }
