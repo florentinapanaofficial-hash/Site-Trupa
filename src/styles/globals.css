@@ -701,6 +701,31 @@ body.mobile-menu-open .left-side-menu {
     box-shadow: 0 0 1.2rem rgba(245, 166, 35, 0.22);
   }
 
+  /* Păstrează gradientul 3D al butoanelor la hover; fundalul generic
+     al linkului de comandă nu trebuie să le întunece. */
+  .desktop-command-nav__link.nav-btn-gold,
+  .desktop-command-nav__link.nav-btn-gold:hover,
+  .desktop-command-nav__link.nav-btn-gold:focus-visible {
+    border: none;
+    background: linear-gradient(175deg, #ffdc6a 0%, #f5a623 55%, #c07510 100%);
+    color: #3a1f00;
+  }
+
+  .desktop-command-nav__link.nav-btn-cyan,
+  .desktop-command-nav__link.nav-btn-cyan:hover,
+  .desktop-command-nav__link.nav-btn-cyan:focus-visible {
+    border: none;
+    background: linear-gradient(175deg, #7ef8ff 0%, #06d6ff 55%, #0096bb 100%);
+    color: #002833;
+  }
+
+  .desktop-command-nav__link.nav-btn-gold:hover,
+  .desktop-command-nav__link.nav-btn-gold:focus-visible,
+  .desktop-command-nav__link.nav-btn-cyan:hover,
+  .desktop-command-nav__link.nav-btn-cyan:focus-visible {
+    filter: brightness(1.08) saturate(1.08);
+  }
+
   .left-side-menu {
     display: none;
   }
