@@ -87,7 +87,10 @@
     }
 
     function applyArrowVisibilityByScroll() {
-        var showByScroll = isLowerPageReached();
+        // Arrows trebuie să fie vizibile când există o pagină anterioară/următoare
+        // valabilă, fără a depinde de scroll-ul aproape de finalul paginii.
+        // Doar pentru homepage se păstrează un hint suplimentar legat de progresul pe pagină.
+        var showByScroll = isHomepage ? isLowerPageReached() : true;
 
         if (arrowPrev) {
             if (canShowPrevArrow && showByScroll) arrowPrev.classList.remove('is-hidden');
