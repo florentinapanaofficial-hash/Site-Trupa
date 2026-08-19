@@ -7,6 +7,7 @@ import couplesData from '../data/couples.json';
 import heroImg from '../assets/card-1-panoramica.jpg';
 
 const optimizedHero = await getImage({ src: heroImg, format: 'webp', width: 320, height: 213 });
+const heroSliderMobile = await getImage({ src: heroImg, format: 'webp', width: 520, height: 324, quality: 62 });
 const heroSliderPrimary = await getImage({ src: heroImg, format: 'webp', width: 900, height: 560, quality: 68 });
 const heroLcpPreload = heroSliderPrimary.src;
 
@@ -45,8 +46,8 @@ type HomepagePhotoSource = {
 
 const homepagePhotoSources: Record<'claudiuFlorentina' | 'anaFlorentina' | 'evenimentOne' | 'claudiuTwo', HomepagePhotoSource> = {
   claudiuFlorentina: {
-    avifSrcSet: `${heroSliderPrimary.src} 900w`,
-    webpSrcSet: `${heroSliderPrimary.src} 900w`,
+    avifSrcSet: `${heroSliderMobile.src} 520w, ${heroSliderPrimary.src} 900w`,
+    webpSrcSet: `${heroSliderMobile.src} 520w, ${heroSliderPrimary.src} 900w`,
     fallbackSrc: heroSliderPrimary.src,
   },
   anaFlorentina: {
@@ -109,7 +110,7 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
 
 <BaseLayout title={acasa.meta.title} description={acasa.meta.description} ogImage={siteContent.seo.ogImage}>
   <Fragment slot="head">
-    <link rel="preload" href={heroLcpPreload} as="image" type="image/webp" fetchpriority="high" />
+    <link rel="preload" href={heroLcpPreload} as="image" type="image/webp" fetchpriority="high" media="(min-width: 768px)" />
     <script is:inline type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>
 
@@ -811,6 +812,7 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
 
   <script is:inline>
     (() => {
+      if (window.matchMedia('(max-width: 767px)').matches) return;
       const slider = document.querySelector('[data-hero-slider]');
       if (!slider) return;
 
@@ -878,6 +880,10 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
 
   <script is:inline>
     (() => {
+      if (window.matchMedia('(max-width: 767px)').matches) {
+        document.querySelectorAll('.reveal-on-scroll').forEach((el) => el.classList.add('is-visible'));
+        return;
+      }
       const targets = Array.from(document.querySelectorAll('.reveal-on-scroll'));
       if (!targets.length || !('IntersectionObserver' in window)) return;
 
@@ -1114,15 +1120,11 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
 
   @media (max-width: 767px) {
     .hero-slider {
-      margin-top: 0.2rem;
-      padding-inline: 0.5rem;
-      max-width: 100%;
+      display: none;
     }
 
     .hero-slider-track {
-      aspect-ratio: 16 / 9;
-      min-height: 200px;
-      border-radius: 1rem;
+      display: none;
     }
 
     .hero-title-gold--compact {
@@ -3559,6 +3561,19 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
       animation: none;
     }
 
+
+  @media (max-width: 767px) {
+    .reveal-on-scroll,
+    .reveal-on-scroll.from-left,
+    .reveal-on-scroll.from-right,
+    .reveal-on-scroll.from-bottom {
+      opacity: 1;
+      transform: none;
+      filter: none;
+      transition: none;
+      will-change: auto;
+    }
+  }
     .hp-convert-btn--wa,
     .hp-convert-btn--offer {
       animation: none;

@@ -668,17 +668,21 @@ const mobileNavAllItems = [
     })();
     </script>
 
-    <!-- ══ MOBIL: săgeți hint swipe (ascunse pe desktop via CSS) ══ -->
-    <div class="mob-swipe-hints" aria-hidden="true">
-      <button type="button" class="mob-arrow mob-arrow--prev" id="mob-arrow-prev" aria-label="Secțiunea anterioară">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
-      </button>
-      <button type="button" class="mob-arrow mob-arrow--next" id="mob-arrow-next" aria-label="Secțiunea următoare">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
-      </button>
-    </div>
+    {!isHomePage && (
+      <>
+        <!-- ══ MOBIL: săgeți hint swipe (ascunse pe desktop via CSS) ══ -->
+        <div class="mob-swipe-hints" aria-hidden="true">
+          <button type="button" class="mob-arrow mob-arrow--prev" id="mob-arrow-prev" aria-label="Secțiunea anterioară">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          <button type="button" class="mob-arrow mob-arrow--next" id="mob-arrow-next" aria-label="Secțiunea următoare">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+        </div>
 
-    <script is:inline src="/js/mobile-swipe.js" defer></script>
+        <script is:inline src="/js/mobile-swipe.js" defer></script>
+      </>
+    )}
 
     <!-- Oprește audio/video când utilizatorul pleacă de pe pagină -->
     <script is:inline>

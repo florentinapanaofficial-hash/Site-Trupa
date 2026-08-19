@@ -323,6 +323,43 @@ La sfârșitul fiecărei sesiuni, Ferrari execută automat:
 
 ---
 
+## 🏁 19 august 2026 — Revert meniu vertical pe mobil (desktop neschimbat)
+
+### Obiectiv
+- Claudiu a cerut revenirea meniului mobil la o variantă compactă, deoarece meniul vertical recent adăugat ocupa prea mult spațiu.
+
+### Ce s-a modificat
+- În [src/styles/globals.css](src/styles/globals.css), pentru breakpoint-ul mobil `@media (max-width: 767px)`, panoul `top-menu-panel` a fost readus la comportament compact sub header (nu full-screen).
+- A fost dezactivat pe mobil overlay-ul vertical (`mobile-overlay-content` + `nav-mobile-grid`) și a fost reactivată bara orizontală de linkuri (`nav-desktop-bar`) în panoul de meniu.
+- Butonul de închidere din overlay-ul full-screen (`mobile-overlay-close`) a fost ascuns pe mobil, deoarece meniul compact se închide din butonul hamburger.
+- Fine-tuning suplimentar: spațiere redusă pentru `top-menu-panel`, gap mai mic între linkuri și dimensiuni mai compacte pentru `nav-link-desktop` pe mobil, pentru consum minim de spațiu vertical.
+- Ajustare de lizibilitate: textul butoanelor din meniul mobil compact a fost făcut mai clar (font mărit, greutate mai mare, contrast și text-shadow discret pentru citire rapidă în lumină puternică).
+- Evidențiere activă îmbunătățită: butonul paginii curente din meniul mobil compact are acum accent vizual mai puternic (border, fundal, glow și text evidențiat), pentru orientare instantă.
+- Optimizare PageSpeed pentru homepage (țintă mobil „verde”):
+  - [src/pages/index.astro](src/pages/index.astro): variantă imagine hero mai mică pentru mobil (520w), `srcset` mobil+desktop, preload LCP limitat la `media="(min-width: 768px)`, slider/reveal dezactivate pe mobil pentru reducerea costului de layout/main-thread, plus fallback CSS care face elementele vizibile fără animații pe mobil.
+  - [src/layouts/BaseLayout.astro](src/layouts/BaseLayout.astro): `mobile-swipe.js` și săgețile swipe nu se mai încarcă pe homepage, pentru a reduce execuția JS pe mobil.
+  - Build validat: `npm run build`.
+  - Lighthouse local pe build static (`serve dist/client`):
+    - Mobil: Performance 93, Accessibility 100, Best Practices 100, SEO 100.
+    - Desktop: Performance 100, Accessibility 100, Best Practices 100, SEO 100.
+  - Observație: auditul pe domeniul live rămâne separat până la deploy și poate include overhead extern (ex: scripturi edge/protecție) absent în testul local static.
+
+### Fișiere modificate
+- [src/styles/globals.css](src/styles/globals.css)
+
+### Validări
+- `get_errors` pe [src/styles/globals.css](src/styles/globals.css) și [src/components/Header.astro](src/components/Header.astro): fără erori.
+- `npm run build`: build complet reușit.
+- Warning-urile `Astro.request.headers` pe pagini prerendered au apărut în build și sunt cunoscute/acceptate în proiect.
+
+### Riscuri / observații
+- Structura de markup pentru overlay-ul vertical a rămas în [src/components/Header.astro](src/components/Header.astro), dar este ascunsă pe mobil prin CSS. Dacă se dorește curățenie completă, se poate elimina ulterior și din markup/script.
+
+### Următorii pași
+- Verificare rapidă pe dispozitiv real (iPhone/Android) pentru confirmare UX: deschidere/închidere meniu, scroll orizontal linkuri, focus accesibilitate.
+
+---
+
 ## 🏁 4 mai 2026 — Unificare jurnal + Protocol Ferrari + Panou Live Facebook
 
 ### Ce s-a stabilit (structură permanentă)

@@ -2266,29 +2266,29 @@ details:focus-visible {
     border-radius: 0.85rem;
   }
 
-  /* Overlay full-screen pentru meniul mobil */
+  /* Revert mobil: panou compact sub header (nu full-screen vertical) */
   .top-menu-panel {
     display: block !important;
     position: fixed;
-    inset: 0;
+    left: 0;
+    right: 0;
+    top: 4.0625rem;
+    bottom: auto;
     z-index: 1200;
-    padding: 1.1rem 1rem 1.25rem;
-    background:
-      radial-gradient(circle at 12% 10%, rgba(11, 188, 214, 0.28), transparent 26%),
-      radial-gradient(circle at 88% 14%, rgba(245, 166, 35, 0.22), transparent 24%),
-      radial-gradient(circle at 50% 82%, rgba(19, 70, 168, 0.32), transparent 34%),
-      linear-gradient(165deg, #03101f 0%, #07162c 34%, #0c2650 100%) !important;
+    padding: 0.45rem 0.55rem 0.5rem;
+    background: rgba(4, 8, 22, 0.98) !important;
     opacity: 0;
     isolation: isolate;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow-y: hidden;
+    overflow-x: auto;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.55);
-    transform: scale(1.015);
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.52);
+    transform: translateY(-8px);
     visibility: hidden;
     pointer-events: none;
     transition:
@@ -2299,13 +2299,7 @@ details:focus-visible {
 
   .top-menu-panel::before,
   .top-menu-panel::after {
-    content: '';
-    position: absolute;
-    inset: auto;
-    pointer-events: none;
-    border-radius: 999px;
-    filter: blur(18px);
-    opacity: 0.9;
+    display: none;
   }
 
   .top-menu-panel::before {
@@ -2327,15 +2321,11 @@ details:focus-visible {
   }
 
   .top-header.menu-open .top-menu-panel {
-    transform: scale(1);
+    transform: translateY(0);
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
-    background:
-      radial-gradient(circle at 12% 10%, rgba(11, 188, 214, 0.28), transparent 26%),
-      radial-gradient(circle at 88% 14%, rgba(245, 166, 35, 0.22), transparent 24%),
-      radial-gradient(circle at 50% 82%, rgba(19, 70, 168, 0.32), transparent 34%),
-      linear-gradient(165deg, #03101f 0%, #07162c 34%, #0c2650 100%) !important;
+    background: rgba(4, 8, 22, 0.98) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     transition:
@@ -2351,7 +2341,7 @@ details:focus-visible {
 
   /* CLOSE via scroll = very slow fade-out discret — TREBUIE SĂ FIE DUPĂ menu-open pt specificitate */
   .top-header.scroll-closing .top-menu-panel {
-    transform: scale(1.01) !important;
+    transform: translateY(-6px) !important;
     opacity: 0 !important;
     visibility: hidden !important;
     pointer-events: none !important;
@@ -2374,25 +2364,21 @@ details:focus-visible {
   }
 
   .top-menu-panel .nav-desktop-bar {
-    display: none !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.42rem;
+    padding-top: 0;
+    padding-bottom: 0.05rem;
+    width: 100%;
   }
 
   .top-menu-panel .mobile-overlay-close {
-    display: inline-flex;
+    display: none;
   }
 
   .top-menu-panel .mobile-overlay-content {
-    display: flex;
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    min-height: 100%;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 1rem;
-    padding-top: 4.15rem;
-    padding-inline: 0.2rem;
+    display: none !important;
   }
 
   .mobile-overlay-hero {
@@ -2485,17 +2471,56 @@ details:focus-visible {
   }
 
   .top-menu-panel .nav-mobile-grid {
-    display: flex !important;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.72rem;
-    padding: 0 0 0.5rem;
-    width: 100%;
+    display: none !important;
   }
 
   .nav-link-desktop {
     display: none !important;
+  }
+
+  .top-menu-panel .nav-link-desktop {
+    display: inline-flex !important;
+    min-height: 40px;
+    padding: 0.48rem 0.72rem;
+    font-size: 0.84rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    border-radius: 0.7rem;
+    color: #f7fbff !important;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+    border-color: rgba(162, 234, 255, 0.44);
+    box-shadow: 0 7px 16px rgba(0, 0, 0, 0.34), 0 0 0 1px rgba(11, 188, 214, 0.12);
+    white-space: nowrap;
+  }
+
+  .top-menu-panel .nav-link-desktop .nav-label {
+    color: #f7fbff !important;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.28);
+  }
+
+  /* Evidențiere puternică pentru pagina activă în meniul compact mobil */
+  .top-menu-panel .nav-link-desktop.is-active,
+  .top-menu-panel .nav-link-desktop[aria-current='page'] {
+    color: #fff6d6 !important;
+    border: 2px solid rgba(245, 208, 130, 0.96) !important;
+    background:
+      linear-gradient(135deg, rgba(11, 188, 214, 0.34), rgba(245, 166, 35, 0.24)),
+      rgba(5, 18, 37, 0.98) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.24),
+      0 0 0 1px rgba(245, 166, 35, 0.32),
+      0 10px 24px rgba(0, 0, 0, 0.5),
+      0 0 22px rgba(245, 166, 35, 0.2);
+    transform: none !important;
+    opacity: 1 !important;
+  }
+
+  .top-menu-panel .nav-link-desktop.is-active .nav-label,
+  .top-menu-panel .nav-link-desktop[aria-current='page'] .nav-label {
+    color: #fff6d6 !important;
+    text-shadow:
+      0 1px 0 rgba(0, 0, 0, 0.32),
+      0 0 12px rgba(245, 166, 35, 0.2);
   }
 
   .nav-link-mobile {
