@@ -64,8 +64,11 @@ const safeReviews = Array.isArray(reviews)
   </div>
 
   <div class="gb-reviews__actions">
-    <a href={googleProfileUrl} target="_blank" rel="noopener noreferrer" class="gb-reviews__btn gb-reviews__btn--primary">Vezi toate recenziile pe Google</a>
-    <a href={googleWriteUrl} target="_blank" rel="noopener noreferrer" class="gb-reviews__btn gb-reviews__btn--ghost">Lasă o recenzie</a>
+    <a href={googleWriteUrl} target="_blank" rel="noopener noreferrer" class="gb-reviews__btn gb-reviews__btn--primary gb-reviews__btn--pulse">
+      <span class="gb-reviews__btn-stars" aria-hidden="true">★★★★★</span>
+      Lasă o recenzie în 10 secunde
+    </a>
+    <a href={googleProfileUrl} target="_blank" rel="noopener noreferrer" class="gb-reviews__btn gb-reviews__btn--ghost">Vezi toate recenziile pe Google</a>
   </div>
 </section>
 
@@ -202,29 +205,57 @@ const safeReviews = Array.isArray(reviews)
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.58rem 0.86rem;
-    border-radius: 0.72rem;
+    gap: 0.45rem;
+    padding: 0.7rem 1.05rem;
+    border-radius: 0.9rem;
     font-weight: 700;
     text-decoration: none;
-    font-size: 0.88rem;
+    font-size: 0.92rem;
     transition: transform 160ms ease, box-shadow 160ms ease;
   }
 
   .gb-reviews__btn:hover,
   .gb-reviews__btn:focus-visible {
-    transform: translateY(-1px);
+    transform: translateY(-2px) scale(1.02);
+  }
+
+  .gb-reviews__btn-stars {
+    font-size: 0.95rem;
+    letter-spacing: 0.1em;
+    color: #1f1200;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
   }
 
   .gb-reviews__btn--primary {
     color: #1f1200;
-    background: linear-gradient(135deg, #ffd36f, #f5a623);
-    box-shadow: 0 6px 16px rgba(245, 166, 35, 0.32);
+    background: linear-gradient(135deg, #ffe08a, #ffd36f, #f5a623);
+    box-shadow: 0 10px 26px rgba(245, 166, 35, 0.4);
+  }
+
+  .gb-reviews__btn--pulse {
+    animation: gb-reviews-pulse 2.4s ease-in-out infinite;
+  }
+
+  .gb-reviews__btn--pulse:hover,
+  .gb-reviews__btn--pulse:focus-visible {
+    animation-play-state: paused;
+  }
+
+  @keyframes gb-reviews-pulse {
+    0%, 100% { box-shadow: 0 10px 26px rgba(245, 166, 35, 0.4), 0 0 0 0 rgba(255, 211, 111, 0.5); }
+    50% { box-shadow: 0 10px 26px rgba(245, 166, 35, 0.4), 0 0 0 9px rgba(255, 211, 111, 0); }
   }
 
   .gb-reviews__btn--ghost {
     color: #f6fbff;
     border: 1px solid rgba(203, 233, 255, 0.38);
     background: rgba(255, 255, 255, 0.06);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .gb-reviews__btn--pulse {
+      animation: none;
+    }
   }
 
   @media (max-width: 767px) {

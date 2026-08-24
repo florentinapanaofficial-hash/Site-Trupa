@@ -351,49 +351,9 @@
             setTimeout(function () { window.location.href = url; }, 180);
         }
 
-        var hpTX = 0, hpTY = 0, hpSkipTouch = false;
-
-        function hpHandleSwipeEnd(endX, endY) {
-            var dx = endX - hpTX;
-            var dy = endY - hpTY;
-            if (Math.abs(dx) < 34) return;
-            if (Math.abs(dy) > Math.abs(dx) * 1.35) return;
-            if (dx < 0 && hpPageIdx < hpPageOrder.length - 1) {
-                hpNavigatePage(hpPageOrder[hpPageIdx + 1]);
-            } else if (dx > 0 && hpPageIdx > 0) {
-                hpNavigatePage(hpPageOrder[hpPageIdx - 1]);
-            }
-        }
-
-        document.addEventListener('touchstart', function (e) {
-            if (shouldSkipGlobalTouch(e.target)) {
-                hpSkipTouch = true; return;
-            }
-            hpSkipTouch = false;
-            hpTX = e.touches[0].clientX;
-            hpTY = e.touches[0].clientY;
-        }, { passive: true });
-
-        document.addEventListener('touchend', function (e) {
-            if (hpSkipTouch) { hpSkipTouch = false; return; }
-            hpHandleSwipeEnd(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
-        }, { passive: true });
-
-        document.addEventListener('touchcancel', function () {
-            hpSkipTouch = false;
-        }, { passive: true });
-
-        var hpMouseDown = false;
-        document.addEventListener('mousedown', function (e) {
-            hpMouseDown = true;
-            hpTX = e.clientX;
-            hpTY = e.clientY;
-        });
-        document.addEventListener('mouseup', function (e) {
-            if (!hpMouseDown) return;
-            hpMouseDown = false;
-            hpHandleSwipeEnd(e.clientX, e.clientY);
-        });
+        /* Navigarea prin swipe orizontal (drag stânga/dreapta) a fost eliminată
+           la cererea utilizatorului — prea sensibilă pe mobil. Rămâne DOAR
+           navigarea prin săgețile laterale (arrowPrev/arrowNext) de mai jos. */
 
         /* ── Săgeți laterale pe homepage ── */
         setArrowEligibility(false, hpPageIdx >= 0 && hpPageIdx < hpPageOrder.length - 1);
@@ -409,13 +369,12 @@
     }
 
     /* ══════════════════════════════════════════════════════════════
-       SUBPAGINI — layout vertical, swipe orizontal navighează
-       la pagina anterioară/următoare (fără slides, fără scroll-snap).
+       SUBPAGINI — layout vertical, navigare la pagina anterioară/
+       următoare doar prin săgețile laterale (fără slides, fără scroll-snap).
     ══════════════════════════════════════════════════════════════ */
     var pageOrder = SITE_PAGE_ORDER.slice();
     var currentPath = normalizePath(location.pathname);
     var pageIdx = pageOrder.indexOf(currentPath);
-    var isMembersPage = currentPath === '/membri/';
 
     /* Marchează butonul activ din navbar */
     setActiveHref(currentPath);
@@ -446,35 +405,7 @@
         }
     }
 
-    /* Detectare swipe orizontal simplu — dx > threshold → navigare */
-    var tStartX = 0, tStartY = 0, tSkipSwipe = false;
-
-    document.addEventListener('touchstart', function (e) {
-        if (isMembersPage) {
-            tSkipSwipe = true;
-            return;
-        }
-        if (shouldSkipGlobalTouch(e.target)) {
-            tSkipSwipe = true; return;
-        }
-        tSkipSwipe = false;
-        tStartX = e.touches[0].clientX;
-        tStartY = e.touches[0].clientY;
-    }, { passive: true });
-
-    document.addEventListener('touchend', function (e) {
-        if (tSkipSwipe) { tSkipSwipe = false; return; }
-        var dx = e.changedTouches[0].clientX - tStartX;
-        var dy = e.changedTouches[0].clientY - tStartY;
-        if (Math.abs(dx) < 34 || Math.abs(dy) > Math.abs(dx) * 1.35) return;
-        if (dx < 0 && pageIdx !== -1 && pageIdx < pageOrder.length - 1) {
-            navigatePage(pageOrder[pageIdx + 1]);
-        } else if (dx > 0 && pageIdx > 0) {
-            navigatePage(pageOrder[pageIdx - 1]);
-        }
-    }, { passive: true });
-
-    document.addEventListener('touchcancel', function () {
-        tSkipSwipe = false;
-    }, { passive: true });
+    /* Navigarea prin swipe orizontal (drag stânga/dreapta) a fost eliminată
+       la cererea utilizatorului — prea sensibilă pe mobil. Rămâne DOAR
+       navigarea prin săgețile laterale (arrowPrev/arrowNext) de mai sus. */
 })();

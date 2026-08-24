@@ -53,7 +53,7 @@ const {
 
 const hasPlaylist = typeof playlistId === 'string' && playlistId.length > 0;
 const hasVideo = typeof youtubeId === 'string' && youtubeId.length > 0;
-const consentButtonLabel = hasPlaylist ? 'Redă playlistul' : 'Acceptă și vizionează';
+const consentButtonLabel = 'Acceptă și vizionează';
 
 const thumbJpg = thumbnailSrc || (hasVideo
   ? `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`
@@ -89,13 +89,12 @@ const ytLink = youtubeUrl || (hasPlaylist
       onerror="this.style.display='none'"
     />
     <div class="yt-gate__consent" role="group" aria-label="Consimțământ cookie-uri YouTube">
-      <!-- Iconiță play -->
-      <div class="yt-gate__play-icon" aria-hidden="true">
+      <button class="yt-gate__btn-accept yt-gate__play-icon" type="button" aria-label={consentButtonLabel}>
         <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
           <circle cx="24" cy="24" r="23" fill="rgba(0,0,0,0.65)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
           <polygon points="19,15 37,24 19,33" fill="white"/>
         </svg>
-      </div>
+      </button>
 
       {!hasPlaylist && (
         <p class="yt-gate__msg">
@@ -104,10 +103,6 @@ const ytLink = youtubeUrl || (hasPlaylist
           (<code>VISITOR_INFO1_LIVE</code>, <code>VISITOR_PRIVACY_METADATA</code>).
         </p>
       )}
-
-      <button class="yt-gate__btn-accept" type="button">
-        {consentButtonLabel}
-      </button>
 
       {!hasPlaylist && (
         <a
@@ -138,6 +133,7 @@ const ytLink = youtubeUrl || (hasPlaylist
     // Asigură că un singur player YouTube este activ pe pagină la orice moment
     
     var YT_PAUSE = JSON.stringify({ event: 'command', func: 'pauseVideo', args: [] });
+    var YT_PLAY = JSON.stringify({ event: 'command', func: 'playVideo', args: [] });
     var YT_LISTEN = JSON.stringify({ event: 'listening' });
     var YT_ADD_STATE_LISTENER = JSON.stringify({ event: 'command', func: 'addEventListener', args: ['onStateChange'] });
     var YT_ORIGINS = ['https://www.youtube-nocookie.com', 'https://www.youtube.com'];
@@ -199,6 +195,18 @@ const ytLink = youtubeUrl || (hasPlaylist
         var iframe = miniIframes[i];
         if (iframe.contentWindow === sourceWindow) {
           return iframe.closest('.yt-gate');
+        }
+      }
+      return null;
+    }
+
+    /** Găsește gate-ul (oricare, nu doar mini) căruia îi aparține un contentWindow */
+    function findGateBySource(sourceWindow) {
+      if (!sourceWindow) return null;
+      var iframes = document.querySelectorAll('.yt-gate iframe[src*="youtube"]');
+      for (var i = 0; i < iframes.length; i += 1) {
+        if (iframes[i].contentWindow === sourceWindow) {
+          return iframes[i].closest('.yt-gate');
         }
       }
       return null;
@@ -281,6 +289,11 @@ const ytLink = youtubeUrl || (hasPlaylist
 
       var playerState = extractPlayerState(data);
       if (typeof playerState === 'number') {
+        var sourceGate = findGateBySource(e.source);
+        if (sourceGate) {
+          sourceGate.setAttribute('data-yt-playing', playerState === 1 ? 'true' : 'false');
+        }
+
         var activeMiniGate = findMiniGateBySource(e.source);
 
         if (activeMiniGate) {
@@ -330,7 +343,86 @@ const ytLink = youtubeUrl || (hasPlaylist
         postYouTubeMessage(iframe.contentWindow, YT_ADD_STATE_LISTENER);
       });
       gate.appendChild(iframe);
+      gate.setAttribute('data-yt-playing', 'false');
+
+      // ── Overlay peste iframe: click oriunde pe video = play/pauză ──
+      // Evită să mai caute clienții butonul mic din player-ul YouTube.
+      var clickOverlay = document.createElement('button');
+      clickOverlay.type = 'button';
+      clickOverlay.className = 'yt-gate__click-overlay';
+      clickOverlay.setAttribute('aria-label', 'Redă sau pune pauză video');
+      gate.appendChild(clickOverlay);
+
       registerMiniGate(gate);
+    }
+
+    /** Comută play/pauză pentru gate-ul dat, pe baza ultimei stări cunoscute */
+    function toggleGatePlayback(gate) {
+      var iframe = gate.querySelector('iframe');
+      if (!iframe || !iframe.contentWindow) return;
+
+      var isPlaying = gate.getAttribute('data-yt-playing') === 'true';
+      postYouTubeMessage(iframe.contentWindow, isPlaying ? YT_PAUSE : YT_PLAY);
+
+      // Feedback optimist imediat — starea reală vine oricum prin postMessage.
+      gate.setAttribute('data-yt-playing', isPlaying ? 'false' : 'true');
+      flashGateIcon(gate, isPlaying ? 'pause' : 'play');
+
+      // La pornire (nu la pauză): fullscreen automat + rotire landscape,
+      // ca pe aplicațiile moderne. Browserele fără suport ignoră silențios.
+      if (!isPlaying) {
+        enterFullscreenAndRotate(gate);
+      }
+    }
+
+    /** Cere fullscreen pentru gate și, dacă e posibil, blochează orientarea pe landscape */
+    function enterFullscreenAndRotate(gate) {
+      if (document.fullscreenElement) return;
+
+      var request = gate.requestFullscreen
+        || gate.webkitRequestFullscreen
+        || gate.mozRequestFullScreen
+        || gate.msRequestFullscreen;
+      if (!request) return;
+
+      try {
+        var result = request.call(gate);
+        if (result && typeof result.then === 'function') {
+          result.then(lockLandscapeOrientation).catch(function () {});
+        } else {
+          lockLandscapeOrientation();
+        }
+      } catch (err) { /* fullscreen nesuportat — ignorăm silențios */ }
+    }
+
+    function lockLandscapeOrientation() {
+      try {
+        if (screen.orientation && screen.orientation.lock) {
+          screen.orientation.lock('landscape').catch(function () {});
+        }
+      } catch (err) { /* orientare blocată de browser — ignorăm silențios */ }
+    }
+
+    // ── La ieșirea din fullscreen, deblochează orientarea ──
+    ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange'].forEach(function (evt) {
+      document.addEventListener(evt, function () {
+        if (!document.fullscreenElement) {
+          try {
+            if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
+          } catch (err) {}
+        }
+      });
+    });
+
+    /** Afișează scurt o iconiță play/pauză ca feedback vizual la click */
+    function flashGateIcon(gate, kind) {
+      var flash = document.createElement('div');
+      flash.className = 'yt-gate__flash-icon';
+      flash.innerHTML = kind === 'play'
+        ? '<svg width="40" height="40" viewBox="0 0 48 48"><polygon points="17,13 37,24 17,35" fill="white"/></svg>'
+        : '<svg width="40" height="40" viewBox="0 0 48 48"><rect x="14" y="12" width="7" height="24" fill="white"/><rect x="27" y="12" width="7" height="24" fill="white"/></svg>';
+      gate.appendChild(flash);
+      window.setTimeout(function () { flash.remove(); }, 420);
     }
 
     /** Activează TOATE embed-urile de pe pagină */
@@ -362,6 +454,16 @@ const ytLink = youtubeUrl || (hasPlaylist
     });
 
     document.addEventListener('click', function (e) {
+      var overlay = (e.target).closest?.('.yt-gate__click-overlay');
+      if (!overlay) return;
+
+      var gate = overlay.closest('.yt-gate');
+      if (!gate) return;
+
+      toggleGatePlayback(gate);
+    });
+
+    document.addEventListener('click', function (e) {
       var returnBtn = (e.target).closest?.('.yt-gate__mini-return');
       if (!returnBtn) return;
 
@@ -387,6 +489,14 @@ const ytLink = youtubeUrl || (hasPlaylist
     background: #0a0d1c;
   }
 
+  /* ── Fullscreen (declanșat la click, vezi enterFullscreenAndRotate) ── */
+  .yt-gate:fullscreen,
+  .yt-gate:-webkit-full-screen {
+    aspect-ratio: unset;
+    width: 100vw;
+    height: 100vh;
+  }
+
   .yt-gate__mini-return {
     position: absolute;
     top: 0.6rem;
@@ -409,6 +519,37 @@ const ytLink = youtubeUrl || (hasPlaylist
 
   .yt-gate__mini-return:hover {
     background: rgba(9, 20, 44, 0.95);
+  }
+
+  /* ── Overlay click-to-toggle peste iframe-ul YouTube ─────── */
+  .yt-gate__click-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  /* ── Iconiță play/pauză, flash scurt la click ────────────── */
+  .yt-gate__flash-icon {
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    background: rgba(0, 0, 0, 0.28);
+    animation: yt-gate-flash 420ms ease forwards;
+  }
+
+  @keyframes yt-gate-flash {
+    0% { opacity: 0; transform: scale(0.85); }
+    18% { opacity: 1; transform: scale(1); }
+    75% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.05); }
   }
 
   .yt-gate--mini {
@@ -509,21 +650,19 @@ const ytLink = youtubeUrl || (hasPlaylist
     border-radius: 3px;
   }
 
+  /* Butonul de accept e acum doar iconița de play — fără text vizibil */
   .yt-gate__btn-accept {
-    background: #4f46e5;
-    color: #fff;
+    background: transparent;
     border: none;
-    border-radius: 6px;
-    padding: 0.45rem 1rem;
-    font-size: 0.78rem;
-    font-weight: 700;
+    padding: 0;
+    line-height: 0;
     cursor: pointer;
-    transition: background 0.15s;
-    white-space: nowrap;
+    transition: transform 0.15s, opacity 0.15s;
   }
 
   .yt-gate__btn-accept:hover {
-    background: #4338ca;
+    transform: scale(1.06);
+    opacity: 1;
   }
 
   .yt-gate__btn-yt {
@@ -539,18 +678,6 @@ const ytLink = youtubeUrl || (hasPlaylist
 
   .yt-gate--playlist .yt-gate__consent {
     gap: 0.4rem;
-  }
-
-  .yt-gate--playlist .yt-gate__btn-accept {
-    min-height: 2.9rem;
-    padding-inline: 1.2rem;
-    border-radius: 999px;
-    background: linear-gradient(135deg, #0bbcd6 0%, #1346a8 100%);
-    box-shadow: 0 10px 24px rgba(11, 188, 214, 0.26);
-  }
-
-  .yt-gate--playlist .yt-gate__btn-accept:hover {
-    background: linear-gradient(135deg, #11c9e4 0%, #1958c6 100%);
   }
 
   /* ── Dimensiuni reduse pe carduri mici ───────────────────── */
