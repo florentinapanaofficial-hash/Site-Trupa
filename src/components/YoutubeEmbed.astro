@@ -353,7 +353,30 @@ const ytLink = youtubeUrl || (hasPlaylist
       clickOverlay.setAttribute('aria-label', 'Redă sau pune pauză video');
       gate.appendChild(clickOverlay);
 
+      // ── Buton dedicat de fullscreen: overlay-ul de mai sus acoperă tot
+      // iframe-ul, deci butonul de „ecran complet” din player-ul nativ
+      // YouTube nu mai poate fi accesat de click — oferim unul propriu.
+      var fullscreenBtn = document.createElement('button');
+      fullscreenBtn.type = 'button';
+      fullscreenBtn.className = 'yt-gate__fullscreen-btn';
+      fullscreenBtn.setAttribute('aria-label', 'Mărește video pe tot ecranul');
+      fullscreenBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
+      gate.appendChild(fullscreenBtn);
+
       registerMiniGate(gate);
+    }
+
+    /** Comută fullscreen pentru gate: iese dacă e deja în fullscreen, altfel intră */
+    function toggleGateFullscreen(gate) {
+      var isThisGateFullscreen = document.fullscreenElement === gate
+        || document.webkitFullscreenElement === gate;
+
+      if (isThisGateFullscreen) {
+        (document.exitFullscreen || document.webkitExitFullscreen)?.call(document);
+        return;
+      }
+
+      enterFullscreenAndRotate(gate);
     }
 
     /** Comută play/pauză pentru gate-ul dat, pe baza ultimei stări cunoscute */
@@ -377,7 +400,10 @@ const ytLink = youtubeUrl || (hasPlaylist
 
     /** Cere fullscreen pentru gate și, dacă e posibil, blochează orientarea pe landscape */
     function enterFullscreenAndRotate(gate) {
-      if (document.fullscreenElement) return;
+      if (document.fullscreenElement === gate) return;
+      if (document.fullscreenElement) {
+        (document.exitFullscreen || document.webkitExitFullscreen)?.call(document);
+      }
 
       var request = gate.requestFullscreen
         || gate.webkitRequestFullscreen
@@ -464,6 +490,17 @@ const ytLink = youtubeUrl || (hasPlaylist
     });
 
     document.addEventListener('click', function (e) {
+      var fsBtn = (e.target).closest?.('.yt-gate__fullscreen-btn');
+      if (!fsBtn) return;
+      e.stopPropagation();
+
+      var gate = fsBtn.closest('.yt-gate');
+      if (!gate) return;
+
+      toggleGateFullscreen(gate);
+    });
+
+    document.addEventListener('click', function (e) {
       var returnBtn = (e.target).closest?.('.yt-gate__mini-return');
       if (!returnBtn) return;
 
@@ -530,6 +567,33 @@ const ytLink = youtubeUrl || (hasPlaylist
     padding: 0;
     background: transparent;
     cursor: pointer;
+  }
+
+  /* ── Buton fullscreen propriu (overlay-ul de mai sus blochează
+     butonul nativ YouTube, deci oferim unul vizibil, mereu funcțional) ── */
+  .yt-gate__fullscreen-btn {
+    position: absolute;
+    right: 0.6rem;
+    bottom: 0.6rem;
+    z-index: 8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    background: rgba(7, 14, 32, 0.72);
+    color: #fff;
+    cursor: pointer;
+    opacity: 0.85;
+    transition: opacity 160ms ease, background 160ms ease, transform 160ms ease;
+  }
+
+  .yt-gate__fullscreen-btn:hover {
+    opacity: 1;
+    background: rgba(9, 20, 44, 0.92);
+    transform: scale(1.05);
   }
 
   /* ── Iconiță play/pauză, flash scurt la click ────────────── */
