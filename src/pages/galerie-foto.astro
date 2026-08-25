@@ -11,14 +11,16 @@ import path from 'node:path';
    în blocul "🆕 ULTIMELE ADĂUGATE". Astfel vizitatorii văd primii cele mai
    recente momente. Pozele vechi rămân în blocul de mai jos, în ordinea lor. */
 const base = "/images/galerie-foto-site";
+const optimizedBase = "/images/galerie-foto-site-optimized";
+const optimizedExtraBase = "/images/poze-09-07-2026-optimized";
 type GalleryPhoto = { src: string; alt: string; cat: string };
 type DirPhotoMeta = { name: string; mtimeMs: number };
 
 const basePhotos = [
   // ═══ DOAR PRIMELE 5 — restul pozelor sunt afișate pe pagina /membri/ ═══
-  { src: `${base}/Eveniment%20Arabesc.jpg`, alt: "Formația Florentina Pană cu trupa Arabesc la eveniment live", cat: "evenimente" },
-  { src: `${base}/Galerie Evenimente 1.jpg`, alt: "Eveniment live cu Formația Florentina Pană", cat: "evenimente" },
-  { src: `${base}/Galerie Evenimente 2.jpg`, alt: "Scenă completă la eveniment live", cat: "evenimente" },
+  { src: `${optimizedBase}/Eveniment%20Arabesc.webp`, alt: "Formația Florentina Pană cu trupa Arabesc la eveniment live", cat: "evenimente" },
+  { src: `${optimizedBase}/Galerie%20Evenimente%201.webp`, alt: "Eveniment live cu Formația Florentina Pană", cat: "evenimente" },
+  { src: `${optimizedBase}/Galerie%20Evenimente%202.webp`, alt: "Scenă completă la eveniment live", cat: "evenimente" },
 ];
 
 // Folosim process.cwd() + path.join pentru a evita probleme cu spații în new URL()
@@ -50,7 +52,7 @@ try {
     .map(({ name }) => {
       const cleanName = name.replace(/\.[^.]+$/, '').replace(/[\-_]+/g, ' ').trim();
       return {
-        src: `/images/poze%2009.07.2026/${encodeURIComponent(name)}`,
+        src: `${optimizedExtraBase}/${encodeURIComponent(name.replace(/\.[^.]+$/, '.webp'))}`,
         alt: `Foto eveniment Formația Florentina Pană - ${cleanName || 'live'}`,
         cat: 'evenimente',
       };

@@ -139,6 +139,46 @@ const ytLink = youtubeUrl || (hasPlaylist
     var YT_ORIGINS = ['https://www.youtube-nocookie.com', 'https://www.youtube.com'];
     var MINI_GATE_SELECTOR = '.yt-gate[data-yt-mini-on-scroll="true"]';
     var miniObserver = null;
+    var videoHoverAudioCtx = null;
+    var lastVideoHoverToneAt = 0;
+
+    function playVideoHoverTone() {
+      if (!window.matchMedia('(min-width: 1025px)').matches) return;
+
+      var AudioCtor = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtor) return;
+      if (!videoHoverAudioCtx) videoHoverAudioCtx = new AudioCtor();
+
+      var now = performance.now();
+      if (now - lastVideoHoverToneAt < 260) return;
+      lastVideoHoverToneAt = now;
+
+      var ctx = videoHoverAudioCtx;
+      if (ctx.state === 'suspended') void ctx.resume();
+
+      var oscillator = ctx.createOscillator();
+      var gain = ctx.createGain();
+      var start = ctx.currentTime;
+      var duration = 0.1;
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(240, start);
+      oscillator.frequency.exponentialRampToValueAtTime(360, start + duration);
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(0.011, start + 0.018);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+      oscillator.connect(gain);
+      gain.connect(ctx.destination);
+      oscillator.start(start);
+      oscillator.stop(start + duration);
+    }
+
+    document.addEventListener('pointerover', function (event) {
+      var target = event.target;
+      var gate = target && target.closest ? target.closest('.yt-gate') : null;
+      if (!gate) return;
+      if (event.relatedTarget && gate.contains(event.relatedTarget)) return;
+      playVideoHoverTone();
+    }, { passive: true });
 
     function hasMiniOnScroll(gate) {
       return gate && gate.getAttribute('data-yt-mini-on-scroll') === 'true';

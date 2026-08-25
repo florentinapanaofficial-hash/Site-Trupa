@@ -67,6 +67,31 @@ const sections = [
       </p>
     </header>
 
+    <nav class="video-channel-menu" aria-label="Selectează genul videoclipurilor">
+      <div class="video-channel-menu__topline">
+        <span class="video-channel-menu__live-dot" aria-hidden="true"></span>
+        <span>Florentina Pană TV</span>
+        <span class="video-channel-menu__status">LIVE LIBRARY</span>
+      </div>
+      <div class="video-channel-menu__channels" role="list">
+        {sections.map((section, index) => (
+          <a
+            class={`video-channel${index === 0 ? ' is-active' : ''}`}
+            href={`#${section.id}`}
+            data-video-channel={section.id}
+            role="listitem"
+          >
+            <span class="video-channel__number">{String(index + 1).padStart(2, '0')}</span>
+            <span class="video-channel__copy">
+              <strong>{section.kicker}</strong>
+              <small>{section.title}</small>
+            </span>
+            <span class="video-channel__arrow" aria-hidden="true">↗</span>
+          </a>
+        ))}
+      </div>
+    </nav>
+
     {sections.map((section) => {
       const playlist = playlistConfigBySection?.[section.id];
       const hasPlaylist = Boolean(playlist?.playlistId);
@@ -74,23 +99,27 @@ const sections = [
         ? `https://www.youtube.com/playlist?list=${playlist.playlistId}`
         : channelPlaylistsUrl;
       return (
-        <div class="section-block" id={section.id}>
+        <div class="section-block tv-panel" id={section.id}>
           <div class="section-label-row">
             <span class="section-kicker-chip">{section.kicker}</span>
             <h2 class="section-h2">{section.title}</h2>
           </div>
 
           {hasPlaylist ? (
-            <div class="playlist-block">
-              <YoutubeEmbed
-                playlistId={playlist.playlistId}
-                title={playlist.title || section.title}
-                thumbnailSrc={playlistThumb(playlist.thumbnailVideoId)}
-                youtubeUrl={playlistUrl}
-                class="playlist-embed"
-              />
+            <div class="playlist-block tv-shell">
+              <div class="tv-shell__screen">
+                <div class="tv-shell__bezel">
+                  <YoutubeEmbed
+                    playlistId={playlist.playlistId}
+                    title={playlist.title || section.title}
+                    thumbnailSrc={playlistThumb(playlist.thumbnailVideoId)}
+                    youtubeUrl={playlistUrl}
+                    class="playlist-embed"
+                  />
+                </div>
+              </div>
 
-              <div class="playlist-actions">
+              <div class="playlist-actions tv-side-panel">
                 <p class="playlist-note">Urmărește selecția noastră de momente live și alege stilul care se potrivește evenimentului vostru.</p>
                 <a href={youtubeRedirectHref(playlistUrl)} class="btn-outline">Deschide playlistul pe YouTube</a>
               </div>
@@ -112,6 +141,10 @@ const sections = [
   .section-block {
     margin-top: clamp(2.5rem, 5vw, 4rem);
     scroll-margin-top: 5rem;
+  }
+
+  .video-channel-menu {
+    display: none;
   }
 
   .section-label-row {
@@ -147,6 +180,41 @@ const sections = [
     gap: 1rem;
   }
 
+  .tv-panel {
+    position: relative;
+  }
+
+  .tv-shell__screen {
+    position: relative;
+    padding: 0.4rem;
+    border-radius: 1.2rem;
+    background: linear-gradient(180deg, rgba(9, 15, 27, 0.95), rgba(13, 21, 37, 0.8));
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    box-shadow: 0 20px 48px rgba(5, 10, 22, 0.4);
+  }
+
+  .tv-shell__screen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.06) 0%,
+      rgba(255, 255, 255, 0) 24%,
+      rgba(255, 255, 255, 0.025) 100%
+    );
+    pointer-events: none;
+  }
+
+  .tv-shell__bezel {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.95rem;
+    background: #04070d;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
   .playlist-embed {
     border-radius: 1.2rem;
     overflow: hidden;
@@ -169,6 +237,14 @@ const sections = [
     line-height: 1.5;
   }
 
+  .tv-side-panel {
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 1rem;
+    padding: 1rem 1rem 0.9rem;
+    background: rgba(8, 14, 25, 0.72);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+  }
+
   .empty-note {
     margin: 0;
     padding: 0.95rem 1rem;
@@ -178,6 +254,234 @@ const sections = [
     color: rgba(255, 233, 184, 0.9);
     font-size: 0.92rem;
     line-height: 1.5;
+  }
+
+  @media (min-width: 1025px) {
+    .video-channel-menu {
+      display: block;
+      position: sticky;
+      top: 1rem;
+      z-index: 10;
+      margin: 2.5rem auto 1rem;
+      padding: 0.65rem;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 1.15rem;
+      background: linear-gradient(135deg, rgba(249, 252, 255, 0.94), rgba(217, 231, 241, 0.9));
+      box-shadow: 0 16px 40px rgba(2, 10, 22, 0.3), 0 0 0 1px rgba(125, 211, 252, 0.12);
+      backdrop-filter: blur(16px) saturate(1.15);
+    }
+
+    .video-channel-menu__topline {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      min-height: 1.55rem;
+      padding: 0 0.55rem 0.45rem;
+      color: #14263a;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .video-channel-menu__live-dot {
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 50%;
+      background: #df4d4d;
+      box-shadow: 0 0 0 4px rgba(223, 77, 77, 0.14), 0 0 12px rgba(223, 77, 77, 0.55);
+    }
+
+    .video-channel-menu__status {
+      margin-left: auto;
+      color: #557086;
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+    }
+
+    .video-channel-menu__channels {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 0.45rem;
+    }
+
+    .video-channel {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      min-width: 0;
+      min-height: 3.9rem;
+      padding: 0.62rem 0.7rem;
+      overflow: hidden;
+      color: #173047;
+      border: 1px solid rgba(47, 87, 115, 0.13);
+      border-radius: 0.75rem;
+      background: rgba(255, 255, 255, 0.56);
+      text-decoration: none;
+      transition: transform 220ms ease, color 220ms ease, background 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+    }
+
+    .video-channel::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(115deg, transparent 25%, rgba(255, 255, 255, 0.72) 50%, transparent 75%);
+      transform: translateX(-120%);
+      transition: transform 500ms ease;
+      pointer-events: none;
+    }
+
+    .video-channel:hover,
+    .video-channel:focus-visible {
+      transform: translateY(-2px);
+      color: #0b2239;
+      border-color: rgba(24, 145, 190, 0.45);
+      background: rgba(255, 255, 255, 0.88);
+      box-shadow: 0 8px 18px rgba(24, 80, 112, 0.14);
+    }
+
+    .video-channel:hover::after,
+    .video-channel:focus-visible::after {
+      transform: translateX(120%);
+    }
+
+    .video-channel.is-active {
+      color: #fff;
+      border-color: rgba(8, 91, 128, 0.55);
+      background: linear-gradient(135deg, #176b91, #16435f);
+      box-shadow: 0 8px 22px rgba(17, 79, 110, 0.27), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    }
+
+    .video-channel__number {
+      flex: 0 0 auto;
+      color: #4284a2;
+      font-size: 0.66rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+    }
+
+    .video-channel.is-active .video-channel__number {
+      color: #a8e7f7;
+    }
+
+    .video-channel__copy {
+      display: grid;
+      min-width: 0;
+      gap: 0.2rem;
+    }
+
+    .video-channel__copy strong,
+    .video-channel__copy small {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .video-channel__copy strong {
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+
+    .video-channel__copy small {
+      color: #627b8e;
+      font-size: 0.62rem;
+    }
+
+    .video-channel.is-active .video-channel__copy small {
+      color: rgba(232, 249, 255, 0.78);
+    }
+
+    .video-channel__arrow {
+      margin-left: auto;
+      color: #6f91a4;
+      font-size: 1rem;
+      opacity: 0.65;
+    }
+
+    .video-channel.is-active .video-channel__arrow {
+      color: #fff;
+      opacity: 1;
+    }
+
+    .tv-panel {
+      padding: 1.2rem 1.2rem 1.4rem;
+      border: 1px solid rgba(125, 211, 252, 0.12);
+      border-radius: 1.5rem;
+      background: linear-gradient(180deg, rgba(10, 16, 27, 0.66), rgba(9, 15, 24, 0.42));
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+
+    .tv-panel::before {
+      content: '';
+      position: absolute;
+      inset: 0.4rem;
+      border-radius: 1.15rem;
+      background: radial-gradient(circle at top left, rgba(125, 211, 252, 0.14), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(245, 166, 35, 0.1), transparent 30%);
+      pointer-events: none;
+    }
+
+    .section-label-row {
+      position: relative;
+      z-index: 1;
+      margin-bottom: 1.15rem;
+    }
+
+    .playlist-block {
+      position: relative;
+      z-index: 1;
+      grid-template-columns: minmax(0, 1.7fr) minmax(260px, 0.7fr);
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    .tv-shell__screen {
+      padding: 0.7rem;
+      border-radius: 1.4rem;
+      border-color: rgba(125, 211, 252, 0.2);
+      background: linear-gradient(180deg, rgba(7, 12, 21, 1), rgba(15, 22, 33, 0.96));
+      box-shadow: 0 30px 80px rgba(2, 7, 17, 0.7);
+    }
+
+    .tv-shell__bezel {
+      border-radius: 1rem;
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .playlist-embed {
+      border-radius: 0.95rem;
+      border-width: 0;
+      box-shadow: none;
+    }
+
+    .tv-side-panel {
+      min-height: fit-content;
+      padding: 1.2rem 1.1rem 1rem;
+      background: linear-gradient(180deg, rgba(13, 21, 31, 0.82), rgba(8, 12, 19, 0.78));
+      border-color: rgba(245, 166, 35, 0.18);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 18px 40px rgba(0,0,0,0.22);
+    }
+
+    .playlist-actions {
+      align-items: flex-start;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .playlist-note {
+      font-size: 0.96rem;
+      color: rgba(226, 236, 252, 0.82);
+      line-height: 1.6;
+    }
+
+    .playlist-actions .btn-outline {
+      width: 100%;
+      justify-content: center;
+      border-color: rgba(245, 166, 35, 0.25);
+      background: rgba(245, 166, 35, 0.05);
+      color: #fff;
+    }
   }
 
   @media (max-width: 48rem) {
@@ -191,3 +495,14 @@ const sections = [
     }
   }
 </style>
+
+<script>
+  const channelLinks = document.querySelectorAll('[data-video-channel]');
+
+  channelLinks.forEach((link) => {
+    link.addEventListener('click', () => {
+      channelLinks.forEach((item) => item.classList.remove('is-active'));
+      link.classList.add('is-active');
+    });
+  });
+</script>

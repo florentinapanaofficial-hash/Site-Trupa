@@ -24,6 +24,8 @@ const isYoutubeRedirectAllowed = (url: string) => {
       'music.youtube.com',
       'youtu.be',
       'www.youtu.be',
+      'youtube-nocookie.com',
+      'www.youtube-nocookie.com',
     ]);
 
     return allowedHosts.has(host);
@@ -53,19 +55,21 @@ const pageDescription = 'Confirmă redirecționarea către YouTube sau revino ra
         </p>
 
         <div class="mt-6 flex flex-wrap gap-3">
-          {canContinueToYoutube ? (
-            <a
-              href={safeTo}
-              rel="noopener noreferrer"
-              class="inline-flex items-center rounded-xl border border-amber-300/50 bg-amber-400/10 px-4 py-2.5 font-['Oswald'] text-sm uppercase tracking-[0.08em] text-amber-200 transition hover:-translate-y-0.5 hover:bg-amber-400/20"
-            >
-              Continuă către YouTube
-            </a>
-          ) : (
-            <span class="rounded-xl border border-red-300/40 bg-red-500/10 px-4 py-2.5 text-sm text-red-200">
-              Link invalid sau lipsă.
-            </span>
-          )}
+          <a
+            id="youtube-continue-link"
+            href={canContinueToYoutube ? safeTo : '#'}
+            target="_blank"
+            rel="noopener noreferrer"
+            class={`inline-flex items-center rounded-xl border border-amber-300/50 bg-amber-400/10 px-4 py-2.5 font-['Oswald'] text-sm uppercase tracking-[0.08em] text-amber-200 transition hover:-translate-y-0.5 hover:bg-amber-400/20${canContinueToYoutube ? '' : ' hidden'}`}
+          >
+            Continuă către YouTube
+          </a>
+          <span
+            id="youtube-invalid-link"
+            class={`rounded-xl border border-red-300/40 bg-red-500/10 px-4 py-2.5 text-sm text-red-200${canContinueToYoutube ? ' hidden' : ''}`}
+          >
+            Link invalid sau lipsă.
+          </span>
 
           <a
             href={safeBack}
@@ -77,4 +81,37 @@ const pageDescription = 'Confirmă redirecționarea către YouTube sau revino ra
       </article>
     </div>
   </section>
+
+  <script is:inline>
+    (function () {
+      var allowedHosts = new Set([
+        'youtube.com',
+        'www.youtube.com',
+        'm.youtube.com',
+        'music.youtube.com',
+        'youtu.be',
+        'www.youtu.be',
+        'youtube-nocookie.com',
+        'www.youtube-nocookie.com',
+      ]);
+      var link = document.getElementById('youtube-continue-link');
+      var invalidMessage = document.getElementById('youtube-invalid-link');
+      var rawTo = new URLSearchParams(window.location.search).get('to') || '';
+      var safeClientTo = '';
+
+      try {
+        var parsed = new URL(rawTo);
+        if ((parsed.protocol === 'https:' || parsed.protocol === 'http:') && allowedHosts.has(parsed.hostname.toLowerCase())) {
+          safeClientTo = parsed.href;
+        }
+      } catch (_) {}
+
+      if (safeClientTo && link) {
+        link.href = safeClientTo;
+        link.classList.remove('hidden');
+        if (invalidMessage) invalidMessage.classList.add('hidden');
+        window.location.replace(safeClientTo);
+      }
+    })();
+  </script>
 </BaseLayout>

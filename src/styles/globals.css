@@ -1577,7 +1577,24 @@ html::-webkit-scrollbar-thumb:hover {
   transition: opacity 500ms ease-in-out;
 }
 
+@media (min-width: 1025px) {
 
+  body.top-menu-expanded .layout-content-shell,
+  body.top-menu-expanded main#continut,
+  body.top-menu-expanded .left-side-menu,
+  body.top-menu-expanded .scroll-progress {
+    filter: blur(2.2px) saturate(0.9) brightness(0.97);
+    transform: scale(0.998);
+    transition: filter 260ms ease, transform 260ms ease;
+    will-change: filter, transform;
+  }
+
+  body.top-menu-expanded .layout-content-shell,
+  body.top-menu-expanded main#continut,
+  body.top-menu-expanded .left-side-menu {
+    pointer-events: none;
+  }
+}
 
 .nav-link-desktop {
   display: inline-flex;

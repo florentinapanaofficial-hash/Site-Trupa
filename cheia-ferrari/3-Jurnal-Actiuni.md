@@ -261,6 +261,44 @@ git push origin main
 
 ---
 
+## 📝 2026-08-25 — Galerie video TV premium
+- **Obiectiv:** Interfață video originală, mai luminoasă și premium, cu selector de genuri.
+- **Fișier modificat:** `src/pages/galerie-video.astro`
+- **Implementat:** meniu desktop „Florentina Pană TV” cu cinci canale, stări active, navigare către genurile existente și cadre TV/glass-metal pentru playlisturi.
+- **Compatibilitate:** mobilul rămâne pe fluxul existent; consimțământul GDPR și embed-urile YouTube nu au fost modificate.
+- **Validări:** `npm run build` — succes; avertismentele `Astro.request.headers` rămân cele cunoscute și neblocante.
+- **Riscuri/pași următori:** este necesară verificarea vizuală în browser la lățimi desktop reale pentru reglaje fine de spațiere, dacă apar diferențe între fonturi sau meniul global.
+
+## 📝 2026-08-25 — Redirect YouTube invalid în pagină statică
+- **Problemă:** pagina `/youtube-redirect/` afișa „Link invalid sau lipsă” pentru playlisturi YouTube valide.
+- **Cauză:** `Astro.url.searchParams` era evaluat la build pe pagina statică, înainte să existe query-ul din browser.
+- **Fix:** validarea sigură și redirectul au fost mutate în scriptul client, folosind `URLSearchParams` și aceeași listă strictă de domenii YouTube permise.
+- **Fișier modificat:** `src/pages/youtube-redirect.astro`
+- **Validări:** `npm run build` — succes; `get_errors` — fără erori.
+
+## 📝 2026-08-25 — Încărcare lentă în galeria foto
+- **Problemă:** galeria servea direct originale JPG/PNG din `public/images`, cu aproximativ 59 MB cumulat și imagini individuale de până la aproape 7 MB.
+- **Fix:** adăugat `scripts/optimize-public-gallery.mjs`, care generează WebP la maximum 1600px și calitate 78 în directoare dedicate; `galerie-foto.astro` folosește derivatele optimizate.
+- **Rezultat măsurat:** aproximativ 7,1 MB pentru derivatele galeriei, cea mai mare imagine aproximativ 0,4 MB.
+- **Compatibilitate:** originalele sunt păstrate; funcția de lightbox, ordinea newest-first și imaginile din alte pagini rămân neschimbate.
+- **Validări:** scriptul de optimizare — succes; `npm run build` — succes; `get_errors` — fără erori; cele 3 imagini de bază referențiate există în variante optimizate.
+
+## 📝 2026-08-25 — Sunet hover pe toate playlisturile
+- **Problemă:** feedback-ul audio la hover funcționa doar pe primul playlist din galerie.
+- **Cauză:** scriptul global al primei componente se inițializa înaintea celorlalte și atașa listenerul doar elementelor existente în acel moment.
+- **Fix:** listener delegat `pointerover` pe document, cu detecție a intrării în orice `.yt-gate`.
+- **Fișier modificat:** `src/components/YoutubeEmbed.astro`
+- **Validări:** `npm run build` — succes; `get_errors` — fără erori.
+
+## 📝 2026-08-25 — Feedback audio la hover pe videoclipuri
+- **Obiectiv:** Sunet discret de marcare când mouse-ul intră peste un videoclip, similar cu meniul desktop.
+- **Fișier modificat:** `src/components/YoutubeEmbed.astro`
+- **Implementat:** ton Web Audio foarte scurt și mai jos ca volum, limitat la desktop (`min-width: 1025px`) și cu throttling pentru treceri rapide între videoclipuri.
+- **Compatibilitate:** mobilul, click-ul, consimțământul GDPR și redarea YouTube rămân neschimbate.
+- **Validări:** `npm run build` — succes; `get_errors` — fără erori.
+
+---
+
 ## 🎉 PROTOCOL „AM AVUT EVENIMENT" — Workflow complet
 
 Când Claudiu scrie **„Am avut eveniment pe [data]"**, Ferrari aplică pașii de mai jos **în ordine** și **NUMAI cu date reale primite de la Claudiu**. Zero inventat. Zero completat din imaginație.

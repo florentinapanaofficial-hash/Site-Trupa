@@ -648,6 +648,74 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       window.addEventListener('load', scheduleLivePolling, { once: true });
     }
 
+    const menuUiAudioCtx = (() => {
+      const AudioCtor = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtor) return null;
+      return new AudioCtor();
+    })();
+
+    let lastUiToneAt = 0;
+    const playMenuUiTone = (variant = 'hover') => {
+      if (window.matchMedia('(max-width: 1024px)').matches || !menuUiAudioCtx) return;
+
+      const now = performance.now();
+      if (now - lastUiToneAt < (variant === 'hover' ? 220 : 320)) {
+        return;
+      }
+      lastUiToneAt = now;
+
+      const ctx = menuUiAudioCtx;
+      if (ctx.state === 'suspended') {
+        void ctx.resume();
+      }
+
+      const oscA = ctx.createOscillator();
+      const oscB = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const start = ctx.currentTime;
+      const duration = variant === 'hover' ? 0.11 : 0.16;
+
+      const baseFreqA = variant === 'hover' ? 220 : 280;
+      const peakFreqA = variant === 'hover' ? 330 : 420;
+      const baseFreqB = variant === 'hover' ? 330 : 420;
+      const peakFreqB = variant === 'hover' ? 440 : 520;
+
+      oscA.type = 'sine';
+      oscB.type = 'triangle';
+      oscA.frequency.setValueAtTime(baseFreqA, start);
+      oscA.frequency.exponentialRampToValueAtTime(peakFreqA, start + duration);
+      oscB.frequency.setValueAtTime(baseFreqB, start);
+      oscB.frequency.exponentialRampToValueAtTime(peakFreqB, start + duration);
+
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(0.014, start + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+
+      oscA.connect(gain);
+      oscB.connect(gain);
+      gain.connect(ctx.destination);
+      oscA.start(start);
+      oscB.start(start + 0.02);
+      oscA.stop(start + duration);
+      oscB.stop(start + duration + 0.04);
+    };
+
+    const attachMenuUiSfx = (element) => {
+      if (!element) return;
+      element.addEventListener('pointerenter', () => {
+        if (!window.matchMedia('(min-width: 1025px)').matches) return;
+        playMenuUiTone('hover');
+      }, { passive: true });
+      element.addEventListener('click', () => {
+        if (!window.matchMedia('(min-width: 1025px)').matches) return;
+        playMenuUiTone('click');
+      }, { passive: true });
+    };
+
+    if (menuToggle) attachMenuUiSfx(menuToggle);
+    if (menuCloseButton) attachMenuUiSfx(menuCloseButton);
+    document.querySelectorAll('#top-menu-panel [data-nav-link]').forEach((link) => attachMenuUiSfx(link));
+
     if (links.length === 0) return;
 
     const normalizePathnameFromHref = (href) => {
