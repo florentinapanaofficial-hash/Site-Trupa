@@ -283,6 +283,19 @@ git push origin main
 - **Compatibilitate:** originalele sunt păstrate; funcția de lightbox, ordinea newest-first și imaginile din alte pagini rămân neschimbate.
 - **Validări:** scriptul de optimizare — succes; `npm run build` — succes; `get_errors` — fără erori; cele 3 imagini de bază referențiate există în variante optimizate.
 
+## 📝 2026-08-25 — Reducere forced reflow în galeria foto
+- **Obiectiv:** Îmbunătățire tehnică fără schimbarea aspectului sau funcționalității.
+- **Fix:** înlocuite două citiri forțate `offsetWidth` folosite pentru repornirea animațiilor cu `requestAnimationFrame`.
+- **Fișier modificat:** `src/pages/galerie-foto.astro`
+- **Compatibilitate:** animația beat bars și fade-ul lightbox rămân active; nu au fost schimbate controale, stiluri sau fluxul de galerie.
+- **Validări:** `npm run build` — succes; `get_errors` — fără erori; nu mai există `offsetWidth`/`getBoundingClientRect`/`getComputedStyle` în pagina galeriei foto.
+
+## 📝 2026-08-25 — Îmbunătățire accesibilitate header
+- **Problemă:** Lighthouse semnala că textul vizibil al logo-linkului nu era inclus în numele accesibil.
+- **Fix:** `aria-label` din `Header.astro` include acum numele vizibil „Formația Florentina Pană” și acțiunea de navigare.
+- **Notă:** avertismentul Lighthouse despre API-uri deprecated provine din scriptul extern Cloudflare Challenge, nu din codul site-ului, și nu a fost modificat.
+- **Validări:** `npm run build` — succes; `get_errors` — fără erori.
+
 ## 📝 2026-08-25 — Sunet hover pe toate playlisturile
 - **Problemă:** feedback-ul audio la hover funcționa doar pe primul playlist din galerie.
 - **Cauză:** scriptul global al primei componente se inițializa înaintea celorlalte și atașa listenerul doar elementelor existente în acel moment.

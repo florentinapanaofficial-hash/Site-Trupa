@@ -259,8 +259,7 @@ const photos = [...latestPhotos, ...basePhotos];
     beatBarIdx += 1;
     if (!bar) return;
     bar.classList.remove('is-hit');
-    void bar.offsetWidth;
-    bar.classList.add('is-hit');
+    requestAnimationFrame(() => bar.classList.add('is-hit'));
   }
 
   function setMontagePreset(nextPreset) {
@@ -538,6 +537,7 @@ const photos = [...latestPhotos, ...basePhotos];
   }
 
   let currentIdx = 0;
+  let photoFadeRaf = 0;
 
   function showPhoto(idx) {
     const visible = getVisibleItems();
@@ -550,8 +550,8 @@ const photos = [...latestPhotos, ...basePhotos];
     lbImg.alt = alt;
     lbCounter.textContent = `${idx + 1} / ${visible.length}`;
     lbImg.classList.remove('lb-fade-in');
-    void lbImg.offsetWidth; /* force reflow for re-trigger */
-    lbImg.classList.add('lb-fade-in');
+    cancelAnimationFrame(photoFadeRaf);
+    photoFadeRaf = requestAnimationFrame(() => lbImg.classList.add('lb-fade-in'));
   }
 
   function openLightbox(idx) {
