@@ -271,7 +271,7 @@ const musicPlaylistSchema = {
         Tu setezi playlistul pentru client cu genurile cerute: muzică populară de petrecere, grecească, arăbească, machedonească, latino, muzică românească și manele. Program live fără pauze, fără DJ sau MC.
       </p>
 
-      {!hasConfiguredR2BaseUrl && (
+      {!hasConfiguredR2BaseUrl && masterPlaylist.every((song) => !song.url.startsWith('https://')) && (
         <p class="mt-4 max-w-3xl rounded-xl border border-amber-400/35 bg-amber-500/10 px-4 py-3 text-sm text-amber-100/90">
           Playerul folosește momentan biblioteca locală din <strong>/public/Audio/</strong> până conectezi bucket-ul R2.
         </p>

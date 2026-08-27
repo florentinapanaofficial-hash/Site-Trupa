@@ -1115,3 +1115,18 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 
 - URL R2 → **HTTP 200**, `audio/mpeg`, 43.386.600 bytes.
 - `npm run seo:check` → build PASS; 60 pagini HTML verificate, **0 FAIL | 0 WARN**.
+
+---
+## Sesiunea 27 august 2026 — Link vizibil pentru Muzică Non-Stop
+
+**Obiectiv:** Repararea situației în care „Muzică Non-Stop” nu era vizibil în meniul desktop deschis de pe Galerie Video.
+
+### Modificări realizate
+
+- Adăugat linkul `/muzica-non-stop/` în modulul desktop `MEDIA` din `src/components/Header.astro`.
+- Ajustat mesajul de fallback din `src/pages/muzica-non-stop.astro`: nu mai afișează avertismentul despre R2 când există o piesă remote cu URL direct.
+
+### Validări
+
+- `get_errors` → fără erori în Header și pagina Muzică Non-Stop.
+- `npm run seo:check` → build PASS; 60 pagini HTML verificate, **0 FAIL | 0 WARN**.
