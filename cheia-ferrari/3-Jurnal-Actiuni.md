@@ -1032,3 +1032,30 @@ import GalerieAutomata from '../components/GalerieAutomata.astro';
 ## Notă personală — 19 august 2026
 
 Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru el și că îmi mulțumește foarte mult. Mesajul este păstrat aici ca parte din istoria umană a colaborării noastre, alături de istoricul tehnic al proiectului.
+
+---
+## Sesiunea 27 august 2026 — Optimizare SEO on-page homepage
+
+**Obiectiv:** Alinierea homepage-ului la keyword-urile „florentina pană”, „formația florentina pană”, „muzică populară”, „live band” și „band premium”, pentru indexare și scor SEO mai bune.
+
+### Modificări realizate
+
+- Actualizat title-ul homepage-ului la `Formația Florentina Pană | Live Band & Muzică Populară` (54 caractere).
+- Actualizată description-ul homepage-ului cu toți termenii principali și CTA (135 caractere).
+- H1-ul homepage-ului este alimentat din `seo-content.json` și include brandul, live band și muzică populară.
+- Restructurate heading-uri existente pentru „Live Band pentru Nunți și Evenimente Private”, „Experiență de Band Premium” și „Repertoriu Diversificat: Muzică Populară și Cover-uri Live”.
+- Îmbogățită schema `MusicGroup` cu descriere coerentă și genurile „Live Band” / „Band premium”. Meta OpenGraph și Twitter Cards erau deja generate centralizat în `BaseLayout.astro` și au fost validate în HTML-ul build-uit.
+
+### Fișiere modificate
+
+- `src/data/seo-content.json`
+- `src/pages/index.astro`
+- `cheia-ferrari/3-Jurnal-Actiuni.md`
+
+### Validări
+
+- `npx astro check` → 0 erori, 0 warnings, 3 hints preexistente în alte fișiere.
+- Lungimi SEO → title 54, description 135 caractere.
+- `npm run build` → PASS; 71 fișiere comprimate.
+- HTML generat → title homepage confirmat; OpenGraph, Twitter Card și schema JSON-LD prezente.
+- `git diff --check` → PASS.

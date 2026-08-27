@@ -1,11 +1,11 @@
 {
     "acasa": {
         "meta": {
-            "title": "Cele Mai Bune Formații de Nuntă 2026 | Florentina Pană",
-            "description": "Una din cele mai bune formații de nuntă — show 100% live, repertoriu non-stop. Disponibili în Pitești, București și toată România. Cere ofertă azi!"
+            "title": "Formația Florentina Pană | Live Band & Muzică Populară",
+            "description": "Formația Florentina Pană este un live band și band premium cu muzică populară pentru nunți și evenimente. Cere oferta și verifică data!"
         },
         "hero": {
-            "h1": "Formație Nuntă Pitești - Formația Florentina Pană",
+            "h1": "Formația Florentina Pană | Live Band și Muzică Populară",
             "kicker": "Trupă live premium | Nunți · Botezuri · Corporate",
             "descriere": "Formația Florentina Pană oferă show 100% live pentru nunți și botezuri în Pitești, Argeș și în toată România: repertoriu variat, sonorizare proprie și atmosferă care ține ringul plin.",
             "bullets": [
@@ -168,7 +168,7 @@
         "@type": "MusicGroup",
         "name": "Formația Florentina Pană",
         "alternateName": "Florentina Pană",
-        "description": "Formație Nuntă & Cover Band Live din Pitești, Argeș — Show Live 100% cu repertoriu complet: muzică populară de petrecere, grecească, arăbească, machedonească, latino, muzică românească și manele. Fără DJ sau MC.",
+        "description": "Formația Florentina Pană este un live band și band premium din Pitești, cu show 100% live, muzică populară de petrecere și repertoriu variat pentru nunți și evenimente.",
         "url": "https://florentinapanaofficial.ro",
         "telephone": "+40767369658",
         "email": "contact@florentinapanaofficial.ro",
@@ -205,6 +205,8 @@
             "addressCountry": "RO"
         },
         "genre": [
+            "Live Band",
+            "Band premium",
             "Muzica Greceasca",
             "Muzica Arabeasca",
             "Muzica Latino",
