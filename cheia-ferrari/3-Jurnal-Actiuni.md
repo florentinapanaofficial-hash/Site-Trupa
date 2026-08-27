@@ -4,9 +4,9 @@
 ## Protocol Jurnal AI — obligatoriu la fiecare sesiune
 
 1. La începutul fiecărei sesiuni, citesc acest jurnal înainte de orice căutare, editare sau comandă care modifică proiectul.
-2. În paralel cu citirea jurnalului, rulez `npm run seo:check` și repar orice `FAIL` SEO înainte de a continua.
+2. În paralel cu citirea jurnalului, rulez `npm run seo:audit` dacă există deja `dist/client`; o dată pe săptămână rulez `npm run seo:weekly`.
 3. Folosesc istoricul pentru a evita repetarea greșelilor și pentru a păstra deciziile tehnice coerente.
-4. După modificări, rulez din nou `npm run seo:check`; sesiunea nu se închide cu FAIL sau WARN SEO.
+4. După modificări care afectează pagini, conținut, imagini, linkuri, layout sau metadata, rulez din nou `npm run seo:check`; sesiunea nu se închide cu FAIL sau WARN SEO.
 5. La finalul fiecărei sesiuni de lucru, consemnez data, obiectivul, fișierele modificate, rezultatul auditului, validările, greșelile sau riscurile descoperite și pașii rămași.
 6. Nu creez un al doilea jurnal. Acest fișier este jurnalul AI oficial al proiectului.
 
@@ -1130,3 +1130,129 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 
 - `get_errors` → fără erori în Header și pagina Muzică Non-Stop.
 - `npm run seo:check` → build PASS; 60 pagini HTML verificate, **0 FAIL | 0 WARN**.
+
+---
+## Sesiunea 27 august 2026 — Player audio simplificat tip media player
+
+**Obiectiv:** Simplificarea secțiunii `/muzica-non-stop/` și afișarea pieselor Cloudflare R2 într-un player familiar, cu selecție și Play/Pauză.
+
+### Modificări realizate
+
+- Înlocuit UI-ul încărcat cu un player compact tip media player: titlu piesă, artist, Play/Pauză, Previous, Next, volum și listă de redare.
+- Adăugat checkbox pentru fiecare melodie; selectarea unui rând schimbă piesa activă, iar butonul Play pornește redarea.
+- Păstrat catalogul remote R2 și schema `MusicPlaylist` pentru SEO.
+- Mutat textele explicative într-o secțiune separată `audio-seo-copy`, sub player.
+- Eliminată logica de preseturi, filtrare, istoric și pseudo-radio din interfața publică.
+
+### Validări
+
+- `npx astro check` → 0 erori; 3 hints preexistente în alte fișiere.
+- `npm run seo:check` → build PASS; 60 pagini HTML verificate, **0 FAIL | 0 WARN**.
+- HTML generat → piesa R2 prezentă, player nativ prezent, `radio-mode-toggle` eliminat.
+
+---
+## Sesiunea 27 august 2026 — EQ grafic pentru playerul Muzică Non-Stop
+
+**Obiectiv:** Transformarea playerului audio într-o interfață de aplicație, cu vizualizare EQ parametrică atractivă.
+
+### Modificări realizate
+
+- Adăugat canvas pentru spectru audio și curbă EQ.
+- Adăugate trei benzi parametric EQ: Bass, Presence și Treble, cu gain între -12 și +12 dB.
+- Filtrele Web Audio se inițializează la interacțiunea utilizatorului, fără autoplay și fără cost la încărcarea inițială.
+- Păstrate lista pieselor R2, selectarea prin checkbox și comenzile Play/Pauză.
+- Eliminat `crossorigin="anonymous"` după verificarea bucketului R2: URL-ul răspunde cu HTTP 200, dar nu trimite CORS. Astfel redarea nativă rămâne funcțională; spectrul live complet necesită configurarea CORS R2 pentru domeniul site-ului.
+
+### Validări
+
+- `npx astro check` → 0 erori; 3 hints preexistente în alte fișiere.
+- `npm run seo:check` → build PASS; 60 pagini HTML verificate, **0 FAIL | 0 WARN**.
+- HTML generat → canvas EQ, 3 benzi EQ și URL R2 prezente.
+
+---
+## Sesiunea 27 august 2026 — Interfață tip aplicație pentru playerul audio
+
+**Obiectiv:** Reproducerea experienței Windows Media Player în browser pentru secțiunea `/muzica-non-stop/`.
+
+### Modificări realizate
+
+- Adăugată bară de titlu tip fereastră: „Muzică Non-Stop - FP Band”.
+- Playerul este organizat ca aplicație: zona de redare și EQ în stânga, biblioteca de piese în dreapta.
+- Biblioteca este scrollabilă pe desktop și se așază sub player pe mobil.
+- Păstrate selecția prin checkbox, Play/Pauză, Previous, Next, volum, lista Cloudflare R2 și EQ parametric.
+
+### Validări
+
+- `npx astro check` → 0 erori; 3 hints preexistente în alte fișiere.
+- `npm run seo:check` → build PASS; 60 pagini HTML verificate, **0 FAIL | 0 WARN**.
+- HTML generat → titlu aplicație, biblioteca media, EQ parametric și URL R2 prezente.
+
+---
+## Sesiunea 27 august 2026 — Protocol SEO rapid și revizie săptămânală
+
+**Obiectiv:** Separarea verificării rapide per sesiune de revizia completă săptămânală.
+
+### Modificări realizate
+
+- Adăugat `npm run seo:weekly`, care rulează `seo:check`, `check-links` și `npm test`.
+- Actualizat `.github/copilot-instructions.md`: audit rapid la începutul sesiunii dacă există build, verificare completă după modificări relevante și revizie săptămânală obligatorie.
+- Actualizat protocolul jurnalului cu aceeași separare a responsabilităților.
+- Corectat linkul ANPC SAL expirat din Footer și Termeni către pagina oficială `/sal`.
+
+### Validări
+
+- `npm run seo:weekly` → build PASS.
+- Audit SEO → 60 pagini HTML, **0 FAIL | 0 WARN**.
+- Link checker → 56/56 linkuri externe valide.
+- Jest → 40/40 teste trecute.
+
+---
+## Sesiunea 27 august 2026 — Distribuire individuală melodii
+
+**Obiectiv:** Permiterea promovării unei singure piese, fără a distribui doar pagina generică a playlistului.
+
+### Modificări realizate
+
+- Adăugat butonul `Distribuie` pe fiecare melodie din player.
+- Pe dispozitivele compatibile se folosește Web Share; pe desktop se copiază linkul în clipboard.
+- Linkul individual folosește `/muzica-non-stop/?track=N` și selectează automat melodia când pagina este deschisă.
+- Păstrată pagina completă pentru distribuirea playlistului general.
+
+### Validări
+
+- `npx astro check` → 0 erori; 3 hints preexistente în alte fișiere.
+- `npm run seo:check` → build PASS; 60 pagini HTML verificate, **0 FAIL | 0 WARN**.
+- HTML generat → buton `Distribuie` și deep-link `?track=` prezente.
+
+---
+## Sesiunea 27 august 2026 — Oprire melodie la schimbarea selecției
+
+**Obiectiv:** Garantarea faptului că melodia anterioară se oprește când utilizatorul selectează sau pornește o altă melodie.
+
+### Modificări realizate
+
+- În `selectTrack`, playerul execută explicit `audio.pause()` și resetează `audio.currentTime` înainte de a încărca noul URL.
+- Regula se aplică pentru checkbox, Play pe rând, Previous, Next și deep-link-urile distribuite.
+
+### Validări
+
+- `npx astro check` → 0 erori; 3 hints preexistente în alte fișiere.
+- `npm run seo:check` → build PASS; 60 pagini HTML verificate, **0 FAIL | 0 WARN**.
+- HTML generat → `audio.pause()` prezent în player.
+
+---
+## Sesiunea 27 august 2026 — Evidențiere melodie în redare
+
+**Obiectiv:** Diferențierea vizuală a piesei care rulează efectiv în playlist.
+
+### Modificări realizate
+
+- Adăugată clasa dinamică `is-playing`, actualizată de evenimentele reale `play` și `pause` ale elementului audio.
+- Melodia redată primește accent verde, contur interior și indicatorul `Redare`.
+- La selectarea altei melodii sau la Pauză, accentul de redare este eliminat de pe piesa anterioară.
+
+### Validări
+
+- `npx astro check` → 0 erori; 3 hints preexistente în alte fișiere.
+- `npm run seo:check` → build PASS; 60 pagini HTML verificate, **0 FAIL | 0 WARN**.
+- HTML generat → clasele `is-playing` și indicatorul `Redare` prezente.

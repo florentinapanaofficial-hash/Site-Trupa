@@ -3,677 +3,195 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import BackButton from '../components/BackButton.astro';
 import audioCatalog from '../data/audio-catalog.generated.json';
 import remoteAudioCatalog from '../data/audio-catalog-remote.json';
-import playlistPresets from '../data/audio-playlist-presets.json';
 
-type CatalogSong = {
-  name: string;
-  artist?: string;
-  file: string;
-  url?: string;
-  genres?: string[];
-};
-
-type CatalogCategory = {
-  id: string;
-  title: string;
-  songs: CatalogSong[];
-};
-
-type PlaylistPreset = {
-  key: string;
-  label: string;
-  description: string;
-  includeGenres?: string[];
-};
-
+type CatalogSong = { name: string; artist?: string; file: string; url?: string };
+type CatalogCategory = { id: string; title: string; songs: CatalogSong[] };
 const pageTitle = 'Muzică de Petrecere Non-Stop | Streaming Audio';
 const pageDescription = 'Ascultă repertoriul live non-stop: muzică populară de petrecere, grecească, arăbească, machedonească, latino, muzică românească și manele. Fără DJ/MC.';
-const pageOgImage = '/images/og-default-1200x630.jpg';
-
-const configuredR2BaseUrl = import.meta.env.PUBLIC_R2_MUSIC_BASE_URL?.trim() || '';
-const hasConfiguredR2BaseUrl = configuredR2BaseUrl.length > 0;
-const r2AudioBaseUrl = configuredR2BaseUrl.replace(/\/$/, '');
 const defaultArtist = 'Formația Florentina Pană';
-
 const catalogData = audioCatalog as { categories?: CatalogCategory[] };
 const remoteCatalogData = remoteAudioCatalog as { categories?: CatalogCategory[] };
-const sourceCategories: CatalogCategory[] = [
-  ...(Array.isArray(catalogData?.categories) ? catalogData.categories : []),
-  ...(Array.isArray(remoteCatalogData?.categories) ? remoteCatalogData.categories : []),
+const categories = [
+  ...(Array.isArray(remoteCatalogData.categories) ? remoteCatalogData.categories : []),
+  ...(Array.isArray(catalogData.categories) ? catalogData.categories : []),
 ];
-const hasCatalogTracks = sourceCategories.some((category) => Array.isArray(category.songs) && category.songs.length > 0);
-
-const fallbackCategories = [
-  {
-    id: 'selectie-generala',
-    title: 'Selecție Generală',
-    songs: [],
-  },
-];
-
-const categories: CatalogCategory[] = hasCatalogTracks ? sourceCategories : fallbackCategories;
-
-const encodePathSegments = (rawPath: string) =>
-  rawPath
-    .split('/')
-    .map((segment) => encodeURIComponent(segment))
-    .join('/');
-
-const resolveSongUrl = (filePath: string) => {
-  const encodedPath = encodePathSegments(filePath);
-  return hasConfiguredR2BaseUrl
-    ? `${r2AudioBaseUrl}/${encodedPath}`
-    : `/Audio/${encodedPath}`;
+const configuredR2BaseUrl = import.meta.env.PUBLIC_R2_MUSIC_BASE_URL?.trim().replace(/\/$/, '') || '';
+const resolveSongUrl = (song: CatalogSong) => {
+  if (song.url) return song.url;
+  const encodedPath = song.file.split('/').map((segment) => encodeURIComponent(segment)).join('/');
+  return configuredR2BaseUrl ? `${configuredR2BaseUrl}/${encodedPath}` : `/Audio/${encodedPath}`;
 };
-
-let currentIndex = 0;
-const masterPlaylist = categories.flatMap((category) =>
-  category.songs.map((song) => {
-    const index = currentIndex++;
-    const normalizedGenres = Array.isArray(song.genres) && song.genres.length > 0 ? song.genres : ['petrecere'];
-    return {
-      ...song,
-      songIndex: index,
-      categoryId: category.id,
-      categoryTitle: category.title,
-      genres: normalizedGenres,
-      url: song.url || resolveSongUrl(song.file),
-      cover_art_url: '/images/sigla-fp-band-110.webp',
-    };
-  })
-);
-
-const categoriesWithIndexes = categories.map((category) => ({
-  ...category,
-  songs: category.songs.map((song) => {
-    const indexedSong = masterPlaylist.find((item) => item.file === song.file && item.categoryId === category.id);
-    return {
-      ...song,
-      songIndex: indexedSong?.songIndex ?? -1,
-      genres: indexedSong?.genres ?? (Array.isArray(song.genres) ? song.genres : ['petrecere']),
-    };
-  }),
-}));
-
-const presetsData = playlistPresets as { defaultPresetKey?: string; presets?: PlaylistPreset[] };
-const providedPresets: PlaylistPreset[] = Array.isArray(presetsData?.presets) ? presetsData.presets : [];
-const normalizedPresets = providedPresets.length > 0
-  ? providedPresets
-  : [
-      {
-        key: 'master',
-        label: 'Master Playlist',
-        description: 'Selecția completă pentru toți clienții',
-        includeGenres: [],
-      },
-    ];
-
-const presetsWithTracks = normalizedPresets
-  .map((preset) => {
-    const requiredGenres = Array.isArray(preset.includeGenres) ? preset.includeGenres : [];
-    const songs = requiredGenres.length === 0
-      ? masterPlaylist
-      : masterPlaylist.filter((song) => song.genres.some((genre) => requiredGenres.includes(genre)));
-
-    return {
-      ...preset,
-      songs,
-    };
-  })
-  .filter((preset) => preset.songs.length > 0);
-
-const presetsFallback = presetsWithTracks.length > 0
-  ? presetsWithTracks
-  : [
-      {
-        key: 'master',
-        label: 'Master Playlist',
-        description: 'Selecția completă pentru toți clienții',
-        includeGenres: [],
-        songs: masterPlaylist,
-      },
-    ];
-
-const defaultPresetKey = presetsFallback.some((preset) => preset.key === presetsData.defaultPresetKey)
-  ? (presetsData.defaultPresetKey as string)
-  : presetsFallback[0]?.key || 'master';
-
+const tracks = categories.flatMap((category) => category.songs.map((song) => ({
+  name: song.name,
+  artist: song.artist || defaultArtist,
+  category: category.title,
+  url: resolveSongUrl(song),
+})));
 const musicPlaylistSchema = {
   '@context': 'https://schema.org',
   '@type': 'MusicPlaylist',
   name: 'Muzică de Petrecere Non-Stop',
-  description: 'Playlist non-stop cu repertoriu complet: muzică populară de petrecere, grecească, arăbească, machedonească, latino, muzică românească și manele. 100% live, fără DJ/MC.',
-  numTracks: masterPlaylist.length,
-  track: masterPlaylist.slice(0, 60).map((song) => ({
-    '@type': 'MusicRecording',
-    name: song.name,
-    byArtist: {
-      '@type': 'MusicGroup',
-      name: song.artist || defaultArtist,
-    },
-    url: song.url,
+  description: pageDescription,
+  numTracks: tracks.length,
+  track: tracks.slice(0, 60).map((track) => ({
+    '@type': 'MusicRecording', name: track.name, url: track.url,
+    byArtist: { '@type': 'MusicGroup', name: track.artist },
   })),
 };
 ---
 
-<BaseLayout title={pageTitle} description={pageDescription} ogImage={pageOgImage}>
-  <Fragment slot="head">
-    <script is:inline src="https://cdn.jsdelivr.net/npm/amplitudejs@5.3.2/dist/amplitude.min.js" defer></script>
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(musicPlaylistSchema)}></script>
-  </Fragment>
-
-  <section class="relative overflow-hidden bg-black py-16 sm:py-20">
-    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,#d4a01733,transparent_62%),linear-gradient(to_bottom,#090909,#100a03_60%,#0a0a0a)]"></div>
-
-    <div class="section-container relative z-10">
-      <div class="mb-6">
-        <BackButton href="/" label="Acasă" />
+<BaseLayout title={pageTitle} description={pageDescription} ogImage="/images/og-default-1200x630.jpg">
+  <Fragment slot="head"><script is:inline type="application/ld+json" set:html={JSON.stringify(musicPlaylistSchema)}></script></Fragment>
+  <main class="audio-page">
+    <div class="audio-page__topbar"><BackButton href="/" label="Acasă" /></div>
+    <section class="audio-player audio-app-window" aria-labelledby="audio-player-title">
+      <div class="audio-window-titlebar">
+        <span class="audio-window-icon" aria-hidden="true">♪</span>
+        <span>Muzică Non-Stop - FP Band</span>
+        <div class="audio-window-actions" aria-hidden="true"><span>_</span><span>□</span><span>×</span></div>
       </div>
-
-      <div class="mb-8 mx-auto max-w-5xl rounded-3xl border border-amber-400/25 bg-gradient-to-br from-[#1d1208]/95 via-[#120c06]/95 to-[#221307]/95 p-5 shadow-[0_16px_60px_rgba(0,0,0,0.45)] sm:p-8">
-        <div class="space-y-4">
-          <p class="text-xs uppercase tracking-[0.14em] text-amber-200/80">Playlist Personalizat</p>
-          <div class="flex flex-wrap gap-2" id="preset-buttons-wrap" role="tablist" aria-label="Alege playlistul preferat">
-            {presetsFallback.map((preset) => (
-              <button
-                type="button"
-                class="playlist-preset-btn inline-flex items-center rounded-full border border-cyan-300/35 bg-cyan-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-cyan-100 transition hover:bg-cyan-500/20"
-                data-preset-key={preset.key}
-                data-default={preset.key === defaultPresetKey ? 'true' : 'false'}
-                aria-label={`Activează playlist ${preset.label}`}
-              >
-                {preset.label}
-              </button>
-            ))}
-          </div>
-          <p id="active-preset-description" class="text-sm text-cyan-100/85"></p>
-          <div class="flex flex-wrap items-center gap-3">
-            <label class="inline-flex items-center gap-2 text-sm text-white/80">
-              <input id="radio-mode-toggle" type="checkbox" class="h-4 w-4 accent-amber-400" checked />
-              Mod Radio Live (pseudo-live)
-            </label>
-            <button
-              id="stream-start-btn"
-              type="button"
-              class="inline-flex items-center rounded-full border border-amber-300/45 bg-amber-500/15 px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-amber-100 transition hover:bg-amber-500/25"
-            >
-              Pornește Streaming
-            </button>
-          </div>
-          <p id="stream-status" class="text-xs text-white/60" aria-live="polite"></p>
-        </div>
-
-        <div class="mt-6 grid gap-8 md:grid-cols-[1.2fr_0.8fr] md:items-start">
-          <div class="space-y-4">
-            <p class="text-xs uppercase tracking-[0.16em] text-amber-300/90">Player Activ</p>
-            <p class="text-2xl font-semibold text-white" data-amplitude-song-info="name" data-amplitude-main-song-info="true">Selectează o piesă</p>
-            <p class="text-white/60" data-amplitude-song-info="artist" data-amplitude-main-song-info="true">{defaultArtist}</p>
-
-            <div class="mt-3 flex flex-wrap items-center gap-3">
-              <button type="button" class="amplitude-prev inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition hover:border-amber-400/70 hover:text-amber-200" aria-label="Piesa anterioară">
-                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M11 19L2 12l9-7v14zM22 19l-9-7 9-7v14z"/></svg>
-              </button>
-
-              <button type="button" class="amplitude-play-pause amplitude-paused inline-flex h-14 w-14 items-center justify-center rounded-full border border-amber-400/60 bg-amber-500/20 text-amber-100 transition hover:bg-amber-500/30" data-amplitude-main-play-pause="true" aria-label="Play/Pause">
-                <svg class="amplitude-play-icon h-7 w-7" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
-              </button>
-
-              <button type="button" class="amplitude-next inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition hover:border-amber-400/70 hover:text-amber-200" aria-label="Piesa următoare">
-                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M13 19l9-7-9-7v14zM2 19l9-7-9-7v14z"/></svg>
-              </button>
-
-              <button id="random-play-btn" type="button" class="inline-flex items-center justify-center rounded-full border border-cyan-300/40 bg-cyan-500/15 px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-cyan-100 transition hover:bg-cyan-500/25" aria-label="Redă o piesă random">
-                Surpriză Random
-              </button>
-            </div>
-
-            <div class="mt-2 flex items-center gap-3 text-xs text-white/70">
-              <span class="amplitude-current-time min-w-[42px]">0:00</span>
-              <input type="range" class="amplitude-song-slider h-1.5 w-full cursor-pointer appearance-none rounded-full bg-white/20" />
-              <span class="amplitude-duration-time min-w-[42px] text-right">0:00</span>
-            </div>
-
-            <div class="flex items-center gap-3 text-sm text-white/70">
-              <span>Volum</span>
-              <input type="range" class="amplitude-volume-slider h-1.5 w-full max-w-[240px] cursor-pointer appearance-none rounded-full bg-white/20" />
-            </div>
-          </div>
-
-          <div class="space-y-4">
-            <div class="mx-auto w-full max-w-[260px] rounded-2xl border border-white/15 bg-black/30 p-4">
-              <img
-                data-amplitude-song-info="cover_art_url"
-                data-amplitude-main-song-info="true"
-                src="/images/sigla-fp-band-110.webp"
-                alt="Copertă playlist"
-                class="h-full w-full rounded-xl object-cover shadow-[0_8px_24px_rgba(0,0,0,0.35)]"
-                loading="lazy"
-              />
-            </div>
-
-            <div class="rounded-2xl border border-white/10 bg-black/25 p-4">
-              <p class="text-xs uppercase tracking-[0.12em] text-white/65">Ascultate Recent</p>
-              <div id="recent-tracks" class="mt-3 flex flex-wrap gap-2">
-                <p class="text-sm text-white/55">Nu există încă istoric de ascultare pe acest browser.</p>
+      <header class="audio-player__header">
+        <div><p class="audio-player__eyebrow">Bibliotecă media</p><h1 id="audio-player-title">Muzică Non-Stop</h1></div>
+        <span id="audio-status" class="audio-player__status">Pregătit</span>
+      </header>
+      <div class="audio-player__screen">
+        <p class="audio-player__now-label">Piesă selectată</p>
+        <p id="audio-now" class="audio-player__now">Selectează o piesă din listă</p>
+        <p id="audio-artist" class="audio-player__artist">{defaultArtist}</p>
+        <audio id="audio-element" preload="metadata"></audio>
+      </div>
+      <div class="audio-player__controls" aria-label="Controale player audio">
+        <button type="button" class="audio-control" id="audio-previous" aria-label="Piesa anterioară">|&lt;&lt;</button>
+        <button type="button" class="audio-control audio-control--main" id="audio-play" aria-label="Redă piesa">Play</button>
+        <button type="button" class="audio-control" id="audio-next" aria-label="Piesa următoare">&gt;&gt;|</button>
+        <label class="audio-volume" for="audio-volume">Volum <input id="audio-volume" type="range" min="0" max="1" step="0.05" value="0.8" /></label>
+      </div>
+      <div class="audio-player__playlist">
+        <div class="audio-playlist__bar"><strong>Listă redare</strong><span>{tracks.length} {tracks.length === 1 ? 'piesă' : 'piese'}</span></div>
+        <ol id="audio-track-list">
+          {tracks.map((track, index) => (
+            <li class="audio-track" data-index={index}>
+              <label><input type="checkbox" class="audio-track__check" aria-label={`Selectează ${track.name}`} /><span class="audio-track__number">{String(index + 1).padStart(2, '0')}</span><span class="audio-track__details"><strong>{track.name}</strong><small>{track.artist} · {track.category}</small></span></label>
+              <div class="audio-track__actions">
+                <button type="button" class="audio-track__play" aria-label={`Redă ${track.name}`}>Play</button>
+                <button type="button" class="audio-track__share" data-track-index={index} aria-label={`Distribuie ${track.name}`}>Distribuie</button>
               </div>
-            </div>
-          </div>
-        </div>
+            </li>
+          ))}
+        </ol>
       </div>
-
-      <h1 class="font-['Oswald'] text-4xl font-bold uppercase tracking-[0.06em] text-white sm:text-5xl lg:text-6xl">
-        Muzică de Petrecere Non-Stop
-      </h1>
-      <p class="mt-3 max-w-2xl text-lg leading-relaxed text-white/75 sm:text-xl">
-        Repertoriu complet pentru clienții care vor atmosferă, ritm și continuitate live fără pauze.
-      </p>
-      <p class="mt-3 max-w-3xl text-sm text-amber-200/80 sm:text-base">
-        Tu setezi playlistul pentru client cu genurile cerute: muzică populară de petrecere, grecească, arăbească, machedonească, latino, muzică românească și manele. Program live fără pauze, fără DJ sau MC.
-      </p>
-
-      {!hasConfiguredR2BaseUrl && masterPlaylist.every((song) => !song.url.startsWith('https://')) && (
-        <p class="mt-4 max-w-3xl rounded-xl border border-amber-400/35 bg-amber-500/10 px-4 py-3 text-sm text-amber-100/90">
-          Playerul folosește momentan biblioteca locală din <strong>/public/Audio/</strong> până conectezi bucket-ul R2.
-        </p>
-      )}
-    </div>
-  </section>
-
-  <section class="bg-[#0b0b0b] py-10 sm:py-14">
-    <div class="section-container">
-      <h2 class="font-['Oswald'] text-3xl uppercase tracking-[0.08em] text-white sm:text-4xl">Repertoriu pe Categorii</h2>
-      <p class="mt-2 max-w-2xl text-white/70">Clientul vede doar piesele din playlistul activat de tine, iar fiecare Play comută instant playerul global.</p>
-
-      <div class="mt-5 grid gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 sm:grid-cols-2">
-        <label class="space-y-2">
-          <span class="text-xs uppercase tracking-[0.1em] text-white/70">Caută piesă</span>
-          <input
-            id="track-search"
-            type="search"
-            placeholder="Ex: Hora, Dans, Petrecere"
-            class="w-full rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-sm text-white placeholder:text-white/45 focus:border-amber-400/70 focus:outline-none"
-          />
-        </label>
-
-        <label class="space-y-2">
-          <span class="text-xs uppercase tracking-[0.1em] text-white/70">Filtrează categorie</span>
-          <select
-            id="category-filter"
-            class="w-full rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-sm text-white focus:border-amber-400/70 focus:outline-none"
-          >
-            <option value="all">Toate categoriile</option>
-            {categoriesWithIndexes.map((category) => (
-              <option value={category.id}>{category.title}</option>
-            ))}
-          </select>
-        </label>
-      </div>
-
-      <p id="tracks-results" class="mt-3 text-sm text-white/65" aria-live="polite"></p>
-
-      <div class="mt-8 space-y-7">
-        {categoriesWithIndexes.map((category) => (
-          <article class="track-category rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-6" id={category.id} data-category-id={category.id}>
-            <h3 class="text-xl font-semibold text-amber-200">{category.title}</h3>
-            <ul class="mt-4 space-y-3">
-              {category.songs.map((song) => (
-                <li
-                  class="track-item rounded-xl border border-white/10 bg-black/25 p-3"
-                  data-category-id={category.id}
-                  data-track-name={song.name.toLowerCase()}
-                  data-track-artist={(song.artist || defaultArtist).toLowerCase()}
-                  data-track-file={song.file}
-                  data-track-genres={(song.genres || ['petrecere']).join(',')}
-                >
-                  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                      <p class="font-medium text-white">{song.name}</p>
-                      <p class="text-sm text-white/60">{song.artist || defaultArtist}</p>
-                    </div>
-
-                    <button
-                      type="button"
-                      class="track-play-btn inline-flex items-center justify-center rounded-lg border border-amber-400/50 bg-amber-500/20 px-4 py-2 text-sm font-semibold text-amber-100 transition hover:bg-amber-500/30"
-                      data-track-file={song.file}
-                      data-song-index="-1"
-                      aria-label={`Redă ${song.name}`}
-                    >
-                      Play
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </article>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <script define:vars={{ masterPlaylist, presetsFallback, defaultPresetKey }} is:inline>
-    (function () {
-      const RECENT_KEY = 'fp-audio-recent-v2';
-      const LAST_PRESET_KEY = 'fp-audio-last-preset-v1';
-      const RADIO_MODE_KEY = 'fp-audio-radio-mode-v1';
-      const AUTO_START_KEY = 'fp-audio-auto-start-v1';
-      const presetsByKey = new Map(presetsFallback.map((preset) => [preset.key, preset]));
-      let activePresetKey = presetsByKey.has(defaultPresetKey) ? defaultPresetKey : presetsFallback[0]?.key;
-      const savedPreset = window.localStorage.getItem(LAST_PRESET_KEY);
-      if (savedPreset && presetsByKey.has(savedPreset)) {
-        activePresetKey = savedPreset;
-      }
-
-      let radioModeEnabled = window.localStorage.getItem(RADIO_MODE_KEY) !== 'false';
-
-      const getActiveSongs = () => presetsByKey.get(activePresetKey)?.songs || masterPlaylist;
-
-      const setStreamStatus = (message) => {
-        const statusEl = document.getElementById('stream-status');
-        if (statusEl) {
-          statusEl.textContent = message;
+    </section>
+    <section class="audio-seo-copy" aria-labelledby="audio-seo-title">
+      <h2 id="audio-seo-title">Muzică populară și de petrecere pentru nunți și evenimente</h2>
+      <p>Ascultă selecții live ale Formației Florentina Pană: muzică populară, muzică de petrecere și repertoriu pentru aperitiv, nuntă, botez sau eveniment privat. Formația oferă un program muzical variat în Pitești, Argeș, București și în toată România.</p>
+    </section>
+  </main>
+  <script define:vars={{ tracks }} is:inline>
+    (() => {
+      const audio = document.getElementById('audio-element');
+      const playButton = document.getElementById('audio-play');
+      const status = document.getElementById('audio-status');
+      const now = document.getElementById('audio-now');
+      const artist = document.getElementById('audio-artist');
+      const rows = Array.from(document.querySelectorAll('.audio-track'));
+      const checks = Array.from(document.querySelectorAll('.audio-track__check'));
+      let currentIndex = -1;
+      const setPlayingRow = (isPlaying) => {
+        rows.forEach((row, rowIndex) => row.classList.toggle('is-playing', isPlaying && rowIndex === currentIndex));
+      };
+      const selectTrack = (index, autoplay = false) => {
+        const track = tracks[index];
+        if (!track || !(audio instanceof HTMLAudioElement)) return;
+        if (currentIndex !== index) {
+          audio.pause();
+          audio.currentTime = 0;
+        }
+        currentIndex = index; audio.src = track.url; audio.load(); now.textContent = track.name; artist.textContent = `${track.artist} · ${track.category}`;
+        rows.forEach((row, rowIndex) => row.classList.toggle('is-selected', rowIndex === index));
+        setPlayingRow(false);
+        checks.forEach((check, checkIndex) => { check.checked = checkIndex === index; });
+        status.textContent = 'Selectat';
+        if (autoplay) {
+          audio.play().catch(() => { status.textContent = 'Apasă Play pentru redare'; });
         }
       };
-
-      const getPseudoLiveIndex = (songs) => {
-        if (!Array.isArray(songs) || songs.length === 0) return 0;
-        const slotSeconds = 180;
-        return Math.floor(Date.now() / 1000 / slotSeconds) % songs.length;
-      };
-
-      const markAutoStartEnabled = () => {
+      const shareTrack = async (index) => {
+        const track = tracks[index];
+        if (!track) return;
+        const shareUrl = `${window.location.origin}/muzica-non-stop/?track=${index}`;
+        const shareData = { title: track.name, text: `${track.name} - ${track.artist}`, url: shareUrl };
         try {
-          window.localStorage.setItem(AUTO_START_KEY, 'true');
-        } catch {
-          // ignoră
+          if (navigator.share) await navigator.share(shareData);
+          else await navigator.clipboard.writeText(shareUrl);
+          status.textContent = navigator.share ? 'Distribuire pregătită' : 'Link copiat';
+        } catch (error) {
+          if (error instanceof DOMException && error.name === 'AbortError') return;
+          status.textContent = 'Linkul nu a putut fi copiat';
         }
       };
-
-      const rememberPreset = () => {
-        try {
-          window.localStorage.setItem(LAST_PRESET_KEY, activePresetKey);
-          window.localStorage.setItem(RADIO_MODE_KEY, String(radioModeEnabled));
-        } catch {
-          // ignoră
-        }
+      const togglePlayback = () => {
+        if (!(audio instanceof HTMLAudioElement)) return;
+        if (currentIndex < 0 && tracks.length) selectTrack(0);
+        if (audio.paused) audio.play().catch(() => { status.textContent = 'Redarea a fost blocată'; }); else audio.pause();
       };
-
-      const safeReadRecent = () => {
-        try {
-          const raw = window.localStorage.getItem(RECENT_KEY);
-          const parsed = raw ? JSON.parse(raw) : {};
-          return typeof parsed === 'object' && parsed ? parsed : {};
-        } catch {
-          return {};
-        }
-      };
-
-      const safeWriteRecent = (value) => {
-        try {
-          window.localStorage.setItem(RECENT_KEY, JSON.stringify(value));
-        } catch {
-          // localStorage indisponibil
-        }
-      };
-
-      const normalizeFile = (filePath) => String(filePath || '').trim();
-
-      function markActivePresetButton() {
-        document.querySelectorAll('.playlist-preset-btn[data-preset-key]').forEach((button) => {
-          const isActive = button.getAttribute('data-preset-key') === activePresetKey;
-          button.classList.toggle('ring-2', isActive);
-          button.classList.toggle('ring-amber-300/70', isActive);
-          button.classList.toggle('bg-amber-500/25', isActive);
-        });
-
-        const descriptionEl = document.getElementById('active-preset-description');
-        if (descriptionEl) {
-          const activePreset = presetsByKey.get(activePresetKey);
-          const tracksCount = getActiveSongs().length;
-          const baseText = activePreset?.description || 'Playlist personalizat activ.';
-          descriptionEl.textContent = `${baseText} (${tracksCount} piese)`;
-        }
-      }
-
-      function renderRecentTracks() {
-        const mount = document.getElementById('recent-tracks');
-        if (!mount) return;
-
-        const recentMap = safeReadRecent();
-        const allSongsByFile = new Map(masterPlaylist.map((song) => [normalizeFile(song.file), song]));
-
-        const entries = Object.entries(recentMap)
-          .map(([file, count]) => ({ file: normalizeFile(file), count: Number(count) }))
-          .filter((item) => item.file && !Number.isNaN(item.count) && allSongsByFile.has(item.file))
-          .sort((a, b) => b.count - a.count)
-          .slice(0, 6);
-
-        if (entries.length === 0) {
-          mount.innerHTML = '<p class="text-sm text-white/55">Nu există încă istoric de ascultare pe acest browser.</p>';
-          return;
-        }
-
-        mount.innerHTML = entries
-          .map((item) => {
-            const song = allSongsByFile.get(item.file);
-            const safeName = song.name.replace(/"/g, '&quot;');
-            return `<button type="button" class="recent-track-btn inline-flex items-center gap-2 rounded-full border border-cyan-300/35 bg-cyan-500/15 px-3 py-1.5 text-xs text-cyan-100 hover:bg-cyan-500/25" data-track-file="${item.file}" aria-label="Redă ${safeName}">${safeName} <span class="text-cyan-200/80">(${item.count})</span></button>`;
-          })
-          .join('');
-
-        mount.querySelectorAll('.recent-track-btn[data-track-file]').forEach((button) => {
-          button.addEventListener('click', () => {
-            const trackFile = normalizeFile(button.getAttribute('data-track-file'));
-            if (!trackFile) return;
-
-            if (!getActiveSongs().some((song) => normalizeFile(song.file) === trackFile)) {
-              activePresetKey = 'master';
-              if (!presetsByKey.has('master')) {
-                activePresetKey = presetsFallback[0]?.key;
-              }
-              applyPreset(activePresetKey, false);
-            }
-
-            const activeSongs = getActiveSongs();
-            const songIndex = activeSongs.findIndex((song) => normalizeFile(song.file) === trackFile);
-            if (songIndex < 0) return;
-
-            window.Amplitude.playSongAtIndex(songIndex);
-            registerPlay(trackFile);
-          });
-        });
-      }
-
-      const registerPlay = (trackFile) => {
-        const fileKey = normalizeFile(trackFile);
-        if (!fileKey) return;
-
-        const recentMap = safeReadRecent();
-        recentMap[fileKey] = (Number(recentMap[fileKey]) || 0) + 1;
-        safeWriteRecent(recentMap);
-        renderRecentTracks();
-      };
-
-      function applyFilters() {
-        const activeSongs = getActiveSongs();
-        const searchInput = document.getElementById('track-search');
-        const categorySelect = document.getElementById('category-filter');
-        const categorySections = Array.from(document.querySelectorAll('.track-category[data-category-id]'));
-        const trackItems = Array.from(document.querySelectorAll('.track-item[data-track-file]'));
-        const resultsLine = document.getElementById('tracks-results');
-
-        const rawSearch = (searchInput instanceof HTMLInputElement ? searchInput.value : '').trim().toLowerCase();
-        const selectedCategory = categorySelect instanceof HTMLSelectElement ? categorySelect.value : 'all';
-        const songIndexByFile = new Map(activeSongs.map((song, index) => [normalizeFile(song.file), index]));
-
-        let visibleTracks = 0;
-        trackItems.forEach((item) => {
-          const name = item.getAttribute('data-track-name') || '';
-          const artist = item.getAttribute('data-track-artist') || '';
-          const categoryId = item.getAttribute('data-category-id') || '';
-          const trackFile = normalizeFile(item.getAttribute('data-track-file'));
-          const button = item.querySelector('.track-play-btn[data-track-file]');
-          const inPreset = songIndexByFile.has(trackFile);
-
-          const matchesSearch = !rawSearch || name.includes(rawSearch) || artist.includes(rawSearch);
-          const matchesCategory = selectedCategory === 'all' || selectedCategory === categoryId;
-          const isVisible = inPreset && matchesSearch && matchesCategory;
-
-          item.style.display = isVisible ? '' : 'none';
-          if (button) {
-            button.setAttribute('data-song-index', isVisible ? String(songIndexByFile.get(trackFile)) : '-1');
-          }
-
-          if (isVisible) visibleTracks += 1;
-        });
-
-        categorySections.forEach((section) => {
-          const categoryId = section.getAttribute('data-category-id');
-          const hasVisibleTracks = trackItems.some((item) => item.getAttribute('data-category-id') === categoryId && item.style.display !== 'none');
-          section.style.display = hasVisibleTracks ? '' : 'none';
-        });
-
-        if (resultsLine) {
-          const presetLabel = presetsByKey.get(activePresetKey)?.label || 'Playlist activ';
-          resultsLine.textContent = visibleTracks > 0
-            ? `${visibleTracks} piese afișate în ${presetLabel}.`
-            : `Nu există rezultate în ${presetLabel} pentru filtrele selectate.`;
-        }
-      }
-
-      function initAmplitudeWithActivePreset(autoplayFirst = false) {
-        const activeSongs = getActiveSongs();
-        if (!window.Amplitude || !Array.isArray(activeSongs) || activeSongs.length === 0) return;
-
-        window.Amplitude.init({
-          songs: activeSongs,
-          autoplay: false,
-          volume: 70,
-          continue_next: true,
-        });
-
-        if (autoplayFirst) {
-          const startIndex = radioModeEnabled ? getPseudoLiveIndex(activeSongs) : 0;
-          window.Amplitude.playSongAtIndex(startIndex);
-          registerPlay(activeSongs[startIndex]?.file);
-          markAutoStartEnabled();
-          setStreamStatus(radioModeEnabled
-            ? 'Streaming pornit în mod Radio Live (pseudo-live).'
-            : 'Streaming pornit din playlistul selectat.');
-        }
-      }
-
-      function applyPreset(presetKey, autoplayFirst = true) {
-        if (!presetsByKey.has(presetKey)) return;
-        activePresetKey = presetKey;
-        rememberPreset();
-        markActivePresetButton();
-        initAmplitudeWithActivePreset(autoplayFirst);
-        applyFilters();
-      }
-
-      function initEvents() {
-        document.querySelectorAll('.playlist-preset-btn[data-preset-key]').forEach((button) => {
-          button.addEventListener('click', () => {
-            const presetKey = button.getAttribute('data-preset-key');
-            if (!presetKey) return;
-            applyPreset(presetKey, true);
-          });
-        });
-
-        const radioModeToggle = document.getElementById('radio-mode-toggle');
-        if (radioModeToggle instanceof HTMLInputElement) {
-          radioModeToggle.checked = radioModeEnabled;
-          radioModeToggle.addEventListener('change', () => {
-            radioModeEnabled = radioModeToggle.checked;
-            rememberPreset();
-            setStreamStatus(radioModeEnabled
-              ? 'Mod Radio Live activ: clienții intră pe un punct pseudo-live al playlistului.'
-              : 'Mod Radio Live dezactivat: playback-ul pornește de la începutul playlistului.');
-          });
-        }
-
-        const streamStartButton = document.getElementById('stream-start-btn');
-        if (streamStartButton) {
-          streamStartButton.addEventListener('click', () => {
-            const activeSongs = getActiveSongs();
-            if (!activeSongs.length) return;
-            const startIndex = radioModeEnabled ? getPseudoLiveIndex(activeSongs) : 0;
-            window.Amplitude.playSongAtIndex(startIndex);
-            registerPlay(activeSongs[startIndex]?.file);
-            markAutoStartEnabled();
-            setStreamStatus('Streaming pornit manual. Vizitatorii recurenți vor primi auto-start inteligent unde browserul permite.');
-          });
-        }
-
-        const searchInput = document.getElementById('track-search');
-        if (searchInput) {
-          searchInput.addEventListener('input', applyFilters);
-        }
-
-        const categorySelect = document.getElementById('category-filter');
-        if (categorySelect) {
-          categorySelect.addEventListener('change', applyFilters);
-        }
-
-        document.querySelectorAll('.track-play-btn[data-track-file]').forEach((button) => {
-          button.addEventListener('click', () => {
-            const songIndex = Number(button.getAttribute('data-song-index'));
-            if (Number.isNaN(songIndex) || songIndex < 0) return;
-
-            window.Amplitude.playSongAtIndex(songIndex);
-            const trackFile = normalizeFile(button.getAttribute('data-track-file'));
-            registerPlay(trackFile);
-            markAutoStartEnabled();
-          });
-        });
-
-        const randomButton = document.getElementById('random-play-btn');
-        if (randomButton) {
-          randomButton.addEventListener('click', () => {
-            const activeSongs = getActiveSongs();
-            if (!activeSongs.length) return;
-
-            const randomIndex = Math.floor(Math.random() * activeSongs.length);
-            window.Amplitude.playSongAtIndex(randomIndex);
-            registerPlay(activeSongs[randomIndex]?.file);
-            markAutoStartEnabled();
-          });
-        }
-      }
-
-      function attemptSmartAutoStart() {
-        const autoStartAllowed = window.localStorage.getItem(AUTO_START_KEY) === 'true';
-        if (!autoStartAllowed) {
-          setStreamStatus('Streaming pregătit. Apasă „Pornește Streaming” pentru start.');
-          return;
-        }
-
-        const activeSongs = getActiveSongs();
-        if (!activeSongs.length) return;
-
-        const startIndex = radioModeEnabled ? getPseudoLiveIndex(activeSongs) : 0;
-        try {
-          window.Amplitude.playSongAtIndex(startIndex);
-          registerPlay(activeSongs[startIndex]?.file);
-          setStreamStatus('Auto-start inteligent activat pentru acest browser.');
-        } catch {
-          setStreamStatus('Auto-start a fost blocat de browser. Apasă „Pornește Streaming”.');
-        }
-      }
-
-      function initPage() {
-        if (!window.Amplitude || !Array.isArray(masterPlaylist) || masterPlaylist.length === 0) return;
-        initEvents();
-        applyPreset(activePresetKey, false);
-        renderRecentTracks();
-        attemptSmartAutoStart();
-      }
-
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initPage, { once: true });
-      } else {
-        initPage();
-      }
+      playButton?.addEventListener('click', togglePlayback);
+      document.getElementById('audio-previous')?.addEventListener('click', () => selectTrack(Math.max(0, currentIndex - 1), true));
+      document.getElementById('audio-next')?.addEventListener('click', () => selectTrack(Math.min(tracks.length - 1, currentIndex + 1), true));
+      document.getElementById('audio-volume')?.addEventListener('input', (event) => { if (audio instanceof HTMLAudioElement) audio.volume = Number(event.target.value); });
+      checks.forEach((check, index) => check.addEventListener('change', () => selectTrack(index)));
+      rows.forEach((row, index) => row.querySelector('.audio-track__play')?.addEventListener('click', () => selectTrack(index, true)));
+      rows.forEach((row, index) => row.querySelector('.audio-track__share')?.addEventListener('click', () => shareTrack(index)));
+      audio?.addEventListener('play', () => { playButton.textContent = 'Pauză'; status.textContent = 'Redare'; setPlayingRow(true); });
+      audio?.addEventListener('pause', () => { playButton.textContent = 'Play'; setPlayingRow(false); if (currentIndex >= 0) status.textContent = 'Pauză'; });
+      audio?.addEventListener('ended', () => { if (currentIndex < tracks.length - 1) selectTrack(currentIndex + 1, true); });
+      audio?.addEventListener('error', () => { status.textContent = 'Fișierul audio nu poate fi redat'; });
+      if (audio instanceof HTMLAudioElement) audio.volume = 0.8;
+      const sharedTrack = Number(new URLSearchParams(window.location.search).get('track'));
+      if (Number.isInteger(sharedTrack) && sharedTrack >= 0 && sharedTrack < tracks.length) selectTrack(sharedTrack);
     })();
   </script>
 </BaseLayout>
+
+<style>
+  .audio-page { max-width: 860px; margin: 0 auto; padding: 2rem 1rem 5rem; color: #e8edf5; }
+  .audio-page__topbar { margin-bottom: 1rem; }
+  .audio-player { display: grid; grid-template-columns: minmax(0, 1fr) 310px; overflow: hidden; border: 1px solid #526d89; border-radius: 5px; background: #111923; box-shadow: 0 18px 48px rgb(0 0 0 / 32%); }
+  .audio-window-titlebar { display: flex; grid-column: 1 / -1; align-items: center; gap: .55rem; min-height: 32px; padding: .35rem .65rem; background: linear-gradient(#3b5873, #1d3045); color: #edf5fc; font-size: .78rem; box-shadow: inset 0 1px rgb(255 255 255 / 18%); }
+  .audio-window-icon { display: grid; width: 19px; height: 19px; place-items: center; border: 1px solid #91b3d1; border-radius: 3px; background: #1b354f; color: #dcecf9; font-size: .85rem; }
+  .audio-window-actions { display: flex; gap: .25rem; margin-left: auto; }
+  .audio-window-actions span { display: grid; width: 24px; height: 20px; place-items: center; border: 1px solid rgb(255 255 255 / 16%); border-radius: 2px; color: #dcecf9; font-size: .75rem; }
+  .audio-player__header, .audio-playlist__bar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1.25rem; border-bottom: 1px solid #30445f; background: #1b2a3b; }
+  .audio-player__header { grid-column: 1 / -1; }
+  .audio-player__eyebrow, .audio-player__now-label { margin: 0 0 .3rem; color: #91a7c1; font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; }
+  .audio-player h1 { margin: 0; color: #fff; font-family: 'Oswald', sans-serif; font-size: clamp(1.7rem, 4vw, 2.4rem); }
+  .audio-player__status, .audio-playlist__bar span { color: #a8c6df; font-size: .8rem; }
+  .audio-player__screen { min-height: 125px; padding: 1.5rem 1.25rem; background: #0b1119; }
+  .audio-player__now { margin: 0; color: #fff; font-size: 1.25rem; font-weight: 700; }
+  .audio-player__artist { margin: .45rem 0 0; color: #9eafc2; }
+  .audio-player__controls { display: flex; grid-column: 1 / 2; align-items: center; gap: .55rem; padding: .8rem 1.25rem; border-bottom: 1px solid #30445f; background: #172333; }
+  .audio-control, .audio-track__play, .audio-track__share { padding: .55rem .7rem; border: 1px solid #536b86; border-radius: 3px; background: #26394e; color: #fff; cursor: pointer; font-size: .8rem; }
+  .audio-track__actions { display: flex; flex-shrink: 0; gap: .35rem; }
+  .audio-track__share { border-color: #3e829d; color: #b9e7f5; }
+  .audio-control:hover, .audio-control:focus-visible, .audio-track__play:hover, .audio-track__share:hover { background: #34506d; }
+  .audio-control--main { min-width: 5.5rem; border-color: #d3a53d; background: #b88722; color: #111923; font-weight: 800; }
+  .audio-volume { display: flex; align-items: center; gap: .5rem; margin-left: auto; color: #aebed0; font-size: .8rem; }
+  .audio-volume input { width: 100px; accent-color: #d3a53d; }
+  .audio-player__playlist { grid-column: 2; grid-row: 3 / span 3; min-width: 0; border-left: 1px solid #30445f; background: #101a25; }
+  .audio-player ol { max-height: 455px; overflow-y: auto; margin: 0; padding: 0; list-style: none; }
+  .audio-track { display: flex; align-items: center; gap: .7rem; padding: .7rem 1.25rem; border-bottom: 1px solid #273749; background: #121d2a; }
+  .audio-track:hover, .audio-track.is-selected { background: #20354a; }
+  .audio-track.is-playing { border-left: 3px solid #56d88a; background: #174936; box-shadow: inset 0 0 0 1px rgb(86 216 138 / 24%); }
+  .audio-track.is-playing .audio-track__number, .audio-track.is-playing .audio-track__details strong { color: #baf7ce; }
+  .audio-track.is-playing::after { content: '● Redare'; margin-left: .25rem; color: #72eca0; font-size: .68rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+  .audio-track label { display: flex; align-items: center; gap: .7rem; min-width: 0; flex: 1; cursor: pointer; }
+  .audio-track__check { width: 1rem; height: 1rem; accent-color: #d3a53d; }
+  .audio-track__number { width: 1.8rem; color: #71869e; font: .75rem monospace; }
+  .audio-track__details { display: flex; min-width: 0; flex-direction: column; gap: .2rem; }
+  .audio-track__details strong, .audio-track__details small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .audio-track__details strong { color: #f3f7fb; }
+  .audio-track__details small { color: #91a7bc; }
+  .audio-seo-copy { padding: 2.5rem .25rem 0; color: #8798aa; font-size: .9rem; line-height: 1.7; }
+  .audio-seo-copy h2 { color: #cbd8e6; font-size: 1.25rem; }
+  @media (max-width: 760px) { .audio-player { display: block; } .audio-window-titlebar, .audio-player__header { display: flex; } .audio-player__playlist { border-top: 1px solid #30445f; border-left: 0; } .audio-player ol { max-height: none; } }
+  @media (max-width: 520px) { .audio-page { padding-inline: .65rem; } .audio-player__controls { flex-wrap: wrap; } .audio-volume { width: 100%; margin-left: 0; } .audio-track { padding-inline: .7rem; } }
+</style>

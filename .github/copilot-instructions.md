@@ -17,7 +17,8 @@
 ## Reguli Critice — OBLIGATORIU DE RESPECTAT
 
 ### 🔴 0. Protocol SEO automat la fiecare sesiune
-- În paralel cu citirea jurnalului, rulează `npm run seo:check` înainte de prima modificare: build complet + audit SEO local.
+- În paralel cu citirea jurnalului, rulează `npm run seo:audit` înainte de prima modificare, dacă există deja `dist/client`.
+- O dată pe săptămână rulează `npm run seo:weekly`: build complet, audit SEO local, verificare linkuri externe și teste.
 - Dacă auditul raportează FAIL, rezolvă problemele SEO înainte de a închide sesiunea; nu ignora rezultatul și nu modifica auditul pentru a ascunde o problemă reală.
 - După orice modificare care poate afecta pagini, conținut, imagini, linkuri, layout sau metadata, rulează din nou `npm run seo:check`.
 - La final, notează în `cheia-ferrari/3-Jurnal-Actiuni.md` rezultatul auditului (`pagini verificate`, `FAIL`, `WARN`) împreună cu fișierele modificate.
@@ -60,7 +61,7 @@
 
 ### 🟡 6. Verificare înainte de deploy
 - `npx astro build` — ZERO erori obligatoriu
-- `npm run seo:check` — audit SEO local obligatoriu: `0 FAIL | 0 WARN`
+- `npm run seo:weekly` — revizie săptămânală obligatorie: `0 FAIL | 0 WARN`, linkuri valide și teste trecute
 - Warnings `Astro.request.headers` pe pagini prerendered sunt normale
 - Caută linkuri fără trailing slash:
   ```powershell
