@@ -87,7 +87,7 @@ function initiale(name: string): string {
                       <button class="ac-th gallery-thumb" type="button" role="listitem"
                         data-src={foto.src} data-alt={foto.alt ?? m.nume} data-member={m.nume}
                         data-fx={String((n % 6) + 1)} tabindex="-1" aria-label={foto.alt ?? `Foto ${n + 1}`}>
-                        <img src={foto.src} alt="" loading="lazy" width="72" height="72" />
+                        <img src={foto.src} alt={foto.alt ?? `Foto ${n + 1} ${m.nume}`} loading="lazy" width="72" height="72" />
                       </button>
                     ))}
                   </div>
@@ -160,7 +160,7 @@ function initiale(name: string): string {
                       <button class="ac-th gallery-thumb" type="button" role="listitem"
                         data-src={foto.src} data-alt={foto.alt ?? m.nume} data-member={m.nume}
                         data-fx={String((n % 6) + 1)} tabindex="-1" aria-label={foto.alt ?? `Foto ${n + 1}`}>
-                        <img src={foto.src} alt="" loading="lazy" width="72" height="72" />
+                        <img src={foto.src} alt={foto.alt ?? `Foto ${n + 1} ${m.nume}`} loading="lazy" width="72" height="72" />
                       </button>
                     ))}
                   </div>
@@ -234,7 +234,7 @@ function initiale(name: string): string {
                       <button class="ac-th gallery-thumb" type="button" role="listitem"
                         data-src={foto.src} data-alt={foto.alt ?? m.nume} data-member={m.nume}
                         data-fx={String((n % 6) + 1)} tabindex="-1" aria-label={foto.alt ?? `Foto ${n + 1}`}>
-                        <img src={foto.src} alt="" loading="lazy" width="72" height="72" />
+                        <img src={foto.src} alt={foto.alt ?? `Foto ${n + 1} ${m.nume}`} loading="lazy" width="72" height="72" />
                       </button>
                     ))}
                   </div>
