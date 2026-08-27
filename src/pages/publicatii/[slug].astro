@@ -126,6 +126,11 @@ let articleHeading = '';
 
 const formatDate = (d: string | Date) =>
   new Date(d).toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' });
+const compactSeoText = (value: string, maxLength: number) => {
+  if (value.length <= maxLength) return value;
+  const shortened = value.slice(0, maxLength - 1).replace(/\s+\S*$/, '').trim();
+  return `${shortened}…`;
+};
 
 // ── Share URL-uri pentru distribuire pe Facebook / WhatsApp ──
 const SITE_URL = 'https://www.florentinapanaofficial.ro';
@@ -133,9 +138,9 @@ const articleSlug = Astro.params.slug ?? '';
 const canonicalUrl = `${SITE_URL}/publicatii/${articleSlug}/`;
 
 if (type === 'local') {
-  pageTitle = `${item.data.titlu} | Blog | ${brand.name}`;
+  pageTitle = compactSeoText(`${item.data.titlu} | Blog | ${brand.name}`, 60);
   articleHeading = item.data.titlu;
-  pageDescription = item.data.descriere;
+  pageDescription = compactSeoText(item.data.descriere, 160);
   ogImage = item.data.imaginePrincipala;
   category = item.data.categorie;
   publishedDate = formatDate(item.data.dataPublicarii);
@@ -143,21 +148,22 @@ if (type === 'local') {
   const rendered = await item.render();
   ContentComponent = rendered.Content;
 } else if (type === 'jsonBlog') {
-  pageTitle = `${item.title} | Blog | ${brand.name}`;
+  pageTitle = compactSeoText(`${item.title} | Blog | ${brand.name}`, 60);
   articleHeading = item.title;
-  pageDescription = item.excerpt || item.title;
+  pageDescription = compactSeoText(item.excerpt || item.title, 160);
   ogImage = item.coverImage || '/images/og-default-1200x630.jpg';
   category = item.category || 'Blog';
   publishedDate = formatDate(item.date);
   publishedIso = new Date(item.date).toISOString();
 } else {
-  pageTitle = `${item.titlu} | Blog | ${brand.name}`;
+  pageTitle = compactSeoText(`${item.titlu} | Blog | ${brand.name}`, 60);
   articleHeading = item.titlu;
   // Construiește o descriere SEO reală: descriere explicită sau primele 155 caractere din conținut
   const plainText = String(item.continut || '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
   pageDescription = (item.descriere && item.descriere.length > 0)
     ? item.descriere
     : (plainText.length > 0 ? plainText.slice(0, 152) + (plainText.length > 152 ? '…' : '') : item.titlu);
+  pageDescription = compactSeoText(pageDescription, 160);
   ogImage = item.imagine_principala || '/images/og-default-1200x630.jpg';
   category = item.categorie || 'Noutăți';
   publishedDate = formatDate(item.created_at || new Date());

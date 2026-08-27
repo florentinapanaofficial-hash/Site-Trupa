@@ -35,8 +35,13 @@ const { video } = Astro.props as {
   };
 };
 
-const pageTitle = `${video.title} | Video live | Formația Florentina Pană`;
-const pageDescription = `Urmărește ${video.title}, moment live din repertoriul Formația Florentina Pană. Vezi clipul complet și distribuie pagina.`;
+const compactSeoText = (value: string, maxLength: number) => {
+  if (value.length <= maxLength) return value;
+  const shortened = value.slice(0, maxLength - 1).replace(/\s+\S*$/, '').trim();
+  return `${shortened}…`;
+};
+const pageTitle = compactSeoText(`${video.title} | Video live | Formația Florentina Pană`, 60);
+const pageDescription = compactSeoText(`Urmărește ${video.title}, moment live din repertoriul Formația Florentina Pană. Vezi clipul complet și distribuie pagina.`, 160);
 const ogImage = `https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`;
 const youtubeUrl = sanitizeUrl(video.youtubeUrl ?? `https://www.youtube.com/watch?v=${video.youtubeId}`);
 const youtubeRedirectUrl = `/youtube-redirect/?to=${encodeURIComponent(youtubeUrl)}&back=${encodeURIComponent('/galerie-video/')}`;

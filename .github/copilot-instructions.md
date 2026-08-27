@@ -16,6 +16,13 @@
 
 ## Reguli Critice — OBLIGATORIU DE RESPECTAT
 
+### 🔴 0. Protocol SEO automat la fiecare sesiune
+- În paralel cu citirea jurnalului, rulează `npm run seo:check` înainte de prima modificare: build complet + audit SEO local.
+- Dacă auditul raportează FAIL, rezolvă problemele SEO înainte de a închide sesiunea; nu ignora rezultatul și nu modifica auditul pentru a ascunde o problemă reală.
+- După orice modificare care poate afecta pagini, conținut, imagini, linkuri, layout sau metadata, rulează din nou `npm run seo:check`.
+- La final, notează în `cheia-ferrari/3-Jurnal-Actiuni.md` rezultatul auditului (`pagini verificate`, `FAIL`, `WARN`) împreună cu fișierele modificate.
+- Auditul este local și verifică output-ul din `dist/client`: title, description, canonical, H1, OpenGraph, Twitter Cards, alt text, trailing slash și sitemap.
+
 ### 🔴 1. Trailing Slash pe toate linkurile interne
 - Site-ul are `trailingSlash: 'always'` în `astro.config.mjs`
 - **TOATE** linkurile interne `href` TREBUIE să se termine cu `/`
@@ -53,6 +60,7 @@
 
 ### 🟡 6. Verificare înainte de deploy
 - `npx astro build` — ZERO erori obligatoriu
+- `npm run seo:check` — audit SEO local obligatoriu: `0 FAIL | 0 WARN`
 - Warnings `Astro.request.headers` pe pagini prerendered sunt normale
 - Caută linkuri fără trailing slash:
   ```powershell

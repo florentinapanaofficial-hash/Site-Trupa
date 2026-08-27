@@ -40,6 +40,13 @@ const isMembersPage = Astro.url.pathname === '/membri/';
 const rawOgImage = Astro.props.ogImage ?? '/images/og-default-1200x630.jpg';
 const ogImageAbsolute = rawOgImage.startsWith('http') ? rawOgImage : `${site}${rawOgImage}`;
 const ogImage = encodeURI(decodeURI(ogImageAbsolute));
+const compactSeoText = (value: string, maxLength: number) => {
+  if (value.length <= maxLength) return value;
+  const shortened = value.slice(0, maxLength - 1).replace(/\s+\S*$/, '').trim();
+  return `${shortened}…`;
+};
+const seoTitle = compactSeoText(title, 60);
+const seoDescription = compactSeoText(description, 160);
 
 const ga4Id = import.meta.env.PUBLIC_GA4_ID;
 const gscVerification = import.meta.env.PUBLIC_GSC_VERIFICATION;
@@ -221,8 +228,8 @@ const isCommunityDetailPage = /^\/comunitate\/[^/]+\/$/.test(Astro.url.pathname)
 const webPageLd = {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  "name": title,
-  "description": description,
+  "name": seoTitle,
+  "description": seoDescription,
   "url": canonical,
   "inLanguage": "ro",
   "isPartOf": {
@@ -338,8 +345,8 @@ const mobileNavAllItems = [
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-    <title>{title}</title>
-    <meta name="description" content={description} />
+    <title>{seoTitle}</title>
+    <meta name="description" content={seoDescription} />
     <meta name="robots" content={noindex ? 'noindex,nofollow' : 'index,follow,max-image-preview:large'} />
     <meta name="theme-color" content="#1346a8" />
     <meta name="author" content="Formația Florentina Pană" />
@@ -350,8 +357,8 @@ const mobileNavAllItems = [
     {gscVerification && <meta name="google-site-verification" content={gscVerification} />}
 
     <meta property="og:type" content={ogType} />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
+    <meta property="og:title" content={seoTitle} />
+    <meta property="og:description" content={seoDescription} />
     {canonical && <meta property="og:url" content={canonical} />}
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:alt" content={`${title} – Formația Florentina Pană`} />
@@ -366,8 +373,8 @@ const mobileNavAllItems = [
     <meta property="og:site_name" content={siteContent.brand.name} />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
+    <meta name="twitter:title" content={seoTitle} />
+    <meta name="twitter:description" content={seoDescription} />
     <meta name="twitter:image" content={ogImage} />
     <!-- [DE_COMPLETAT] Înlocuiește @florentinapana cu contul real X/Twitter -->
     <meta name="twitter:site" content="@florentinapana" />

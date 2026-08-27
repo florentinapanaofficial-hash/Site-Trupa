@@ -4,9 +4,11 @@
 ## Protocol Jurnal AI — obligatoriu la fiecare sesiune
 
 1. La începutul fiecărei sesiuni, citesc acest jurnal înainte de orice căutare, editare sau comandă care modifică proiectul.
-2. Folosesc istoricul pentru a evita repetarea greșelilor și pentru a păstra deciziile tehnice coerente.
-3. La finalul fiecărei sesiuni de lucru, consemnez data, obiectivul, fișierele modificate, validările, greșelile sau riscurile descoperite și pașii rămași.
-4. Nu creez un al doilea jurnal. Acest fișier este jurnalul AI oficial al proiectului.
+2. În paralel cu citirea jurnalului, rulez `npm run seo:check` și repar orice `FAIL` SEO înainte de a continua.
+3. Folosesc istoricul pentru a evita repetarea greșelilor și pentru a păstra deciziile tehnice coerente.
+4. După modificări, rulez din nou `npm run seo:check`; sesiunea nu se închide cu FAIL sau WARN SEO.
+5. La finalul fiecărei sesiuni de lucru, consemnez data, obiectivul, fișierele modificate, rezultatul auditului, validările, greșelile sau riscurile descoperite și pașii rămași.
+6. Nu creez un al doilea jurnal. Acest fișier este jurnalul AI oficial al proiectului.
 
 ---
 
@@ -1058,4 +1060,41 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - Lungimi SEO → title 54, description 135 caractere.
 - `npm run build` → PASS; 71 fișiere comprimate.
 - HTML generat → title homepage confirmat; OpenGraph, Twitter Card și schema JSON-LD prezente.
+- `git diff --check` → PASS.
+
+---
+## Sesiunea 27 august 2026 — Audit SEO local automatizat
+
+**Obiectiv:** Verificarea SEO locală a site-ului fără accesarea serviciilor externe de audit.
+
+### Modificări realizate
+
+- Adăugat `scripts/seo-audit.mjs`, audit local pe toate paginile HTML din `dist/client`.
+- Auditul verifică title și description, canonical HTTPS unic, exact un H1, meta OpenGraph, Twitter Cards, alt text, trailing slash pentru linkuri `<a>` și linia Sitemap din robots.txt.
+- Paginile dinamice au title și description limitate central în `BaseLayout.astro` la 60 / 160 de caractere.
+- Excluse corect din audit aplicația `admin` și paginile redirect/noindex.
+- Adăugat alt text inițial descriptiv pentru imaginile lightbox din Galerie Foto și Membri.
+- Adăugată comanda `npm run seo:audit` în `package.json`.
+
+### Validări
+
+- `npm run build` → PASS.
+- `npm run seo:audit` → 60 pagini HTML verificate, **0 FAIL | 0 WARN**.
+- Auditul rulează complet local și nu face request-uri către servicii SEO externe.
+
+---
+## Sesiunea 27 august 2026 — SEO audit integrat în protocolul Ferrari
+
+**Obiectiv:** Rularea auditului SEO automat în paralel cu jurnalul AI la fiecare sesiune.
+
+### Modificări realizate
+
+- Actualizat `.github/copilot-instructions.md` cu protocol obligatoriu: `npm run seo:check` la început, după modificări și înainte de închiderea sesiunii.
+- Actualizat protocolul din acest jurnal pentru a cere același audit și consemnarea rezultatului.
+- Păstrate modificările existente ale lui `scripts/seo-audit.mjs`; nu au fost suprascrise.
+
+### Validări
+
+- `npm run seo:check` → build PASS; 60 pagini HTML verificate, **0 FAIL | 0 WARN**.
+- `npx astro check` → 0 erori; 3 hints preexistente în alte fișiere.
 - `git diff --check` → PASS.

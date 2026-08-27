@@ -16,6 +16,8 @@
     "update-seo:dry": "node scripts/update-seo.js --dry-run",
     "check-links": "node scripts/check-links.mjs",
     "check-links:fix": "node scripts/check-links.mjs --fix",
+    "seo:audit": "node scripts/seo-audit.mjs",
+    "seo:check": "npm run build && npm run seo:audit",
     "seo:submit": "node seo-agent/submit-all-to-gsc.js",
     "seo:submit:dry": "node seo-agent/submit-all-to-gsc.js --dry-run",
     "seo:submit:sitemap": "node seo-agent/submit-all-to-gsc.js --sitemap",
