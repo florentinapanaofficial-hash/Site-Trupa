@@ -1,0 +1,20 @@
+{
+    "categories": [
+        {
+            "id": "aperitiv",
+            "title": "Muzică pentru Aperitiv",
+            "songs": [
+                {
+                    "name": "Colaj Cântece de Masă - Aperitiv",
+                    "artist": "Formația Florentina Pană",
+                    "file": "Colaj Cantece de masă - Aperetiv FP Band/Colaj Cantece  - Aperetiv - FP Band.mp3",
+                    "url": "https://pub-990252095ed1490dbf610cd678419215.r2.dev/Colaj%20Cantece%20de%20mas%C4%83%20-%20Aperetiv%20FP%20Band/Colaj%20Cantece%20%20-%20Aperetiv%20-%20FP%20Band.mp3",
+                    "genres": [
+                        "cafe-concert",
+                        "petrecere"
+                    ]
+                }
+            ]
+        }
+    ]
+}

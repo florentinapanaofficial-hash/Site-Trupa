@@ -1098,3 +1098,20 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - `npm run seo:check` → build PASS; 60 pagini HTML verificate, **0 FAIL | 0 WARN**.
 - `npx astro check` → 0 erori; 3 hints preexistente în alte fișiere.
 - `git diff --check` → PASS.
+
+---
+## Sesiunea 27 august 2026 — Integrare MP3 Cloudflare R2 în Muzică Non-Stop
+
+**Obiectiv:** Adăugarea colajului „Cântece de Masă - Aperitiv” în playerul audio de pe `/muzica-non-stop/`.
+
+### Modificări realizate
+
+- Adăugat catalogul persistent `src/data/audio-catalog-remote.json` pentru piese găzduite în Cloudflare R2.
+- Actualizat `src/pages/muzica-non-stop.astro` pentru combinarea catalogului remote cu cel generat local.
+- Playerul folosește URL-ul R2 direct pentru piesă, iar melodia apare în categoria „Muzică pentru Aperitiv” și în presetul `master`.
+- Nu a fost copiat niciun fișier audio voluminos în repository; MP3-ul rămâne servit din R2.
+
+### Validări
+
+- URL R2 → **HTTP 200**, `audio/mpeg`, 43.386.600 bytes.
+- `npm run seo:check` → build PASS; 60 pagini HTML verificate, **0 FAIL | 0 WARN**.

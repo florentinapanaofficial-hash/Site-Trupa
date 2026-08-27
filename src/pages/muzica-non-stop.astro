@@ -2,12 +2,14 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BackButton from '../components/BackButton.astro';
 import audioCatalog from '../data/audio-catalog.generated.json';
+import remoteAudioCatalog from '../data/audio-catalog-remote.json';
 import playlistPresets from '../data/audio-playlist-presets.json';
 
 type CatalogSong = {
   name: string;
   artist?: string;
   file: string;
+  url?: string;
   genres?: string[];
 };
 
@@ -34,7 +36,11 @@ const r2AudioBaseUrl = configuredR2BaseUrl.replace(/\/$/, '');
 const defaultArtist = 'Formația Florentina Pană';
 
 const catalogData = audioCatalog as { categories?: CatalogCategory[] };
-const sourceCategories: CatalogCategory[] = Array.isArray(catalogData?.categories) ? catalogData.categories : [];
+const remoteCatalogData = remoteAudioCatalog as { categories?: CatalogCategory[] };
+const sourceCategories: CatalogCategory[] = [
+  ...(Array.isArray(catalogData?.categories) ? catalogData.categories : []),
+  ...(Array.isArray(remoteCatalogData?.categories) ? remoteCatalogData.categories : []),
+];
 const hasCatalogTracks = sourceCategories.some((category) => Array.isArray(category.songs) && category.songs.length > 0);
 
 const fallbackCategories = [
@@ -71,7 +77,7 @@ const masterPlaylist = categories.flatMap((category) =>
       categoryId: category.id,
       categoryTitle: category.title,
       genres: normalizedGenres,
-      url: resolveSongUrl(song.file),
+      url: song.url || resolveSongUrl(song.file),
       cover_art_url: '/images/sigla-fp-band-110.webp',
     };
   })
