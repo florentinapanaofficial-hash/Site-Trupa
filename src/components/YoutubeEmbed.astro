@@ -39,6 +39,7 @@ interface Props {
   miniOnScroll?: boolean;
   thumbnailSrc?: string;
   youtubeUrl?: string;
+  globalConsentOnly?: boolean;
 }
 
 const {
@@ -49,6 +50,7 @@ const {
   miniOnScroll = false,
   thumbnailSrc,
   youtubeUrl,
+  globalConsentOnly = false,
 } = Astro.props;
 
 const hasPlaylist = typeof playlistId === 'string' && playlistId.length > 0;
@@ -88,33 +90,30 @@ const ytLink = youtubeUrl || (hasPlaylist
       height="360"
       onerror="this.style.display='none'"
     />
-    <div class="yt-gate__consent" role="group" aria-label="Consimțământ cookie-uri YouTube">
-      <button class="yt-gate__btn-accept yt-gate__play-icon" type="button" aria-label={consentButtonLabel}>
-        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-          <circle cx="24" cy="24" r="23" fill="rgba(0,0,0,0.65)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
-          <polygon points="19,15 37,24 19,33" fill="white"/>
-        </svg>
-      </button>
+    {!globalConsentOnly && (
+      <div class="yt-gate__consent" role="group" aria-label="Consimțământ cookie-uri YouTube">
+        <button class="yt-gate__btn-accept yt-gate__play-icon" type="button" aria-label={consentButtonLabel}>
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+            <circle cx="24" cy="24" r="23" fill="rgba(0,0,0,0.65)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+            <polygon points="19,15 37,24 19,33" fill="white"/>
+          </svg>
+        </button>
 
-      {!hasPlaylist && (
-        <p class="yt-gate__msg">
-          <strong>Cookie-uri YouTube</strong><br>
-          Vizionarea activează cookie-uri de urmărire<br>
-          (<code>VISITOR_INFO1_LIVE</code>, <code>VISITOR_PRIVACY_METADATA</code>).
-        </p>
-      )}
+        {!hasPlaylist && (
+          <p class="yt-gate__msg">
+            <strong>Cookie-uri YouTube</strong><br>
+            Vizionarea activează cookie-uri de urmărire<br>
+            (<code>VISITOR_INFO1_LIVE</code>, <code>VISITOR_PRIVACY_METADATA</code>).
+          </p>
+        )}
 
-      {!hasPlaylist && (
-        <a
-          href={ytLink}
-          class="yt-gate__btn-yt"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Deschide pe YouTube ↗
-        </a>
-      )}
-    </div>
+        {!hasPlaylist && (
+          <a href={ytLink} class="yt-gate__btn-yt" target="_blank" rel="noopener noreferrer">
+            Deschide pe YouTube ↗
+          </a>
+        )}
+      </div>
+    )}
   </div>
 
   {miniOnScroll && (
@@ -496,12 +495,20 @@ const ytLink = youtubeUrl || (hasPlaylist
       document.querySelectorAll('.yt-gate').forEach(activateGate);
     }
 
-    // ── La încărcarea paginii: verifică consimțământul deja acordat ──
-    try {
-      if (localStorage.getItem('cookie_consent') === 'granted') {
-        activateAllGates();
-      }
-    } catch (_) { /* localStorage indisponibil */ }
+    // ── La încărcarea paginii: așteaptă DOM-ul complet pentru toate embed-urile ──
+    function activateGrantedGates() {
+      try {
+        if (localStorage.getItem('cookie_consent') === 'granted') {
+          activateAllGates();
+        }
+      } catch (_) { /* localStorage indisponibil */ }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', activateGrantedGates, { once: true });
+    } else {
+      activateGrantedGates();
+    }
 
     // ── Reacționează la acceptarea din CookieBanner ──
     window.addEventListener('cookie:granted', activateAllGates);

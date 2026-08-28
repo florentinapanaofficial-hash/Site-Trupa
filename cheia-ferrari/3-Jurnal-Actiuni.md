@@ -278,6 +278,59 @@ git push origin main
 - **Fișier modificat:** `src/pages/youtube-redirect.astro`
 - **Validări:** `npm run build` — succes; `get_errors` — fără erori.
 
+## 📝 2026-08-28 — Galerie video Smart TV
+- **Obiectiv:** Înlocuirea galeriei video pe categorii cu interfața Smart TV, videoclipuri selectabile, filtre și taburi pentru playlisturi.
+- **Fișiere modificate:** `src/components/SmartTvVideoPlayer.astro`, `src/pages/galerie-video.astro`.
+- **Implementat:** componentă nouă alimentată din `siteContent.videos` și `youtubePlaylists.galerieVideo`; thumbnail-uri cu alt text descriptiv și player-e protejate prin `YoutubeEmbed`, inclusiv consimțământ GDPR.
+- **Validări:** `npx astro check` — 0 erori; `npm run seo:check` — succes; audit SEO — 60 pagini verificate, 0 FAIL | 0 WARN.
+
+## 📝 2026-08-28 — Etichetă meniu Bibliotecă Audio
+- **Modificări:** eticheta `/muzica-non-stop/` a fost schimbată în „Bibliotecă Audio” în meniul desktop, meniul mobil, navigația din date și breadcrumb mapping.
+- **SEO:** ruta tehnică `/muzica-non-stop/` a rămas neschimbată.
+- **Validări:** `npx astro check` — 0 erori; `npm run seo:check` — succes; audit SEO — 60 pagini verificate, 0 FAIL | 0 WARN.
+
+## 📝 2026-08-28 — Redenumire bibliotecă audio
+- **Modificări:** H1-ul paginii `/muzica-non-stop/` este acum „Biblioteca Audio Formația Florentina Pană”; secțiunea din „Cauți formație?” este „Repertoriu audio live / Biblioteca audio a formației”.
+- **SEO:** URL-ul și expresia „Muzică Non-Stop” din metadata au fost păstrate.
+- **Validări:** `npx astro check` — 0 erori; `npm run seo:check` — succes; audit SEO — 60 pagini verificate, 0 FAIL | 0 WARN.
+
+## 📝 2026-08-28 — Buton playlist și cursor card
+- **Problemă:** butonul „Redă Playlist” nu pornea mereu iframe-ul, iar titlul cardului afișa cursor de selecție text.
+- **Fix:** la selectare se retrimite evenimentul de consimțământ și se așteaptă următorul frame pentru overlay-ul de play; cardurile folosesc `cursor-default select-none`, iar butoanele au `cursor-pointer`.
+- **Validări:** `npx astro check` — 0 erori; `npm run seo:check` — succes; audit SEO — 60 pagini verificate, 0 FAIL | 0 WARN.
+
+## 📝 2026-08-28 — Activare playlisturi după încărcarea DOM-ului
+- **Problemă:** cu consimțământul deja salvat, primul `YoutubeEmbed` activa doar playerele existente înainte de parsarea tuturor playlisturilor.
+- **Fix:** activarea inițială a playerelor este amânată la `DOMContentLoaded`, astfel încât toate videoclipurile și playlisturile să primească iframe-ul și overlay-ul de control.
+- **Validări:** `npx astro check` — 0 erori; `npm run seo:check` — succes; audit SEO — 60 pagini verificate, 0 FAIL | 0 WARN.
+
+## 📝 2026-08-28 — Buton Redă separat
+- **Problemă:** click-ul pe titlul sau thumbnail-ul unei piese avea aceeași acțiune ca butonul de redare.
+- **Fix:** cardurile sunt containere neutre, iar schimbarea playerului este legată exclusiv de butoanele „Redă” și „Redă Playlist”.
+- **Validări:** `npx astro check` — 0 erori; `npm run seo:check` — succes.
+
+## 📝 2026-08-28 — Audit linkuri YouTube
+- **Verificare:** 8 ID-uri video unice testate prin endpoint-ul YouTube oEmbed — toate răspund HTTP 200; 4 playlisturi configurate răspund HTTP 200.
+- **Constatare:** cele 16 intrări video folosesc doar 8 ID-uri unice, cu ID-uri repetate în categorii și titluri diferite. Nu sunt linkuri moarte, dar asignarea conținutului este duplicată și uneori nu corespunde titlului afișat.
+- **Pași următori:** înlocuirea asignărilor necesită lista/ID-urile reale ale videoclipurilor; nu s-au modificat datele pe baza unor presupuneri.
+
+## 📝 2026-08-28 — GDPR global pentru galeria video
+- **Obiectiv:** Eliminarea mesajelor GDPR repetate din fiecare player al galeriei video.
+- **Fix:** `YoutubeEmbed` acceptă `globalConsentOnly`; Smart TV folosește acest mod, iar iframe-urile rămân blocate până la acceptarea bannerului global.
+- **Validări:** `npx astro check` — 0 erori; `npm run seo:check` — succes; audit SEO — 60 pagini verificate, 0 FAIL | 0 WARN.
+- **Riscuri/pași următori:** player-ele YouTube rămân controlate de componenta GDPR existentă; nu au fost introduse iframe-uri directe din prompt.
+
+## 📝 2026-08-28 — Fix preview galerie Smart TV
+- **Problemă:** interacțiunile galeriei puteau să nu pornească în preview din cauza identificării containerului prin `previousElementSibling`.
+- **Fix:** scriptul selectează explicit `.smart-tv-gallery`.
+- **Validări:** `npx astro check` — 0 erori; serverul proiectului `server.mjs` — `/galerie-video/` răspunde HTTP 200 și include componenta; audit SEO — 60 pagini verificate, 0 FAIL | 0 WARN.
+- **Notă:** `astro preview` returnează 500 la ruta fără slash din configurația existentă `output: static` + adapter Node; nu este o eroare a paginii sau componentei.
+
+## 📝 2026-08-28 — Redare la selectarea videoclipului
+- **Problemă:** selectarea unei piese schimba vizual playerul, dar nu pornea videoclipul deja consimțit.
+- **Fix:** selecția activează overlay-ul de play al playerului ales după următorul frame, numai când `cookie_consent` este `granted`; fără consimțământ se păstrează poarta GDPR.
+- **Validări:** `npx astro check` — 0 erori; `npm run seo:check` — succes; audit SEO — 60 pagini verificate, 0 FAIL | 0 WARN.
+
 ## 📝 2026-08-25 — Încărcare lentă în galeria foto
 - **Problemă:** galeria servea direct originale JPG/PNG din `public/images`, cu aproximativ 59 MB cumulat și imagini individuale de până la aproape 7 MB.
 - **Fix:** adăugat `scripts/optimize-public-gallery.mjs`, care generează WebP la maximum 1600px și calitate 78 în directoare dedicate; `galerie-foto.astro` folosește derivatele optimizate.

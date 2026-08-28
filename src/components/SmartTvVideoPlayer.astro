@@ -1,0 +1,109 @@
+---
+import YoutubeEmbed from './YoutubeEmbed.astro';
+
+export interface VideoItem { id: string; title: string; category: string; youtubeId: string; duration?: string; badge?: string; }
+export interface PlaylistItem { id: string; title: string; category: string; playlistId: string; thumbnailYtId: string; videoCount: string; }
+interface Props { initialVideo: VideoItem; videos: VideoItem[]; playlists: PlaylistItem[]; }
+
+const { initialVideo, videos, playlists } = Astro.props;
+const categories = ['Toate', ...Array.from(new Set(videos.map((video) => video.category)))];
+const activePlayerId = `video-${initialVideo.id}`;
+---
+
+<div class="smart-tv-gallery mx-auto w-full max-w-4xl px-4 py-6 text-white">
+  <div class="relative mx-auto w-full">
+    <div class="relative rounded-3xl border-4 border-slate-800 bg-neutral-950 p-2.5 shadow-[0_20px_50px_rgba(0,0,0,0.8)] sm:p-3.5">
+      <div class="relative aspect-video overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-950 shadow-inner">
+        {videos.map((video) => (
+          <div class={`smart-tv-player h-full w-full${video.id === initialVideo.id ? '' : ' hidden'}`} data-player-id={`video-${video.id}`}>
+            <YoutubeEmbed youtubeId={video.youtubeId} title={video.title} thumbnailSrc={`https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`} class="h-full w-full" globalConsentOnly />
+          </div>
+        ))}
+        {playlists.map((playlist) => (
+          <div class="smart-tv-player h-full w-full hidden" data-player-id={`playlist-${playlist.id}`}>
+            <YoutubeEmbed playlistId={playlist.playlistId} title={playlist.title} thumbnailSrc={`https://img.youtube.com/vi/${playlist.thumbnailYtId}/maxresdefault.jpg`} class="h-full w-full" globalConsentOnly />
+          </div>
+        ))}
+      </div>
+    </div>
+    <div class="mx-auto h-4 w-32 rounded-b-md bg-slate-800 shadow-md"></div>
+    <div class="mx-auto h-2 w-48 rounded-full bg-slate-700 shadow-lg"></div>
+  </div>
+
+  <div class="mt-8">
+    <div class="mx-auto flex max-w-md rounded-2xl border border-slate-800 bg-slate-900/90 p-1.5">
+      <button id="smart-tv-tab-videos" type="button" class="flex-1 rounded-xl bg-rose-600 py-2.5 text-xs font-bold text-white shadow-md transition-all sm:text-sm">Videoclipuri</button>
+      <button id="smart-tv-tab-playlists" type="button" class="flex-1 rounded-xl py-2.5 text-xs font-medium text-slate-400 transition-all hover:text-white sm:text-sm">Playlist-uri</button>
+    </div>
+  </div>
+
+  <div id="smart-tv-categories" class="no-scrollbar flex gap-2 overflow-x-auto py-4 sm:justify-center">
+    {categories.map((category, index) => (
+      <button type="button" class={`smart-tv-category shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-all ${index === 0 ? 'border-white bg-white text-slate-950' : 'border-slate-800 bg-slate-900 text-slate-300 hover:border-slate-600'}`} data-category={category}>{category}</button>
+    ))}
+  </div>
+
+  <div id="smart-tv-videos" class="mt-2 space-y-3">
+    {videos.map((video, index) => (
+      <div class={`smart-tv-card cursor-default select-none flex w-full items-center justify-between rounded-2xl border p-3 text-left transition-all ${index === 0 ? 'border-rose-600/50 bg-rose-950/20' : 'border-slate-800 bg-slate-900/60 hover:border-slate-700'}`} data-player-id={`video-${video.id}`} data-category={video.category}>
+        <span class="flex min-w-0 items-center gap-3"><span class="relative flex h-11 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-800 bg-slate-950"><img src={`https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`} alt={`Previzualizare: ${video.title}`} loading="lazy" class="h-full w-full object-cover opacity-70" /><span class="absolute text-[11px] font-bold text-white">▶</span></span><span class="min-w-0"><strong class="block truncate text-xs text-slate-100 sm:text-sm">{video.title}</strong><small class="mt-0.5 block text-[10px] text-slate-400 sm:text-xs">{video.category} · {video.duration || 'Live'}</small></span></span>
+        <button type="button" class="smart-tv-play-action ml-2 shrink-0 cursor-pointer rounded-lg bg-slate-800 px-3 py-1.5 text-xs font-bold text-slate-200">Redă</button>
+      </div>
+    ))}
+  </div>
+
+  <div id="smart-tv-playlists" class="mt-2 hidden space-y-3">
+    {playlists.map((playlist) => (
+      <div class="smart-tv-card cursor-default select-none flex w-full items-center justify-between rounded-2xl border border-slate-800 bg-slate-900/60 p-3 text-left transition-all hover:border-slate-700" data-player-id={`playlist-${playlist.id}`}>
+        <span class="flex min-w-0 items-center gap-3"><span class="relative flex h-11 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-800 bg-slate-950"><img src={`https://img.youtube.com/vi/${playlist.thumbnailYtId}/hqdefault.jpg`} alt={`Previzualizare playlist: ${playlist.title}`} loading="lazy" class="h-full w-full object-cover opacity-70" /><span class="absolute text-[10px] font-bold text-amber-300">LIST</span></span><span class="min-w-0"><strong class="block truncate text-xs text-slate-100 sm:text-sm">{playlist.title}</strong><small class="mt-0.5 block text-[10px] text-slate-400 sm:text-xs">{playlist.category} · {playlist.videoCount}</small></span></span>
+            <button type="button" class="smart-tv-play-action ml-2 shrink-0 cursor-pointer rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-bold text-white">Redă Playlist</button>
+          </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
+
+<script is:inline define:vars={{ activePlayerId }}>
+  const gallery = document.querySelector('.smart-tv-gallery');
+  if (gallery) {
+    const showPlayer = (playerId) => {
+      gallery.querySelectorAll('.smart-tv-player').forEach((player) => player.classList.toggle('hidden', player.dataset.playerId !== playerId));
+      gallery.querySelectorAll('.smart-tv-card').forEach((card) => {
+        const active = card.dataset.playerId === playerId;
+        card.classList.toggle('border-rose-600/50', active); card.classList.toggle('bg-rose-950/20', active);
+        card.classList.toggle('border-slate-800', !active); card.classList.toggle('bg-slate-900/60', !active);
+      });
+    };
+    const selectPlayer = (playerId) => {
+      if (!playerId) return;
+      showPlayer(playerId);
+      window.requestAnimationFrame(() => {
+        let consentGranted = false;
+        try { consentGranted = localStorage.getItem('cookie_consent') === 'granted'; } catch (_) {}
+        if (!consentGranted) return;
+        window.dispatchEvent(new CustomEvent('cookie:granted'));
+        const player = gallery.querySelector(`.smart-tv-player[data-player-id="${playerId}"]`);
+        window.requestAnimationFrame(() => {
+          const playOverlay = player?.querySelector('.yt-gate__click-overlay');
+          if (playOverlay) playOverlay.click();
+        });
+      });
+    };
+    gallery.querySelectorAll('.smart-tv-play-action').forEach((action) => action.addEventListener('click', () => selectPlayer(action.closest('.smart-tv-card')?.dataset.playerId)));
+    gallery.querySelectorAll('.smart-tv-category').forEach((chip) => chip.addEventListener('click', () => {
+      gallery.querySelectorAll('.smart-tv-category').forEach((item) => item.classList.remove('border-white', 'bg-white', 'text-slate-950'));
+      chip.classList.add('border-white', 'bg-white', 'text-slate-950');
+      const selected = chip.dataset.category;
+      gallery.querySelectorAll('#smart-tv-videos .smart-tv-card').forEach((card) => card.classList.toggle('hidden', selected !== 'Toate' && card.dataset.category !== selected));
+    }));
+    const videosTab = gallery.querySelector('#smart-tv-tab-videos'); const playlistsTab = gallery.querySelector('#smart-tv-tab-playlists');
+    const videosPanel = gallery.querySelector('#smart-tv-videos'); const playlistsPanel = gallery.querySelector('#smart-tv-playlists'); const categoriesBar = gallery.querySelector('#smart-tv-categories');
+    videosTab?.addEventListener('click', () => { videosPanel?.classList.remove('hidden'); playlistsPanel?.classList.add('hidden'); categoriesBar?.classList.remove('hidden'); videosTab.classList.add('bg-rose-600', 'text-white'); playlistsTab?.classList.remove('bg-rose-600', 'text-white'); });
+    playlistsTab?.addEventListener('click', () => { playlistsPanel?.classList.remove('hidden'); videosPanel?.classList.add('hidden'); categoriesBar?.classList.add('hidden'); playlistsTab.classList.add('bg-rose-600', 'text-white'); videosTab?.classList.remove('bg-rose-600', 'text-white'); });
+    showPlayer(activePlayerId);
+  }
+</script>

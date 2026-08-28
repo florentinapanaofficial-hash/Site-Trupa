@@ -2,9 +2,13 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BackButton from '../components/BackButton.astro';
 import YoutubeEmbed from '../components/YoutubeEmbed.astro';
+import SmartTvVideoPlayer from '../components/SmartTvVideoPlayer.astro';
+import AudioPlaylistPlayer from '../components/AudioPlaylistPlayer.astro';
 import GoogleBusinessReviews from '../components/GoogleBusinessReviews.astro';
 import siteContent from '../data/siteContent.json';
 import couplesData from '../data/couples.json';
+import audioCatalog from '../data/audio-catalog.generated.json';
+import remoteAudioCatalog from '../data/audio-catalog-remote.json';
 
 const { faq } = siteContent;
 const featuredCouple = couplesData.couples[0];
@@ -26,33 +30,46 @@ const featuredPlaylistThumb = featuredPlaylist?.thumbnailVideoId
   : '/images/logo-fp-stage.svg';
 const featuredPlaylistRedirectHref = `/youtube-redirect/?to=${encodeURIComponent(featuredPlaylistUrl)}&back=${encodeURIComponent('/cauti-formatie-nunta/')}`;
 
-const priorityVideoSections = [
-  'populara',
-  'usoara',
-  'tineret',
-  'instrumentala',
-] as const;
+const galleryVideos = siteContent.videos.map((video, index) => ({
+  id: `${video.youtubeId}-${index}`,
+  title: video.title,
+  category: video.category,
+  youtubeId: video.youtubeId,
+}));
+const playlistLabels: Record<string, string> = {
+  populara: 'Muzică Populară', usoara: 'Muzică Ușoară', tineret: 'Tineret',
+  instrumentala: 'Instrumentală', 'dans-miri': 'Dansul Mirilor',
+};
+type PlaylistSectionConfig = { title?: string; playlistId?: string; thumbnailVideoId?: string };
+const playlistConfigBySection = (siteContent.youtubePlaylists?.galerieVideo ?? {}) as Record<string, PlaylistSectionConfig>;
+const galleryPlaylists = Object.entries(playlistConfigBySection)
+  .filter(([, playlist]) => playlist.playlistId)
+  .map(([id, playlist]) => ({
+    id, title: playlist.title || id, category: playlistLabels[id] || 'Playlist',
+    playlistId: playlist.playlistId || '', thumbnailYtId: playlist.thumbnailVideoId || '', videoCount: 'Playlist YouTube',
+  }));
 
-const playlistConfigBySection = siteContent.youtubePlaylists?.galerieVideo ?? {};
-
-const priorityVideoPlayers = priorityVideoSections
-  .map((sectionId) => {
-    const playlist = playlistConfigBySection?.[sectionId];
-    if (!playlist?.playlistId) {
-      return null;
-    }
-
-    return {
-      id: sectionId,
-      title: playlist.title,
-      playlistId: playlist.playlistId,
-      thumbnailSrc: playlist.thumbnailVideoId
-        ? `https://img.youtube.com/vi/${playlist.thumbnailVideoId}/hqdefault.jpg`
-        : '/images/logo-fp-stage.svg',
-      playlistUrl: `https://www.youtube.com/playlist?list=${playlist.playlistId}`,
-    };
-  })
-  .filter((playlist): playlist is NonNullable<typeof playlist> => Boolean(playlist));
+type CatalogSong = { name: string; artist?: string; file: string; url?: string };
+type CatalogCategory = { title: string; songs: CatalogSong[] };
+const catalogData = audioCatalog as { categories?: CatalogCategory[] };
+const remoteCatalogData = remoteAudioCatalog as { categories?: CatalogCategory[] };
+const audioCategories = [
+  ...(Array.isArray(remoteCatalogData.categories) ? remoteCatalogData.categories : []),
+  ...(Array.isArray(catalogData.categories) ? catalogData.categories : []),
+];
+const audioBaseUrl = import.meta.env.PUBLIC_R2_MUSIC_BASE_URL?.trim().replace(/\/$/, '') || '';
+const resolveAudioUrl = (song: CatalogSong) => {
+  if (song.url) return song.url;
+  const encodedPath = song.file.split('/').map((segment) => encodeURIComponent(segment)).join('/');
+  return audioBaseUrl ? `${audioBaseUrl}/${encodedPath}` : `/Audio/${encodedPath}`;
+};
+const audioTracks = audioCategories.flatMap((category) => category.songs.map((song, index) => ({
+  id: `${category.title}-${song.name}-${index}`,
+  title: song.name,
+  artist: song.artist || 'Formația Florentina Pană',
+  audioUrl: resolveAudioUrl(song),
+  duration: 'Live',
+})));
 
 const processCards = [
   {
@@ -134,28 +151,14 @@ const googleBusinessReviews = [
       <BackButton href="/" label="Acasă" />
     </div>
 
-    {priorityVideoPlayers.length > 0 && (
+    {galleryVideos.length > 0 && (
       <div class="response-top-players" aria-label="Playere video recomandate">
         <div class="response-top-players__head">
           <p class="response-section-kicker">Video live</p>
-          <h2>Clipuri live reprezentative</h2>
-          <p>Urmărește momente reale de nuntă: populară, ușoară, petrecere și instrumentală.</p>
+          <h2>Galerie video live</h2>
+          <p>Descoperă momente reale de nuntă și alege rapid genul muzical potrivit evenimentului tău.</p>
         </div>
-
-        <div class="response-top-players__grid">
-          {priorityVideoPlayers.map((player) => (
-            <article class="response-top-player-card" id={`video-${player.id}`}>
-              <h3>{player.title}</h3>
-              <YoutubeEmbed
-                playlistId={player.playlistId}
-                title={player.title}
-                thumbnailSrc={player.thumbnailSrc}
-                youtubeUrl={player.playlistUrl}
-                class="response-top-player-embed"
-              />
-            </article>
-          ))}
-        </div>
+        <SmartTvVideoPlayer initialVideo={galleryVideos[0]} videos={galleryVideos} playlists={galleryPlaylists} />
       </div>
     )}
 
@@ -282,6 +285,17 @@ const googleBusinessReviews = [
       <a href={whatsappBudgetOfferHref} class="btn-solid" target="_blank" rel="noopener noreferrer">Spune-ne bugetul și îți facem oferta pe WhatsApp</a>
     </div>
   </section>
+
+  {audioTracks.length > 0 && (
+    <section class="response-section section-container pb-8" id="muzica-non-stop">
+      <div class="response-section-head">
+        <p class="response-section-kicker">Repertoriu audio live</p>
+        <h2>Biblioteca audio a formației</h2>
+        <p>Alege o piesă și ascultă selecții din repertoriul Formației Florentina Pană.</p>
+      </div>
+      <AudioPlaylistPlayer tracks={audioTracks} playlistTitle="Repertoriu & Mostre Live" />
+    </section>
+  )}
 
   <section class="response-section section-container pb-8">
     <div class="response-section-head">
