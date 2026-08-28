@@ -1100,6 +1100,110 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - `git diff --check` → PASS.
 
 ---
+## Sesiunea 28 august 2026 — Componentă playlist audio WaveSurfer
+
+**Obiectiv:** Crearea componentei reutilizabile `AudioPlaylistPlayer.astro` pentru redarea playlistului audio cu waveform, navigare între piese, volum și contorizarea redărilor.
+
+### Modificări realizate
+
+- Adăugat `src/components/AudioPlaylistPlayer.astro` cu interfața `Track`, afișarea playlistului și integrarea `wavesurfer.js`.
+- Componenta include controale play/pause, piesa anterioară/următoare, waveform, slider de volum și informații despre piese.
+
+### Validări
+
+- `npx astro check` → **0 erori**, 4 hints raportate de proiect.
+- Componenta este verificată sintactic și tipată TypeScript; hintul local provine din utilizarea `event` deprecated în codul furnizat.
+
+---
+## Sesiunea 28 august 2026 — Înlocuire player audio pe pagina Muzică Non-Stop
+
+**Obiectiv:** Înlocuirea playerului audio vechi de pe `/muzica-non-stop/` cu componenta reutilizabilă `AudioPlaylistPlayer`.
+
+### Modificări realizate
+
+- Actualizat `src/pages/muzica-non-stop.astro` cu importul `AudioPlaylistPlayer` și playlistul `audioTracks` furnizat.
+- Eliminat markup-ul, controalele și scriptul playerului HTML audio vechi.
+- Păstrată schema SEO `MusicPlaylist` bazată pe catalogul audio existent și conținutul SEO al paginii.
+
+### Validări
+
+- `npx astro check` → **0 erori**, 4 hints raportate în proiect.
+- `git diff --check` → PASS.
+- Hinturile rămase provin din handlerul inline furnizat în `AudioPlaylistPlayer.astro` și din fișiere preexistente.
+
+---
+## Sesiunea 28 august 2026 — Actualizare piese R2 și audit SEO
+
+**Obiectiv:** Înlocuirea pieselor demo din player cu cele două piese R2 furnizate și validarea paginii audio.
+
+### Modificări realizate
+
+- Actualizate `audioTracks` din `src/pages/muzica-non-stop.astro` cu `track-1` și `track-2`, datate 28 august 2026.
+- Păstrată schema SEO existentă a catalogului audio.
+- Restaurat H1-ul paginii în afara componentei pentru a păstra structura SEO după înlocuirea playerului.
+
+### Validări
+
+- `npx astro check` → **0 erori**, 4 hints raportate de proiect.
+- `npm run seo:check` → build PASS; auditul final `60 pagini HTML verificate, 0 FAIL | 0 WARN`.
+- CORS R2 rămâne o configurare operațională în bucket-ul Cloudflare R2; JSON-ul trebuie aplicat acolo cu domeniul real, nu în codul Astro.
+
+---
+## Sesiunea 28 august 2026 — Test local player audio
+
+### Validări
+
+- Serverul Astro pornit pe `http://127.0.0.1:4321/`.
+- `GET /muzica-non-stop/` → **200 OK**.
+- HTML-ul local conține H1-ul paginii, titlul playlistului și ambele piese configurate.
+- Interacțiunile WaveSurfer trebuie testate în browser cu URL-uri R2 reale și CORS activat în bucket.
+
+---
+## Sesiunea 28 august 2026 — Streaming audio nativ cu WaveSurfer
+
+### Modificări realizate
+
+- În `src/components/AudioPlaylistPlayer.astro`, creat elementul `Audio` nativ cu `crossOrigin = 'anonymous'`.
+- Transmis elementul prin opțiunea `media` în `WaveSurfer.create(...)` pentru redare streaming.
+- Păstrată schimbarea piesei prin `ws.load(url)` în `loadTrack`.
+
+### Validări
+
+- `npx astro check` → **0 erori**, 4 hints cunoscute.
+- `npm run build` → PASS.
+- `npm run seo:audit` → **60 pagini HTML, 0 FAIL | 0 WARN**.
+- Nu a fost disponibil un browser partajat pentru verificarea directă a consolei; nu au fost raportate erori de runtime în verificările de compilare/build.
+
+---
+## Sesiunea 28 august 2026 — Redare audio nativă pentru fișiere R2 mari
+
+### Modificări realizate
+
+- Înlocuit scriptul playerului cu redare prin `HTMLAudioElement` nativ, configurat cu `preload = 'metadata'`, `crossOrigin = 'anonymous'` și URL-ul inițial.
+- Mutate controalele play/pause, navigarea, volumul, timpul și auto-next pe evenimentele elementului audio nativ.
+- Păstrat `WaveSurfer.create(...)` cu `media: audio` pentru waveform și seek, fără a mai folosi WaveSurfer pentru controlul redării.
+
+### Validări
+
+- `npx astro check` → **0 erori**, 4 hints cunoscute.
+- `npm run seo:check` / `npm run seo:audit` → build PASS; **60 pagini HTML, 0 FAIL | 0 WARN**.
+
+---
+## Sesiunea 28 august 2026 — Activare piesă R2 reală și verificare CORS
+
+### Modificări realizate
+
+- Înlocuit playlistul cu piesa reală `Colaj Cântece de Masă - Aperitiv`.
+- Corectată calea URL la numele exact al obiectului din R2, care conține două spații înainte de `- Aperetiv`.
+
+### Validări
+
+- URL MP3 R2 → **200 OK**, `audio/mpeg`, aproximativ 43 MB.
+- Request cu `Origin: http://127.0.0.1:4321` → **200 OK**, `Access-Control-Allow-Origin: *`.
+- `npx astro check` → **0 erori**, 4 hints cunoscute.
+- `npm run seo:check` / `npm run seo:audit` → build PASS; **60 pagini HTML, 0 FAIL | 0 WARN**.
+
+---
 ## Sesiunea 27 august 2026 — Integrare MP3 Cloudflare R2 în Muzică Non-Stop
 
 **Obiectiv:** Adăugarea colajului „Cântece de Masă - Aperitiv” în playerul audio de pe `/muzica-non-stop/`.

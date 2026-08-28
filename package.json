@@ -45,7 +45,8 @@
     "nanoid": "^5.0.8",
     "openai": "^6.34.0",
     "sharp": "^0.35.3",
-    "sirv": "^3.0.2"
+    "sirv": "^3.0.2",
+    "wavesurfer.js": "^7.12.11"
   },
   "devDependencies": {
     "@astrojs/sitemap": "^3.7.3",

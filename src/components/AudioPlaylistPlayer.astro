@@ -1,0 +1,255 @@
+---
+export interface Track {
+  id: string;
+  title: string;
+  artist?: string;
+  audioUrl: string;
+  duration?: string;
+  plays?: number;
+  createdAt?: string;
+}
+
+interface Props {
+  tracks: Track[];
+  playlistTitle?: string;
+}
+
+const { tracks, playlistTitle = "Repertoriu & Mostre Audio" } = Astro.props;
+const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: '', artist: '', plays: 0 };
+---
+
+<div class="playlist-player bg-slate-900 border border-slate-800/80 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl max-w-3xl mx-auto my-4 sm:my-8 text-white font-sans w-full">
+  <div class="flex items-center justify-between gap-2 mb-3 sm:mb-4">
+    <div class="min-w-0 flex-1">
+      <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-indigo-400">Acum se redă</span>
+      <h3 class="current-track-title text-base sm:text-xl font-bold text-slate-100 truncate">{initialTrack.title}</h3>
+      <p class="current-track-artist text-xs sm:text-sm text-slate-400 truncate">{initialTrack.artist || "Live"}</p>
+    </div>
+    <div class="shrink-0 text-[11px] sm:text-xs font-mono text-slate-300 bg-slate-800/90 px-2.5 py-1 rounded-lg border border-slate-700/60">
+      <span class="time-current text-indigo-300 font-semibold">0:00</span> / <span class="time-total">0:00</span>
+    </div>
+  </div>
+
+  <div id="waveform-container" class="w-full cursor-pointer py-2 sm:py-3 rounded-xl bg-slate-950/60 px-1 sm:px-2 my-1 sm:my-2 border border-slate-800/60"></div>
+
+  <div class="flex items-center justify-between mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-slate-800/80">
+    <div class="flex items-center gap-2 sm:gap-3">
+      <button class="btn-prev p-2.5 sm:p-2 text-slate-400 hover:text-white active:scale-95 transition-all" title="Piesa anterioară" aria-label="Previous Track">
+        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+      </button>
+
+      <button class="btn-play-pause bg-indigo-600 hover:bg-indigo-500 active:scale-90 text-white w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all shadow-lg shadow-indigo-600/30 shrink-0" aria-label="Play or Pause">
+        <svg class="icon-play w-5 h-5 sm:w-6 sm:h-6 fill-current ml-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <svg class="icon-pause w-5 h-5 sm:w-6 sm:h-6 fill-current hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+      </button>
+
+      <button class="btn-next p-2.5 sm:p-2 text-slate-400 hover:text-white active:scale-95 transition-all" title="Piesa următoare" aria-label="Next Track">
+        <svg class="w-5 h-5 sm:w-5 sm:h-5 fill-current" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+      </button>
+    </div>
+
+    <div class="hidden sm:flex items-center gap-2">
+      <svg class="w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+      <input type="range" class="volume-slider w-20 h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500" min="0" max="1" step="0.05" value="0.8">
+    </div>
+  </div>
+
+  <div class="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-slate-800/80">
+    <h4 class="text-xs sm:text-sm font-semibold text-slate-400 mb-2 sm:mb-3">{playlistTitle}</h4>
+
+    <div class="space-y-1.5 max-h-72 sm:max-h-64 overflow-y-auto pr-1 -mr-1">
+      {tracks.map((track, idx) => (
+        <div
+          class="track-item flex items-center justify-between p-2.5 sm:p-3 rounded-xl cursor-pointer hover:bg-slate-800/60 active:bg-slate-800 transition-all border border-transparent gap-2"
+          data-track-idx={idx}
+          data-track-id={track.id}
+          data-audio-url={track.audioUrl}
+          data-title={track.title}
+          data-artist={track.artist || "Live"}
+        >
+          <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+            <span class="track-index text-xs font-mono text-slate-500 w-4 shrink-0 text-center">{idx + 1}</span>
+            <div class="min-w-0 flex-1">
+              <div class="track-name font-medium text-xs sm:text-sm text-slate-200 truncate">{track.title}</div>
+              <div class="text-[11px] sm:text-xs text-slate-500 truncate">{track.artist}</div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+            {track.createdAt && (
+              <div class="relative group/info flex items-center">
+                <button
+                  type="button"
+                  class="text-slate-400 hover:text-indigo-400 p-1 rounded-full transition-colors focus:outline-none"
+                  title="Detalii dată"
+                  aria-label="Informații dată"
+                  onclick="event.stopPropagation()"
+                >
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                  </svg>
+                </button>
+                <div class="absolute bottom-full right-0 mb-1.5 hidden group-hover/info:flex items-center gap-1 text-[10px] font-medium text-slate-200 bg-slate-800/95 backdrop-blur-sm border border-slate-700/80 px-2 py-1 rounded-md shadow-xl whitespace-nowrap z-20 pointer-events-none">
+                  <span class="text-indigo-400 font-semibold">Dată:</span> {track.createdAt}
+                </div>
+              </div>
+            )}
+
+            <div class="flex items-center gap-1 text-[11px] sm:text-xs font-medium text-slate-400 bg-slate-800/80 px-2 py-0.5 sm:py-1 rounded-md border border-slate-700/50" title="Număr ascultări">
+              <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5 text-indigo-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <span class="play-count-badge font-mono">{track.plays ?? 0}</span>
+            </div>
+
+            <span class="text-[11px] sm:text-xs font-mono text-slate-400 w-8 text-right">{track.duration || "Demo"}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
+
+<script>
+  import WaveSurfer from 'wavesurfer.js';
+
+  const formatTime = (seconds: number) => {
+    if (isNaN(seconds) || seconds === 0) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  };
+
+  const root = document.querySelector<HTMLElement>('.playlist-player');
+  if (root) {
+    const trackItems = root.querySelectorAll<HTMLElement>('.track-item');
+    const titleEl = root.querySelector('.current-track-title');
+    const artistEl = root.querySelector('.current-track-artist');
+    const timeCurrent = root.querySelector('.time-current');
+    const timeTotal = root.querySelector('.time-total');
+    const playBtn = root.querySelector('.btn-play-pause');
+    const iconPlay = root.querySelector('.icon-play');
+    const iconPause = root.querySelector('.icon-pause');
+    const btnNext = root.querySelector('.btn-next');
+    const btnPrev = root.querySelector('.btn-prev');
+    const volumeSlider = root.querySelector<HTMLInputElement>('.volume-slider');
+
+    let currentIndex = 0;
+    const trackedTracks = new Set<string>();
+    const initialUrl = trackItems[0]?.dataset.audioUrl || '';
+    const isMobile = window.innerWidth < 640;
+
+    const audio = new Audio();
+    audio.preload = 'metadata';
+    audio.crossOrigin = 'anonymous';
+    if (initialUrl) audio.src = initialUrl;
+
+    WaveSurfer.create({
+      container: '#waveform-container',
+      media: audio,
+      waveColor: '#475569',
+      progressColor: '#6366f1',
+      cursorColor: '#818cf8',
+      barWidth: isMobile ? 2.5 : 3,
+      barGap: isMobile ? 1.5 : 2,
+      barRadius: 2,
+      height: isMobile ? 50 : 65,
+      normalize: true
+    });
+
+    const updateActiveUI = (index: number) => {
+      trackItems.forEach((el, i) => {
+        if (i === index) {
+          el.classList.add('bg-indigo-950/40', 'border-indigo-500/40');
+          el.querySelector('.track-name')?.classList.add('text-indigo-400');
+        } else {
+          el.classList.remove('bg-indigo-950/40', 'border-indigo-500/40');
+          el.querySelector('.track-name')?.classList.remove('text-indigo-400');
+        }
+      });
+    };
+
+    const loadTrack = (index: number, playImmediately = true) => {
+      if (index < 0 || index >= trackItems.length) return;
+      currentIndex = index;
+      const target = trackItems[currentIndex];
+      const url = target.dataset.audioUrl;
+      const title = target.dataset.title;
+      const artist = target.dataset.artist;
+
+      if (titleEl && title) titleEl.textContent = title;
+      if (artistEl && artist) artistEl.textContent = artist;
+
+      updateActiveUI(currentIndex);
+
+      if (url) {
+        audio.src = url;
+        audio.load();
+        if (playImmediately) {
+          audio.play().catch(console.error);
+        }
+      }
+    };
+
+    updateActiveUI(0);
+
+    audio.addEventListener('loadedmetadata', () => {
+      if (timeTotal) timeTotal.textContent = formatTime(audio.duration);
+    });
+
+    audio.addEventListener('timeupdate', () => {
+      if (timeCurrent) timeCurrent.textContent = formatTime(audio.currentTime);
+    });
+
+    audio.addEventListener('play', () => {
+      iconPlay?.classList.add('hidden');
+      iconPause?.classList.remove('hidden');
+
+      const currentTrackEl = trackItems[currentIndex];
+      const trackId = currentTrackEl?.dataset.trackId;
+      if (trackId && !trackedTracks.has(trackId)) {
+        trackedTracks.add(trackId);
+        const badge = currentTrackEl.querySelector('.play-count-badge');
+        if (badge) {
+          const currentVal = parseInt(badge.textContent || '0', 10);
+          badge.textContent = (currentVal + 1).toString();
+        }
+      }
+    });
+
+    audio.addEventListener('pause', () => {
+      iconPlay?.classList.remove('hidden');
+      iconPause?.classList.add('hidden');
+    });
+
+    audio.addEventListener('ended', () => {
+      if (currentIndex < trackItems.length - 1) {
+        loadTrack(currentIndex + 1, true);
+      } else {
+        loadTrack(0, false);
+      }
+    });
+
+    playBtn?.addEventListener('click', () => {
+      if (audio.paused) {
+        audio.play().catch(console.error);
+      } else {
+        audio.pause();
+      }
+    });
+
+    btnNext?.addEventListener('click', () => loadTrack((currentIndex + 1) % trackItems.length, true));
+    btnPrev?.addEventListener('click', () => loadTrack((currentIndex - 1 + trackItems.length) % trackItems.length, true));
+
+    trackItems.forEach((item, idx) => {
+      item.addEventListener('click', () => loadTrack(idx, true));
+    });
+
+    volumeSlider?.addEventListener('input', (e) => {
+      audio.volume = parseFloat((e.target as HTMLInputElement).value);
+    });
+  }
+</script>
