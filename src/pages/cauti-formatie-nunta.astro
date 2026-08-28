@@ -2,7 +2,6 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BackButton from '../components/BackButton.astro';
 import YoutubeEmbed from '../components/YoutubeEmbed.astro';
-import SmartTvVideoPlayer from '../components/SmartTvVideoPlayer.astro';
 import GoogleBusinessReviews from '../components/GoogleBusinessReviews.astro';
 import siteContent from '../data/siteContent.json';
 import couplesData from '../data/couples.json';
@@ -33,19 +32,6 @@ const galleryVideos = siteContent.videos.map((video, index) => ({
   category: video.category,
   youtubeId: video.youtubeId,
 }));
-const playlistLabels: Record<string, string> = {
-  populara: 'Muzică Populară', usoara: 'Muzică Ușoară', tineret: 'Tineret',
-  instrumentala: 'Instrumentală', 'dans-miri': 'Dansul Mirilor',
-};
-type PlaylistSectionConfig = { title?: string; playlistId?: string; thumbnailVideoId?: string };
-const playlistConfigBySection = (siteContent.youtubePlaylists?.galerieVideo ?? {}) as Record<string, PlaylistSectionConfig>;
-const galleryPlaylists = Object.entries(playlistConfigBySection)
-  .filter(([, playlist]) => playlist.playlistId)
-  .map(([id, playlist]) => ({
-    id, title: playlist.title || id, category: playlistLabels[id] || 'Playlist',
-    playlistId: playlist.playlistId || '', thumbnailYtId: playlist.thumbnailVideoId || '', videoCount: 'Playlist YouTube',
-  }));
-
 const processCards = [
   {
     title: 'Discutăm ce vă place',
@@ -127,31 +113,28 @@ const googleBusinessReviews = [
     </div>
 
     {galleryVideos.length > 0 && (
-      <details class="response-top-players">
-        <summary class="response-gallery-trigger">
-          <span>
-            <span class="response-section-kicker">Video live</span>
-            <strong>Galerie video live</strong>
-            <small>Momente reale de nuntă pe genuri muzicale</small>
-          </span>
-          <span class="response-gallery-trigger__action"><span class="response-gallery-trigger__icon" aria-hidden="true">+</span><span class="response-gallery-trigger__open">Deschide galeria</span><span class="response-gallery-trigger__close">Închide galeria</span></span>
-        </summary>
-        <div class="response-gallery-content">
-          <p>Descoperă momente reale de nuntă și alege rapid genul muzical potrivit evenimentului tău.</p>
-          <SmartTvVideoPlayer initialVideo={galleryVideos[0]} videos={galleryVideos} playlists={galleryPlaylists} />
-        </div>
-      </details>
+      <a href="/galerie-video/" class="response-media-card response-media-card--video">
+        <img src={`https://img.youtube.com/vi/${galleryVideos[0].youtubeId}/hqdefault.jpg`} alt="Momente live din galeria video" loading="eager" />
+        <span class="response-media-card__veil" aria-hidden="true"></span>
+        <span class="response-media-card__content">
+          <span class="response-section-kicker">Momente live</span>
+          <strong>Galerie video</strong>
+          <small>Vezi formația în acțiune la nunți și evenimente</small>
+        </span>
+        <span class="response-media-card__action">Deschide <span aria-hidden="true">→</span></span>
+      </a>
     )}
 
     <section class="response-audio-card" aria-label="Biblioteca audio">
-      <a href="/muzica-non-stop/" class="response-audio-card__link">
-        <span class="response-audio-card__icon" aria-hidden="true">♫</span>
-        <span class="response-audio-card__copy">
+      <a href="/muzica-non-stop/" class="response-media-card response-media-card--audio">
+        <img src="/images/sigla-fp-band.webp" alt="Formația Florentina Pană - biblioteca audio" loading="lazy" />
+        <span class="response-media-card__veil" aria-hidden="true"></span>
+        <span class="response-media-card__content">
           <span class="response-section-kicker">Repertoriu audio live</span>
-          <strong>Biblioteca audio a formației</strong>
+          <strong>Biblioteca audio</strong>
           <small>Ascultă selecții live și mostre din repertoriu</small>
         </span>
-        <span class="response-audio-card__action">Deschide biblioteca <span aria-hidden="true">→</span></span>
+        <span class="response-media-card__action">Ascultă <span aria-hidden="true">→</span></span>
       </a>
     </section>
 
@@ -223,7 +206,7 @@ const googleBusinessReviews = [
       subtitle="Dacă vrei confirmare rapidă înainte de ofertă, citește recenziile publice și verifică experiențele clienților noștri."
       googleProfileUrl={googleBusinessProfileUrl}
       googleWriteUrl={googleBusinessWriteUrl}
-      reviews={googleBusinessReviews}
+      reviews={googleBusinessReviews.slice(0, 1)}
     />
   </section>
 
@@ -354,6 +337,109 @@ const googleBusinessReviews = [
       font-weight: 800;
       letter-spacing: 0.11em;
       text-transform: uppercase;
+    }
+
+    .response-media-card {
+      position: relative;
+      display: flex;
+      min-height: 10.5rem;
+      margin: 0 0 0.85rem;
+      overflow: hidden;
+      isolation: isolate;
+      align-items: flex-end;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 1.2rem;
+      color: #fff;
+      text-decoration: none;
+      box-shadow: 0 16px 34px rgba(0, 0, 0, 0.28);
+      transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    }
+
+    .response-media-card img,
+    .response-media-card__veil {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .response-media-card img {
+      z-index: -2;
+      object-fit: cover;
+      object-position: center;
+      transition: transform 300ms ease;
+    }
+
+    .response-media-card__veil {
+      z-index: -1;
+      background: linear-gradient(90deg, rgba(2, 9, 22, 0.94) 0%, rgba(3, 12, 28, 0.7) 48%, rgba(3, 12, 28, 0.18) 100%);
+    }
+
+    .response-media-card--audio {
+      min-height: 8.5rem;
+      border-color: rgba(86, 216, 138, 0.42);
+    }
+
+    .response-media-card--audio img {
+      object-fit: contain;
+      object-position: right center;
+      background: linear-gradient(120deg, #092c31, #071923);
+    }
+
+    .response-media-card--audio .response-media-card__veil {
+      background: linear-gradient(90deg, rgba(4, 28, 31, 0.98) 0%, rgba(5, 39, 43, 0.8) 52%, rgba(5, 39, 43, 0.15) 100%);
+    }
+
+    .response-media-card:hover,
+    .response-media-card:focus-visible {
+      transform: translateY(-2px);
+      border-color: rgba(245, 166, 35, 0.86);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.36), 0 0 26px rgba(245, 166, 35, 0.16);
+    }
+
+    .response-media-card:hover img,
+    .response-media-card:focus-visible img {
+      transform: scale(1.04);
+    }
+
+    .response-media-card__content {
+      display: grid;
+      width: min(72%, 31rem);
+      gap: 0.18rem;
+      padding: 1.15rem 1.2rem;
+    }
+
+    .response-media-card__content strong {
+      color: #fff;
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(1.55rem, 4vw, 2.2rem);
+      line-height: 1;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .response-media-card__content small {
+      color: rgba(235, 244, 255, 0.84);
+      font-size: 0.88rem;
+      line-height: 1.4;
+    }
+
+    .response-media-card__action {
+      position: absolute;
+      right: 1rem;
+      bottom: 1rem;
+      padding: 0.52rem 0.72rem;
+      border: 1px solid rgba(245, 166, 35, 0.58);
+      border-radius: 999px;
+      background: rgba(3, 12, 27, 0.7);
+      color: #ffd26f;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .response-media-card__action span {
+      font-size: 1rem;
     }
 
     .response-top-players {

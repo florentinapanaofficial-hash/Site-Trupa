@@ -1473,3 +1473,24 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 
 - `npx astro check` → 0 erori; 4 hints preexistente în alte fișiere.
 - `npm run seo:check` → build PASS; 60 pagini HTML verificate, **0 FAIL | 0 WARN**.
+
+## 📝 2026-08-28 — Carduri vizuale și revenire directă
+
+- **Obiectiv:** Eliminarea cardului video înghesuit pe mobil și revenirea clară din galeria video și biblioteca audio la pagina „Cauți formație?”.
+- **Modificări:** Cardul video din `src/pages/cauti-formatie-nunta.astro` folosește thumbnail-ul real al primului videoclip și duce direct la `/galerie-video/`; biblioteca audio folosește un card vizual cu imaginea formației și duce la `/muzica-non-stop/`.
+- **Navigare:** `BackButton.astro` acceptă `direct`, iar galeria video și biblioteca audio folosesc ținta explicită `/cauti-formatie-nunta/`, fără `history.back()`.
+- **Validări:** `npx astro check` — 0 erori; `npm run build` — PASS; `npm run seo:check` — 60 pagini verificate, **0 FAIL | 0 WARN**. Au rămas doar 4 hints preexistente în alte fișiere.
+
+## 📝 2026-08-28 — Reducere recenzii pe pagina de ofertă
+
+- **Obiectiv:** Secțiunea „Încredere verificabilă” afișa prea multe recenzii pe pagina „Cauți formație?”.
+- **Modificări:** `src/pages/cauti-formatie-nunta.astro` afișează acum o singură recenzie reprezentativă; linkul către profilul Google păstrează accesul la toate recenziile publice. Pagina „Despre” nu a fost modificată.
+- **Validări:** `npx astro check` — 0 erori; `npm run seo:check` și auditul local — 60 pagini verificate, **0 FAIL | 0 WARN**.
+
+## 📝 2026-08-28 — Derulare titlu melodie în biblioteca audio
+
+- **Obiectiv:** Titlurile lungi din playerul audio erau tăiate și nu puteau fi citite integral pe mobil.
+- **Modificări:** `src/components/AudioPlaylistPlayer.astro` activează automat un marquee de la dreapta spre stânga doar când titlul depășește lățimea disponibilă; titlurile scurte rămân statice, iar animația respectă `prefers-reduced-motion`.
+- **Performanță:** Măsurarea overflow-ului și actualizarea clasei se fac într-un `requestAnimationFrame` separat.
+- **Corecție preview:** Detectarea folosește acum lățimea intrinsecă a titlului, nu elementul deja limitat la 100%, astfel încât marquee-ul pornește corect pentru melodiile lungi.
+- **Validări:** `npx astro check` — 0 erori; `npm run seo:check` și auditul local — 60 pagini verificate, **0 FAIL | 0 WARN**.

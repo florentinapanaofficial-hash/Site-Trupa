@@ -22,7 +22,7 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
   <div class="flex items-center justify-between gap-2 mb-3 sm:mb-4">
     <div class="min-w-0 flex-1">
       <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-indigo-400">Acum se redă</span>
-      <h3 class="current-track-title select-none cursor-default text-base sm:text-xl font-bold text-slate-100 truncate">{initialTrack.title}</h3>
+      <h3 class="current-track-title select-none cursor-default text-base sm:text-xl font-bold text-slate-100"><span class="current-track-title__text">{initialTrack.title}</span></h3>
       <p class="current-track-artist select-none cursor-default text-xs sm:text-sm text-slate-400 truncate">{initialTrack.artist || "Live"}</p>
     </div>
     <div class="shrink-0 text-[11px] sm:text-xs font-mono text-slate-300 bg-slate-800/90 px-2.5 py-1 rounded-lg border border-slate-700/60">
@@ -113,6 +113,45 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
   </div>
 </div>
 
+<style>
+  .current-track-title {
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .current-track-title__text {
+    display: inline-block;
+    width: max-content;
+    vertical-align: bottom;
+  }
+
+  .current-track-title__text.is-static {
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .current-track-title__text.is-marquee {
+    padding-right: 2.5rem;
+    text-overflow: clip;
+    animation: audio-title-marquee 9s linear infinite;
+  }
+
+  @keyframes audio-title-marquee {
+    0%, 18% { transform: translateX(0); }
+    82%, 100% { transform: translateX(calc(-1 * var(--marquee-distance))); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .current-track-title__text.is-marquee {
+      animation: none;
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+</style>
+
 <script>
   import WaveSurfer from 'wavesurfer.js';
 
@@ -126,7 +165,8 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
   const root = document.querySelector<HTMLElement>('.playlist-player');
   if (root) {
     const trackItems = root.querySelectorAll<HTMLElement>('.track-item');
-    const titleEl = root.querySelector('.current-track-title');
+    const titleEl = root.querySelector<HTMLElement>('.current-track-title__text');
+    const titleViewport = root.querySelector<HTMLElement>('.current-track-title');
     const artistEl = root.querySelector('.current-track-artist');
     const timeCurrent = root.querySelector('.time-current');
     const timeTotal = root.querySelector('.time-total');
@@ -136,6 +176,23 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
     const btnNext = root.querySelector('.btn-next');
     const btnPrev = root.querySelector('.btn-prev');
     const volumeSlider = root.querySelector<HTMLInputElement>('.volume-slider');
+
+    let titleMeasureRaf = 0;
+    const updateTitleMarquee = () => {
+      if (titleMeasureRaf) cancelAnimationFrame(titleMeasureRaf);
+      titleMeasureRaf = requestAnimationFrame(() => {
+        titleMeasureRaf = 0;
+        if (!titleEl || !titleViewport) return;
+        const isOverflowing = titleViewport.scrollWidth > titleViewport.clientWidth + 1;
+        if (isOverflowing) {
+          titleEl.style.setProperty('--marquee-distance', `${titleViewport.scrollWidth - titleViewport.clientWidth + 40}px`);
+        } else {
+          titleEl.style.removeProperty('--marquee-distance');
+        }
+        titleEl.classList.toggle('is-marquee', isOverflowing);
+        titleEl.classList.toggle('is-static', !isOverflowing);
+      });
+    };
 
     let currentIndex = 0;
     const trackedTracks = new Set<string>();
@@ -182,6 +239,7 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
 
       if (titleEl && title) titleEl.textContent = title;
       if (artistEl && artist) artistEl.textContent = artist;
+      updateTitleMarquee();
 
       updateActiveUI(currentIndex);
 
@@ -195,6 +253,8 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
     };
 
     updateActiveUI(0);
+    updateTitleMarquee();
+    window.addEventListener('resize', updateTitleMarquee, { passive: true });
 
     audio.addEventListener('loadedmetadata', () => {
       if (timeTotal) timeTotal.textContent = formatTime(audio.duration);
