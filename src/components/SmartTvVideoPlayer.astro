@@ -49,7 +49,6 @@ const activePlayerId = `video-${initialVideo.id}`;
         <span class="flex min-w-0 items-center gap-3"><span class="relative flex h-11 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-800 bg-slate-950"><img src={`https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`} alt={`Previzualizare: ${video.title}`} loading="lazy" class="h-full w-full object-cover opacity-70" /><span class="absolute text-[11px] font-bold text-white">▶</span></span><span class="min-w-0"><strong class="block truncate text-xs text-slate-100 sm:text-sm">{video.title}</strong><small class="mt-0.5 block text-[10px] text-slate-400 sm:text-xs">{video.category} · {video.duration || 'Live'}</small></span></span>
         <span class="ml-2 flex shrink-0 items-center gap-2">
           <button type="button" class="smart-tv-play-action cursor-pointer rounded-lg bg-slate-800 px-3 py-1.5 text-xs font-bold text-slate-200">Redă</button>
-          <a href={video.youtubeUrl || `https://www.youtube.com/watch?v=${video.youtubeId}`} target="_blank" rel="noopener noreferrer" class="rounded-lg border border-slate-700 px-2.5 py-1.5 text-xs font-bold text-slate-300 transition-colors hover:border-rose-500 hover:text-white" aria-label={`Deschide ${video.title} pe YouTube`}>YouTube</a>
         </span>
       </div>
     ))}
@@ -99,10 +98,7 @@ const activePlayerId = `video-${initialVideo.id}`;
         if (!consentGranted) return;
         window.dispatchEvent(new CustomEvent('cookie:granted'));
         const player = gallery.querySelector(`.smart-tv-player[data-player-id="${playerId}"]`);
-        window.setTimeout(() => {
-          const playOverlay = player?.querySelector('.yt-gate__click-overlay');
-          if (playOverlay) playOverlay.click();
-        }, 80);
+        window.dispatchEvent(new CustomEvent('yt:play', { detail: { gate: player?.querySelector('.yt-gate') } }));
       });
     };
     gallery.querySelectorAll('.smart-tv-play-action').forEach((action) => action.addEventListener('click', () => selectPlayer(action.closest('.smart-tv-card')?.dataset.playerId)));

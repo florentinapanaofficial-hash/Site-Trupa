@@ -284,6 +284,12 @@ git push origin main
 - **Implementat:** componentă nouă alimentată din `siteContent.videos` și `youtubePlaylists.galerieVideo`; thumbnail-uri cu alt text descriptiv și player-e protejate prin `YoutubeEmbed`, inclusiv consimțământ GDPR.
 - **Validări:** `npx astro check` — 0 erori; `npm run seo:check` — succes; audit SEO — 60 pagini verificate, 0 FAIL | 0 WARN.
 
+## 📝 2026-08-28 — Buton unic de redare în galeria video
+- **Problemă:** galeria afișa butoanele „Redă” și „YouTube”, iar „Redă” nu pornea uneori clipurile când iframe-ul încă nu fusese creat.
+- **Fix:** eliminat linkul extern „YouTube” din cardurile galeriei; adăugat evenimentul explicit `yt:play`, care activează gate-ul și trimite comanda play după încărcarea iframe-ului, fără timeout fix.
+- **Fișiere modificate:** `src/components/SmartTvVideoPlayer.astro`, `src/components/YoutubeEmbed.astro`.
+- **Validări:** `npx astro check` — 0 erori, 4 hint-uri preexistente; `npm run seo:check` — succes; audit SEO — 60 pagini verificate, 0 FAIL | 0 WARN; `npm test -- --runInBand` — 40 teste trecute.
+
 ## 📝 2026-08-28 — Închidere Bibliotecă Audio
 - **Modificări:** pagina `/muzica-non-stop/` are acum linkul „Închide biblioteca audio”, lângă controlul „Acasă”.
 - **Navigare:** linkul revine la `/cauti-formatie-nunta/`, completând fluxul „Deschide biblioteca / Închide biblioteca”.

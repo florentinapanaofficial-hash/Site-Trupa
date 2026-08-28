@@ -405,6 +405,23 @@ const ytLink = youtubeUrl || (hasPlaylist
       registerMiniGate(gate);
     }
 
+    function activateAndPlayGate(gate) {
+      if (!gate) return;
+
+      var iframe = gate.querySelector('iframe');
+      if (!iframe) {
+        activateGate(gate);
+        iframe = gate.querySelector('iframe');
+        if (!iframe) return;
+        iframe.addEventListener('load', function () {
+          postYouTubeMessage(iframe.contentWindow, YT_PLAY);
+        }, { once: true });
+        return;
+      }
+
+      postYouTubeMessage(iframe.contentWindow, YT_PLAY);
+    }
+
     /** Comută fullscreen pentru gate: iese dacă e deja în fullscreen, altfel intră */
     function toggleGateFullscreen(gate) {
       var isThisGateFullscreen = document.fullscreenElement === gate
@@ -532,6 +549,10 @@ const ytLink = youtubeUrl || (hasPlaylist
 
     // ── Reacționează la acceptarea din CookieBanner ──
     window.addEventListener('cookie:granted', activateVisibleGates);
+
+    window.addEventListener('yt:play', function (e) {
+      activateAndPlayGate(e.detail && e.detail.gate);
+    });
 
     // ── Butonul „Acceptă și vizionează" per video (delegare de eveniment) ──
     document.addEventListener('click', function (e) {
