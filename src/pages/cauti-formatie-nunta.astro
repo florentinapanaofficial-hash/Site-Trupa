@@ -3,12 +3,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import BackButton from '../components/BackButton.astro';
 import YoutubeEmbed from '../components/YoutubeEmbed.astro';
 import SmartTvVideoPlayer from '../components/SmartTvVideoPlayer.astro';
-import AudioPlaylistPlayer from '../components/AudioPlaylistPlayer.astro';
 import GoogleBusinessReviews from '../components/GoogleBusinessReviews.astro';
 import siteContent from '../data/siteContent.json';
 import couplesData from '../data/couples.json';
-import audioCatalog from '../data/audio-catalog.generated.json';
-import remoteAudioCatalog from '../data/audio-catalog-remote.json';
 
 const { faq } = siteContent;
 const featuredCouple = couplesData.couples[0];
@@ -48,28 +45,6 @@ const galleryPlaylists = Object.entries(playlistConfigBySection)
     id, title: playlist.title || id, category: playlistLabels[id] || 'Playlist',
     playlistId: playlist.playlistId || '', thumbnailYtId: playlist.thumbnailVideoId || '', videoCount: 'Playlist YouTube',
   }));
-
-type CatalogSong = { name: string; artist?: string; file: string; url?: string };
-type CatalogCategory = { title: string; songs: CatalogSong[] };
-const catalogData = audioCatalog as { categories?: CatalogCategory[] };
-const remoteCatalogData = remoteAudioCatalog as { categories?: CatalogCategory[] };
-const audioCategories = [
-  ...(Array.isArray(remoteCatalogData.categories) ? remoteCatalogData.categories : []),
-  ...(Array.isArray(catalogData.categories) ? catalogData.categories : []),
-];
-const audioBaseUrl = import.meta.env.PUBLIC_R2_MUSIC_BASE_URL?.trim().replace(/\/$/, '') || '';
-const resolveAudioUrl = (song: CatalogSong) => {
-  if (song.url) return song.url;
-  const encodedPath = song.file.split('/').map((segment) => encodeURIComponent(segment)).join('/');
-  return audioBaseUrl ? `${audioBaseUrl}/${encodedPath}` : `/Audio/${encodedPath}`;
-};
-const audioTracks = audioCategories.flatMap((category) => category.songs.map((song, index) => ({
-  id: `${category.title}-${song.name}-${index}`,
-  title: song.name,
-  artist: song.artist || 'Formația Florentina Pană',
-  audioUrl: resolveAudioUrl(song),
-  duration: 'Live',
-})));
 
 const processCards = [
   {
@@ -152,15 +127,33 @@ const googleBusinessReviews = [
     </div>
 
     {galleryVideos.length > 0 && (
-      <div class="response-top-players" aria-label="Playere video recomandate">
-        <div class="response-top-players__head">
-          <p class="response-section-kicker">Video live</p>
-          <h2>Galerie video live</h2>
+      <details class="response-top-players">
+        <summary class="response-gallery-trigger">
+          <span>
+            <span class="response-section-kicker">Video live</span>
+            <strong>Galerie video live</strong>
+            <small>Momente reale de nuntă pe genuri muzicale</small>
+          </span>
+          <span class="response-gallery-trigger__action"><span class="response-gallery-trigger__icon" aria-hidden="true">+</span><span class="response-gallery-trigger__open">Deschide galeria</span><span class="response-gallery-trigger__close">Închide galeria</span></span>
+        </summary>
+        <div class="response-gallery-content">
           <p>Descoperă momente reale de nuntă și alege rapid genul muzical potrivit evenimentului tău.</p>
+          <SmartTvVideoPlayer initialVideo={galleryVideos[0]} videos={galleryVideos} playlists={galleryPlaylists} />
         </div>
-        <SmartTvVideoPlayer initialVideo={galleryVideos[0]} videos={galleryVideos} playlists={galleryPlaylists} />
-      </div>
+      </details>
     )}
+
+    <section class="response-audio-card" aria-label="Biblioteca audio">
+      <a href="/muzica-non-stop/" class="response-audio-card__link">
+        <span class="response-audio-card__icon" aria-hidden="true">♫</span>
+        <span class="response-audio-card__copy">
+          <span class="response-section-kicker">Repertoriu audio live</span>
+          <strong>Biblioteca audio a formației</strong>
+          <small>Ascultă selecții live și mostre din repertoriu</small>
+        </span>
+        <span class="response-audio-card__action">Deschide biblioteca <span aria-hidden="true">→</span></span>
+      </a>
+    </section>
 
     <div class="response-shell">
       <div class="response-shell__glow response-shell__glow--cyan" aria-hidden="true"></div>
@@ -183,7 +176,7 @@ const googleBusinessReviews = [
           <div class="response-offer-highlight" aria-label="Repertoriu și preț orientativ">
             <p class="response-offer-highlight__genres"><strong>Cântăm toate genurile muzicale</strong>, adaptate pe invitații voștri și pe energia evenimentului.</p>
             <p class="response-offer-highlight__genres">Program live fără pauze, alternat după specificul evenimentului, fără DJ sau MC.</p>
-            <p class="response-offer-highlight__price">Preț orientativ: <span>2.500€ - 4.000€</span>, în funcție de numărul de membri din formulă.</p>
+            <p class="response-offer-highlight__price">Oferte de la <span>2.500 €</span>, în funcție de formulă, dată și specificul evenimentului.</p>
           </div>
 
           <div class="response-pills" aria-label="Servicii și pachete">
@@ -286,17 +279,6 @@ const googleBusinessReviews = [
     </div>
   </section>
 
-  {audioTracks.length > 0 && (
-    <section class="response-section section-container pb-8" id="muzica-non-stop">
-      <div class="response-section-head">
-        <p class="response-section-kicker">Repertoriu audio live</p>
-        <h2>Biblioteca audio a formației</h2>
-        <p>Alege o piesă și ascultă selecții din repertoriul Formației Florentina Pană.</p>
-      </div>
-      <AudioPlaylistPlayer tracks={audioTracks} playlistTitle="Repertoriu & Mostre Live" />
-    </section>
-  )}
-
   <section class="response-section section-container pb-8">
     <div class="response-section-head">
       <p class="response-section-kicker">Repertoriu</p>
@@ -385,6 +367,163 @@ const googleBusinessReviews = [
       box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.08),
         0 16px 34px rgba(0, 0, 0, 0.2);
+    }
+
+    .response-gallery-trigger {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      min-height: 4.4rem;
+      padding: 0.5rem 0.65rem;
+      color: #fff;
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+    }
+
+    .response-gallery-trigger::-webkit-details-marker { display: none; }
+
+    .response-gallery-trigger > span:first-child {
+      display: grid;
+      gap: 0.18rem;
+    }
+
+    .response-gallery-trigger strong {
+      color: #f8fcff;
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.25rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .response-gallery-trigger small {
+      color: rgba(235, 244, 255, 0.72);
+      font-size: 0.8rem;
+    }
+
+    .response-gallery-trigger__action {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      flex-shrink: 0;
+      border: 1px solid rgba(245, 166, 35, 0.42);
+      border-radius: 999px;
+      padding: 0.45rem 0.7rem;
+      color: #ffd26f;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .response-gallery-trigger__icon {
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+
+    .response-gallery-trigger__close { display: none; }
+
+    .response-top-players[open] .response-gallery-trigger__open { display: none; }
+    .response-top-players[open] .response-gallery-trigger__close { display: inline; }
+    .response-top-players[open] .response-gallery-trigger__icon { transform: rotate(45deg); }
+
+    .response-gallery-content {
+      padding-top: 0.35rem;
+    }
+
+    .response-gallery-content > p {
+      max-width: 42rem;
+      margin: 0 auto;
+      padding: 0 1rem;
+      color: rgba(235, 244, 255, 0.8);
+      font-size: 0.93rem;
+      line-height: 1.48;
+      text-align: center;
+    }
+
+    .response-audio-card {
+      margin: 0 0 1rem;
+    }
+
+    .response-audio-card__link {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      min-height: 5.2rem;
+      padding: 0.85rem 1rem;
+      border: 1px solid rgba(86, 216, 138, 0.3);
+      border-radius: 1.15rem;
+      background: linear-gradient(120deg, rgba(12, 52, 52, 0.9), rgba(8, 25, 40, 0.95));
+      color: #fff;
+      text-decoration: none;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+    }
+
+    .response-audio-card__link:hover,
+    .response-audio-card__link:focus-visible {
+      transform: translateY(-2px);
+      border-color: rgba(86, 216, 138, 0.72);
+      background: linear-gradient(120deg, rgba(16, 71, 65, 0.95), rgba(8, 31, 47, 0.98));
+    }
+
+    .response-audio-card__icon {
+      display: grid;
+      width: 2.75rem;
+      height: 2.75rem;
+      flex: 0 0 auto;
+      place-items: center;
+      border: 1px solid rgba(86, 216, 138, 0.42);
+      border-radius: 0.85rem;
+      background: rgba(86, 216, 138, 0.14);
+      color: #9ef2b7;
+      font-size: 1.55rem;
+    }
+
+    .response-audio-card__copy {
+      display: grid;
+      min-width: 0;
+      flex: 1;
+      gap: 0.12rem;
+    }
+
+    .response-audio-card__copy strong {
+      color: #f7fff9;
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.18rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .response-audio-card__copy small {
+      overflow: hidden;
+      color: rgba(221, 246, 230, 0.72);
+      font-size: 0.8rem;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .response-audio-card__action {
+      flex: 0 0 auto;
+      color: #9ef2b7;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 560px) {
+      .response-audio-card__link {
+        align-items: flex-start;
+      }
+
+      .response-audio-card__action {
+        align-self: center;
+        font-size: 0;
+      }
+
+      .response-audio-card__action span {
+        font-size: 1.25rem;
+      }
     }
 
     .response-top-players__head {

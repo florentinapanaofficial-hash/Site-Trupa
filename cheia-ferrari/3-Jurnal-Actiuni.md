@@ -284,6 +284,27 @@ git push origin main
 - **Implementat:** componentă nouă alimentată din `siteContent.videos` și `youtubePlaylists.galerieVideo`; thumbnail-uri cu alt text descriptiv și player-e protejate prin `YoutubeEmbed`, inclusiv consimțământ GDPR.
 - **Validări:** `npx astro check` — 0 erori; `npm run seo:check` — succes; audit SEO — 60 pagini verificate, 0 FAIL | 0 WARN.
 
+## 📝 2026-08-28 — Închidere Bibliotecă Audio
+- **Modificări:** pagina `/muzica-non-stop/` are acum linkul „Închide biblioteca audio”, lângă controlul „Acasă”.
+- **Navigare:** linkul revine la `/cauti-formatie-nunta/`, completând fluxul „Deschide biblioteca / Închide biblioteca”.
+- **Validări:** `npx astro check` — 0 erori; `npm run seo:check` — succes; audit SEO — 60 pagini verificate, 0 FAIL | 0 WARN.
+
+## 📝 2026-08-28 — Card Bibliotecă Audio în pagina de ofertă
+- **Modificări:** playerul audio inline a fost înlocuit cu un card compact clicabil, amplasat imediat după galeria video.
+- **Navigare:** cardul duce către `/muzica-non-stop/`, unde rămâne disponibil playerul complet al bibliotecii audio.
+- **Performanță:** pagina „Cauți formație?” nu mai încarcă playerul audio și catalogul audio direct în oferta de prezentare.
+- **Validări:** `npx astro check` — 0 erori; `npm run seo:check` — succes; audit SEO — 60 pagini verificate, 0 FAIL | 0 WARN.
+
+## 📝 2026-08-28 — Ordine galerie, bibliotecă audio și ofertă
+- **Modificări:** în pagina „Cauți formație?”, Biblioteca Audio este acum imediat după galeria video colapsată și înaintea blocului de ofertă.
+- **Preț:** mesajul comercial este „Oferte de la 2.500 €”, cu mențiunea că suma depinde de formulă, dată și specificul evenimentului.
+- **Validări:** `npx astro check` — 0 erori; `npm run seo:check` — succes; audit SEO — 60 pagini verificate, 0 FAIL | 0 WARN.
+
+## 📝 2026-08-28 — Galerie video colapsabilă în oferta de prezentare
+- **Problemă:** galeria Smart TV ocupa prea mult spațiu în pagina „Cauți formație?”.
+- **Fix:** galeria este acum un `<details>` închis implicit, cu control „Deschide galeria”; playerul Smart TV se afișează doar după extinderea secțiunii.
+- **Validări:** `npx astro check` — 0 erori; `npm run seo:check` — succes; audit SEO — 60 pagini verificate, 0 FAIL | 0 WARN.
+
 ## 📝 2026-08-28 — Etichetă meniu Bibliotecă Audio
 - **Modificări:** eticheta `/muzica-non-stop/` a fost schimbată în „Bibliotecă Audio” în meniul desktop, meniul mobil, navigația din date și breadcrumb mapping.
 - **SEO:** ruta tehnică `/muzica-non-stop/` a rămas neschimbată.
