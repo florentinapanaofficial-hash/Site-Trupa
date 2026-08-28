@@ -11,6 +11,7 @@ const videos = siteContent.videos.map((video, index) => ({
   title: video.title,
   category: video.category,
   youtubeId: video.youtubeId,
+  youtubeUrl: video.youtubeUrl,
 }));
 
 type PlaylistSectionConfig = { title?: string; playlistId?: string; thumbnailVideoId?: string };

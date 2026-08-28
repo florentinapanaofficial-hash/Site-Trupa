@@ -1507,3 +1507,10 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - **Modificări:** `src/components/AudioPlaylistPlayer.astro` animă acum titlul piesei active în interiorul rândului, de la dreapta spre stânga, păstrând titlurile inactive și cele scurte statice.
 - **Accesibilitate:** Marquee-ul din listă respectă `prefers-reduced-motion`.
 - **Validări:** `npx astro check` — 0 erori; `npm run seo:check` și auditul local — 60 pagini verificate, **0 FAIL | 0 WARN**.
+
+## 📝 2026-08-28 — Linkuri funcționale în galeria video
+
+- **Obiectiv:** Repararea acțiunilor pentru clipurile din lista galeriei video, inclusiv „Tineret - moment live manele”.
+- **Cauză:** Cardurile depindeau exclusiv de JavaScript și de injectarea asincronă a iframe-ului YouTube; în anumite stări de consimțământ, butonul „Redă” nu avea overlay activ pe care să îl poată porni.
+- **Modificări:** `src/pages/galerie-video.astro` transmite URL-ul YouTube, iar `src/components/SmartTvVideoPlayer.astro` afișează un link direct YouTube pentru fiecare clip și așteaptă activarea embedului înainte de redare.
+- **Validări:** `npm run build` — PASS; `get_errors` pentru fișierele modificate — fără erori; `npm run seo:check` — 60 pagini verificate, **0 FAIL | 0 WARN**; linkul `HQfVn98caic` prezent în HTML-ul generat.
