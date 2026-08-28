@@ -22,8 +22,8 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
   <div class="flex items-center justify-between gap-2 mb-3 sm:mb-4">
     <div class="min-w-0 flex-1">
       <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-indigo-400">Acum se redă</span>
-      <h3 class="current-track-title text-base sm:text-xl font-bold text-slate-100 truncate">{initialTrack.title}</h3>
-      <p class="current-track-artist text-xs sm:text-sm text-slate-400 truncate">{initialTrack.artist || "Live"}</p>
+      <h3 class="current-track-title select-none cursor-default text-base sm:text-xl font-bold text-slate-100 truncate">{initialTrack.title}</h3>
+      <p class="current-track-artist select-none cursor-default text-xs sm:text-sm text-slate-400 truncate">{initialTrack.artist || "Live"}</p>
     </div>
     <div class="shrink-0 text-[11px] sm:text-xs font-mono text-slate-300 bg-slate-800/90 px-2.5 py-1 rounded-lg border border-slate-700/60">
       <span class="time-current text-indigo-300 font-semibold">0:00</span> / <span class="time-total">0:00</span>

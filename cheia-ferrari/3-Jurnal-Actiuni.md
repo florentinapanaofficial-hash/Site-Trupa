@@ -1189,6 +1189,18 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - `npm run seo:check` / `npm run seo:audit` → build PASS; **60 pagini HTML, 0 FAIL | 0 WARN**.
 
 ---
+## Sesiunea 28 august 2026 — Corecție aspect titlu player audio
+
+### Modificări realizate
+
+- Adăugat `select-none` și `cursor-default` pe titlul și artistul piesei din `AudioPlaylistPlayer.astro`.
+- Eliminat aspectul de text editabil/I-beam la trecerea cursorului și la click pe text.
+
+### Validare
+
+- `npx astro check` → **0 erori**, 4 hints cunoscute.
+
+---
 ## Sesiunea 28 august 2026 — Activare piesă R2 reală și verificare CORS
 
 ### Modificări realizate
