@@ -70,7 +70,7 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
           <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
             <span class="track-index text-xs font-mono text-slate-500 w-4 shrink-0 text-center">{idx + 1}</span>
             <div class="min-w-0 flex-1">
-              <div class="track-name font-medium text-xs sm:text-sm text-slate-200 truncate">{track.title}</div>
+              <div class="track-name font-medium text-xs sm:text-sm text-slate-200"><span class="track-name__text">{track.title}</span></div>
               <div class="text-[11px] sm:text-xs text-slate-500 truncate">{track.artist}</div>
             </div>
           </div>
@@ -115,8 +115,14 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
 
 <style>
   .current-track-title {
+    position: relative;
+    display: block;
+    max-width: 100%;
     overflow: hidden;
     white-space: nowrap;
+    isolation: isolate;
+    contain: paint;
+    clip-path: inset(0);
   }
 
   .current-track-title__text {
@@ -137,13 +143,37 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
     animation: audio-title-marquee 9s linear infinite;
   }
 
+  .track-name {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .track-name__text {
+    display: inline-block;
+    width: max-content;
+    vertical-align: bottom;
+  }
+
+  .track-name__text.is-static {
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .track-name__text.is-marquee {
+    padding-right: 2.5rem;
+    animation: audio-title-marquee 8s linear infinite;
+  }
+
   @keyframes audio-title-marquee {
     0%, 18% { transform: translateX(0); }
     82%, 100% { transform: translateX(calc(-1 * var(--marquee-distance))); }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .current-track-title__text.is-marquee {
+    .current-track-title__text.is-marquee,
+    .track-name__text.is-marquee {
       animation: none;
       width: 100%;
       overflow: hidden;
@@ -194,6 +224,26 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
       });
     };
 
+    let trackNameMeasureRaf = 0;
+    const updateTrackNameMarquee = (index: number) => {
+      if (trackNameMeasureRaf) cancelAnimationFrame(trackNameMeasureRaf);
+      trackNameMeasureRaf = requestAnimationFrame(() => {
+        trackNameMeasureRaf = 0;
+        const activeTrack = trackItems[index];
+        const viewport = activeTrack?.querySelector<HTMLElement>('.track-name');
+        const text = activeTrack?.querySelector<HTMLElement>('.track-name__text');
+        if (!viewport || !text) return;
+        const isOverflowing = viewport.scrollWidth > viewport.clientWidth + 1;
+        if (isOverflowing) {
+          text.style.setProperty('--marquee-distance', `${viewport.scrollWidth - viewport.clientWidth + 40}px`);
+        } else {
+          text.style.removeProperty('--marquee-distance');
+        }
+        text.classList.toggle('is-marquee', isOverflowing);
+        text.classList.toggle('is-static', !isOverflowing);
+      });
+    };
+
     let currentIndex = 0;
     const trackedTracks = new Set<string>();
     const initialUrl = trackItems[0]?.dataset.audioUrl || '';
@@ -222,11 +272,17 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
         if (i === index) {
           el.classList.add('bg-indigo-950/40', 'border-indigo-500/40');
           el.querySelector('.track-name')?.classList.add('text-indigo-400');
+          el.querySelector('.track-name__text')?.classList.remove('is-static');
         } else {
           el.classList.remove('bg-indigo-950/40', 'border-indigo-500/40');
           el.querySelector('.track-name')?.classList.remove('text-indigo-400');
+          const text = el.querySelector<HTMLElement>('.track-name__text');
+          text?.classList.remove('is-marquee');
+          text?.classList.add('is-static');
+          text?.style.removeProperty('--marquee-distance');
         }
       });
+      updateTrackNameMarquee(index);
     };
 
     const loadTrack = (index: number, playImmediately = true) => {

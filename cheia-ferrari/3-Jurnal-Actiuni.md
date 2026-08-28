@@ -1494,3 +1494,16 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - **Performanță:** Măsurarea overflow-ului și actualizarea clasei se fac într-un `requestAnimationFrame` separat.
 - **Corecție preview:** Detectarea folosește acum lățimea intrinsecă a titlului, nu elementul deja limitat la 100%, astfel încât marquee-ul pornește corect pentru melodiile lungi.
 - **Validări:** `npx astro check` — 0 erori; `npm run seo:check` și auditul local — 60 pagini verificate, **0 FAIL | 0 WARN**.
+
+## 📝 2026-08-28 — Corecție clipping marquee audio pe mobil
+
+- **Obiectiv:** Textul animat al melodiei ieșea vizual din zona playerului și apărea în spatele cardului.
+- **Modificări:** Containerul titlului din `src/components/AudioPlaylistPlayer.astro` este acum un viewport izolat, cu `contain: paint` și clipping explicit, astfel încât marquee-ul rămâne în headerul playerului.
+- **Validări:** `npx astro check` — 0 erori; `npm run seo:check` și auditul local — 60 pagini verificate, **0 FAIL | 0 WARN**.
+
+## 📝 2026-08-28 — Derulare titlu piesă în lista bibliotecii audio
+
+- **Obiectiv:** Titlul lung al melodiei din zona „Repertoriu & Mostre Live” era tăiat pe mobil.
+- **Modificări:** `src/components/AudioPlaylistPlayer.astro` animă acum titlul piesei active în interiorul rândului, de la dreapta spre stânga, păstrând titlurile inactive și cele scurte statice.
+- **Accesibilitate:** Marquee-ul din listă respectă `prefers-reduced-motion`.
+- **Validări:** `npx astro check` — 0 erori; `npm run seo:check` și auditul local — 60 pagini verificate, **0 FAIL | 0 WARN**.
