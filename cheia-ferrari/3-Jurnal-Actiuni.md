@@ -1457,3 +1457,19 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - `npx astro check` → 0 erori; 3 hints preexistente în alte fișiere.
 - `npm run seo:check` → build PASS; 60 pagini HTML verificate, **0 FAIL | 0 WARN**.
 - HTML generat → clasele `is-playing` și indicatorul `Redare` prezente.
+
+---
+## Sesiunea 28 august 2026 — Navigare mobilă galerie video
+
+**Obiectiv:** Când utilizatorul selectează un videoclip sau playlist, playerul să fie adus în partea de sus a ecranului pe mobil, pentru o operare clară.
+
+### Modificări realizate
+
+- Adăugat scroll automat și fluid către cadrul playerului la selectarea unui element din playlist, activ doar sub 768px.
+- Adăugat `scroll-margin-top` pentru a păstra playerul vizibil sub bara fixă de navigare mobilă.
+- Păstrat fullscreen-ul la acțiunea Play, deoarece fullscreen-ul automat la simpla selectare poate fi blocat de browser și poate întrerupe fluxul utilizatorului.
+
+### Validări
+
+- `npx astro check` → 0 erori; 4 hints preexistente în alte fișiere.
+- `npm run seo:check` → build PASS; 60 pagini HTML verificate, **0 FAIL | 0 WARN**.
