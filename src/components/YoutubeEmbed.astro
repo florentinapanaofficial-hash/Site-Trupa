@@ -490,16 +490,36 @@ const ytLink = youtubeUrl || (hasPlaylist
       window.setTimeout(function () { flash.remove(); }, 420);
     }
 
-    /** Activează TOATE embed-urile de pe pagină */
+    /** Activează doar embed-urile vizibile; cele ascunse se activează la afișare. */
     function activateAllGates() {
       document.querySelectorAll('.yt-gate').forEach(activateGate);
+    }
+
+    function activateVisibleGates() {
+      if (!('IntersectionObserver' in window)) {
+        activateAllGates();
+        return;
+      }
+
+      var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            activateGate(entry.target);
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { rootMargin: '240px 0px' });
+
+      document.querySelectorAll('.yt-gate').forEach(function (gate) {
+        if (!gate.querySelector('iframe')) observer.observe(gate);
+      });
     }
 
     // ── La încărcarea paginii: așteaptă DOM-ul complet pentru toate embed-urile ──
     function activateGrantedGates() {
       try {
         if (localStorage.getItem('cookie_consent') === 'granted') {
-          activateAllGates();
+          activateVisibleGates();
         }
       } catch (_) { /* localStorage indisponibil */ }
     }
@@ -511,7 +531,7 @@ const ytLink = youtubeUrl || (hasPlaylist
     }
 
     // ── Reacționează la acceptarea din CookieBanner ──
-    window.addEventListener('cookie:granted', activateAllGates);
+    window.addEventListener('cookie:granted', activateVisibleGates);
 
     // ── Butonul „Acceptă și vizionează" per video (delegare de eveniment) ──
     document.addEventListener('click', function (e) {

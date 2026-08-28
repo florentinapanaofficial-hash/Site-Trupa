@@ -50,12 +50,12 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
 
     <div class="hidden sm:flex items-center gap-2">
       <svg class="w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
-      <input type="range" class="volume-slider w-20 h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500" min="0" max="1" step="0.05" value="0.8">
+      <input type="range" class="volume-slider w-20 h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500" min="0" max="1" step="0.05" value="0.8" aria-label="Volum audio">
     </div>
   </div>
 
   <div class="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-slate-800/80">
-    <h4 class="text-xs sm:text-sm font-semibold text-slate-400 mb-2 sm:mb-3">{playlistTitle}</h4>
+    <h2 class="text-xs sm:text-sm font-semibold text-slate-400 mb-2 sm:mb-3">{playlistTitle}</h2>
 
     <div class="space-y-1.5 max-h-72 sm:max-h-64 overflow-y-auto pr-1 -mr-1">
       {tracks.map((track, idx) => (

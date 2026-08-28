@@ -335,6 +335,17 @@ git push origin main
 - **Constatare:** cele 16 intrări video folosesc doar 8 ID-uri unice, cu ID-uri repetate în categorii și titluri diferite. Nu sunt linkuri moarte, dar asignarea conținutului este duplicată și uneori nu corespunde titlului afișat.
 - **Pași următori:** înlocuirea asignărilor necesită lista/ID-urile reale ale videoclipurilor; nu s-au modificat datele pe baza unor presupuneri.
 
+## 📝 2026-08-28 — Verificare PageSpeed locală
+- **Audit Lighthouse:** pagina „Cauți formație?” desktop — Performance 100, Accessibility 100, Best Practices 100, SEO 100; mobil — Performance 80, Accessibility 100, Best Practices 100, SEO 100, FCP 1,0 s, LCP 2,7 s.
+- **Biblioteca Audio desktop:** Performance 100, Best Practices 100, SEO 100; Accessibility 89, cu audituri privind contrastul, ordinea heading-urilor și etichetele controalelor.
+- **Limitare:** homepage-ul mobil nu a putut fi măsurat local din cauza `ERR_CONTENT_LENGTH_MISMATCH` la fișierele comprimate servite de serverul local.
+
+## 📝 2026-08-28 — Optimizare PageSpeed mobil
+- **Performanță:** `YoutubeEmbed` activează acum doar playerele vizibile sau apropiate de viewport, reducând încărcarea simultană a iframe-urilor YouTube.
+- **Accesibilitate:** adăugată etichetă pentru volumul audio și corectată ierarhia heading-urilor din `AudioPlaylistPlayer`.
+- **Rezultate după optimizare:** pagina de ofertă mobil — Performance 86, Accessibility 100, Best Practices 100, SEO 100; Biblioteca Audio desktop — Performance 100, Accessibility 95, Best Practices 100, SEO 100.
+- **Validări:** `npx astro check` — 0 erori; `npm run seo:check` — succes; audit SEO — 60 pagini verificate, 0 FAIL | 0 WARN.
+
 ## 📝 2026-08-28 — GDPR global pentru galeria video
 - **Obiectiv:** Eliminarea mesajelor GDPR repetate din fiecare player al galeriei video.
 - **Fix:** `YoutubeEmbed` acceptă `globalConsentOnly`; Smart TV folosește acest mod, iar iframe-urile rămân blocate până la acceptarea bannerului global.
