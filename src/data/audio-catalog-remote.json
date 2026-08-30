@@ -1,6 +1,23 @@
 {
     "categories": [
         {
+            "id": "muzica-arabeasca",
+            "title": "Muzică Arăbească",
+            "songs": [
+                {
+                    "name": "Muzică Arăbească Cover",
+                    "artist": "FP Band",
+                    "file": "Muzica Arabeasca Cover FP BAnd.mp3",
+                    "url": "https://pub-990252095ed1490dbf610cd678419215.r2.dev/Muzica%20Arabeasca%20Cover%20FP%20BAnd.mp3",
+                    "genres": [
+                        "arabeasca",
+                        "oriental",
+                        "petrecere"
+                    ]
+                }
+            ]
+        },
+        {
             "id": "aperitiv",
             "title": "Muzică pentru Aperitiv",
             "songs": [
