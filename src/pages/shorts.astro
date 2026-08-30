@@ -2,13 +2,17 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import siteContent from '../data/siteContent.json';
 import seo from '../data/seo-content.json';
+import { getReelsFromPlaylist } from '../lib/youtube-reels';
+
+export const prerender = false;
 
 const shortsSeo = seo.shorts;
 const SITE_URL = 'https://www.florentinapanaofficial.ro';
 
-type Short = {
+type ShortRaw = {
   id: string;
-  youtubeVideoId: string;
+  youtubeVideoId?: string;
+  cloudflareUid?: string;
   author: string;
   avatar: string;
   verified?: boolean;
@@ -18,7 +22,56 @@ type Short = {
   likesCount: number;
 };
 
-const shorts = (siteContent.shorts ?? []) as Short[];
+const BRAND = siteContent.brand?.name ?? 'Formația Florentina Pană';
+const DEFAULT_AVATAR = '/images/logo-512.png';
+const DEFAULT_SONG = `${BRAND} · Moment live`;
+
+// Număr de aprecieri pseudo-aleator, dar stabil per clip (nu se schimbă la refresh)
+function pseudoLikes(id: string): number {
+  let h = 0;
+  for (const ch of id) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return 320 + (h % 1580);
+}
+
+// Clipuri „fixate” din siteContent.json (montaj Cloudflare + eventuale manuale)
+const pinnedShorts = (siteContent.shorts ?? []) as ShortRaw[];
+
+// Shorturi trase automat din playlista YouTube (RSS, cache 30 min)
+const reelsPlaylistId = (siteContent.reelsPlaylistId ?? '').trim();
+const playlistReels = reelsPlaylistId ? await getReelsFromPlaylist(reelsPlaylistId) : [];
+
+const pinnedYouTubeIds = new Set(
+  pinnedShorts.map((s) => s.youtubeVideoId).filter(Boolean) as string[]
+);
+
+const playlistShorts: ShortRaw[] = playlistReels
+  .filter((r) => !pinnedYouTubeIds.has(r.youtubeVideoId))
+  .map((r) => ({
+    id: `yt-${r.youtubeVideoId}`,
+    youtubeVideoId: r.youtubeVideoId,
+    author: BRAND,
+    avatar: DEFAULT_AVATAR,
+    verified: true,
+    caption: r.title || `${BRAND} — moment live`,
+    hashtags: '#shorts #nunta #muzicalive #fpband',
+    song: DEFAULT_SONG,
+    likesCount: pseudoLikes(r.youtubeVideoId),
+  }));
+
+const rawShorts = [...pinnedShorts, ...playlistShorts];
+const shorts = rawShorts.map((s) => {
+  const isCloudflare = Boolean(s.cloudflareUid);
+  return {
+    ...s,
+    provider: isCloudflare ? 'cloudflare' : 'youtube',
+    poster: isCloudflare
+      ? `https://videodelivery.net/${s.cloudflareUid}/thumbnails/thumbnail.jpg?time=2s&height=1080`
+      : `https://i.ytimg.com/vi/${s.youtubeVideoId}/hqdefault.jpg`,
+    cfEmbed: isCloudflare
+      ? `https://iframe.cloudflarestream.com/${s.cloudflareUid}?muted=true&loop=true&autoplay=false&controls=false&preload=metadata`
+      : '',
+  };
+});
 ---
 
 <BaseLayout title={shortsSeo.meta.title} description={shortsSeo.meta.description} hideFooter>
@@ -26,10 +79,14 @@ const shorts = (siteContent.shorts ?? []) as Short[];
     <link rel="preconnect" href="https://www.youtube.com" crossorigin />
     <link rel="preconnect" href="https://i.ytimg.com" crossorigin />
     <link rel="preconnect" href="https://s.ytimg.com" crossorigin />
+    <link rel="preconnect" href="https://embed.cloudflarestream.com" crossorigin />
+    <link rel="preconnect" href="https://videodelivery.net" crossorigin />
     <link rel="dns-prefetch" href="https://www.youtube.com" />
     <link rel="dns-prefetch" href="https://i.ytimg.com" />
     <link rel="dns-prefetch" href="https://s.ytimg.com" />
     <link rel="dns-prefetch" href="https://googlevideo.com" />
+    <link rel="dns-prefetch" href="https://embed.cloudflarestream.com" />
+    <link rel="dns-prefetch" href="https://videodelivery.net" />
   </Fragment>
 
   <div class="reels-overlay" id="reels-overlay" data-muted="true">
@@ -54,19 +111,32 @@ const shorts = (siteContent.shorts ?? []) as Short[];
           data-reel
           data-index={index}
           data-id={short.id}
-          data-video-id={short.youtubeVideoId}
+          data-provider={short.provider}
+          data-video-id={short.youtubeVideoId ?? ''}
           data-likes={short.likesCount}
         >
           <div class="reel-media-wrap">
             <img
               class="reel-poster"
-              src={`https://i.ytimg.com/vi/${short.youtubeVideoId}/hqdefault.jpg`}
+              src={short.poster}
               alt={`Miniatură Reels — ${short.author}: moment live`}
               loading="lazy"
               decoding="async"
             />
-            <div class="reel-media">
-              <div id={`reel-player-${index}`} data-player></div>
+            <div class={`reel-media${short.provider === 'cloudflare' ? ' reel-media--cf' : ''}`}>
+              {short.provider === 'cloudflare' ? (
+                <iframe
+                  class="reel-cf"
+                  data-cf
+                  src={short.cfEmbed}
+                  title={`Reels — ${short.author}`}
+                  loading="lazy"
+                  allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+                  allowfullscreen
+                ></iframe>
+              ) : (
+                <div id={`reel-player-${index}`} data-player></div>
+              )}
             </div>
 
             {/* Strat de interacțiune (tap / double-tap) */}
@@ -258,6 +328,19 @@ const shorts = (siteContent.shorts ?? []) as Short[];
     border: 0;
     display: block;
   }
+
+  /* Cloudflare Stream — video vertical 9:16, umple cardul fără crop 16:9 */
+  .reel-media--cf {
+    top: 0;
+    left: 0;
+    inset: 0;
+    transform: none;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+    min-width: 0;
+  }
+  .reel-cf { width: 100%; height: 100%; border: 0; display: block; }
 
   /* Zonă de tap (play/pause + double-tap like) */
   .reel-tap-layer {
@@ -458,8 +541,17 @@ const shorts = (siteContent.shorts ?? []) as Short[];
     interface Window {
       YT?: any;
       onYouTubeIframeAPIReady?: () => void;
+      Stream?: (el: HTMLIFrameElement) => any;
     }
   }
+
+  // Interfață uniformă peste playerele YouTube și Cloudflare Stream
+  type PlayerCtl = {
+    play: () => void;
+    pause: () => void;
+    reset: () => void;
+    setMuted: (m: boolean) => void;
+  };
 
   (() => {
     const overlay = document.getElementById('reels-overlay');
@@ -469,7 +561,7 @@ const shorts = (siteContent.shorts ?? []) as Short[];
     const cards = Array.from(document.querySelectorAll<HTMLElement>('[data-reel]'));
     if (!cards.length) return;
 
-    const players = new Map<number, YTPlayer>();
+    const players = new Map<number, PlayerCtl>();
     const ready = new Set<number>();
     let isMuted = true;          // autoplay policy: primul clip pornește pe mute
     let activeIndex = -1;
@@ -487,15 +579,28 @@ const shorts = (siteContent.shorts ?? []) as Short[];
       document.head.appendChild(tag);
     }
 
-    /* ─── Creează un player pentru fiecare card ─── */
-    function buildPlayers() {
+    /* ─── Încarcă Cloudflare Stream SDK o singură dată ─── */
+    function loadCloudflareSDK(cb: () => void) {
+      if (window.Stream) { cb(); return; }
+      const existing = document.getElementById('cf-stream-sdk');
+      if (existing) { existing.addEventListener('load', cb); return; }
+      const tag = document.createElement('script');
+      tag.id = 'cf-stream-sdk';
+      tag.src = 'https://embed.cloudflarestream.com/embed/sdk.latest.js';
+      tag.addEventListener('load', cb);
+      document.head.appendChild(tag);
+    }
+
+    /* ─── Creează playere YouTube ─── */
+    function buildYouTubePlayers() {
       cards.forEach((card) => {
+        if (card.dataset.provider === 'cloudflare') return;
         const index = Number(card.dataset.index);
         const videoId = card.dataset.videoId || '';
         const mount = card.querySelector<HTMLElement>('[data-player]');
         if (!mount || !videoId) return;
 
-        const player = new window.YT.Player(mount.id, {
+        new window.YT.Player(mount.id, {
           videoId,
           width: '100%',
           height: '100%',
@@ -515,16 +620,23 @@ const shorts = (siteContent.shorts ?? []) as Short[];
           },
           events: {
             onReady: (e: { target: YTPlayer }) => {
-              players.set(index, e.target);
+              const yt = e.target;
+              yt.mute();
+              const ctl: PlayerCtl = {
+                play: () => yt.playVideo(),
+                pause: () => yt.pauseVideo(),
+                reset: () => yt.seekTo(0, true),
+                setMuted: (m: boolean) => { if (m) yt.mute(); else { yt.unMute(); yt.setVolume(100); } },
+              };
+              players.set(index, ctl);
               ready.add(index);
-              e.target.mute();
               if (index === activeIndex) startPlayback(index);
             },
             onStateChange: (e: { data: number }) => {
               // 0 = ENDED → reia (siguranță suplimentară pe lângă loop)
               if (e.data === 0) {
                 const p = players.get(index);
-                if (p) { p.seekTo(0, true); p.playVideo(); }
+                if (p) { p.reset(); p.play(); }
               }
             },
           },
@@ -532,19 +644,42 @@ const shorts = (siteContent.shorts ?? []) as Short[];
       });
     }
 
+    /* ─── Creează playere Cloudflare Stream ─── */
+    function buildCloudflarePlayers() {
+      if (!window.Stream) return;
+      cards.forEach((card) => {
+        if (card.dataset.provider !== 'cloudflare') return;
+        const index = Number(card.dataset.index);
+        const iframe = card.querySelector<HTMLIFrameElement>('[data-cf]');
+        if (!iframe) return;
+        const cf = window.Stream!(iframe);
+        cf.muted = true;
+        cf.loop = true;
+        const ctl: PlayerCtl = {
+          play: () => { const pr = cf.play(); if (pr && typeof pr.catch === 'function') pr.catch(() => {}); },
+          pause: () => cf.pause(),
+          reset: () => { try { cf.currentTime = 0; } catch { /* noop */ } },
+          setMuted: (m: boolean) => { cf.muted = m; },
+        };
+        players.set(index, ctl);
+        ready.add(index);
+        if (index === activeIndex) startPlayback(index);
+      });
+    }
+
     function startPlayback(index: number) {
       const p = players.get(index);
       if (!p) return;
-      if (isMuted) p.mute(); else { p.unMute(); p.setVolume(100); }
-      p.seekTo(0, true);
-      p.playVideo();
+      p.setMuted(isMuted);
+      p.reset();
+      p.play();
     }
 
     function stopPlayback(index: number) {
       const p = players.get(index);
       if (!p) return;
-      p.pauseVideo();
-      p.seekTo(0, true);
+      p.pause();
+      p.reset();
     }
 
     /* ─── IntersectionObserver: redare automată la ≥70% vizibil ─── */
@@ -569,10 +704,7 @@ const shorts = (siteContent.shorts ?? []) as Short[];
     /* ─── Sunet global (Mute / Unmute) ─── */
     function applyMuteState() {
       overlay!.dataset.muted = String(isMuted);
-      players.forEach((p) => {
-        if (isMuted) p.mute();
-        else { p.unMute(); p.setVolume(100); }
-      });
+      players.forEach((p) => p.setMuted(isMuted));
     }
 
     /* ─── Like: persistență în localStorage, fără login ─── */
@@ -685,10 +817,10 @@ const shorts = (siteContent.shorts ?? []) as Short[];
             // Toggle simplu: dacă e activ, pune pauză; altfel redă
             if (card.dataset.paused === '1') {
               card.dataset.paused = '0';
-              p.playVideo();
+              p.play();
             } else {
               card.dataset.paused = '1';
-              p.pauseVideo();
+              p.pause();
             }
             flashPlayPause(card);
           }, 280);
@@ -738,11 +870,14 @@ const shorts = (siteContent.shorts ?? []) as Short[];
     // primul card devine activ implicit (pentru autoplay la onReady)
     activeIndex = 0;
     initLikes();
-    loadYouTubeAPI(buildPlayers);
+    const hasYouTube = cards.some((c) => c.dataset.provider !== 'cloudflare');
+    const hasCloudflare = cards.some((c) => c.dataset.provider === 'cloudflare');
+    if (hasYouTube) loadYouTubeAPI(buildYouTubePlayers);
+    if (hasCloudflare) loadCloudflareSDK(buildCloudflarePlayers);
 
     // eliberează playerele când părăsim pagina (SPA / navigare)
     window.addEventListener('pagehide', () => {
-      players.forEach((p) => { try { p.pauseVideo(); } catch { /* noop */ } });
+      players.forEach((p) => { try { p.pause(); } catch { /* noop */ } });
     });
   })();
 </script>

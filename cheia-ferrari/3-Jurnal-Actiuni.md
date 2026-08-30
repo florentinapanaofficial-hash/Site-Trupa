@@ -1549,3 +1549,13 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - **Validări:** `npx astro build` — PASS; embed `iframe.cloudflarestream.com/a730f6e433418be5fe0c13e11af5728b` prezent în `dist/client/despre/index.html`; `npm run seo:audit` — **61 pagini | 0 FAIL | 0 WARN**.
 - **Reținut:** `.env` e gitignored — variabilele noi trebuie adăugate manual și în Railway → Variables, altfel producția rămâne pe fallback.
 
+## 📝 2026-08-30 — Reels alimentate automat dintr-o playlistă YouTube (Data API v3)
+
+- **Obiectiv:** shorturile YouTube să apară automat în `/shorts/` dintr-o playlistă gestionată pe canal, fără editare de cod și fără linkuri trimise manual.
+- **Montaj Cloudflare în Reels:** adăugat montajul (`cloudflareUid`) ca prim clip „fixat”; feed-ul suportă acum atât YouTube (IFrame API) cât și Cloudflare Stream (SDK `embed.cloudflarestream.com`) printr-o interfață uniformă `PlayerCtl` (play/pause/reset/setMuted). Video CF vertical 9:16 umple cardul fără crop.
+- **Sursă automată:** `src/lib/youtube-reels.ts` citește playlistItems via **YouTube Data API v3** (cache 30 min, timeout, dedupe, filtrare Deleted/Private). RSS-ul public YouTube a fost abandonat — întoarce 404 pe IP-uri de server (testat: 404 chiar și pentru canale mari).
+- **Pagina `/shorts/` → SSR** (`export const prerender = false`): îmbină clipurile fixate din `siteContent.json` (`shorts[]`, doar montajul Cloudflare rămas) cu reels-urile din playlistă (dedupe după videoId). Titlul videoclipului devine caption; likesCount pseudo-stabil per id.
+- **Config:** `reelsPlaylistId` în `siteContent.json` (`PLHIvkNOpOdtM`); cheie `YOUTUBE_API_KEY` în `.env` + `.env.example`. Cheia veche `GEMINI_API_KEY` era expirată; cheie nouă YouTube Data API creată de Claudiu. Fix: eliminat duplicat `YOUTUBE_API_KEY` din `.env` (o linie goală + una cu valoare → invalida citirea).
+- **Validări:** Data API a întors cele 2 shorturi reale; dev `/shorts/` randează montaj + `RxHw6HFtE7s` + `OTqNRXW48IM`; `npx astro build` — PASS; `npm run seo:audit` — **60 pagini | 0 FAIL | 0 WARN** (`/shorts/` SSR, nu mai e static).
+- **Reținut:** în producție (Railway) trebuie adăugat `YOUTUBE_API_KEY`, altfel feed-ul arată doar montajul. De acum, adăugarea/scoaterea unui short = doar din playlistă (fără cod).
+
