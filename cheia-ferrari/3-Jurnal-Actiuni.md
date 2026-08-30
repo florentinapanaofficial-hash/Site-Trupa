@@ -1586,4 +1586,14 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - **Validări proiect:** `npx astro check` — **0 erori**, 4 hints preexistente; `npm run seo:check` — build PASS, **60 pagini verificate, 0 FAIL | 0 WARN**; HTML-ul construit conține titlul și URL-ul piesei în player și în schema SEO; `get_errors` — fără erori în fișierele modificate.
 - **Analiză SEO:** `node seo-agent/seo-analyzer.js` — 13 oportunități existente; modificarea bibliotecii audio nu a introdus probleme noi.
 
+## 📝 2026-08-30 — Reels: fix ecran negru + preload progresiv playere YouTube (magnetic scroll)
+
+- **Simptom raportat:** primul card din `/shorts/` apărea cu ecran negru la deschidere; trecerea de la un card la altul se simțea lentă, nu „magnetică".
+- **Cauză ecran negru:** poster-ul (`.reel-poster`) și iframe-ul Cloudflare aveau `loading="lazy"` inclusiv pentru cardul 0, vizibil instant — browserul nu îl încărca prioritar în overlay-ul `position: fixed`.
+- **Cauză derulare lentă:** dublu debounce la comutarea playback-ului (150 ms în `onScrollSettled` + încă 150 ms în `settlePlayback`) — ~300 ms lag vizibil după fixarea cardului pe ecran.
+- **Cauză reală de fond:** `buildYouTubePlayers()` crea TOATE playerele YouTube din playlistă simultan la încărcarea paginii → congestie rețea/CPU → playerele cardurilor următoare nu erau gata (`players.get(index)` undefined) când utilizatorul ajungea la ele.
+- **Fix:** `loading="eager"` + `fetchpriority="high"` doar pe primul poster; eliminat al doilea debounce din `settlePlayback`; fallback `scrollend` redus 150→80 ms; playerele YouTube se construiesc acum progresiv — cardul curent + următorul imediat, restul printr-un `IntersectionObserver` separat cu `rootMargin: 150%` (preload înainte să ajungă utilizatorul la ele).
+- **Validări:** `get_errors` pe `shorts.astro` — fără erori; `npx astro build` — **Complete!** (doar warning-urile cunoscute `Astro.request.headers`).
+- **Confirmat cu Claudiu:** montajul Cloudflare rămâne dezactivat intenționat (bug audio pe mobil din sesiunea anterioară); feed-ul e exclusiv din playlista YouTube.
+
 

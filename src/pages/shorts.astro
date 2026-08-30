@@ -120,8 +120,9 @@ const shorts = rawShorts.map((s) => {
               class="reel-poster"
               src={short.poster}
               alt={`Miniatură Reels — ${short.author}: moment live`}
-              loading="lazy"
-              decoding="async"
+              loading={index === 0 ? 'eager' : 'lazy'}
+              fetchpriority={index === 0 ? 'high' : 'auto'}
+              decoding={index === 0 ? 'sync' : 'async'}
             />
             <div class={`reel-media${short.provider === 'cloudflare' ? ' reel-media--cf' : ''}`}>
               {short.provider === 'cloudflare' ? (
@@ -130,7 +131,7 @@ const shorts = rawShorts.map((s) => {
                   data-cf
                   src={short.cfEmbed}
                   title={`Reels — ${short.author}`}
-                  loading="lazy"
+                  loading={index === 0 ? 'eager' : 'lazy'}
                   allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
                   allowfullscreen
                 ></iframe>
@@ -602,16 +603,19 @@ const shorts = rawShorts.map((s) => {
       document.head.appendChild(tag);
     }
 
-    /* ─── Creează playere YouTube ─── */
-    function buildYouTubePlayers() {
-      cards.forEach((card) => {
-        if (card.dataset.provider === 'cloudflare') return;
-        const index = Number(card.dataset.index);
-        const videoId = card.dataset.videoId || '';
-        const mount = card.querySelector<HTMLElement>('[data-player]');
-        if (!mount || !videoId) return;
+    /* ─── Creează un singur player YouTube, la cerere (lazy) ─── */
+    const builtPlayers = new Set<number>();
 
-        new window.YT.Player(mount.id, {
+    function buildYouTubePlayer(index: number) {
+      if (builtPlayers.has(index)) return;
+      const card = cards[index];
+      if (!card || card.dataset.provider === 'cloudflare') return;
+      const videoId = card.dataset.videoId || '';
+      const mount = card.querySelector<HTMLElement>('[data-player]');
+      if (!mount || !videoId) return;
+      builtPlayers.add(index);
+
+      new window.YT.Player(mount.id, {
           videoId,
           width: '100%',
           height: '100%',
@@ -658,6 +662,23 @@ const shorts = rawShorts.map((s) => {
             },
           },
         });
+    }
+
+    /* ─── Preîncarcă playerul cardului curent + vecinii, înainte să fie nevoie ─── */
+    function initYouTubePlayers() {
+      buildYouTubePlayer(0);
+      buildYouTubePlayer(1);
+
+      const preloadIO = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const index = Number((entry.target as HTMLElement).dataset.index);
+          buildYouTubePlayer(index);
+        });
+      }, { root: feed, rootMargin: '150% 0px', threshold: 0 });
+
+      cards.forEach((card) => {
+        if (card.dataset.provider !== 'cloudflare') preloadIO.observe(card);
       });
     }
 
@@ -702,14 +723,11 @@ const shorts = rawShorts.map((s) => {
     }
 
     function settlePlayback() {
-      if (settledIndex === -1) return;
       window.clearTimeout(playbackTimer);
-      playbackTimer = window.setTimeout(() => {
-        if (settledIndex === -1 || settledIndex === activeIndex) return;
-        if (activeIndex !== -1) stopPlayback(activeIndex);
-        activeIndex = settledIndex;
-        startPlayback(activeIndex);
-      }, 150);
+      if (settledIndex === -1 || settledIndex === activeIndex) return;
+      if (activeIndex !== -1) stopPlayback(activeIndex);
+      activeIndex = settledIndex;
+      startPlayback(activeIndex);
     }
 
     /* ─── IntersectionObserver: selectează cardul la ≥80%; playback după scroll ─── */
@@ -741,7 +759,7 @@ const shorts = rawShorts.map((s) => {
       isScrolling = true;
       window.clearTimeout(playbackTimer);
       window.clearTimeout(scrollEndTimer);
-      scrollEndTimer = window.setTimeout(onScrollSettled, 150);
+      scrollEndTimer = window.setTimeout(onScrollSettled, 80);
     }, { passive: true });
     feed.addEventListener('scrollend', onScrollSettled, { passive: true });
 
@@ -914,7 +932,7 @@ const shorts = rawShorts.map((s) => {
     initLikes();
     const hasYouTube = cards.some((c) => c.dataset.provider !== 'cloudflare');
     const hasCloudflare = cards.some((c) => c.dataset.provider === 'cloudflare');
-    if (hasYouTube) loadYouTubeAPI(buildYouTubePlayers);
+    if (hasYouTube) loadYouTubeAPI(initYouTubePlayers);
     if (hasCloudflare) loadCloudflareSDK(buildCloudflarePlayers);
     window.setTimeout(onScrollSettled, 150);
 
