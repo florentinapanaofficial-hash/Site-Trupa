@@ -120,9 +120,9 @@ const shorts = rawShorts.map((s) => {
               class="reel-poster"
               src={short.poster}
               alt={`Miniatură Reels — ${short.author}: moment live`}
-              loading={index === 0 ? 'eager' : 'lazy'}
+              loading={index <= 1 ? 'eager' : 'lazy'}
               fetchpriority={index === 0 ? 'high' : 'auto'}
-              decoding={index === 0 ? 'sync' : 'async'}
+              decoding={index <= 1 ? 'sync' : 'async'}
             />
             <div class={`reel-media${short.provider === 'cloudflare' ? ' reel-media--cf' : ''}`}>
               {short.provider === 'cloudflare' ? (
@@ -131,7 +131,7 @@ const shorts = rawShorts.map((s) => {
                   data-cf
                   src={short.cfEmbed}
                   title={`Reels — ${short.author}`}
-                  loading={index === 0 ? 'eager' : 'lazy'}
+                  loading={index <= 1 ? 'eager' : 'lazy'}
                   allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
                   allowfullscreen
                 ></iframe>
