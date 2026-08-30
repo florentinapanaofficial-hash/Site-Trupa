@@ -81,6 +81,11 @@
       "color": "cyan"
     },
     {
+      "href": "/shorts/",
+      "label": "Reels",
+      "color": "cyan"
+    },
+    {
       "href": "/muzica-non-stop/",
       "label": "Bibliotecă Audio",
       "color": "cyan"
@@ -109,6 +114,30 @@
       "Comunicare rapidă și organizare clară"
     ]
   },
+  "shorts": [
+    {
+      "id": "short-1",
+      "youtubeVideoId": "RxHw6HFtE7s",
+      "author": "Formația Florentina Pană",
+      "avatar": "/images/logo-512.png",
+      "verified": true,
+      "caption": "Moment live cu Formația Florentina Pană — energie și emoție pe scenă! 🎶",
+      "hashtags": "#nunta #muzicalive #shorts #fpband",
+      "song": "Formația Florentina Pană · Moment live",
+      "likesCount": 1240
+    },
+    {
+      "id": "short-2",
+      "youtubeVideoId": "OTqNRXW48IM",
+      "author": "Formația Florentina Pană",
+      "avatar": "/images/logo-512.png",
+      "verified": true,
+      "caption": "Atmosferă de eveniment cu Formația Florentina Pană — voce live, energie reală! 🔥",
+      "hashtags": "#evenimente #liveband #shorts #arges",
+      "song": "Formația Florentina Pană · Moment live",
+      "likesCount": 986
+    }
+  ],
   "videos": [
     {
       "title": "Muzică populară - moment live",

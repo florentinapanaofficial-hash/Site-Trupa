@@ -1520,3 +1520,24 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - **Cauză:** Cardurile depindeau exclusiv de JavaScript și de injectarea asincronă a iframe-ului YouTube; în anumite stări de consimțământ, butonul „Redă” nu avea overlay activ pe care să îl poată porni.
 - **Modificări:** `src/pages/galerie-video.astro` transmite URL-ul YouTube, iar `src/components/SmartTvVideoPlayer.astro` afișează un link direct YouTube pentru fiecare clip și așteaptă activarea embedului înainte de redare.
 - **Validări:** `npm run build` — PASS; `get_errors` pentru fișierele modificate — fără erori; `npm run seo:check` — 60 pagini verificate, **0 FAIL | 0 WARN**; linkul `HQfVn98caic` prezent în HTML-ul generat.
+
+## 📝 2026-08-30 — Secțiune nouă Reels / YouTube Shorts (feed vertical)
+
+- **Obiectiv:** Pagină de tip Instagram Reels / YouTube Shorts pentru clipuri scurte pe verticală, acces 100% public și anonim, optimizată touch/swipe (mobil) și scroll/taste (desktop).
+- **Fișiere noi:** `src/pages/shorts.astro` — overlay fullscreen `100dvh` cu `scroll-snap-type: y mandatory`, scrollbar ascuns, video simulat 9:16 prin `aspect-ratio: 16/9` + crop lateral. Overlay stânga (avatar, nume + badge verificat, descriere expandabilă la tap, notă muzicală cu marquee) și overlay dreapta (Like, Share, Mute/Unmute).
+- **Funcționalitate:** YouTube IFrame API încărcat asincron; `IntersectionObserver` (threshold 0.7) pentru autoplay la intrare / pauză + reset la ieșire; loop pe un singur clip via `playlist=videoId`; primul clip pornește pe `muted` (politica autoplay), unmute global la prima apăsare; Like anonim persistat în `localStorage` (`liked_shorts_{id}`) cu animație pop; double-tap pe video → like + inimă mare centrată; single-tap → play/pause cu iconiță; Share prin `navigator.share` cu fallback clipboard + toast.
+- **Date:** `src/data/siteContent.json` → array nou `shorts` (6 clipuri mock cu ID-uri reale, autor, avatar `/images/logo-512.png`, caption, hashtags, likesCount). SEO în `src/data/seo-content.json` → cheia `shorts` (title 54c, description 148c).
+- **Navigație:** adăugat `/shorts/` (label „Reels") în `Header.astro` (nav mobil + modul MEDIA), `siteContent.json` → `navigation`, `BaseLayout.astro` (side menu + breadcrumb) și `astro.config.mjs` → `customPages`. Toate linkurile cu trailing slash.
+- **Regula de aur JS:** măsurările/animațiile (heart burst, pop) izolate în `requestAnimationFrame`; nicio citire geometrică imediat după WRITE DOM.
+- **Validări:** `npx astro build` — PASS (doar warning-uri normale `Astro.request.headers`); `dist/client/shorts/index.html` generat; `npm run seo:audit` — **61 pagini | 0 FAIL | 0 WARN**; `get_errors` pe toate fișierele modificate — fără erori.
+
+## 📝 2026-08-30 — Reels: Shorts reale, poziție meniu și fullscreen curat
+
+- **Shorts reale:** înlocuit clipurile mock cu 2 Shorts furnizate de Claudiu (`RxHw6HFtE7s`, `OTqNRXW48IM`) în `siteContent.json` → `shorts[]`. Galeria video principală (`videos[]`) neatinsă.
+- **Poziție meniu:** mutat „Reels" imediat după „Galerie Video" în `Header.astro` (nav mobil + modul MEDIA) și `BaseLayout.astro` (side menu).
+- **Fix fullscreen (feedback preview):** header-ul global apărea peste overlay și lipsea un fundal. Adăugat bloc `<style is:global>` cu `body:has(#reels-overlay)` care ascunde pe pagina Reels: `.top-header`, `.mob-nav`, `.left-side-menu`, `.scroll-progress`, `.wa-float` și `.quick-dock` (butoanele Sună/WhatsApp/Ofertă), elimină padding-ul din `#continut` și pune `overflow:hidden` pe body.
+- **Poster fallback:** fiecare card afișează thumbnail-ul real YouTube (`i.ytimg.com/vi/{id}/hqdefault.jpg`) în spatele playerului (`z-index` sub iframe), cu `alt` completat pentru audit; garantează conținut vizibil chiar dacă embedul întârzie/este blocat.
+- **Compat iframe:** adăugat `origin: window.location.origin` la playerVars.
+- **Notă preview:** embedurile YouTube nu se redau fiabil în VS Code Simple Browser; testarea se face în Chrome/Edge real.
+- **Validări:** `npx astro build` — PASS; ambele ID-uri prezente în HTML; `npm run seo:audit` — **61 pagini | 0 FAIL | 0 WARN** (după completarea `alt` pe poster); `get_errors` — fără erori.
+

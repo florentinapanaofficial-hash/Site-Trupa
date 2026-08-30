@@ -1,0 +1,740 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import siteContent from '../data/siteContent.json';
+import seo from '../data/seo-content.json';
+
+const shortsSeo = seo.shorts;
+const SITE_URL = 'https://www.florentinapanaofficial.ro';
+
+type Short = {
+  id: string;
+  youtubeVideoId: string;
+  author: string;
+  avatar: string;
+  verified?: boolean;
+  caption: string;
+  hashtags: string;
+  song: string;
+  likesCount: number;
+};
+
+const shorts = (siteContent.shorts ?? []) as Short[];
+---
+
+<BaseLayout title={shortsSeo.meta.title} description={shortsSeo.meta.description} hideFooter>
+  <div class="reels-overlay" id="reels-overlay" data-muted="true">
+    <h1 class="sr-only">{shortsSeo.h1}</h1>
+
+    {/* ─── Header minimalist ─── */}
+    <div class="reels-topbar">
+      <a href="/" class="reels-icon-btn" aria-label="Închide și mergi la pagina principală">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+        </svg>
+      </a>
+      <span class="reels-title">Reels</span>
+      <span class="reels-icon-btn reels-icon-btn--ghost" aria-hidden="true"></span>
+    </div>
+
+    {/* ─── Feed vertical cu scroll-snap ─── */}
+    <div class="reels-feed" id="reels-feed">
+      {shorts.map((short, index) => (
+        <article
+          class="reel-card"
+          data-reel
+          data-index={index}
+          data-id={short.id}
+          data-video-id={short.youtubeVideoId}
+          data-likes={short.likesCount}
+        >
+          <div class="reel-media-wrap">
+            <img
+              class="reel-poster"
+              src={`https://i.ytimg.com/vi/${short.youtubeVideoId}/hqdefault.jpg`}
+              alt={`Miniatură Reels — ${short.author}: moment live`}
+              loading="lazy"
+              decoding="async"
+            />
+            <div class="reel-media">
+              <div id={`reel-player-${index}`} data-player></div>
+            </div>
+
+            {/* Strat de interacțiune (tap / double-tap) */}
+            <button class="reel-tap-layer" data-tap aria-label="Redă sau pune pauză"></button>
+
+            {/* Inima mare la double-tap */}
+            <span class="reel-heart-burst" data-heart-burst aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="120" height="120">
+                <path d="M12 21s-7.5-4.6-10.2-9C-0.3 8.4 1.2 4.5 4.7 4.1c2-.2 3.6.9 4.5 2.3.9-1.4 2.5-2.5 4.5-2.3 3.5.4 5 4.3 2.9 7.9C19.5 16.4 12 21 12 21z"/>
+              </svg>
+            </span>
+
+            {/* Iconiță Play/Pause centrată */}
+            <span class="reel-playpause" data-playpause aria-hidden="true">
+              <svg class="reel-playpause-play" viewBox="0 0 24 24" fill="currentColor" width="72" height="72">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+            </span>
+          </div>
+
+          {/* ─── Overlay stânga jos: autor + descriere + sunet ─── */}
+          <div class="reel-info">
+            <div class="reel-author">
+              <img class="reel-avatar" src={short.avatar} alt={`Avatar ${short.author}`} width="40" height="40" loading="lazy" decoding="async" />
+              <span class="reel-author-name">{short.author}</span>
+              {short.verified && (
+                <svg class="reel-verified" viewBox="0 0 24 24" width="16" height="16" aria-label="Cont verificat">
+                  <path fill="#3897f0" d="M12 1l2.6 2.1 3.3-.3 1 3.2 2.9 1.6-1 3.2 1 3.2-2.9 1.6-1 3.2-3.3-.3L12 23l-2.6-2.1-3.3.3-1-3.2L2.2 15l1-3.2-1-3.2 2.9-1.6 1-3.2 3.3.3z"/>
+                  <path fill="#fff" d="M10.3 15.2l-2.8-2.8 1.2-1.2 1.6 1.6 3.8-3.8 1.2 1.2z"/>
+                </svg>
+              )}
+            </div>
+            <p class="reel-caption" data-caption>
+              <span class="reel-caption-text">{short.caption}</span>
+              <span class="reel-hashtags">{short.hashtags}</span>
+            </p>
+            <div class="reel-song">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
+                <path d="M9 17V5l10-2v12" stroke="currentColor" stroke-width="0" />
+                <path d="M9 18a3 3 0 11-2-2.8V6l10-2v9.2A3 3 0 1117 16V7.3L11 8.5v6.7A3 3 0 019 18z"/>
+              </svg>
+              <div class="reel-song-marquee"><span>{short.song}&nbsp;&nbsp;•&nbsp;&nbsp;{short.song}&nbsp;&nbsp;•&nbsp;&nbsp;</span></div>
+            </div>
+          </div>
+
+          {/* ─── Overlay dreapta: acțiuni ─── */}
+          <div class="reel-actions">
+            <button class="reel-action" data-like-btn aria-label="Apreciază">
+              <span class="reel-action-icon">
+                <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor">
+                  <path d="M12 21s-7.5-4.6-10.2-9C-0.3 8.4 1.2 4.5 4.7 4.1c2-.2 3.6.9 4.5 2.3.9-1.4 2.5-2.5 4.5-2.3 3.5.4 5 4.3 2.9 7.9C19.5 16.4 12 21 12 21z"/>
+                </svg>
+              </span>
+              <span class="reel-action-count" data-like-count>{short.likesCount.toLocaleString('ro-RO')}</span>
+            </button>
+
+            <button class="reel-action" data-share-btn data-url={`${SITE_URL}/shorts/#${short.id}`} aria-label="Distribuie">
+              <span class="reel-action-icon">
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7" />
+                  <path d="M16 6l-4-4-4 4" />
+                  <path d="M12 2v13" />
+                </svg>
+              </span>
+              <span class="reel-action-label">Distribuie</span>
+            </button>
+
+            <button class="reel-action" data-mute-btn aria-label="Activează sau dezactivează sunetul">
+              <span class="reel-action-icon">
+                <svg class="reel-icon-muted" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M11 5L6 9H2v6h4l5 4V5z" />
+                  <path d="M23 9l-6 6M17 9l6 6" />
+                </svg>
+                <svg class="reel-icon-sound" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M11 5L6 9H2v6h4l5 4V5z" />
+                  <path d="M15.5 8.5a5 5 0 010 7M19 5a9 9 0 010 14" />
+                </svg>
+              </span>
+            </button>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  /* ═══ Overlay fullscreen — acoperă tot ecranul, inclusiv header-ul global ═══ */
+  .reels-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1250;
+    background: #000;
+    overflow: hidden;
+    color: #fff;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  .reels-topbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: max(env(safe-area-inset-top), 0.75rem) 1rem 2rem;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0) 100%);
+    pointer-events: none;
+  }
+
+  .reels-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  .reels-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 9999px;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.25);
+    text-decoration: none;
+    pointer-events: auto;
+    transition: background 0.2s ease;
+  }
+  .reels-icon-btn:hover { background: rgba(255, 255, 255, 0.18); }
+  .reels-icon-btn--ghost { background: transparent; pointer-events: none; }
+
+  /* ═══ Feed cu scroll-snap vertical ═══ */
+  .reels-feed {
+    height: 100dvh;
+    height: 100vh;
+    width: 100%;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .reels-feed::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+  .reel-card {
+    position: relative;
+    height: 100dvh;
+    height: 100vh;
+    width: 100%;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+    overflow: hidden;
+  }
+
+  /* ═══ Video — simulare object-fit: cover pentru 9:16 ═══ */
+  .reel-media-wrap { position: absolute; inset: 0; overflow: hidden; }
+  .reel-poster {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    filter: brightness(0.9);
+  }
+  .reel-media {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 100%;
+    aspect-ratio: 16 / 9;
+    min-width: 100%;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .reel-media :global(iframe),
+  .reel-media > div {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+  }
+
+  /* Zonă de tap (play/pause + double-tap like) */
+  .reel-tap-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Inima mare la double-tap */
+  .reel-heart-burst {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 8;
+    transform: translate(-50%, -50%) scale(0.2);
+    color: #fff;
+    opacity: 0;
+    pointer-events: none;
+    filter: drop-shadow(0 4px 18px rgba(0, 0, 0, 0.5));
+  }
+  .reel-heart-burst.is-active { animation: heartBurst 0.9s ease forwards; }
+  @keyframes heartBurst {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.2); }
+    15%  { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+    30%  { transform: translate(-50%, -50%) scale(0.95); }
+    45%  { transform: translate(-50%, -50%) scale(1.05); }
+    70%  { opacity: 1; transform: translate(-50%, -55%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -75%) scale(1); }
+  }
+
+  /* Iconiță play/pause centrată */
+  .reel-playpause {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 7;
+    transform: translate(-50%, -50%) scale(0.8);
+    color: rgba(255, 255, 255, 0.9);
+    opacity: 0;
+    pointer-events: none;
+    filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.6));
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+  .reel-playpause.is-visible { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
+  /* ═══ Overlay stânga jos ═══ */
+  .reel-info {
+    position: absolute;
+    left: 0;
+    right: 4.75rem;
+    bottom: 0;
+    z-index: 10;
+    padding: 2.75rem 1rem max(env(safe-area-inset-bottom), 2.5rem);
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.78) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0) 100%);
+    pointer-events: none;
+  }
+  .reel-author { display: flex; align-items: center; gap: 0.55rem; margin-bottom: 0.5rem; pointer-events: auto; }
+  .reel-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 9999px;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.85);
+    background: #111;
+  }
+  .reel-author-name { font-weight: 700; font-size: 0.95rem; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6); }
+  .reel-verified { flex-shrink: 0; }
+
+  .reel-caption {
+    font-size: 0.9rem;
+    line-height: 1.3;
+    margin: 0 0 0.95rem;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+    pointer-events: auto;
+    cursor: pointer;
+  }
+  .reel-caption.is-expanded {
+    max-height: 40vh;
+    overflow-y: auto;
+    display: block;
+    -webkit-line-clamp: unset;
+  }
+  .reel-hashtags { color: #d8e4ff; font-weight: 600; margin-left: 0.25rem; }
+
+  .reel-song { display: flex; align-items: center; gap: 0.45rem; max-width: 70%; margin-top: 0.15rem; pointer-events: auto; }
+  .reel-song svg { flex-shrink: 0; opacity: 0.9; }
+  .reel-song-marquee { overflow: hidden; white-space: nowrap; font-size: 0.82rem; opacity: 0.92; }
+  .reel-song-marquee span {
+    display: inline-block;
+    padding-left: 0;
+    animation: songMarquee 12s linear infinite;
+  }
+  @keyframes songMarquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* ═══ Overlay dreapta: acțiuni ═══ */
+  .reel-actions {
+    position: absolute;
+    right: 0.5rem;
+    bottom: 0;
+    z-index: 12;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.3rem;
+    padding: 0 0.35rem max(env(safe-area-inset-bottom), 1.75rem);
+  }
+  .reel-action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    background: transparent;
+    border: 0;
+    color: #fff;
+    cursor: pointer;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .reel-action-icon {
+    display: inline-flex;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
+    transition: transform 0.18s ease;
+  }
+  .reel-action:active .reel-action-icon { transform: scale(0.86); }
+  .reel-action-count, .reel-action-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  }
+
+  /* Stare Like activ */
+  .reel-action[data-like-btn].is-liked { color: #ef4444; }
+  .reel-action[data-like-btn].is-liked .reel-action-icon { animation: likePop 0.35s ease; }
+  @keyframes likePop {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.35); }
+    70% { transform: scale(0.9); }
+    100% { transform: scale(1); }
+  }
+
+  /* Stare Mute — comută cele două iconițe */
+  .reel-icon-sound { display: none; }
+  .reels-overlay[data-muted="false"] .reel-icon-muted { display: none; }
+  .reels-overlay[data-muted="false"] .reel-icon-sound { display: inline; }
+
+  @media (min-width: 1024px) {
+    .reels-feed { max-width: 480px; margin: 0 auto; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reel-song-marquee span { animation: none; }
+    .reel-heart-burst.is-active { animation-duration: 0.5s; }
+  }
+</style>
+
+{/* Ascunde crome-ul global al site-ului pentru experiență fullscreen pe pagina Reels */}
+<style is:global>
+  body:has(#reels-overlay) .top-header,
+  body:has(#reels-overlay) .mob-nav,
+  body:has(#reels-overlay) .left-side-menu,
+  body:has(#reels-overlay) .scroll-progress,
+  body:has(#reels-overlay) .wa-float,
+  body:has(#reels-overlay) .quick-dock {
+    display: none !important;
+  }
+  body:has(#reels-overlay) #continut {
+    padding: 0 !important;
+    margin: 0 !important;
+    min-height: 0 !important;
+  }
+  body:has(#reels-overlay) {
+    overflow: hidden;
+  }
+</style>
+
+
+<script>
+  type YTPlayer = {
+    playVideo: () => void;
+    pauseVideo: () => void;
+    seekTo: (s: number, allow: boolean) => void;
+    mute: () => void;
+    unMute: () => void;
+    setVolume: (v: number) => void;
+  };
+
+  declare global {
+    interface Window {
+      YT?: any;
+      onYouTubeIframeAPIReady?: () => void;
+    }
+  }
+
+  (() => {
+    const overlay = document.getElementById('reels-overlay');
+    const feed = document.getElementById('reels-feed');
+    if (!overlay || !feed) return;
+
+    const cards = Array.from(document.querySelectorAll<HTMLElement>('[data-reel]'));
+    if (!cards.length) return;
+
+    const players = new Map<number, YTPlayer>();
+    const ready = new Set<number>();
+    let isMuted = true;          // autoplay policy: primul clip pornește pe mute
+    let activeIndex = -1;
+
+    /* ─── Încarcă YouTube IFrame API o singură dată ─── */
+    function loadYouTubeAPI(cb: () => void) {
+      if (window.YT && window.YT.Player) { cb(); return; }
+      const existing = document.getElementById('youtube-iframe-api');
+      const prev = window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady = () => { if (typeof prev === 'function') prev(); cb(); };
+      if (existing) return;
+      const tag = document.createElement('script');
+      tag.id = 'youtube-iframe-api';
+      tag.src = 'https://www.youtube.com/iframe_api';
+      document.head.appendChild(tag);
+    }
+
+    /* ─── Creează un player pentru fiecare card ─── */
+    function buildPlayers() {
+      cards.forEach((card) => {
+        const index = Number(card.dataset.index);
+        const videoId = card.dataset.videoId || '';
+        const mount = card.querySelector<HTMLElement>('[data-player]');
+        if (!mount || !videoId) return;
+
+        const player = new window.YT.Player(mount.id, {
+          videoId,
+          width: '100%',
+          height: '100%',
+          playerVars: {
+            autoplay: 0,
+            controls: 0,
+            modestbranding: 1,
+            rel: 0,
+            playsinline: 1,
+            loop: 1,
+            playlist: videoId,   // necesar pentru loop pe un singur clip
+            fs: 0,
+            disablekb: 1,
+            iv_load_policy: 3,
+            mute: 1,
+            origin: window.location.origin,
+          },
+          events: {
+            onReady: (e: { target: YTPlayer }) => {
+              players.set(index, e.target);
+              ready.add(index);
+              e.target.mute();
+              if (index === activeIndex) startPlayback(index);
+            },
+            onStateChange: (e: { data: number }) => {
+              // 0 = ENDED → reia (siguranță suplimentară pe lângă loop)
+              if (e.data === 0) {
+                const p = players.get(index);
+                if (p) { p.seekTo(0, true); p.playVideo(); }
+              }
+            },
+          },
+        });
+      });
+    }
+
+    function startPlayback(index: number) {
+      const p = players.get(index);
+      if (!p) return;
+      if (isMuted) p.mute(); else { p.unMute(); p.setVolume(100); }
+      p.seekTo(0, true);
+      p.playVideo();
+    }
+
+    function stopPlayback(index: number) {
+      const p = players.get(index);
+      if (!p) return;
+      p.pauseVideo();
+      p.seekTo(0, true);
+    }
+
+    /* ─── IntersectionObserver: redare automată la ≥70% vizibil ─── */
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        const card = entry.target as HTMLElement;
+        const index = Number(card.dataset.index);
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.7) {
+          if (activeIndex !== index) {
+            if (activeIndex !== -1) stopPlayback(activeIndex);
+            activeIndex = index;
+          }
+          startPlayback(index);
+        } else if (activeIndex === index && entry.intersectionRatio < 0.5) {
+          stopPlayback(index);
+        }
+      });
+    }, { threshold: [0, 0.5, 0.7, 1] });
+
+    cards.forEach((card) => io.observe(card));
+
+    /* ─── Sunet global (Mute / Unmute) ─── */
+    function applyMuteState() {
+      overlay!.dataset.muted = String(isMuted);
+      players.forEach((p) => {
+        if (isMuted) p.mute();
+        else { p.unMute(); p.setVolume(100); }
+      });
+    }
+
+    /* ─── Like: persistență în localStorage, fără login ─── */
+    const likeKey = (id: string) => `liked_shorts_${id}`;
+
+    function initLikes() {
+      cards.forEach((card) => {
+        const id = card.dataset.id || '';
+        const btn = card.querySelector<HTMLElement>('[data-like-btn]');
+        const countEl = card.querySelector<HTMLElement>('[data-like-count]');
+        if (!btn || !countEl) return;
+        const base = Number(card.dataset.likes || 0);
+        const liked = localStorage.getItem(likeKey(id)) === '1';
+        if (liked) {
+          btn.classList.add('is-liked');
+          countEl.textContent = (base + 1).toLocaleString('ro-RO');
+        }
+      });
+    }
+
+    function setLike(card: HTMLElement, liked: boolean) {
+      const id = card.dataset.id || '';
+      const btn = card.querySelector<HTMLElement>('[data-like-btn]');
+      const countEl = card.querySelector<HTMLElement>('[data-like-count]');
+      if (!btn || !countEl) return;
+      const base = Number(card.dataset.likes || 0);
+      const already = btn.classList.contains('is-liked');
+      if (liked === already) return;
+      btn.classList.toggle('is-liked', liked);
+      if (liked) {
+        localStorage.setItem(likeKey(id), '1');
+        countEl.textContent = (base + 1).toLocaleString('ro-RO');
+        btn.querySelector('.reel-action-icon')?.classList.remove('is-liked');
+        // reporneşte animația pop
+        void (btn as HTMLElement).offsetWidth;
+      } else {
+        localStorage.removeItem(likeKey(id));
+        countEl.textContent = base.toLocaleString('ro-RO');
+      }
+    }
+
+    function triggerHeartBurst(card: HTMLElement) {
+      const burst = card.querySelector<HTMLElement>('[data-heart-burst]');
+      if (!burst) return;
+      burst.classList.remove('is-active');
+      requestAnimationFrame(() => burst.classList.add('is-active'));
+      const clear = () => burst.classList.remove('is-active');
+      burst.addEventListener('animationend', clear, { once: true });
+    }
+
+    function flashPlayPause(card: HTMLElement) {
+      const icon = card.querySelector<HTMLElement>('[data-playpause]');
+      if (!icon) return;
+      icon.classList.add('is-visible');
+      window.setTimeout(() => icon.classList.remove('is-visible'), 500);
+    }
+
+    /* ─── Delegare evenimente pe overlay ─── */
+    overlay.addEventListener('click', (ev) => {
+      const target = ev.target as HTMLElement;
+
+      const likeBtn = target.closest<HTMLElement>('[data-like-btn]');
+      if (likeBtn) {
+        const card = likeBtn.closest<HTMLElement>('[data-reel]')!;
+        setLike(card, !likeBtn.classList.contains('is-liked'));
+        return;
+      }
+
+      const shareBtn = target.closest<HTMLElement>('[data-share-btn]');
+      if (shareBtn) {
+        handleShare(shareBtn);
+        return;
+      }
+
+      const muteBtn = target.closest<HTMLElement>('[data-mute-btn]');
+      if (muteBtn) {
+        isMuted = !isMuted;
+        applyMuteState();
+        return;
+      }
+
+      const caption = target.closest<HTMLElement>('[data-caption]');
+      if (caption) {
+        caption.classList.toggle('is-expanded');
+        return;
+      }
+    });
+
+    /* ─── Tap / Double-tap pe zona video ─── */
+    let lastTap = 0;
+    let tapTimer = 0;
+    cards.forEach((card) => {
+      const tapLayer = card.querySelector<HTMLElement>('[data-tap]');
+      if (!tapLayer) return;
+      tapLayer.addEventListener('click', () => {
+        const now = Date.now();
+        if (now - lastTap < 280) {
+          // DOUBLE TAP → like + inimă
+          window.clearTimeout(tapTimer);
+          lastTap = 0;
+          setLike(card, true);
+          triggerHeartBurst(card);
+        } else {
+          // SINGLE TAP → play / pause (după fereastra de dublu-tap)
+          lastTap = now;
+          tapTimer = window.setTimeout(() => {
+            const index = Number(card.dataset.index);
+            const p = players.get(index);
+            if (!p) return;
+            // Toggle simplu: dacă e activ, pune pauză; altfel redă
+            if (card.dataset.paused === '1') {
+              card.dataset.paused = '0';
+              p.playVideo();
+            } else {
+              card.dataset.paused = '1';
+              p.pauseVideo();
+            }
+            flashPlayPause(card);
+          }, 280);
+        }
+      });
+    });
+
+    /* ─── Share: Web Share API sau clipboard ─── */
+    async function handleShare(btn: HTMLElement) {
+      const url = btn.dataset.url || location.href;
+      const shareData = {
+        title: 'Formația Florentina Pană — Reels',
+        text: 'Vezi acest moment live 🎶',
+        url,
+      };
+      try {
+        if (navigator.share) {
+          await navigator.share(shareData);
+          return;
+        }
+      } catch { /* utilizatorul a anulat — ignoră */ }
+      try {
+        await navigator.clipboard.writeText(url);
+        showToast('Link copiat în clipboard');
+      } catch {
+        showToast('Nu s-a putut copia linkul');
+      }
+    }
+
+    let toastTimer = 0;
+    function showToast(msg: string) {
+      let toast = document.getElementById('reels-toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'reels-toast';
+        toast.setAttribute('role', 'status');
+        toast.style.cssText = 'position:absolute;left:50%;bottom:6rem;transform:translateX(-50%);z-index:30;background:rgba(20,20,20,.92);color:#fff;padding:.6rem 1rem;border-radius:9999px;font-size:.85rem;opacity:0;transition:opacity .2s ease;pointer-events:none;';
+        overlay!.appendChild(toast);
+      }
+      toast.textContent = msg;
+      requestAnimationFrame(() => { toast!.style.opacity = '1'; });
+      window.clearTimeout(toastTimer);
+      toastTimer = window.setTimeout(() => { toast!.style.opacity = '0'; }, 1800);
+    }
+
+    /* ─── Pornire ─── */
+    // primul card devine activ implicit (pentru autoplay la onReady)
+    activeIndex = 0;
+    initLikes();
+    loadYouTubeAPI(buildPlayers);
+
+    // eliberează playerele când părăsim pagina (SPA / navigare)
+    window.addEventListener('pagehide', () => {
+      players.forEach((p) => { try { p.pauseVideo(); } catch { /* noop */ } });
+    });
+  })();
+</script>
+
+
