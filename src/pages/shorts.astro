@@ -645,8 +645,16 @@ const shorts = rawShorts.map((s) => {
               };
               players.set(index, ctl);
               ready.add(index);
-              ctl.pause();
-              if (!isScrolling && index === settledIndex) settlePlayback();
+              // Cardul deja vizat (ex: primul, la încărcarea paginii) autoplay-ează
+              // natural — nu îl întrerupem cu pauză+reset, ca să nu reapară un
+              // cadru negru cât se re-bufferează de la zero.
+              if (!isScrolling && index === settledIndex && activeIndex === -1) {
+                activeIndex = index;
+                ctl.setMuted(isMuted);
+              } else {
+                ctl.pause();
+                if (!isScrolling && index === settledIndex) settlePlayback();
+              }
             },
             onStateChange: (e: { data: number }) => {
               if (e.data === window.YT.PlayerState.PLAYING) {
