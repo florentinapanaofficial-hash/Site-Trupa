@@ -1541,3 +1541,11 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - **Notă preview:** embedurile YouTube nu se redau fiabil în VS Code Simple Browser; testarea se face în Chrome/Edge real.
 - **Validări:** `npx astro build` — PASS; ambele ID-uri prezente în HTML; `npm run seo:audit` — **61 pagini | 0 FAIL | 0 WARN** (după completarea `alt` pe poster); `get_errors` — fără erori.
 
+## 📝 2026-08-30 — Reels perf + montaj Cloudflare Stream pe pagina Despre
+
+- **Perf Reels:** adăugat `preconnect`/`dns-prefetch` către `youtube.com`, `i.ytimg.com`, `s.ytimg.com`, `googlevideo.com` prin `<Fragment slot="head">` — doar pe `/shorts/`, ca să nu afecteze restul site-ului. Reduce întârzierea la inițializarea playerului. Commit `101f0f3a`.
+- **Montaj Despre (colaj „catcup"):** pagina `despre.astro` avea deja slot pregătit (`PUBLIC_ABOUT_MONTAGE_CLOUDFLARE_UID`, fallback MP4 local). UID-ul nu era în proiect; l-am găsit interogând API-ul Cloudflare Stream cu tokenul din `.env` → video `Videop 1 Catcup Despre.cloudflare.mp4`, UID `a730f6e433418be5fe0c13e11af5728b`, stare `ready` (85s, HLS activ).
+- **Config:** setat `PUBLIC_ABOUT_MONTAGE_CLOUDFLARE_UID` în `.env` (local) și documentat în `.env.example` (commit `4e2ab507`). În Railway variabila a fost suprascrisă cu valoarea corectă (producție).
+- **Validări:** `npx astro build` — PASS; embed `iframe.cloudflarestream.com/a730f6e433418be5fe0c13e11af5728b` prezent în `dist/client/despre/index.html`; `npm run seo:audit` — **61 pagini | 0 FAIL | 0 WARN**.
+- **Reținut:** `.env` e gitignored — variabilele noi trebuie adăugate manual și în Railway → Variables, altfel producția rămâne pe fallback.
+
