@@ -58,11 +58,11 @@ const hasVideo = typeof youtubeId === 'string' && youtubeId.length > 0;
 const consentButtonLabel = 'Acceptă și vizionează';
 
 const thumbJpg = thumbnailSrc || (hasVideo
-  ? `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`
+  ? `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`
   : '/images/logo-fp-stage.svg');
 const embedSrc = hasPlaylist
-  ? `https://www.youtube-nocookie.com/embed/videoseries?list=${playlistId}&rel=0`
-  : `https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0`;
+  ? `https://www.youtube-nocookie.com/embed/videoseries?list=${playlistId}&rel=0&vq=hd1080`
+  : `https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0&vq=hd1080`;
 const ytLink = youtubeUrl || (hasPlaylist
   ? `https://www.youtube.com/playlist?list=${playlistId}`
   : `https://www.youtube.com/watch?v=${youtubeId}`);

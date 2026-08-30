@@ -358,6 +358,13 @@ git push origin main
 - **Validări:** `npx astro check` — 0 erori; `npm run seo:check` — succes; audit SEO — 60 pagini verificate, 0 FAIL | 0 WARN.
 - **Riscuri/pași următori:** player-ele YouTube rămân controlate de componenta GDPR existentă; nu au fost introduse iframe-uri directe din prompt.
 
+## 📝 2026-08-30 — Optimizare HD Reels YouTube
+- **Problemă:** pe `/shorts/` apărea text în partea de sus la încărcarea clipurilor, iar embed-urile YouTube nu cereau explicit calitate HD.
+- **Fix:** playerul Reels cere `hd1080` la `onReady` și la fiecare `PLAYING`, trimite `vq=hd1080`, folosește iframe YouTube 1080x1920 scalat vizual și adaugă un strat superior discret pentru a acoperi chrome-ul YouTube temporar.
+- **Thumbnail-uri:** `YoutubeEmbed` folosește acum `maxresdefault.jpg` implicit și adaugă `vq=hd1080` în URL-urile embed generale.
+- **Fișiere modificate:** `src/pages/shorts.astro`, `src/components/YoutubeEmbed.astro`, `cheia-ferrari/3-Jurnal-Actiuni.md`.
+- **Validări:** audit inițial `npm run seo:audit` — 60 pagini, 0 FAIL | 0 WARN; `get_errors` — fără erori; `npm run seo:check` — build reușit și audit SEO 60 pagini, 0 FAIL | 0 WARN.
+
 ## 📝 2026-08-28 — Fix preview galerie Smart TV
 - **Problemă:** interacțiunile galeriei puteau să nu pornească în preview din cauza identificării containerului prin `previousElementSibling`.
 - **Fix:** scriptul selectează explicit `.smart-tv-gallery`.

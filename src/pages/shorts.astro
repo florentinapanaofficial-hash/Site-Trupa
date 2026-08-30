@@ -99,7 +99,7 @@ const shorts = rawShorts.map((s) => {
           <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
         </svg>
       </a>
-      <span class="reels-title">Reels</span>
+      <span class="reels-title" aria-hidden="true"></span>
       <span class="reels-icon-btn reels-icon-btn--ghost" aria-hidden="true"></span>
     </div>
 
@@ -124,7 +124,7 @@ const shorts = rawShorts.map((s) => {
               fetchpriority={index === 0 ? 'high' : 'auto'}
               decoding={index <= 1 ? 'sync' : 'async'}
             />
-            <div class={`reel-media${short.provider === 'cloudflare' ? ' reel-media--cf' : ''}`}>
+            <div class={`reel-media${short.provider === 'cloudflare' ? ' reel-media--cf' : ' reel-media--yt'}`}>
               {short.provider === 'cloudflare' ? (
                 <iframe
                   class="reel-cf"
@@ -255,6 +255,8 @@ const shorts = rawShorts.map((s) => {
     font-size: 1.25rem;
     font-weight: 700;
     letter-spacing: 0.02em;
+    width: 40px;
+    height: 40px;
   }
 
   .reels-icon-btn {
@@ -306,6 +308,17 @@ const shorts = rawShorts.map((s) => {
 
   /* ═══ Video — simulare object-fit: cover pentru 9:16 ═══ */
   .reel-media-wrap { position: absolute; inset: 0; overflow: hidden; }
+  .reel-media-wrap::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: max(4.5rem, calc(env(safe-area-inset-top) + 3.25rem));
+    z-index: 4;
+    background: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.82) 35%, rgba(0, 0, 0, 0) 100%);
+    pointer-events: none;
+  }
   .reel-poster {
     position: absolute;
     inset: 0;
@@ -315,6 +328,9 @@ const shorts = rawShorts.map((s) => {
     z-index: 0;
     filter: brightness(0.9);
     transition: opacity 0.12s linear;
+    image-rendering: -webkit-optimize-contrast;
+    transform: translateZ(0);
+    backface-visibility: hidden;
   }
   .reel-media {
     position: absolute;
@@ -333,9 +349,32 @@ const shorts = rawShorts.map((s) => {
     height: 100%;
     border: 0;
     display: block;
+    image-rendering: -webkit-optimize-contrast;
+    transform: translateZ(0);
+    backface-visibility: hidden;
   }
   .reel-media :global(iframe) { pointer-events: none; }
   .reel-card.is-playing .reel-poster { opacity: 0; }
+
+  .reel-media--yt {
+    width: 1080px;
+    height: 1920px;
+    aspect-ratio: 9 / 16;
+    min-width: 100%;
+    min-height: 100%;
+    transform: translate(-50%, -50%) scale(var(--reel-yt-scale, 1)) translateZ(0);
+    transform-origin: center;
+    backface-visibility: hidden;
+    will-change: transform;
+  }
+
+  .reel-media--yt :global(iframe),
+  .reel-media--yt > div {
+    width: 1080px !important;
+    height: 1920px !important;
+    max-width: none;
+    max-height: none;
+  }
 
   /* Cloudflare Stream — video vertical 9:16, umple cardul fără crop 16:9 */
   .reel-media--cf {
@@ -543,6 +582,7 @@ const shorts = rawShorts.map((s) => {
     mute: () => void;
     unMute: () => void;
     setVolume: (v: number) => void;
+    setPlaybackQuality?: (quality: string) => void;
   };
 
   declare global {
@@ -577,6 +617,29 @@ const shorts = rawShorts.map((s) => {
     let playbackTimer = 0;
     let scrollEndTimer = 0;
     let isScrolling = false;
+
+    function enforceHDPlayback(player: YTPlayer) {
+      if (!player.setPlaybackQuality) return;
+      player.setPlaybackQuality('hd1080');
+      window.setTimeout(() => player.setPlaybackQuality?.('hd1080'), 700);
+    }
+
+    function fitYouTubeFrame(card: HTMLElement) {
+      const media = card.querySelector<HTMLElement>('.reel-media--yt');
+      if (!media) return;
+      const rect = card.getBoundingClientRect();
+      const scale = Math.max(rect.width / 1080, rect.height / 1920);
+      requestAnimationFrame(() => {
+        media.style.setProperty('--reel-yt-scale', String(Math.max(scale, 0.01)));
+      });
+    }
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      entries.forEach((entry) => fitYouTubeFrame(entry.target as HTMLElement));
+    });
+    cards.forEach((card) => {
+      if (card.dataset.provider !== 'cloudflare') resizeObserver.observe(card);
+    });
 
     /* ─── Încarcă YouTube IFrame API o singură dată ─── */
     function loadYouTubeAPI(cb: () => void) {
@@ -617,11 +680,13 @@ const shorts = rawShorts.map((s) => {
 
       new window.YT.Player(mount.id, {
           videoId,
-          width: '100%',
-          height: '100%',
+          width: '1080',
+          height: '1920',
+          host: 'https://www.youtube-nocookie.com',
           playerVars: {
             autoplay: 1,
             controls: 0,
+            enablejsapi: 1,
             modestbranding: 1,
             rel: 0,
             playsinline: 1,
@@ -631,11 +696,14 @@ const shorts = rawShorts.map((s) => {
             disablekb: 1,
             iv_load_policy: 3,
             mute: 1,
+            vq: 'hd1080',
             origin: window.location.origin,
           },
           events: {
             onReady: (e: { target: YTPlayer }) => {
               const yt = e.target;
+              enforceHDPlayback(yt);
+              fitYouTubeFrame(card);
               const ctl: PlayerCtl = {
                 play: () => yt.playVideo(),
                 pause: () => yt.pauseVideo(),
@@ -657,8 +725,9 @@ const shorts = rawShorts.map((s) => {
                 if (!isScrolling && index === settledIndex) settlePlayback();
               }
             },
-            onStateChange: (e: { data: number }) => {
+            onStateChange: (e: { target: YTPlayer; data: number }) => {
               if (e.data === window.YT.PlayerState.PLAYING) {
+                enforceHDPlayback(e.target);
                 card.classList.add('is-playing');
               } else if (e.data === window.YT.PlayerState.PAUSED || e.data === window.YT.PlayerState.CUED) {
                 card.classList.remove('is-playing');
@@ -964,6 +1033,7 @@ const shorts = rawShorts.map((s) => {
     // eliberează playerele când părăsim pagina (SPA / navigare)
     window.addEventListener('pagehide', () => {
       players.forEach((p) => { try { p.pause(); } catch { /* noop */ } });
+      resizeObserver.disconnect();
     });
   })();
 </script>
