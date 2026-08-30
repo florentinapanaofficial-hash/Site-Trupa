@@ -18,7 +18,7 @@ const SECURITY_HEADERS: Record<string, string> = {
     // Content Security Policy — protejează contra XSS și injecții de resurse
     'Content-Security-Policy': [
         "default-src 'self'",
-        "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://cdn.jsdelivr.net",
+        "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://cdn.jsdelivr.net https://www.youtube.com https://s.ytimg.com https://embed.cloudflarestream.com",
         "style-src 'self' 'unsafe-inline'",
         "img-src 'self' data: https://www.google-analytics.com https://i.ytimg.com https://img.youtube.com https://*.googleusercontent.com https://*.cloudflarestream.com https://videodelivery.net",
         "font-src 'self'",
