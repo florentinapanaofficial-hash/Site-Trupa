@@ -636,7 +636,6 @@ const shorts = rawShorts.map((s) => {
           events: {
             onReady: (e: { target: YTPlayer }) => {
               const yt = e.target;
-              yt.mute();
               const ctl: PlayerCtl = {
                 play: () => yt.playVideo(),
                 pause: () => yt.pauseVideo(),
@@ -645,12 +644,14 @@ const shorts = rawShorts.map((s) => {
               };
               players.set(index, ctl);
               ready.add(index);
-              // Cardul deja vizat (ex: primul, la încărcarea paginii) autoplay-ează
-              // natural — nu îl întrerupem cu pauză+reset, ca să nu reapară un
-              // cadru negru cât se re-bufferează de la zero.
+              // Cardul deja vizat (ex: primul, la încărcarea paginii): apelăm play()
+              // explicit (fără seekTo, ca să nu forțăm un re-buffer de la zero care
+              // arată un cadru negru) — necesar fiindcă yt.mute() de mai sus poate
+              // întrerupe autoplay-ul nativ pornit deja de player prin URL.
               if (!isScrolling && index === settledIndex && activeIndex === -1) {
                 activeIndex = index;
                 ctl.setMuted(isMuted);
+                ctl.play();
               } else {
                 ctl.pause();
                 if (!isScrolling && index === settledIndex) settlePlayback();
@@ -943,6 +944,19 @@ const shorts = rawShorts.map((s) => {
     if (hasYouTube) loadYouTubeAPI(initYouTubePlayers);
     if (hasCloudflare) loadCloudflareSDK(buildCloudflarePlayers);
     window.setTimeout(onScrollSettled, 150);
+
+    // Plasă de siguranță: dacă browserul blochează silențios play() înainte de
+    // orice gest al utilizatorului, reîncercăm la primul tap/scroll/tastă.
+    let firstGestureHandled = false;
+    function unlockActivePlayback() {
+      if (firstGestureHandled) return;
+      firstGestureHandled = true;
+      const p = activeIndex !== -1 ? players.get(activeIndex) : undefined;
+      if (p) p.play();
+    }
+    (['pointerdown', 'touchstart', 'scroll', 'keydown'] as const).forEach((evt) => {
+      overlay!.addEventListener(evt, unlockActivePlayback, { once: true, passive: true });
+    });
 
     // eliberează playerele când părăsim pagina (SPA / navigare)
     window.addEventListener('pagehide', () => {
