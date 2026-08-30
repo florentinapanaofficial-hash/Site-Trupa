@@ -1611,4 +1611,13 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - **Validări:** `get_errors` pe `shorts.astro` — fără erori; `npx astro build` — **Complete!** (doar warning-urile cunoscute `Astro.request.headers`).
 - **Confirmat cu Claudiu:** montajul Cloudflare rămâne dezactivat intenționat (bug audio pe mobil din sesiunea anterioară); feed-ul e exclusiv din playlista YouTube.
 
+## 📝 2026-08-30 — Reels: cardul depășea ecranul pe mobil (butonul de sunet inaccesibil)
+
+- **Simptom raportat:** pe unele telefoane cardul din `/shorts/` nu se încadra, partea de jos rămânea sub fold și butonul de sunet nu putea fi apăsat.
+- **Cauză:** `.reels-feed` și `.reel-card` aveau `height: 100dvh; height: 100vh;` — ultima declarație (`100vh`) câștiga mereu, iar `100vh` pe mobil include înălțimea barelor de browser → cardul era mai înalt decât viewportul vizibil, iar `.reel-actions` (bottom: 0) ieșea sub ecran. În Chrome Android nici `position: fixed; inset: 0` nu ajuta, fiindcă viewportul de layout e cel „large".
+- **Fix:** `.reels-overlay` primește `height: 100vh; height: 100svh;` (svh = viewport mic, stabil, cu barele vizibile — nu clatină scroll-snap-ul cum ar face `dvh`); `.reels-feed` și `.reel-card` folosesc acum `height: 100%` (moștenit din overlay). Padding-ul de jos la `.reel-info` și `.reel-actions` a trecut de la `max(env(safe-area-inset-bottom), X)` la `calc(env(safe-area-inset-bottom, 0px) + X)`, ca butoanele să nu stea lipite de bara de gesturi.
+- **Fișier modificat:** `src/pages/shorts.astro`.
+- **Validări:** `npx astro build` — **Complete!**, zero erori.
+- **Regulă de reținut:** la fallback-uri CSS, unitatea modernă se pune ULTIMA (`height: 100vh; height: 100svh;`), nu invers.
+
 
