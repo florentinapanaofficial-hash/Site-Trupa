@@ -1559,3 +1559,13 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - **Validări:** Data API a întors cele 2 shorturi reale; dev `/shorts/` randează montaj + `RxHw6HFtE7s` + `OTqNRXW48IM`; `npx astro build` — PASS; `npm run seo:audit` — **60 pagini | 0 FAIL | 0 WARN** (`/shorts/` SSR, nu mai e static).
 - **Reținut:** în producție (Railway) trebuie adăugat `YOUTUBE_API_KEY`, altfel feed-ul arată doar montajul. De acum, adăugarea/scoaterea unui short = doar din playlistă (fără cod).
 
+## 📝 2026-08-30 — Reels: scos montajul Cloudflare + fix autoplay YouTube pe mobil
+
+- **Simptom (mobil):** montajul Cloudflare pornea dar fără sunet; shorturile YouTube rămâneau doar poster (poză statică), fără redare/sunet.
+- **Cauză:** playerele YouTube porneau prin `playVideo()` apelat programatic în `onReady`/IntersectionObserver — blocat de politica de autoplay pe mobil (mai ales iOS). Cloudflare pornea fiindcă folosește `<video>` nativ (autoplay muted permis).
+- **Fix montaj:** golit `src/data/siteContent.json` → `"shorts": []` (scos `short-montaj` Cloudflare). Feed-ul rămâne exclusiv YouTube din playlistă. Codul Cloudflare din `shorts.astro` păstrat ca infrastructură inactivă (nefolosit când `shorts[]` e gol).
+- **Fix autoplay YouTube:** `src/pages/shorts.astro` → `playerVars.autoplay: 0 → 1` (pornire automată muted, ca `<video>` nativ) + în `onReady`, clipurile inactive primesc `ctl.pause()` imediat ca să nu redea simultan. Butonul de difuzor (unmute global) funcționează fiindcă e gest user → `unMute() + setVolume(100)`.
+- **Validări:** `get_errors` pe `shorts.astro` + `siteContent.json` — fără erori; `npx astro build` — **Complete!** (doar warning-uri normale `Astro.request.headers`).
+- **De testat în browser real (mobil):** primul short YouTube pornește automat muted; apăsarea difuzorului dă sunet pe toate. Simple Browser din VS Code nu redă fiabil embed YouTube.
+
+

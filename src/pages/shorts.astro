@@ -605,7 +605,7 @@ const shorts = rawShorts.map((s) => {
           width: '100%',
           height: '100%',
           playerVars: {
-            autoplay: 0,
+            autoplay: 1,
             controls: 0,
             modestbranding: 1,
             rel: 0,
@@ -631,6 +631,7 @@ const shorts = rawShorts.map((s) => {
               players.set(index, ctl);
               ready.add(index);
               if (index === activeIndex) startPlayback(index);
+              else ctl.pause();
             },
             onStateChange: (e: { data: number }) => {
               // 0 = ENDED → reia (siguranță suplimentară pe lângă loop)
