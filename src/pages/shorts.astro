@@ -734,6 +734,9 @@ const shorts = rawShorts.map((s) => {
     function settlePlayback() {
       window.clearTimeout(playbackTimer);
       if (settledIndex === -1 || settledIndex === activeIndex) return;
+      // Playerul poate să nu fie încă gata (creat) — nu marca activeIndex până
+      // nu există efectiv, altfel onReady crede că e deja activ și îl pune pauză.
+      if (!players.has(settledIndex)) return;
       if (activeIndex !== -1) stopPlayback(activeIndex);
       activeIndex = settledIndex;
       startPlayback(activeIndex);
