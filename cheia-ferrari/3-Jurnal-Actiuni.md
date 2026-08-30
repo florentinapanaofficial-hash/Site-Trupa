@@ -1568,4 +1568,14 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - **Validări:** `get_errors` pe `shorts.astro` + `siteContent.json` — fără erori; `npx astro build` — **Complete!** (doar warning-uri normale `Astro.request.headers`).
 - **De testat în browser real (mobil):** primul short YouTube pornește automat muted; apăsarea difuzorului dă sunet pe toate. Simple Browser din VS Code nu redă fiabil embed YouTube.
 
+## 📝 2026-08-30 — Reels: scroll-snap fără jank și playback după stabilizare
+
+- **Obiectiv:** prioritate totală pentru fluiditatea swipe-ului; playback-ul YouTube poate începe cu întârziere mică, numai după fixarea cardului.
+- **Fișier modificat:** `src/pages/shorts.astro` — iframe-urile din carduri au `pointer-events: none`, iar stratul existent `reel-tap-layer` rămâne deasupra pentru tap, dublu-tap și like fără interceptarea gestului nativ de scroll.
+- **Scroll:** feed-ul are `overscroll-behavior-y: contain` și `scroll-behavior: auto !important`; fiecare card păstrează snap obligatoriu și este compus pe GPU prin `translateZ(0)` + `will-change: transform`.
+- **Playback:** `IntersectionObserver` selectează numai cardurile vizibile în proporție de minimum 80%. Evenimentele `scrollend` și fallback-ul debounce de 150 ms pornesc clipul doar după oprirea scroll-ului; cardul activ este pus imediat pe pauză și resetat când iese sub prag.
+- **Poster:** thumbnail-ul YouTube este acum `maxresdefault.jpg` și rămâne vizibil până la confirmarea `YT.PlayerState.PLAYING`; atunci se estompează rapid. Inițializarea întârziată a API-ului reprogramează redarea numai când feed-ul nu este în scroll.
+- **Validări:** `npx astro check` — **0 erori / 0 warnings / 4 hint-uri preexistente**; `npm run seo:check` — build PASS, **60 pagini verificate, 0 FAIL | 0 WARN**; `get_errors` pentru `shorts.astro` — fără erori; `git diff --check` — curat.
+- **Notă:** warning-urile de build `Astro.request.headers` pe pagini prerenderizate sunt cele cunoscute și nu provin din această schimbare.
+
 

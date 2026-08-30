@@ -66,7 +66,7 @@ const shorts = rawShorts.map((s) => {
     provider: isCloudflare ? 'cloudflare' : 'youtube',
     poster: isCloudflare
       ? `https://videodelivery.net/${s.cloudflareUid}/thumbnails/thumbnail.jpg?time=2s&height=1080`
-      : `https://i.ytimg.com/vi/${s.youtubeVideoId}/hqdefault.jpg`,
+      : `https://img.youtube.com/vi/${s.youtubeVideoId}/maxresdefault.jpg`,
     cfEmbed: isCloudflare
       ? `https://iframe.cloudflarestream.com/${s.cloudflareUid}?muted=true&loop=true&autoplay=false&controls=false&preload=metadata`
       : '',
@@ -279,6 +279,8 @@ const shorts = rawShorts.map((s) => {
     width: 100%;
     overflow-y: scroll;
     scroll-snap-type: y mandatory;
+    overscroll-behavior-y: contain;
+    scroll-behavior: auto !important;
     scrollbar-width: none;
     -ms-overflow-style: none;
     -webkit-overflow-scrolling: touch;
@@ -297,6 +299,8 @@ const shorts = rawShorts.map((s) => {
     justify-content: center;
     background: #000;
     overflow: hidden;
+    transform: translateZ(0);
+    will-change: transform;
   }
 
   /* ═══ Video — simulare object-fit: cover pentru 9:16 ═══ */
@@ -309,6 +313,7 @@ const shorts = rawShorts.map((s) => {
     object-fit: cover;
     z-index: 0;
     filter: brightness(0.9);
+    transition: opacity 0.12s linear;
   }
   .reel-media {
     position: absolute;
@@ -328,6 +333,8 @@ const shorts = rawShorts.map((s) => {
     border: 0;
     display: block;
   }
+  .reel-media :global(iframe) { pointer-events: none; }
+  .reel-card.is-playing .reel-poster { opacity: 0; }
 
   /* Cloudflare Stream — video vertical 9:16, umple cardul fără crop 16:9 */
   .reel-media--cf {
@@ -565,6 +572,10 @@ const shorts = rawShorts.map((s) => {
     const ready = new Set<number>();
     let isMuted = true;          // autoplay policy: primul clip pornește pe mute
     let activeIndex = -1;
+    let settledIndex = -1;
+    let playbackTimer = 0;
+    let scrollEndTimer = 0;
+    let isScrolling = false;
 
     /* ─── Încarcă YouTube IFrame API o singură dată ─── */
     function loadYouTubeAPI(cb: () => void) {
@@ -630,12 +641,17 @@ const shorts = rawShorts.map((s) => {
               };
               players.set(index, ctl);
               ready.add(index);
-              if (index === activeIndex) startPlayback(index);
-              else ctl.pause();
+              ctl.pause();
+              if (!isScrolling && index === settledIndex) settlePlayback();
             },
             onStateChange: (e: { data: number }) => {
+              if (e.data === window.YT.PlayerState.PLAYING) {
+                card.classList.add('is-playing');
+              } else if (e.data === window.YT.PlayerState.PAUSED || e.data === window.YT.PlayerState.CUED) {
+                card.classList.remove('is-playing');
+              }
               // 0 = ENDED → reia (siguranță suplimentară pe lângă loop)
-              if (e.data === 0) {
+              if (e.data === 0 && index === activeIndex) {
                 const p = players.get(index);
                 if (p) { p.reset(); p.play(); }
               }
@@ -664,13 +680,14 @@ const shorts = rawShorts.map((s) => {
         };
         players.set(index, ctl);
         ready.add(index);
-        if (index === activeIndex) startPlayback(index);
+        if (!isScrolling && index === settledIndex) settlePlayback();
       });
     }
 
     function startPlayback(index: number) {
       const p = players.get(index);
       if (!p) return;
+      cards[index]?.classList.remove('is-playing');
       p.setMuted(isMuted);
       p.reset();
       p.play();
@@ -681,26 +698,52 @@ const shorts = rawShorts.map((s) => {
       if (!p) return;
       p.pause();
       p.reset();
+      cards[index]?.classList.remove('is-playing');
     }
 
-    /* ─── IntersectionObserver: redare automată la ≥70% vizibil ─── */
+    function settlePlayback() {
+      if (settledIndex === -1) return;
+      window.clearTimeout(playbackTimer);
+      playbackTimer = window.setTimeout(() => {
+        if (settledIndex === -1 || settledIndex === activeIndex) return;
+        if (activeIndex !== -1) stopPlayback(activeIndex);
+        activeIndex = settledIndex;
+        startPlayback(activeIndex);
+      }, 150);
+    }
+
+    /* ─── IntersectionObserver: selectează cardul la ≥80%; playback după scroll ─── */
     const io = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         const card = entry.target as HTMLElement;
         const index = Number(card.dataset.index);
-        if (entry.isIntersecting && entry.intersectionRatio >= 0.7) {
-          if (activeIndex !== index) {
-            if (activeIndex !== -1) stopPlayback(activeIndex);
-            activeIndex = index;
-          }
-          startPlayback(index);
-        } else if (activeIndex === index && entry.intersectionRatio < 0.5) {
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.8) {
+          settledIndex = index;
+        } else if (settledIndex === index && entry.intersectionRatio < 0.8) {
+          settledIndex = -1;
+        }
+        if (activeIndex === index && entry.intersectionRatio < 0.8) {
           stopPlayback(index);
+          activeIndex = -1;
         }
       });
-    }, { threshold: [0, 0.5, 0.7, 1] });
+    }, { threshold: [0, 0.8, 1] });
 
     cards.forEach((card) => io.observe(card));
+
+    function onScrollSettled() {
+      window.clearTimeout(scrollEndTimer);
+      isScrolling = false;
+      settlePlayback();
+    }
+
+    feed.addEventListener('scroll', () => {
+      isScrolling = true;
+      window.clearTimeout(playbackTimer);
+      window.clearTimeout(scrollEndTimer);
+      scrollEndTimer = window.setTimeout(onScrollSettled, 150);
+    }, { passive: true });
+    feed.addEventListener('scrollend', onScrollSettled, { passive: true });
 
     /* ─── Sunet global (Mute / Unmute) ─── */
     function applyMuteState() {
@@ -868,13 +911,12 @@ const shorts = rawShorts.map((s) => {
     }
 
     /* ─── Pornire ─── */
-    // primul card devine activ implicit (pentru autoplay la onReady)
-    activeIndex = 0;
     initLikes();
     const hasYouTube = cards.some((c) => c.dataset.provider !== 'cloudflare');
     const hasCloudflare = cards.some((c) => c.dataset.provider === 'cloudflare');
     if (hasYouTube) loadYouTubeAPI(buildYouTubePlayers);
     if (hasCloudflare) loadCloudflareSDK(buildCloudflarePlayers);
+    window.setTimeout(onScrollSettled, 150);
 
     // eliberează playerele când părăsim pagina (SPA / navigare)
     window.addEventListener('pagehide', () => {
