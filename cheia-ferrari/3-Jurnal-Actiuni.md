@@ -1591,6 +1591,14 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - **Modificări:** adăugată „Muzică Arăbească Cover” ca primă piesă în playerul vizibil din `src/pages/muzica-non-stop.astro` și într-o categorie nouă din `src/data/audio-catalog-remote.json`, astfel încât piesa să fie inclusă și în schema SEO `MusicPlaylist`.
 - **Validare R2:** URL-ul răspunde cu **HTTP 200**, `audio/mpeg`, 34.047.125 bytes, `Accept-Ranges: bytes` și `Access-Control-Allow-Origin: *`.
 - **Validări proiect:** `npx astro check` — **0 erori**, 4 hints preexistente; `npm run seo:check` — build PASS, **60 pagini verificate, 0 FAIL | 0 WARN**; HTML-ul construit conține titlul și URL-ul piesei în player și în schema SEO; `get_errors` — fără erori în fișierele modificate.
+
+## 📝 2026-08-30 — Hore 2026 în biblioteca audio
+
+- **Obiectiv:** adăugarea piesei „Hore 2026” în biblioteca audio de pe `/muzica-non-stop/`.
+- **Fișiere modificate:** `src/pages/muzica-non-stop.astro`, `src/data/audio-catalog-remote.json`, `cheia-ferrari/3-Jurnal-Actiuni.md`.
+- **Modificări:** piesa „Hore 2026” a fost adăugată prima în playerul vizibil și într-o categorie nouă „Muzică Populară - Hore”, fiind inclusă și în schema SEO `MusicPlaylist`.
+- **Validare R2:** URL-ul răspunde cu **HTTP 200**, `audio/mpeg`, 49.648.265 bytes și `Accept-Ranges: bytes`.
+- **Validări proiect:** `npx astro check` — **0 erori**, 4 hints preexistente; `npm run seo:check` — build PASS, **60 pagini verificate, 0 FAIL | 0 WARN**; HTML-ul construit conține titlul de 4 ori, URL-ul de 2 ori și păstrează piesa înaintea celor existente; `get_errors` — fără erori în fișierele modificate.
 - **Analiză SEO:** `node seo-agent/seo-analyzer.js` — 13 oportunități existente; modificarea bibliotecii audio nu a introdus probleme noi.
 
 ## 📝 2026-08-30 — Reels: fix ecran negru + preload progresiv playere YouTube (magnetic scroll)

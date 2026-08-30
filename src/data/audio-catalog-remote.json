@@ -1,6 +1,23 @@
 {
     "categories": [
         {
+            "id": "hore-2026",
+            "title": "Muzică Populară - Hore",
+            "songs": [
+                {
+                    "name": "Hore 2026",
+                    "artist": "FP Band",
+                    "file": "Hore 2026 FP Band.mp3",
+                    "url": "https://pub-990252095ed1490dbf610cd678419215.r2.dev/Hore%202026%20FP%20Band.mp3",
+                    "genres": [
+                        "populara",
+                        "hora",
+                        "petrecere"
+                    ]
+                }
+            ]
+        },
+        {
             "id": "muzica-arabeasca",
             "title": "Muzică Arăbească",
             "songs": [
