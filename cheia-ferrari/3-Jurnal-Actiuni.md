@@ -1643,4 +1643,13 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - **Fix:** adăugat `uploadDate` în mapping-ul `videos`; definit `FALLBACK_UPLOAD_DATE = '2024-01-01'` pentru clipuri fără dată; `description` nu mai duplică `name` (text distinct); `thumbnailUrl` trimis ca array cu 2 rezoluții (`maxresdefault.jpg` + `hqdefault.jpg` fallback).
 - **Validări:** `get_errors` — fără erori; `npx astro build` — 0 erori; confirmat în `dist/client/galerie-video/index.html` că fiecare `VideoObject` conține `name`, `description`, `thumbnailUrl`, `uploadDate`, `contentUrl` și `embedUrl`.
 
+## 📝 2026-09-03 — FAQ dinamic + Schema `FAQPage` pe paginile locale (Pitești, București, Curtea de Argeș)
+
+- **Obiectiv:** secțiune FAQ optimizată pentru conversie și SEO local, cu date structurate `FAQPage`, pe rutele `/formatie-nunta/*`.
+- **Decizie importantă:** modificarea NU a fost făcută direct în `src/pages/formatie-nunta/pitesti.astro` (fișier generat automat, editare manuală interzisă de regulament), ci în sursa `scripts/programmatic-seo/template.astro`, apoi regenerat cu `node scripts/programmatic-seo/generate-pages.js` — astfel FAQ-ul e sincronizat pe toate cele 3 orașe.
+- **Conținut:** 4 întrebări (termen rezervare, echipament sonorizare/lumini, repertoriu, acoperire zonă), generalizate cu `{ORAS}` / `{JUDET}` / `{ZONE_ACOPERITE}` pentru a se adapta automat fiecărui oraș.
+- **Schema:** `faqJsonLd` (`@type: FAQPage`, `mainEntity` cu `Question`/`acceptedAnswer`) adăugată ca al doilea `<script>` în `Fragment slot="head"`, alături de schema existentă `LocalBusiness`/`MusicGroup` (nesuprascrisă).
+- **UI:** bloc nou `<details>`/`<summary>` accesibil, stilizat cu clasele Tailwind deja folosite în template (`rounded-2xl border border-white/20 bg-white/10`), plasat înainte de secțiunea CTA final.
+- **Validări:** `get_errors` pe cele 3 pagini generate — fără erori; `npx astro build` — 0 erori; confirmat în `dist/client/formatie-nunta/pitesti/index.html` că schema `FAQPage` apare corect serializată, separată de schema `LocalBusiness`.
+
 

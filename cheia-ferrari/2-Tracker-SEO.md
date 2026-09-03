@@ -21,3 +21,5 @@ Aici vom nota evoluția săptămânală pentru a ne asigura că creștem, nu bat
 | 03 sep 2026 | povestea formatiei | - | - | ✅ Rezolvat — `despre.astro` primește Schema `AboutPage` legată de `MusicGroup` |
 | 03 sep 2026 | galerie foto nunta | - | - | ✅ Rezolvat — `galerie-foto.astro` conectat corect la `seo-content.json` (elimină hardcoding) + Schema `CollectionPage`/`ImageGallery` |
 | 03 sep 2026 | comunitate recenzii mirii | - | - | ✅ Rezolvat — `comunitate.meta.title` redus la 45 car. (era ~59-60, la limită) |
+| 03 sep 2026 | muzica nunta live (Schema fix) | - | 12.3 | ✅ Rezolvat — avertisment GSC `VideoObject` incomplet pe `/galerie-video/` (lipsea `uploadDate`); acum toate cele 12 clipuri au `name`, `description`, `thumbnailUrl`, `uploadDate`, `contentUrl`, `embedUrl` |
+| 03 sep 2026 | formatie nunta pitesti/bucuresti/curtea-de-arges (FAQ) | - | - | ✅ Rezolvat — FAQ dinamic (4 întrebări) + Schema `FAQPage` adăugate în `template.astro`, regenerate pe toate cele 3 pagini locale prin `generate-pages.js` |
