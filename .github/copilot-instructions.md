@@ -14,6 +14,19 @@
 
 ---
 
+## Protocol Periodic de Mentenanță SEO la Start de Sesiune
+
+> Se execută automat, fără să fie nevoie ca Claudiu să ceară explicit.
+
+1. **Verificare automată la deschiderea sesiunii:** la fiecare sesiune nouă, în paralel cu citirea `cheia-ferrari/3-Jurnal-Actiuni.md` și `cheia-ferrari/2-Tracker-SEO.md`, verifică data ultimei intrări de audit/verificare SEO din jurnal. Dacă au trecut peste 14 zile de la ultimul audit SEO complet, avertizează scurt în primul mesaj al sesiunii: *„Au trecut peste 14 zile de la ultimul audit SEO complet. Recomand o scanare rapidă.”*
+2. **Trigger la modificarea fișierelor:** de fiecare dată când într-o sesiune se creează sau se editează fișiere din `src/pages/`, componente de layout (`BaseLayout.astro`, `Header.astro`, `Footer.astro`) sau `src/data/siteContent.json` / `src/data/seo-content.json`:
+   - verifică automat că `title` (50–58 caractere) și `meta description` (130–150 caractere) respectă limitele de mai jos, la pagina/cheia afectată;
+   - verifică că schema JSON-LD aferentă paginii respective (dacă există) e completă și sincronizată cu datele noi (ex: dacă se schimbă un titlu de pagină, verifică dacă apare și în `name`/`description` din schema proprie);
+   - verifică existența atributului `alt` pentru orice imagine `<img>` nouă sau modificată.
+3. **Încheierea sesiunii:** înainte de commit, actualizează `cheia-ferrari/2-Tracker-SEO.md` cu rândurile relevante pentru sesiunea curentă și adaugă rezumatul în `cheia-ferrari/3-Jurnal-Actiuni.md`, respectând formatul standard deja folosit în jurnal (titlu `## 📝 [dată] — [titlu scurt]`, obiectiv, modificări, validări).
+
+---
+
 ## Reguli Critice — OBLIGATORIU DE RESPECTAT
 
 ### 🔴 0. Protocol SEO automat la fiecare sesiune

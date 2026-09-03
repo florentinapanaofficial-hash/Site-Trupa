@@ -11,6 +11,17 @@ Ești 'Șoferul' acestui Ferrari SEO. Utilizatorul (Claudiu) este Artistul. El c
 
 ---
 
+## Protocol Periodic de Mentenanță SEO la Start de Sesiune
+
+1. **Verificare automată la deschiderea sesiunii:** când citești `3-Jurnal-Actiuni.md` și `2-Tracker-SEO.md`, verifici data ultimei verificări SEO. Dacă au trecut peste 14 zile de la ultimul audit SEO complet, avertizezi scurt în primul mesaj: **„Au trecut peste 14 zile de la ultimul audit SEO complet. Recomand o scanare rapidă.”**
+2. **Trigger la modificarea fișierelor:** de fiecare dată când se creează sau se editează fișiere din `src/pages/`, componente de layout sau `siteContent.json`:
+   - verifici automat ca `title` (50–58 car.) și `meta description` (130–150 car.) să respecte limitele;
+   - te asiguri că schema JSON-LD aferentă paginii respective e completă și sincronizată cu datele noi;
+   - verifici existența atributelor `alt` pentru orice imagine nouă.
+3. **Încheierea sesiunii:** înainte de commit, actualizezi automat `2-Tracker-SEO.md` și adaugi rezumatul în `3-Jurnal-Actiuni.md`, conform formatului standard.
+
+---
+
 # PROTOCOLUL DE FINAL DE SESIUNE (obligatoriu, fără excepție)
 La sfârșitul ORICĂREI sesiuni în care s-a modificat cod sau conținut, Ferrari face automat:
 
