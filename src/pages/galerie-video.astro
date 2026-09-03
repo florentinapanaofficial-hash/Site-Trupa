@@ -12,6 +12,7 @@ const videos = siteContent.videos.map((video, index) => ({
   category: video.category,
   youtubeId: video.youtubeId,
   youtubeUrl: video.youtubeUrl,
+  uploadDate: (video as any).uploadDate as string | undefined,
 }));
 
 type PlaylistSectionConfig = { title?: string; playlistId?: string; thumbnailVideoId?: string };
@@ -28,6 +29,8 @@ const playlists = Object.entries(playlistConfig)
   }));
 
 const SITE = 'https://www.florentinapanaofficial.ro';
+/* Fallback ISO valid pentru clipurile fără uploadDate în siteContent.json (cerut strict de Google Video Schema) */
+const FALLBACK_UPLOAD_DATE = '2024-01-01';
 const videoCollectionLd = {
   '@context': 'https://schema.org',
   '@type': 'CollectionPage',
@@ -47,8 +50,12 @@ const videoCollectionLd = {
       item: {
         '@type': 'VideoObject',
         name: v.title,
-        description: v.title,
-        thumbnailUrl: `https://img.youtube.com/vi/${v.youtubeId}/hqdefault.jpg`,
+        description: `${v.title} — Formația Florentina Pană, muzică live la nunți și evenimente.`,
+        thumbnailUrl: [
+          `https://img.youtube.com/vi/${v.youtubeId}/maxresdefault.jpg`,
+          `https://img.youtube.com/vi/${v.youtubeId}/hqdefault.jpg`,
+        ],
+        uploadDate: v.uploadDate ?? FALLBACK_UPLOAD_DATE,
         contentUrl: v.youtubeUrl,
         embedUrl: `https://www.youtube.com/embed/${v.youtubeId}`,
       },

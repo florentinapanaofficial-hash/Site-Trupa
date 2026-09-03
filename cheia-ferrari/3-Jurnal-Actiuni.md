@@ -1636,4 +1636,11 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - **Validări:** `get_errors` pe toate fișierele modificate — fără erori; `npx astro build` — **Complete!**, 0 erori (doar warning-urile cunoscute `Astro.request.headers`); verificat direct în `dist/client/*/index.html` că toate schemele (`AboutPage`, `ItemList`, `CollectionPage`, `ImageGallery`, `VideoObject`) apar corect serializate, JSON valid.
 - **Pași următori:** monitorizare poziții GSC pentru `muzica nunta live` (pagina `/galerie-video/`) și `cele mai bune formatii de nunta` (homepage) — vezi tracker SEO.
 
+## 📝 2026-09-03 — Fix avertisment GSC: date structurate VideoObject incomplete pe `/galerie-video/`
+
+- **Simptom:** Google Search Console raporta avertisment la datele structurate video pe `/galerie-video/`.
+- **Cauză:** `uploadDate` exista în `siteContent.json` → `videos[]`, dar mapping-ul din `src/pages/galerie-video.astro` nu prelua acest câmp, iar schema `VideoObject` rămânea fără `uploadDate` (proprietate obligatorie pentru Google Video Schema).
+- **Fix:** adăugat `uploadDate` în mapping-ul `videos`; definit `FALLBACK_UPLOAD_DATE = '2024-01-01'` pentru clipuri fără dată; `description` nu mai duplică `name` (text distinct); `thumbnailUrl` trimis ca array cu 2 rezoluții (`maxresdefault.jpg` + `hqdefault.jpg` fallback).
+- **Validări:** `get_errors` — fără erori; `npx astro build` — 0 erori; confirmat în `dist/client/galerie-video/index.html` că fiecare `VideoObject` conține `name`, `description`, `thumbnailUrl`, `uploadDate`, `contentUrl` și `embedUrl`.
+
 
