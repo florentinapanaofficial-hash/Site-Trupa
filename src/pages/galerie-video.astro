@@ -26,9 +26,41 @@ const playlists = Object.entries(playlistConfig)
     id, title: playlist.title || id, category: playlistLabels[id] || 'Playlist',
     playlistId: playlist.playlistId || '', thumbnailYtId: playlist.thumbnailVideoId || '', videoCount: 'Playlist YouTube',
   }));
+
+const SITE = 'https://www.florentinapanaofficial.ro';
+const videoCollectionLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: videoSeo.meta.title,
+  description: videoSeo.meta.description,
+  url: `${SITE}/galerie-video/`,
+  about: {
+    '@type': 'MusicGroup',
+    name: seo.schema.name,
+    url: SITE,
+  },
+  mainEntity: {
+    '@type': 'ItemList',
+    itemListElement: videos.map((v, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      item: {
+        '@type': 'VideoObject',
+        name: v.title,
+        description: v.title,
+        thumbnailUrl: `https://img.youtube.com/vi/${v.youtubeId}/hqdefault.jpg`,
+        contentUrl: v.youtubeUrl,
+        embedUrl: `https://www.youtube.com/embed/${v.youtubeId}`,
+      },
+    })),
+  },
+};
 ---
 
 <BaseLayout title={videoSeo.meta.title} description={videoSeo.meta.description}>
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(videoCollectionLd)} />
+  </Fragment>
   <section class="section-container py-16">
     <div class="mb-8"><BackButton href="/cauti-formatie-nunta/" label="Cauți formație" direct /></div>
     <header class="section-head mx-auto text-center">

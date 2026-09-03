@@ -32,12 +32,36 @@ const googleBusinessReviews = [
     text: comment.text,
   })),
 ].filter(Boolean);
+
+const SITE = 'https://www.florentinapanaofficial.ro';
+const aboutPageLd = {
+  '@context': 'https://schema.org',
+  '@type': 'AboutPage',
+  name: despre.meta.title,
+  description: despre.meta.description,
+  url: `${SITE}/despre/`,
+  mainEntity: {
+    '@type': seo.schema['@type'],
+    name: seo.schema.name,
+    alternateName: seo.schema.alternateName,
+    description: seo.schema.description,
+    url: SITE,
+    telephone: seo.schema.telephone,
+    email: seo.schema.email,
+    genre: seo.schema.genre,
+    areaServed: seo.schema.areaServed,
+    sameAs: seo.schema.sameAs,
+  },
+};
 ---
 
 <BaseLayout
   title={despre.meta.title}
   description={despre.meta.description}
 >
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(aboutPageLd)} />
+  </Fragment>
   <section class="section-container py-16">
     <div class="mb-8"><BackButton href="/" label="Acasă" /></div>
 

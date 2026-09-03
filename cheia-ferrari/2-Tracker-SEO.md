@@ -15,3 +15,9 @@ Aici vom nota evoluția săptămânală pentru a ne asigura că creștem, nu bat
 | 04 mai 2026 | muzica nunta live | - | 12.3 | Pagina /galerie-video — necesită optimizare title SEO |
 | 04 mai 2026 | preturi formatie nunta bucuresti | - | 11.8 | Gap — fără pagină locală București cu focus pe prețuri |
 | 04 mai 2026 | formatie nunta pret | - | 14.5 | Neschimbat față de apr — articolul există, necesită link-building |
+| 03 sep 2026 | muzica nunta live | - | 12.3 | ✅ Rezolvat parțial — `/galerie-video/` primește acum Schema `CollectionPage`+`ItemList`(VideoObject); title/description rămân neschimbate (deja sub limită) |
+| 03 sep 2026 | formatie nunta pitesti (membri) | - | - | ✅ Rezolvat — title/description `membri.astro` corectate (erau 76/210 car., acum 51/141 car.) + Schema `ItemList`(Person) adăugată |
+| 03 sep 2026 | album foto nunta pitesti | - | - | ✅ Rezolvat — title/description `momente-cu-mirii.astro` corectate (erau 77/180 car., acum 50/143 car.) |
+| 03 sep 2026 | povestea formatiei | - | - | ✅ Rezolvat — `despre.astro` primește Schema `AboutPage` legată de `MusicGroup` |
+| 03 sep 2026 | galerie foto nunta | - | - | ✅ Rezolvat — `galerie-foto.astro` conectat corect la `seo-content.json` (elimină hardcoding) + Schema `CollectionPage`/`ImageGallery` |
+| 03 sep 2026 | comunitate recenzii mirii | - | - | ✅ Rezolvat — `comunitate.meta.title` redus la 45 car. (era ~59-60, la limită) |

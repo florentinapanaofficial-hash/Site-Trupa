@@ -3,7 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import siteContent from '../data/siteContent.json';
 import BackButton from '../components/BackButton.astro';
 
-const { membri, colaboratori: colaboratoriData } = siteContent as any;
+const { brand, membri, colaboratori: colaboratoriData } = siteContent as any;
 const allMembri: any[] = membri ?? [];
 const solisti        = allMembri.filter((m: any) => m.categorie === 'solisti');
 const instrumentisti = allMembri.filter((m: any) => m.categorie === 'instrumentisti');
@@ -19,13 +19,42 @@ function areGalerieFoto(m: any): boolean {
 function initiale(name: string): string {
   return name.split(' ').filter(Boolean).map((w) => w[0]).join('').slice(0, 2).toUpperCase();
 }
+
+const SITE = 'https://www.florentinapanaofficial.ro';
+const membriListLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'Echipa Formației Florentina Pană',
+  url: `${SITE}/membri/`,
+  itemListElement: allMembri
+    .filter((m: any) => m.nume)
+    .map((m: any, i: number) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      item: {
+        '@type': 'Person',
+        name: m.nume,
+        jobTitle: m.rol,
+        memberOf: {
+          '@type': 'MusicGroup',
+          name: brand.name,
+          url: SITE,
+        },
+        ...(m.imagine ? { image: `${SITE}${encodeURI(m.imagine)}` } : {}),
+        ...(m.bio ? { description: m.bio } : {}),
+      },
+    })),
+};
 ---
 
 <BaseLayout
-  title="Membrii Formației Florentina Pană | Trupă Profesionistă Nuntă Pitești, Argeș"
-  description="Cunoaște echipa formației Florentina Pană — soliști vocali și instrumentiști cu experiență de peste 20 ani. Formație nuntă Pitești și Argeș, disponibilă pentru nunți, botezuri și evenimente în toată România."
+  title="Membrii Trupei Live Nuntă Pitești | Florentina Pană"
+  description="Echipa Formației Florentina Pană: soliști și instrumentiști cu 10+ ani experiență. Trupă live pentru nunți și evenimente în Pitești și Argeș."
   hideFooter={true}
 >
+<Fragment slot="head">
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(membriListLd)} />
+</Fragment>
 <div class="stage-wrap">
   <div class="stage-back"><BackButton href="/" label="Acasă" /></div>
 

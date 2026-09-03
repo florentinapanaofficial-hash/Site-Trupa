@@ -1620,4 +1620,20 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - **Validări:** `npx astro build` — **Complete!**, zero erori.
 - **Regulă de reținut:** la fallback-uri CSS, unitatea modernă se pune ULTIMA (`height: 100vh; height: 100svh;`), nu invers.
 
+## 📝 2026-09-03 — Audit SEO on-page + Schema JSON-LD (membri, despre, galerie-foto, galerie-video, momente-cu-mirii)
+
+- **Obiectiv:** rezolvarea problemelor identificate în auditul SEO rapid (title/description prea lungi) și adăugarea de Schema JSON-LD specifică pentru Google Knowledge Graph.
+- **Title/Description corectate (respectând 50-58 / 135-150 caractere):**
+  - `src/pages/membri.astro` → title 51 car. ("Membrii Trupei Live Nuntă Pitești | Florentina Pană"), description 141 car.
+  - `src/pages/momente-cu-mirii.astro` → title 50 car. ("Momente cu Mirii | Album Foto Nunți Pitești, Argeș"), description 143 car.
+  - `src/data/seo-content.json` → `comunitate.meta.title` redus la 45 car. ("Comunitate — Recenzii Mirii | Florentina Pană"); `galerie.meta.description` rescris la 132 car. (era 157, orfan — nefolosit până acum).
+  - `src/pages/galerie-foto.astro` → title/description hardcodate înlocuite cu `seo.galerie.meta.title` / `.description` (conform convenției din `copilot-instructions.md`).
+- **Schema JSON-LD nouă (injectată prin `<Fragment slot="head">` + `<slot name="head" />` din `BaseLayout.astro`):**
+  - `src/pages/despre.astro` → `AboutPage` cu `mainEntity` legat de `MusicGroup` (`seo.schema`).
+  - `src/pages/membri.astro` → `ItemList` cu `Person` pentru fiecare membru (solist/instrumentist), incluzând `jobTitle` (`m.rol`) și `memberOf` → `MusicGroup` (brand).
+  - `src/pages/galerie-foto.astro` → `CollectionPage` + `ImageGallery` cu `mainEntity` de tip `ItemList` (`ImageObject`, limitat la primele 30 poze).
+  - `src/pages/galerie-video.astro` → `CollectionPage` cu `mainEntity` de tip `ItemList` (`VideoObject` pentru fiecare videoclip din `siteContent.videos`).
+- **Validări:** `get_errors` pe toate fișierele modificate — fără erori; `npx astro build` — **Complete!**, 0 erori (doar warning-urile cunoscute `Astro.request.headers`); verificat direct în `dist/client/*/index.html` că toate schemele (`AboutPage`, `ItemList`, `CollectionPage`, `ImageGallery`, `VideoObject`) apar corect serializate, JSON valid.
+- **Pași următori:** monitorizare poziții GSC pentru `muzica nunta live` (pagina `/galerie-video/`) și `cele mai bune formatii de nunta` (homepage) — vezi tracker SEO.
+
 
