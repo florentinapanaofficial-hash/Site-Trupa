@@ -23,3 +23,6 @@ Aici vom nota evoluția săptămânală pentru a ne asigura că creștem, nu bat
 | 03 sep 2026 | comunitate recenzii mirii | - | - | ✅ Rezolvat — `comunitate.meta.title` redus la 45 car. (era ~59-60, la limită) |
 | 03 sep 2026 | muzica nunta live (Schema fix) | - | 12.3 | ✅ Rezolvat — avertisment GSC `VideoObject` incomplet pe `/galerie-video/` (lipsea `uploadDate`); acum toate cele 12 clipuri au `name`, `description`, `thumbnailUrl`, `uploadDate`, `contentUrl`, `embedUrl` |
 | 03 sep 2026 | formatie nunta pitesti/bucuresti/curtea-de-arges (FAQ) | - | - | ✅ Rezolvat — FAQ dinamic (4 întrebări) + Schema `FAQPage` adăugate în `template.astro`, regenerate pe toate cele 3 pagini locale prin `generate-pages.js` |
+| 10 sep 2026 | cele mai bune formatii de nunta | - | 15.2 | ✅ Optimizat homepage: title orientat pe „formație de nuntă” + locații Pitești/Argeș; CTR de referință 0.67% la 300 afișări — de remăsurat în GSC |
+| 10 sep 2026 | muzica nunta live | - | 12.3 | ✅ Optimizat `/galerie-video/`: title „Clipuri Reale 2026” + CTA în description; CTR de referință 2.38% la 210 afișări — de remăsurat în GSC |
+| 10 sep 2026 | preturi formatie nunta bucuresti / formatie nunta pret | - | 11.8 / 14.5 | ✅ Optimizat `/contact/`: title cu București, Pitești și Argeș; prețul și oferta în description; CTR de referință 2.00% / 1.67% — de remăsurat în GSC |

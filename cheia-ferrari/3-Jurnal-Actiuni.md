@@ -365,6 +365,15 @@ git push origin main
 - **Fișiere modificate:** `src/pages/shorts.astro`, `src/components/YoutubeEmbed.astro`, `cheia-ferrari/3-Jurnal-Actiuni.md`.
 - **Validări:** audit inițial `npm run seo:audit` — 60 pagini, 0 FAIL | 0 WARN; `get_errors` — fără erori; `npm run seo:check` — build reușit și audit SEO 60 pagini, 0 FAIL | 0 WARN.
 
+## 📝 2026-09-10 — Optimizare CTR pentru paginile cu afișări mari
+- **Obiectiv:** Îmbunătățirea CTR pentru interogările GSC cu poziții 11-16 și CTR scăzut.
+- **Date de referință:** „cele mai bune formatii de nunta” — 0,67% CTR / 300 afișări; „muzica nunta live” — 2,38% / 210; intenția de preț — 2,00% / 200 și 1,67% / 180.
+- **Modificări:** actualizate title și meta description pentru homepage, `/galerie-video/` și `/contact/` în `src/data/seo-content.json`; au fost păstrate prețul transparent, locațiile, anul 2026 și CTA-urile. Schema galeriei video reutilizează automat aceleași valori.
+- **Lungimi finale:** title 52/52/55 caractere; description 133/145/133 caractere.
+- **Validări:** `npm run seo:check` — build reușit; audit SEO — 60 pagini verificate, 0 FAIL | 0 WARN; `get_errors` — fără erori pe fișierele afectate; `node seo-agent/seo-analyzer.js` — 13 oportunități rămase în snapshotul GSC, care nu se actualizează automat după publicare.
+- **Fișiere modificate:** `src/data/seo-content.json`, `cheia-ferrari/2-Tracker-SEO.md`, `cheia-ferrari/3-Jurnal-Actiuni.md`.
+- **Risc/pași următori:** CTR-ul real se poate evalua după 14-28 de zile de date noi în GSC; nu se declară creștere înainte de remăsurare.
+
 ## 📝 2026-08-28 — Fix preview galerie Smart TV
 - **Problemă:** interacțiunile galeriei puteau să nu pornească în preview din cauza identificării containerului prin `previousElementSibling`.
 - **Fix:** scriptul selectează explicit `.smart-tv-gallery`.
