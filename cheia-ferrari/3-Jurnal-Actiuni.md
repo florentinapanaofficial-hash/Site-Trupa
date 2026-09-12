@@ -1668,4 +1668,10 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - **UI:** bloc nou `<details>`/`<summary>` accesibil, stilizat cu clasele Tailwind deja folosite în template (`rounded-2xl border border-white/20 bg-white/10`), plasat înainte de secțiunea CTA final.
 - **Validări:** `get_errors` pe cele 3 pagini generate — fără erori; `npx astro build` — 0 erori; confirmat în `dist/client/formatie-nunta/pitesti/index.html` că schema `FAQPage` apare corect serializată, separată de schema `LocalBusiness`.
 
+## 📝 2026-09-12 — Buton Comunitate în meniul principal
+
+- **Obiectiv:** afișarea butonului `Comunitate` în panoul meniului principal desktop.
+- **Modificări:** adăugat linkul `/comunitate/` în `desktopMenuModules` din `src/components/Header.astro`; meniul mobil și bara desktop existentă aveau deja linkul corect.
+- **Validări:** `npm run seo:audit` — 60 pagini, 0 FAIL, 0 WARN; `npm run seo:check` — trecut; `npm run build` — complet, fără erori; verificat în `dist/client/index.html` textul `Comunitate` și ruta `/comunitate/`. `get_errors` pe `Header.astro` — fără erori.
+
 
