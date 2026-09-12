@@ -374,6 +374,13 @@ git push origin main
 - **Fișiere modificate:** `src/data/seo-content.json`, `cheia-ferrari/2-Tracker-SEO.md`, `cheia-ferrari/3-Jurnal-Actiuni.md`.
 - **Risc/pași următori:** CTR-ul real se poate evalua după 14-28 de zile de date noi în GSC; nu se declară creștere înainte de remăsurare.
 
+## 📝 2026-09-12 — Curățare URL-uri cu redirecționare (GSC)
+- **Obiectiv:** Reducerea redirecturilor interne raportate în Google Search Console prin uniformizarea URL-urilor canonice cu trailing slash.
+- **Modificări:** corectat URL schema `CollectionPage` în `/comunitate/` (era fără slash), corectat URL `Offer` în `momente-cu-mirii` către `/contact/`, normalizat fallback `pagePath` în `PhotoGallery` la `/galerie-foto/` și actualizat exemplul `EmbedSnippet` la varianta canonical.
+- **Validări:** `get_errors` pe fișierele modificate — fără erori; `npm run seo:check` — build reușit, audit local 60 pagini, 0 FAIL | 0 WARN; scan output `dist/client` — fără linkuri interne de pagină fără slash final.
+- **Fișiere modificate:** `src/pages/comunitate/index.astro`, `src/pages/momente-cu-mirii.astro`, `src/components/PhotoGallery.astro`, `src/components/EmbedSnippet.astro`, `cheia-ferrari/2-Tracker-SEO.md`, `cheia-ferrari/3-Jurnal-Actiuni.md`.
+- **Notă SEO:** lista „Pagină cu redirecționare” din GSC include și redirecturi normale (http→https, www/non-www, URL-uri istorice); actualizarea în raport se vede după recrawl (de obicei 3-14 zile).
+
 ## 📝 2026-08-28 — Fix preview galerie Smart TV
 - **Problemă:** interacțiunile galeriei puteau să nu pornească în preview din cauza identificării containerului prin `previousElementSibling`.
 - **Fix:** scriptul selectează explicit `.smart-tv-gallery`.
