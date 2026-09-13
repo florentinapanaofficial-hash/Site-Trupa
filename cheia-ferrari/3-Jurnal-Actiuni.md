@@ -1695,4 +1695,11 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - **Modificări:** adăugat linkul `/comunitate/` în `desktopMenuModules` din `src/components/Header.astro`; meniul mobil și bara desktop existentă aveau deja linkul corect.
 - **Validări:** `npm run seo:audit` — 60 pagini, 0 FAIL, 0 WARN; `npm run seo:check` — trecut; `npm run build` — complet, fără erori; verificat în `dist/client/index.html` textul `Comunitate` și ruta `/comunitate/`. `get_errors` pe `Header.astro` — fără erori.
 
+## 📝 2026-09-13 — Diagnostic CodeQL Advanced
+- **Simptom:** run-ul CodeQL pentru commitul `f43e9e4a` era marcat cu `failure` prin jobul `Analyze (actions)`.
+- **Diagnostic:** `Analyze (javascript-typescript)` a fost `success`; `Initialize CodeQL` a trecut pentru ambele joburi, iar eșecul apărea doar la `Perform CodeQL Analysis` pentru limbajul `actions`. Aceeași separare exista și în run-ul anterior, deci problema nu provenea din articolul Majestic sau din Astro/TypeScript.
+- **Fix:** eliminat `actions` din matrix-ul `.github/workflows/codeql.yml`; păstrată analiza `javascript-typescript` cu `build-mode: none`, configurația potrivită pentru sursa Astro necompilată de CodeQL.
+- **Validări:** API GitHub verificat pentru run-ul `34749038374`; validare locală a workflow-ului — un singur limbaj (`javascript-typescript`), `git diff --check` curat și `get_errors` fără erori. Următorul push va declanșa un singur job CodeQL relevant.
+- **Limitare:** logul detaliat al jobului nu a putut fi descărcat anonim, deoarece endpoint-ul GitHub cere drepturi admin; concluzia este însă izolată prin statusurile independente ale joburilor și reproducerea în două run-uri consecutive.
+
 
