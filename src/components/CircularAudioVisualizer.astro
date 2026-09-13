@@ -1,0 +1,380 @@
+---
+export interface Props {
+  audioUrl: string;
+  title?: string;
+  tagline?: string;
+  imageSrc?: string;
+  imageAlt?: string;
+}
+
+const {
+  audioUrl,
+  title = 'Formația Florentina Pană',
+  tagline = 'Muzică live pentru nunți, botezuri și evenimente private — solicită oferta acum!',
+  imageSrc = '/images/galerie-foto-site-optimized/Florentina Pană 11.webp',
+  imageAlt = 'Florentina Pană — solistă vocală formație live',
+} = Astro.props;
+---
+
+<div class="cav" data-cav>
+  <p class="cav__title">{title}</p>
+  <p class="cav__tagline">{tagline}</p>
+
+  <div class="cav__stage">
+    <canvas class="cav__canvas" data-cav-canvas width="360" height="360" aria-hidden="true"></canvas>
+
+    <div class="cav__disc">
+      <img class="cav__image" src={imageSrc} alt={imageAlt} loading="lazy" width="180" height="180" />
+      <button type="button" class="cav__play" data-cav-play aria-pressed="false" aria-label="Redă melodia">
+        <svg class="cav__icon cav__icon--play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+        <svg class="cav__icon cav__icon--pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <audio data-cav-audio src={audioUrl} preload="none" crossorigin="anonymous"></audio>
+</div>
+
+<style>
+  .cav {
+    --cav-accent-1: #ff2d6a;
+    --cav-accent-2: #21e6c1;
+    --cav-accent-3: #ffd166;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 1.75rem 1.25rem 2rem;
+    border-radius: 28px;
+    background: radial-gradient(120% 140% at 50% -10%, #1c1032 0%, #0b0617 55%, #060309 100%);
+    box-shadow: 0 25px 60px rgb(0 0 0 / 45%), inset 0 0 0 1px rgb(255 255 255 / 6%);
+    text-align: center;
+    color: #f4f0ff;
+    overflow: hidden;
+  }
+
+  .cav__title {
+    margin: 0;
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(1.1rem, 4vw, 1.5rem);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    background: linear-gradient(90deg, var(--cav-accent-2), var(--cav-accent-1));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .cav__tagline {
+    margin: 0 0 0.5rem;
+    max-width: 320px;
+    font-size: 0.82rem;
+    line-height: 1.45;
+    color: #c7bfe0;
+  }
+
+  .cav__stage {
+    --cav-pulse: 0;
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: min(82vw, 280px);
+    aspect-ratio: 1 / 1;
+    margin: 0.35rem 0 0.6rem;
+  }
+
+  .cav__canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .cav__disc {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 58%;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    background: #12081f;
+    box-shadow:
+      0 0 0 2px rgb(255 255 255 / 10%),
+      0 12px 30px rgb(0 0 0 / 55%),
+      0 0 calc(8px + var(--cav-pulse, 0) * 46px) calc(1px + var(--cav-pulse, 0) * 10px) rgb(33 230 193 / calc(0.25 + var(--cav-pulse, 0) * 0.5));
+    transition: box-shadow 120ms ease-out;
+    overflow: hidden;
+  }
+
+  .cav__image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.85;
+  }
+
+  .cav__play {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 44%;
+    aspect-ratio: 1 / 1;
+    border: none;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--cav-accent-1), var(--cav-accent-2));
+    color: #0b0617;
+    cursor: pointer;
+    box-shadow: 0 0 0 4px rgb(255 255 255 / 12%), 0 8px 22px rgb(255 45 106 / 45%);
+    transition: transform 160ms ease, box-shadow 160ms ease;
+  }
+
+  .cav__play:hover,
+  .cav__play:focus-visible {
+    transform: scale(1.06);
+    box-shadow: 0 0 0 4px rgb(255 255 255 / 18%), 0 10px 26px rgb(33 230 193 / 55%);
+  }
+
+  .cav__play:active {
+    transform: scale(0.96);
+  }
+
+  .cav__icon {
+    width: 46%;
+    height: 46%;
+    fill: currentColor;
+  }
+
+  .cav__icon--pause {
+    display: none;
+  }
+
+  .cav[data-playing='true'] .cav__icon--play {
+    display: none;
+  }
+
+  .cav[data-playing='true'] .cav__icon--pause {
+    display: block;
+  }
+
+  .cav[data-playing='true'] .cav__disc {
+    animation: cav-spin 12s linear infinite;
+  }
+
+  @keyframes cav-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cav[data-playing='true'] .cav__disc {
+      animation: none;
+    }
+  }
+
+  @media (min-width: 640px) {
+    .cav {
+      padding: 2.25rem 2rem 2.5rem;
+    }
+    .cav__stage {
+      width: 320px;
+    }
+  }
+</style>
+
+<script>
+  type CavState = {
+    audioCtx: AudioContext | null;
+    analyser: AnalyserNode | null;
+    sourceConnected: boolean;
+  };
+
+  const nodes = document.querySelectorAll<HTMLElement>('[data-cav]');
+
+  nodes.forEach((root) => {
+    const audio = root.querySelector<HTMLAudioElement>('[data-cav-audio]');
+    const playBtn = root.querySelector<HTMLButtonElement>('[data-cav-play]');
+    const canvas = root.querySelector<HTMLCanvasElement>('[data-cav-canvas]');
+    if (!audio || !playBtn || !canvas) return;
+
+    const ctx2d = canvas.getContext('2d');
+    const state: CavState = { audioCtx: null, analyser: null, sourceConnected: false };
+    let rafId = 0;
+    let fade = 0;
+    let fadeTarget = 0;
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const resizeCanvas = () => {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+    };
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas, { passive: true });
+
+    const ensureAudioGraph = () => {
+      if (state.audioCtx) return;
+      const AudioContextCtor = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextCtor) return;
+      const audioCtx: AudioContext = new AudioContextCtor();
+      const analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 128;
+      analyser.smoothingTimeConstant = 0.75;
+
+      try {
+        const source = audioCtx.createMediaElementSource(audio);
+        try {
+          source.connect(analyser);
+          analyser.connect(audioCtx.destination);
+        } catch (wiringError) {
+          // keep audio audible even if the analyser graph fails to connect
+          source.connect(audioCtx.destination);
+          console.error('CircularAudioVisualizer: analyser wiring failed', wiringError);
+        }
+        state.sourceConnected = true;
+      } catch (sourceError) {
+        state.sourceConnected = false;
+        console.error('CircularAudioVisualizer: could not attach Web Audio graph, falling back to plain playback', sourceError);
+      }
+
+      state.audioCtx = audioCtx;
+      state.analyser = analyser;
+    };
+
+    const drawIdle = () => {
+      if (!ctx2d) return;
+      ctx2d.clearRect(0, 0, canvas.width, canvas.height);
+    };
+    drawIdle();
+
+    // fixed neon palette repeated around the ring: green, red, cyan, yellow
+    const NEON_COLORS = ['#39ff14', '#ff2f4e', '#22e6ff', '#ffe94d'];
+    const BARS = 60;
+
+    const draw = () => {
+      rafId = requestAnimationFrame(draw);
+      if (!ctx2d) return;
+
+      const w = canvas.width;
+      const h = canvas.height;
+      const cx = w / 2;
+      const cy = h / 2;
+      const baseRadius = Math.min(w, h) * 0.36;
+
+      // ease fade toward its target (instant start, smooth stop)
+      fade += (fadeTarget - fade) * 0.14;
+      if (fade < 0.004) fade = 0;
+
+      let data: Uint8Array;
+      if (state.analyser && state.sourceConnected) {
+        data = new Uint8Array(state.analyser.frequencyBinCount);
+        state.analyser.getByteFrequencyData(data);
+      } else {
+        data = new Uint8Array(BARS);
+      }
+
+      ctx2d.clearRect(0, 0, w, h);
+      const barWidth = Math.max(2, w * 0.016);
+      let totalAmplitude = 0;
+
+      for (let i = 0; i < BARS; i++) {
+        const value = data[i % data.length] ?? 0;
+        const reactive = state.sourceConnected
+          ? value / 255
+          : 0.18 + 0.12 * Math.sin(Date.now() / 320 + i);
+        const amplitude = reactive * fade;
+        totalAmplitude += amplitude;
+
+        const idleLen = baseRadius * 0.06;
+        const reactiveLen = baseRadius * 0.62 * amplitude;
+        const barLength = idleLen + reactiveLen;
+        const angle = (i / BARS) * Math.PI * 2;
+
+        const x1 = cx + Math.cos(angle) * baseRadius;
+        const y1 = cy + Math.sin(angle) * baseRadius;
+        const x2 = cx + Math.cos(angle) * (baseRadius + barLength);
+        const y2 = cy + Math.sin(angle) * (baseRadius + barLength);
+
+        const color = NEON_COLORS[i % NEON_COLORS.length];
+        ctx2d.lineCap = 'round';
+        ctx2d.lineWidth = barWidth;
+        ctx2d.strokeStyle = color;
+        ctx2d.shadowColor = color;
+        ctx2d.shadowBlur = 4 + amplitude * 18;
+        ctx2d.globalAlpha = 0.35 + fade * 0.65;
+        ctx2d.beginPath();
+        ctx2d.moveTo(x1, y1);
+        ctx2d.lineTo(x2, y2);
+        ctx2d.stroke();
+      }
+
+      ctx2d.globalAlpha = 1;
+      ctx2d.shadowBlur = 0;
+
+      const glow = Math.min(1, totalAmplitude / BARS);
+      root.style.setProperty('--cav-pulse', glow.toFixed(3));
+
+      if (fadeTarget === 0 && fade === 0) {
+        cancelAnimationFrame(rafId);
+        rafId = 0;
+        root.style.setProperty('--cav-pulse', '0');
+      }
+    };
+
+    const startVisual = () => {
+      fadeTarget = 1;
+      if (rafId) return;
+      draw();
+    };
+
+    const stopVisual = () => {
+      fadeTarget = 0;
+      // keep the loop running until draw() detects fade has settled to 0
+    };
+
+    playBtn.addEventListener('click', async () => {
+      ensureAudioGraph();
+      if (state.audioCtx && state.audioCtx.state === 'suspended') {
+        await state.audioCtx.resume().catch((resumeError) => {
+          console.error('CircularAudioVisualizer: audioContext.resume failed', resumeError);
+        });
+      }
+
+      if (audio.paused) {
+        audio.muted = false;
+        audio.volume = 1;
+        try {
+          await audio.play();
+        } catch (playError) {
+          console.error('CircularAudioVisualizer: audio.play() failed', playError);
+        }
+      } else {
+        audio.pause();
+      }
+    });
+
+    audio.addEventListener('play', () => {
+      root.dataset.playing = 'true';
+      playBtn.setAttribute('aria-pressed', 'true');
+      startVisual();
+    });
+
+    audio.addEventListener('pause', () => {
+      root.dataset.playing = 'false';
+      playBtn.setAttribute('aria-pressed', 'false');
+      stopVisual();
+    });
+
+    audio.addEventListener('ended', () => {
+      root.dataset.playing = 'false';
+      playBtn.setAttribute('aria-pressed', 'false');
+      stopVisual();
+    });
+  });
+</script>

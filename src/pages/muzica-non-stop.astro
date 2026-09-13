@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BackButton from '../components/BackButton.astro';
 import AudioPlaylistPlayer from '../components/AudioPlaylistPlayer.astro';
+import CircularAudioVisualizer from '../components/CircularAudioVisualizer.astro';
 import audioCatalog from '../data/audio-catalog.generated.json';
 import remoteAudioCatalog from '../data/audio-catalog-remote.json';
 
@@ -78,6 +79,13 @@ const musicPlaylistSchema = {
       <a href="/cauti-formatie-nunta/" class="audio-page__close-link">Închide biblioteca audio</a>
     </div>
     <h1 class="audio-page__title">Biblioteca Audio Formația Florentina Pană</h1>
+    <CircularAudioVisualizer
+      audioUrl={audioTracks[0]?.audioUrl ?? ''}
+      title="Formația Florentina Pană"
+      tagline="Muzică live pentru nunți, botezuri și evenimente private — solicită oferta acum!"
+      imageSrc="/images/galerie-foto-site-optimized/Florentina Pană 11.webp"
+      imageAlt="Florentina Pană — solistă vocală formație live"
+    />
     <AudioPlaylistPlayer tracks={audioTracks} playlistTitle="Repertoriu & Mostre Live" />
     <section class="audio-seo-copy" aria-labelledby="audio-seo-title">
       <h2 id="audio-seo-title">Muzică populară și de petrecere pentru nunți și evenimente</h2>
