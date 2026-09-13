@@ -379,6 +379,13 @@ git push origin main
 - **Modificări:** corectat URL schema `CollectionPage` în `/comunitate/` (era fără slash), corectat URL `Offer` în `momente-cu-mirii` către `/contact/`, normalizat fallback `pagePath` în `PhotoGallery` la `/galerie-foto/` și actualizat exemplul `EmbedSnippet` la varianta canonical.
 - **Validări:** `get_errors` pe fișierele modificate — fără erori; `npm run seo:check` — build reușit, audit local 60 pagini, 0 FAIL | 0 WARN; scan output `dist/client` — fără linkuri interne de pagină fără slash final.
 
+## 📝 2026-09-13 — Aranjare stilistică și formatare articol blog Restaurant Majestic
+- **Obiectiv:** Îmbunătățirea aspectului vizual și a lizibilității articolului de blog dedicat Restaurantului Majestic Pitești.
+- **Modificări:**
+  - În [src/pages/publicatii/[slug].astro](src/pages/publicatii/[slug].astro): adăugat suport stilistic CSS global în `.prose-shell` pentru `blockquote` (casetă elegantă cu bordură aurie `#f2cc7f`), liste ordonate/neordonate (`ul`, `ol`, `li`), text aliniat cu accent pe `strong` și separator vizual `hr`.
+  - În [src/content/publicatii/restaurant-majestic-pitesti-experienta-de-5-stele.md](src/content/publicatii/restaurant-majestic-pitesti-experienta-de-5-stele.md): structurat textul cu un citat reprezentativ (blockquote), buline sintetice cu highlights bold pe punctele cheie, separatoare elegante și o secțiune aerisită de link-uri utile cu pictograme.
+- **Validări:** `npm run build` — reușit; `node scripts/qa-check.mjs` — 49 OK | 0 FAIL; formatare responsive pe mobil și desktop.
+
 ## 📝 2026-09-13 — Articol Restaurant Majestic și categoria locațiilor de 5 stele
 - **Obiectiv:** Crearea primului articol din seria „Locații de 5 Stele | Parteneri de Încredere”, dedicat Restaurantului Majestic Pitești, și stabilirea unei categorii editoriale pentru recomandări de restaurante.
 - **Modificări:** adăugat `src/content/publicatii/restaurant-majestic-pitesti-experienta-de-5-stele.md`, cu structură H1/H2/H3, facilități despre acustică, ring de dans și servire, outbound către `https://salonmajestic.ro/`, linkuri interne către ofertă, repertoriu și contact, plus text pregătit pentru Facebook; schema colecției acceptă `locatie`; articolele locale cu locație generează `BlogPosting` și `contentLocation` în Pitești, Argeș.
