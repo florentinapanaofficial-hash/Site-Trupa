@@ -31,7 +31,7 @@ O formație poate construi atmosfera, dar reușita unei seri depinde de întreag
 
 Restaurant Majestic Pitești intră în seria noastră **Locații de 5 Stele | Parteneri de Încredere** pentru felul în care îmbină eleganța sălii, organizarea și deschiderea către o colaborare profesionistă cu formațiile live.
 
-Poți afla mai multe despre locație pe <a href="https://restaurantmajestic.ro/" target="_blank" rel="noopener noreferrer">site-ul oficial Restaurant Majestic Pitești</a>. Pentru partea muzicală, îți recomandăm să consulți <a href="/oferta-premium/">serviciile noastre pentru evenimente</a> și <a href="/muzica-non-stop/">repertoriul disponibil</a>, apoi să ne scrii pe <a href="/contact/">pagina de contact și rezervări</a> cu data și locația evenimentului.
+Poți afla mai multe despre locație pe <a href="https://salonmajestic.ro/" target="_blank" rel="noopener noreferrer">site-ul oficial Restaurant Majestic Pitești</a>. Pentru partea muzicală, îți recomandăm să consulți <a href="/oferta-premium/">serviciile noastre pentru evenimente</a> și <a href="/muzica-non-stop/">repertoriul disponibil</a>, apoi să ne scrii pe <a href="/contact/">pagina de contact și rezervări</a> cu data și locația evenimentului.
 
 ## Formație live pentru o seară memorabilă
 
