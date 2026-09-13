@@ -1,6 +1,5 @@
 ---
 export interface Props {
-  audioUrl: string;
   title?: string;
   tagline?: string;
   imageSrc?: string;
@@ -8,7 +7,6 @@ export interface Props {
 }
 
 const {
-  audioUrl,
   title = 'Formația Florentina Pană',
   tagline = 'Muzică live pentru nunți, botezuri și evenimente private — solicită oferta acum!',
   imageSrc = '/images/galerie-foto-site-optimized/Florentina Pană 11.webp',
@@ -17,22 +15,43 @@ const {
 ---
 
 <div class="cav" data-cav>
-  <p class="cav__title">{title}</p>
-  <p class="cav__tagline">{tagline}</p>
+  <div class="cav__backdrop" data-cav-backdrop></div>
 
-  <div class="cav__stage">
-    <canvas class="cav__canvas" data-cav-canvas width="360" height="360" aria-hidden="true"></canvas>
+  <div class="cav__panel" role="dialog" aria-modal="true" aria-label={`Player audio — ${title}`}>
+    <button type="button" class="cav__close" data-cav-close aria-label="Închide playerul">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+    </button>
 
-    <div class="cav__disc">
-      <img class="cav__image" src={imageSrc} alt={imageAlt} loading="lazy" width="180" height="180" />
-      <button type="button" class="cav__play" data-cav-play aria-pressed="false" aria-label="Redă melodia">
-        <svg class="cav__icon cav__icon--play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
-        <svg class="cav__icon cav__icon--pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-      </button>
+    <p class="cav__title">{title}</p>
+    <p class="cav__tagline">{tagline}</p>
+
+    <div class="cav__stage">
+      <canvas class="cav__canvas" data-cav-canvas width="360" height="360" aria-hidden="true"></canvas>
+
+      <div class="cav__disc">
+        <img class="cav__image" src={imageSrc} alt={imageAlt} loading="lazy" width="220" height="220" />
+        <button type="button" class="cav__play" data-cav-play aria-pressed="false" aria-label="Redă / Pauză">
+          <svg class="cav__icon cav__icon--play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+          <svg class="cav__icon cav__icon--pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="cav__nowplaying">
+      <p class="cav__track-title" data-cav-title>—</p>
+      <p class="cav__track-artist" data-cav-artist></p>
+    </div>
+
+    <div class="cav__progress" data-cav-progress role="slider" aria-label="Poziție redare" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+      <div class="cav__progress-track">
+        <div class="cav__progress-fill" data-cav-progress-fill></div>
+      </div>
+      <div class="cav__progress-time">
+        <span data-cav-current>0:00</span>
+        <span data-cav-duration>0:00</span>
+      </div>
     </div>
   </div>
-
-  <audio data-cav-audio src={audioUrl} preload="none" crossorigin="anonymous"></audio>
 </div>
 
 <style>
@@ -40,20 +59,82 @@ const {
     --cav-accent-1: #ff2d6a;
     --cav-accent-2: #21e6c1;
     --cav-accent-3: #ffd166;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 220ms ease, visibility 0s linear 220ms;
+  }
+
+  .cav.is-open {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+    transition: opacity 220ms ease, visibility 0s linear 0s;
+  }
+
+  .cav__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgb(4 2 10 / 78%);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .cav__panel {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.4rem;
-    width: 100%;
-    max-width: 420px;
-    margin: 0 auto;
-    padding: 1.75rem 1.25rem 2rem;
+    width: min(92vw, 420px);
+    max-height: 92vh;
+    overflow-y: auto;
+    margin: auto;
+    padding: 2.25rem 1.25rem 2rem;
     border-radius: 28px;
     background: radial-gradient(120% 140% at 50% -10%, #1c1032 0%, #0b0617 55%, #060309 100%);
-    box-shadow: 0 25px 60px rgb(0 0 0 / 45%), inset 0 0 0 1px rgb(255 255 255 / 6%);
+    box-shadow: 0 25px 60px rgb(0 0 0 / 55%), inset 0 0 0 1px rgb(255 255 255 / 6%);
     text-align: center;
     color: #f4f0ff;
-    overflow: hidden;
+    transform: scale(0.94);
+    transition: transform 220ms ease;
+  }
+
+  .cav.is-open .cav__panel {
+    transform: scale(1);
+  }
+
+  .cav__close {
+    position: absolute;
+    top: 0.85rem;
+    right: 0.85rem;
+    display: grid;
+    place-items: center;
+    width: 2.1rem;
+    height: 2.1rem;
+    border: 1px solid rgb(255 255 255 / 18%);
+    border-radius: 50%;
+    background: rgb(255 255 255 / 8%);
+    color: #f4f0ff;
+    cursor: pointer;
+    transition: background 160ms ease, transform 160ms ease;
+  }
+
+  .cav__close:hover,
+  .cav__close:focus-visible {
+    background: rgb(255 255 255 / 16%);
+    transform: rotate(90deg);
+  }
+
+  .cav__close svg {
+    width: 46%;
+    height: 46%;
   }
 
   .cav__title {
@@ -166,6 +247,62 @@ const {
     animation: cav-spin 12s linear infinite;
   }
 
+  .cav__nowplaying {
+    margin-top: 0.3rem;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .cav__track-title {
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+
+  .cav__track-artist {
+    margin: 0.15rem 0 0;
+    color: #9eafc2;
+    font-size: 0.82rem;
+  }
+
+  .cav__progress {
+    width: 100%;
+    max-width: 320px;
+    margin-top: 0.9rem;
+    cursor: pointer;
+  }
+
+  .cav__progress-track {
+    position: relative;
+    width: 100%;
+    height: 6px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 12%);
+    overflow: hidden;
+  }
+
+  .cav__progress-fill {
+    position: absolute;
+    inset: 0;
+    width: 0%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--cav-accent-2), var(--cav-accent-1));
+    transition: width 100ms linear;
+  }
+
+  .cav__progress-time {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.4rem;
+    color: #9eafc2;
+    font-size: 0.72rem;
+    font-variant-numeric: tabular-nums;
+  }
+
   @keyframes cav-spin {
     to {
       transform: rotate(360deg);
@@ -179,7 +316,7 @@ const {
   }
 
   @media (min-width: 640px) {
-    .cav {
+    .cav__panel {
       padding: 2.25rem 2rem 2.5rem;
     }
     .cav__stage {
@@ -195,19 +332,34 @@ const {
     sourceConnected: boolean;
   };
 
+  const getSharedAudio = (): HTMLAudioElement | null => (window as any).__fpAudio ?? null;
+
   const nodes = document.querySelectorAll<HTMLElement>('[data-cav]');
 
   nodes.forEach((root) => {
-    const audio = root.querySelector<HTMLAudioElement>('[data-cav-audio]');
+    // #continut has overflow:clip, which would clip this fixed overlay — escape it to <body>
+    if (root.parentElement !== document.body) {
+      document.body.appendChild(root);
+    }
+
     const playBtn = root.querySelector<HTMLButtonElement>('[data-cav-play]');
+    const closeBtn = root.querySelector<HTMLButtonElement>('[data-cav-close]');
+    const backdrop = root.querySelector<HTMLElement>('[data-cav-backdrop]');
     const canvas = root.querySelector<HTMLCanvasElement>('[data-cav-canvas]');
-    if (!audio || !playBtn || !canvas) return;
+    const titleEl = root.querySelector<HTMLElement>('[data-cav-title]');
+    const artistEl = root.querySelector<HTMLElement>('[data-cav-artist]');
+    const progressEl = root.querySelector<HTMLElement>('[data-cav-progress]');
+    const progressFill = root.querySelector<HTMLElement>('[data-cav-progress-fill]');
+    const currentTimeEl = root.querySelector<HTMLElement>('[data-cav-current]');
+    const durationEl = root.querySelector<HTMLElement>('[data-cav-duration]');
+    if (!playBtn || !closeBtn || !canvas) return;
 
     const ctx2d = canvas.getContext('2d');
     const state: CavState = { audioCtx: null, analyser: null, sourceConnected: false };
     let rafId = 0;
     let fade = 0;
     let fadeTarget = 0;
+    let boundAudio: HTMLAudioElement | null = null;
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const resizeCanvas = () => {
@@ -218,7 +370,7 @@ const {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas, { passive: true });
 
-    const ensureAudioGraph = () => {
+    const ensureAudioGraph = (audio: HTMLAudioElement) => {
       if (state.audioCtx) return;
       const AudioContextCtor = window.AudioContext || (window as any).webkitAudioContext;
       if (!AudioContextCtor) return;
@@ -235,27 +387,21 @@ const {
         } catch (wiringError) {
           // keep audio audible even if the analyser graph fails to connect
           source.connect(audioCtx.destination);
-          console.error('CircularAudioVisualizer: analyser wiring failed', wiringError);
+          console.error('AudioVisualizerModal: analyser wiring failed', wiringError);
         }
         state.sourceConnected = true;
       } catch (sourceError) {
         state.sourceConnected = false;
-        console.error('CircularAudioVisualizer: could not attach Web Audio graph, falling back to plain playback', sourceError);
+        console.error('AudioVisualizerModal: could not attach Web Audio graph, falling back to plain playback', sourceError);
       }
 
       state.audioCtx = audioCtx;
       state.analyser = analyser;
     };
 
-    const drawIdle = () => {
-      if (!ctx2d) return;
-      ctx2d.clearRect(0, 0, canvas.width, canvas.height);
-    };
-    drawIdle();
-
     // fixed neon palette repeated around the ring: green, red, cyan, yellow
     const NEON_COLORS = ['#39ff14', '#ff2f4e', '#22e6ff', '#ffe94d'];
-    const BARS = 60;
+    const BARS = 64;
 
     const draw = () => {
       rafId = requestAnimationFrame(draw);
@@ -265,7 +411,7 @@ const {
       const h = canvas.height;
       const cx = w / 2;
       const cy = h / 2;
-      const baseRadius = Math.min(w, h) * 0.36;
+      const baseRadius = Math.min(w, h) * 0.32;
 
       // ease fade toward its target (instant start, smooth stop)
       fade += (fadeTarget - fade) * 0.14;
@@ -280,38 +426,39 @@ const {
       }
 
       ctx2d.clearRect(0, 0, w, h);
-      const barWidth = Math.max(2, w * 0.016);
+      const barThickness = Math.max(2, w * 0.013);
       let totalAmplitude = 0;
 
       for (let i = 0; i < BARS; i++) {
         const value = data[i % data.length] ?? 0;
         const reactive = state.sourceConnected
           ? value / 255
-          : 0.18 + 0.12 * Math.sin(Date.now() / 320 + i);
+          : 0.25 + 0.18 * Math.sin(Date.now() / 260 + i * 0.7);
         const amplitude = reactive * fade;
         totalAmplitude += amplitude;
 
-        const idleLen = baseRadius * 0.06;
-        const reactiveLen = baseRadius * 0.62 * amplitude;
+        const idleLen = baseRadius * 0.24;
+        const reactiveLen = baseRadius * 1.1 * amplitude;
         const barLength = idleLen + reactiveLen;
-        const angle = (i / BARS) * Math.PI * 2;
-
-        const x1 = cx + Math.cos(angle) * baseRadius;
-        const y1 = cy + Math.sin(angle) * baseRadius;
-        const x2 = cx + Math.cos(angle) * (baseRadius + barLength);
-        const y2 = cy + Math.sin(angle) * (baseRadius + barLength);
-
+        const angle = (i / BARS) * Math.PI * 2 - Math.PI / 2;
         const color = NEON_COLORS[i % NEON_COLORS.length];
-        ctx2d.lineCap = 'round';
-        ctx2d.lineWidth = barWidth;
-        ctx2d.strokeStyle = color;
+
+        ctx2d.save();
+        ctx2d.translate(cx, cy);
+        ctx2d.rotate(angle);
+        ctx2d.fillStyle = color;
         ctx2d.shadowColor = color;
-        ctx2d.shadowBlur = 4 + amplitude * 18;
-        ctx2d.globalAlpha = 0.35 + fade * 0.65;
+        ctx2d.shadowBlur = 5 + amplitude * 22;
+        ctx2d.globalAlpha = 0.4 + fade * 0.6;
         ctx2d.beginPath();
-        ctx2d.moveTo(x1, y1);
-        ctx2d.lineTo(x2, y2);
-        ctx2d.stroke();
+        const rectY = -barThickness / 2;
+        if (typeof ctx2d.roundRect === 'function') {
+          ctx2d.roundRect(baseRadius, rectY, barLength, barThickness, barThickness / 2);
+        } else {
+          ctx2d.rect(baseRadius, rectY, barLength, barThickness);
+        }
+        ctx2d.fill();
+        ctx2d.restore();
       }
 
       ctx2d.globalAlpha = 1;
@@ -338,11 +485,35 @@ const {
       // keep the loop running until draw() detects fade has settled to 0
     };
 
+    const openModal = () => {
+      root.classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+    };
+
+    const closeModal = () => {
+      root.classList.remove('is-open');
+      document.body.style.overflow = '';
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    backdrop?.addEventListener('click', closeModal);
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && root.classList.contains('is-open')) closeModal();
+    });
+
+    window.addEventListener('fp-track-change', (event) => {
+      const detail = (event as CustomEvent<{ title?: string; artist?: string }>).detail || {};
+      if (titleEl && detail.title) titleEl.textContent = detail.title;
+      if (artistEl) artistEl.textContent = detail.artist || '';
+    });
+
     playBtn.addEventListener('click', async () => {
-      ensureAudioGraph();
+      const audio = getSharedAudio();
+      if (!audio) return;
+      ensureAudioGraph(audio);
       if (state.audioCtx && state.audioCtx.state === 'suspended') {
         await state.audioCtx.resume().catch((resumeError) => {
-          console.error('CircularAudioVisualizer: audioContext.resume failed', resumeError);
+          console.error('AudioVisualizerModal: audioContext.resume failed', resumeError);
         });
       }
 
@@ -352,29 +523,80 @@ const {
         try {
           await audio.play();
         } catch (playError) {
-          console.error('CircularAudioVisualizer: audio.play() failed', playError);
+          console.error('AudioVisualizerModal: audio.play() failed', playError);
         }
       } else {
         audio.pause();
       }
     });
 
-    audio.addEventListener('play', () => {
-      root.dataset.playing = 'true';
-      playBtn.setAttribute('aria-pressed', 'true');
-      startVisual();
-    });
+    const bindAudioEvents = (audio: HTMLAudioElement) => {
+      if (boundAudio === audio) return;
+      boundAudio = audio;
 
-    audio.addEventListener('pause', () => {
-      root.dataset.playing = 'false';
-      playBtn.setAttribute('aria-pressed', 'false');
-      stopVisual();
-    });
+      const formatTime = (seconds: number) => {
+        if (!Number.isFinite(seconds) || seconds < 0) return '0:00';
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+      };
 
-    audio.addEventListener('ended', () => {
-      root.dataset.playing = 'false';
-      playBtn.setAttribute('aria-pressed', 'false');
-      stopVisual();
-    });
+      const updateProgress = () => {
+        if (!audio.duration || !Number.isFinite(audio.duration)) return;
+        const ratio = Math.min(1, Math.max(0, audio.currentTime / audio.duration));
+        if (progressFill) progressFill.style.width = `${ratio * 100}%`;
+        if (currentTimeEl) currentTimeEl.textContent = formatTime(audio.currentTime);
+        if (durationEl) durationEl.textContent = formatTime(audio.duration);
+        progressEl?.setAttribute('aria-valuenow', Math.round(ratio * 100).toString());
+      };
+
+      audio.addEventListener('timeupdate', updateProgress);
+      audio.addEventListener('loadedmetadata', updateProgress);
+
+      progressEl?.addEventListener('click', (event) => {
+        const rect = progressEl.getBoundingClientRect();
+        const clickX = (event as MouseEvent).clientX - rect.left;
+        const ratio = Math.min(1, Math.max(0, clickX / rect.width));
+        if (audio.duration && Number.isFinite(audio.duration)) {
+          audio.currentTime = ratio * audio.duration;
+          updateProgress();
+        }
+      });
+
+      audio.addEventListener('play', () => {
+        root.dataset.playing = 'true';
+        playBtn.setAttribute('aria-pressed', 'true');
+        ensureAudioGraph(audio);
+        startVisual();
+        openModal();
+      });
+
+      audio.addEventListener('pause', () => {
+        root.dataset.playing = 'false';
+        playBtn.setAttribute('aria-pressed', 'false');
+        stopVisual();
+      });
+
+      audio.addEventListener('ended', () => {
+        root.dataset.playing = 'false';
+        playBtn.setAttribute('aria-pressed', 'false');
+        stopVisual();
+      });
+    };
+
+    // the shared <audio> element is created by AudioPlaylistPlayer; wait for it if not ready yet
+    const existingAudio = getSharedAudio();
+    if (existingAudio) {
+      bindAudioEvents(existingAudio);
+    } else {
+      const waitId = window.setInterval(() => {
+        const audio = getSharedAudio();
+        if (audio) {
+          bindAudioEvents(audio);
+          window.clearInterval(waitId);
+        }
+      }, 150);
+      window.setTimeout(() => window.clearInterval(waitId), 8000);
+    }
   });
 </script>

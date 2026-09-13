@@ -19,18 +19,21 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
 ---
 
 <div class="playlist-player bg-slate-900 border border-slate-800/80 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl max-w-3xl mx-auto my-4 sm:my-8 text-white font-sans w-full">
-  <div class="flex items-center justify-between gap-2 mb-3 sm:mb-4">
-    <div class="min-w-0 flex-1">
-      <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-indigo-400">Acum se redă</span>
-      <div class="current-track-title select-none cursor-default text-base sm:text-xl font-bold text-slate-100"><span class="current-track-title__text">{initialTrack.title}</span></div>
-      <p class="current-track-artist select-none cursor-default text-xs sm:text-sm text-slate-400 truncate">{initialTrack.artist || "Live"}</p>
-    </div>
-    <div class="shrink-0 text-[11px] sm:text-xs font-mono text-slate-300 bg-slate-800/90 px-2.5 py-1 rounded-lg border border-slate-700/60">
-      <span class="time-current text-indigo-300 font-semibold">0:00</span> / <span class="time-total">0:00</span>
-    </div>
+  <div class="flex flex-col items-center text-center gap-1 mb-3 sm:mb-4">
+    <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-indigo-400">Acum se redă</span>
+    <div class="current-track-title select-none cursor-default text-base sm:text-xl font-bold text-slate-100 mx-auto"><span class="current-track-title__text">{initialTrack.title}</span></div>
+    <p class="current-track-artist select-none cursor-default text-xs sm:text-sm text-slate-400 truncate">{initialTrack.artist || "Live"}</p>
   </div>
 
-  <div id="waveform-container" class="w-full cursor-pointer py-2 sm:py-3 rounded-xl bg-slate-950/60 px-1 sm:px-2 my-1 sm:my-2 border border-slate-800/60"></div>
+  <div class="playlist-progress" data-playlist-progress role="slider" aria-label="Poziție redare" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+    <div class="playlist-progress-track">
+      <div class="playlist-progress-fill" data-playlist-progress-fill></div>
+    </div>
+    <div class="playlist-progress-time">
+      <span class="time-current">0:00</span>
+      <span class="time-total">0:00</span>
+    </div>
+  </div>
 
   <div class="flex items-center justify-between mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-slate-800/80">
     <div class="flex items-center gap-2 sm:gap-3">
@@ -68,7 +71,7 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
           data-artist={track.artist || "Live"}
         >
           <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
-            <span class="track-index text-xs font-mono text-slate-500 w-4 shrink-0 text-center">{idx + 1}</span>
+            <span class="track-index flex items-center justify-center text-xs font-mono text-slate-400 bg-slate-800/80 border border-slate-700/60 rounded-full w-6 h-6 shrink-0">{idx + 1}</span>
             <div class="min-w-0 flex-1">
               <div class="track-name font-medium text-xs sm:text-sm text-slate-200"><span class="track-name__text">{track.title}</span></div>
               <div class="text-[11px] sm:text-xs text-slate-500 truncate">{track.artist}</div>
@@ -123,6 +126,40 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
     isolation: isolate;
     contain: paint;
     clip-path: inset(0);
+  }
+
+  .playlist-progress {
+    width: 100%;
+    max-width: 420px;
+    margin: 0.4rem auto 0;
+    cursor: pointer;
+  }
+
+  .playlist-progress-track {
+    position: relative;
+    width: 100%;
+    height: 6px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 10%);
+    overflow: hidden;
+  }
+
+  .playlist-progress-fill {
+    position: absolute;
+    inset: 0;
+    width: 0%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #6366f1, #22e6ff);
+    transition: width 100ms linear;
+  }
+
+  .playlist-progress-time {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.35rem;
+    color: #93a3b8;
+    font-size: 0.72rem;
+    font-variant-numeric: tabular-nums;
   }
 
   .current-track-title__text {
@@ -183,8 +220,6 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
 </style>
 
 <script>
-  import WaveSurfer from 'wavesurfer.js';
-
   const formatTime = (seconds: number) => {
     if (isNaN(seconds) || seconds === 0) return '0:00';
     const mins = Math.floor(seconds / 60);
@@ -206,6 +241,8 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
     const btnNext = root.querySelector('.btn-next');
     const btnPrev = root.querySelector('.btn-prev');
     const volumeSlider = root.querySelector<HTMLInputElement>('.volume-slider');
+    const progressEl = root.querySelector<HTMLElement>('[data-playlist-progress]');
+    const progressFill = root.querySelector<HTMLElement>('[data-playlist-progress-fill]');
 
     let titleMeasureRaf = 0;
     const updateTitleMarquee = () => {
@@ -247,25 +284,18 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
     let currentIndex = 0;
     const trackedTracks = new Set<string>();
     const initialUrl = trackItems[0]?.dataset.audioUrl || '';
-    const isMobile = window.innerWidth < 640;
 
     const audio = new Audio();
     audio.preload = 'metadata';
     audio.crossOrigin = 'anonymous';
     if (initialUrl) audio.src = initialUrl;
 
-    WaveSurfer.create({
-      container: '#waveform-container',
-      media: audio,
-      waveColor: '#475569',
-      progressColor: '#6366f1',
-      cursorColor: '#818cf8',
-      barWidth: isMobile ? 2.5 : 3,
-      barGap: isMobile ? 1.5 : 2,
-      barRadius: 2,
-      height: isMobile ? 50 : 65,
-      normalize: true
-    });
+    // shared with the fullscreen circular visualizer modal
+    (window as any).__fpAudio = audio;
+
+    const announceTrack = (title?: string, artist?: string) => {
+      window.dispatchEvent(new CustomEvent('fp-track-change', { detail: { title, artist } }));
+    };
 
     const updateActiveUI = (index: number) => {
       trackItems.forEach((el, i) => {
@@ -273,9 +303,11 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
           el.classList.add('bg-indigo-950/40', 'border-indigo-500/40');
           el.querySelector('.track-name')?.classList.add('text-indigo-400');
           el.querySelector('.track-name__text')?.classList.remove('is-static');
+          el.querySelector('.track-index')?.classList.add('bg-indigo-600', 'text-white', 'border-indigo-400');
         } else {
           el.classList.remove('bg-indigo-950/40', 'border-indigo-500/40');
           el.querySelector('.track-name')?.classList.remove('text-indigo-400');
+          el.querySelector('.track-index')?.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-400');
           const text = el.querySelector<HTMLElement>('.track-name__text');
           text?.classList.remove('is-marquee');
           text?.classList.add('is-static');
@@ -296,6 +328,7 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
       if (titleEl && title) titleEl.textContent = title;
       if (artistEl && artist) artistEl.textContent = artist;
       updateTitleMarquee();
+      announceTrack(title, artist);
 
       updateActiveUI(currentIndex);
 
@@ -310,7 +343,26 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
 
     updateActiveUI(0);
     updateTitleMarquee();
+    announceTrack(trackItems[0]?.dataset.title, trackItems[0]?.dataset.artist);
     window.addEventListener('resize', updateTitleMarquee, { passive: true });
+
+    // hidratează numărul real de ascultări (istoric persistent din DB), nu doar sesiunea curentă
+    fetch('/api/track-plays/')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { plays?: Record<string, number> } | null) => {
+        if (!data?.plays) return;
+        trackItems.forEach((el) => {
+          const trackId = el.dataset.trackId;
+          const known = trackId ? data.plays![trackId] : undefined;
+          if (typeof known === 'number') {
+            const badge = el.querySelector('.play-count-badge');
+            if (badge) badge.textContent = known.toString();
+          }
+        });
+      })
+      .catch(() => {
+        // API indisponibil — rămân valorile inițiale randate de server
+      });
 
     audio.addEventListener('loadedmetadata', () => {
       if (timeTotal) timeTotal.textContent = formatTime(audio.duration);
@@ -318,6 +370,18 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
 
     audio.addEventListener('timeupdate', () => {
       if (timeCurrent) timeCurrent.textContent = formatTime(audio.currentTime);
+      if (audio.duration && Number.isFinite(audio.duration) && progressFill) {
+        const ratio = Math.min(1, Math.max(0, audio.currentTime / audio.duration));
+        progressFill.style.width = `${ratio * 100}%`;
+        progressEl?.setAttribute('aria-valuenow', Math.round(ratio * 100).toString());
+      }
+    });
+
+    progressEl?.addEventListener('click', (event) => {
+      if (!audio.duration || !Number.isFinite(audio.duration)) return;
+      const rect = progressEl.getBoundingClientRect();
+      const ratio = Math.min(1, Math.max(0, ((event as MouseEvent).clientX - rect.left) / rect.width));
+      audio.currentTime = ratio * audio.duration;
     });
 
     audio.addEventListener('play', () => {
@@ -329,10 +393,28 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
       if (trackId && !trackedTracks.has(trackId)) {
         trackedTracks.add(trackId);
         const badge = currentTrackEl.querySelector('.play-count-badge');
-        if (badge) {
-          const currentVal = parseInt(badge.textContent || '0', 10);
-          badge.textContent = (currentVal + 1).toString();
-        }
+
+        fetch('/api/track-plays/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ trackId }),
+        })
+          .then((res) => (res.ok ? res.json() : null))
+          .then((data: { plays?: number } | null) => {
+            if (badge && typeof data?.plays === 'number') {
+              badge.textContent = data.plays.toString();
+            } else if (badge) {
+              // API indisponibil — fallback local, doar pentru UI-ul curent
+              const currentVal = parseInt(badge.textContent || '0', 10);
+              badge.textContent = (currentVal + 1).toString();
+            }
+          })
+          .catch(() => {
+            if (badge) {
+              const currentVal = parseInt(badge.textContent || '0', 10);
+              badge.textContent = (currentVal + 1).toString();
+            }
+          });
       }
     });
 

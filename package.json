@@ -28,6 +28,7 @@
     "seo:errors:dry": "node seo-agent/gsc-errors.js --dry-run",
     "seo:errors:only": "node seo-agent/gsc-errors.js --only-errors",
     "audio:sync": "node scripts/sync-audio-catalog.mjs",
+    "db:migrate:track-plays": "node scripts/create-track-plays-table.mjs",
     "ferrari": "node ferrari.js"
   },
   "dependencies": {

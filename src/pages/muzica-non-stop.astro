@@ -79,14 +79,13 @@ const musicPlaylistSchema = {
       <a href="/cauti-formatie-nunta/" class="audio-page__close-link">Închide biblioteca audio</a>
     </div>
     <h1 class="audio-page__title">Biblioteca Audio Formația Florentina Pană</h1>
+    <AudioPlaylistPlayer tracks={audioTracks} playlistTitle="Repertoriu & Mostre Live" />
     <CircularAudioVisualizer
-      audioUrl={audioTracks[0]?.audioUrl ?? ''}
       title="Formația Florentina Pană"
       tagline="Muzică live pentru nunți, botezuri și evenimente private — solicită oferta acum!"
       imageSrc="/images/galerie-foto-site-optimized/Florentina Pană 11.webp"
       imageAlt="Florentina Pană — solistă vocală formație live"
     />
-    <AudioPlaylistPlayer tracks={audioTracks} playlistTitle="Repertoriu & Mostre Live" />
     <section class="audio-seo-copy" aria-labelledby="audio-seo-title">
       <h2 id="audio-seo-title">Muzică populară și de petrecere pentru nunți și evenimente</h2>
       <p>Ascultă selecții live ale Formației Florentina Pană: muzică populară, muzică de petrecere și repertoriu pentru aperitiv, nuntă, botez sau eveniment privat. Formația oferă un program muzical variat în Pitești, Argeș, București și în toată România.</p>

@@ -44,3 +44,11 @@ CREATE TABLE IF NOT EXISTS rezervari (
   PRIMARY KEY (id),
   INDEX idx_rezervari_creat_la (creat_la)
 ) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS track_plays (
+  track_id VARCHAR(191) NOT NULL,
+  play_count INT UNSIGNED NOT NULL DEFAULT 0,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (track_id)
+) ENGINE=InnoDB;
+
