@@ -114,7 +114,7 @@ const googleBusinessReviews = [
 
     {galleryVideos.length > 0 && (
       <a href="/galerie-video/" class="response-media-card response-media-card--video">
-        <img src={`https://img.youtube.com/vi/${galleryVideos[0].youtubeId}/hqdefault.jpg`} alt="Momente live din galeria video" loading="eager" />
+        <img src={`https://img.youtube.com/vi/${galleryVideos[0].youtubeId}/hqdefault.jpg`} alt="Momente live din galeria video" loading="eager" width="480" height="360" />
         <span class="response-media-card__veil" aria-hidden="true"></span>
         <span class="response-media-card__content">
           <span class="response-section-kicker">Momente live</span>
@@ -127,7 +127,7 @@ const googleBusinessReviews = [
 
     <section class="response-audio-card" aria-label="Biblioteca audio">
       <a href="/muzica-non-stop/" class="response-media-card response-media-card--audio">
-        <img src="/images/sigla-fp-band.webp" alt="Formația Florentina Pană - biblioteca audio" loading="lazy" />
+        <img src="/images/sigla-fp-band.webp" alt="Formația Florentina Pană - biblioteca audio" loading="lazy" width="160" height="80" />
         <span class="response-media-card__veil" aria-hidden="true"></span>
         <span class="response-media-card__content">
           <span class="response-section-kicker">Repertoriu audio live</span>
@@ -179,7 +179,7 @@ const googleBusinessReviews = [
 
           <div class="response-actions">
             <a href="tel:+40767369658" class="btn-call"><span aria-hidden="true">☎</span><span>Sună Acum</span></a>
-            <a href="https://wa.me/40767369658" class="btn-wa"><span aria-hidden="true">◉</span><span>WhatsApp</span></a>
+            <a href="https://wa.me/40767369658" class="btn-wa" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">◉</span><span>WhatsApp</span></a>
             <a href={whatsappBudgetOfferHref} class="btn-solid" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">◇</span><span>Buget pe WhatsApp</span></a>
           </div>
 

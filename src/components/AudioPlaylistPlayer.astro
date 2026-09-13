@@ -22,7 +22,7 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
   <div class="flex items-center justify-between gap-2 mb-3 sm:mb-4">
     <div class="min-w-0 flex-1">
       <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-indigo-400">Acum se redă</span>
-      <h3 class="current-track-title select-none cursor-default text-base sm:text-xl font-bold text-slate-100"><span class="current-track-title__text">{initialTrack.title}</span></h3>
+      <div class="current-track-title select-none cursor-default text-base sm:text-xl font-bold text-slate-100"><span class="current-track-title__text">{initialTrack.title}</span></div>
       <p class="current-track-artist select-none cursor-default text-xs sm:text-sm text-slate-400 truncate">{initialTrack.artist || "Live"}</p>
     </div>
     <div class="shrink-0 text-[11px] sm:text-xs font-mono text-slate-300 bg-slate-800/90 px-2.5 py-1 rounded-lg border border-slate-700/60">
@@ -55,7 +55,7 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
   </div>
 
   <div class="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-slate-800/80">
-    <h2 class="text-xs sm:text-sm font-semibold text-slate-400 mb-2 sm:mb-3">{playlistTitle}</h2>
+    <div class="text-xs sm:text-sm font-semibold text-slate-400 mb-2 sm:mb-3">{playlistTitle}</div>
 
     <div class="space-y-1.5 max-h-72 sm:max-h-64 overflow-y-auto pr-1 -mr-1">
       {tracks.map((track, idx) => (

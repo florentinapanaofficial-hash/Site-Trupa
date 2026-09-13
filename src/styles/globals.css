@@ -4025,7 +4025,8 @@ select:focus-visible {
     background: rgba(42, 29, 9, 0.42);
   }
 
-  .desktop-sf-module h2 {
+  .desktop-sf-module h2,
+  .desktop-sf-module__heading {
     margin: 0 0 0.7rem;
     color: #a9f3fb;
     font-family: 'Oswald', sans-serif;
@@ -4034,7 +4035,8 @@ select:focus-visible {
     letter-spacing: 0.16em;
   }
 
-  .desktop-sf-module--gold h2 {
+  .desktop-sf-module--gold h2,
+  .desktop-sf-module--gold .desktop-sf-module__heading {
     color: #ffe7a8;
   }
 

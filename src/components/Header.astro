@@ -232,7 +232,7 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
         <div class="desktop-sf-menu__modules">
           {desktopMenuModules.map((module) => (
             <section class={`desktop-sf-module desktop-sf-module--${module.accent}`}>
-              <h2>{module.label}</h2>
+              <div class="desktop-sf-module__heading">{module.label}</div>
               <div class="desktop-sf-module__links">
                 {module.links.map((link) => (
                   <a href={link.href} class="desktop-sf-module__link" data-nav-link>

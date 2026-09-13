@@ -48,7 +48,7 @@ const safeReviews = Array.isArray(reviews)
             <strong>{review.author}</strong>
             <span>{review.context}</span>
             {review.sourceUrl && (
-              <a href={review.sourceUrl} target="_blank" rel="noopener noreferrer">Vezi sursa</a>
+              <a href={review.sourceUrl} target="_blank" rel="noopener noreferrer" aria-label={`Vezi recenzia Google de la ${review.author}`}>Vezi recenzia pe Google</a>
             )}
           </footer>
         </article>

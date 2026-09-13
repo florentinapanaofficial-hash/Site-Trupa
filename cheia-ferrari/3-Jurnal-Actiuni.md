@@ -399,6 +399,18 @@ git push origin main
 - **Compatibilitate:** originalele sunt păstrate; funcția de lightbox, ordinea newest-first și imaginile din alte pagini rămân neschimbate.
 - **Validări:** scriptul de optimizare — succes; `npm run build` — succes; `get_errors` — fără erori; cele 3 imagini de bază referențiate există în variante optimizate.
 
+## 📝 2026-09-13 — Audit Seobility: Page Structure (71%) & Links (52%)
+- **Obiectiv:** Remedierea problemelor de ierarhie heading-uri, accesibilitate linkuri, alt-uri de imagine și atribute externe semnalate în rapoartele Seobility.
+- **Modificări de cod:**
+  - `Header.astro` & `globals.css`: Eliminați cei 4 <h2> ai modulelor drawer din header-ul global și înlocuiți cu `<div class="desktop-sf-module__heading">`.
+  - `AudioPlaylistPlayer.astro` & `despre.astro`: Titlurile din UI player audio și modal (h2/h3) transformate în div-uri semantice/accesibile.
+  - `membri.astro` & `live.astro`: Titlurile de secțiune (Soliști, Instrumentiști, Colaboratori) transformate în <h2> explicite sub <h1>; titlul offline transformat în <h2>; linkurile sociale actualizate cu `rel="noopener noreferrer"`.
+  - `cauti-formatie-nunta.astro`: Atribute `width` și `height` adăugate la imaginile media; `target="_blank" rel="noopener noreferrer"` la WhatsApp.
+  - `CoupleGallery.astro` & `momente-cu-mirii.astro`: Atribute `alt` complete pentru ferestrele lightbox.
+  - `CookieBanner.astro`, `Footer.astro`, `GoogleBusinessReviews.astro`: Ancore descriptive (`Detalii cookie-uri`, `Publicații & Blog`), eliminare link 301 către `/blog/` în footer și `aria-label` descriptiv pe recenzii Google.
+- **Validări:** `npm run build` — succes complet; `npm run seo:audit` — 60 pagini verificate, 0 FAIL | 0 WARN; `node scripts/qa-check.mjs` — 49 OK | 0 FAIL.
+- **Fișiere modificate:** `src/components/Header.astro`, `src/styles/globals.css`, `src/components/AudioPlaylistPlayer.astro`, `src/pages/despre.astro`, `src/pages/live.astro`, `src/pages/membri.astro`, `src/pages/cauti-formatie-nunta.astro`, `src/components/CoupleGallery.astro`, `src/pages/momente-cu-mirii.astro`, `src/components/CookieBanner.astro`, `src/components/Footer.astro`, `src/components/GoogleBusinessReviews.astro`, `cheia-ferrari/2-Tracker-SEO.md`, `cheia-ferrari/3-Jurnal-Actiuni.md`.
+
 ## 📝 2026-08-25 — Reducere forced reflow în galeria foto
 - **Obiectiv:** Îmbunătățire tehnică fără schimbarea aspectului sau funcționalității.
 - **Fix:** înlocuite două citiri forțate `offsetWidth` folosite pentru repornirea animațiilor cu `requestAnimationFrame`.
