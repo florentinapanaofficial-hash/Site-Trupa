@@ -8,6 +8,7 @@ const publicatii = defineCollection({
     descriere: z.string().min(20).max(155),
     imaginePrincipala: z.string().min(1),
     categorie: z.string().min(2),
+    locatie: z.string().min(2).optional(),
   }),
 });
 

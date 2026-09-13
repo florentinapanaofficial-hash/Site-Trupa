@@ -378,6 +378,13 @@ git push origin main
 - **Obiectiv:** Reducerea redirecturilor interne raportate în Google Search Console prin uniformizarea URL-urilor canonice cu trailing slash.
 - **Modificări:** corectat URL schema `CollectionPage` în `/comunitate/` (era fără slash), corectat URL `Offer` în `momente-cu-mirii` către `/contact/`, normalizat fallback `pagePath` în `PhotoGallery` la `/galerie-foto/` și actualizat exemplul `EmbedSnippet` la varianta canonical.
 - **Validări:** `get_errors` pe fișierele modificate — fără erori; `npm run seo:check` — build reușit, audit local 60 pagini, 0 FAIL | 0 WARN; scan output `dist/client` — fără linkuri interne de pagină fără slash final.
+
+## 📝 2026-09-13 — Articol Restaurant Majestic și categoria locațiilor de 5 stele
+- **Obiectiv:** Crearea primului articol din seria „Locații de 5 Stele | Parteneri de Încredere”, dedicat Restaurantului Majestic Pitești, și stabilirea unei categorii editoriale pentru recomandări de restaurante.
+- **Modificări:** adăugat `src/content/publicatii/restaurant-majestic-pitesti-experienta-de-5-stele.md`, cu structură H1/H2/H3, facilități despre acustică, ring de dans și servire, outbound către `https://restaurantmajestic.ro/`, linkuri interne către ofertă, repertoriu și contact, plus text pregătit pentru Facebook; schema colecției acceptă `locatie`; articolele locale cu locație generează `BlogPosting` și `contentLocation` în Pitești, Argeș.
+- **SEO/social:** meta title este derivat din H1 și include intenția „Nuntă și Petrecere la Restaurant Majestic Pitești”; meta description are CTA implicit prin conținut descriptiv, iar `BaseLayout` generează automat `og:title`, `og:description` și `og:image` pentru distribuirea pe Facebook.
+- **Validări:** `npm run build` — reușit; `get_errors` — fără erori pe fișierele afectate; HTML generat verificat pentru `BlogPosting`, locație, OG image și linkuri; `npm run seo:audit` — 61 pagini, 0 FAIL | 0 WARN.
+- **Risc/pași următori:** imaginea articolului folosește fallback-ul OG existent până când este disponibilă o fotografie optimizată de la eveniment; categoria poate primi articole noi despre alte restaurante fără schimbări de arhitectură.
 - **Fișiere modificate:** `src/pages/comunitate/index.astro`, `src/pages/momente-cu-mirii.astro`, `src/components/PhotoGallery.astro`, `src/components/EmbedSnippet.astro`, `cheia-ferrari/2-Tracker-SEO.md`, `cheia-ferrari/3-Jurnal-Actiuni.md`.
 - **Notă SEO:** lista „Pagină cu redirecționare” din GSC include și redirecturi normale (http→https, www/non-www, URL-uri istorice); actualizarea în raport se vede după recrawl (de obicei 3-14 zile).
 

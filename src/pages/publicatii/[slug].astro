@@ -172,7 +172,7 @@ if (type === 'local') {
 
 const articleJsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'Article',
+  '@type': type === 'local' ? 'BlogPosting' : 'Article',
   headline: articleHeading,
   description: pageDescription,
   datePublished: publishedIso,
@@ -191,6 +191,18 @@ const articleJsonLd = {
   },
   mainEntityOfPage: canonicalUrl,
   image: ogImage.startsWith('http') ? ogImage : `${SITE_URL}${ogImage}`,
+  ...(type === 'local' && item.data.locatie ? {
+    contentLocation: {
+      '@type': 'Place',
+      name: item.data.locatie,
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: 'Pitești',
+        addressRegion: 'Argeș',
+        addressCountry: 'RO',
+      },
+    },
+  } : {}),
 };
 
 // Pentru articolele Supabase cu conținut text plain (cu \n),
