@@ -408,8 +408,10 @@ git push origin main
   - `cauti-formatie-nunta.astro`: Atribute `width` și `height` adăugate la imaginile media; `target="_blank" rel="noopener noreferrer"` la WhatsApp.
   - `CoupleGallery.astro` & `momente-cu-mirii.astro`: Atribute `alt` complete pentru ferestrele lightbox.
   - `CookieBanner.astro`, `Footer.astro`, `GoogleBusinessReviews.astro`: Ancore descriptive (`Detalii cookie-uri`, `Publicații & Blog`), eliminare link 301 către `/blog/` în footer și `aria-label` descriptiv pe recenzii Google.
+  - `index.astro` (Homepage): Număr de heading-uri redus de la 36 la 13 (păstrat `<h1>` principal și 12 `<h2>` de secțiuni principale, convertite <h3>-urile repetitive de carduri/FAQ/subtitluri în `<div>`-uri stilizate identic CSS). Adăugat text de ancoră `sr-only` pe linkul gol din cardul de rezervare.
+  - `Footer.astro`: Adăugat `rel="nofollow"` pe linkurile interne cu parametri dinamici (`?cat=locatii`, `?cat=sfaturi`, `?cat=jurnal`).
 - **Validări:** `npm run build` — succes complet; `npm run seo:audit` — 60 pagini verificate, 0 FAIL | 0 WARN; `node scripts/qa-check.mjs` — 49 OK | 0 FAIL.
-- **Fișiere modificate:** `src/components/Header.astro`, `src/styles/globals.css`, `src/components/AudioPlaylistPlayer.astro`, `src/pages/despre.astro`, `src/pages/live.astro`, `src/pages/membri.astro`, `src/pages/cauti-formatie-nunta.astro`, `src/components/CoupleGallery.astro`, `src/pages/momente-cu-mirii.astro`, `src/components/CookieBanner.astro`, `src/components/Footer.astro`, `src/components/GoogleBusinessReviews.astro`, `cheia-ferrari/2-Tracker-SEO.md`, `cheia-ferrari/3-Jurnal-Actiuni.md`.
+- **Fișiere modificate:** `src/components/Header.astro`, `src/styles/globals.css`, `src/components/AudioPlaylistPlayer.astro`, `src/pages/despre.astro`, `src/pages/live.astro`, `src/pages/membri.astro`, `src/pages/cauti-formatie-nunta.astro`, `src/components/CoupleGallery.astro`, `src/pages/momente-cu-mirii.astro`, `src/components/CookieBanner.astro`, `src/components/Footer.astro`, `src/components/GoogleBusinessReviews.astro`, `src/pages/index.astro`, `cheia-ferrari/2-Tracker-SEO.md`, `cheia-ferrari/3-Jurnal-Actiuni.md`.
 
 ## 📝 2026-08-25 — Reducere forced reflow în galeria foto
 - **Obiectiv:** Îmbunătățire tehnică fără schimbarea aspectului sau funcționalității.
