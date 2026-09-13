@@ -81,9 +81,7 @@ const {
   .cav__backdrop {
     position: absolute;
     inset: 0;
-    background: rgb(4 2 10 / 78%);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: rgb(4 2 10 / 88%);
   }
 
   .cav__panel {
@@ -92,11 +90,11 @@ const {
     flex-direction: column;
     align-items: center;
     gap: 0.4rem;
-    width: min(92vw, 420px);
-    max-height: 92vh;
+    width: min(94vw, 560px);
+    max-height: 94vh;
     overflow-y: auto;
     margin: auto;
-    padding: 2.25rem 1.25rem 2rem;
+    padding: 2.25rem 1.5rem 2rem;
     border-radius: 28px;
     background: radial-gradient(120% 140% at 50% -10%, #1c1032 0%, #0b0617 55%, #060309 100%);
     box-shadow: 0 25px 60px rgb(0 0 0 / 55%), inset 0 0 0 1px rgb(255 255 255 / 6%);
@@ -162,9 +160,9 @@ const {
     position: relative;
     display: grid;
     place-items: center;
-    width: min(82vw, 280px);
+    width: min(84vw, 400px);
     aspect-ratio: 1 / 1;
-    margin: 0.35rem 0 0.6rem;
+    margin: 0.6rem 0 0.8rem;
   }
 
   .cav__canvas {
@@ -178,7 +176,7 @@ const {
     position: relative;
     display: grid;
     place-items: center;
-    width: 58%;
+    width: 40%;
     aspect-ratio: 1 / 1;
     border-radius: 50%;
     background: #12081f;
@@ -317,10 +315,10 @@ const {
 
   @media (min-width: 640px) {
     .cav__panel {
-      padding: 2.25rem 2rem 2.5rem;
+      padding: 2.5rem 2.5rem 2.75rem;
     }
     .cav__stage {
-      width: 320px;
+      width: 400px;
     }
   }
 </style>
@@ -411,7 +409,7 @@ const {
       const h = canvas.height;
       const cx = w / 2;
       const cy = h / 2;
-      const baseRadius = Math.min(w, h) * 0.32;
+      const baseRadius = Math.min(w, h) * 0.24;
 
       // ease fade toward its target (instant start, smooth stop)
       fade += (fadeTarget - fade) * 0.14;
@@ -437,8 +435,8 @@ const {
         const amplitude = reactive * fade;
         totalAmplitude += amplitude;
 
-        const idleLen = baseRadius * 0.24;
-        const reactiveLen = baseRadius * 1.1 * amplitude;
+        const idleLen = baseRadius * 0.3;
+        const reactiveLen = baseRadius * 0.6 * amplitude;
         const barLength = idleLen + reactiveLen;
         const angle = (i / BARS) * Math.PI * 2 - Math.PI / 2;
         const color = NEON_COLORS[i % NEON_COLORS.length];
@@ -487,11 +485,13 @@ const {
 
     const openModal = () => {
       root.classList.add('is-open');
+      document.documentElement.style.overflow = 'hidden';
       document.body.style.overflow = 'hidden';
     };
 
     const closeModal = () => {
       root.classList.remove('is-open');
+      document.documentElement.style.overflow = '';
       document.body.style.overflow = '';
     };
 
