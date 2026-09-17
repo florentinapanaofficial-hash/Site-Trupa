@@ -86,7 +86,7 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
                   class="text-slate-400 hover:text-indigo-400 p-1 rounded-full transition-colors focus:outline-none"
                   title="Detalii dată"
                   aria-label="Informații dată"
-                  onclick="event.stopPropagation()"
+                  data-track-date
                 >
                   <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
@@ -443,7 +443,10 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
     btnPrev?.addEventListener('click', () => loadTrack((currentIndex - 1 + trackItems.length) % trackItems.length, true));
 
     trackItems.forEach((item, idx) => {
-      item.addEventListener('click', () => loadTrack(idx, true));
+      item.addEventListener('click', (event) => {
+        if ((event.target as HTMLElement).closest('[data-track-date]')) return;
+        loadTrack(idx, true);
+      });
     });
 
     volumeSlider?.addEventListener('input', (e) => {

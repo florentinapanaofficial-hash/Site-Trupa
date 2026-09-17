@@ -653,7 +653,7 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
     }
 
     const menuUiAudioCtx = (() => {
-      const AudioCtor = window.AudioContext || window.webkitAudioContext;
+      const AudioCtor = window.AudioContext || window['webkitAudioContext'];
       if (!AudioCtor) return null;
       return new AudioCtor();
     })();

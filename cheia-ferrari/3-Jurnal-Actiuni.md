@@ -1709,4 +1709,24 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - **Validări:** API GitHub verificat pentru run-ul `34749038374`; validare locală a workflow-ului — un singur limbaj (`javascript-typescript`), `git diff --check` curat și `get_errors` fără erori. Următorul push va declanșa un singur job CodeQL relevant.
 - **Limitare:** logul detaliat al jobului nu a putut fi descărcat anonim, deoarece endpoint-ul GitHub cere drepturi admin; concluzia este însă izolată prin statusurile independente ale joburilor și reproducerea în două run-uri consecutive.
 
+## 📝 2026-09-17 — Curățare Comunitate: păstrată singura poveste reală
+
+- **Obiectiv:** eliminarea paginilor demonstrative de cupluri și alinierea paginii Comunității la singura poveste reală disponibilă.
+- **Modificări:** `src/data/couples.json` conținea deja exclusiv Cristina și Manu; actualizate textele SEO și pagina `/comunitate/` la singular, eliminată căutarea pentru mai multe cupluri și starea de rezultate multiple.
+- **Validări:** `get_errors` — fără erori; `npm run seo:check` — build complet; `npm run seo:audit` — 61 pagini, 0 FAIL | 0 WARN; sitemap-ul conține un singur URL individual `/comunitate/cristina-si-manu/`.
+- **Risc / notă:** URL-urile vechi ale exemplelor rămân 404, fără redirect către o poveste diferită; acest lucru este intenționat pentru eliminarea lor din indexare.
+
+## 📝 2026-09-17 — Eliminare link legacy către redirectul Comunității
+
+- **Obiectiv:** prevenirea redirecturilor interne către ruta istorică `/comunitatea-noastra/`.
+- **Modificări:** actualizat linkul din `src/data/siteContent.js` către ruta canonică `/comunitate/`; redirectul public pentru URL-ul istoric rămâne păstrat pentru compatibilitate.
+- **Validări:** `node scripts/check-links.mjs` — trecut; `get_errors` — fără erori; `npm run seo:check` — build complet.
+
+## 📝 2026-09-17 — Debug complet și curățare diagnostice Astro
+
+- **Obiectiv:** verificare generală după eliminarea paginilor demonstrative și după problema de indexare video din Search Console.
+- **Probleme găsite:** un error TypeScript în `CircularAudioVisualizer.astro` pentru bufferul Web Audio și 4 warnings/hints în componentele audio/video și galeria foto.
+- **Remedieri:** tip buffer compatibil cu `AnalyserNode`; handlerul pentru butonul de dată mutat în listenerul existent; acces compatibil pentru `webkitAudioContext`; eliminată variabila nefolosită din galerie.
+- **Validări:** `astro check` — 0 errors | 0 warnings | 0 hints; Jest — 40/40; QA — 49 OK | 0 FAIL; `npm run seo:audit` — 61 pagini, 0 FAIL | 0 WARN; build complet.
+
 

@@ -144,7 +144,7 @@ const ytLink = youtubeUrl || (hasPlaylist
     function playVideoHoverTone() {
       if (!window.matchMedia('(min-width: 1025px)').matches) return;
 
-      var AudioCtor = window.AudioContext || window.webkitAudioContext;
+      var AudioCtor = window.AudioContext || window['webkitAudioContext'];
       if (!AudioCtor) return;
       if (!videoHoverAudioCtx) videoHoverAudioCtx = new AudioCtor();
 

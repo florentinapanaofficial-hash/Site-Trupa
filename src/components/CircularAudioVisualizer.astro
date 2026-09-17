@@ -415,7 +415,7 @@ const {
       fade += (fadeTarget - fade) * 0.14;
       if (fade < 0.004) fade = 0;
 
-      let data: Uint8Array;
+      let data: Uint8Array<ArrayBuffer>;
       if (state.analyser && state.sourceConnected) {
         data = new Uint8Array(state.analyser.frequencyBinCount);
         state.analyser.getByteFrequencyData(data);

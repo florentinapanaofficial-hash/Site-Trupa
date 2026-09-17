@@ -21,7 +21,7 @@ const couples = couplesData.couples
 const whatsappNumber = contact.phoneRaw.replace(/\D/g, '');
 
 const pageTitle = `Mirii Noștri — Comunitate | ${brand.name}`;
-const pageDescription = `Descoperă poveștile de dragoste ale cuplurilor care ne-au ales. ${couples.length} perechi fericite — recenzii, galerie foto și dansul mirilor. ${brand.name} — Pitești, Argeș.`;
+const pageDescription = `Descoperă povestea reală a Cristinei și a lui Manu, mirii care ne-au ales. Recenzie, galerie foto și dansul mirilor — ${brand.name}, Pitești, Argeș.`;
 
 const SITE = 'https://www.florentinapanaofficial.ro';
 const pageUrl = `${SITE}/comunitate/`;
@@ -89,40 +89,19 @@ const schemas = [collectionPageLd, aggregateRatingLd];
       <p class="community-hero__kicker">Formația Florentina Pană</p>
       <h1 class="community-hero__title">Mirii Noștri</h1>
       <p class="community-hero__subtitle">
-        Fiecare nuntă e o poveste unică. Iată cuplurile care ne-au încredințat cele mai frumoase momente din viața lor.
+        O poveste reală, spusă chiar de mirii care ne-au încredințat cele mai frumoase momente din viața lor.
       </p>
       <div class="community-hero__stats">
-        <span class="community-hero__stat">💍 {couples.length} cupluri fericite</span>
+        <span class="community-hero__stat">💍 O poveste reală</span>
         <span class="community-hero__stat">⭐ 5.0 rating</span>
       </div>
     </header>
-
-    <!-- ═══ SEARCH BAR ═════════════════════════════════════════════ -->
-    <div class="community-search" role="search">
-      <label for="coupleSearch" class="sr-only">Caută pereche de miri</label>
-      <div class="community-search__wrap">
-        <svg class="community-search__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-        <input
-          type="search"
-          id="coupleSearch"
-          class="community-search__input"
-          placeholder="Caută după nume, locație sau an (ex: Cristina, Manu, 2026)..."
-          autocomplete="off"
-        />
-        <span class="community-search__count" id="searchCount">{couples.length} rezultate</span>
-      </div>
-    </div>
 
     <!-- ═══ GRID CARDURI MIRI ══════════════════════════════════════ -->
     <div class="couples-grid" id="couplesGrid">
       {couples.map((couple) => (
         <div
           class="couples-grid__item"
-          data-couple-name={couple.names.toLowerCase()}
-          data-couple-city={couple.city.toLowerCase()}
-          data-couple-date={couple.date.toLowerCase()}
-          data-couple-location={(couple.locationName || '').toLowerCase()}
-          data-couple-year={(couple.isoDate || '').slice(0, 4)}
         >
           <CoupleCard
             slug={couple.slug}
@@ -135,12 +114,6 @@ const schemas = [collectionPageLd, aggregateRatingLd];
           />
         </div>
       ))}
-    </div>
-
-    <!-- ═══ EMPTY STATE (hidden by default) ════════════════════════ -->
-    <div class="couples-empty" id="couplesEmpty" hidden>
-      <p>😔 Nicio pereche nu corespunde căutării tale.</p>
-      <p class="couples-empty__hint">Încearcă alt nume, oraș sau dată.</p>
     </div>
 
     <!-- ═══ LINK PUBLICAȚII ═════════════════════════════════════════ -->
@@ -182,48 +155,6 @@ const schemas = [collectionPageLd, aggregateRatingLd];
       </div>
     </div>
   </section>
-
-  <!-- ═══ SEARCH SCRIPT ════════════════════════════════════════════ -->
-  <script is:inline>
-    (function () {
-      var searchInput = document.getElementById('coupleSearch');
-      var grid = document.getElementById('couplesGrid');
-      var emptyState = document.getElementById('couplesEmpty');
-      var countEl = document.getElementById('searchCount');
-
-      if (!searchInput || !grid) return;
-
-      var items = Array.from(grid.querySelectorAll('.couples-grid__item'));
-      var totalCount = items.length;
-
-      searchInput.addEventListener('input', function () {
-        var query = this.value.trim().toLowerCase();
-        var visibleCount = 0;
-
-        items.forEach(function (item) {
-          var name = item.getAttribute('data-couple-name') || '';
-          var city = item.getAttribute('data-couple-city') || '';
-          var date = item.getAttribute('data-couple-date') || '';
-          var location = item.getAttribute('data-couple-location') || '';
-          var year = item.getAttribute('data-couple-year') || '';
-          var haystack = name + ' ' + city + ' ' + date + ' ' + location + ' ' + year;
-
-          var match = !query || haystack.indexOf(query) !== -1;
-          item.style.display = match ? '' : 'none';
-          if (match) visibleCount++;
-        });
-
-        if (emptyState) {
-          emptyState.hidden = visibleCount > 0;
-        }
-        if (countEl) {
-          countEl.textContent = query
-            ? visibleCount + ' din ' + totalCount + ' rezultate'
-            : totalCount + ' rezultate';
-        }
-      });
-    })();
-  </script>
 
   <!-- ═══ ENTRANCE ANIMATION ═══════════════════════════════════════ -->
   <script is:inline>
