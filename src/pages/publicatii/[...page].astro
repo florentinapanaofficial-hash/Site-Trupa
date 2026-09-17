@@ -111,7 +111,7 @@ export async function getStaticPaths() {
 
   // Fallback la content local dacă nu există nimic în Supabase
   const localEntries = (await getCollection('publicatii')).map((entry) => ({
-    slug: entry.slug,
+    slug: entry.id,
     titlu: entry.data.titlu,
     descriere: entry.data.descriere,
     preview: entry.data.descriere ? entry.data.descriere.slice(0, 320) : '',

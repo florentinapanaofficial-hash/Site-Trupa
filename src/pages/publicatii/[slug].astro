@@ -1,5 +1,5 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import BackButton from '../../components/BackButton.astro';
 import siteContent from '../../data/siteContent.json';
@@ -10,7 +10,7 @@ export const prerender = true;
 export async function getStaticPaths() {
   const localEntries = await getCollection('publicatii');
   const localPaths = localEntries.map((entry) => ({
-    params: { slug: entry.slug },
+    params: { slug: entry.id },
     props: { type: 'local', item: entry },
   }));
 
@@ -145,7 +145,7 @@ if (type === 'local') {
   category = item.data.categorie;
   publishedDate = formatDate(item.data.dataPublicarii);
   publishedIso = new Date(item.data.dataPublicarii).toISOString();
-  const rendered = await item.render();
+  const rendered = await render(item);
   ContentComponent = rendered.Content;
 } else if (type === 'jsonBlog') {
   pageTitle = compactSeoText(`${item.title} | Blog | ${brand.name}`, 60);

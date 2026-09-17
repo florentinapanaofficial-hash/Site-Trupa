@@ -33,10 +33,10 @@
   },
   "dependencies": {
     "@astrojs/check": "^0.9.10",
-    "@astrojs/node": "^9.5.5",
+    "@astrojs/node": "^10.1.4",
     "@google/generative-ai": "^0.24.1",
     "@supabase/supabase-js": "^2.105.4",
-    "astro": "^5.18.2",
+    "astro": "^6.4.8",
     "clsx": "^2.1.1",
     "compression": "^1.8.1",
     "dotenv": "^16.4.5",
@@ -50,7 +50,7 @@
     "wavesurfer.js": "^7.12.11"
   },
   "devDependencies": {
-    "@astrojs/sitemap": "^3.7.3",
+    "@astrojs/sitemap": "^3.7.4",
     "autoprefixer": "^10.4.0",
     "jest": "^30.4.2",
     "lightningcss": "^1.32.0",
