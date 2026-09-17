@@ -10,21 +10,19 @@
  *     ÎNAINTE de obținerea consimțământului prealabil al utilizatorului.
  *
  * Comportament:
- *   – Prima vizită: banner vizibil; GA4 NU se încarcă.
- *   – „Acceptă": salvează 'granted' în localStorage; GA4 se injectează dinamic.
- *   – „Refuz":    salvează 'denied'  în localStorage; GA4 nu se încarcă niciodată.
- *   – Vizite ulterioare: se citește localStorage → GA4 pornit sau omis fără banner.
+ *   – Prima vizită: banner vizibil; GA4/Meta Pixel/TikTok Pixel NU se încarcă.
+ *   – „Acceptă": salvează 'granted' în localStorage; FPTracking.init() injectează scripturile.
+ *   – „Refuz":    salvează 'denied'  în localStorage; nimic nu se încarcă vreodată.
+ *   – Vizite ulterioare: se citește localStorage → tracking pornit sau omis fără banner.
  *
  * Consimțământul se stochează în localStorage (nu cookie) pentru a nu crea
  * un cookie înainte de consimțământ — localStorage nu este reglementat de
  * Directiva ePrivacy în același mod cu cookie-urile.
+ *
+ * Încrcarea efectivă a scripturilor (GA4/Meta/TikTok) e centralizată în
+ * public/js/tracking-pixels.js (window.FPTracking) — folosit și la fiecare
+ * navigare client-side (astro:page-load), nu doar la accept.
  */
-
-interface Props {
-  ga4Id?: string;
-}
-
-const { ga4Id } = Astro.props;
 ---
 
 <!-- Banner cookie – ascuns implicit; JS îl afișează dacă nu există consimțământ -->
@@ -48,39 +46,18 @@ const { ga4Id } = Astro.props;
   </div>
 </div>
 
-<script is:inline define:vars={{ ga4Id }}>
+<script is:inline>
   (function () {
     var STORAGE_KEY = 'cookie_consent'; // valori: 'granted' | 'denied'
     var banner = document.getElementById('cookie-banner');
     var btnAccept = document.getElementById('cookie-accept');
     var btnRefuse = document.getElementById('cookie-refuse');
 
-    /** Injectează dinamic scripturile GA4 în <head> */
-    function loadGA4() {
-      if (!ga4Id) return;
-
-      // Preconnect – adăugat abia după consimțământ
-      var pc = document.createElement('link');
-      pc.rel = 'preconnect';
-      pc.href = 'https://www.googletagmanager.com';
-      document.head.appendChild(pc);
-
-      var dns = document.createElement('link');
-      dns.rel = 'dns-prefetch';
-      dns.href = 'https://www.google-analytics.com';
-      document.head.appendChild(dns);
-
-      // Script principal GA4
-      var s = document.createElement('script');
-      s.async = true;
-      s.src = 'https://www.googletagmanager.com/gtag/js?id=' + ga4Id;
-      document.head.appendChild(s);
-
-      // Inițializare gtag
-      window.dataLayer = window.dataLayer || [];
-      window.gtag = function () { window.dataLayer.push(arguments); };
-      window.gtag('js', new Date());
-      window.gtag('config', ga4Id);
+    /** Deleagă pornirea GA4/Meta Pixel/TikTok Pixel către modulul comun */
+    function startTracking() {
+      if (window.FPTracking) {
+        window.FPTracking.init(window.__FP_TRACKING_IDS__);
+      }
     }
 
     function hideBanner() {
@@ -97,7 +74,7 @@ const { ga4Id } = Astro.props;
     } catch (_) { /* localStorage indisponibil (ex. mod privat strict) */ }
 
     if (consent === 'granted') {
-      loadGA4();
+      startTracking();
     } else if (consent === 'denied') {
       // consimțământ refuzat – nu se face nimic
     } else {
@@ -113,7 +90,7 @@ const { ga4Id } = Astro.props;
       btnAccept.addEventListener('click', function () {
         try { localStorage.setItem(STORAGE_KEY, 'granted'); } catch (_) {}
         hideBanner();
-        loadGA4();
+        startTracking();
         // Notifică componentele YoutubeEmbed și altele care ascultă
         window.dispatchEvent(new CustomEvent('cookie:granted'));
       });

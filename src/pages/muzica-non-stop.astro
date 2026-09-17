@@ -72,7 +72,7 @@ const musicPlaylistSchema = {
 ---
 
 <BaseLayout title={pageTitle} description={pageDescription} ogImage="/images/og-default-1200x630.jpg">
-  <Fragment slot="head"><script is:inline type="application/ld+json" set:html={JSON.stringify(musicPlaylistSchema)}></script></Fragment>
+  <Fragment slot="head"><script is:inline type="application/ld+json" data-schema="music-playlist" set:html={JSON.stringify(musicPlaylistSchema)}></script></Fragment>
   <main class="audio-page">
     <div class="audio-page__topbar">
       <BackButton href="/cauti-formatie-nunta/" label="Cauți formație" direct />

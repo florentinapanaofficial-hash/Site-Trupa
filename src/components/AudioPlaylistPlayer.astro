@@ -1,4 +1,6 @@
 ---
+import TrackPlaysBadge from './TrackPlaysBadge.astro';
+
 export interface Track {
   id: string;
   title: string;
@@ -18,7 +20,11 @@ const { tracks, playlistTitle = "Repertoriu & Mostre Audio" } = Astro.props;
 const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: '', artist: '', plays: 0 };
 ---
 
-<div class="playlist-player bg-slate-900 border border-slate-800/80 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl max-w-3xl mx-auto my-4 sm:my-8 text-white font-sans w-full">
+<div
+  class="playlist-player bg-slate-900 border border-slate-800/80 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl max-w-3xl mx-auto my-4 sm:my-8 text-white font-sans w-full"
+  transition:persist
+  transition:name="fp-audio-player"
+>
   <div class="flex flex-col items-center text-center gap-1 mb-3 sm:mb-4">
     <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-indigo-400">Acum se redă</span>
     <div class="current-track-title select-none cursor-default text-base sm:text-xl font-bold text-slate-100 mx-auto"><span class="current-track-title__text">{initialTrack.title}</span></div>
@@ -105,7 +111,9 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                 <circle cx="12" cy="12" r="3"></circle>
               </svg>
-              <span class="play-count-badge font-mono">{track.plays ?? 0}</span>
+              <TrackPlaysBadge trackId={track.id} server:defer>
+                <span slot="fallback" class="play-count-badge font-mono animate-pulse" aria-hidden="true">···</span>
+              </TrackPlaysBadge>
             </div>
 
             <span class="text-[11px] sm:text-xs font-mono text-slate-400 w-8 text-right">{track.duration || "Demo"}</span>
@@ -227,8 +235,13 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
-  const root = document.querySelector<HTMLElement>('.playlist-player');
-  if (root) {
+  // Reintra pe astro:page-load (View Transitions); dataset.fpInit evita rebindarea
+  // listenerilor daca nodul a supraviețuit navigării prin transition:persist.
+  function initAudioPlayer() {
+    const root = document.querySelector<HTMLElement>('.playlist-player');
+    if (!root || root.dataset.fpInit === '1') return;
+    root.dataset.fpInit = '1';
+
     const trackItems = root.querySelectorAll<HTMLElement>('.track-item');
     const titleEl = root.querySelector<HTMLElement>('.current-track-title__text');
     const titleViewport = root.querySelector<HTMLElement>('.current-track-title');
@@ -345,24 +358,8 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
     updateTitleMarquee();
     announceTrack(trackItems[0]?.dataset.title, trackItems[0]?.dataset.artist);
     window.addEventListener('resize', updateTitleMarquee, { passive: true });
-
-    // hidratează numărul real de ascultări (istoric persistent din DB), nu doar sesiunea curentă
-    fetch('/api/track-plays/')
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data: { plays?: Record<string, number> } | null) => {
-        if (!data?.plays) return;
-        trackItems.forEach((el) => {
-          const trackId = el.dataset.trackId;
-          const known = trackId ? data.plays![trackId] : undefined;
-          if (typeof known === 'number') {
-            const badge = el.querySelector('.play-count-badge');
-            if (badge) badge.textContent = known.toString();
-          }
-        });
-      })
-      .catch(() => {
-        // API indisponibil — rămân valorile inițiale randate de server
-      });
+    // Numărul de ascultări vine deja randat de server (TrackPlaysBadge, server island) —
+    // nu mai e nevoie de fetch GET la /api/track-plays la montare.
 
     audio.addEventListener('loadedmetadata', () => {
       if (timeTotal) timeTotal.textContent = formatTime(audio.duration);
@@ -453,4 +450,7 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
       audio.volume = parseFloat((e.target as HTMLInputElement).value);
     });
   }
+
+  initAudioPlayer();
+  document.addEventListener('astro:page-load', initAudioPlayer);
 </script>

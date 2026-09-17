@@ -2,6 +2,7 @@ import { createServer } from 'node:http';
 import { handler as ssrHandler } from './dist/server/entry.mjs';
 import sirv from 'sirv';
 import compression from 'compression';
+import { CONTENT_SECURITY_POLICY } from './src/lib/csp.mjs';
 
 // ── Compression for SSR responses (static files use pre-built .gz/.br via sirv) ──
 const compress = compression({ threshold: 256 });
@@ -54,6 +55,8 @@ const serve = sirv('dist/client', {
 });
 
 // ── Security headers (OWASP) ──
+// NOTĂ: output:'static' → paginile prerenderizate sunt servite de sirv, NU trec prin
+// src/middleware.ts (Astro SSR middleware) — de aceea CSP-ul se aplică AICI, nu doar în middleware.
 const SECURITY_HEADERS = {
     'X-Frame-Options': 'SAMEORIGIN',
     'X-Content-Type-Options': 'nosniff',
@@ -62,6 +65,7 @@ const SECURITY_HEADERS = {
     'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
     'Cross-Origin-Resource-Policy': 'same-origin',
     'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+    'Content-Security-Policy': CONTENT_SECURITY_POLICY,
 };
 
 // Resurse publice care trebuie accesibile cross-origin (imagini OG, fonturi, etc.)

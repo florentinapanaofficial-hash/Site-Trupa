@@ -1,4 +1,5 @@
 import { defineMiddleware } from 'astro:middleware';
+import { CONTENT_SECURITY_POLICY } from './lib/csp.mjs';
 
 const isDev = import.meta.env.DEV;
 
@@ -16,20 +17,7 @@ const SECURITY_HEADERS: Record<string, string> = {
     'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
     'Cross-Origin-Resource-Policy': 'same-origin',
     // Content Security Policy — protejează contra XSS și injecții de resurse
-    'Content-Security-Policy': [
-        "default-src 'self'",
-        "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://cdn.jsdelivr.net https://www.youtube.com https://s.ytimg.com https://embed.cloudflarestream.com",
-        "style-src 'self' 'unsafe-inline'",
-        "img-src 'self' data: https://www.google-analytics.com https://i.ytimg.com https://img.youtube.com https://*.googleusercontent.com https://*.cloudflarestream.com https://videodelivery.net",
-        "font-src 'self'",
-        "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://api.whatsapp.com https://*.supabase.co wss://*.supabase.co https://*.cloudflarestream.com https://videodelivery.net",
-        "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://ec.europa.eu https://*.cloudflarestream.com https://iframe.cloudflarestream.com",
-        "media-src 'self' blob: https://*.cloudflarestream.com https://videodelivery.net",
-        "object-src 'none'",
-        "base-uri 'self'",
-        "form-action 'self' https://api.whatsapp.com",
-        "frame-ancestors 'self'",
-    ].join('; '),
+    'Content-Security-Policy': CONTENT_SECURITY_POLICY,
 };
 
 const CANONICAL_HOST = 'www.florentinapanaofficial.ro';

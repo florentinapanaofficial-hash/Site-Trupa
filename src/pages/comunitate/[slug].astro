@@ -166,6 +166,8 @@ const reviewLd = {
     {coupleOgImage && <meta property="og:image" content={coupleOgImage} />}
     <meta property="og:url" content={pageUrl} />
     <meta property="og:type" content="article" />
+    <script is:inline type="application/ld+json" data-schema="event" set:html={JSON.stringify(eventLd)} />
+    <script is:inline type="application/ld+json" data-schema="review" set:html={JSON.stringify(reviewLd)} />
   </Fragment>
 
   <main class="couple-page">
@@ -315,9 +317,7 @@ const reviewLd = {
       </div>
     </section>
 
-    <!-- JSON-LD -->
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(eventLd)} />
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(reviewLd)} />
+    <!-- Elemente de partajare pagină -->
     <script is:inline>
       (function () {
         var pageShareButton = document.querySelector('[data-page-share]');

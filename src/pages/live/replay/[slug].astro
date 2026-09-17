@@ -102,7 +102,9 @@ const videoJsonLd = {
   ogVideoHeight="720"
   datePublished={isoDate}
 >
-  <script is:inline type="application/ld+json" set:html={JSON.stringify(videoJsonLd)} />
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" data-schema="video" set:html={JSON.stringify(videoJsonLd)} />
+  </Fragment>
 
   <section class="bg-black py-10 sm:py-14">
     <div class="section-container">

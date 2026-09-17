@@ -1,4 +1,5 @@
 ---
+import { ClientRouter } from 'astro:transitions';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import SkyBackground from '../components/SkyBackground.astro';
@@ -49,6 +50,8 @@ const seoTitle = compactSeoText(title, 60);
 const seoDescription = compactSeoText(description, 160);
 
 const ga4Id = import.meta.env.PUBLIC_GA4_ID;
+const metaPixelId = import.meta.env.PUBLIC_META_PIXEL_ID;
+const tiktokPixelId = import.meta.env.PUBLIC_TIKTOK_PIXEL_ID;
 const gscVerification = import.meta.env.PUBLIC_GSC_VERIFICATION;
 const telHref = `tel:${siteContent.contact.phoneRaw}`;
 const waFloatHref = `https://wa.me/${siteContent.contact.phoneRaw.replace('+', '')}?text=Bun%C4%83!%20Vreau%20o%20ofert%C4%83%20pentru%20Forma%C8%9Bia%20Florentina%20Pan%C4%83.`;
@@ -347,6 +350,7 @@ const mobileNavAllItems = [
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+    <ClientRouter />
     <title>{seoTitle}</title>
     <meta name="description" content={seoDescription} />
     <meta name="robots" content={noindex ? 'noindex,nofollow' : 'index,follow,max-image-preview:large'} />
@@ -406,17 +410,22 @@ const mobileNavAllItems = [
     <link rel="icon" type="image/svg+xml" href="/images/logo-fp-stage.svg" />
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(organizationLd)} />
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(webSiteLd)} />
-    {isHomePage && <script is:inline type="application/ld+json" set:html={JSON.stringify(localBusinessLd)} />}
-    {isHomePage && <script is:inline type="application/ld+json" set:html={JSON.stringify(commercialServiceLd)} />}
-    {isHomePage && <script is:inline type="application/ld+json" set:html={JSON.stringify(offerCatalogLd)} />}
-    {isHomePage && <script is:inline type="application/ld+json" set:html={JSON.stringify(repertoireItemListLd)} />}
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(webPageLd)} />
-    {!isHomePage && <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />}
-    {/* GA4 NU se încarcă în <head> — se injectează dinamic DUPĂ consimțământul
-        utilizatorului prin CookieBanner, conform Rec. 30 & 32 RGPD / ePrivacy */}
+    <script is:inline type="application/ld+json" data-schema="music-group" set:html={JSON.stringify(jsonLd)} />
+    <script is:inline type="application/ld+json" data-schema="organization" set:html={JSON.stringify(organizationLd)} />
+    <script is:inline type="application/ld+json" data-schema="website" set:html={JSON.stringify(webSiteLd)} />
+    {isHomePage && <script is:inline type="application/ld+json" data-schema="local-business" set:html={JSON.stringify(localBusinessLd)} />}
+    {isHomePage && <script is:inline type="application/ld+json" data-schema="commercial-service" set:html={JSON.stringify(commercialServiceLd)} />}
+    {isHomePage && <script is:inline type="application/ld+json" data-schema="offer-catalog" set:html={JSON.stringify(offerCatalogLd)} />}
+    {isHomePage && <script is:inline type="application/ld+json" data-schema="repertoire-item-list" set:html={JSON.stringify(repertoireItemListLd)} />}
+    <script is:inline type="application/ld+json" data-schema="webpage" set:html={JSON.stringify(webPageLd)} />
+    {!isHomePage && <script is:inline type="application/ld+json" data-schema="breadcrumb" set:html={JSON.stringify(breadcrumbLd)} />}
+    {/* GA4, Meta Pixel și TikTok Pixel NU se încarcă direct în <head> — se injectează dinamic
+        DUPĂ consimțământul utilizatorului (CookieBanner) prin FPTracking, conform Rec. 30 & 32
+        RGPD / ePrivacy. Retrimise la fiecare navigare client-side prin astro:page-load. */}
+    <script is:inline define:vars={{ ga4Id, metaPixelId, tiktokPixelId }}>
+      window.__FP_TRACKING_IDS__ = { ga4Id: ga4Id, metaPixelId: metaPixelId, tiktokPixelId: tiktokPixelId };
+    </script>
+    <script src="/js/tracking-pixels.js" defer></script>
   </head>
   <body class={`page-shell${isHomePage ? ' is-homepage' : ''}${isCommunityDetailPage ? ' is-community-detail' : ''}${isAboutPage ? ' is-about-page' : ''}`}>
     <div class="scroll-progress" aria-hidden="true"></div>
@@ -520,8 +529,8 @@ const mobileNavAllItems = [
       </main>
     </div>
 
-    {/* Banner consimțământ cookie – GA4 pornit doar după accept */}
-    <CookieBanner ga4Id={ga4Id} />
+    {/* Banner consimțământ cookie – GA4/Meta/TikTok pornite doar după accept (vezi FPTracking) */}
+    <CookieBanner />
 
     <!-- ══ Mutual Exclusion: YouTube Player Pause on Active ══ 
          Pauzează TOȚI playerele YouTube de pe pagină atunci când se porneşte playback pe oricare dintre ele.
