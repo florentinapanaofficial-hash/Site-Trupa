@@ -430,8 +430,10 @@ const mobileNavAllItems = [
         1) Dezactivăm restaurarea automată de scroll a browserului: fără asta,
            browserul poate aplica poziția de scroll adâncă a paginii anterioare
            înainte ca noul DOM să fie complet randat, lăsând vizibil doar fundalul.
-        2) La finalul swap-ului (astro:after-swap), dacă am revenit pe Acasă,
-           forțăm scroll instant la top — pattern recomandat oficial de Astro. */}
+        2) La finalul swap-ului (astro:after-swap), dacă am AJUNS pe Acasă printr-o
+           navigare înainte (link/click), forțăm scroll la top. La Back/Forward
+           (data-astro-transition="back") NU suprascriem — ClientRouter restaurează
+           deja poziția exactă de scroll salvată în history.state. */}
     <script is:inline>
       (function () {
         if ('scrollRestoration' in history) {
@@ -442,7 +444,8 @@ const mobileNavAllItems = [
         });
         document.addEventListener('astro:after-swap', function () {
           document.documentElement.classList.remove('is-navigating');
-          if (location.pathname === '/') {
+          var direction = document.documentElement.getAttribute('data-astro-transition');
+          if (location.pathname === '/' && direction !== 'back') {
             window.scrollTo({ left: 0, top: 0, behavior: 'instant' });
           }
           var main = document.getElementById('continut');

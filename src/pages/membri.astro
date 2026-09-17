@@ -427,7 +427,9 @@ const membriListLd = {
 
     showImage(startIdx, fx, true);
 
-    history.pushState({ galleryOpen: true }, '');
+    // Păstrează index/scrollX/scrollY din state-ul ClientRouter — un pushState „gol"
+    // le-ar suprascrie și ar strica tracking-ul de history index folosit la Back real.
+    history.pushState({ ...history.state, galleryOpen: true }, '');
     requestAnimationFrame(function() { popupClose.focus(); });
   }
 

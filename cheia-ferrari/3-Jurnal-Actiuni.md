@@ -1816,5 +1816,36 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - Cele 3 fix-uri sunt bazate pe analiză de cod + documentația oficială Astro (View Transitions lifecycle), nu au putut fi testate direct pe un dispozitiv Android fizic — recomandată o verificare manuală rapidă (gest Back real, drag pe bara audio, scroll peste săgeți) la următoarea sesiune.
 - `mobile-swipe.js` nu se reinițializează pe navigare SPA (script cu `src`, exclus din re-execuție de ClientRouter) — nu afectează bug-urile raportate (Home nu încarcă acest script), dar rămâne o slăbiciune arhitecturală latentă pentru navigarea subpagină → subpagină, de investigat separat dacă apar alte simptome.
 
+---
+## 📝 2026-09-18 — Fix corupere history ClientRouter (Membri → Back), redesign Hero pe 2 coloane desktop
+
+**Obiectiv:** rezolvarea definitivă a ecranului albastru gol la Back de pe `/membri/` spre Acasă (raportat și pe desktop), plus corectarea layout-ului Hero care afișa cardul foto mobil enorm și titlul H1 supradimensionat pe ferestre sub 1024px.
+
+### 1. Cauza reală a ecranului gol la Back (și pe desktop)
+- **Cauză:** popup-ul galeriei foto din [membri.astro](src/pages/membri.astro) făcea `history.pushState({ galleryOpen: true }, '')` — un state „gol” care suprascria obiectul intern al `ClientRouter` (`{ index, scrollX, scrollY }`), stricând contorul `currentHistoryIndex` folosit de Astro pentru a decide direcția Back/Forward și poziția de scroll de restaurat.
+- **Fix:** pushState-ul păstrează acum `...history.state` (index/scrollX/scrollY existente) + flag-ul propriu `galleryOpen`.
+- **Fix conex:** [BaseLayout.astro](src/layouts/BaseLayout.astro) — scroll-to-top forțat pe `/` la `astro:after-swap` se aplică acum doar la navigare înainte (`direction !== 'back'`); la Back, ClientRouter restaurează singur poziția exactă de scroll, conform cerinței „să revină exact de unde am plecat, nu de la începutul paginii”.
+
+### 2. Redesign Hero — homepage
+- Eliminat CTA redundant „Vezi toți membrii și galeria completă →” de pe homepage (navigarea către `/membri/` rămâne disponibilă din meniu).
+- H1 SEO complet (`acasa.hero.h1`) despărțit vizual în două nivele (`heroTitleBrand` / `heroTitleTagline`, split pe „|”) — brand mai discret (serif italic) + tagline auriu — text identic pentru SEO, dar fără să domine tot ecranul.
+- Adăugat breakpoint tabletă (768–1024px) pentru `.hero-kicker-text`/`.hero-title-gold`, eliminând „gap”-ul unde titlul folosea scara desktop (până la 5.5rem) deși header-ul afișa deja meniul mobil.
+- `.hero-photo-card`: micșorat pe mobil (≤767px) de la `90%`/`340px` la `62%`/`230px`.
+- Restructurat markup-ul Hero: wrapper nou `.hero-stage-copy` (badge + H1 + text + CTA + stats), `display:contents` pe mobil (flux identic, zero regresie). De la `768px`, `.hero-stage-inner` devine `flex-direction:row` — stânga `.hero-stage-copy`, dreapta `.hero-photo-card` (unhidden, `max-width:420px`→`460px` de la 1025px, `aspect-ratio:4/3`, `object-fit:cover`).
+- **Clarificare header:** butonul „MENIU” nu e bug — site-ul nu are navigație orizontală desktop (CSS `.desktop-command-nav` e mort, neconectat în `Header.astro`); navigația desktop reală e sidebar-ul `.left-side-menu` (≥1025px), iar hamburger-ul e trigger global pentru meniul complet, prezent la orice lățime.
+
+### Fișiere modificate
+- [src/pages/membri.astro](src/pages/membri.astro)
+- [src/layouts/BaseLayout.astro](src/layouts/BaseLayout.astro)
+- [src/pages/index.astro](src/pages/index.astro)
+
+### Validări
+- `npx astro check` — 0 erori, 0 warnings.
+- `npm run seo:check` — build PASS; **57 pagini HTML, 0 FAIL | 0 WARN**.
+
+### Riscuri / pași următori
+- Fix-urile de history/scroll nu au putut fi testate cu Back real pe dispozitiv fizic — de reverificat la următoarea sesiune fluxul Home → Membri → (deschide poză) → Back → Back.
+- Layout-ul pe 2 coloane e nou; de urmărit vizual pe ferestre reale 768–1024px (tabletă/laptop nemaximizat) la următoarea verificare.
+
 
 
