@@ -1743,4 +1743,10 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - **Fiecare pas** a fost validat cu `astro check` (0/0/0), `npm run build`, `npm test` (40/40), `node scripts/qa-check.mjs` (49 OK), `npm run seo:audit`, `node scripts/check-links.mjs`, apoi commit + push separat, confirmat live pe Railway (deploy `ACTIVE`, homepage + pagină migrată verificate prin fetch real).
 - **Stare finală:** `astro@7.3.3`, `@astrojs/node@11.1.6`, site cu 57 pagini reale (fără cele 4 pagini video fabricate), 0 FAIL/WARN SEO.
 
+## 📝 2026-09-17 — Fix încadrare poze Florentina Pană și Marian Oprea (Nucleul Trupei, pagina principală)
+- **Problemă:** în secțiunea „Nucleul Trupei” de pe homepage, cardurile `MembruCard` foloseau `object-cover` cu poziționare centrată implicită; pozele lor sunt fotografii integrale (corp întreg), iar centrarea tăia complet capul, lăsând vizibil doar torsul/vioara.
+- **Fix:** `src/components/MembruCard.astro` — detectat prin numele fișierului sursă (`Florentina Pan`, `oprea-marian`) și aplicat `object-position: center top` doar pentru aceste două poze; restul membrilor (poze tip portret apropiat) rămân neschimbați.
+- **Validat vizual:** verificat cu browser-ul (dev server local) — fața este vizibilă la ambele carduri după fix.
+- **Fișier modificat:** `src/components/MembruCard.astro`.
+
 

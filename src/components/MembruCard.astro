@@ -26,6 +26,9 @@ const {
 
 /** id unic — permite mai multe instanțe MembruCard pe aceeași pagină fără coliziuni ARIA */
 const uid = `mc-${Math.random().toString(36).slice(2, 9)}`;
+
+/** Pozele cu cadru integral (corp întreg) trebuie ancorate sus, altfel object-cover taie fața. */
+const imaginePozitieSus = /Florentina Pan|oprea-marian/i.test(imagine);
 ---
 
 <div
@@ -67,6 +70,7 @@ const uid = `mc-${Math.random().toString(36).slice(2, 9)}`;
             src={imagine}
             alt={`${nume} — ${rol}, Formația Florentina Pană`}
             class="h-full w-full object-cover"
+            style={imaginePozitieSus ? 'object-position: center top' : undefined}
             loading="lazy"
             decoding="async"
             width="480"
