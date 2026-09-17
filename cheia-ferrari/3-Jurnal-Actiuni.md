@@ -1729,4 +1729,18 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - **Remedieri:** tip buffer compatibil cu `AnalyserNode`; handlerul pentru butonul de dată mutat în listenerul existent; acces compatibil pentru `webkitAudioContext`; eliminată variabila nefolosită din galerie.
 - **Validări:** `astro check` — 0 errors | 0 warnings | 0 hints; Jest — 40/40; QA — 49 OK | 0 FAIL; `npm run seo:audit` — 61 pagini, 0 FAIL | 0 WARN; build complet.
 
+## 📝 2026-09-17 — Sesiune majoră de mentenanță: dependințe critice, persistență DB, migrare Astro 5 → 7, curățare conținut video fabricat
+
+- **Obiectiv:** rezolvarea găsirilor din code review complet (securitate, SEO, regresii), în pași mici, fiecare validat și publicat separat.
+- **Pas 1 — dependințe fără breaking change:** `sharp` 0.35.3 → 0.35.4, `mysql2` 3.19.1 → 3.24.4 (ambele ieșite din `npm audit`).
+- **Pas 2 — persistență reală submisii miri:** `couple-upload.ts` (story/recommendation/video) scria doar în log, nu salva nimic. Adăugată tabela `couple_submissions` în `schema.sql` + script de migrare `scripts/create-couple-submissions-table.mjs` (idempotent, `CREATE TABLE IF NOT EXISTS`). Migrare rulată manual pe producție (Railway) cu `MYSQL_PUBLIC_URL` temporar în `.env` local, șters imediat după.
+- **Pas 3 — eliminare `@astrojs/tailwind`:** integrarea nu suporta Astro 6/7 (peer `^3.0.0 || ^4.0.0 || ^5.0.0`, abandonată). Eliminată din `astro.config.mjs`; Tailwind rămâne pe `postcss.config.mjs` direct (`applyBaseStyles: false` deja elimina orice diferență). Verificat: variabile `--tw-` și clase Tailwind prezente identic în HTML generat.
+- **Pas 4 — Astro 5 → 6:** migrare obligatorie de la content collections legacy (`type: 'content'` în `src/content/config.ts`) la Content Layer API (`src/content.config.ts`, `loader: glob(...)`). Actualizate `entry.slug` → `entry.id` și `.render()` → `render()` din `astro:content` în `src/pages/publicatii/[slug].astro` și `[...page].astro`. URL-urile celor 4 articole locale verificate identice.
+- **Pas 5 — Astro 6 → 7 + `@astrojs/node` 9.5.5 → 11.1.6:** upgrade final, testat cu server real (`node server.mjs`) și cereri HTTP reale (homepage + articol migrat, ambele 200 OK) înainte de publicare.
+- **Rezultat vulnerabilități:** `npm audit` de la **9 (1 critică, 5 high)** la **6 (0 critice, 3 high)** — restul (`qs`, `svgo`, `js-yaml`, `fast-uri`) sunt dependințe tranzitive fără expunere pe calea de request (folosite doar în `seo-agent/` offline sau build-time).
+- **Pas 6 — conținut video fabricat:** categoria `dans-miri` (4 clipuri: „Andreea & Radu", „Bianca & Mihai", „Ioana & Cătălin", „Alina & Ștefan") reutiliza aceleași clipuri reale ale Florentinei (confirmate prin YouTube oEmbed API) sub nume de cupluri inventate — Claudiu a confirmat că are un singur cuplu real (Cristina și Manu, deja pe site). Eliminate cele 4 intrări din `siteContent.json` + categoria orfană din `videoAdmin.categories` și `youtubePlaylists.galerieVideo`, plus eticheta din `galerie-video.astro`.
+- **Verificat separat:** `tvAppearances` — Claudiu a confirmat că sunt clipuri reale cu Florentina; **nu a fost modificată**.
+- **Fiecare pas** a fost validat cu `astro check` (0/0/0), `npm run build`, `npm test` (40/40), `node scripts/qa-check.mjs` (49 OK), `npm run seo:audit`, `node scripts/check-links.mjs`, apoi commit + push separat, confirmat live pe Railway (deploy `ACTIVE`, homepage + pagină migrată verificate prin fetch real).
+- **Stare finală:** `astro@7.3.3`, `@astrojs/node@11.1.6`, site cu 57 pagini reale (fără cele 4 pagini video fabricate), 0 FAIL/WARN SEO.
+
 
