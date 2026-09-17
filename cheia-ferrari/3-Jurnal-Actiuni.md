@@ -1749,4 +1749,37 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - **Validat vizual:** verificat cu browser-ul (dev server local) — fața este vizibilă la ambele carduri după fix.
 - **Fișier modificat:** `src/components/MembruCard.astro`.
 
+---
+## 📝 2026-09-17 — Audit SEO on-page: brand-first homepage + FAQ „preț 2026” + consolidare „show band”
+
+**Obiectiv:** Recuperare/consolidare poziții GSC pe baza a 4 priorități: brand identity, keyword-uri comerciale locale, intenția „cât costă o formație la nuntă”, audit tehnic metadate/schema.
+
+### Audit efectuat (fără modificare, deja conform)
+- Schema `MusicGroup`/`LocalBusiness` din `BaseLayout.astro` — `name`, `areaServed`, `genre`, `url`, `image` valide.
+- Canonical, Open Graph (`og:title/description/image`) și Twitter Cards — generate centralizat în `BaseLayout.astro`, deja corecte pe toate paginile.
+- Densitatea „formație nuntă pitești / formații nuntă / preț formație nuntă 2026” — deja bine acoperită în `siteContent.json`, `blogPosts.json`, paginile `formatie-nunta/*`, `contact.astro`, `oferta-premium.astro`; nu s-a intervenit acolo ca să nu se strice testul de CTR aflat în curs (notat în tracker la 10 sep 2026).
+
+### Modificări realizate
+- `src/data/seo-content.json` → `acasa.meta.title` schimbat din `Formație de Nuntă Pitești și Argeș | Florentina Pană` în **`Florentina Pană – Formație Nuntă Pitești & Argeș`** (brand-first, 48 car.).
+- `acasa.meta.description` rescris brand-first cu CTA: **`Florentina Pană – formație de nuntă în Pitești și Argeș, show 100% live, sonorizare proprie și repertoriu variat. Cere oferta acum!`** (131 car.).
+- `acasa.hero.kicker` → adăugat „Show Band” (keyword lipsă din site): `Trupă live premium & Show Band | Nunți · Botezuri · Corporate`.
+- `acasa.faq[0]` înlocuit complet cu întrebarea exactă cerută **„Cât costă o formație la nuntă în 2026?”** + răspuns detaliat: componența trupei, sonorizare/lumini profesionale, durata evenimentului, repertoriul live, servicii conexe (DJ/solist). Schema `FAQPage` de pe homepage se generează automat din `acasa.faq`, deci s-a sincronizat implicit.
+- `src/pages/index.astro` → paragraful din secțiunea „Live Band pentru Nunți și Evenimente Private” include acum „show band complet” (context natural, fără keyword stuffing).
+- H1-ul homepage (`Formația Florentina Pană | Live Band și Muzică Populară`) **nu a fost schimbat** — deja începe cu entitatea de brand, conform cerinței.
+
+### Fișiere modificate
+- [src/data/seo-content.json](src/data/seo-content.json)
+- [src/pages/index.astro](src/pages/index.astro)
+- [cheia-ferrari/2-Tracker-SEO.md](cheia-ferrari/2-Tracker-SEO.md)
+- [cheia-ferrari/3-Jurnal-Actiuni.md](cheia-ferrari/3-Jurnal-Actiuni.md)
+
+### Validări
+- `npm run build` — 0 erori.
+- `npm run seo:check` — `0 FAIL | 0 WARN`.
+- Verificat în `dist/client/index.html`: title nou, FAQPage JSON-LD cu întrebarea „Cât costă o formație la nuntă în 2026?”, și textul „show band” apar corect serializate.
+
+### Riscuri / pași următori
+- Titlul homepage a trecut de la keyword-first la brand-first — de monitorizat CTR/poziție în GSC pentru „cele mai bune formații de nuntă” (referință anterioară: 15.2, CTR 0.67%) ca să nu regreseze față de optimizarea din 10 sep 2026.
+- Restul paginilor principale (`contact.astro`, `formatie-nunta/*`) au rămas intenționat keyword-first, fiind în plin test de CTR conform tracker-ului — de revizuit brand-first doar dacă poziția de brand scade în GSC.
+
 
