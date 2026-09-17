@@ -8,6 +8,7 @@ const livePageDescription = 'Urmărește live stream-urile de la nunți, botezur
 const livePageOgImage = '/images/og-live-1200x630.jpg';
 const publicSupabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || '';
 const publicSupabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY || '';
+const isDev = import.meta.env.DEV;
 
 /* Replay-uri sortate descrescător după dată (newest-first) */
 const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
@@ -785,7 +786,7 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
   }
 </style>
 
-<script is:inline define:vars={{ publicSupabaseUrl, publicSupabaseAnonKey }}>
+<script is:inline define:vars={{ publicSupabaseUrl, publicSupabaseAnonKey, isDev }}>
   /* ═════════════════════════════════════════════════════════════════
      SUPABASE CLIENT — Inițializare cu PUBLIC_SUPABASE_URL și PUBLIC_SUPABASE_ANON_KEY
   ═════════════════════════════════════════════════════════════════ */
@@ -887,7 +888,9 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
         )
         .subscribe((status) => {
           if (status === 'SUBSCRIBED') {
-            console.log('✓ Realtime listener activ pentru like-uri');
+            if (isDev) {
+              console.log('✓ Realtime listener activ pentru like-uri');
+            }
           }
         });
     }

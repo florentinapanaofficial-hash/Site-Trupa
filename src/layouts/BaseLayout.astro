@@ -425,7 +425,7 @@ const mobileNavAllItems = [
     <script is:inline define:vars={{ ga4Id, metaPixelId, tiktokPixelId }}>
       window.__FP_TRACKING_IDS__ = { ga4Id: ga4Id, metaPixelId: metaPixelId, tiktokPixelId: tiktokPixelId };
     </script>
-    <script src="/js/tracking-pixels.js" defer></script>
+    <script is:inline src="/js/tracking-pixels.js" defer></script>
     {/* ── Fix ecran gol la Back pe mobil (ClientRouter + scroll restoration nativă) ──
         1) Dezactivăm restaurarea automată de scroll a browserului: fără asta,
            browserul poate aplica poziția de scroll adâncă a paginii anterioare

@@ -41,7 +41,9 @@ async function loadSupabaseArticles(): Promise<any[]> {
       const url = `${supabaseUrl}/rest/v1/${table}?select=${encodeURIComponent(select)}`;
       const payload = await fetchArrayPayload(url);
       if (payload) {
-        console.log(`[publicatii-source] Supabase source: ${table} (${payload.length} rows)`);
+        if (import.meta.env.DEV) {
+          console.log(`[publicatii-source] Supabase source: ${table} (${payload.length} rows)`);
+        }
         return payload;
       }
     }
