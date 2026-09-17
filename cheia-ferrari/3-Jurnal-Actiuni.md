@@ -1875,5 +1875,29 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - Fix-urile de history/scroll nu au putut fi testate cu Back real pe dispozitiv fizic — de reverificat la următoarea sesiune fluxul Home → Membri → (deschide poză) → Back → Back.
 - Layout-ul pe 2 coloane e nou; de urmărit vizual pe ferestre reale 768–1024px (tabletă/laptop nemaximizat) la următoarea verificare.
 
+---
+## 📝 2026-09-18 (sesiune 3) — Fix buton „Vezi toate recenziile pe Google” (ateriza pe tab greșit)
+
+**Obiectiv:** Claudiu a raportat că butonul „Vezi toate recenziile pe Google” de pe `/despre/` și `/cauti-formatie-nunta/` nu direcționează unde trebuie.
+
+### Cauză
+- Link-ul (`https://g.page/r/Ca7MqSu2OLysEAE`, fără sufix `/review`) redirecționează corect către profilul Google Maps al afacerii (confirmat cu screenshot: „Formația Florentina Pană”, 5.0★, 24 recenzii — business-ul corect), dar aterizează pe tab-ul „Prezentare generală”, nu pe tab-ul „Recenzii” — utilizatorul trebuie să mai dea un click pentru a vedea lista de recenzii, contrar textului butonului.
+
+### Fix
+- [src/pages/despre.astro](src/pages/despre.astro) și [src/pages/cauti-formatie-nunta.astro](src/pages/cauti-formatie-nunta.astro) — `googleBusinessProfileUrl` înlocuit cu un link Google Maps direct (coordonate + place ID extrase din URL-ul confirmat de Claudiu) cu flag-ul de data `!9m1!1b1`, care deschide direct tab-ul „Recenzii” în loc de „Prezentare generală”.
+- Butonul „Oferă o recenzie” (`googleBusinessWriteUrl`, `g.page/.../review`) nu a fost modificat — funcționează corect (flux separat de scriere recenzie).
+
+### Validări
+- `npx astro check` — 0 erori, 0 warnings, 0 hints.
+- `npm run seo:check` — build PASS; **57 pagini HTML, 0 FAIL | 0 WARN**.
+
+### Fișiere modificate
+- [src/pages/despre.astro](src/pages/despre.astro)
+- [src/pages/cauti-formatie-nunta.astro](src/pages/cauti-formatie-nunta.astro)
+
+### Riscuri / pași următori
+- Flag-ul `!9m1!1b1` este un parametru nedocumentat oficial de Google (observat empiric); dacă Google își schimbă formatul intern al URL-urilor Maps, linkul ar putea reveni la tab-ul „Prezentare generală” (fără regresie față de starea anterioară, doar fără îmbunătățire). Recomandat un test manual rapid după deploy.
+
+
 
 
