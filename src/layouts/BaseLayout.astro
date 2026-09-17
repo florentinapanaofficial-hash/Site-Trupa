@@ -426,8 +426,36 @@ const mobileNavAllItems = [
       window.__FP_TRACKING_IDS__ = { ga4Id: ga4Id, metaPixelId: metaPixelId, tiktokPixelId: tiktokPixelId };
     </script>
     <script src="/js/tracking-pixels.js" defer></script>
+    {/* ── Fix ecran gol la Back pe mobil (ClientRouter + scroll restoration nativă) ──
+        1) Dezactivăm restaurarea automată de scroll a browserului: fără asta,
+           browserul poate aplica poziția de scroll adâncă a paginii anterioare
+           înainte ca noul DOM să fie complet randat, lăsând vizibil doar fundalul.
+        2) La finalul swap-ului (astro:after-swap), dacă am revenit pe Acasă,
+           forțăm scroll instant la top — pattern recomandat oficial de Astro. */}
+    <script is:inline>
+      (function () {
+        if ('scrollRestoration' in history) {
+          history.scrollRestoration = 'manual';
+        }
+        document.addEventListener('astro:before-preparation', function () {
+          document.documentElement.classList.add('is-navigating');
+        });
+        document.addEventListener('astro:after-swap', function () {
+          document.documentElement.classList.remove('is-navigating');
+          if (location.pathname === '/') {
+            window.scrollTo({ left: 0, top: 0, behavior: 'instant' });
+          }
+          var main = document.getElementById('continut');
+          if (main) {
+            main.style.opacity = '';
+            main.style.transition = '';
+          }
+        });
+      })();
+    </script>
   </head>
   <body class={`page-shell${isHomePage ? ' is-homepage' : ''}${isCommunityDetailPage ? ' is-community-detail' : ''}${isAboutPage ? ' is-about-page' : ''}`}>
+    <div class="nav-loading-bar" aria-hidden="true"></div>
     <div class="scroll-progress" aria-hidden="true"></div>
     <a href="#continut" class="skip-link">Sari la conținut</a>
     <SkyBackground />
@@ -952,6 +980,37 @@ const mobileNavAllItems = [
         background: linear-gradient(90deg, #0bbcd6 0%, #ffd700 48%, #f5a623 100%);
         box-shadow: 0 0 14px rgba(245, 166, 35, 0.45);
         pointer-events: none;
+      }
+
+      /* ── Bară de încărcare navigare (ClientRouter) ──
+         Feedback vizual continuu în timpul fetch-ului de pagină (inclusiv
+         Back/Forward), ca ecranul să nu pară „înghețat”/gol pe conexiuni lente. */
+      .nav-loading-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 3px;
+        width: 100%;
+        z-index: 1000;
+        pointer-events: none;
+        transform: scaleX(0);
+        transform-origin: left center;
+        opacity: 0;
+        background: linear-gradient(90deg, #0bbcd6 0%, #ffd700 48%, #f5a623 100%);
+        transition: opacity 0.15s ease;
+      }
+      html.is-navigating .nav-loading-bar {
+        opacity: 1;
+        animation: nav-loading-sweep 1.1s ease-in-out infinite;
+      }
+      @keyframes nav-loading-sweep {
+        0% { transform: scaleX(0); transform-origin: left center; }
+        50% { transform: scaleX(0.75); transform-origin: left center; }
+        50.001% { transform-origin: right center; }
+        100% { transform: scaleX(0); transform-origin: right center; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html.is-navigating .nav-loading-bar { animation: none; opacity: 1; transform: scaleX(1); }
       }
 
       /* ── WhatsApp Floating Button ── */

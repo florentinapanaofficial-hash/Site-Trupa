@@ -71,6 +71,41 @@
     var arrowPrev = document.getElementById('mob-arrow-prev');
     var arrowNext = document.getElementById('mob-arrow-next');
     var hintsContainer = document.querySelector('.mob-swipe-hints');
+
+    /* ── Gard tap-vs-scroll pentru săgețile laterale ──
+       Săgețile stau fix pe marginea ecranului, chiar pe traiectoria firească
+       a gestului de scroll cu degetul. Fără acest gard, un swipe vertical care
+       pornește/trece peste săgeată e interpretat ca tap și sare la altă pagină.
+       Considerăm tap valid doar dacă degetul nu s-a mișcat > prag și pagina
+       nu s-a scrollat în timpul atingerii. */
+    function armTapGuard(el) {
+        if (!el) return function () { return true; };
+        var startX = 0, startY = 0, startScrollY = 0, cancelled = false;
+        var THRESHOLD = 10;
+        el.addEventListener('touchstart', function (e) {
+            var t = e.touches[0];
+            startX = t.clientX;
+            startY = t.clientY;
+            startScrollY = window.scrollY || window.pageYOffset;
+            cancelled = false;
+        }, { passive: true });
+        el.addEventListener('touchmove', function (e) {
+            var t = e.touches[0];
+            var dx = Math.abs(t.clientX - startX);
+            var dy = Math.abs(t.clientY - startY);
+            var scrollDelta = Math.abs((window.scrollY || window.pageYOffset) - startScrollY);
+            if (dx > THRESHOLD || dy > THRESHOLD || scrollDelta > THRESHOLD) cancelled = true;
+        }, { passive: true });
+        el.addEventListener('touchcancel', function () { cancelled = true; }, { passive: true });
+        return function wasTapValid() {
+            var valid = !cancelled;
+            cancelled = false;
+            return valid;
+        };
+    }
+
+    var arrowPrevTapValid = armTapGuard(arrowPrev);
+    var arrowNextTapValid = armTapGuard(arrowNext);
     var canShowPrevArrow = false;
     var canShowNextArrow = false;
     var arrowVisibilityTicking = false;
@@ -361,6 +396,7 @@
         if (arrowNext && hpPageIdx >= 0 && hpPageIdx < hpPageOrder.length - 1) {
             arrowNext.classList.add('hint-pulse');
             arrowNext.addEventListener('click', function () {
+                if (!arrowNextTapValid()) return;
                 hpNavigatePage(hpPageOrder[hpPageIdx + 1]);
             });
         }
@@ -392,6 +428,7 @@
         if (pageIdx > 0) {
             arrowPrev.classList.add('hint-pulse');
             arrowPrev.addEventListener('click', function () {
+                if (!arrowPrevTapValid()) return;
                 navigatePage(pageOrder[pageIdx - 1]);
             });
         }
@@ -400,6 +437,7 @@
         if (pageIdx >= 0 && pageIdx < pageOrder.length - 1) {
             arrowNext.classList.add('hint-pulse');
             arrowNext.addEventListener('click', function () {
+                if (!arrowNextTapValid()) return;
                 navigatePage(pageOrder[pageIdx + 1]);
             });
         }

@@ -140,7 +140,9 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
     width: 100%;
     max-width: 420px;
     margin: 0.4rem auto 0;
+    padding: 8px 0;
     cursor: pointer;
+    touch-action: none;
   }
 
   .playlist-progress-track {
@@ -149,7 +151,7 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
     height: 6px;
     border-radius: 999px;
     background: rgb(255 255 255 / 10%);
-    overflow: hidden;
+    overflow: visible;
   }
 
   .playlist-progress-fill {
@@ -159,6 +161,29 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
     border-radius: 999px;
     background: linear-gradient(90deg, #6366f1, #22e6ff);
     transition: width 100ms linear;
+  }
+
+  .playlist-progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -6px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 1px 4px rgb(0 0 0 / 40%);
+    transform: translateY(-50%) scale(0);
+    transition: transform 120ms ease;
+  }
+
+  .playlist-progress:hover .playlist-progress-fill::after,
+  .playlist-progress.is-seeking .playlist-progress-fill::after {
+    transform: translateY(-50%) scale(1);
+  }
+
+  .playlist-progress.is-seeking .playlist-progress-fill {
+    transition: none;
   }
 
   .playlist-progress-time {
@@ -366,6 +391,7 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
     });
 
     audio.addEventListener('timeupdate', () => {
+      if (isSeeking) return;
       if (timeCurrent) timeCurrent.textContent = formatTime(audio.currentTime);
       if (audio.duration && Number.isFinite(audio.duration) && progressFill) {
         const ratio = Math.min(1, Math.max(0, audio.currentTime / audio.duration));
@@ -374,11 +400,60 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
       }
     });
 
-    progressEl?.addEventListener('click', (event) => {
+    // Drag-to-seek pe bara de progres — funcționează cu degetul (touch) și mouse
+    // prin Pointer Events; ratio-ul se recalculează live la fiecare mișcare.
+    let isSeeking = false;
+
+    const ratioFromClientX = (clientX: number) => {
+      const rect = progressEl!.getBoundingClientRect();
+      return Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+    };
+
+    const previewSeek = (clientX: number) => {
       if (!audio.duration || !Number.isFinite(audio.duration)) return;
-      const rect = progressEl.getBoundingClientRect();
-      const ratio = Math.min(1, Math.max(0, ((event as MouseEvent).clientX - rect.left) / rect.width));
-      audio.currentTime = ratio * audio.duration;
+      const ratio = ratioFromClientX(clientX);
+      if (progressFill) progressFill.style.width = `${ratio * 100}%`;
+      if (timeCurrent) timeCurrent.textContent = formatTime(ratio * audio.duration);
+      progressEl?.setAttribute('aria-valuenow', Math.round(ratio * 100).toString());
+    };
+
+    progressEl?.addEventListener('pointerdown', (event) => {
+      if (!audio.duration || !Number.isFinite(audio.duration)) return;
+      isSeeking = true;
+      progressEl.classList.add('is-seeking');
+      progressEl.setPointerCapture(event.pointerId);
+      previewSeek(event.clientX);
+      event.preventDefault();
+    });
+
+    progressEl?.addEventListener('pointermove', (event) => {
+      if (!isSeeking) return;
+      previewSeek(event.clientX);
+    });
+
+    const endSeek = (event: PointerEvent) => {
+      if (!isSeeking) return;
+      isSeeking = false;
+      progressEl?.classList.remove('is-seeking');
+      if (audio.duration && Number.isFinite(audio.duration)) {
+        audio.currentTime = ratioFromClientX(event.clientX) * audio.duration;
+      }
+    };
+
+    progressEl?.addEventListener('pointerup', endSeek);
+    progressEl?.addEventListener('pointercancel', endSeek);
+
+    progressEl?.addEventListener('keydown', (event) => {
+      if (!audio.duration || !Number.isFinite(audio.duration)) return;
+      const step = audio.duration * 0.02;
+      if (event.key === 'ArrowRight') {
+        audio.currentTime = Math.min(audio.duration, audio.currentTime + step);
+      } else if (event.key === 'ArrowLeft') {
+        audio.currentTime = Math.max(0, audio.currentTime - step);
+      } else {
+        return;
+      }
+      event.preventDefault();
     });
 
     audio.addEventListener('play', () => {
