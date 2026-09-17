@@ -1843,6 +1843,34 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - `npx astro check` — 0 erori, 0 warnings.
 - `npm run seo:check` — build PASS; **57 pagini HTML, 0 FAIL | 0 WARN**.
 
+---
+## 📝 2026-09-18 (sesiune 2) — Fix ecran gol la Back Acasă → Galerie Video (persistent după fix-urile anterioare)
+
+**Obiectiv:** Claudiu a raportat că bug-ul ecranului gol la Back persistă pe scenariul specific: Acasă → click pe un card video → `/galerie-video/` → Back → Acasă apare complet goală (doar `SkyBackground`), în ciuda fix-urilor din 17 și 18 sep.
+
+### Cauză
+- `.reveal-on-scroll` (carduri video/foto din secțiunea „Showcase live foto-video” de pe Acasă) pornesc din CSS cu `opacity:0` și devin vizibile doar printr-un `IntersectionObserver` pornit dintr-un script `is:inline` în body. Deși `ClientRouter` re-execută teoretic scripturile din body la fiecare swap, timing-ul/ordinea exactă de reataşare a observer-ului nu era garantată robust pe restaurări de scroll adânc la Back, riscând ca elementele să rămână blocate la `opacity:0`.
+- Link-urile card către `/galerie-video/` foloseau navigare client-side (`ClientRouter`), exact ruta pe care fusese identificat anterior riscul de fetch lent / race de scroll restoration pe mobil.
+
+### Fix
+- [src/pages/index.astro](src/pages/index.astro) — scriptul `.reveal-on-scroll` reinițializează observer-ul explicit pe `astro:page-load` (cu `disconnect()` pe `astro:before-swap` pentru a evita observere duplicate), în loc să se bazeze exclusiv pe re-execuția implicită a scriptului inline.
+- [src/pages/index.astro](src/pages/index.astro) — adăugat `data-astro-reload` pe cele 3 linkuri de pe Acasă către `/galerie-video/` (CTA hero „Ascultă live”, „Vezi rezultatul live”, cardurile video din Showcase). Navigarea devine full-page (fără `ClientRouter`) pe acest hop specific, astfel Back revine prin bfcache nativ al browserului — imediat, fără fetch/swap și fără risc de stare vizuală blocată.
+- [src/layouts/BaseLayout.astro](src/layouts/BaseLayout.astro) — plasă de siguranță generală: funcție `unstickPage()` care elimină `is-navigating` + opacity inline pe `#continut` + forțează `is-visible` pe toate `.reveal-on-scroll`/`.text-reveal`/`.page-reveal`; apelată automat la 1.5s după orice `astro:after-swap` (fallback dacă observerul nu a apucat să reveleze elementele) și pe `pageshow` cu `event.persisted === true` (restaurare din bfcache).
+
+### Validări
+- `npx astro check` — 0 erori, 0 warnings, 0 hints.
+- `npx astro build` — 0 erori.
+- `npm run seo:check` — build PASS; **57 pagini HTML, 0 FAIL | 0 WARN**.
+
+### Fișiere modificate
+- [src/pages/index.astro](src/pages/index.astro)
+- [src/layouts/BaseLayout.astro](src/layouts/BaseLayout.astro)
+
+### Riscuri / pași următori
+- `data-astro-reload` elimină animația de tranziție client-side doar pe cele 3 linkuri Acasă → Galerie Video (trade-off acceptat explicit pentru robustețe); restul navigației site-ului rămâne SPA.
+- Recomandată o verificare manuală pe un dispozitiv Android fizic (Back real din `/galerie-video/`) la următoarea ocazie, fix-ul fiind bazat pe analiza codului și documentația oficială Astro View Transitions (nu a putut fi testat direct pe hardware).
+
+
 ### Riscuri / pași următori
 - Fix-urile de history/scroll nu au putut fi testate cu Back real pe dispozitiv fizic — de reverificat la următoarea sesiune fluxul Home → Membri → (deschide poză) → Back → Back.
 - Layout-ul pe 2 coloane e nou; de urmărit vizual pe ferestre reale 768–1024px (tabletă/laptop nemaximizat) la următoarea verificare.

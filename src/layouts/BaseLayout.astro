@@ -439,6 +439,23 @@ const mobileNavAllItems = [
         if ('scrollRestoration' in history) {
           history.scrollRestoration = 'manual';
         }
+
+        /* Elimină orice stare vizuală „blocată" (is-navigating, opacity inline pe
+           #continut) și forțează reveal pe elementele care ar putea rămâne
+           opacity:0 dacă IntersectionObserver-ul nu a apucat să le observe încă
+           (ex. poziție de scroll restaurată adânc pe pagină la Back). */
+        function unstickPage() {
+          document.documentElement.classList.remove('is-navigating');
+          var main = document.getElementById('continut');
+          if (main) {
+            main.style.opacity = '';
+            main.style.transition = '';
+          }
+          document.querySelectorAll('.reveal-on-scroll, .text-reveal, .page-reveal').forEach(function (el) {
+            el.classList.add('is-visible');
+          });
+        }
+
         document.addEventListener('astro:before-preparation', function () {
           document.documentElement.classList.add('is-navigating');
         });
@@ -453,6 +470,18 @@ const mobileNavAllItems = [
             main.style.opacity = '';
             main.style.transition = '';
           }
+          /* Fallback: dacă la 1.5s după swap tot mai există elemente ascunse
+             (observer-ul de reveal nu a apucat să le prindă), le arătăm forțat
+             în loc să lăsăm ecranul gol/parțial gol. */
+          window.setTimeout(unstickPage, 1500);
+        });
+
+        /* Fallback pentru restaurare din bfcache (Back/Forward pe unele mobile
+           browsers pot restaura pagina din bfcache fără să treacă prin
+           ciclul ClientRouter astro:after-swap) — curățăm imediat orice stare
+           vizuală rămasă blocată. */
+        window.addEventListener('pageshow', function (event) {
+          if (event.persisted) unstickPage();
         });
       })();
     </script>
