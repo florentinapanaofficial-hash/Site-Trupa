@@ -1782,4 +1782,39 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - Titlul homepage a trecut de la keyword-first la brand-first — de monitorizat CTR/poziție în GSC pentru „cele mai bune formații de nuntă” (referință anterioară: 15.2, CTR 0.67%) ca să nu regreseze față de optimizarea din 10 sep 2026.
 - Restul paginilor principale (`contact.astro`, `formatie-nunta/*`) au rămas intenționat keyword-first, fiind în plin test de CTR conform tracker-ului — de revizuit brand-first doar dacă poziția de brand scade în GSC.
 
+---
+## 📝 2026-09-17 — Fix ecran gol la Back pe mobil, drag-to-seek player audio, gard tap-vs-scroll pe săgețile laterale
+
+**Obiectiv:** rezolvarea a 3 bug-uri UX raportate de Claudiu pe mobil: (1) ecran gol câteva secunde la revenirea pe Acasă cu Back-ul nativ Android, (2) bara de progres a playerului audio nu se putea trage cu degetul pentru derulare, (3) săgețile laterale de navigare declanșau accidental schimbarea paginii în timpul unui scroll vertical.
+
+### 1. Ecran gol la Back pe mobil (ClientRouter + scroll restoration)
+- **Cauză:** `<ClientRouter />` (View Transitions) re-fetch-uiește pagina inclusiv la Back/Forward; pe conexiune mobilă lentă fetch-ul durează câteva secunde, timp în care browserul restaura scroll-ul adânc pe noul document înainte de randare, lăsând vizibil doar `SkyBackground` (fixed, z-index -1).
+- **Fix:** [astro.config.mjs](astro.config.mjs) — activat `prefetch: { prefetchAll: true, defaultStrategy: 'viewport' }` (linkurile din nav, inclusiv cel spre Acasă, se prefetch-uiesc automat). [BaseLayout.astro](src/layouts/BaseLayout.astro) — `history.scrollRestoration = 'manual'` global; `astro:after-swap` resetează scroll la top pe `/` și curăță orice `opacity`/`transition` inline rămasă pe `#continut`; `astro:before-preparation`/`astro:after-swap` alimentează o bară subțire de încărcare (`.nav-loading-bar`) ca feedback vizual continuu în timpul fetch-ului.
+- **Validări:** `npx astro build` — 0 erori; `npm run seo:check` — 57 pagini, 0 FAIL | 0 WARN.
+
+### 2. Drag-to-seek pe bara de progres audio
+- **Cauză:** [AudioPlaylistPlayer.astro](src/components/AudioPlaylistPlayer.astro) avea doar `click` pe bara de progres (funcționalitatea WaveSurfer de derulare prin drag fusese eliminată într-o sesiune anterioară când playerul a trecut pe `HTMLAudioElement` nativ, fără să fie recreată).
+- **Fix:** înlocuit cu Pointer Events (`pointerdown`/`pointermove`/`pointerup`/`pointercancel` + `setPointerCapture`) — preview live al poziției în timpul drag-ului, `audio.currentTime` setat doar la eliberare; `touch-action: none` pe bară ca swipe-ul să nu declanșeze scroll-ul paginii; tranziția CSS a fill-ului dezactivată în timpul drag-ului; adăugat „thumb" vizibil și suport tastatură (săgeți stânga/dreapta), given `role="slider"` deja prezent.
+- **Validări:** `npx astro check` — 0 erori, 0 warnings, 1 hint preexistent; `npm run seo:check` — 57 pagini, 0 FAIL | 0 WARN.
+
+### 3. Gard tap-vs-scroll pe săgețile laterale
+- **Cauză:** `.mob-arrow-prev`/`.mob-arrow-next` stau fix pe marginea ecranului, exact pe traiectoria gestului de scroll cu degetul; ascultau doar `click`, deci orice atingere (chiar în timpul unui scroll) declanșa navigarea.
+- **Fix:** [mobile-swipe.js](public/js/mobile-swipe.js) — `armTapGuard(el)` urmărește `touchstart`/`touchmove`/`touchcancel` pe fiecare săgeată; gestul e considerat tap valid doar dacă degetul nu s-a mișcat > 10px și pagina nu s-a scrollat între timp. Ambele handler-e de `click` (homepage și subpagini) verifică gard-ul înainte de a naviga.
+- **Validări:** `node --check public/js/mobile-swipe.js` — sintaxă OK; `npm run seo:check` — 57 pagini, 0 FAIL | 0 WARN.
+
+### Fișiere modificate
+- [astro.config.mjs](astro.config.mjs)
+- [src/layouts/BaseLayout.astro](src/layouts/BaseLayout.astro)
+- [src/components/AudioPlaylistPlayer.astro](src/components/AudioPlaylistPlayer.astro)
+- [public/js/mobile-swipe.js](public/js/mobile-swipe.js)
+
+### Validare finală și publicare
+- `npm run seo:check` — build PASS; **57 pagini HTML, 0 FAIL | 0 WARN**.
+- Commit `64e54d69` — push pe `origin/main` reușit.
+
+### Riscuri / pași următori
+- Cele 3 fix-uri sunt bazate pe analiză de cod + documentația oficială Astro (View Transitions lifecycle), nu au putut fi testate direct pe un dispozitiv Android fizic — recomandată o verificare manuală rapidă (gest Back real, drag pe bara audio, scroll peste săgeți) la următoarea sesiune.
+- `mobile-swipe.js` nu se reinițializează pe navigare SPA (script cu `src`, exclus din re-execuție de ClientRouter) — nu afectează bug-urile raportate (Home nu încarcă acest script), dar rămâne o slăbiciune arhitecturală latentă pentru navigarea subpagină → subpagină, de investigat separat dacă apar alte simptome.
+
+
 
