@@ -1,6 +1,7 @@
 ---
 import { getImage } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import MembruCard from '../components/MembruCard.astro';
 import siteContent from '../data/siteContent.json';
 import seo from '../data/seo-content.json';
 import couplesData from '../data/couples.json';
@@ -106,6 +107,11 @@ const signatureCouples = [...couplesData.couples]
   }));
 const heroTelHref = `tel:${contact.phoneRaw}`;
 const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%83!%20Vreau%20s%C4%83%20verific%20disponibilitatea%20Forma%C8%9Biei%20Florentina%20Pan%C4%83.`;
+
+/** Nucleul trupei — soliști + instrumentiști cu poză reală, pentru cardurile 3D de pe homepage. */
+const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
+  (m: any) => m.nume && m.imagine && m.imagine.trim() !== ''
+);
 ---
 
 <BaseLayout title={acasa.meta.title} description={acasa.meta.description} ogImage={siteContent.seo.ogImage}>
@@ -455,6 +461,36 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
     <div class="hp-signature-actions reveal-on-scroll from-bottom" style="--reveal-delay: 250ms">
       <a href="/contact/" class="btn-solid">Vreau aceeași experiență</a>
       <a href="/galerie-video/" class="btn-outline">Vezi rezultatul live</a>
+    </div>
+  </section>
+
+  {/* ═══════════════════════════════════════════
+      NUCLEUL TRUPEI — carduri 3D interactive (tilt + flip pe click BIO)
+  ═══════════════════════════════════════════ */}
+  <section class="hp-nucleu section-container" aria-label="Cunoaște echipa completă a formației">
+    <div class="hp-nucleu-head reveal-on-scroll from-bottom" style="--reveal-delay: 20ms">
+      <p class="hp-nucleu-kicker">Nucleul Trupei</p>
+      <h2 class="hp-nucleu-title">Cunoaște Echipa care Dă Viață Fiecărui Eveniment</h2>
+      <p class="hp-nucleu-copy">
+        Soliști și instrumentiști cu peste 10 ani de experiență live, uniți de aceeași pasiune:
+        un show autentic, fără compromisuri. Dă click pe „Bio” pentru povestea fiecăruia.
+      </p>
+    </div>
+
+    <div class="hp-nucleu-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 reveal-on-scroll from-bottom" style="--reveal-delay: 60ms">
+      {echipaPrincipala.map((membru: any) => (
+        <MembruCard
+          nume={membru.nume}
+          rol={membru.rol}
+          imagine={membru.imagine}
+          bio={membru.bio}
+          specialitate={membru.specialitate}
+        />
+      ))}
+    </div>
+
+    <div class="hp-nucleu-actions reveal-on-scroll from-bottom" style="--reveal-delay: 120ms">
+      <a href="/membri/" class="hp-nucleu-cta">Vezi toți membrii și galeria completă →</a>
     </div>
   </section>
 
@@ -2048,6 +2084,80 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
     flex-wrap: wrap;
   }
 
+  .hp-nucleu {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding-block: var(--hp-section-pad);
+  }
+
+  .hp-nucleu-head {
+    max-width: 72ch;
+    margin: 0 auto 1.75rem;
+    text-align: center;
+  }
+
+  .hp-nucleu-kicker {
+    margin: 0;
+    color: rgba(255, 221, 155, 0.92);
+    font-size: 0.66rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  .hp-nucleu-title {
+    margin: 0.45rem 0 0;
+    color: #f8fbff;
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+
+  .hp-nucleu-copy {
+    margin: 0.6rem auto 0;
+    color: rgba(209, 223, 243, 0.93);
+    max-width: 64ch;
+    font-size: clamp(0.87rem, 1.1vw, 0.96rem);
+    line-height: 1.74;
+    text-wrap: pretty;
+  }
+
+  .hp-nucleu-grid {
+    max-width: 68rem;
+    margin: 0 auto;
+  }
+
+  .hp-nucleu-actions {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .hp-nucleu-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.75rem 1.6rem;
+    border-radius: 9999px;
+    border: 1.5px solid rgba(245, 166, 35, 0.55);
+    background: linear-gradient(120deg, rgba(11, 188, 214, 0.12), rgba(245, 166, 35, 0.12));
+    color: #ffd166;
+    font-weight: 700;
+    font-size: 0.92rem;
+    text-decoration: none;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.3);
+    transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease, color 220ms ease;
+  }
+
+  .hp-nucleu-cta:hover,
+  .hp-nucleu-cta:focus-visible {
+    transform: translateY(-2px);
+    border-color: rgba(255, 209, 102, 0.85);
+    color: #fff2d6;
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.38);
+  }
+
   .hp-convert-wrap {
     border-radius: 1rem;
     border: 1px solid rgba(255, 255, 255, 0.15);
@@ -2492,6 +2602,11 @@ const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%
     .hp-team-actions .btn-solid,
     .hp-team-actions .btn-outline {
       width: 100%;
+    }
+
+    .hp-nucleu-cta {
+      width: 100%;
+      justify-content: center;
     }
 
     .hp-convert-actions {

@@ -23,6 +23,14 @@ const SECURITY_HEADERS: Record<string, string> = {
 const CANONICAL_HOST = 'www.florentinapanaofficial.ro';
 
 export const onRequest = defineMiddleware(async (context, next) => {
+    // La build (SSG) request-ul e sintetic — fără host/protocol reale — iar la runtime
+    // paginile prerenderizate sunt servite direct de sirv, înainte să ajungă aici.
+    // Sărim peste logica de redirect/headere ca să nu declanșăm avertismentul
+    // `Astro.request.headers` și să nu irosim muncă fără efect la build.
+    if (context.isPrerendered) {
+        return next();
+    }
+
     const host = context.request.headers.get('host') ?? '';
     const proto = context.request.headers.get('x-forwarded-proto') ?? 'https';
 
