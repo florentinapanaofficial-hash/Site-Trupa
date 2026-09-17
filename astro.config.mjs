@@ -1,6 +1,5 @@
 import { defineConfig } from 'astro/config';
 import node from '@astrojs/node';
-import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
 
 const siteUrl = process.env.SITE_URL || 'https://www.florentinapanaofficial.ro';
@@ -24,11 +23,6 @@ export default defineConfig({
     mode: 'middleware',
   }),
   integrations: [
-    tailwind({
-      config: {
-        applyBaseStyles: false,
-      },
-    }),
     sitemap({
       customPages: [
         `${siteUrl}/comunitate/`,
