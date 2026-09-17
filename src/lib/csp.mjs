@@ -8,7 +8,7 @@ export const CONTENT_SECURITY_POLICY = [
     "font-src 'self'",
     "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://api.whatsapp.com https://*.supabase.co wss://*.supabase.co https://*.cloudflarestream.com https://videodelivery.net https://www.facebook.com https://analytics.tiktok.com https://business-api.tiktok.com",
     "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://ec.europa.eu https://*.cloudflarestream.com https://iframe.cloudflarestream.com",
-    "media-src 'self' blob: https://*.cloudflarestream.com https://videodelivery.net",
+    "media-src 'self' blob: https://*.cloudflarestream.com https://videodelivery.net https://*.r2.dev",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self' https://api.whatsapp.com",
