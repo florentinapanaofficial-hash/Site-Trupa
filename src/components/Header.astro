@@ -301,6 +301,7 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
 </header>
 
 <script is:inline>
+(function () {
   const initScrollSpy = () => {
     const headerEl = document.querySelector('[data-top-header]');
     const menuToggle = document.querySelector('[data-top-menu-toggle]');
@@ -984,4 +985,5 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
   } else {
     deferredInit();
   }
+})();
 </script>

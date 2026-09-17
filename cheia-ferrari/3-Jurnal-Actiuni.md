@@ -1898,6 +1898,31 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 ### Riscuri / pași următori
 - Flag-ul `!9m1!1b1` este un parametru nedocumentat oficial de Google (observat empiric); dacă Google își schimbă formatul intern al URL-urilor Maps, linkul ar putea reveni la tab-ul „Prezentare generală” (fără regresie față de starea anterioară, doar fără îmbunătățire). Recomandat un test manual rapid după deploy.
 
+---
+## 📝 2026-09-18 (sesiune 4) — Fix buton „Meniu” blocat intermitent (mobil + desktop), necesita refresh
+
+**Obiectiv:** Claudiu a raportat că butonul „Meniu” (hamburger) rămâne blocat/nu răspunde la click în anumite momente, pe mobil și pe desktop, și se remediază doar cu refresh manual al paginii.
+
+### Cauză reală
+- [Header.astro](src/components/Header.astro) — scriptul `is:inline` care leagă click-ul de hamburger (`initScrollSpy`/`deferredInit`) era declarat direct la nivelul de top al `<script>`, fără un wrapper IIFE (`const initScrollSpy = ...`, `function deferredInit() {...}`).
+- La navigare client-side (`ClientRouter`), acest script (parte din body-ul fiecărei pagini, nu doar din head) se re-execută la fiecare swap — dar identificatorii `const`/`function` declarați la nivel de top al unui script clasic (non-module) rămân în scope-ul global al lexicului (`window`) pe toată durata de viață a SPA-ului. La a doua navigare către o pagină cu `Header`, re-declararea acelorași `const`/`function` arunca `SyntaxError: Identifier 'initScrollSpy' has already been declared`, întrerupea silențios tot scriptul **înainte** de linia care atașează `click` pe `[data-top-menu-toggle]` — de aici butonul „blocat” fără nicio eroare vizibilă pentru utilizator, remediat doar de refresh (care resetează complet scope-ul global).
+- Explică de ce fenomenul era intermitent și identic pe mobil/desktop: depindea strict de câte navigări SPA avuseseră loc înainte, nu de dispozitiv.
+
+### Fix
+- [Header.astro](src/components/Header.astro) — întregul bloc `<script is:inline>` (linking hamburger, scroll-spy, body-scroll-lock, audio meniu etc.) a fost învelit într-un IIFE (`(function () { ... })();`), la fel ca restul scripturilor `is:inline` din proiect (`Footer.astro`, `CookieBanner.astro`, `ConsentWhatsApp.astro`), eliminând complet riscul de redeclarare la re-execuție.
+- Verificate și celelalte scripturi globale (`Footer.astro`, `CookieBanner.astro`, `ConsentWhatsApp.astro`) — deja corect izolate în IIFE, fără risc similar.
+
+### Validări
+- `npx astro check` — 0 erori, 0 warnings, 0 hints.
+- `npm run seo:check` — build PASS; **57 pagini HTML, 0 FAIL | 0 WARN**.
+
+### Fișiere modificate
+- [src/components/Header.astro](src/components/Header.astro)
+
+### Riscuri / pași următori
+- [BackButton.astro](src/components/BackButton.astro) atașează `document.addEventListener('click', ...)` direct la nivel de top (fără flag anti-duplicare) — nu produce `SyntaxError` la re-execuție (nu redeclară `const`/`function`), dar acumulează listeneri duplicați pe navigări SPA repetate; nu afectează bug-ul raportat, dar rămâne o slăbiciune minoră de investigat separat dacă apar simptome (ex. navigare Back declanșată de mai multe ori la un singur tap).
+
+
 
 
 
