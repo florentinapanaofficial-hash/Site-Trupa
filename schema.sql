@@ -52,3 +52,15 @@ CREATE TABLE IF NOT EXISTS track_plays (
   PRIMARY KEY (track_id)
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS couple_submissions (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  couple_slug VARCHAR(120) NOT NULL,
+  tip ENUM('story','recommendation','video') NOT NULL,
+  continut TEXT NOT NULL,
+  sursa VARCHAR(255) DEFAULT NULL,
+  stare ENUM('in_asteptare','aprobat','respins') NOT NULL DEFAULT 'in_asteptare',
+  creat_la TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  INDEX idx_couple_submissions_slug (couple_slug)
+) ENGINE=InnoDB;
+

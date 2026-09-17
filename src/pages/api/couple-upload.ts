@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import DOMPurify from 'isomorphic-dompurify';
+import { query } from '../../lib/db.js';
 import { secureLogger } from '../../lib/secure-logger.js';
 
 export const prerender = false;
@@ -108,8 +109,15 @@ export const POST: APIRoute = async ({ request }) => {
         if (!story || story.length < 10 || story.length > MAX_TEXT_LEN) {
             return json({ error: 'Povestea trebuie să aibă între 10 și 5000 de caractere.' }, 400);
         }
-        // In production, this would save to DB or file. For now, log it.
-        secureLogger.info(`[couple-upload] Story from ${couple.names}: ${story.substring(0, 100)}...`);
+        try {
+            await query(
+                'INSERT INTO couple_submissions (couple_slug, tip, continut) VALUES (?, ?, ?)',
+                [couple.slug, 'story', story],
+            );
+        } catch (error) {
+            secureLogger.error('[couple-upload] Eroare la salvarea povestii:', error);
+            return json({ error: 'Eroare server la salvarea povestii.' }, 500);
+        }
         return json({ success: true, message: 'Povestea a fost trimisă! O vom publica în curând.' }, 200);
     }
 
@@ -121,8 +129,16 @@ export const POST: APIRoute = async ({ request }) => {
             return json({ error: 'Recomandarea trebuie să aibă între 10 și 5000 de caractere.' }, 400);
         }
         const rawSource = typeof formData.get('source') === 'string' ? String(formData.get('source')) : '';
-        sanitize(rawSource);
-        secureLogger.info(`[couple-upload] Recommendation from ${couple.names}: ${rec.substring(0, 100)}...`);
+        const source = sanitize(rawSource);
+        try {
+            await query(
+                'INSERT INTO couple_submissions (couple_slug, tip, continut, sursa) VALUES (?, ?, ?, ?)',
+                [couple.slug, 'recommendation', rec, source || null],
+            );
+        } catch (error) {
+            secureLogger.error('[couple-upload] Eroare la salvarea recomandarii:', error);
+            return json({ error: 'Eroare server la salvarea recomandarii.' }, 500);
+        }
         return json({ success: true, message: 'Recomandarea a fost trimisă! Mulțumim frumos!' }, 200);
     }
 
@@ -133,7 +149,15 @@ export const POST: APIRoute = async ({ request }) => {
         if (!videoUrl || !videoUrl.startsWith('https://')) {
             return json({ error: 'Link-ul video trebuie să fie un URL valid (https://).' }, 400);
         }
-        secureLogger.info(`[couple-upload] Video from ${couple.names}: ${videoUrl}`);
+        try {
+            await query(
+                'INSERT INTO couple_submissions (couple_slug, tip, continut) VALUES (?, ?, ?)',
+                [couple.slug, 'video', videoUrl],
+            );
+        } catch (error) {
+            secureLogger.error('[couple-upload] Eroare la salvarea video-ului:', error);
+            return json({ error: 'Eroare server la salvarea video-ului.' }, 500);
+        }
         return json({ success: true, message: 'Link-ul video a fost trimis!' }, 200);
     }
 
