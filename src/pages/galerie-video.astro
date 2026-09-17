@@ -18,7 +18,7 @@ const videos = siteContent.videos.map((video, index) => ({
 type PlaylistSectionConfig = { title?: string; playlistId?: string; thumbnailVideoId?: string };
 const playlistLabels: Record<string, string> = {
   populara: 'Muzică Populară', usoara: 'Muzică Ușoară', tineret: 'Tineret',
-  instrumentala: 'Instrumentală', 'dans-miri': 'Dansul Mirilor',
+  instrumentala: 'Instrumentală',
 };
 const playlistConfig = (siteContent.youtubePlaylists?.galerieVideo ?? {}) as Record<string, PlaylistSectionConfig>;
 const playlists = Object.entries(playlistConfig)

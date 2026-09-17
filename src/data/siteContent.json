@@ -51,11 +51,6 @@
         "title": "Muzică Instrumentală",
         "playlistId": "PLA2uJhhkHzIGwMQGyVMPNPYTF7yFppWtM",
         "thumbnailVideoId": "7Dk2oIHgOaI"
-      },
-      "dans-miri": {
-        "title": "Dansul Mirilor",
-        "playlistId": "",
-        "thumbnailVideoId": "GRwVkbUGVPs"
       }
     }
   },
@@ -200,34 +195,6 @@
       "youtubeUrl": "https://www.youtube.com/watch?v=LSd5N1AmiFg",
       "category": "instrumentala",
       "uploadDate": "2024-07-30"
-    },
-    {
-      "title": "Dansul Mirilor - Andreea & Radu",
-      "youtubeId": "HQfVn98caic",
-      "youtubeUrl": "https://www.youtube.com/watch?v=HQfVn98caic",
-      "category": "dans-miri",
-      "uploadDate": "2024-06-15"
-    },
-    {
-      "title": "Dansul Mirilor - Bianca & Mihai",
-      "youtubeId": "7MQIWMj_W0g",
-      "youtubeUrl": "https://www.youtube.com/watch?v=7MQIWMj_W0g",
-      "category": "dans-miri",
-      "uploadDate": "2024-08-24"
-    },
-    {
-      "title": "Dansul Mirilor - Ioana & Cătălin",
-      "youtubeId": "GRwVkbUGVPs",
-      "youtubeUrl": "https://www.youtube.com/watch?v=GRwVkbUGVPs",
-      "category": "dans-miri",
-      "uploadDate": "2024-09-07"
-    },
-    {
-      "title": "Dansul Mirilor - Alina & Ștefan",
-      "youtubeId": "xdcdjAtxZlA",
-      "youtubeUrl": "https://www.youtube.com/watch?v=xdcdjAtxZlA",
-      "category": "dans-miri",
-      "uploadDate": "2024-10-19"
     }
   ],
   "videoAdmin": {
@@ -250,10 +217,6 @@
       {
         "id": "instrumentala",
         "title": "Muzică Instrumentală"
-      },
-      {
-        "id": "dans-miri",
-        "title": "Dansul Mirilor"
       }
     ]
   },
