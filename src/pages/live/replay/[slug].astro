@@ -192,7 +192,7 @@ const videoJsonLd = {
   </section>
 </BaseLayout>
 
-<script is:inline>
+<script is:inline data-astro-rerun>
   document.querySelectorAll('[data-replay-copy]').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const url = btn.getAttribute('data-url') || window.location.href;

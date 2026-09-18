@@ -47,7 +47,8 @@ const { photos, names, accentColor } = Astro.props;
   </div>
 </dialog>
 
-<script is:inline define:vars={{ photos }}>
+<script is:inline data-astro-rerun define:vars={{ photos }}>
+(() => {
   if (photos.length > 0) {
     const dialog = document.getElementById('coupleLightbox');
     const img = dialog?.querySelector('.couple-lightbox__img');
@@ -91,6 +92,7 @@ const { photos, names, accentColor } = Astro.props;
       if (Math.abs(diff) > 50) showPhoto(diff > 0 ? currentIndex - 1 : currentIndex + 1);
     });
   }
+})();
 </script>
 
 <style>

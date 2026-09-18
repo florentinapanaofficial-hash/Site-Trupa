@@ -1953,6 +1953,41 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 ### Riscuri / pași următori
 - Fluxul trebuie verificat după deploy pe un browser mobil real: deschidere meniu → navigare → redirect/ancoră → redeschidere meniu. Verificările automate disponibile confirmă compilarea și output-ul, dar nu simulează un tap real în browser.
 
+---
+## 📝 2026-09-18 (sesiune 6) — Audit complet scripturi Astro View Transitions
+
+**Obiectiv:** Auditarea integrală a scripturilor interactive din `src/` și eliminarea listener-elor, timerelor sau observerelor care puteau rămâne atașate DOM-ului vechi după navigare ClientRouter ori Back/Forward.
+
+### Probleme identificate
+- Șase inițializări bazate pe `DOMContentLoaded`, eveniment care nu reprezintă ciclul de viață al navigărilor Astro.
+- Scripturi inline de pagină care capturau noduri o singură dată și nu aveau rerulare explicită.
+- Polling, intervale, timeout-uri, RAF-uri, `IntersectionObserver`, `ResizeObserver`, AudioContext și abonament Supabase fără cleanup complet la `astro:before-swap`.
+- [public/js/mobile-swipe.js](public/js/mobile-swipe.js), încărcat din BaseLayout, păstra referințe către vechiul `#continut`, navbar și săgețile mobile.
+
+### Modificări
+- `DOMContentLoaded` eliminat complet din `src/`; inițializările globale folosesc `astro:page-load`.
+- Scripturile locale dependente de DOM folosesc `data-astro-rerun` și IIFE pentru a evita redeclarările globale.
+- Serviciile globale (Header, BackButton, media mutual exclusion, scroll restoration) au garduri singleton și selecție dinamică unde este necesar.
+- Cleanup adăugat pentru polling live, Supabase Realtime, audio/video, AudioContext, RAF, intervale, timeout-uri, observere, fullscreen, popup-uri mutate în body și clasele de scroll lock.
+- Nu a fost necesar `data-astro-reload`: toate componentele auditate pot funcționa corect cu ClientRouter.
+
+### Fișiere modificate
+- Layout și navigație: [src/layouts/BaseLayout.astro](src/layouts/BaseLayout.astro), [src/components/Header.astro](src/components/Header.astro), [src/components/Footer.astro](src/components/Footer.astro), [src/components/BackButton.astro](src/components/BackButton.astro), [public/js/mobile-swipe.js](public/js/mobile-swipe.js).
+- Media și galerii: `AudioPlaylistPlayer`, `CircularAudioVisualizer`, `YoutubeEmbed`, `SmartTvVideoPlayer`, `PhotoGallery`, `CoupleGallery`, `MembruCard`, `EmbedSnippet` și paginile galerie/membri/shorts/live.
+- Formulare și GDPR: [src/pages/contact.astro](src/pages/contact.astro), [src/pages/upload/[token].astro](src/pages/upload/[token].astro), `CookieBanner`, `ConsentWhatsApp`, paginile politica de confidențialitate și termeni.
+- Pagini cu interacțiuni locale: homepage, despre, apariții TV, cauți formație, comunitate index/detaliu, momente cu mirii, publicații index/detaliu, vlog și replay live.
+
+### Validări
+- Scanare `DOMContentLoaded` în `src/**/*.{astro,js,ts}` — **0 rezultate**.
+- Matrice lifecycle pentru toate fișierele cu `addEventListener`, timere sau observere — toate au `astro:page-load`, `data-astro-rerun`, `astro:before-swap` sau gard singleton, după rol.
+- `node --check public/js/mobile-swipe.js` — PASS.
+- `npx astro check` — **0 erori, 0 warnings, 0 hints**.
+- `npm test` — **1 suită, 40/40 teste trecute**.
+- `npm run seo:check` — build + compresie PASS; **57 pagini HTML, 0 FAIL | 0 WARN**.
+
+### Riscuri / pași următori
+- Nu există în proiect o suită browser E2E; validarea automată nu simulează click-uri și Back/Forward reale. După deploy este recomandat un smoke test mobil pe rutele `/contact/`, `/galerie-foto/`, `/membri/`, `/momente-cu-mirii/`, `/live/` și `/shorts/`.
+
 
 
 

@@ -138,6 +138,7 @@ const ytLink = youtubeUrl || (hasPlaylist
     var YT_ORIGINS = ['https://www.youtube-nocookie.com', 'https://www.youtube.com'];
     var MINI_GATE_SELECTOR = '.yt-gate[data-yt-mini-on-scroll="true"]';
     var miniObserver = null;
+    var activationObservers = [];
     var videoHoverAudioCtx = null;
     var lastVideoHoverToneAt = 0;
 
@@ -526,6 +527,7 @@ const ytLink = youtubeUrl || (hasPlaylist
           }
         });
       }, { rootMargin: '240px 0px' });
+      activationObservers.push(observer);
 
       document.querySelectorAll('.yt-gate').forEach(function (gate) {
         if (!gate.querySelector('iframe')) observer.observe(gate);
@@ -541,11 +543,8 @@ const ytLink = youtubeUrl || (hasPlaylist
       } catch (_) { /* localStorage indisponibil */ }
     }
 
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', activateGrantedGates, { once: true });
-    } else {
-      activateGrantedGates();
-    }
+    activateGrantedGates();
+    document.addEventListener('astro:page-load', activateGrantedGates);
 
     // ── Reacționează la acceptarea din CookieBanner ──
     window.addEventListener('cookie:granted', activateVisibleGates);
@@ -599,6 +598,16 @@ const ytLink = youtubeUrl || (hasPlaylist
       gate.setAttribute('data-yt-out-of-view', 'false');
       syncMiniDocumentState();
       gate.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    document.addEventListener('astro:before-swap', function () {
+      if (miniObserver) {
+        miniObserver.disconnect();
+        miniObserver = null;
+      }
+      activationObservers.forEach(function (observer) { observer.disconnect(); });
+      activationObservers = [];
+      document.documentElement.classList.remove('yt-mini-active');
     });
   })();
 </script>

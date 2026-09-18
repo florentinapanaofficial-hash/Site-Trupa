@@ -92,13 +92,15 @@ const ogImage = '/images/og-live-1200x630.jpg';
     </div>
   </section>
 
-  <script is:inline>
+  <script is:inline data-astro-rerun>
     (function () {
       var iframe = document.getElementById('preview-player');
       var offlineOverlay = document.getElementById('preview-offline');
       var countdownEl = document.getElementById('preview-countdown');
       var secondsEl = document.getElementById('preview-seconds');
       var continueBtn = document.getElementById('preview-continue');
+      var countdownTimer = 0;
+      var disposed = false;
       if (!iframe) return;
 
       // Permitem suprascrierea destinației prin ?next= (whitelist intern)
@@ -135,11 +137,11 @@ const ogImage = '/images/og-live-1200x630.jpg';
         if (!secondsEl) return;
         var remaining = duration;
         secondsEl.textContent = String(remaining);
-        var timer = window.setInterval(function () {
+        countdownTimer = window.setInterval(function () {
           remaining -= 1;
           if (secondsEl) secondsEl.textContent = String(Math.max(remaining, 0));
           if (remaining <= 0) {
-            window.clearInterval(timer);
+            window.clearInterval(countdownTimer);
             // Oprim playerul înainte de redirect (curățenie)
             try { iframe.src = 'about:blank'; } catch (err) {}
             // Adăugăm UTM pentru tracking în GA4
@@ -159,6 +161,7 @@ const ogImage = '/images/og-live-1200x630.jpg';
       async function init() {
         try {
           var response = await fetch('/api/live-status/', { cache: 'no-store' });
+          if (disposed) return;
           if (!response.ok) throw new Error('live-status fetch failed');
           var payload = await response.json();
           var customer = payload && payload.customerCode;
@@ -187,6 +190,11 @@ const ogImage = '/images/og-live-1200x630.jpg';
         }
       }
 
+      document.addEventListener('astro:before-swap', function () {
+        disposed = true;
+        window.clearInterval(countdownTimer);
+        iframe.src = 'about:blank';
+      }, { once: true });
       init();
     })();
   </script>

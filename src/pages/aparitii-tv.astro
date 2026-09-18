@@ -101,8 +101,9 @@ const videoObjectsLd = {
     </div>
   </section>
 
-  <script is:inline>
+  <script is:inline data-astro-rerun>
     (() => {
+      const controller = new AbortController();
       const consentWrap = document.getElementById('yt-consent-bottom');
       const consentBtn = document.getElementById('yt-consent-bottom-btn');
       if (!consentWrap || !consentBtn) return;
@@ -127,7 +128,8 @@ const videoObjectsLd = {
         syncVisibility();
       });
 
-      window.addEventListener('cookie:granted', syncVisibility);
+      window.addEventListener('cookie:granted', syncVisibility, { signal: controller.signal });
+      document.addEventListener('astro:before-swap', () => controller.abort(), { once: true });
       syncVisibility();
     })();
   </script>

@@ -853,8 +853,13 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
 
   </section>
 
-  <script is:inline>
+  <script is:inline data-astro-rerun>
     (() => {
+      const controller = new AbortController();
+      let revealTimer = 0;
+      let autoplayTimer = 0;
+      let sliderInterval = 0;
+      let idleCallbackId = 0;
       if (window.matchMedia('(max-width: 767px)').matches) return;
       const slider = document.querySelector('[data-hero-slider]');
       if (!slider) return;
@@ -880,18 +885,18 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
 
       const scheduleReveal = () => {
         if ('requestIdleCallback' in window) {
-          window.requestIdleCallback(() => {
-            window.setTimeout(revealSlider, REVEAL_DELAY_MS);
+          idleCallbackId = window.requestIdleCallback(() => {
+            revealTimer = window.setTimeout(revealSlider, REVEAL_DELAY_MS);
           }, { timeout: 2200 });
         } else {
-          window.setTimeout(revealSlider, REVEAL_DELAY_MS);
+          revealTimer = window.setTimeout(revealSlider, REVEAL_DELAY_MS);
         }
       };
 
       if (document.readyState === 'complete') {
         scheduleReveal();
       } else {
-        window.addEventListener('load', scheduleReveal, { once: true });
+        window.addEventListener('load', scheduleReveal, { once: true, signal: controller.signal });
       }
 
       if (slides.length < 2) return;
@@ -901,7 +906,7 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
       const startSlider = () => {
         if (slider.getAttribute('data-ready') !== 'true') return;
         slider.setAttribute('data-running', 'true');
-        window.setInterval(() => {
+        sliderInterval = window.setInterval(() => {
           slides[activeIndex].classList.remove('is-active');
           activeIndex = (activeIndex + 1) % slides.length;
           slides[activeIndex].classList.add('is-active');
@@ -917,7 +922,14 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
       };
 
       // Sliderul pornește după ce zona devine vizibilă și pagina trece de faza critică.
-      window.setTimeout(startSlider, REVEAL_DELAY_MS + AUTOPLAY_DELAY_AFTER_REVEAL_MS);
+      autoplayTimer = window.setTimeout(startSlider, REVEAL_DELAY_MS + AUTOPLAY_DELAY_AFTER_REVEAL_MS);
+      document.addEventListener('astro:before-swap', () => {
+        controller.abort();
+        window.clearTimeout(revealTimer);
+        window.clearTimeout(autoplayTimer);
+        window.clearInterval(sliderInterval);
+        if ('cancelIdleCallback' in window) window.cancelIdleCallback(idleCallbackId);
+      }, { once: true });
     })();
   </script>
 
@@ -961,8 +973,9 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
     })();
   </script>
 
-  <script is:inline>
+  <script is:inline data-astro-rerun>
     (() => {
+      let disposed = false;
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       const nums = Array.from(document.querySelectorAll('.hero-stat-num[data-target]'));
       if (!nums.length) return;
@@ -980,7 +993,7 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
           const eased = 1 - Math.pow(1 - p, 3);
           const value = Math.round(eased * numeric);
           el.textContent = `${value}${suffix}`;
-          if (p < 1) requestAnimationFrame(tick);
+          if (p < 1 && !disposed) requestAnimationFrame(tick);
         };
         requestAnimationFrame(tick);
       };
@@ -994,11 +1007,16 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
       }, { threshold: 0.6 });
 
       nums.forEach((n) => io.observe(n));
+      document.addEventListener('astro:before-swap', () => {
+        disposed = true;
+        io.disconnect();
+      }, { once: true });
     })();
   </script>
 
-  <script is:inline>
+  <script is:inline data-astro-rerun>
     (() => {
+      const controller = new AbortController();
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       if (window.matchMedia('(max-width: 1024px)').matches) return;
       if (!window.matchMedia('(hover: hover)').matches) return;
@@ -1021,12 +1039,13 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
           card.style.transform = `translate3d(${moveX.toFixed(2)}px, ${moveY.toFixed(2)}px, 0) scale(1.018)`;
         });
         card.addEventListener('mouseleave', reset);
-        window.addEventListener('resize', () => { rect = null; reset(); }, { passive: true });
+        window.addEventListener('resize', () => { rect = null; reset(); }, { passive: true, signal: controller.signal });
       });
+      document.addEventListener('astro:before-swap', () => controller.abort(), { once: true });
     })();
   </script>
 
-  <script is:inline>
+  <script is:inline data-astro-rerun>
     (() => {
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       if (window.matchMedia('(max-width: 1024px)').matches) return;

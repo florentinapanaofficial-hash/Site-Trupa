@@ -1981,7 +1981,11 @@ const googleBusinessReviews = [
     }
   </style>
 
-  <script is:inline>
+  <script is:inline data-astro-rerun>
+    (() => {
+    const controller = new AbortController();
+    let tickerRaf = 0;
+    let tickerResizeObserver = null;
     const tickerTrack = document.querySelector('[data-ticker-track]');
 
     if (tickerTrack && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -2021,11 +2025,11 @@ const googleBusinessReviews = [
             tickerItem.style.transform = `translateX(${offset}px)`;
           }
 
-          requestAnimationFrame(tick);
+          tickerRaf = requestAnimationFrame(tick);
         };
 
         measureTicker();
-        requestAnimationFrame(tick);
+        tickerRaf = requestAnimationFrame(tick);
 
         if (document.fonts && document.fonts.ready) {
           document.fonts.ready.then(() => {
@@ -2038,17 +2042,17 @@ const googleBusinessReviews = [
             cancelAnimationFrame(resizeRaf);
           }
           resizeRaf = requestAnimationFrame(measureTicker);
-        }, { passive: true });
+        }, { passive: true, signal: controller.signal });
 
         if ('ResizeObserver' in window) {
-          const ro = new ResizeObserver(() => {
+          tickerResizeObserver = new ResizeObserver(() => {
             if (resizeRaf) {
               cancelAnimationFrame(resizeRaf);
             }
             resizeRaf = requestAnimationFrame(measureTicker);
           });
-          ro.observe(tickerTrack);
-          ro.observe(tickerItem);
+          tickerResizeObserver.observe(tickerTrack);
+          tickerResizeObserver.observe(tickerItem);
         }
       }
     }
@@ -2102,7 +2106,7 @@ const googleBusinessReviews = [
       };
 
       lane.addEventListener('scroll', requestUpdate, { passive: true });
-      window.addEventListener('resize', requestUpdate, { passive: true });
+      window.addEventListener('resize', requestUpdate, { passive: true, signal: controller.signal });
       requestUpdate();
     }
 
@@ -2127,5 +2131,11 @@ const googleBusinessReviews = [
 
       initCenterHighlight(lane);
     });
+    document.addEventListener('astro:before-swap', () => {
+      controller.abort();
+      cancelAnimationFrame(tickerRaf);
+      tickerResizeObserver?.disconnect();
+    }, { once: true });
+    })();
   </script>
 </BaseLayout>

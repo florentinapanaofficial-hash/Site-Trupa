@@ -271,7 +271,8 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
     <script is:inline type="application/ld+json" set:html={JSON.stringify(seo.schema)} />
   </Fragment>
 
-  <script is:inline>
+  <script is:inline data-astro-rerun>
+  (() => {
     const feedbackEl = document.getElementById('form-feedback');
     const feedbackType = new URLSearchParams(window.location.search).get('trimis');
     const funnelSessionKey = 'lead_funnel_session_id';
@@ -660,6 +661,7 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
         }
       });
     }
+  })();
   </script>
 
   <style>
@@ -932,7 +934,7 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
 </BaseLayout>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  function revealContactEmail() {
     const el = document.querySelector('.ob-email-contact');
     if (el) {
       const u = el.getAttribute('data-u');
@@ -942,5 +944,8 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
         el.outerHTML = `<a class="btn-outline" href="mailto:${addr}" style="overflow-wrap:anywhere;word-break:break-word">Email: ${addr}</a>`;
       }
     }
-  });
+  }
+
+  revealContactEmail();
+  document.addEventListener('astro:page-load', revealContactEmail);
 </script>

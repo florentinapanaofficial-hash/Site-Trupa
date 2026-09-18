@@ -858,9 +858,10 @@ const aboutPageLd = {
   }
 </style>
 
-<script is:inline>
+<script is:inline data-astro-rerun>
   // ── Modal detalii carduri ──
   (function () {
+    const controller = new AbortController();
     const modal    = document.getElementById('dp-card-modal');
     const backdrop = document.getElementById('dp-modal-backdrop');
     const closeBtn = document.getElementById('dp-modal-close');
@@ -900,11 +901,16 @@ const aboutPageLd = {
     closeBtn?.addEventListener('click', closeModal);
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && !modal.hidden) closeModal();
-    });
+    }, { signal: controller.signal });
+    document.addEventListener('astro:before-swap', () => {
+      controller.abort();
+      closeModal();
+    }, { once: true });
   })();
 
   // ── Montaj cinematic membrii ──
   (function() {
+    var controller = new AbortController();
     var slides  = Array.from(document.querySelectorAll('.cine-slide'));
     var dots    = Array.from(document.querySelectorAll('.cine-dot'));
     var infoEl  = document.getElementById('cine-info');
@@ -1004,8 +1010,8 @@ const aboutPageLd = {
       }
     }
 
-    document.addEventListener('pointerdown', unlockAndMaybePlay, { once: true });
-    document.addEventListener('keydown', unlockAndMaybePlay, { once: true });
+    document.addEventListener('pointerdown', unlockAndMaybePlay, { once: true, signal: controller.signal });
+    document.addEventListener('keydown', unlockAndMaybePlay, { once: true, signal: controller.signal });
 
     // Dots click
     dots.forEach(function(dot, i) {
@@ -1058,6 +1064,14 @@ const aboutPageLd = {
           startBgAudio();
         }
       }
-    });
+    }, { signal: controller.signal });
+    document.addEventListener('astro:before-swap', function() {
+      controller.abort();
+      clearInterval(timer);
+      if (typeof observer !== 'undefined') observer.disconnect();
+      if (audioEl) pauseBgAudio();
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+    }, { once: true });
   })();
 </script>

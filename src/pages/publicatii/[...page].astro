@@ -223,8 +223,9 @@ function formatDate(date: string | Date | undefined) {
   </section>
 
   <script is:inline type="application/json" id="blog-search-data" set:html={JSON.stringify(searchIndex)}></script>
-  <script is:inline>
+  <script is:inline data-astro-rerun>
     (() => {
+      const controller = new AbortController();
       const input = document.getElementById('blog-search');
       const suggestions = document.getElementById('blog-search-suggestions');
       const dataEl = document.getElementById('blog-search-data');
@@ -264,7 +265,8 @@ function formatDate(date: string | Date | undefined) {
         if (!suggestions.contains(e.target) && e.target !== input) {
           suggestions.hidden = true;
         }
-      });
+      }, { signal: controller.signal });
+      document.addEventListener('astro:before-swap', () => controller.abort(), { once: true });
     })();
   </script>
   <style>

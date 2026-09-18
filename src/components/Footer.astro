@@ -188,7 +188,7 @@ const isHomePage = Astro.url.pathname === '/';
   </div>
 </footer>
 
-<script is:inline>
+<script is:inline data-astro-rerun>
   (function () {
     var btn = document.getElementById('cookie-prefs-btn');
     if (!btn) return;
@@ -204,7 +204,7 @@ const isHomePage = Astro.url.pathname === '/';
   })();
 </script>
 
-<script is:inline>
+<script is:inline data-astro-rerun>
   (function () {
     var el = document.getElementById('footer-email-js');
     if (!el) return;

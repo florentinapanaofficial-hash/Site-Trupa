@@ -305,7 +305,9 @@ const membriListLd = {
 </BaseLayout>
 
 
-<script is:inline>
+<script is:inline data-astro-rerun>
+(() => {
+  const controller = new AbortController();
   // ═══ Mut popup-ul galerie la <body> — evită containment-ul
   // backdrop-filter/overflow care blochează position:fixed ═══
   (function() {
@@ -353,7 +355,7 @@ const membriListLd = {
       b.classList.remove('active');
       b.setAttribute('aria-expanded', 'false');
     });
-  });
+  }, { signal: controller.signal });
 
   // ═══ GALLERY POPUP FX + NAVIGARE GRUP ═══
   const fxMap = {
@@ -471,7 +473,7 @@ const membriListLd = {
     if (popup.classList.contains('active')) {
       closePopup(currentFx, { fromPopstate: true });
     }
-  });
+  }, { signal: controller.signal });
 
   // ═══ GALLERY SLIDER — dots + mouse drag ═══
   let galleryDragged = false;
@@ -524,7 +526,7 @@ const membriListLd = {
     if (e.key === 'Escape') closePopup(currentFx);
     if (e.key === 'ArrowLeft')  navigateTo(-1);
     if (e.key === 'ArrowRight') navigateTo(1);
-  });
+  }, { signal: controller.signal });
 
   // ── Pe mobil, swipe-ul în popup este DEZACTIVAT intenționat.
   //    Navigarea între poze se face DOAR din săgețile ‹ › (.gallery-popup-nav).
@@ -609,7 +611,7 @@ const membriListLd = {
       const dx = e.pageX - startX;
       if (Math.abs(dx) > 5) dragMoved = true;
       gallery.scrollLeft = scrollStart - dx;
-    });
+    }, { signal: controller.signal });
 
     document.addEventListener('mouseup', () => {
       if (!isDragging) return;
@@ -617,7 +619,7 @@ const membriListLd = {
       gallery.style.cursor = '';
       gallery.style.userSelect = '';
       if (dragMoved) galleryDragged = true;
-    });
+    }, { signal: controller.signal });
   });
 
   // ── Photo cycling on hover (membrii cu galerie) ──
@@ -639,6 +641,15 @@ const membriListLd = {
       idx = 0;
     });
   });
+  document.addEventListener('astro:before-swap', function() {
+    controller.abort();
+    document.querySelectorAll('.ac.has-gal').forEach(function(card) {
+      card.dispatchEvent(new Event('mouseleave'));
+    });
+    popup.classList.remove('active');
+    popup.remove();
+  }, { once: true });
+})();
 </script>
 
 <!-- Override-urile mobile sunt acum în globals.css (secțiunile 5 & 6 = vertical by default). -->

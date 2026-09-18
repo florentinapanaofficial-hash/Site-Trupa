@@ -300,7 +300,7 @@ const lastUpdated = '24 martie 2026';
 </style>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  function revealGdprEmails() {
     document.querySelectorAll('.ob-email-gdpr').forEach((el) => {
       const u = el.getAttribute('data-u');
       const d = el.getAttribute('data-d');
@@ -309,5 +309,8 @@ const lastUpdated = '24 martie 2026';
         el.innerHTML = `<a href="mailto:${addr}">${addr}</a>`;
       }
     });
-  });
+  }
+
+  revealGdprEmails();
+  document.addEventListener('astro:page-load', revealGdprEmails);
 </script>

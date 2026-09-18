@@ -157,7 +157,7 @@ const schemas = [collectionPageLd, aggregateRatingLd];
   </section>
 
   <!-- ═══ ENTRANCE ANIMATION ═══════════════════════════════════════ -->
-  <script is:inline>
+  <script is:inline data-astro-rerun>
     (function () {
       var observer = new IntersectionObserver(
         function (entries) {
@@ -175,6 +175,9 @@ const schemas = [collectionPageLd, aggregateRatingLd];
         el.style.setProperty('--delay', i * 80 + 'ms');
         observer.observe(el);
       });
+      document.addEventListener('astro:before-swap', function () {
+        observer.disconnect();
+      }, { once: true });
     })();
   </script>
 

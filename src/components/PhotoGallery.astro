@@ -129,7 +129,7 @@ const pageUrl = `${siteUrl}${pagePath}`;
 </section>
 
 <!-- ═══ CLIENT SCRIPT ═══ -->
-<script is:inline>
+<script is:inline data-astro-rerun>
 (function () {
   /* ── Info tooltip toggle ── */
   document.querySelectorAll('[data-pg-info]').forEach(function (btn) {
@@ -153,12 +153,16 @@ const pageUrl = `${siteUrl}${pagePath}`;
   });
 
   // Închide tooltip-ul dacă click în afara
-  document.addEventListener('click', function () {
+  function closePhotoTooltips() {
     document.querySelectorAll('.pg-tooltip--open').forEach(function (t) {
       t.classList.remove('pg-tooltip--open');
       t.setAttribute('aria-hidden', 'true');
     });
-  });
+  }
+  document.addEventListener('click', closePhotoTooltips);
+  document.addEventListener('astro:before-swap', function () {
+    document.removeEventListener('click', closePhotoTooltips);
+  }, { once: true });
 
   /* ── Copiază link în clipboard ── */
   document.querySelectorAll('.pg-share-copy').forEach(function (btn) {

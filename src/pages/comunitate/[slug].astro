@@ -318,8 +318,9 @@ const reviewLd = {
     </section>
 
     <!-- Elemente de partajare pagină -->
-    <script is:inline>
+    <script is:inline data-astro-rerun>
       (function () {
+      var controller = new AbortController();
         var pageShareButton = document.querySelector('[data-page-share]');
         var pageShareStatus = document.querySelector('[data-page-share-status]');
 
@@ -527,7 +528,7 @@ const reviewLd = {
           }
           setButtonLabel();
           setDanceButtonLabel();
-        });
+        }, { signal: controller.signal });
 
         window.addEventListener('message', function (e) {
           if (!hasDance || !danceIframe || e.source !== danceIframe.contentWindow) return;
@@ -569,7 +570,7 @@ const reviewLd = {
               setDanceFallbackVisible(false);
             }
           }
-        });
+        }, { signal: controller.signal });
 
         if (hasDance) {
           if (danceIframe) {
@@ -644,7 +645,7 @@ const reviewLd = {
           if (hasDance && danceWrapper && danceWrapper.classList.contains(danceFsClass) && window.innerWidth > window.innerHeight) {
             setDanceButtonLabel();
           }
-        });
+        }, { signal: controller.signal });
 
         var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         var revealItems = document.querySelectorAll('.couple-page__share-wrap, .couple-section, .couple-rec');
@@ -670,6 +671,15 @@ const reviewLd = {
             item.classList.add('is-revealed');
           });
         }
+        document.addEventListener('astro:before-swap', function () {
+          controller.abort();
+          clearDanceFallbackTimer();
+          if (typeof revealObserver !== 'undefined') revealObserver.disconnect();
+          if (danceWrapper) danceWrapper.classList.remove(danceFsClass);
+          if (wrapper) wrapper.classList.remove(inlineFullscreenClass);
+          document.body.classList.remove('couple-inline-fs-open');
+          unlockLandscape();
+        }, { once: true });
       })();
     </script>
   </main>

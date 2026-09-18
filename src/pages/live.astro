@@ -786,7 +786,11 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
   }
 </style>
 
-<script is:inline define:vars={{ publicSupabaseUrl, publicSupabaseAnonKey, isDev }}>
+<script is:inline data-astro-rerun define:vars={{ publicSupabaseUrl, publicSupabaseAnonKey, isDev }}>
+  (() => {
+  let liveClient = null;
+  let liveChannel = null;
+  let disposed = false;
   /* ═════════════════════════════════════════════════════════════════
      SUPABASE CLIENT — Inițializare cu PUBLIC_SUPABASE_URL și PUBLIC_SUPABASE_ANON_KEY
   ═════════════════════════════════════════════════════════════════ */
@@ -802,7 +806,9 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
     // Importăm Supabase client din CDN
     try {
       const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+      if (disposed) return;
       const client = createClient(supabaseUrl, supabaseKey);
+      liveClient = client;
       window.supabaseClient = client;
 
       // Inițializează Like button și Realtime listeners
@@ -869,7 +875,7 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
 
     // ── Realtime listener — ascultă noi like-uri ──
     if (lowerThird && client) {
-      client
+      liveChannel = client
         .channel(`interactions:stream_id=eq.${streamId}`)
         .on(
           'postgres_changes',
@@ -914,9 +920,16 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
     // Încarcă contul inițial
     await loadLikeCount();
   };
+
+  document.addEventListener('astro:before-swap', () => {
+    disposed = true;
+    if (liveClient && liveChannel) void liveClient.removeChannel(liveChannel);
+    if (window.supabaseClient === liveClient) delete window.supabaseClient;
+  }, { once: true });
+  })();
 </script>
 
-<script is:inline define:vars={{ replays }}>
+<script is:inline data-astro-rerun define:vars={{ replays }}>
   (function () {
     // ── Status live + fallback playlist YouTube auto pentru offline ──
     var player = document.getElementById('live-player');
@@ -1027,7 +1040,7 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
     syncPlayerWithLiveStatus();
 
     // Repolling la 60s pentru a prinde tranziția online → offline
-    window.setInterval(syncPlayerWithLiveStatus, 60000);
+    var liveStatusInterval = window.setInterval(syncPlayerWithLiveStatus, 60000);
 
     // ── Share buttons — URL dinamic ──
     var pageUrl = encodeURIComponent(window.location.href);
@@ -1082,5 +1095,10 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
         }
       });
     }
+    document.addEventListener('astro:before-swap', function () {
+      window.clearInterval(liveStatusInterval);
+      if (shareToast && shareToast._hideTimer) clearTimeout(shareToast._hideTimer);
+      if (player) player.src = 'about:blank';
+    }, { once: true });
   })();
 </script>

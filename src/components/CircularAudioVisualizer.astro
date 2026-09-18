@@ -332,9 +332,13 @@ const {
 
   const getSharedAudio = (): HTMLAudioElement | null => (window as any).__fpAudio ?? null;
 
-  const nodes = document.querySelectorAll<HTMLElement>('[data-cav]');
+  function initCircularAudioVisualizers(): void {
+  const nodes = document.querySelectorAll<HTMLElement>('[data-cav]:not([data-cav-init])');
 
   nodes.forEach((root) => {
+    root.dataset.cavInit = 'true';
+    const controller = new AbortController();
+    const listenerOptions = { signal: controller.signal };
     // #continut has overflow:clip, which would clip this fixed overlay — escape it to <body>
     if (root.parentElement !== document.body) {
       document.body.appendChild(root);
@@ -366,7 +370,7 @@ const {
       canvas.height = rect.height * dpr;
     };
     resizeCanvas();
-    window.addEventListener('resize', resizeCanvas, { passive: true });
+    window.addEventListener('resize', resizeCanvas, { passive: true, signal: controller.signal });
 
     const ensureAudioGraph = (audio: HTMLAudioElement) => {
       if (state.audioCtx) return;
@@ -495,17 +499,17 @@ const {
       document.body.style.overflow = '';
     };
 
-    closeBtn.addEventListener('click', closeModal);
-    backdrop?.addEventListener('click', closeModal);
+    closeBtn.addEventListener('click', closeModal, listenerOptions);
+    backdrop?.addEventListener('click', closeModal, listenerOptions);
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape' && root.classList.contains('is-open')) closeModal();
-    });
+    }, listenerOptions);
 
     window.addEventListener('fp-track-change', (event) => {
       const detail = (event as CustomEvent<{ title?: string; artist?: string }>).detail || {};
       if (titleEl && detail.title) titleEl.textContent = detail.title;
       if (artistEl) artistEl.textContent = detail.artist || '';
-    });
+    }, listenerOptions);
 
     playBtn.addEventListener('click', async () => {
       const audio = getSharedAudio();
@@ -528,7 +532,7 @@ const {
       } else {
         audio.pause();
       }
-    });
+    }, listenerOptions);
 
     const bindAudioEvents = (audio: HTMLAudioElement) => {
       if (boundAudio === audio) return;
@@ -550,8 +554,8 @@ const {
         progressEl?.setAttribute('aria-valuenow', Math.round(ratio * 100).toString());
       };
 
-      audio.addEventListener('timeupdate', updateProgress);
-      audio.addEventListener('loadedmetadata', updateProgress);
+      audio.addEventListener('timeupdate', updateProgress, listenerOptions);
+      audio.addEventListener('loadedmetadata', updateProgress, listenerOptions);
 
       progressEl?.addEventListener('click', (event) => {
         const rect = progressEl.getBoundingClientRect();
@@ -561,7 +565,7 @@ const {
           audio.currentTime = ratio * audio.duration;
           updateProgress();
         }
-      });
+      }, listenerOptions);
 
       audio.addEventListener('play', () => {
         root.dataset.playing = 'true';
@@ -569,34 +573,52 @@ const {
         ensureAudioGraph(audio);
         startVisual();
         openModal();
-      });
+      }, listenerOptions);
 
       audio.addEventListener('pause', () => {
         root.dataset.playing = 'false';
         playBtn.setAttribute('aria-pressed', 'false');
         stopVisual();
-      });
+      }, listenerOptions);
 
       audio.addEventListener('ended', () => {
         root.dataset.playing = 'false';
         playBtn.setAttribute('aria-pressed', 'false');
         stopVisual();
-      });
+      }, listenerOptions);
     };
 
     // the shared <audio> element is created by AudioPlaylistPlayer; wait for it if not ready yet
+    let waitId = 0;
+    let waitTimeoutId = 0;
     const existingAudio = getSharedAudio();
     if (existingAudio) {
       bindAudioEvents(existingAudio);
     } else {
-      const waitId = window.setInterval(() => {
+      waitId = window.setInterval(() => {
         const audio = getSharedAudio();
         if (audio) {
           bindAudioEvents(audio);
           window.clearInterval(waitId);
         }
       }, 150);
-      window.setTimeout(() => window.clearInterval(waitId), 8000);
+      waitTimeoutId = window.setTimeout(() => window.clearInterval(waitId), 8000);
     }
+
+    document.addEventListener('astro:before-swap', () => {
+      controller.abort();
+      window.clearInterval(waitId);
+      window.clearTimeout(waitTimeoutId);
+      cancelAnimationFrame(rafId);
+      closeModal();
+      if (state.audioCtx && state.audioCtx.state !== 'closed') {
+        void state.audioCtx.close();
+      }
+      root.remove();
+    }, { once: true });
   });
+  }
+
+  initCircularAudioVisualizers();
+  document.addEventListener('astro:page-load', initCircularAudioVisualizers);
 </script>

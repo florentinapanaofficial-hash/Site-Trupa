@@ -185,13 +185,16 @@ const lastUpdated = '7 aprilie 2026';
 
 <!-- ✅ SEO: script obfuscare email -->
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  function revealTermsEmail() {
     const el = document.getElementById('ob-email');
     if (el) {
       const addr = el.dataset.u + '@' + el.dataset.d;
       el.innerHTML = `<a href="mailto:${addr}">${addr}</a>`;
     }
-  });
+  }
+
+  revealTermsEmail();
+  document.addEventListener('astro:page-load', revealTermsEmail);
 </script>
 
 <!-- ✅ Stiluri prose-policy (lipseau din această pagină) -->

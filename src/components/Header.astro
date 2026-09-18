@@ -302,6 +302,9 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
 
 <script is:inline>
 (function () {
+  if (window.__fpHeaderLifecycleInit) return;
+  window.__fpHeaderLifecycleInit = true;
+
   const MENU_KEY = 'top-menu-open';
   const mobileMq = window.matchMedia('(max-width: 1024px)');
   const isMobileViewport = () => mobileMq.matches;
@@ -452,7 +455,13 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
 
   document.addEventListener('astro:before-swap', closeMobileMenu);
 
+  let cleanupScrollSpy = () => {};
+  let deferredInitTimer = 0;
+  let deferredInitIdleCallback = 0;
+
   const initScrollSpy = () => {
+    cleanupScrollSpy();
+    const controller = new AbortController();
     const headerEl = document.querySelector('[data-top-header]');
     const menuToggle = document.querySelector('[data-top-menu-toggle]');
     const menuCloseButton = document.querySelector('[data-top-menu-close]');
@@ -504,7 +513,7 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       window.addEventListener('resize', () => {
         recalcHeaderSpyOffset();
         recalcSectionTops();
-      });
+      }, { signal: controller.signal });
 
       // ── Scroll / swipe pe mobil → închide meniul very-slow-motion ──
       let isScrollClosing = false;
@@ -533,7 +542,7 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
         if (window.scrollY > menuOpenScrollY + 36) {
           triggerScrollClose();
         }
-      }, { passive: true });
+      }, { passive: true, signal: controller.signal });
 
       // Metoda 2: touchmove — detectează swipe-up chiar dacă pagina nu scrollează
       let touchStartY = 0;
@@ -542,7 +551,7 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
         if (!e.touches.length) return;
         touchStartY = e.touches[0].clientY;
         touchStartedInsideMenu = Boolean(menuPanel && menuPanel.contains(e.target));
-      }, { passive: true });
+      }, { passive: true, signal: controller.signal });
 
       window.addEventListener('touchmove', (e) => {
         if (!ENABLE_GESTURE_CLOSE) return;
@@ -554,7 +563,7 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
         if (deltaY > 28) {
           triggerScrollClose();
         }
-      }, { passive: true });
+      }, { passive: true, signal: controller.signal });
 
       // Metoda 3: wheel event — unele browsere mobile emit wheel în loc de scroll
       window.addEventListener('wheel', (e) => {
@@ -565,12 +574,15 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
         if (e.deltaY > 24) {
           triggerScrollClose();
         }
-      }, { passive: true });
+      }, { passive: true, signal: controller.signal });
     }
 
     const links = Array.from(document.querySelectorAll('#top-menu-panel [data-nav-link]'));
     const liveLinks = Array.from(document.querySelectorAll('#top-menu-panel [data-live-link="true"]'));
     const LIVE_STATUS_REFRESH_MS = 60000;
+    let livePollingInterval = 0;
+    let liveKickoffTimer = 0;
+    let liveIdleCallbackId = 0;
 
     const applyLiveState = (isLive) => {
       liveLinks.forEach((link) => {
@@ -611,7 +623,7 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
 
     const startLiveStatePolling = () => {
       refreshLiveState();
-      window.setInterval(refreshLiveState, LIVE_STATUS_REFRESH_MS);
+      livePollingInterval = window.setInterval(refreshLiveState, LIVE_STATUS_REFRESH_MS);
     };
 
     // Amânăm apelul cu un delay mare după `load` ca să iasă complet din
@@ -619,18 +631,18 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
     const scheduleLivePolling = () => {
       const kickoff = () => {
         if ('requestIdleCallback' in window) {
-          window.requestIdleCallback(startLiveStatePolling, { timeout: 5000 });
+          liveIdleCallbackId = window.requestIdleCallback(startLiveStatePolling, { timeout: 5000 });
         } else {
-          window.setTimeout(startLiveStatePolling, 500);
+          liveKickoffTimer = window.setTimeout(startLiveStatePolling, 500);
         }
       };
-      window.setTimeout(kickoff, 4000);
+      liveKickoffTimer = window.setTimeout(kickoff, 4000);
     };
 
     if (document.readyState === 'complete') {
       scheduleLivePolling();
     } else {
-      window.addEventListener('load', scheduleLivePolling, { once: true });
+      window.addEventListener('load', scheduleLivePolling, { once: true, signal: controller.signal });
     }
 
     const menuUiAudioCtx = (() => {
@@ -910,8 +922,8 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
     };
 
     if (hasSectionMap) {
-      window.addEventListener('scroll', onScroll, { passive: true });
-      window.addEventListener('resize', onScroll);
+      window.addEventListener('scroll', onScroll, { passive: true, signal: controller.signal });
+      window.addEventListener('resize', onScroll, { signal: controller.signal });
     }
 
     links.forEach((link) => {
@@ -949,21 +961,36 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       recalcHeaderSpyOffset();
       recalcSectionTops();
       getActiveByScroll();
-    }, { once: true });
+    }, { once: true, signal: controller.signal });
+
+    cleanupScrollSpy = () => {
+      controller.abort();
+      window.clearInterval(livePollingInterval);
+      window.clearTimeout(liveKickoffTimer);
+      if ('cancelIdleCallback' in window) window.cancelIdleCallback(liveIdleCallbackId);
+      cancelAnimationFrame(menuInertRaf);
+      if (menuUiAudioCtx && menuUiAudioCtx.state !== 'closed') {
+        void menuUiAudioCtx.close();
+      }
+    };
   };
 
   function deferredInit() {
+    window.clearTimeout(deferredInitTimer);
+    if ('cancelIdleCallback' in window) window.cancelIdleCallback(deferredInitIdleCallback);
     if ('requestIdleCallback' in window) {
-      requestIdleCallback(initScrollSpy);
+      deferredInitIdleCallback = requestIdleCallback(initScrollSpy);
     } else {
-      setTimeout(initScrollSpy, 1);
+      deferredInitTimer = window.setTimeout(initScrollSpy, 1);
     }
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', deferredInit, { once: true });
-  } else {
-    deferredInit();
-  }
+  document.addEventListener('astro:page-load', deferredInit);
+  document.addEventListener('astro:before-swap', () => {
+    window.clearTimeout(deferredInitTimer);
+    if ('cancelIdleCallback' in window) window.cancelIdleCallback(deferredInitIdleCallback);
+    cleanupScrollSpy();
+  });
+  deferredInit();
 })();
 </script>

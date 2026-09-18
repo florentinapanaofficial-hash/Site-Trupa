@@ -436,6 +436,10 @@ const mobileNavAllItems = [
            deja poziția exactă de scroll salvată în history.state. */}
     <script is:inline>
       (function () {
+        if (window.__fpScrollRestorationInit) return;
+        window.__fpScrollRestorationInit = true;
+        var unstickTimer = 0;
+
         if ('scrollRestoration' in history) {
           history.scrollRestoration = 'manual';
         }
@@ -473,7 +477,11 @@ const mobileNavAllItems = [
           /* Fallback: dacă la 1.5s după swap tot mai există elemente ascunse
              (observer-ul de reveal nu a apucat să le prindă), le arătăm forțat
              în loc să lăsăm ecranul gol/parțial gol. */
-          window.setTimeout(unstickPage, 1500);
+          window.clearTimeout(unstickTimer);
+          unstickTimer = window.setTimeout(unstickPage, 1500);
+        });
+        document.addEventListener('astro:before-swap', function () {
+          window.clearTimeout(unstickTimer);
         });
 
         /* Fallback pentru restaurare din bfcache (Back/Forward pe unele mobile
@@ -674,8 +682,10 @@ const mobileNavAllItems = [
       })();
     </script>
 
-    <script is:inline>
+    <script is:inline data-astro-rerun>
     (() => {
+      const controller = new AbortController();
+      let progressRaf = 0;
         function initScrollProgress() {
             const root = document.documentElement;
             let ticking = false;
@@ -690,23 +700,24 @@ const mobileNavAllItems = [
             const onScroll = () => {
                 if (ticking) return;
                 ticking = true;
-                requestAnimationFrame(() => { updateScrollProgress(); ticking = false; });
+                progressRaf = requestAnimationFrame(() => { updateScrollProgress(); ticking = false; });
             };
             cacheHeight();
-            window.addEventListener('scroll', onScroll, { passive: true });
-            window.addEventListener('resize', () => { cacheHeight(); updateScrollProgress(); });
+              window.addEventListener('scroll', onScroll, { passive: true, signal: controller.signal });
+              window.addEventListener('resize', () => { cacheHeight(); updateScrollProgress(); }, { signal: controller.signal });
             updateScrollProgress();
         }
-        if ('requestIdleCallback' in window) {
-            requestIdleCallback(initScrollProgress);
-        } else {
-            setTimeout(initScrollProgress, 1);
-        }
+            initScrollProgress();
+            document.addEventListener('astro:before-swap', () => {
+              controller.abort();
+              cancelAnimationFrame(progressRaf);
+            }, { once: true });
     })();
     </script>
 
-    <script is:inline>
+          <script is:inline data-astro-rerun>
     (() => {
+            const controller = new AbortController();
         const menu = document.querySelector('.left-side-menu');
         if (!menu) return;
         const links = Array.from(menu.querySelectorAll('.left-side-link'));
@@ -727,7 +738,7 @@ const mobileNavAllItems = [
             return path;
         }
         setActive(currentHref());
-        links.forEach(l => { l.addEventListener('click', () => { setTimeout(() => setActive(l.getAttribute('href')), 80); }); });
+        links.forEach(l => { l.addEventListener('click', () => { setTimeout(() => setActive(l.getAttribute('href')), 80); }, { signal: controller.signal }); });
         const sections = Array.from(document.querySelectorAll('section[id]'));
         if (!sections.length) return;
         const visibleSet = new Set();
@@ -743,6 +754,10 @@ const mobileNavAllItems = [
             else { const anchorHref = path + '#' + topSection.id; if (links.some(l => l.getAttribute('href') === anchorHref)) setActive(anchorHref); }
         }, { rootMargin: '-8% 0px -45% 0px', threshold: 0 });
         sections.forEach(s => obs.observe(s));
+        document.addEventListener('astro:before-swap', () => {
+          controller.abort();
+          obs.disconnect();
+        }, { once: true });
     })();
     </script>
 
@@ -765,6 +780,9 @@ const mobileNavAllItems = [
     <!-- Oprește audio/video când utilizatorul pleacă de pe pagină -->
     <script is:inline>
     (function(){
+      if(window.__fpStopMediaInit) return;
+      window.__fpStopMediaInit = true;
+
       function stopAllMedia(){
         document.querySelectorAll('audio, video').forEach(function(el){
           if(!el.paused){ el.pause(); el.currentTime=0; }
@@ -783,6 +801,9 @@ const mobileNavAllItems = [
     <!-- Calculează înălțimea header-ului și sincronizează --mob-nav-h -->
     <script is:inline>
     (function(){
+      if(window.__fpMobileHeaderHeightInit) return;
+      window.__fpMobileHeaderHeightInit = true;
+
       if(!window.matchMedia('(max-width:767px)').matches) return;
       /* Fix forced reflow: separăm READ (offsetHeight) de orice WRITE anterior
          cu requestAnimationFrame, ca browserul să folosească layout-ul deja
@@ -797,13 +818,14 @@ const mobileNavAllItems = [
       }
       var resizeTimer;
       function debouncedSync(){ clearTimeout(resizeTimer); resizeTimer=setTimeout(sync,200); }
-      if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',sync);}else{sync();}
+      sync();
+      document.addEventListener('astro:page-load',sync);
       window.addEventListener('resize',debouncedSync,{passive:true});
     })();
     </script>
 
     <!-- Hamburger pulse: activează animația după 5s, oprește la click -->
-    <script is:inline>
+    <script is:inline data-astro-rerun>
     (function(){
       if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       if(!window.matchMedia('(max-width: 767px)').matches) return;
@@ -816,11 +838,15 @@ const mobileNavAllItems = [
         clearTimeout(timer);
         icon.classList.remove('pulse-animation');
       }, { once: false });
+      document.addEventListener('astro:before-swap', function(){
+        clearTimeout(timer);
+        icon.classList.remove('pulse-animation');
+      }, { once: true });
     })();
     </script>
 
     <!-- IntersectionObserver — Text Reveal cu efect cascadă (staggered) -->
-    <script is:inline>
+    <script is:inline data-astro-rerun>
     (function(){
       if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
@@ -877,11 +903,15 @@ const mobileNavAllItems = [
       });
 
       targets.forEach(function(el){ io.observe(el); });
+      document.addEventListener('astro:before-swap', function(){
+        io.disconnect();
+      }, { once: true });
     })();
     </script>
     <!-- Magnetic Button — efect discret desktop (CTA-uri de conversie) -->
-    <script is:inline>
+    <script is:inline data-astro-rerun>
     (function(){
+      var controller = new AbortController();
       /* Doar pe desktop cu mouse și fără preferință reduce-motion */
       if(window.matchMedia('(max-width: 767px)').matches) return;
       if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -914,8 +944,8 @@ const mobileNavAllItems = [
       }
 
       function invalidateRects(){ rectsDirty = true; }
-      window.addEventListener('scroll', invalidateRects, { passive: true });
-      window.addEventListener('resize', invalidateRects, { passive: true });
+      window.addEventListener('scroll', invalidateRects, { passive: true, signal: controller.signal });
+      window.addEventListener('resize', invalidateRects, { passive: true, signal: controller.signal });
 
       var rafId = 0;
       var mouseX = 0, mouseY = 0;
@@ -925,7 +955,7 @@ const mobileNavAllItems = [
         mouseX = e.clientX;
         mouseY = e.clientY;
         if(!rafId) rafId = requestAnimationFrame(tick);
-      }, { passive: true });
+      }, { passive: true, signal: controller.signal });
 
       function tick(){
         rafId = 0;
@@ -966,7 +996,12 @@ const mobileNavAllItems = [
       document.addEventListener('mouseleave', function(){
         btns.forEach(function(b){ b.style.transform = ''; });
         active = null;
-      });
+      }, { signal: controller.signal });
+      document.addEventListener('astro:before-swap', function(){
+        controller.abort();
+        cancelAnimationFrame(rafId);
+        btns.forEach(function(b){ b.style.transform = ''; });
+      }, { once: true });
     })();
     </script>
 

@@ -73,7 +73,8 @@ const activePlayerId = `video-${initialVideo.id}`;
   }
 </style>
 
-<script is:inline define:vars={{ activePlayerId }}>
+<script is:inline data-astro-rerun define:vars={{ activePlayerId }}>
+(() => {
   const gallery = document.querySelector('.smart-tv-gallery');
   if (gallery) {
     const showPlayer = (playerId) => {
@@ -114,4 +115,5 @@ const activePlayerId = `video-${initialVideo.id}`;
     playlistsTab?.addEventListener('click', () => { playlistsPanel?.classList.remove('hidden'); videosPanel?.classList.add('hidden'); categoriesBar?.classList.add('hidden'); playlistsTab.classList.add('bg-rose-600', 'text-white'); videosTab?.classList.remove('bg-rose-600', 'text-white'); });
     showPlayer(activePlayerId);
   }
+})();
 </script>

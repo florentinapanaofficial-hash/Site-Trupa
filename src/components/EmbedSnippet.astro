@@ -252,7 +252,9 @@ const embedCode = `<a href="${pageUrl}" target="_blank" rel="noopener noreferrer
 </style>
 
 <script>
-  document.querySelectorAll('[data-embed]').forEach((wrap) => {
+  function initEmbedSnippets(): void {
+    document.querySelectorAll<HTMLElement>('[data-embed]:not([data-embed-bound])').forEach((wrap) => {
+    wrap.dataset.embedBound = 'true';
     const embedBtn = wrap.querySelector('[data-embed-copy]') as HTMLButtonElement | null;
     const code = wrap.querySelector('[data-embed-code]') as HTMLElement | null;
     const embedLabel = wrap.querySelector('[data-embed-label]') as HTMLElement | null;
@@ -300,5 +302,9 @@ const embedCode = `<a href="${pageUrl}" target="_blank" rel="noopener noreferrer
         flashBtn(linkBtn, linkLabel, 'Copiază link');
       });
     }
-  });
+    });
+  }
+
+  initEmbedSnippets();
+  document.addEventListener('astro:page-load', initEmbedSnippets);
 </script>

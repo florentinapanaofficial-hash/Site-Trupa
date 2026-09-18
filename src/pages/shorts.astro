@@ -607,10 +607,11 @@ const shorts = rawShorts.map((s) => {
     setMuted: (m: boolean) => void;
   };
 
-  (() => {
+  function initShorts(): void {
     const overlay = document.getElementById('reels-overlay');
     const feed = document.getElementById('reels-feed');
-    if (!overlay || !feed) return;
+    if (!overlay || !feed || overlay.dataset.shortsInit === 'true') return;
+    overlay.dataset.shortsInit = 'true';
 
     const cards = Array.from(document.querySelectorAll<HTMLElement>('[data-reel]'));
     if (!cards.length) return;
@@ -622,6 +623,8 @@ const shorts = rawShorts.map((s) => {
     let settledIndex = -1;
     let playbackTimer = 0;
     let scrollEndTimer = 0;
+    let initialPlaybackTimer = 0;
+    let preloadObserver: IntersectionObserver | null = null;
     let isScrolling = false;
 
     function enforceHDPlayback(player: YTPlayer) {
@@ -753,7 +756,7 @@ const shorts = rawShorts.map((s) => {
       buildYouTubePlayer(0);
       buildYouTubePlayer(1);
 
-      const preloadIO = new IntersectionObserver((entries) => {
+      preloadObserver = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
           if (!entry.isIntersecting) return;
           const index = Number((entry.target as HTMLElement).dataset.index);
@@ -762,7 +765,7 @@ const shorts = rawShorts.map((s) => {
       }, { root: feed, rootMargin: '150% 0px', threshold: 0 });
 
       cards.forEach((card) => {
-        if (card.dataset.provider !== 'cloudflare') preloadIO.observe(card);
+        if (card.dataset.provider !== 'cloudflare') preloadObserver?.observe(card);
       });
     }
 
@@ -1021,7 +1024,7 @@ const shorts = rawShorts.map((s) => {
     const hasCloudflare = cards.some((c) => c.dataset.provider === 'cloudflare');
     if (hasYouTube) loadYouTubeAPI(initYouTubePlayers);
     if (hasCloudflare) loadCloudflareSDK(buildCloudflarePlayers);
-    window.setTimeout(onScrollSettled, 150);
+    initialPlaybackTimer = window.setTimeout(onScrollSettled, 150);
 
     // Plasă de siguranță: dacă browserul blochează silențios play() înainte de
     // orice gest al utilizatorului, reîncercăm la primul tap/scroll/tastă.
@@ -1036,12 +1039,24 @@ const shorts = rawShorts.map((s) => {
       overlay!.addEventListener(evt, unlockActivePlayback, { once: true, passive: true });
     });
 
-    // eliberează playerele când părăsim pagina (SPA / navigare)
-    window.addEventListener('pagehide', () => {
+    const cleanup = () => {
       players.forEach((p) => { try { p.pause(); } catch { /* noop */ } });
+      window.clearTimeout(playbackTimer);
+      window.clearTimeout(scrollEndTimer);
+      window.clearTimeout(initialPlaybackTimer);
+      window.clearTimeout(tapTimer);
+      window.clearTimeout(toastTimer);
+      preloadObserver?.disconnect();
+      io.disconnect();
       resizeObserver.disconnect();
-    });
-  })();
+      overlay.removeAttribute('data-shorts-init');
+    };
+    document.addEventListener('astro:before-swap', cleanup, { once: true });
+    window.addEventListener('pagehide', cleanup, { once: true });
+  }
+
+  initShorts();
+  document.addEventListener('astro:page-load', initShorts);
 </script>
 
 

@@ -234,7 +234,9 @@ const galleryPageLd = {
 <!-- ═══════════════════════════════════════════
      SCRIPT — Filtre, Lightbox, Swipe, Keyboard
 ═══════════════════════════════════════════ -->
-<script is:inline>
+<script is:inline data-astro-rerun>
+(() => {
+  const controller = new AbortController();
   const items = document.querySelectorAll('.gal-item');
 
   // ── Montaj cinematic autoplay ──
@@ -542,7 +544,7 @@ const galleryPageLd = {
         pauseMontageAudio();
       }
       else if (montagePlaying || (montagePlay && montagePlay.textContent === 'Pause')) startMontage();
-    });
+    }, { signal: controller.signal });
 
     currentPreset = montagePreset?.value || 'elegant';
     if (montageStage) montageStage.setAttribute('data-preset', currentPreset);
@@ -660,7 +662,7 @@ const galleryPageLd = {
     if (e.key === 'Escape') closeLightbox();
     if (e.key === 'ArrowLeft') navPrev();
     if (e.key === 'ArrowRight') navNext();
-  });
+  }, { signal: controller.signal });
 
   // ── Swipe touch pe mobile ──
   let touchStartX = 0;
@@ -674,6 +676,16 @@ const galleryPageLd = {
       diff > 0 ? navNext() : navPrev();
     }
   }, { passive: true });
+  document.addEventListener('astro:before-swap', () => {
+    controller.abort();
+    stopMontage();
+    pauseMontageAudio();
+    cancelAnimationFrame(photoFadeRaf);
+    if (audioCtx && audioCtx.state !== 'closed') void audioCtx.close();
+    document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
+  }, { once: true });
+})();
 </script>
 
 <!-- ═══════════════════════════════════════════

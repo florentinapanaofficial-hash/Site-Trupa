@@ -524,6 +524,19 @@ const initialTrack = tracks[0] || { id: '0', title: 'Nicio piesă', audioUrl: ''
     volumeSlider?.addEventListener('input', (e) => {
       audio.volume = parseFloat((e.target as HTMLInputElement).value);
     });
+
+    document.addEventListener('astro:before-swap', () => {
+      audio.pause();
+      audio.removeAttribute('src');
+      audio.load();
+      cancelAnimationFrame(titleMeasureRaf);
+      cancelAnimationFrame(trackNameMeasureRaf);
+      window.removeEventListener('resize', updateTitleMarquee);
+      if ((window as any).__fpAudio === audio) {
+        delete (window as any).__fpAudio;
+      }
+      root.removeAttribute('data-fp-init');
+    }, { once: true });
   }
 
   initAudioPlayer();

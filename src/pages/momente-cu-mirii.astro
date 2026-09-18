@@ -104,7 +104,7 @@ const eventsJsonLd = realMoments.events
     ))}
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&display=swap" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&display=swap" data-async-css />
-    <script is:inline>
+    <script is:inline data-astro-rerun>
       // Activează CSS-ul asincron după ce s-a încărcat — echivalent cu media="print" onload="this.media='all'"
       document.querySelectorAll('link[data-async-css]').forEach((l) => { l.media = 'all'; });
     </script>
@@ -235,7 +235,8 @@ const eventsJsonLd = realMoments.events
     </dialog>
   </section>
 
-  <script is:inline>
+  <script is:inline data-astro-rerun>
+    (() => {
     const lightbox = document.getElementById('photo-lightbox');
     const lightboxImage = document.getElementById('photo-lightbox-image');
     const lightboxCaption = document.getElementById('photo-lightbox-caption');
@@ -1334,6 +1335,7 @@ const eventsJsonLd = realMoments.events
 
     // ── Muzică romantică de fundal ────────────────────────────────────────────
     (function () {
+      const bgController = new AbortController();
       const bgSection = document.getElementById('momente-reale');
       if (!bgSection) return;
 
@@ -1377,6 +1379,7 @@ const eventsJsonLd = realMoments.events
       let bgNextTime = 0;
       let bgBeatIdx = 0;
       let bgLoopTimer = null;
+      let bgAutoStartTimer = null;
       let bgSectionVisible = false;
       let bgStartedOnce = false;
 
@@ -1485,7 +1488,7 @@ const eventsJsonLd = realMoments.events
           if (entry.isIntersecting) {
             bgFab.classList.add('is-visible');
             if (!bgStartedOnce) {
-              window.setTimeout(() => { if (bgSectionVisible) bgStart(); }, 900);
+              bgAutoStartTimer = window.setTimeout(() => { if (bgSectionVisible) bgStart(); }, 900);
             }
           } else {
             bgFab.classList.remove('is-visible');
@@ -1497,8 +1500,24 @@ const eventsJsonLd = realMoments.events
 
       // Pornire automată la primul click/touch pe pagină dacă secțiunea e vizibilă
       const bgOnFirst = () => { if (bgSectionVisible && !bgStartedOnce) bgStart(); };
-      document.addEventListener('click',    bgOnFirst, { once: true });
-      document.addEventListener('touchend', bgOnFirst, { once: true });
+      document.addEventListener('click', bgOnFirst, { once: true, signal: bgController.signal });
+      document.addEventListener('touchend', bgOnFirst, { once: true, signal: bgController.signal });
+      document.addEventListener('astro:before-swap', () => {
+        bgController.abort();
+        bgObserver.disconnect();
+        window.clearTimeout(bgAutoStartTimer);
+        bgStop();
+        if (bgCtx && bgCtx.state !== 'closed') void bgCtx.close();
+        bgFab.remove();
+      }, { once: true });
+    })();
+    document.addEventListener('astro:before-swap', () => {
+      window.clearTimeout(searchDebounceTimer);
+      stopPetals();
+      if (lightboxAudio instanceof HTMLAudioElement) lightboxAudio.pause();
+      if (lightbox instanceof HTMLDialogElement && lightbox.open) lightbox.close();
+      unlockPageScrollForLightbox();
+    }, { once: true });
     })();
   </script>
 

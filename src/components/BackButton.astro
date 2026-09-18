@@ -69,6 +69,10 @@ const { href = '/', label = 'Înapoi', direct = false } = Astro.props;
 </style>
 
 <script is:inline>
+  (function () {
+  if (window.__fpBackButtonDelegated) return;
+  window.__fpBackButtonDelegated = true;
+
   document.addEventListener('click', function (e) {
     var btn = (e.target).closest?.('.back-btn');
     if (!btn) return;
@@ -88,4 +92,5 @@ const { href = '/', label = 'Înapoi', direct = false } = Astro.props;
     }
     // Altfel lasă browser-ul să navigheze la href (fallback sigur)
   });
+  })();
 </script>
