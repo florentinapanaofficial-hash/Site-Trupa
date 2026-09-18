@@ -516,19 +516,17 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
 
     <div class="hp-cinematic-grid">
       {heroVideos.map((video, index) => (
-        <a
-          href="/galerie-video/"
+        <div
           class="hp-cine-card hp-cine-card--video reveal-on-scroll from-left"
           style={`--reveal-delay: ${index * 90}ms`}
-          aria-label={`Vezi videoclipuri live: ${video.title}`}
-          data-astro-reload
+          aria-label={`Videoclip live: ${video.title}`}
         >
           <img src={video.thumbJpg} alt={video.title} loading="lazy" decoding="async" width="640" height="360" />
           <span class="hp-cine-overlay" aria-hidden="true"></span>
           <span class="hp-cine-chip" aria-hidden="true">LIVE</span>
           <span class="hp-cine-play" aria-hidden="true">▶</span>
           <span class="hp-cine-caption">{video.title}</span>
-        </a>
+        </div>
       ))}
 
       <div class="hp-cine-story reveal-on-scroll from-right" style="--reveal-delay: 140ms">
@@ -538,6 +536,7 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
           Accentul rămâne pe conținut, dar prezentarea capătă impact emoțional.
         </p>
         <div class="hp-cine-actions">
+          <a href="/galerie-video/" class="btn-outline">Vezi videoclipuri live</a>
           <a href="/galerie-foto/" class="btn-outline">Vezi galerie foto</a>
           <a href="/contact/" class="btn-solid">Rezervă data ta</a>
         </div>
@@ -546,11 +545,10 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
       {heroPhotos.map((photo, index) => {
         const source = homepagePhotoSources[photo.variant];
         return (
-        <a
-          href="/galerie-foto/"
+        <div
           class="hp-cine-card hp-cine-card--photo reveal-on-scroll from-right"
           style={`--reveal-delay: ${160 + index * 100}ms`}
-          aria-label="Cadru autentic de la eveniment — vezi mai multe fotografii din galerie"
+          aria-label="Cadru autentic de la eveniment"
         >
           <picture>
             {source.avifSrcSet && (
@@ -571,7 +569,7 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
           </picture>
           <span class="hp-cine-overlay" aria-hidden="true"></span>
           <span class="hp-cine-caption">Cadru autentic de la eveniment</span>
-        </a>
+        </div>
       );})}
 
       <div class="hp-cine-editorial reveal-on-scroll from-left" style="--reveal-delay: 210ms">
@@ -820,8 +818,6 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
     </a>
 
     <div class="hp-card hp-card--book anim-on-scroll anim-d2 anim-card-hover reveal-on-scroll from-right" style="--reveal-delay: 180ms">
-      {/* Stretched link acoperă tot cardul — navigare spre /contact */}
-      <a href="/contact/" class="hp-card-link" aria-label="Rezervă acum — pagina de contact"><span class="sr-only">Rezervă acum — pagina de contact</span></a>
       <div class="hp-card-overlay" aria-hidden="true"></div>
       <div class="hp-card-content">
         <span class="hp-card-kicker">Disponibilitate</span>

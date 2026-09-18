@@ -1988,6 +1988,25 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 ### Riscuri / pași următori
 - Nu există în proiect o suită browser E2E; validarea automată nu simulează click-uri și Back/Forward reale. După deploy este recomandat un smoke test mobil pe rutele `/contact/`, `/galerie-foto/`, `/membri/`, `/momente-cu-mirii/`, `/live/` și `/shorts/`.
 
+## 📝 18 sep 2026 — Curățare linkuri interne homepage
+
+### Obiectiv
+- Eliminarea navigațiilor duplicate și a linkurilor repetate din DOM-ul homepage-ului, fără schimbarea meniului mobil activ.
+
+### Modificări
+- Eliminate `mob-nav` și `left-side-menu`, împreună cu datele și scriptul sidebarului dezactivat din `BaseLayout.astro`.
+- Showcase-ul cinematic păstrează câte un CTA pentru `/galerie-video/` și `/galerie-foto/`; cardurile vizuale nu mai repetă aceleași ancore.
+- Eliminat `hp-card-link`, astfel încât butonul WhatsApp din cardul Highlights să nu mai fie acoperit de un link invizibil.
+
+### Validări
+- Build Astro + compresie: PASS.
+- `npm test`: 40/40 teste trecute.
+- `npm run seo:check`: 57 pagini HTML, **0 FAIL | 0 WARN**.
+- HTML compilat: 0 taguri `left-side-menu`, 0 taguri `mob-nav`, 0 taguri `hp-card-link`; showcase: 1 link video și 1 link foto.
+
+### Riscuri / pași următori
+- Meniul mobil hamburger (`nav-mobile-grid`) rămâne neschimbat; nu există suită browser E2E pentru testarea vizuală automată.
+
 
 
 

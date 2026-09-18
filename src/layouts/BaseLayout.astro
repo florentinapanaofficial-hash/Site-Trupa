@@ -84,14 +84,6 @@ const organizationLd = {
   "sameAs": seoContent.schema.sameAs
 };
 
-const webSiteLd = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": seoContent.schema.name,
-  "url": site,
-  "inLanguage": "ro-RO"
-};
-
 // Schema LocalBusiness + MusicGroup — SEO local, Google Maps, Knowledge Panel
 const localBusinessLd = {
   "@context": "https://schema.org",
@@ -132,6 +124,14 @@ const localBusinessLd = {
   "genre": ["Muzica Greceasca", "Muzica Arabeasca", "Muzica Latino", "Muzica Machedoneasca", "Manele", "Muzica Populara de Petrecere"],
   "knowsAbout": seoContent.schema.knowsAbout,
   "sameAs": seoContent.schema.sameAs
+};
+
+const webSiteLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": seoContent.schema.name,
+  "url": site,
+  "inLanguage": "ro-RO"
 };
 
 const serviceCatalogItems = (siteContent.services ?? []).map((service, index) => {
@@ -300,49 +300,6 @@ const breadcrumbLd = {
   "itemListElement": breadcrumbItems
 };
 
-const sideMenuTopItems = [
-  { href: '/', label: 'Acasă', color: 'cyan', icon: 'home' },
-  { href: '/cauti-formatie-nunta/', label: 'Cauți formație?', color: 'gold', icon: 'star' },
-  { href: '/despre/', label: 'Despre', color: 'cyan', icon: 'info' },
-  { href: '/povestea-noastra/', label: 'Povestea noastră', color: 'cyan', icon: 'heart' },
-  { href: '/membri/', label: 'Membri', color: 'cyan', icon: 'users' },
-  { href: '/galerie-video/', label: 'Galerie Video', color: 'cyan', icon: 'video' },
-  { href: '/shorts/', label: 'Reels', color: 'cyan', icon: 'play' },
-  { href: '/galerie-foto/', label: 'Galerie Foto', color: 'cyan', icon: 'camera' },
-  { href: '/muzica-non-stop/', label: 'Bibliotecă Audio', color: 'cyan', icon: 'music' },
-  { href: '/comunitate/', label: 'Comunitate', color: 'cyan', icon: 'people' },
-  { href: '/blog/', label: 'Blog', color: 'cyan', icon: 'book' },
-  { href: '/vlog/', label: 'Vlog', color: 'cyan', icon: 'play' },
-  { href: '/aparitii-tv/', label: 'Apariții TV', color: 'cyan', icon: 'tv' },
-  { href: '/live/', label: 'Live', color: 'rose', icon: 'video' },
-];
-
-const sideMenuBottomItems: { href: string; label: string; color: string }[] = [];
-
-const { socialLinks: socialLinksData } = siteContent;
-const sidebarSocialLinks = {
-  youtube: socialLinksData?.youtube || null,
-  facebook: socialLinksData?.facebook || null,
-  instagram: socialLinksData?.instagram || null,
-};
-
-// Lista completă pentru nav-ul mobil — ordine logică, corespunde cu swipe-ul stânga→dreapta
-const mobileNavAllItems = [
-  { href: '/', label: 'Acasă', color: 'cyan' },
-  { href: '/cauti-formatie-nunta/', label: 'Cauți formație?', color: 'gold' },
-  { href: '/despre/', label: 'Despre', color: 'cyan' },
-  { href: '/povestea-noastra/', label: 'Povestea noastră', color: 'cyan' },
-  { href: '/membri/', label: 'Membri', color: 'cyan' },
-  { href: '/galerie-video/', label: 'Galerie Video', color: 'cyan' },
-  { href: '/galerie-foto/', label: 'Galerie Foto', color: 'cyan' },
-  { href: '/muzica-non-stop/', label: 'Bibliotecă Audio', color: 'cyan' },
-  { href: '/comunitate/', label: 'Comunitate', color: 'cyan' },
-  { href: '/blog/', label: 'Blog', color: 'cyan' },
-  { href: '/vlog/', label: 'Vlog', color: 'cyan' },
-  { href: '/aparitii-tv/', label: 'Apariții TV', color: 'cyan' },
-  { href: '/live/', label: 'Live', color: 'rose' },
-  { href: '/contact/', label: 'Contact', color: 'cyan' },
-];
 ---
 
 <!DOCTYPE html>
@@ -501,95 +458,7 @@ const mobileNavAllItems = [
     <SkyBackground />
     <Header />
 
-    <!-- ══ MOBIL: nav plutitor (ascuns pe desktop via CSS) ══ -->
-    <nav class="mob-nav" aria-label="Navigare mobilă">
-      <div class="mob-nav-track">
-        {mobileNavAllItems.map((item) => (
-          <a href={item.href} class="mob-nav-btn" data-mb={item.href}>{item.label}</a>
-        ))}
-      </div>
-    </nav>
-
     <div class="layout-content-shell">
-      <aside class="left-side-menu" aria-label="Navigare principală">
-        <!-- Logo + nume formație (vizibil doar pe desktop via CSS) -->
-        <a href={isHomePage ? '#acasa' : '/'} class="sidebar-brand" aria-label="Acasă">
-          <img src="/images/sigla-fp-band-110.webp" alt="Sigla Formația Florentina Pană (FP Band)" class="h-10 w-auto max-w-[96px] rounded-lg object-contain" loading="lazy" decoding="async" width="110" height="60" />
-          <span class="sidebar-brand-text">
-            <span class="sidebar-brand-name">{siteContent.brand.name}</span>
-            <span class="sidebar-brand-sub">Live Band Premium</span>
-          </span>
-        </a>
-
-        {sideMenuTopItems.map((item) => (
-          <a href={item.href} class={`left-side-link nav-btn-${item.color}`} data-nav-link>
-            <span class="nav-icon" aria-hidden="true">
-              {item.icon === 'home' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>}
-              {item.icon === 'info' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>}
-              {item.icon === 'users' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>}
-              {item.icon === 'video' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>}
-              {item.icon === 'camera' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>}
-              {item.icon === 'heart' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>}
-              {item.icon === 'people' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>}
-              {item.icon === 'book' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>}
-              {item.icon === 'play' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>}
-              {item.icon === 'music' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>}
-              {item.icon === 'tv' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>}
-              {item.icon === 'mail' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>}
-            </span>
-            {item.label}
-          </a>
-        ))}
-
-        {sideMenuBottomItems.map((item) => (
-          <a href={item.href} class={`left-side-link nav-btn-${item.color}`} data-nav-link>{item.label}</a>
-        ))}
-
-        <!-- Buton „Oferă o recenzie" — separat vizual de linkurile principale -->
-        <a
-          href="https://g.page/r/Ca7MqSu2OLysEAE/review"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="sidebar-review-btn"
-          aria-label="Oferă o recenzie Google pentru Formația Florentina Pană"
-        >
-          <span class="sidebar-review-stars" aria-hidden="true">★★★★★</span>
-          <span class="sidebar-review-text">
-            <span class="sidebar-review-main">Oferă o recenzie</span>
-            <span class="sidebar-review-sub">Cât de mult ți-a plăcut?</span>
-          </span>
-        </a>
-
-        <!-- Spacer flexibil — împinge social media la baza sidebarului -->
-        <div class="sidebar-spacer"></div>
-
-        <!-- Social media (vizibil doar pe desktop via CSS) -->
-        <div class="sidebar-social">
-          {sidebarSocialLinks.youtube && (
-            <a href={sidebarSocialLinks.youtube} target="_blank" rel="noopener noreferrer" aria-label="YouTube"
-              class="social-btn social-btn--yt">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2" y="6" width="20" height="13" rx="4" fill="#fff"/><polygon points="9.5,9.5 9.5,15.5 16.5,12.5" fill="#FF0000"/></svg>
-              <span class="sr-only">YouTube Formația Florentina Pană</span>
-            </a>
-          )}
-          {sidebarSocialLinks.facebook && (
-            <a href={sidebarSocialLinks.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook"
-              class="social-btn social-btn--fb">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M13.5 21V14.3H16l.4-2.85H13.5V9.7c0-.82.38-1.2 1.38-1.2H16.5V5.85C16.05 5.77 15.1 5.7 14 5.7c-2.65 0-4.05 1.4-4.05 4.15v1.6H8v2.85h1.95V21H13.5z" fill="#fff"/></svg>
-              <span class="sr-only">Facebook Formația Florentina Pană</span>
-            </a>
-          )}
-          {sidebarSocialLinks.instagram && (
-            <a href={sidebarSocialLinks.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram"
-              class="social-btn social-btn--ig">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5" stroke="#fff" stroke-width="2.1"/><circle cx="12" cy="12" r="4.3" stroke="#fff" stroke-width="2"/><circle cx="17.5" cy="6.6" r="1.4" fill="#fff"/></svg>
-              <span class="sr-only">Instagram Formația Florentina Pană</span>
-            </a>
-          )}
-        </div>
-        <small class="sidebar-copy">© 2026 Formația Florentina Pană</small>
-      </aside>
-
       <main id="continut" class="flex-1 min-w-0 pt-40 sm:pt-44 lg:pt-0 flex flex-col min-h-[100dvh]">
         <slot />
         {!hideFooter && <div class="flex-1" aria-hidden="true"></div>}
@@ -712,52 +581,6 @@ const mobileNavAllItems = [
               controller.abort();
               cancelAnimationFrame(progressRaf);
             }, { once: true });
-    })();
-    </script>
-
-          <script is:inline data-astro-rerun>
-    (() => {
-            const controller = new AbortController();
-        const menu = document.querySelector('.left-side-menu');
-        if (!menu) return;
-        const links = Array.from(menu.querySelectorAll('.left-side-link'));
-        const sectionToHref = { 'acasa': '/', 'video': '/galerie-video', 'galerie': '/galerie-foto', 'membri': '/membri' };
-        function setActive(href) {
-            menu.classList.remove('has-active');
-            links.forEach(l => l.classList.remove('is-active'));
-            const match = links.find(l => l.getAttribute('href') === href);
-            if (match) { match.classList.add('is-active'); menu.classList.add('has-active'); }
-        }
-        function currentHref() {
-            const path = location.pathname.replace(/\/$/, '') || '/';
-            const hash = location.hash;
-            const full = path + hash;
-            if (links.some(l => l.getAttribute('href') === full)) return full;
-            if (links.some(l => l.getAttribute('href') === path)) return path;
-            if (path === '' || path === '/') return '/';
-            return path;
-        }
-        setActive(currentHref());
-        links.forEach(l => { l.addEventListener('click', () => { setTimeout(() => setActive(l.getAttribute('href')), 80); }, { signal: controller.signal }); });
-        const sections = Array.from(document.querySelectorAll('section[id]'));
-        if (!sections.length) return;
-        const visibleSet = new Set();
-        let lastActiveId = '';
-        const obs = new IntersectionObserver((entries) => {
-            entries.forEach(entry => { if (entry.isIntersecting) visibleSet.add(entry.target.id); else visibleSet.delete(entry.target.id); });
-            if (!visibleSet.size) return;
-            const topSection = sections.find(s => visibleSet.has(s.id));
-            if (!topSection || topSection.id === lastActiveId) return;
-            lastActiveId = topSection.id;
-            const path = location.pathname.replace(/\/$/, '') || '/';
-            if (path === '/') { const href = sectionToHref[topSection.id]; if (href) setActive(href); }
-            else { const anchorHref = path + '#' + topSection.id; if (links.some(l => l.getAttribute('href') === anchorHref)) setActive(anchorHref); }
-        }, { rootMargin: '-8% 0px -45% 0px', threshold: 0 });
-        sections.forEach(s => obs.observe(s));
-        document.addEventListener('astro:before-swap', () => {
-          controller.abort();
-          obs.disconnect();
-        }, { once: true });
     })();
     </script>
 
