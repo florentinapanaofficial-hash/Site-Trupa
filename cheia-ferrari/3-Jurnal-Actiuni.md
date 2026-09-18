@@ -2007,7 +2007,21 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 ### Riscuri / pași următori
 - Meniul mobil hamburger (`nav-mobile-grid`) rămâne neschimbat; nu există suită browser E2E pentru testarea vizuală automată.
 
+## 📝 18 sep 2026 (sesiune 7) — Fix Seobility: titluri duplicate în MembruCard (front/back)
 
+### Obiectiv
+- Rezolvarea avertismentului Seobility „duplicate heading texts on the page" cauzat de numele membrilor marcate `<h3>` atât pe fața cât și pe spatele cardului 3D.
+
+### Modificări
+- `src/components/MembruCard.astro`: pe `data-face="back"` numele membrului a fost schimbat din `<h3>` în `<p>`, păstrând exact clasele `font-display text-base font-bold text-yellow-400`. `<h3>` rămâne doar pe `data-face="front"`.
+- Verificat restul paginilor (`membri.astro`, `index.astro`, `formatie-nunta/*`, FAQ-uri) pentru h2/h3 duplicate pe aceeași pagină — nu s-au găsit alte cazuri.
+
+### Validări
+- `npx astro build`: PASS, 0 erori.
+- `node scripts/qa-check.mjs`: 49 OK | 0 FAIL.
+
+### Riscuri / pași următori
+- Niciunul identificat.
 
 
 
