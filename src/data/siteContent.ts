@@ -98,7 +98,7 @@ export const siteContent = {
         couple: 'Cristina și Manu',
         city: 'Pitești',
         date: '25 Iulie 2026',
-        image: '/Blog/Cristina%20si%20manu.png',
+        image: '/Blog/cristina-si-manu.webp',
         youtubeUrl: '',
         coupleQuote:
           '"Formația Florentina Pană ne-a făcut nunta exact cum am visat: repertoriu variat, energie superbă și comunicare impecabilă cu invitații. Îi recomandăm din tot sufletul!"',

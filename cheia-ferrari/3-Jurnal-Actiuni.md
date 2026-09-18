@@ -2023,5 +2023,25 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 ### Riscuri / pași următori
 - Niciunul identificat.
 
+## 📝 18 sep 2026 (sesiune 8) — Audit tehnic Ahrefs: imagini mari, redirect în sitemap, nofollow intern
+
+### Obiectiv
+- Rezolvarea celor 3 probleme din auditul tehnic Ahrefs: imagini PNG uriașe, `/blog/` (redirect 301) prezent în sitemap, `rel="nofollow"` pe linkuri interne către categorii.
+
+### Modificări
+- **Imagini → WebP:** `public/Blog/Cristina si manu.png` (8.2 MB) → `cristina-si-manu.webp` (159 KB); `public/images/og-placeholder.png` (5.1 MB) → `og-placeholder.webp` (5.3 KB); `Alexia 1 profil.png` (6.1 MB) și `Alexia Galerie 2.png` (6.9 MB) aveau deja echivalent WebP optimizat în `galerie-foto-site-optimized/` — doar referințele au fost mutate acolo. PNG-urile mari au fost șterse.
+- Referințe actualizate: `src/data/blogPosts.json`, `src/data/couples.json`, `src/data/siteContent.json`, `src/data/siteContent.js`, `src/data/siteContent.ts`, `src/content/publicatii/locatia-perfecta-pentru-un-show-cu-impact.md`.
+- **Sitemap:** adăugat filtru în `astro.config.mjs` care exclude `/blog/` (redirect 301 → `/publicatii/`).
+- **Nofollow intern:** eliminat `rel="nofollow"` de pe cele 3 linkuri din `Footer.astro` (`?cat=locatii`, `?cat=sfaturi`, `?cat=jurnal`) — fusese adăugat pe 13 sep 2026, dar blochează transferul de autoritate pe linkuri 100% interne; Ahrefs raportează explicit acest pattern.
+
+### Validări
+- `npx astro build`: PASS, 0 erori.
+- Sitemap generat: `/blog/` nu mai apare în niciun `sitemap-*.xml`.
+- `npm test`: 40/40 teste trecute.
+- `node scripts/qa-check.mjs`: 49 OK | 0 FAIL.
+
+### Riscuri / pași următori
+- Reindexare Ahrefs/Seobility poate dura câteva zile până confirmă rezolvarea celor 3 probleme.
+
 
 

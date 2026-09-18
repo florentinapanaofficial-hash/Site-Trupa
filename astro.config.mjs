@@ -52,6 +52,8 @@ export default defineConfig({
         if (url.pathname === '/live-preview/') return false;
         // Exclude /mini-tv/ — redirect 301 → /live/ (pagina a fost integrată)
         if (url.pathname === '/mini-tv/') return false;
+        // Exclude /blog/ — redirect 301 → /publicatii/ (Ahrefs: 3XX redirect in sitemap)
+        if (url.pathname === '/blog/') return false;
         // Păstrează doar versiunea cu trailing slash
         return page.endsWith('/');
       },

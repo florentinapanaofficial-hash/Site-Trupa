@@ -2,7 +2,7 @@
 titlu: "Locația Perfectă Pentru Un Show Cu Impact"
 dataPublicarii: 2026-04-28
 descriere: "Alege mai inteligent locația pentru evenimentul tău și află ce elemente fac diferența pentru atmosferă, scenografie și experiența invitaților."
-imaginePrincipala: /images/og-placeholder.png
+imaginePrincipala: /images/og-placeholder.webp
 categorie: "Locații de Poveste"
 ---
 
