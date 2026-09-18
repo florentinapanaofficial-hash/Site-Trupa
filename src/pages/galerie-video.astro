@@ -6,6 +6,15 @@ import BackButton from '../components/BackButton.astro';
 import SmartTvVideoPlayer from '../components/SmartTvVideoPlayer.astro';
 
 const videoSeo = seo.galerieVideo;
+/* Slugify identic cu src/pages/video/[slug].astro — necesar ca linkurile generate aici să corespundă rutelor reale */
+const slugify = (value: string) =>
+  value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
 const videos = siteContent.videos.map((video, index) => ({
   id: `${video.youtubeId}-${index}`,
   title: video.title,
@@ -13,6 +22,7 @@ const videos = siteContent.videos.map((video, index) => ({
   youtubeId: video.youtubeId,
   youtubeUrl: video.youtubeUrl,
   uploadDate: (video as any).uploadDate as string | undefined,
+  slug: `${slugify(video.title)}-${video.youtubeId.toLowerCase()}`,
 }));
 
 type PlaylistSectionConfig = { title?: string; playlistId?: string; thumbnailVideoId?: string };
@@ -77,6 +87,27 @@ const videoCollectionLd = {
     </header>
 
     <SmartTvVideoPlayer initialVideo={videos[0]} videos={videos} playlists={playlists} />
+
+    <!-- Linkuri directe către paginile dedicate /video/[slug]/ — indexabile individual în Google -->
+    <div class="mt-12">
+      <h2 class="section-title text-center">Toate clipurile, pagină cu pagină</h2>
+      <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        {videos.map((v) => (
+          <a href={`/video/${v.slug}/`} class="group block overflow-hidden rounded-xl border border-white/10 bg-white/5 transition-colors hover:border-yellow-500/40" aria-label={`Vezi pagina dedicată: ${v.title}`}>
+            <img
+              src={`https://img.youtube.com/vi/${v.youtubeId}/hqdefault.jpg`}
+              alt={v.title}
+              class="aspect-video w-full object-cover"
+              loading="lazy"
+              decoding="async"
+              width="480"
+              height="270"
+            />
+            <p class="p-2 text-xs font-medium text-white/80 group-hover:text-yellow-400">{v.title}</p>
+          </a>
+        ))}
+      </div>
+    </div>
 
     <div class="mt-12 flex justify-center">
       <a href="/aparitii-tv/" class="btn-outline">Vezi și apariții TV</a>

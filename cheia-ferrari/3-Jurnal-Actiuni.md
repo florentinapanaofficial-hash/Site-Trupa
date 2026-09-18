@@ -2043,5 +2043,23 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 ### Riscuri / pași următori
 - Reindexare Ahrefs/Seobility poate dura câteva zile până confirmă rezolvarea celor 3 probleme.
 
+## 📝 18 sep 2026 (sesiune 9) — Audit Ahrefs: pagini orfane /video/*, linkuri către redirect /blog/, verificare http insecure
+
+### Obiectiv
+- Rezolvarea celor 3 probleme rămase din auditul Ahrefs: pagini `/video/*` orfane (0 linkuri interne), 55 linkuri către redirect (`/blog/...`), 3 linkuri `http://` neschimbate.
+
+### Modificări
+- **Orphan `/video/*`:** [galerie-video.astro](src/pages/galerie-video.astro) generează acum slug-ul identic cu `video/[slug].astro` (aceeași funcție `slugify`) și randează o grilă de 12 `<a href="/video/{slug}/">` reale (thumbnail + titlu), sub player-ul JS. Confirmat în build: 12 linkuri `<a href="/video/...">` prezente în HTML generat.
+- **Linkuri către redirect `/blog/...`:** înlocuite cu `/publicatii/...` (aceleași slug-uri, incluse și în `getStaticPaths` din `publicatii/[slug].astro`) în [comunitate/[slug].astro](src/pages/comunitate/%5Bslug%5D.astro), [momente-cu-mirii.astro](src/pages/momente-cu-mirii.astro), [vlog.astro](src/pages/vlog.astro) (link card, JSON-LD `ItemList`, buton copiere link).
+- **`http://` insecure:** căutare completă în `src/` — nicio apariție reală (doar `xmlns="http://www.w3.org/2000/svg"`, standard XML, nu link de site). Toate SITE_URL hardcodate deja `https://www.florentinapanaofficial.ro`. Nicio modificare necesară — probabil semnalul Ahrefs provine dintr-un crawl mai vechi.
+
+### Validări
+- `npx astro build`: PASS, 0 erori, toate cele 12 pagini `/video/[slug]/` generate.
+- `npm test`: 40/40 teste trecute.
+- `node scripts/qa-check.mjs`: 49 OK | 0 FAIL.
+
+### Riscuri / pași următori
+- Reindexare Ahrefs pentru confirmarea dispariției celor 3 avertismente poate dura câteva zile.
+
 
 
