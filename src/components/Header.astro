@@ -302,58 +302,41 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
 
 <script is:inline>
 (function () {
-  const initScrollSpy = () => {
-    const headerEl = document.querySelector('[data-top-header]');
-    const menuToggle = document.querySelector('[data-top-menu-toggle]');
-    const menuCloseButton = document.querySelector('[data-top-menu-close]');
-    const menuBackdrop = document.querySelector('[data-menu-backdrop]');
-    const menuPanel = document.querySelector('[data-top-menu-panel]');
-    const mobileMq = window.matchMedia('(max-width: 1024px)');
-    const isMobileViewport = () => mobileMq.matches;
-    const desktopNav = document.querySelector('.nav-desktop-bar');
-    const mobileNav = document.querySelector('.nav-mobile-grid');
+  const MENU_KEY = 'top-menu-open';
+  const mobileMq = window.matchMedia('(max-width: 1024px)');
+  const isMobileViewport = () => mobileMq.matches;
+  let bodyScrollLockY = 0;
+  let isBodyScrollLocked = false;
+  let menuInertRaf = 0;
+
+  const pauseMobileMenuAudio = () => {
     const menuAudio = document.querySelector('[data-menu-audio]');
-    const topMenuNavList = Array.from(document.querySelectorAll('#top-menu-panel nav'));
-    let lastScrollY = window.scrollY;
-    const MENU_KEY = 'top-menu-open';
-    const ENABLE_GESTURE_CLOSE = false;
-    let inertRaf = 0;
-    let cachedHeaderSpyOffset = 0;
-    let cachedOrderedSections = [];
-    let bodyScrollLockY = 0;
-    let isBodyScrollLocked = false;
+    if (!(menuAudio instanceof HTMLMediaElement)) return;
+    menuAudio.pause();
+    menuAudio.currentTime = 0;
+  };
 
-    const pauseMenuAudio = () => {
-      if (!menuAudio) return;
-      menuAudio.pause();
-      menuAudio.currentTime = 0;
-    };
+  const unlockMobileBodyScroll = () => {
+    if (!isBodyScrollLocked) return;
+    const offset = Math.abs(parseInt(document.body.style.top || '0', 10)) || bodyScrollLockY;
+    document.body.style.removeProperty('position');
+    document.body.style.removeProperty('top');
+    document.body.style.removeProperty('left');
+    document.body.style.removeProperty('right');
+    document.body.style.removeProperty('width');
+    document.body.style.removeProperty('overflow');
+    isBodyScrollLocked = false;
+    if (isMobileViewport()) {
+      window.scrollTo(0, offset);
+    }
+  };
 
-    const hasOtherPlayingAudio = () => {
-      const allAudio = Array.from(document.querySelectorAll('audio'));
-      return allAudio.some((audioEl) => {
-        if (!(audioEl instanceof HTMLMediaElement)) return false;
-        if (audioEl === menuAudio) return false;
-        return !audioEl.paused && !audioEl.ended;
-      });
-    };
+  const syncMobileMenuBodyState = (isOpen) => {
+    document.documentElement.classList.toggle('mobile-menu-open', Boolean(isOpen) && isMobileViewport());
+    document.body.classList.toggle('top-menu-expanded', Boolean(isOpen));
+    document.body.classList.toggle('mobile-menu-open', Boolean(isOpen) && isMobileViewport());
 
-    const playMenuAudio = async () => {
-      if (!menuAudio) return false;
-      if (hasOtherPlayingAudio()) {
-        return false;
-      }
-      menuAudio.volume = 0.16;
-      try {
-        await menuAudio.play();
-        return true;
-      } catch (_) {
-        return false;
-      }
-    };
-
-    const lockMobileBodyScroll = () => {
-      if (!isMobileViewport() || isBodyScrollLocked) return;
+    if (Boolean(isOpen) && isMobileViewport() && !isBodyScrollLocked) {
       bodyScrollLockY = window.scrollY;
       document.body.style.position = 'fixed';
       document.body.style.top = `-${bodyScrollLockY}px`;
@@ -362,22 +345,123 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       document.body.style.width = '100%';
       document.body.style.overflow = 'hidden';
       isBodyScrollLocked = true;
-    };
+    } else if (!isOpen || !isMobileViewport()) {
+      unlockMobileBodyScroll();
+    }
 
-    const unlockMobileBodyScroll = () => {
-      if (!isBodyScrollLocked) return;
-      const offset = Math.abs(parseInt(document.body.style.top || '0', 10)) || bodyScrollLockY;
-      document.body.style.removeProperty('position');
-      document.body.style.removeProperty('top');
-      document.body.style.removeProperty('left');
-      document.body.style.removeProperty('right');
-      document.body.style.removeProperty('width');
-      document.body.style.removeProperty('overflow');
-      isBodyScrollLocked = false;
-      if (isMobileViewport()) {
-        window.scrollTo(0, offset);
+    const desktopNav = document.querySelector('.nav-desktop-bar');
+    const mobileNav = document.querySelector('.nav-mobile-grid');
+    if (desktopNav && mobileNav) {
+      cancelAnimationFrame(menuInertRaf);
+      menuInertRaf = requestAnimationFrame(() => {
+        desktopNav.inert = isMobileViewport();
+        mobileNav.inert = !isMobileViewport();
+      });
+    }
+  };
+
+  const closeMobileMenu = () => {
+    const headerEl = document.querySelector('[data-top-header]');
+    const menuToggle = document.querySelector('[data-top-menu-toggle]');
+    headerEl?.classList.remove('menu-open');
+    menuToggle?.setAttribute('aria-expanded', 'false');
+    menuToggle?.setAttribute('aria-label', 'Deschide meniul principal');
+    syncMobileMenuBodyState(false);
+    pauseMobileMenuAudio();
+    sessionStorage.setItem(MENU_KEY, 'false');
+  };
+
+  const openMobileMenu = async (restore = false) => {
+    const headerEl = document.querySelector('[data-top-header]');
+    const menuToggle = document.querySelector('[data-top-menu-toggle]');
+    if (!headerEl || !menuToggle) return;
+
+    headerEl.classList.add('menu-open');
+    menuToggle.setAttribute('aria-expanded', 'true');
+    menuToggle.setAttribute('aria-label', 'Închide meniul principal');
+    syncMobileMenuBodyState(true);
+    sessionStorage.setItem(MENU_KEY, 'true');
+
+    const menuAudio = document.querySelector('[data-menu-audio]');
+    const hasOtherPlayingAudio = Array.from(document.querySelectorAll('audio')).some((audioEl) => (
+      audioEl instanceof HTMLMediaElement
+      && audioEl !== menuAudio
+      && !audioEl.paused
+      && !audioEl.ended
+    ));
+    if (!restore && isMobileViewport() && menuAudio instanceof HTMLMediaElement && !hasOtherPlayingAudio) {
+      menuAudio.volume = 0.16;
+      try {
+        await menuAudio.play();
+      } catch (_) {
+        // Autoplay poate fi refuzat de browser fără să afecteze meniul.
       }
-    };
+    }
+  };
+
+  document.addEventListener('click', (event) => {
+    if (!(event.target instanceof Element)) return;
+
+    const menuToggle = event.target.closest('[data-top-menu-toggle]');
+    if (menuToggle) {
+      event.preventDefault();
+      const headerEl = document.querySelector('[data-top-header]');
+      if (headerEl?.classList.contains('menu-open')) {
+        closeMobileMenu();
+      } else {
+        void openMobileMenu();
+      }
+      return;
+    }
+
+    if (event.target.closest('[data-menu-backdrop], [data-top-menu-close]')) {
+      event.preventDefault();
+      closeMobileMenu();
+      return;
+    }
+
+    const navLink = event.target.closest('#top-menu-panel [data-nav-link]');
+    if (!(navLink instanceof HTMLAnchorElement)) return;
+
+    const href = navLink.getAttribute('href') ?? '';
+    const hasModifierKey = event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
+    const isMainClick = event.button === 0;
+    const target = navLink.getAttribute('target') ?? '';
+    const isExternalProtocol = /^(https?:|mailto:|tel:)/i.test(href);
+    const isHashLink = href.startsWith('#');
+
+    if (hasModifierKey || !isMainClick || target === '_blank') return;
+
+    closeMobileMenu();
+    if (isExternalProtocol || isHashLink) return;
+
+    event.preventDefault();
+    window.location.assign(href);
+  }, { capture: true });
+
+  window.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    if (!document.querySelector('[data-top-header]')?.classList.contains('menu-open')) return;
+    closeMobileMenu();
+  });
+
+  window.addEventListener('resize', () => {
+    if (!document.querySelector('[data-top-header]')?.classList.contains('menu-open')) return;
+    syncMobileMenuBodyState(true);
+  });
+
+  document.addEventListener('astro:before-swap', closeMobileMenu);
+
+  const initScrollSpy = () => {
+    const headerEl = document.querySelector('[data-top-header]');
+    const menuToggle = document.querySelector('[data-top-menu-toggle]');
+    const menuCloseButton = document.querySelector('[data-top-menu-close]');
+    const menuPanel = document.querySelector('[data-top-menu-panel]');
+    const topMenuNavList = Array.from(document.querySelectorAll('#top-menu-panel nav'));
+    let lastScrollY = window.scrollY;
+    const ENABLE_GESTURE_CLOSE = false;
+    let cachedHeaderSpyOffset = 0;
+    let cachedOrderedSections = [];
 
     const recalcHeaderSpyOffset = () => {
       cachedHeaderSpyOffset = (headerEl?.offsetHeight ?? 0) + 8;
@@ -393,61 +477,14 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
         .sort((a, b) => a.top - b.top);
     };
 
-    const syncTopMenuBodyClass = (isOpen) => {
-      document.documentElement.classList.toggle('mobile-menu-open', Boolean(isOpen) && isMobileViewport());
-      document.body.classList.toggle('top-menu-expanded', Boolean(isOpen));
-      document.body.classList.toggle('mobile-menu-open', Boolean(isOpen) && isMobileViewport());
-
-      if (Boolean(isOpen) && isMobileViewport()) {
-        lockMobileBodyScroll();
-      } else {
-        unlockMobileBodyScroll();
-      }
-
-      /* Marchează nav-ul inactiv ca inert (scos din tab order + accesibilitate)
-         pentru a nu încărca DOM-ul cu elemente duplicate desktop/mobil */
-      if (desktopNav && mobileNav) {
-        cancelAnimationFrame(inertRaf);
-        inertRaf = requestAnimationFrame(() => {
-          if (isMobileViewport()) {
-            desktopNav.inert = true;
-            mobileNav.inert = false;
-          } else {
-            desktopNav.inert = false;
-            mobileNav.inert = true;
-          }
-        });
-      }
-    };
-
-    const closeMenu = () => {
-      if (!headerEl || !menuToggle) return;
-      headerEl.classList.remove('menu-open');
-      menuToggle.setAttribute('aria-expanded', 'false');
-      menuToggle.setAttribute('aria-label', 'Deschide meniul principal');
-      syncTopMenuBodyClass(false);
-      pauseMenuAudio();
-      sessionStorage.setItem(MENU_KEY, 'false');
-    };
-
-    const openMenu = (options = {}) => {
-      if (!headerEl || !menuToggle) return;
-      const restore = Boolean(options.restore);
-      headerEl.classList.add('menu-open');
-      menuToggle.setAttribute('aria-expanded', 'true');
-      menuToggle.setAttribute('aria-label', 'Închide meniul principal');
-      syncTopMenuBodyClass(true);
-      sessionStorage.setItem(MENU_KEY, 'true');
-      if (isMobileViewport() && !restore) {
-        void playMenuAudio();
-      }
-    };
+    const closeMenu = closeMobileMenu;
+    const openMenu = (options = {}) => void openMobileMenu(Boolean(options.restore));
 
     /* ── Fix forced reflow: READ înainte de WRITE la init.
        Citim offsetHeight ÎNAINTE să modificăm clase pe <body>,
        altfel browserul e forțat să recalculeze layout-ul sincron. ── */
     recalcHeaderSpyOffset();
-    syncTopMenuBodyClass(false);
+    syncMobileMenuBodyState(false);
 
     // Restaurăm starea meniului din sessionStorage și pe mobil,
     // astfel refresh-ul nu îl închide dacă utilizatorul îl avea deschis.
@@ -464,66 +501,9 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
       let menuOpenScrollY = window.scrollY;
       let menuOpenedAt = 0;
 
-      menuToggle.addEventListener('click', () => {
-        const willOpen = !headerEl.classList.contains('menu-open');
-        if (willOpen) {
-          openMenu();
-          menuOpenScrollY = window.scrollY;
-          menuOpenedAt = Date.now();
-          requestAnimationFrame(recalcHeaderSpyOffset);
-        } else {
-          closeMenu();
-          requestAnimationFrame(recalcHeaderSpyOffset);
-        }
-      });
-
-      // Click pe backdrop → închide meniul
-      if (menuBackdrop) {
-        menuBackdrop.addEventListener('click', closeMenu);
-      }
-
-      if (menuCloseButton) {
-        menuCloseButton.addEventListener('click', closeMenu);
-      }
-
-      // Click pe orice link din meniu → închide meniul (și pe mobil)
-      const navLinks = document.querySelectorAll('#top-menu-panel [data-nav-link]');
-      navLinks.forEach((link) => {
-        link.addEventListener('click', (event) => {
-          const href = link.getAttribute('href') ?? '';
-          const hasModifierKey = event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
-          const isMainClick = event.button === 0;
-          const target = link.getAttribute('target') ?? '';
-          const isExternalProtocol = /^(https?:|mailto:|tel:)/i.test(href);
-          const isHashLink = href.startsWith('#');
-
-          // Respectăm comportamentele native (new tab, external, hash).
-          if (hasModifierKey || !isMainClick || target === '_blank' || isExternalProtocol || isHashLink) {
-            if (!isMobileViewport() && headerEl.classList.contains('menu-open')) {
-              closeMenu();
-            }
-            return;
-          }
-
-          // Pentru linkurile interne, navigăm explicit — bypass pentru cazurile
-          // în care unele motoare mobile ignoră click-ul în overlay fixed.
-          event.preventDefault();
-          closeMenu();
-          window.location.assign(href);
-        });
-      });
-
-      window.addEventListener('keydown', (event) => {
-        if (event.key !== 'Escape') return;
-        if (!headerEl.classList.contains('menu-open')) return;
-        closeMenu();
-      });
-
       window.addEventListener('resize', () => {
         recalcHeaderSpyOffset();
         recalcSectionTops();
-        if (!headerEl.classList.contains('menu-open')) return;
-        syncTopMenuBodyClass(true);
       });
 
       // ── Scroll / swipe pe mobil → închide meniul very-slow-motion ──

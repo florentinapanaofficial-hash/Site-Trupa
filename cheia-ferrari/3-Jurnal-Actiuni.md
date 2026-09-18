@@ -1922,6 +1922,37 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 ### Riscuri / pași următori
 - [BackButton.astro](src/components/BackButton.astro) atașează `document.addEventListener('click', ...)` direct la nivel de top (fără flag anti-duplicare) — nu produce `SyntaxError` la re-execuție (nu redeclară `const`/`function`), dar acumulează listeneri duplicați pe navigări SPA repetate; nu afectează bug-ul raportat, dar rămâne o slăbiciune minoră de investigat separat dacă apar simptome (ex. navigare Back declanșată de mai multe ori la un singur tap).
 
+---
+## 📝 2026-09-18 (sesiune 5) — Event delegation pentru meniul principal după ClientRouter swap
+
+**Obiectiv:** Eliminarea definitivă a situației în care butonul „MENIU” devine inactiv după navigări ClientRouter, redirecturi sau linkuri cu ancoră.
+
+### Cauză
+- Chiar după izolarea scriptului într-un IIFE, `initScrollSpy()` atașa direct listener-ele de click pe instanțele curente ale butonului, backdrop-ului, butonului de închidere și linkurilor din meniu.
+- După un DOM swap, noile elemente nu moșteneau listener-ele atașate nodurilor eliminate.
+
+### Modificări
+- [src/components/Header.astro](src/components/Header.astro) — comenzile meniului folosesc event delegation pe `document`, în faza de captură, și caută nodurile actuale prin `closest()`/`querySelector()` la fiecare acțiune.
+- Toggle-ul, backdrop-ul, butonul close și linkurile meniului nu mai depind de listener-e directe pe noduri înlocuibile.
+- `astro:before-swap` închide meniul, oprește audio și elimină body scroll lock înainte de înlocuirea DOM-ului.
+- `Escape` și sincronizarea la `resize` folosesc, de asemenea, headerul curent.
+- Verificarea secțiunilor FAQ nu a găsit `stopPropagation()` global sau overlay FAQ care să blocheze headerul; proiectul nu conține în prezent o rută sursă `/faq/` dedicată.
+
+### Validări
+- Audit pre-editare: **57 pagini HTML, 0 FAIL | 0 WARN**.
+- `npx astro check` — **0 erori, 0 warnings, 0 hints**.
+- `npx astro build` — build complet reușit; fallback-ul local Supabase la DNS indisponibil a funcționat conform proiectului.
+- `npm run seo:check` — build + compresie PASS; **57 pagini HTML, 0 FAIL | 0 WARN**.
+- Diagnostice editor [src/components/Header.astro](src/components/Header.astro) — fără erori.
+
+### Fișiere modificate
+- [src/components/Header.astro](src/components/Header.astro)
+- [cheia-ferrari/2-Tracker-SEO.md](cheia-ferrari/2-Tracker-SEO.md)
+- [cheia-ferrari/3-Jurnal-Actiuni.md](cheia-ferrari/3-Jurnal-Actiuni.md)
+
+### Riscuri / pași următori
+- Fluxul trebuie verificat după deploy pe un browser mobil real: deschidere meniu → navigare → redirect/ancoră → redeschidere meniu. Verificările automate disponibile confirmă compilarea și output-ul, dar nu simulează un tap real în browser.
+
 
 
 
