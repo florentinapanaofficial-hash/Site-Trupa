@@ -54,6 +54,8 @@ export default defineConfig({
         if (url.pathname === '/mini-tv/') return false;
         // Exclude /blog/ — redirect 301 → /publicatii/ (Ahrefs: 3XX redirect in sitemap)
         if (url.pathname === '/blog/') return false;
+        // Exclude /youtube-redirect/ — pagină intermediară noindex, fără linkuri interne (Ahrefs: canonical fără linkuri)
+        if (url.pathname === '/youtube-redirect/') return false;
         // Păstrează doar versiunea cu trailing slash
         return page.endsWith('/');
       },

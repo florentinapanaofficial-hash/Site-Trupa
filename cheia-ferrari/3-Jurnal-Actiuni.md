@@ -2061,5 +2061,23 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 ### Riscuri / pași următori
 - Reindexare Ahrefs pentru confirmarea dispariției celor 3 avertismente poate dura câteva zile.
 
+## 📝 19 sep 2026 — Fix Ahrefs: „Canonical URL has no incoming internal links” pe `/youtube-redirect/`
+
+### Obiectiv
+- Pagina intermediară `/youtube-redirect/` avea canonical auto-declarat ca resursă indexabilă, fără linkuri interne reale către ea (e generată dinamic din query string `?to=...`, deci nu are sens ca pagină indexabilă separată).
+
+### Modificări
+- `src/pages/youtube-redirect.astro`: adăugat `noindex={true}` pe `<BaseLayout>` — generează `<meta name="robots" content="noindex,nofollow">` (pattern deja existent în layout, folosit și de `colaboratori/tambal.astro` și `upload/[token].astro`). Canonical rămâne self-referențial (recomandarea Google chiar și pentru pagini noindex).
+- `astro.config.mjs`: adăugat filtru care exclude `/youtube-redirect/` din sitemap.
+
+### Validări
+- `npx astro build`: PASS, 0 erori.
+- Confirmat în HTML generat: `<meta name="robots" content="noindex,nofollow">` prezent pe `/youtube-redirect/`.
+- Confirmat: `/youtube-redirect/` absent din toate fișierele `sitemap-*.xml`.
+- `npm test`: 40/40 teste trecute.
+
+### Riscuri / pași următori
+- Niciunul identificat.
+
 
 
