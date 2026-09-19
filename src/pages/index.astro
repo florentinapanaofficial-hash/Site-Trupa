@@ -301,7 +301,7 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
     </div>
   </section>
 
-  <section id="showcase-cinematic" class="hp-cinematic section-container snap-section" aria-label="Showcase live foto-video">
+  <section id="showcase-cinematic" class="hp-cinematic section-container free-scroll-section" aria-label="Showcase live foto-video">
     <div class="hp-cinematic-head reveal-on-scroll from-bottom" style="--reveal-delay: 0ms">
       <span class="hp-cinematic-eyebrow">Live Editorial Experience</span>
       <p class="hp-cinematic-kicker">Experiență vizuală</p>
@@ -435,7 +435,7 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
     </div>
   </section>
 
-  <section class="hp-team-spotlight section-container snap-section" aria-label="Cunoaște nucleul formației">
+  <section class="hp-team-spotlight section-container free-scroll-section" aria-label="Cunoaște nucleul formației">
     <div class="hp-team-head reveal-on-scroll from-bottom" style="--reveal-delay: 55ms">
       <p class="hp-team-kicker">Nucleul formației</p>
       <h2 class="hp-team-title">Oameni reali, energie reală, chimie care se simte pe scenă</h2>
@@ -580,7 +580,7 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
   {/* ═══════════════════════════════════════════
       SHOWCASE CINEMATIC — text + video + foto cu reveal la scroll
   ═══════════════════════════════════════════ */}
-  <section class="hp-proof section-container snap-section" aria-label="Recomandări reale de la cupluri">
+  <section class="hp-proof section-container free-scroll-section" aria-label="Recomandări reale de la cupluri">
     <div class="hp-proof-head reveal-on-scroll from-bottom" style="--reveal-delay: 35ms">
       <p class="hp-proof-kicker">Social Proof Real</p>
       <h2 class="hp-proof-title">Recomandări autentice de la mirii care au ales o ofertă potrivită bugetului lor</h2>
@@ -726,13 +726,6 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
     <h2 class="hp-seo-title anim-on-scroll">Întrebări frecvente</h2>
 
     <div class="hp-faq-list anim-on-scroll anim-d1">
-      <details class="hp-faq-item">
-        <summary class="hp-faq-question">
-          <div class="hp-faq-q-text">Pot primi o ofertă în funcție de bugetul pe care îl avem?</div>
-          <svg class="hp-faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
-        </summary>
-        <p class="hp-faq-answer">Da. Spuneți-ne bugetul estimat, iar noi revenim cu o propunere de trupă și un pachet ajustat pe stilul evenimentului, fără costuri ascunse.</p>
-      </details>
       {faqItems.map((item) => (
         <details class="hp-faq-item">
           <summary class="hp-faq-question">
@@ -742,20 +735,6 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
           <p class="hp-faq-answer">{item.answer}</p>
         </details>
       ))}
-      <details class="hp-faq-item">
-        <summary class="hp-faq-question">
-          <div class="hp-faq-q-text">Oferiți și sonorizare proprie?</div>
-          <svg class="hp-faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
-        </summary>
-        <p class="hp-faq-answer">Da, dispunem de echipament profesional de sunet și lumini, inclus în oferta noastră pentru un spectacol complet.</p>
-      </details>
-      <details class="hp-faq-item">
-        <summary class="hp-faq-question">
-          <div class="hp-faq-q-text">Cum putem rezerva formația?</div>
-          <svg class="hp-faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
-        </summary>
-        <p class="hp-faq-answer">Ne puteți contacta telefonic la 0767 369 658, pe WhatsApp sau prin formularul de contact de pe site. Verificăm disponibilitatea și revenim cu o ofertă personalizată.</p>
-      </details>
     </div>
   </section>
 
@@ -1105,16 +1084,17 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
   }
 
   @media (max-width: 767px) {
-    :global(html),
-    :global(body.is-homepage) {
-      scroll-snap-type: y mandatory;
-      scroll-behavior: smooth;
+    :global(html) {
+      scroll-snap-type: y proximity;
+      scroll-behavior: auto;
       scroll-padding-top: var(--mob-nav-h, 72px);
       scroll-padding-bottom: 1rem;
       overflow-x: clip;
     }
 
     :global(body.is-homepage) {
+      scroll-snap-type: none;
+      scroll-behavior: auto;
       overflow-x: clip !important;
     }
 
