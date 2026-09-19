@@ -2,6 +2,7 @@
 import { getImage } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import MembruCard from '../components/MembruCard.astro';
+import YoutubeEmbed from '../components/YoutubeEmbed.astro';
 import siteContent from '../data/siteContent.json';
 import seo from '../data/seo-content.json';
 import couplesData from '../data/couples.json';
@@ -40,7 +41,7 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
 
 const heroVideos = siteContent.videos.slice(0, 3).map((video) => ({
   title: video.title,
-  thumbJpg: `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`,
+  youtubeId: video.youtubeId,
 }));
 
 type HomepagePhotoSource = {
@@ -318,10 +319,12 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
           style={`--reveal-delay: ${index * 90}ms`}
           aria-label={`Videoclip live: ${video.title}`}
         >
-          <img src={video.thumbJpg} alt={video.title} loading="lazy" decoding="async" width="640" height="360" />
-          <span class="hp-cine-overlay" aria-hidden="true"></span>
+          <YoutubeEmbed
+            youtubeId={video.youtubeId}
+            title={video.title}
+            class="hp-home-video-gate"
+          />
           <span class="hp-cine-chip" aria-hidden="true">LIVE</span>
-          <span class="hp-cine-play" aria-hidden="true">▶</span>
           <span class="hp-cine-caption">{video.title}</span>
         </div>
       ))}
@@ -605,7 +608,7 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
   {/* ═══════════════════════════════════════════
       EARLY BOOKING — Link intern la articol preț
   ═══════════════════════════════════════════ */}
-  <section class="hp-early-booking section-container py-8 sm:py-12" aria-label="Oferte Early Booking">
+  <section class="hp-early-booking section-container free-scroll-section py-8 sm:py-12" aria-label="Oferte Early Booking">
     <div class="rounded-2xl border border-amber-500/20 bg-gradient-to-r from-amber-500/10 to-orange-500/10 p-6 sm:p-8 text-center">
       <p class="text-xs sm:text-sm font-semibold text-amber-300 mb-2">⏰ Ofertă Limitată</p>
       <h2 class="text-lg sm:text-xl font-extrabold text-white mb-3">Early Booking 2027 — ofertă personalizată și tarif blocat pentru data ta</h2>
@@ -1103,32 +1106,43 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
 
   @media (max-width: 767px) {
     :global(html),
-    :global(body) {
+    :global(body.is-homepage) {
+      scroll-snap-type: y mandatory;
       scroll-behavior: smooth;
+      scroll-padding-top: var(--mob-nav-h, 72px);
+      scroll-padding-bottom: 1rem;
+      overflow-x: clip;
     }
 
-    :global(main#continut) {
-      height: 100dvh;
-      overflow-y: scroll;
-      scroll-snap-type: y mandatory;
+    :global(body.is-homepage) {
+      overflow-x: clip !important;
+    }
+
+    :global(body.is-homepage main#continut) {
+      height: auto !important;
+      min-height: unset !important;
+      overflow-y: visible !important;
+      scroll-snap-type: none !important;
+      touch-action: pan-y !important;
       -webkit-overflow-scrolling: touch;
     }
 
-    .snap-section {
-      scroll-snap-align: start;
-      scroll-snap-stop: always;
-      min-height: 100svh;
-      box-sizing: border-box;
-      padding-bottom: 85px;
+    :global(body.is-homepage main#continut > section.snap-section) {
+      scroll-snap-align: start !important;
+      scroll-snap-stop: normal !important;
+      scroll-margin-top: var(--mob-nav-h, 72px);
+      min-height: calc(100svh - var(--mob-nav-h, 72px)) !important;
+      height: auto !important;
+      box-sizing: border-box !important;
       display: flex;
       flex-direction: column;
       justify-content: center;
     }
 
-    .free-scroll-section {
-      scroll-snap-align: none;
-      min-height: auto;
-      padding-bottom: 110px;
+    :global(body.is-homepage main#continut > section.free-scroll-section) {
+      scroll-snap-align: none !important;
+      min-height: auto !important;
+      height: auto !important;
     }
 
     .hp-offer-price {
@@ -3370,6 +3384,24 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
     border: 1px solid rgba(255, 255, 255, 0.16);
     background: rgba(9, 18, 42, 0.58);
     min-height: 220px;
+  }
+
+  .hp-home-video-gate {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    overflow: hidden;
+  }
+
+  .hp-home-video-gate .yt-gate__thumb {
+    object-fit: cover;
+  }
+
+  .hp-home-video-gate .yt-gate__click-overlay,
+  .hp-home-video-gate .yt-gate__fullscreen-btn {
+    z-index: 4;
   }
 
   .hp-cine-card {

@@ -2057,6 +2057,23 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - `npx astro check` — 0 erori, 0 warnings, 0 hints.
 - `npm run seo:check` — build reușit, 57 pagini, 0 FAIL | 0 WARN.
 
+## 📝 2026-09-20 — Scroll Snap mutat la viewport pe homepage
+
+### Problemă
+- Scroll Snap-ul nu se activa pe mobil deoarece `main#continut` era tratat ca un container izolat, iar regulile globale mobile îl resetau cu `!important`.
+
+### Fix
+- `html` primește `scroll-snap-type: y mandatory`, `scroll-behavior: smooth` și `overflow-x: clip`.
+- `main#continut` revine la fluxul documentului (`height: auto`, `overflow-y: visible`, fără snap), limitat la `body.is-homepage`.
+- `.snap-section` folosește `scroll-snap-align: start`, `scroll-snap-stop: normal`, `scroll-margin-top` sub header, `min-height: calc(100svh - header)` și `height: auto`, astfel încât showcase-ul video să nu se suprapună și footer-ul să rămână accesibil; `.free-scroll-section` rămâne liberă.
+- Secțiunea `hp-early-booking` a fost marcată explicit `free-scroll-section`, pentru ca oferta și ultimul rând al homepage-ului să nu fie blocate de snap-ul obligatoriu.
+- Google Maps de pe pagina Contact era blocat de CSP: `frame-src` nu includea originea Google. Au fost adăugate `https://www.google.com` și `https://maps.google.com` în `src/lib/csp.mjs`.
+- Override-urile au fost limitate la homepage și contracarează explicit regulile globale `!important`, fără modificarea comportamentului desktop sau al celorlalte pagini.
+
+### Validări
+- `npx astro check` — 0 erori, 0 warnings, 0 hints.
+- `npm run seo:check` — build reușit, 57 pagini, 0 FAIL | 0 WARN.
+
 ## 📝 18 sep 2026 (sesiune 8) — Audit tehnic Ahrefs: imagini mari, redirect în sitemap, nofollow intern
 
 ### Obiectiv
