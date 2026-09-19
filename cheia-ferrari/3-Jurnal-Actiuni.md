@@ -2023,6 +2023,40 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 ### Riscuri / pași următori
 - Niciunul identificat.
 
+## 📝 2026-09-20 — Social Feed Snap mobil pe homepage
+
+### Obiectiv
+- Reordonarea fluxului homepage-ului pentru mobil, cu showcase-ul live imediat după Hero și scroll snap nativ fără afectarea conținutului SEO.
+
+### Modificări
+- În `src/pages/index.astro`, secțiunea `hp-cinematic` cu videoclipurile și cardurile de momente live a fost mutată sub Hero.
+- Nota de preț `2.500-4.000 euro` a fost mutată într-un bloc dedicat din banda de ofertă.
+- Hero, showcase-ul, echipa și testimonialele folosesc `snap-section`, iar FAQ-ul, repertoriul și blocurile SEO folosesc `free-scroll-section`.
+- `main#continut` primește scroll snap, înălțime de viewport și overflow vertical numai la `max-width: 767px`; desktopul rămâne cu derulare nativă liberă.
+
+### Validări
+- `npx astro check` — 0 erori, 0 warnings, 0 hints.
+- `npm run build` — reușit.
+- `get_errors` — fără erori pe `src/pages/index.astro`.
+- `npm run seo:audit` — 57 pagini, 0 FAIL | 0 WARN.
+
+### Riscuri / pași următori
+- Comportamentul vizual al snap-ului trebuie urmărit pe dispozitive mobile reale, în special în combinație cu bara flotantă și înălțimi mici de viewport.
+
+## 📝 2026-09-20 — Fix Scroll Snap mobil pe containerul real
+
+### Problemă
+- Scroll Snap-ul cu `proximity` nu agăța constant secțiunile în preview-ul mobil.
+
+### Fix
+- În `src/pages/index.astro`, `main#continut` folosește acum `scroll-snap-type: y mandatory` și `overflow-y: scroll`.
+- `.snap-section` folosește `scroll-snap-stop: always`, `min-height: 100svh` și `box-sizing: border-box`.
+- `html/body` primesc doar `scroll-behavior: smooth`; nu au fost transformate într-un al doilea container de scroll, pentru a evita nested scrolling.
+
+### Validări
+- `npx astro check` — 0 erori, 0 warnings, 0 hints.
+- `npm run seo:check` — build reușit, 57 pagini, 0 FAIL | 0 WARN.
+
 ## 📝 18 sep 2026 (sesiune 8) — Audit tehnic Ahrefs: imagini mari, redirect în sitemap, nofollow intern
 
 ### Obiectiv

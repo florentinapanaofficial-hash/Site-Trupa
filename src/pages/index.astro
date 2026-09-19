@@ -170,7 +170,7 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
   {/* ═══════════════════════════════════════════
       HERO — Scenă, titlu mare, CTA-uri
   ═══════════════════════════════════════════ */}
-  <section id="acasa" class="hero-stage hero-fullscreen hp-hero-wrap" aria-label="Secțiunea principală">
+  <section id="acasa" class="hero-stage hero-fullscreen hp-hero-wrap snap-section" aria-label="Secțiunea principală">
     <div class="hero-stage-inner">
       <div class="hero-light-orbs" aria-hidden="true">
         <span class="hero-orb hero-orb--one"></span>
@@ -193,12 +193,6 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
 
         <p class="hero-lead anim-hero-load anim-hero-d3">
           {acasa.hero.descriere}
-        </p>
-
-        <p class="hero-pricing-note anim-hero-load anim-hero-d3">
-          Interval orientativ: 2.500-4.000 euro, în funcție de formulă, locație și program.
-          Trimite data și bugetul, iar revenim în maximum 24 de ore cu ofertă clară și disponibilitate.
-          <a href="/contact/" class="hero-pricing-link">Trimite data și bugetul</a>
         </p>
 
         {/* CTA-uri hero */}
@@ -306,6 +300,81 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
     </div>
   </section>
 
+  <section id="showcase-cinematic" class="hp-cinematic section-container snap-section" aria-label="Showcase live foto-video">
+    <div class="hp-cinematic-head reveal-on-scroll from-bottom" style="--reveal-delay: 0ms">
+      <span class="hp-cinematic-eyebrow">Live Editorial Experience</span>
+      <p class="hp-cinematic-kicker">Experiență vizuală</p>
+      <h2 class="hp-cinematic-title">Nu doar muzică. Un spectacol care prinde viață în fața ta.</h2>
+      <p class="hp-cinematic-copy">
+        Când faci scroll, povestea se deschide în ritmul evenimentului: cadre live, lumină, energie și momente reale
+        care transformă o pagină statică într-o atmosferă de scenă.
+      </p>
+    </div>
+
+    <div class="hp-cinematic-grid">
+      {heroVideos.map((video, index) => (
+        <div
+          class="hp-cine-card hp-cine-card--video reveal-on-scroll from-left"
+          style={`--reveal-delay: ${index * 90}ms`}
+          aria-label={`Videoclip live: ${video.title}`}
+        >
+          <img src={video.thumbJpg} alt={video.title} loading="lazy" decoding="async" width="640" height="360" />
+          <span class="hp-cine-overlay" aria-hidden="true"></span>
+          <span class="hp-cine-chip" aria-hidden="true">LIVE</span>
+          <span class="hp-cine-play" aria-hidden="true">▶</span>
+          <span class="hp-cine-caption">{video.title}</span>
+        </div>
+      ))}
+
+      <div class="hp-cine-story reveal-on-scroll from-right" style="--reveal-delay: 140ms">
+        <div class="hp-cine-story-title">Scroll și simte ritmul serii</div>
+        <p>
+          Paragrafele și cardurile intră gradual din lateral, exact ca intrarea unei formații pe scenă.
+          Accentul rămâne pe conținut, dar prezentarea capătă impact emoțional.
+        </p>
+        <div class="hp-cine-actions">
+          <a href="/galerie-video/" class="btn-outline">Vezi videoclipuri live</a>
+          <a href="/galerie-foto/" class="btn-outline">Vezi galerie foto</a>
+          <a href="/contact/" class="btn-solid">Rezervă data ta</a>
+        </div>
+      </div>
+
+      {heroPhotos.map((photo, index) => {
+        const source = homepagePhotoSources[photo.variant];
+        return (
+        <div
+          class="hp-cine-card hp-cine-card--photo reveal-on-scroll from-right"
+          style={`--reveal-delay: ${160 + index * 100}ms`}
+          aria-label="Cadru autentic de la eveniment"
+        >
+          <picture>
+            {source.avifSrcSet && <source type="image/avif" srcset={source.avifSrcSet} sizes="(max-width: 767px) 92vw, 399px" />}
+            {source.webpSrcSet && <source type="image/webp" srcset={source.webpSrcSet} sizes="(max-width: 767px) 92vw, 399px" />}
+            <img src={source.fallbackSrc} alt={photo.alt} loading="lazy" decoding="async" width="500" height="889" />
+          </picture>
+          <span class="hp-cine-overlay" aria-hidden="true"></span>
+          <span class="hp-cine-caption">Cadru autentic de la eveniment</span>
+        </div>
+      );})}
+
+      <div class="hp-cine-editorial reveal-on-scroll from-left" style="--reveal-delay: 210ms">
+        <p class="hp-cine-editorial-kicker">Semnătura noastră</p>
+        <div class="hp-cine-editorial-title">Repertoriu Diversificat: Muzică Populară și Cover-uri Live</div>
+        <p>
+          Construim tensiunea serii în valuri: intro elegant, urcare energică, explozie pe ring și final memorabil.
+          Asta transformă evenimentul într-un show, nu într-o simplă petrecere.
+        </p>
+        <a href="/oferta-premium/" class="hp-cine-editorial-cta" onclick="window.gtag&&window.gtag('event','click_premium_offer',{event_category:'homepage',event_label:'editorial-cta'})">Cere oferta premium</a>
+      </div>
+    </div>
+
+    <div class="hp-cinematic-marquee reveal-on-scroll from-bottom" style="--reveal-delay: 260ms" aria-hidden="true">
+      <div class="hp-cinematic-track">
+        <span>LIVE BAND PREMIUM</span><span>•</span><span>REPERTORIU PERSONALIZAT</span><span>•</span><span>ENERGIE REALĂ PE SCENĂ</span><span>•</span><span>FORMAȚIA FLORENTINA PANĂ</span>
+      </div>
+    </div>
+  </section>
+
   <section class="hp-meet-teaser section-container" aria-label="Cunoaște Formația Florentina Pană">
     <div class="hp-meet-wrap reveal-on-scroll from-bottom" style="--reveal-delay: 30ms">
       <div class="hp-meet-media">
@@ -340,6 +409,11 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
       <div class="hp-convert-copy">
         <p class="hp-convert-kicker">Disponibilitate rapidă</p>
         <h2 class="hp-convert-title">Spune-ne data și bugetul, iar noi revenim rapid cu o ofertă clară.</h2>
+        <div class="hp-offer-price" aria-label="Preț orientativ pentru formație">
+          <strong>2.500-4.000 euro</strong>
+          <span>Interval orientativ, în funcție de formulă, locație și program.</span>
+          <a href="/contact/" class="hero-pricing-link">Trimite data și bugetul</a>
+        </div>
       </div>
       <div class="hp-convert-actions">
         <a href={heroTelHref} class="hp-convert-btn hp-convert-btn--call" aria-label="Sună acum pentru ofertă" onclick="window.gtag&&window.gtag('event','click_phone',{event_category:'homepage',event_label:'convert-strip'})">
@@ -358,7 +432,7 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
     </div>
   </section>
 
-  <section class="hp-team-spotlight section-container" aria-label="Cunoaște nucleul formației">
+  <section class="hp-team-spotlight section-container snap-section" aria-label="Cunoaște nucleul formației">
     <div class="hp-team-head reveal-on-scroll from-bottom" style="--reveal-delay: 55ms">
       <p class="hp-team-kicker">Nucleul formației</p>
       <h2 class="hp-team-title">Oameni reali, energie reală, chimie care se simte pe scenă</h2>
@@ -437,7 +511,7 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
     </div>
   </section>
 
-  <section class="hp-signature-flow section-container" aria-label="Cum transformăm evenimentul într-un spectacol">
+  <section class="hp-signature-flow section-container free-scroll-section" aria-label="Cum transformăm evenimentul într-un spectacol">
     <div class="hp-signature-head reveal-on-scroll from-bottom" style="--reveal-delay: 20ms">
       <p class="hp-signature-kicker">Signature Flow</p>
       <h2 class="hp-signature-title">Experiență de Band Premium, de la primul mesaj la ultimul dans</h2>
@@ -476,7 +550,7 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
   {/* ═══════════════════════════════════════════
       NUCLEUL TRUPEI — carduri 3D interactive (tilt + flip pe click BIO)
   ═══════════════════════════════════════════ */}
-  <section class="hp-nucleu section-container" aria-label="Cunoaște echipa completă a formației">
+  <section class="hp-nucleu section-container free-scroll-section" aria-label="Cunoaște echipa completă a formației">
     <div class="hp-nucleu-head reveal-on-scroll from-bottom" style="--reveal-delay: 20ms">
       <p class="hp-nucleu-kicker">Nucleul Trupei</p>
       <h2 class="hp-nucleu-title">Cunoaște Echipa care Dă Viață Fiecărui Eveniment</h2>
@@ -503,106 +577,7 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
   {/* ═══════════════════════════════════════════
       SHOWCASE CINEMATIC — text + video + foto cu reveal la scroll
   ═══════════════════════════════════════════ */}
-  <section id="showcase-cinematic" class="hp-cinematic section-container" aria-label="Showcase live foto-video">
-    <div class="hp-cinematic-head reveal-on-scroll from-bottom" style="--reveal-delay: 0ms">
-      <span class="hp-cinematic-eyebrow">Live Editorial Experience</span>
-      <p class="hp-cinematic-kicker">Experiență vizuală</p>
-      <h2 class="hp-cinematic-title">Nu doar muzică. Un spectacol care prinde viață în fața ta.</h2>
-      <p class="hp-cinematic-copy">
-        Când faci scroll, povestea se deschide în ritmul evenimentului: cadre live, lumină, energie și momente reale
-        care transformă o pagină statică într-o atmosferă de scenă.
-      </p>
-    </div>
-
-    <div class="hp-cinematic-grid">
-      {heroVideos.map((video, index) => (
-        <div
-          class="hp-cine-card hp-cine-card--video reveal-on-scroll from-left"
-          style={`--reveal-delay: ${index * 90}ms`}
-          aria-label={`Videoclip live: ${video.title}`}
-        >
-          <img src={video.thumbJpg} alt={video.title} loading="lazy" decoding="async" width="640" height="360" />
-          <span class="hp-cine-overlay" aria-hidden="true"></span>
-          <span class="hp-cine-chip" aria-hidden="true">LIVE</span>
-          <span class="hp-cine-play" aria-hidden="true">▶</span>
-          <span class="hp-cine-caption">{video.title}</span>
-        </div>
-      ))}
-
-      <div class="hp-cine-story reveal-on-scroll from-right" style="--reveal-delay: 140ms">
-        <div class="hp-cine-story-title">Scroll și simte ritmul serii</div>
-        <p>
-          Paragrafele și cardurile intră gradual din lateral, exact ca intrarea unei formații pe scenă.
-          Accentul rămâne pe conținut, dar prezentarea capătă impact emoțional.
-        </p>
-        <div class="hp-cine-actions">
-          <a href="/galerie-video/" class="btn-outline">Vezi videoclipuri live</a>
-          <a href="/galerie-foto/" class="btn-outline">Vezi galerie foto</a>
-          <a href="/contact/" class="btn-solid">Rezervă data ta</a>
-        </div>
-      </div>
-
-      {heroPhotos.map((photo, index) => {
-        const source = homepagePhotoSources[photo.variant];
-        return (
-        <div
-          class="hp-cine-card hp-cine-card--photo reveal-on-scroll from-right"
-          style={`--reveal-delay: ${160 + index * 100}ms`}
-          aria-label="Cadru autentic de la eveniment"
-        >
-          <picture>
-            {source.avifSrcSet && (
-              <source
-                type="image/avif"
-                srcset={source.avifSrcSet}
-                sizes="(max-width: 767px) 92vw, 399px"
-              />
-            )}
-            {source.webpSrcSet && (
-              <source
-                type="image/webp"
-                srcset={source.webpSrcSet}
-                sizes="(max-width: 767px) 92vw, 399px"
-              />
-            )}
-            <img src={source.fallbackSrc} alt={photo.alt} loading="lazy" decoding="async" width="500" height="889" />
-          </picture>
-          <span class="hp-cine-overlay" aria-hidden="true"></span>
-          <span class="hp-cine-caption">Cadru autentic de la eveniment</span>
-        </div>
-      );})}
-
-      <div class="hp-cine-editorial reveal-on-scroll from-left" style="--reveal-delay: 210ms">
-        <p class="hp-cine-editorial-kicker">Semnătura noastră</p>
-        <div class="hp-cine-editorial-title">Repertoriu Diversificat: Muzică Populară și Cover-uri Live</div>
-        <p>
-          Construim tensiunea serii în valuri: intro elegant, urcare energică, explozie pe ring și final memorabil.
-          Asta transformă evenimentul într-un show, nu într-o simplă petrecere.
-        </p>
-        <a href="/oferta-premium/" class="hp-cine-editorial-cta" onclick="window.gtag&&window.gtag('event','click_premium_offer',{event_category:'homepage',event_label:'editorial-cta'})">Cere oferta premium</a>
-      </div>
-    </div>
-
-    <div class="hp-cinematic-marquee reveal-on-scroll from-bottom" style="--reveal-delay: 260ms" aria-hidden="true">
-      <div class="hp-cinematic-track">
-        <span>LIVE BAND PREMIUM</span>
-        <span>•</span>
-        <span>REPERTORIU PERSONALIZAT</span>
-        <span>•</span>
-        <span>ENERGIE REALĂ PE SCENĂ</span>
-        <span>•</span>
-        <span>FORMAȚIA FLORENTINA PANĂ</span>
-        <span>•</span>
-        <span>LIVE BAND PREMIUM</span>
-        <span>•</span>
-        <span>REPERTORIU PERSONALIZAT</span>
-        <span>•</span>
-        <span>ENERGIE REALĂ PE SCENĂ</span>
-      </div>
-    </div>
-  </section>
-
-  <section class="hp-proof section-container" aria-label="Recomandări reale de la cupluri">
+  <section class="hp-proof section-container snap-section" aria-label="Recomandări reale de la cupluri">
     <div class="hp-proof-head reveal-on-scroll from-bottom" style="--reveal-delay: 35ms">
       <p class="hp-proof-kicker">Social Proof Real</p>
       <h2 class="hp-proof-title">Recomandări autentice de la mirii care au ales o ofertă potrivită bugetului lor</h2>
@@ -647,7 +622,7 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
   {/* ═══════════════════════════════════════════
       DESPRE FORMAȚIE — text SEO + H3 subtitluri
   ═══════════════════════════════════════════ */}
-  <section id="despre-formatie" class="hp-seo-section" aria-label="Despre formația noastră">
+  <section id="despre-formatie" class="hp-seo-section free-scroll-section" aria-label="Despre formația noastră">
     <h2 class="hp-seo-title anim-on-scroll">Peste 10 ani de pasiune pe scenă</h2>
 
     <div class="hp-seo-grid">
@@ -679,7 +654,7 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
   {/* ═══════════════════════════════════════════
       DE CE SĂ NE ALEGEȚI — beneficii + H3
   ═══════════════════════════════════════════ */}
-  <section id="de-ce-noi" class="hp-seo-section" aria-label="De ce să ne alegeți">
+  <section id="de-ce-noi" class="hp-seo-section free-scroll-section" aria-label="De ce să ne alegeți">
     <h2 class="hp-seo-title anim-on-scroll">De ce să ne alegeți</h2>
 
     <div class="hp-seo-grid">
@@ -709,7 +684,7 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
   {/* ═══════════════════════════════════════════
       TIPURI DE EVENIMENTE — servicii + H3
   ═══════════════════════════════════════════ */}
-  <section id="tipuri-evenimente" class="hp-seo-section" aria-label="Tipuri de evenimente">
+  <section id="tipuri-evenimente" class="hp-seo-section free-scroll-section" aria-label="Tipuri de evenimente">
     <h2 class="hp-seo-title anim-on-scroll">Ce evenimente acoperim</h2>
 
     <div class="hp-seo-grid hp-seo-grid--3">
@@ -744,7 +719,7 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
   {/* ═══════════════════════════════════════════
       FAQ — Întrebări frecvente (vizibile pe pagină)
   ═══════════════════════════════════════════ */}
-  <section id="intrebari-frecvente" class="hp-seo-section" aria-label="Întrebări frecvente">
+  <section id="intrebari-frecvente" class="hp-seo-section free-scroll-section" aria-label="Întrebări frecvente">
     <h2 class="hp-seo-title anim-on-scroll">Întrebări frecvente</h2>
 
     <div class="hp-faq-list anim-on-scroll anim-d1">
@@ -784,7 +759,7 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
   {/* ═══════════════════════════════════════════
       HIGHLIGHTS — 2 carduri clickabile
   ═══════════════════════════════════════════ */}
-  <section id="highlights" class="hp-highlights hp-highlights--diamond" aria-label="Descoperă mai mult">
+  <section id="highlights" class="hp-highlights hp-highlights--diamond free-scroll-section" aria-label="Descoperă mai mult">
 
     <div class="hp-diamond-head reveal-on-scroll from-bottom" style="--reveal-delay: 60ms">
       <p class="hp-diamond-kicker">Diamantul serii</p>
@@ -1100,6 +1075,65 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
   :root {
     --hp-section-pad: clamp(1rem, 2.4vw, 1.6rem);
     --hp-section-pad-compact: clamp(0.9rem, 2vw, 1.3rem);
+  }
+
+  .hp-offer-price {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    width: fit-content;
+    max-width: 100%;
+    margin-top: 0.85rem;
+    padding: 0.75rem 0.9rem;
+    border: 1px solid rgba(245, 166, 35, 0.36);
+    border-radius: 0.85rem;
+    background: rgba(245, 166, 35, 0.1);
+  }
+
+  .hp-offer-price strong {
+    color: #ffe6a6;
+    font-size: clamp(1.1rem, 2vw, 1.35rem);
+  }
+
+  .hp-offer-price span {
+    color: rgba(239, 245, 255, 0.84);
+    font-size: 0.82rem;
+    line-height: 1.45;
+  }
+
+  @media (max-width: 767px) {
+    :global(html),
+    :global(body) {
+      scroll-behavior: smooth;
+    }
+
+    :global(main#continut) {
+      height: 100dvh;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .snap-section {
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      min-height: 100svh;
+      box-sizing: border-box;
+      padding-bottom: 85px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .free-scroll-section {
+      scroll-snap-align: none;
+      min-height: auto;
+      padding-bottom: 110px;
+    }
+
+    .hp-offer-price {
+      width: 100%;
+    }
   }
 
   .hero-slider {
