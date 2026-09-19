@@ -4,6 +4,10 @@ type GoogleReviewItem = {
   context: string;
   text: string;
   sourceUrl?: string;
+  profilePhotoUrl?: string;
+  rating?: number;
+  publishedAt?: string;
+  publishedLabel?: string;
 };
 
 interface Props {
@@ -14,6 +18,23 @@ interface Props {
   reviews: GoogleReviewItem[];
 }
 
+type GooglePlacesResponse = {
+  status?: string;
+  result?: {
+    rating?: number;
+    user_ratings_total?: number;
+    reviews?: Array<{
+      author_name?: string;
+      author_url?: string;
+      profile_photo_url?: string;
+      rating?: number;
+      relative_time_description?: string;
+      text?: string;
+      time?: number;
+    }>;
+  };
+};
+
 const {
   title = 'Recenzii Google Business',
   subtitle = 'Recenzii reale de la clienți care au lucrat cu noi la evenimente.',
@@ -22,31 +43,110 @@ const {
   reviews,
 } = Astro.props;
 
-const safeReviews = Array.isArray(reviews)
-  ? reviews
-      .filter((item) => item?.author && item?.text)
-      .slice(0, 3)
-  : [];
+const fallbackReviews = Array.isArray(reviews) ? reviews : [];
+let googleRating: number | undefined;
+let googleRatingsTotal: number | undefined;
+let apiReviews: GoogleReviewItem[] = [];
+
+const googlePlacesApiKey = (import.meta.env.GOOGLE_PLACES_API_KEY ?? '').trim();
+const googlePlaceId = (import.meta.env.GOOGLE_PLACE_ID ?? '').trim();
+
+if (googlePlacesApiKey && googlePlaceId) {
+  try {
+    const params = new URLSearchParams({
+      place_id: googlePlaceId,
+      fields: 'reviews,rating,user_ratings_total',
+      key: googlePlacesApiKey,
+      reviews_sort: 'newest',
+      language: 'ro',
+    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    const response = await fetch(`https://maps.googleapis.com/maps/api/place/details/json?${params}`, {
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+
+    if (response.ok) {
+      const payload = await response.json() as GooglePlacesResponse;
+      const result = payload.status === 'OK' ? payload.result : undefined;
+      googleRating = typeof result?.rating === 'number' ? result.rating : undefined;
+      googleRatingsTotal = typeof result?.user_ratings_total === 'number'
+        ? result.user_ratings_total
+        : undefined;
+      apiReviews = (result?.reviews ?? [])
+        .filter((review) => review.author_name && review.text)
+        .map((review) => ({
+          author: review.author_name as string,
+          context: review.relative_time_description || 'Recenzie Google verificată',
+          text: review.text as string,
+          sourceUrl: review.author_url,
+          profilePhotoUrl: review.profile_photo_url,
+          rating: review.rating,
+          publishedAt: typeof review.time === 'number' ? new Date(review.time * 1000).toISOString() : undefined,
+          publishedLabel: typeof review.time === 'number'
+            ? new Intl.DateTimeFormat('ro-RO', { dateStyle: 'medium' }).format(new Date(review.time * 1000))
+            : undefined,
+        }))
+        .slice(0, 3);
+    }
+  } catch {
+    // Build-ul continuă cu fallback-ul static dacă Google este indisponibil.
+  }
+}
+
+const activeReviews = apiReviews.length > 0 ? apiReviews : fallbackReviews;
+const usingGoogleReviews = apiReviews.length > 0;
+const visibleReviews = activeReviews
+  .filter((item) => item?.author && item?.text)
+  .slice(0, 3);
+const displayedRating = usingGoogleReviews ? googleRating : undefined;
+const reviewSchema = usingGoogleReviews ? visibleReviews.map((review) => ({
+  '@type': 'Review',
+  author: { '@type': 'Person', name: review.author },
+  reviewBody: review.text,
+  ...(review.publishedAt ? { datePublished: review.publishedAt } : {}),
+  ...(review.rating ? { reviewRating: { '@type': 'Rating', ratingValue: review.rating, bestRating: 5 } } : {}),
+})) : [];
+const displayTitle = usingGoogleReviews ? title : 'Testimoniale de la clienți';
+const displaySubtitle = usingGoogleReviews
+  ? subtitle
+  : 'Recenziile Google sunt temporar indisponibile la build; afișăm separat testimoniale publicate pe site, fără să le prezentăm ca recenzii Google.';
+const reviewsSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  name: 'Formația Florentina Pană',
+  ...(displayedRating && googleRatingsTotal
+    ? { aggregateRating: { '@type': 'AggregateRating', ratingValue: displayedRating.toFixed(1), bestRating: 5, ratingCount: googleRatingsTotal } }
+    : {}),
+  ...(reviewSchema.length > 0 ? { review: reviewSchema } : {}),
+};
 ---
 
-<section class="gb-reviews" aria-label="Recenzii Google Business">
+<section class="gb-reviews" aria-label={usingGoogleReviews ? 'Recenzii Google Business' : 'Testimoniale publicate pe site'}>
   <div class="gb-reviews__head">
-    <p class="gb-reviews__kicker">Încredere verificabilă</p>
-    <h2>{title}</h2>
-    <p>{subtitle}</p>
+    <p class="gb-reviews__kicker">{usingGoogleReviews ? 'Încredere verificabilă' : 'Fallback transparent'}</p>
+    <h2>{displayTitle}</h2>
+    <p>{displaySubtitle}</p>
   </div>
 
-  {safeReviews.length > 0 ? (
+  {visibleReviews.length > 0 ? (
     <div class="gb-reviews__grid">
-      {safeReviews.map((review) => (
+      {visibleReviews.map((review) => (
         <article class="gb-reviews__card">
-          <div class="gb-reviews__stars" aria-label="5 stele din 5">★★★★★</div>
+          {review.profilePhotoUrl && <img class="gb-reviews__avatar" src={review.profilePhotoUrl} alt={`Fotografie profil ${review.author}`} loading="lazy" width="40" height="40" />}
+          {usingGoogleReviews ? (
+            <div class="gb-reviews__stars" aria-label={`${review.rating ?? 5} stele din 5`}>{'★'.repeat(Math.max(1, Math.min(5, Math.round(review.rating ?? 5))))}</div>
+          ) : (
+            <div class="gb-reviews__fallback-label">Testimonial public pe site</div>
+          )}
           <blockquote>
             <p>„{review.text}”</p>
           </blockquote>
           <footer>
             <strong>{review.author}</strong>
             <span>{review.context}</span>
+            {review.publishedLabel && <span>{review.publishedLabel}</span>}
             {review.sourceUrl && (
               <a href={review.sourceUrl} target="_blank" rel="noopener noreferrer" aria-label={`Vezi recenzia Google de la ${review.author}`}>Vezi recenzia pe Google</a>
             )}
@@ -58,10 +158,14 @@ const safeReviews = Array.isArray(reviews)
     <p class="gb-reviews__empty">Recenziile Google vor apărea aici imediat ce sunt publicate sau sincronizate.</p>
   )}
 
-  <div class="gb-reviews__rating" aria-label="Evaluare de 5 stele din 5">
+  {displayedRating && (
+    <div class="gb-reviews__rating" aria-label={`Evaluare Google de ${displayedRating.toFixed(1)} stele din 5`}>
     <span class="gb-reviews__rating-stars" aria-hidden="true">★★★★★</span>
-    <span class="gb-reviews__rating-label">Lasă-ne experiența ta pe Google</span>
-  </div>
+      <span class="gb-reviews__rating-label">{displayedRating.toFixed(1)} / 5{googleRatingsTotal ? ` • ${googleRatingsTotal} evaluări` : ''}</span>
+    </div>
+  )}
+
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(reviewsSchema)} />
 
   <div class="gb-reviews__actions">
     <a href={googleWriteUrl} target="_blank" rel="noopener noreferrer" class="gb-reviews__btn gb-reviews__btn--primary gb-reviews__btn--pulse">
@@ -125,6 +229,25 @@ const safeReviews = Array.isArray(reviews)
     letter-spacing: 0.12em;
     color: #ffd36f;
     margin-bottom: 0.35rem;
+  }
+
+  .gb-reviews__fallback-label {
+    margin-bottom: 0.35rem;
+    color: rgba(192, 222, 255, 0.9);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .gb-reviews__avatar {
+    display: block;
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-bottom: 0.45rem;
+    border-radius: 999px;
+    object-fit: cover;
+    border: 1px solid rgba(255, 255, 255, 0.22);
   }
 
   .gb-reviews__card blockquote {

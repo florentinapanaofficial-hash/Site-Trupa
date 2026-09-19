@@ -2068,6 +2068,27 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - `.snap-section` folosește `scroll-snap-align: start`, `scroll-snap-stop: normal`, `scroll-margin-top` sub header, `min-height: calc(100svh - header)` și `height: auto`, astfel încât showcase-ul video să nu se suprapună și footer-ul să rămână accesibil; `.free-scroll-section` rămâne liberă.
 - Secțiunea `hp-early-booking` a fost marcată explicit `free-scroll-section`, pentru ca oferta și ultimul rând al homepage-ului să nu fie blocate de snap-ul obligatoriu.
 - Google Maps de pe pagina Contact era blocat de CSP: `frame-src` nu includea originea Google. Au fost adăugate `https://www.google.com` și `https://maps.google.com` în `src/lib/csp.mjs`.
+
+## 📝 2026-09-20 — Recenzii Google Places la build time
+
+### Obiectiv
+- Automatizarea recenziilor Google Business pe homepage și în componentele existente, fără expunerea cheii API în client.
+
+### Modificări
+- `GoogleBusinessReviews.astro` citește `GOOGLE_PLACES_API_KEY` și `GOOGLE_PLACE_ID` numai în frontmatter și apelează Places Details la build time cu timeout de 8 secunde.
+- Sunt mapate numele autorului, fotografia de profil, ratingul, textul, URL-ul și data recenziei; interfața afișează datele Google în designul existent.
+- La lipsa configurației, eroare API sau răspuns non-OK, componenta folosește recenziile statice primite ca fallback, fără să blocheze build-ul.
+- Componenta emite JSON-LD static pentru `AggregateRating` și `Review` când există datele necesare.
+- Componenta este inclusă și pe homepage; homepage-ul nu mai primește fallback nominal, pentru a nu prezenta un cuplu local ca autor Google când env-ul lipsește în deploy. Paginile secundare păstrează fallback-ul transparent.
+
+### Securitate și validări
+- Cheia API nu este inclusă în markup-ul generat sau în script client.
+- `npx astro check` — 0 erori, 0 warnings, 0 hints.
+- `npm run build` — reușit.
+- `npm run seo:check` — 57 pagini, 0 FAIL | 0 WARN.
+- Verificare directă Google Places — HTTP 200, `OK`, 5 recenzii disponibile, rating și total evaluări disponibile; homepage-ul generat conține recenzii live și `AggregateRating`.
+- Corecție de proveniență: fallback-urile statice nu mai primesc stele, `AggregateRating` sau schema `Review` și sunt etichetate explicit ca „Testimonial public pe site”; numai autorii returnați de Google sunt prezentați ca recenzii Google.
+- Pentru producție, `GOOGLE_PLACES_API_KEY` și `GOOGLE_PLACE_ID` trebuie configurate și în mediul Railway/deploy; `.env` local nu este publicat în Git.
 - Override-urile au fost limitate la homepage și contracarează explicit regulile globale `!important`, fără modificarea comportamentului desktop sau al celorlalte pagini.
 
 ### Validări

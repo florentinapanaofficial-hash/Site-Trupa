@@ -3,9 +3,9 @@ import { getImage } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import MembruCard from '../components/MembruCard.astro';
 import YoutubeEmbed from '../components/YoutubeEmbed.astro';
+import GoogleBusinessReviews from '../components/GoogleBusinessReviews.astro';
 import siteContent from '../data/siteContent.json';
 import seo from '../data/seo-content.json';
-import couplesData from '../data/couples.json';
 import heroImg from '../assets/card-1-panoramica.jpg';
 
 const optimizedHero = await getImage({ src: heroImg, format: 'webp', width: 320, height: 213 });
@@ -100,16 +100,8 @@ const heroPhotos: Array<{ variant: keyof typeof homepagePhotoSources; alt: strin
   },
 ];
 
-const signatureCouples = [...couplesData.couples]
-  .sort((a, b) => (b.isoDate || '').localeCompare(a.isoDate || ''))
-  .slice(0, 3)
-  .map((item) => ({
-    names: item.names,
-    city: item.city,
-    date: item.date,
-    recommendation: item.recommendation,
-    slug: item.slug,
-  }));
+const googleBusinessProfileUrl = 'https://www.google.com/maps/place/Formatia+Florentina+Pana/@44.83968,24.881169,17z/data=!4m8!3m7!1s0x40b2bd065971a471:0xacbc38b62ba9ccae!8m2!3d44.83968!4d24.881169!9m1!1b1';
+const googleBusinessWriteUrl = 'https://g.page/r/Ca7MqSu2OLysEAE/review';
 const heroTelHref = `tel:${contact.phoneRaw}`;
 const heroWaHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%83!%20Vreau%20s%C4%83%20verific%20disponibilitatea%20Forma%C8%9Biei%20Florentina%20Pan%C4%83.`;
 
@@ -580,29 +572,14 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
   {/* ═══════════════════════════════════════════
       SHOWCASE CINEMATIC — text + video + foto cu reveal la scroll
   ═══════════════════════════════════════════ */}
-  <section class="hp-proof section-container free-scroll-section" aria-label="Recomandări reale de la cupluri">
-    <div class="hp-proof-head reveal-on-scroll from-bottom" style="--reveal-delay: 35ms">
-      <p class="hp-proof-kicker">Social Proof Real</p>
-      <h2 class="hp-proof-title">Recomandări autentice de la mirii care au ales o ofertă potrivită bugetului lor</h2>
-      <p class="hp-proof-copy">
-        Atmosfera nu se explică doar în cuvintele noastre. Se vede în reacția cuplurilor care au spus bugetul,
-        au primit o formulă adaptată și ne-au recomandat mai departe.
-      </p>
-    </div>
-
-    <div class="hp-proof-grid">
-      {signatureCouples.map((item, index) => (
-        <article class="hp-proof-card reveal-on-scroll from-bottom" style={`--reveal-delay: ${70 + index * 80}ms`}>
-          <span class="hp-proof-quote" aria-hidden="true">“</span>
-          <p class="hp-proof-text">{item.recommendation}</p>
-          <div class="hp-proof-meta">
-            <strong>{item.names}</strong>
-            <span>{item.city} · {item.date}</span>
-          </div>
-          <a href="/comunitate/" class="hp-proof-link" aria-label={`Vezi povestea completă — ${item.names}`}>Vezi povestea completă</a>
-        </article>
-      ))}
-    </div>
+  <section class="section-container free-scroll-section" aria-label="Recenzii Google Business">
+    <GoogleBusinessReviews
+      title="Recenzii reale de pe Google"
+      subtitle="Feedback public de la clienți care au trăit experiența live alături de Formația Florentina Pană."
+      googleProfileUrl={googleBusinessProfileUrl}
+      googleWriteUrl={googleBusinessWriteUrl}
+      reviews={[]}
+    />
   </section>
 
   {/* ═══════════════════════════════════════════
