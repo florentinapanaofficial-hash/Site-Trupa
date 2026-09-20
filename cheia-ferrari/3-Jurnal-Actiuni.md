@@ -456,6 +456,12 @@ git push origin main
 
 ---
 
+## 📝 2026-09-20 — Recenzii vizibile pe homepage
+- **Obiectiv:** eliminarea stării goale a secțiunii de recenzii de pe homepage, păstrând delimitarea transparentă dintre testimoniale locale și date Google Places.
+- **Modificări:** `src/pages/index.astro` importă povestea Cristinei și a lui Manu din `couples.json` și o transmite drept fallback componentei `GoogleBusinessReviews`; aceeași sursă era deja utilizată pe `/despre/`.
+- **Validări:** `npx astro check` — 0 errors, 0 warnings, 0 hints; `npm run build` și `npm run seo:check` — reușite; audit SEO — 57 pagini, 0 FAIL | 0 WARN.
+- **Risc / pas următor:** build-ul local nu are `GOOGLE_PLACES_API_KEY` și `GOOGLE_PLACE_ID`, deci recenziile Google live nu pot fi sincronizate; configurează ambele variabile secrete în mediul de build Railway, apoi rebuild/deploy pentru preluarea datelor live.
+
 ## 🎉 PROTOCOL „AM AVUT EVENIMENT" — Workflow complet
 
 Când Claudiu scrie **„Am avut eveniment pe [data]"**, Ferrari aplică pașii de mai jos **în ordine** și **NUMAI cu date reale primite de la Claudiu**. Zero inventat. Zero completat din imaginație.
