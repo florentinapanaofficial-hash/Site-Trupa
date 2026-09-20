@@ -480,6 +480,11 @@ git push origin main
 - **Validări:** `npx astro check` — 0 errors, 0 warnings, 0 hints; `npm run seo:check` — build reușit; audit SEO — 57 pagini, 0 FAIL | 0 WARN; HTML compilat: 3 URL-uri `hqdefault`, 0 URL-uri `maxresdefault` pentru homepage.
 - **Risc / pas următor:** Lighthouse live trebuie reluat după deploy. Raportul include și costuri externe Cloudflare Challenge, care nu sunt controlate de codul Astro.
 
+## 📝 2026-09-20 — Confirmare deploy și Lighthouse mobil
+- **Deploy:** commitul `11a7bce0` este publicat pe `main`; homepage-ul live confirmă 3 miniaturi `hqdefault` și 0 `maxresdefault`.
+- **Măsurare live:** Performance 75, FCP 1,7 s, LCP 4,1 s, TBT 460 ms, CLS 0,004 și Speed Index 2,1 s. Rularea anterioară a versiunii vechi a dat 73, iar cea intermediară 78; Lighthouse throttled are variație între rulari, astfel scorul publicat corect pentru această versiune este 75.
+- **Validări suplimentare:** `npm test` — 40/40 teste trecute; serverul local de audit a fost oprit.
+
 ## 🎉 PROTOCOL „AM AVUT EVENIMENT" — Workflow complet
 
 Când Claudiu scrie **„Am avut eveniment pe [data]"**, Ferrari aplică pașii de mai jos **în ordine** și **NUMAI cu date reale primite de la Claudiu**. Zero inventat. Zero completat din imaginație.
