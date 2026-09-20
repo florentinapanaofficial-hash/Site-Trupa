@@ -36,6 +36,7 @@ interface Props {
   playlistId?: string;
   title: string;
   class?: string;
+  eagerThumbnail?: boolean;
   miniOnScroll?: boolean;
   thumbnailSrc?: string;
   youtubeUrl?: string;
@@ -47,6 +48,7 @@ const {
   playlistId,
   title,
   class: className = '',
+  eagerThumbnail = false,
   miniOnScroll = false,
   thumbnailSrc,
   youtubeUrl,
@@ -84,7 +86,8 @@ const ytLink = youtubeUrl || (hasPlaylist
       class="yt-gate__thumb"
       src={thumbJpg}
       alt={`Previzualizare: ${title}`}
-      loading="lazy"
+      loading={eagerThumbnail ? 'eager' : 'lazy'}
+      fetchpriority={eagerThumbnail ? 'low' : 'auto'}
       decoding="async"
       width="480"
       height="360"

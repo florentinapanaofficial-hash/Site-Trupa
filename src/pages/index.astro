@@ -101,7 +101,7 @@ const heroPhotos: Array<{ variant: keyof typeof homepagePhotoSources; alt: strin
   },
 ];
 
-const googleBusinessProfileUrl = 'https://maps.google.com/?cid=12446885825212959918';
+const googleBusinessProfileUrl = 'https://www.google.com/maps?cid=12446885825212959918';
 const googleBusinessWriteUrl = 'https://g.page/r/Ca7MqSu2OLysEAE/review';
 const featuredCouple = couplesData.couples[0];
 const googleBusinessReviews = featuredCouple
@@ -324,6 +324,8 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
             youtubeId={video.youtubeId}
             title={video.title}
             class="hp-home-video-gate"
+            thumbnailSrc={`https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`}
+            eagerThumbnail={true}
           />
           <span class="hp-cine-chip" aria-hidden="true">LIVE</span>
           <span class="hp-cine-caption">{video.title}</span>
@@ -581,7 +583,7 @@ const echipaPrincipala: any[] = ((siteContent as any).membri ?? []).filter(
   {/* ═══════════════════════════════════════════
       SHOWCASE CINEMATIC — text + video + foto cu reveal la scroll
   ═══════════════════════════════════════════ */}
-  <section class="section-container free-scroll-section" aria-label="Recenzii Google Business">
+  <section id="recenzii-google" class="section-container free-scroll-section" aria-label="Recenzii Google Business">
     <GoogleBusinessReviews
       title="Recenzii reale de pe Google"
       subtitle="Feedback public de la clienți care au trăit experiența live alături de Formația Florentina Pană."

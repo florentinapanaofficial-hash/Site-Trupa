@@ -467,6 +467,19 @@ git push origin main
 - **Modificări:** URL-ul Maps construit manual a fost înlocuit cu URL-ul canonic returnat de Google Places pentru profilul verificat „Formația Florentina Pană” în `index.astro`, `despre.astro` și `cauti-formatie-nunta.astro`.
 - **Validări:** Google Places răspunde `OK`; `npx astro check` — 0 errors, 0 warnings, 0 hints; build-ul confirmă linkul canonic în toate cele 3 pagini; audit SEO — 57 pagini, 0 FAIL | 0 WARN.
 
+## 📝 2026-09-20 — Homepage mobil: miniaturi video și recenzii
+- **Obiectiv:** eliminarea întârzierii vizuale a celor trei video de sub hero pe mobil și stabilizarea destinației pentru recenzii.
+- **Modificări:** `YoutubeEmbed.astro` acceptă `eagerThumbnail`; numai cele trei carduri video din `index.astro` folosesc încărcare imediată cu `fetchpriority="low"`, păstrând iframe-urile YouTube blocate de consimțământ. Secțiunea de recenzii are `id="recenzii-google"`, iar linkul profilului folosește `https://www.google.com/maps?cid=12446885825212959918`.
+- **Validări:** `npx astro check` — 0 errors, 0 warnings, 0 hints; `npm run seo:check` — build reușit; audit SEO — 57 pagini, 0 FAIL | 0 WARN; HTML compilat: 3 miniaturi eager, ancora și URL-ul Google confirmate.
+- **Risc / pas următor:** măsurarea PageSpeed mobil după publicare trebuie să confirme îmbunătățirea de la scorul 92; nu au fost încărcate iframe-uri sau scripturi YouTube suplimentare.
+
+## 📝 2026-09-20 — Audit Lighthouse mobil și reducere transfer video
+- **Obiectiv:** măsurarea performanței reale a homepage-ului publicat și eliminarea problemei cu cel mai mare impact identificată de Lighthouse.
+- **Constatare live:** Performance 73, FCP 1,7 s, LCP 4,1 s, TBT 500 ms și CLS 0,004. Raportul a identificat 560 KiB potențial economisiți din cele trei preview-uri YouTube `maxresdefault.jpg` de sub hero; domeniul live servește încă versiunea anterioară modificărilor locale.
+- **Modificări:** cele trei instanțe `YoutubeEmbed` din `index.astro` folosesc explicit `hqdefault.jpg` (480 px), adecvat lățimii cardurilor mobile. Miniaturile sunt încărcate imediat, cu prioritate joasă; iframe-urile rămân condiționate de consimțământul GDPR.
+- **Validări:** `npx astro check` — 0 errors, 0 warnings, 0 hints; `npm run seo:check` — build reușit; audit SEO — 57 pagini, 0 FAIL | 0 WARN; HTML compilat: 3 URL-uri `hqdefault`, 0 URL-uri `maxresdefault` pentru homepage.
+- **Risc / pas următor:** Lighthouse live trebuie reluat după deploy. Raportul include și costuri externe Cloudflare Challenge, care nu sunt controlate de codul Astro.
+
 ## 🎉 PROTOCOL „AM AVUT EVENIMENT" — Workflow complet
 
 Când Claudiu scrie **„Am avut eveniment pe [data]"**, Ferrari aplică pașii de mai jos **în ordine** și **NUMAI cu date reale primite de la Claudiu**. Zero inventat. Zero completat din imaginație.
