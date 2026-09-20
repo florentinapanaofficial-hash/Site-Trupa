@@ -485,6 +485,19 @@ git push origin main
 - **Măsurare live:** Performance 75, FCP 1,7 s, LCP 4,1 s, TBT 460 ms, CLS 0,004 și Speed Index 2,1 s. Rularea anterioară a versiunii vechi a dat 73, iar cea intermediară 78; Lighthouse throttled are variație între rulari, astfel scorul publicat corect pentru această versiune este 75.
 - **Validări suplimentare:** `npm test` — 40/40 teste trecute; serverul local de audit a fost oprit.
 
+## 📝 2026-09-20 — Optimizare LCP și izolare layout homepage
+- **Obiectiv:** reducerea întârzierii LCP și a blocării thread-ului principal pe mobil.
+- **Constatare:** elementul LCP este titlul Hero, nu imaginea; auditul a raportat `elementRenderDelay` de aproximativ 580 ms. Pixelii Meta și TikTok sunt încărcați numai după consimțământul GDPR, deci nu rulează în auditul inițial și nu sunt candidați pentru Partytown în acest flux.
+- **Modificări:** imaginea Hero folosește acum componenta Astro `<Image>` cu WebP, `loading="eager"` și `fetchpriority="high"`. Toate cele 15 secțiuni de după Hero au `content-visibility:auto` și dimensiune intrinsecă de rezervă, reducând costul de style/layout înainte de scroll. Nu există `client:load`, `transition-all` sau tranziții de `height`/`margin` pe homepage care să necesite conversie.
+- **Validări:** `npx astro check` — 0 errors, 0 warnings, 0 hints; `npm run seo:check` — build reușit, audit SEO 57 pagini, 0 FAIL | 0 WARN; HTML compilat: imagine Hero cu prioritate ridicată și 15 secțiuni izolate.
+- **Măsurare locală:** Performance 84, FCP 1,3 s, LCP 3,5 s, TBT 320 ms, CLS 0,002 și Speed Index 1,5 s. Este o îmbunătățire măsurată, dar ținta 90+ nu este încă atinsă; următorul cost dominant rămâne style/layout și ClientRouter/prefetch.
+
+## 📝 2026-09-20 — Prefetch la hover și stabilizare font Hero
+- **Obiectiv:** reducerea muncii ClientRouter la încărcarea inițială, fără regresie CLS.
+- **Modificări:** `astro.config.mjs` schimbă strategia globală de prefetch din `viewport` în `hover`. `BaseLayout.astro` nu mai deschide conexiuni către Google Analytics/Tag Manager înainte de consimțământ; pixelii rămân porniți exclusiv după accept GDPR. Nu au fost adăugate directive `client:load` sau Partytown: pixelii nu participă la încărcarea inițială și nu sunt o cauză a TBT-ului raportat.
+- **Constatare și rollback:** Hero-ul LCP este text, iar fotografia WebP este deja generată la 320 px pentru mobil; adăugarea unor `widths` mai mari ar fi mărit transferul. Eliminarea preload-urilor Inter/Oswald a produs CLS 0,111, cu H1 ca element deplasat; preload-urile au fost restaurate pentru a preveni font swap-ul.
+- **Validări:** `npx astro check` — 0 errors, 0 warnings, 0 hints; `npm run seo:check` — build reușit; audit SEO 57 pagini, 0 FAIL | 0 WARN.
+
 ## 🎉 PROTOCOL „AM AVUT EVENIMENT" — Workflow complet
 
 Când Claudiu scrie **„Am avut eveniment pe [data]"**, Ferrari aplică pașii de mai jos **în ordine** și **NUMAI cu date reale primite de la Claudiu**. Zero inventat. Zero completat din imaginație.

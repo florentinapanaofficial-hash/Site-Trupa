@@ -10,13 +10,11 @@ export default defineConfig({
   output: 'static',
   trailingSlash: 'always',
   compressHTML: true,
-  // Prefetch link-urile interne (viewport + hover) astfel încât navigarea
-  // client-side (ClientRouter) — inclusiv Back/Forward — să refolosească
-  // răspunsul deja descărcat în loc să declanșeze un fetch nou pe conexiuni
-  // mobile lente (cauza ecranului gol câteva secunde la revenirea pe Acasă).
+  // Prefetch-ul la hover păstrează navigarea rapidă după intenția explicită
+  // a utilizatorului, fără să consume thread-ul principal la încărcarea mobilă.
   prefetch: {
     prefetchAll: true,
-    defaultStrategy: 'viewport',
+    defaultStrategy: 'hover',
   },
   build: {
     inlineStylesheets: 'always',
