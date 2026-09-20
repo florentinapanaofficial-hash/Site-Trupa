@@ -462,6 +462,11 @@ git push origin main
 - **Validări:** `npx astro check` — 0 errors, 0 warnings, 0 hints; `npm run build` și `npm run seo:check` — reușite; audit SEO — 57 pagini, 0 FAIL | 0 WARN.
 - **Risc / pas următor:** build-ul local nu are `GOOGLE_PLACES_API_KEY` și `GOOGLE_PLACE_ID`, deci recenziile Google live nu pot fi sincronizate; configurează ambele variabile secrete în mediul de build Railway, apoi rebuild/deploy pentru preluarea datelor live.
 
+## 📝 2026-09-20 — Link canonic profil Google
+- **Obiectiv:** corectarea butonului „Vezi toate recenziile pe Google”.
+- **Modificări:** URL-ul Maps construit manual a fost înlocuit cu URL-ul canonic returnat de Google Places pentru profilul verificat „Formația Florentina Pană” în `index.astro`, `despre.astro` și `cauti-formatie-nunta.astro`.
+- **Validări:** Google Places răspunde `OK`; `npx astro check` — 0 errors, 0 warnings, 0 hints; build-ul confirmă linkul canonic în toate cele 3 pagini; audit SEO — 57 pagini, 0 FAIL | 0 WARN.
+
 ## 🎉 PROTOCOL „AM AVUT EVENIMENT" — Workflow complet
 
 Când Claudiu scrie **„Am avut eveniment pe [data]"**, Ferrari aplică pașii de mai jos **în ordine** și **NUMAI cu date reale primite de la Claudiu**. Zero inventat. Zero completat din imaginație.
