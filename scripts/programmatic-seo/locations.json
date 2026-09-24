@@ -4,7 +4,8 @@
         "oras": "Pitești",
         "judet": "Argeș",
         "keyword": "Formație Nuntă Pitești",
-        "meta_desc": "Cauți formații nuntă Pitești? Alege Trupa Florentina Pană — muzică live premium la nunți, botezuri și evenimente. 10+ ani experiență. Cere ofertă acum!",
+        "meta_title": "Formație Nuntă Pitești | Formația Florentina Pană",
+        "meta_desc": "Formație nuntă Pitești cu show band live, sonorizare proprie și repertoriu variat. Verifică disponibilitatea și cere oferta personalizată!",
         "keywords_schema": [
             "Formație Nuntă Pitești",
             "Formații Nuntă Pitești",
@@ -27,6 +28,24 @@
             "Ștefănești",
             "Bascov",
             "Bradu"
+        ],
+        "faq": [
+            {
+                "question": "Cât costă o formație de nuntă în Pitești?",
+                "answer": "Prețul depinde de data evenimentului, formula artistică, durata programului și cerințele de sonorizare. Trimite-ne data și bugetul estimat pentru o ofertă personalizată în Pitești."
+            },
+            {
+                "question": "Aveți sonorizare și lumini pentru sălile din Pitești?",
+                "answer": "Da. Venim cu sonorizare profesională, lumini de atmosferă și microfoane wireless, dimensionate pentru restaurante și saloane de evenimente din Pitești și Argeș."
+            },
+            {
+                "question": "Ce repertoriu live are formația pentru nunți în Pitești?",
+                "answer": "Programul include muzică populară de petrecere, repertoriu românesc, grecesc, arăbesc, latino și cover-uri internaționale, ajustate împreună cu mirii."
+            },
+            {
+                "question": "Vă deplasați și în localitățile din jurul Piteștiului?",
+                "answer": "Da, ne deplasăm în Mioveni, Ștefănești, Bascov, Bradu și în celelalte localități din județul Argeș."
+            }
         ]
     },
     {
@@ -34,6 +53,8 @@
         "oras": "București",
         "judet": "Municipiul București",
         "keyword": "Formație Nuntă București",
+        "meta_title": "Formație Nuntă București | Formația Florentina Pană",
+        "meta_desc": "Formație nuntă București cu show band live, repertoriu variat și sonorizare proprie. Verifică data evenimentului și cere oferta personalizată!",
         "lat": 44.4268,
         "lng": 26.1025,
         "intro": "Cauți o formație de nuntă pentru un eveniment în București? Formația Florentina Pană se deplasează frecvent în capitală, oferind spectacole live de excepție la cele mai prestigioase locații din oraș.",
@@ -50,6 +71,24 @@
             "Voluntari",
             "Snagov",
             "Buftea"
+        ],
+        "faq": [
+            {
+                "question": "Cât costă o formație de nuntă în București?",
+                "answer": "Oferta pentru București se stabilește în funcție de data nunții, numărul de artiști, durata programului și cerințele locației. Cere o ofertă după ce ne trimiți data și bugetul."
+            },
+            {
+                "question": "Formația asigură sonorizarea la nunțile din București?",
+                "answer": "Da. Asigurăm sonorizare profesională, lumini și microfoane wireless, cu logistică adaptată saloanelor, hotelurilor și locațiilor de evenimente din București."
+            },
+            {
+                "question": "Ce stiluri muzicale cântați la o nuntă în București?",
+                "answer": "Cântăm live muzică populară de petrecere, repertoriu românesc, grecesc, arăbesc, latino și cover-uri internaționale, într-un program construit pentru invitații voștri."
+            },
+            {
+                "question": "În ce zone din jurul Bucureștiului vă deplasați?",
+                "answer": "Ne deplasăm în toate sectoarele, precum și în Otopeni, Voluntari, Snagov, Buftea și localitățile limitrofe."
+            }
         ]
     },
     {
@@ -57,6 +96,8 @@
         "oras": "Curtea de Argeș",
         "judet": "Argeș",
         "keyword": "Formație Nuntă Curtea de Argeș",
+        "meta_title": "Formație Nuntă Curtea de Argeș | Florentina Pană",
+        "meta_desc": "Formație nuntă Curtea de Argeș cu show band live și repertoriu variat. Sonorizare proprie, program personalizat și ofertă clară pentru evenimentul tău!",
         "lat": 45.1386,
         "lng": 24.6814,
         "intro": "Curtea de Argeș — orașul Mănăstirii și al tradițiilor — este unul dintre locurile noastre preferate pentru evenimente live. Formația Florentina Pană aduce Show Live 100% la nunțile din această zonă pitorească a județului Argeș.",
@@ -73,6 +114,24 @@
             "Domnești",
             "Corbeni",
             "Arefu"
+        ],
+        "faq": [
+            {
+                "question": "Cât costă o formație de nuntă în Curtea de Argeș?",
+                "answer": "Calculăm oferta după data evenimentului, formula artistică, durata programului și locație. Trimite-ne detaliile nunții pentru o propunere adaptată în Curtea de Argeș."
+            },
+            {
+                "question": "Asigurați echipamentul pentru nunți în Curtea de Argeș?",
+                "answer": "Da. Venim cu sonorizare profesională, lumini de atmosferă și microfoane wireless, potrivite atât pentru saloane, cât și pentru locații de evenimente din zona montană."
+            },
+            {
+                "question": "Ce muzică live cântați la nunțile din Curtea de Argeș?",
+                "answer": "Programul combină muzică populară de petrecere, repertoriu românesc și internațional, grecesc, arăbesc și latino, cu momente alese împreună cu mirii."
+            },
+            {
+                "question": "Vă deplasați în localitățile din nordul Argeșului?",
+                "answer": "Da, acoperim Curtea de Argeș, Câmpulung, Domnești, Corbeni, Arefu și localitățile apropiate din județul Argeș."
+            }
         ]
     }
 ]

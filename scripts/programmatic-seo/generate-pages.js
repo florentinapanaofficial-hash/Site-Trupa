@@ -83,8 +83,10 @@ for (const loc of locations) {
     page = page.replace(/\{\{CONTENT_SERVICES\}\}/g, escapeAstroString(content.service));
     page = page.replace(/\{\{CONTENT_OUTRO\}\}/g, escapeAstroString(content.outro));
 
-    // Înlocuiește meta_desc (override sau gol)
+    // Înlocuiește metadata și întrebările specifice locației
+    page = page.replace(/\{\{META_TITLE\}\}/g, escapeAstroString(loc.meta_title || ''));
     page = page.replace(/\{\{META_DESC\}\}/g, escapeAstroString(loc.meta_desc || ''));
+    page = page.replace(/\{\{FAQ_ITEMS\}\}/g, JSON.stringify(loc.faq || []));
 
     // Înlocuiește array-urile (JSON inline)
     page = page.replace(/\{\{LOCATII_POPULARE\}\}/g, JSON.stringify(loc.locatii_populare));
@@ -95,7 +97,7 @@ for (const loc of locations) {
     const outputPath = join(OUTPUT_DIR, `${loc.slug}.astro`);
     writeFileSync(outputPath, page, 'utf-8');
 
-    const title = `${loc.keyword} — Formația Florentina Pană`;
+    const title = loc.meta_title || `${loc.keyword} | Formația Florentina Pană`;
     report.push({
         slug: loc.slug,
         file: `src/pages/formatie-nunta/${loc.slug}.astro`,

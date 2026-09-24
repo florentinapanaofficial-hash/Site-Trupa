@@ -23,37 +23,21 @@ const PARAGRAF2      = 'Ne-am construit o reputație solidă în fața cuplurilo
 const PARAGRAF3      = 'Fie că este vorba de o nuntă elegantă într-un hotel de 5 stele sau o petrecere vibrantă într-un restaurant cu tradiție, ne adaptăm perfect stilului evenimentului tău. Transportul și logistica sunt incluse — tu te bucuri doar de muzică.';
 const CONTENT_INTRO    = 'Nunta ta în București merită cea mai bună coloană sonoră. Noi suntem Formația Florentina Pană și de peste 10 ani aducem energie, emoție și profesionalism la cele mai frumoase evenimente din zonă.';
 const CONTENT_SERVICES = 'Repertoriul nostru este complet 100% live: muzică populară de petrecere, muzică grecească, arăbească, machedonească, latino, muzică românească și manele, toate dozate corect pentru energia serii în București. Cântăm fără pauze, alternăm programele artistice după specificul evenimentului și nu folosim DJ sau MC.';
-const CONTENT_OUTRO    = 'Nu lăsa muzica pe ultimul loc — este ingredientul care leagă totul. Contactează-ne astăzi pentru disponibilitate în București și hai să planificăm împreună coloana sonoră perfectă pentru nunta ta.';
+const CONTENT_OUTRO    = 'Ești gata să transformi nunta ta din București într-o poveste de neuitat? Formația Florentina Pană este aici pentru tine. Cere o ofertă personalizată — fără obligații, cu drag.';
 const LOCATII_POP    = ["Palatul Snagov","Hanul Drumeților","Ballrooms by Bamboo"];
 const ZONE_ACOPERITE = ["Sector 1–6","Otopeni","Voluntari","Snagov","Buftea"];
-const META_DESC      = '';
+const FAQ_ITEMS      = [{"question":"Cât costă o formație de nuntă în București?","answer":"Oferta pentru București se stabilește în funcție de data nunții, numărul de artiști, durata programului și cerințele locației. Cere o ofertă după ce ne trimiți data și bugetul."},{"question":"Formația asigură sonorizarea la nunțile din București?","answer":"Da. Asigurăm sonorizare profesională, lumini și microfoane wireless, cu logistică adaptată saloanelor, hotelurilor și locațiilor de evenimente din București."},{"question":"Ce stiluri muzicale cântați la o nuntă în București?","answer":"Cântăm live muzică populară de petrecere, repertoriu românesc, grecesc, arăbesc, latino și cover-uri internaționale, într-un program construit pentru invitații voștri."},{"question":"În ce zone din jurul Bucureștiului vă deplasați?","answer":"Ne deplasăm în toate sectoarele, precum și în Otopeni, Voluntari, Snagov, Buftea și localitățile limitrofe."}];
+const META_DESC      = 'Formație nuntă București cu show band live, repertoriu variat și sonorizare proprie. Verifică data evenimentului și cere oferta personalizată!';
 const KEYWORDS_SCHEMA: string[] = [];
 
-const SEO_TITLE = `${KEYWORD} — ${brand.name}`;
-const SEO_DESC  = META_DESC || `${KEYWORD} — muzică live la nunți, botezuri și evenimente în ${ORAS}, ${JUDET}. Formație profesionistă cu 10+ ani experiență. Cere ofertă acum!`;
+const SEO_TITLE = 'Formație Nuntă București | Formația Florentina Pană' || `${KEYWORD} | ${brand.name}`;
+const SEO_DESC  = META_DESC || `${KEYWORD} cu show band live în ${ORAS}. Repertoriu variat, sonorizare proprie și ofertă personalizată. Cere disponibilitatea!`;
 
 const whatsappNumber = contact.phoneRaw.replace(/\\D/g, '');
 const whatsappText   = encodeURIComponent(`Bună ziua! Aș dori să rezerv formația pentru un eveniment în ${ORAS}.`);
 const whatsappLink   = `https://wa.me/${whatsappNumber}?text=${whatsappText}`;
 
-const faqItems = [
-  {
-    question: `Cu cât timp înainte este recomandat să rezervăm formația pentru o nuntă în ${ORAS}?`,
-    answer: `Recomandăm rezervarea cu 6-12 luni înainte, mai ales pentru datele de sezon (mai-septembrie) în ${ORAS} și împrejurimi, când disponibilitatea se completează rapid.`,
-  },
-  {
-    question: `Asigurați sonorizare, echipamente audio și lumini profesionale pentru restaurantele și sălile din ${JUDET}?`,
-    answer: `Da. Venim cu echipament complet de scenă — sonorizare profesională, lumini de atmosferă și microfoane wireless — adaptat la volumul oricărei săli, de la restaurante intime la saloane mari de evenimente.`,
-  },
-  {
-    question: 'Ce repertoriu include programul artistic la o nuntă?',
-    answer: 'Programul acoperă folclor autentic, muzică populară de petrecere, cover-uri internaționale (grecească, arăbească, latino) și momente elegante de cafe-concert, cântate fără pauze lungi, 100% live.',
-  },
-  {
-    question: `Vă deplasați și în localitățile din jurul orașului ${ORAS}?`,
-    answer: `Da, acoperim tot ${JUDET}, inclusiv ${ZONE_ACOPERITE.join(', ')}, fără costuri suplimentare de deplasare în zonă.`,
-  },
-];
+const faqItems = FAQ_ITEMS;
 
 const faqJsonLd = {
   '@context': 'https://schema.org',
@@ -67,10 +51,15 @@ const faqJsonLd = {
 
 const localBusinessLd = {
   "@context": "https://schema.org",
-  "@type": ["LocalBusiness", "MusicGroup"],
+  "@type": ["LocalBusiness", "EntertainmentBusiness"],
+  "@id": `https://www.florentinapanaofficial.ro/formatie-nunta/${SLUG}/#local-business`,
   "name": brand.name,
   "description": `${KEYWORD} — Formație Nuntă & Cover Band Live, Show Live 100% cu repertoriu complet: muzică populară de petrecere, grecească, arăbească, machedonească, latino, muzică românească și manele în ${ORAS}. Fără DJ sau MC.`,
   "url": `https://www.florentinapanaofficial.ro/formatie-nunta/${SLUG}/`,
+  "performer": {
+    "@type": "MusicGroup",
+    "@id": "https://www.florentinapanaofficial.ro/#music-group"
+  },
   "telephone": contact.phoneRaw,
   "image": "https://www.florentinapanaofficial.ro/images/sigla-fp-band.webp",
   "priceRange": "$$",
@@ -135,6 +124,15 @@ const localBusinessLd = {
       <p class="text-sm text-white/90 leading-relaxed">{CONTENT_OUTRO}</p>
     </div>
 
+    <div class="mt-8 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-6 sm:p-8">
+      <h2 class="text-lg font-extrabold text-white mb-4">Show band pentru nunți în {ORAS}</h2>
+      <p class="text-sm text-white/90 leading-relaxed">
+        Oferim un show band live complet în {ORAS}: soliști și instrumentiști experimentați,
+        repertoriu adaptat invitaților, sonorizare proprie și momente artistice construite pentru
+        ritmul fiecărui eveniment.
+      </p>
+    </div>
+
     {/* ═══ Secțiunea 1.7: Prețuri & Ofertă ═══ */}
     <div class="mt-8 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-6 sm:p-8">
       <h2 class="text-lg font-extrabold text-white mb-4">💰 Prețuri Formație Nuntă {ORAS} — Ofertă Early Booking 2027</h2>
@@ -168,7 +166,7 @@ const localBusinessLd = {
 
     {/* ═══ Secțiunea 3: Zone acoperite ═══ */}
     <div class="mt-8 rounded-2xl border border-white/20 bg-white/10 p-6 sm:p-8">
-      <h3 class="text-base font-bold text-white mb-3">Zone acoperite în {JUDET}</h3>
+      <h2 class="text-lg font-extrabold text-white mb-4">Zone acoperite în {JUDET}</h2>
       <div class="flex flex-wrap gap-2">
         {ZONE_ACOPERITE.map((zona: string) => (
           <span class="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white/90">{zona}</span>

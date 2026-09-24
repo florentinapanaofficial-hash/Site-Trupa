@@ -2065,6 +2065,28 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 ### Riscuri / pași următori
 - Niciunul identificat.
 
+## 📝 24 sep 2026 — Refactorizare SEO: graph JSON-LD și pagini locale
+
+### Obiectiv
+- Eliminarea suprapunerii de intenție dintre homepage și pagina locală Pitești.
+- Unificarea entității `MusicGroup` în JSON-LD și diferențierea paginilor locale.
+
+### Modificări
+- Adăugat `@id` comun pentru `MusicGroup` și referințe `performer` pentru `LocalBusiness`.
+- Homepage-ul targetează acum intenția generală „Live Band / Show Band pentru Nunți și Evenimente”.
+- Adăugate `meta_title`, `meta_desc` și FAQ-uri specifice în `locations.json`.
+- Adăugat bloc H2 „Show band” în template-ul paginilor locale și regenerate cele 3 pagini.
+
+### Validări
+- Build Astro + compresie: PASS.
+- `npm run seo:audit`: 57 pagini, 0 FAIL | 0 WARN.
+- JSON-LD: toate paginile verificate parsează corect; `@id` și `performer` prezente.
+- `npm test`: 40/40 teste trecute.
+- `git diff --check`: PASS.
+
+### Riscuri / pași următori
+- Railway va porni deploy-ul automat după push; este necesară verificarea URL-urilor live după finalizarea buildului.
+
 ## 📝 2026-09-20 — Social Feed Snap mobil pe homepage
 
 ### Obiectiv

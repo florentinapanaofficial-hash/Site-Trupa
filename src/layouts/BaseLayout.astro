@@ -34,6 +34,7 @@ const rawPath = Astro.url.pathname.replace(/\/$/, '') || '';
 const canonicalPath = rawPath === '' ? '/' : `${rawPath}/`;
 const canonicalURL = new URL(canonicalPath, Astro.site ?? SITE_FALLBACK);
 const canonical = canonicalURL.href;
+const MUSIC_GROUP_ID = `${site}/#music-group`;
 const isAboutPage = Astro.url.pathname === '/despre/';
 const isMembersPage = Astro.url.pathname === '/membri/';
 
@@ -59,6 +60,7 @@ const logoPngUrl = `${site}/images/logo-512.png`;
 
 const jsonLd = {
   ...seoContent.schema,
+  '@id': MUSIC_GROUP_ID,
   url: site || seoContent.schema.url,
   logo: {
     "@type": "ImageObject",
@@ -87,12 +89,17 @@ const organizationLd = {
 // Schema LocalBusiness + MusicGroup — SEO local, Google Maps, Knowledge Panel
 const localBusinessLd = {
   "@context": "https://schema.org",
-  "@type": ["LocalBusiness", "EntertainmentBusiness", "MusicGroup"],
+  "@type": ["LocalBusiness", "EntertainmentBusiness"],
+  "@id": `${site}/#local-business`,
   "name": seoContent.schema.name,
   "legalName": "Pană Claudiu-Gheorghe Întreprindere Individuală",
   "alternateName": seoContent.schema.alternateName,
   "description": seoContent.schema.description,
   "url": site,
+  "performer": {
+    "@type": "MusicGroup",
+    "@id": MUSIC_GROUP_ID
+  },
   "telephone": seoContent.schema.telephone,
   "email": seoContent.schema.email,
   "image": logoPngUrl,
@@ -242,6 +249,7 @@ const webPageLd = {
   },
   "author": {
     "@type": "MusicGroup",
+    "@id": MUSIC_GROUP_ID,
     "name": "Formația Florentina Pană",
     "url": site
   },

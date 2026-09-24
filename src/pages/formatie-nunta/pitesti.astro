@@ -21,39 +21,23 @@ const LNG            = 24.8692;
 const INTRO          = 'Formația Florentina Pană este una dintre cele mai căutate formații de nuntă din Pitești. Cu sediul chiar în inima orașului, oferim muzică live premium la nunți, botezuri și evenimente corporate în tot județul Argeș.';
 const PARAGRAF2      = 'Repertoriul nostru acoperă toate tipurile de muzică: muzică populară de petrecere, muzică grecească, arăbească, machedonească, latino, muzică românească și manele — totul adaptat gusturilor mirilor și atmosferei evenimentului. Cântăm fără pauze, alternăm programele artistice și nu folosim DJ sau MC.';
 const PARAGRAF3      = 'Echipa noastră știe exact cum să mențină ringul de dans plin de la prima secundă până la ultimul cântec. Fiecare eveniment beneficiază de sonorizare profesională, lumini de atmosferă și un program muzical personalizat, discutat în detaliu cu mirii.';
-const CONTENT_INTRO    = 'Pitești este un loc special pentru noi. Am cântat la zeci de nunți memorabile aici și știm exact cum să facem ca fiecare eveniment să fie unic. Formația Florentina Pană — muzică live care se simte.';
+const CONTENT_INTRO    = 'Dacă ești în căutarea unei atmosfere de neuitat în Pitești, ai ajuns unde trebuie. Formația Florentina Pană transformă fiecare eveniment într-o experiență muzicală de excepție — de la primul dans și până la ultimul cântec al serii.';
 const CONTENT_SERVICES = 'Oferim un pachet complet de Formație Nuntă Pitești: sonorizare profesională, lumini de atmosferă și repertoriu complet cu muzică populară de petrecere, grecească, arăbească, machedonească, latino, muzică românească și manele. Cântăm fără pauze, alternăm programele artistice după specificul evenimentului și nu avem DJ sau MC.';
-const CONTENT_OUTRO    = 'Am pus suflet în fiecare eveniment din Pitești și continuăm să o facem. Hai să discutăm despre nunta ta — completează formularul de contact sau dă-ne un telefon. Primele 3 date din sezon se rezervă cel mai repede!';
+const CONTENT_OUTRO    = 'Nu lăsa muzica pe ultimul loc — este ingredientul care leagă totul. Contactează-ne astăzi pentru disponibilitate în Pitești și hai să planificăm împreună coloana sonoră perfectă pentru nunta ta.';
 const LOCATII_POP    = ["Restaurant & Events Noblesse","La Noblesse Events","Pensiunea Flowers"];
 const ZONE_ACOPERITE = ["Pitești","Mioveni","Ștefănești","Bascov","Bradu"];
-const META_DESC      = 'Cauți formații nuntă Pitești? Alege Trupa Florentina Pană — muzică live premium la nunți, botezuri și evenimente. 10+ ani experiență. Cere ofertă acum!';
+const FAQ_ITEMS      = [{"question":"Cât costă o formație de nuntă în Pitești?","answer":"Prețul depinde de data evenimentului, formula artistică, durata programului și cerințele de sonorizare. Trimite-ne data și bugetul estimat pentru o ofertă personalizată în Pitești."},{"question":"Aveți sonorizare și lumini pentru sălile din Pitești?","answer":"Da. Venim cu sonorizare profesională, lumini de atmosferă și microfoane wireless, dimensionate pentru restaurante și saloane de evenimente din Pitești și Argeș."},{"question":"Ce repertoriu live are formația pentru nunți în Pitești?","answer":"Programul include muzică populară de petrecere, repertoriu românesc, grecesc, arăbesc, latino și cover-uri internaționale, ajustate împreună cu mirii."},{"question":"Vă deplasați și în localitățile din jurul Piteștiului?","answer":"Da, ne deplasăm în Mioveni, Ștefănești, Bascov, Bradu și în celelalte localități din județul Argeș."}];
+const META_DESC      = 'Formație nuntă Pitești cu show band live, sonorizare proprie și repertoriu variat. Verifică disponibilitatea și cere oferta personalizată!';
 const KEYWORDS_SCHEMA: string[] = ["Formație Nuntă Pitești","Formații Nuntă Pitești","trupa nunta Pitesti","muzica live nunta Pitesti"];
 
-const SEO_TITLE = `${KEYWORD} — ${brand.name}`;
-const SEO_DESC  = META_DESC || `${KEYWORD} — muzică live la nunți, botezuri și evenimente în ${ORAS}, ${JUDET}. Formație profesionistă cu 10+ ani experiență. Cere ofertă acum!`;
+const SEO_TITLE = 'Formație Nuntă Pitești | Formația Florentina Pană' || `${KEYWORD} | ${brand.name}`;
+const SEO_DESC  = META_DESC || `${KEYWORD} cu show band live în ${ORAS}. Repertoriu variat, sonorizare proprie și ofertă personalizată. Cere disponibilitatea!`;
 
 const whatsappNumber = contact.phoneRaw.replace(/\\D/g, '');
 const whatsappText   = encodeURIComponent(`Bună ziua! Aș dori să rezerv formația pentru un eveniment în ${ORAS}.`);
 const whatsappLink   = `https://wa.me/${whatsappNumber}?text=${whatsappText}`;
 
-const faqItems = [
-  {
-    question: `Cu cât timp înainte este recomandat să rezervăm formația pentru o nuntă în ${ORAS}?`,
-    answer: `Recomandăm rezervarea cu 6-12 luni înainte, mai ales pentru datele de sezon (mai-septembrie) în ${ORAS} și împrejurimi, când disponibilitatea se completează rapid.`,
-  },
-  {
-    question: `Asigurați sonorizare, echipamente audio și lumini profesionale pentru restaurantele și sălile din ${JUDET}?`,
-    answer: `Da. Venim cu echipament complet de scenă — sonorizare profesională, lumini de atmosferă și microfoane wireless — adaptat la volumul oricărei săli, de la restaurante intime la saloane mari de evenimente.`,
-  },
-  {
-    question: 'Ce repertoriu include programul artistic la o nuntă?',
-    answer: 'Programul acoperă folclor autentic, muzică populară de petrecere, cover-uri internaționale (grecească, arăbească, latino) și momente elegante de cafe-concert, cântate fără pauze lungi, 100% live.',
-  },
-  {
-    question: `Vă deplasați și în localitățile din jurul orașului ${ORAS}?`,
-    answer: `Da, acoperim tot ${JUDET}, inclusiv ${ZONE_ACOPERITE.join(', ')}, fără costuri suplimentare de deplasare în zonă.`,
-  },
-];
+const faqItems = FAQ_ITEMS;
 
 const faqJsonLd = {
   '@context': 'https://schema.org',
@@ -67,10 +51,15 @@ const faqJsonLd = {
 
 const localBusinessLd = {
   "@context": "https://schema.org",
-  "@type": ["LocalBusiness", "MusicGroup"],
+  "@type": ["LocalBusiness", "EntertainmentBusiness"],
+  "@id": `https://www.florentinapanaofficial.ro/formatie-nunta/${SLUG}/#local-business`,
   "name": brand.name,
   "description": `${KEYWORD} — Formație Nuntă & Cover Band Live, Show Live 100% cu repertoriu complet: muzică populară de petrecere, grecească, arăbească, machedonească, latino, muzică românească și manele în ${ORAS}. Fără DJ sau MC.`,
   "url": `https://www.florentinapanaofficial.ro/formatie-nunta/${SLUG}/`,
+  "performer": {
+    "@type": "MusicGroup",
+    "@id": "https://www.florentinapanaofficial.ro/#music-group"
+  },
   "telephone": contact.phoneRaw,
   "image": "https://www.florentinapanaofficial.ro/images/sigla-fp-band.webp",
   "priceRange": "$$",
@@ -135,6 +124,15 @@ const localBusinessLd = {
       <p class="text-sm text-white/90 leading-relaxed">{CONTENT_OUTRO}</p>
     </div>
 
+    <div class="mt-8 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-6 sm:p-8">
+      <h2 class="text-lg font-extrabold text-white mb-4">Show band pentru nunți în {ORAS}</h2>
+      <p class="text-sm text-white/90 leading-relaxed">
+        Oferim un show band live complet în {ORAS}: soliști și instrumentiști experimentați,
+        repertoriu adaptat invitaților, sonorizare proprie și momente artistice construite pentru
+        ritmul fiecărui eveniment.
+      </p>
+    </div>
+
     {/* ═══ Secțiunea 1.7: Prețuri & Ofertă ═══ */}
     <div class="mt-8 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-6 sm:p-8">
       <h2 class="text-lg font-extrabold text-white mb-4">💰 Prețuri Formație Nuntă {ORAS} — Ofertă Early Booking 2027</h2>
@@ -168,7 +166,7 @@ const localBusinessLd = {
 
     {/* ═══ Secțiunea 3: Zone acoperite ═══ */}
     <div class="mt-8 rounded-2xl border border-white/20 bg-white/10 p-6 sm:p-8">
-      <h3 class="text-base font-bold text-white mb-3">Zone acoperite în {JUDET}</h3>
+      <h2 class="text-lg font-extrabold text-white mb-4">Zone acoperite în {JUDET}</h2>
       <div class="flex flex-wrap gap-2">
         {ZONE_ACOPERITE.map((zona: string) => (
           <span class="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white/90">{zona}</span>

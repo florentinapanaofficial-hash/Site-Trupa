@@ -26,34 +26,18 @@ const CONTENT_SERVICES = '{{CONTENT_SERVICES}}';
 const CONTENT_OUTRO    = '{{CONTENT_OUTRO}}';
 const LOCATII_POP    = {{LOCATII_POPULARE}};
 const ZONE_ACOPERITE = {{ZONE_ACOPERITE}};
+const FAQ_ITEMS      = {{FAQ_ITEMS}};
 const META_DESC      = '{{META_DESC}}';
 const KEYWORDS_SCHEMA: string[] = {{KEYWORDS_SCHEMA}};
 
-const SEO_TITLE = `${KEYWORD} — ${brand.name}`;
-const SEO_DESC  = META_DESC || `${KEYWORD} — muzică live la nunți, botezuri și evenimente în ${ORAS}, ${JUDET}. Formație profesionistă cu 10+ ani experiență. Cere ofertă acum!`;
+const SEO_TITLE = '{{META_TITLE}}' || `${KEYWORD} | ${brand.name}`;
+const SEO_DESC  = META_DESC || `${KEYWORD} cu show band live în ${ORAS}. Repertoriu variat, sonorizare proprie și ofertă personalizată. Cere disponibilitatea!`;
 
 const whatsappNumber = contact.phoneRaw.replace(/\\D/g, '');
 const whatsappText   = encodeURIComponent(`Bună ziua! Aș dori să rezerv formația pentru un eveniment în ${ORAS}.`);
 const whatsappLink   = `https://wa.me/${whatsappNumber}?text=${whatsappText}`;
 
-const faqItems = [
-  {
-    question: `Cu cât timp înainte este recomandat să rezervăm formația pentru o nuntă în ${ORAS}?`,
-    answer: `Recomandăm rezervarea cu 6-12 luni înainte, mai ales pentru datele de sezon (mai-septembrie) în ${ORAS} și împrejurimi, când disponibilitatea se completează rapid.`,
-  },
-  {
-    question: `Asigurați sonorizare, echipamente audio și lumini profesionale pentru restaurantele și sălile din ${JUDET}?`,
-    answer: `Da. Venim cu echipament complet de scenă — sonorizare profesională, lumini de atmosferă și microfoane wireless — adaptat la volumul oricărei săli, de la restaurante intime la saloane mari de evenimente.`,
-  },
-  {
-    question: 'Ce repertoriu include programul artistic la o nuntă?',
-    answer: 'Programul acoperă folclor autentic, muzică populară de petrecere, cover-uri internaționale (grecească, arăbească, latino) și momente elegante de cafe-concert, cântate fără pauze lungi, 100% live.',
-  },
-  {
-    question: `Vă deplasați și în localitățile din jurul orașului ${ORAS}?`,
-    answer: `Da, acoperim tot ${JUDET}, inclusiv ${ZONE_ACOPERITE.join(', ')}, fără costuri suplimentare de deplasare în zonă.`,
-  },
-];
+const faqItems = FAQ_ITEMS;
 
 const faqJsonLd = {
   '@context': 'https://schema.org',
@@ -67,10 +51,15 @@ const faqJsonLd = {
 
 const localBusinessLd = {
   "@context": "https://schema.org",
-  "@type": ["LocalBusiness", "MusicGroup"],
+  "@type": ["LocalBusiness", "EntertainmentBusiness"],
+  "@id": `https://www.florentinapanaofficial.ro/formatie-nunta/${SLUG}/#local-business`,
   "name": brand.name,
   "description": `${KEYWORD} — Formație Nuntă & Cover Band Live, Show Live 100% cu repertoriu complet: muzică populară de petrecere, grecească, arăbească, machedonească, latino, muzică românească și manele în ${ORAS}. Fără DJ sau MC.`,
   "url": `https://www.florentinapanaofficial.ro/formatie-nunta/${SLUG}/`,
+  "performer": {
+    "@type": "MusicGroup",
+    "@id": "https://www.florentinapanaofficial.ro/#music-group"
+  },
   "telephone": contact.phoneRaw,
   "image": "https://www.florentinapanaofficial.ro/images/sigla-fp-band.webp",
   "priceRange": "$$",
@@ -135,6 +124,15 @@ const localBusinessLd = {
       <p class="text-sm text-white/90 leading-relaxed">{CONTENT_OUTRO}</p>
     </div>
 
+    <div class="mt-8 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-6 sm:p-8">
+      <h2 class="text-lg font-extrabold text-white mb-4">Show band pentru nunți în {ORAS}</h2>
+      <p class="text-sm text-white/90 leading-relaxed">
+        Oferim un show band live complet în {ORAS}: soliști și instrumentiști experimentați,
+        repertoriu adaptat invitaților, sonorizare proprie și momente artistice construite pentru
+        ritmul fiecărui eveniment.
+      </p>
+    </div>
+
     {/* ═══ Secțiunea 1.7: Prețuri & Ofertă ═══ */}
     <div class="mt-8 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-6 sm:p-8">
       <h2 class="text-lg font-extrabold text-white mb-4">💰 Prețuri Formație Nuntă {ORAS} — Ofertă Early Booking 2027</h2>
@@ -168,7 +166,7 @@ const localBusinessLd = {
 
     {/* ═══ Secțiunea 3: Zone acoperite ═══ */}
     <div class="mt-8 rounded-2xl border border-white/20 bg-white/10 p-6 sm:p-8">
-      <h3 class="text-base font-bold text-white mb-3">Zone acoperite în {JUDET}</h3>
+      <h2 class="text-lg font-extrabold text-white mb-4">Zone acoperite în {JUDET}</h2>
       <div class="flex flex-wrap gap-2">
         {ZONE_ACOPERITE.map((zona: string) => (
           <span class="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white/90">{zona}</span>

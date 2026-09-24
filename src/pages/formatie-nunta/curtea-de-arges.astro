@@ -21,39 +21,23 @@ const LNG            = 24.6814;
 const INTRO          = 'Curtea de Argeș — orașul Mănăstirii și al tradițiilor — este unul dintre locurile noastre preferate pentru evenimente live. Formația Florentina Pană aduce Show Live 100% la nunțile din această zonă pitorească a județului Argeș.';
 const PARAGRAF2      = 'Știm ce înseamnă o nuntă cu adevărat românească: horă la intrarea mirilor, muzică de petrecere, momente emoționante și dans până în zori. Repertoriul nostru include muzică populară de petrecere, grecească, arăbească, machedonească, latino, muzică românească și manele, într-un program live fără pauze, fără DJ sau MC.';
 const PARAGRAF3      = 'Zonele montane din jurul Curții de Argeș oferă locații de nuntă spectaculoase. Noi ne ocupăm de tot ce ține de muzică — sonorizare, lumini și un program muzical pe gustul vostru, discutat cu cel puțin două săptămâni înainte de eveniment.';
-const CONTENT_INTRO    = 'Dacă ești în căutarea unei atmosfere de neuitat în Curtea de Argeș, ai ajuns unde trebuie. Formația Florentina Pană transformă fiecare eveniment într-o experiență muzicală de excepție — de la primul dans și până la ultimul cântec al serii.';
-const CONTENT_SERVICES = 'Oferim un pachet complet de Formație Nuntă Curtea de Argeș: sonorizare profesională, lumini de atmosferă și repertoriu complet cu muzică populară de petrecere, grecească, arăbească, machedonească, latino, muzică românească și manele. Cântăm fără pauze, alternăm programele artistice după specificul evenimentului și nu avem DJ sau MC.';
-const CONTENT_OUTRO    = 'Am pus suflet în fiecare eveniment din Curtea de Argeș și continuăm să o facem. Hai să discutăm despre nunta ta — completează formularul de contact sau dă-ne un telefon. Primele 3 date din sezon se rezervă cel mai repede!';
+const CONTENT_INTRO    = 'Curtea de Argeș este un loc special pentru noi. Am cântat la zeci de nunți memorabile aici și știm exact cum să facem ca fiecare eveniment să fie unic. Formația Florentina Pană — muzică live care se simte.';
+const CONTENT_SERVICES = 'Suntem recunoscuți ca top formații nuntă Curtea de Argeș datorită energiei de pe scenă și atenției la detalii. Pentru fiecare eveniment construim programe artistice alternate, cu repertoriu complet: populară de petrecere, grecească, arăbească, machedonească, latino, românească și manele, 100% live fără DJ sau MC.';
+const CONTENT_OUTRO    = 'Nu lăsa muzica pe ultimul loc — este ingredientul care leagă totul. Contactează-ne astăzi pentru disponibilitate în Curtea de Argeș și hai să planificăm împreună coloana sonoră perfectă pentru nunta ta.';
 const LOCATII_POP    = ["Conacul Manasia","Complex Marami","Hanul Posada"];
 const ZONE_ACOPERITE = ["Curtea de Argeș","Câmpulung","Domnești","Corbeni","Arefu"];
-const META_DESC      = '';
+const FAQ_ITEMS      = [{"question":"Cât costă o formație de nuntă în Curtea de Argeș?","answer":"Calculăm oferta după data evenimentului, formula artistică, durata programului și locație. Trimite-ne detaliile nunții pentru o propunere adaptată în Curtea de Argeș."},{"question":"Asigurați echipamentul pentru nunți în Curtea de Argeș?","answer":"Da. Venim cu sonorizare profesională, lumini de atmosferă și microfoane wireless, potrivite atât pentru saloane, cât și pentru locații de evenimente din zona montană."},{"question":"Ce muzică live cântați la nunțile din Curtea de Argeș?","answer":"Programul combină muzică populară de petrecere, repertoriu românesc și internațional, grecesc, arăbesc și latino, cu momente alese împreună cu mirii."},{"question":"Vă deplasați în localitățile din nordul Argeșului?","answer":"Da, acoperim Curtea de Argeș, Câmpulung, Domnești, Corbeni, Arefu și localitățile apropiate din județul Argeș."}];
+const META_DESC      = 'Formație nuntă Curtea de Argeș cu show band live și repertoriu variat. Sonorizare proprie, program personalizat și ofertă clară pentru evenimentul tău!';
 const KEYWORDS_SCHEMA: string[] = [];
 
-const SEO_TITLE = `${KEYWORD} — ${brand.name}`;
-const SEO_DESC  = META_DESC || `${KEYWORD} — muzică live la nunți, botezuri și evenimente în ${ORAS}, ${JUDET}. Formație profesionistă cu 10+ ani experiență. Cere ofertă acum!`;
+const SEO_TITLE = 'Formație Nuntă Curtea de Argeș | Florentina Pană' || `${KEYWORD} | ${brand.name}`;
+const SEO_DESC  = META_DESC || `${KEYWORD} cu show band live în ${ORAS}. Repertoriu variat, sonorizare proprie și ofertă personalizată. Cere disponibilitatea!`;
 
 const whatsappNumber = contact.phoneRaw.replace(/\\D/g, '');
 const whatsappText   = encodeURIComponent(`Bună ziua! Aș dori să rezerv formația pentru un eveniment în ${ORAS}.`);
 const whatsappLink   = `https://wa.me/${whatsappNumber}?text=${whatsappText}`;
 
-const faqItems = [
-  {
-    question: `Cu cât timp înainte este recomandat să rezervăm formația pentru o nuntă în ${ORAS}?`,
-    answer: `Recomandăm rezervarea cu 6-12 luni înainte, mai ales pentru datele de sezon (mai-septembrie) în ${ORAS} și împrejurimi, când disponibilitatea se completează rapid.`,
-  },
-  {
-    question: `Asigurați sonorizare, echipamente audio și lumini profesionale pentru restaurantele și sălile din ${JUDET}?`,
-    answer: `Da. Venim cu echipament complet de scenă — sonorizare profesională, lumini de atmosferă și microfoane wireless — adaptat la volumul oricărei săli, de la restaurante intime la saloane mari de evenimente.`,
-  },
-  {
-    question: 'Ce repertoriu include programul artistic la o nuntă?',
-    answer: 'Programul acoperă folclor autentic, muzică populară de petrecere, cover-uri internaționale (grecească, arăbească, latino) și momente elegante de cafe-concert, cântate fără pauze lungi, 100% live.',
-  },
-  {
-    question: `Vă deplasați și în localitățile din jurul orașului ${ORAS}?`,
-    answer: `Da, acoperim tot ${JUDET}, inclusiv ${ZONE_ACOPERITE.join(', ')}, fără costuri suplimentare de deplasare în zonă.`,
-  },
-];
+const faqItems = FAQ_ITEMS;
 
 const faqJsonLd = {
   '@context': 'https://schema.org',
@@ -67,10 +51,15 @@ const faqJsonLd = {
 
 const localBusinessLd = {
   "@context": "https://schema.org",
-  "@type": ["LocalBusiness", "MusicGroup"],
+  "@type": ["LocalBusiness", "EntertainmentBusiness"],
+  "@id": `https://www.florentinapanaofficial.ro/formatie-nunta/${SLUG}/#local-business`,
   "name": brand.name,
   "description": `${KEYWORD} — Formație Nuntă & Cover Band Live, Show Live 100% cu repertoriu complet: muzică populară de petrecere, grecească, arăbească, machedonească, latino, muzică românească și manele în ${ORAS}. Fără DJ sau MC.`,
   "url": `https://www.florentinapanaofficial.ro/formatie-nunta/${SLUG}/`,
+  "performer": {
+    "@type": "MusicGroup",
+    "@id": "https://www.florentinapanaofficial.ro/#music-group"
+  },
   "telephone": contact.phoneRaw,
   "image": "https://www.florentinapanaofficial.ro/images/sigla-fp-band.webp",
   "priceRange": "$$",
@@ -135,6 +124,15 @@ const localBusinessLd = {
       <p class="text-sm text-white/90 leading-relaxed">{CONTENT_OUTRO}</p>
     </div>
 
+    <div class="mt-8 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-6 sm:p-8">
+      <h2 class="text-lg font-extrabold text-white mb-4">Show band pentru nunți în {ORAS}</h2>
+      <p class="text-sm text-white/90 leading-relaxed">
+        Oferim un show band live complet în {ORAS}: soliști și instrumentiști experimentați,
+        repertoriu adaptat invitaților, sonorizare proprie și momente artistice construite pentru
+        ritmul fiecărui eveniment.
+      </p>
+    </div>
+
     {/* ═══ Secțiunea 1.7: Prețuri & Ofertă ═══ */}
     <div class="mt-8 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-6 sm:p-8">
       <h2 class="text-lg font-extrabold text-white mb-4">💰 Prețuri Formație Nuntă {ORAS} — Ofertă Early Booking 2027</h2>
@@ -168,7 +166,7 @@ const localBusinessLd = {
 
     {/* ═══ Secțiunea 3: Zone acoperite ═══ */}
     <div class="mt-8 rounded-2xl border border-white/20 bg-white/10 p-6 sm:p-8">
-      <h3 class="text-base font-bold text-white mb-3">Zone acoperite în {JUDET}</h3>
+      <h2 class="text-lg font-extrabold text-white mb-4">Zone acoperite în {JUDET}</h2>
       <div class="flex flex-wrap gap-2">
         {ZONE_ACOPERITE.map((zona: string) => (
           <span class="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white/90">{zona}</span>

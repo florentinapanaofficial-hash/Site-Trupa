@@ -1,8 +1,8 @@
 {
     "acasa": {
         "meta": {
-            "title": "Florentina Pană – Formație Nuntă Pitești & Argeș",
-            "description": "Formația Florentina Pană – formație de nuntă în Pitești și Argeș, show 100% live, sonorizare proprie și repertoriu variat. Cere oferta acum!"
+            "title": "Florentina Pană – Live Band pentru Nunți și Evenimente",
+            "description": "Show band 100% live pentru nunți și evenimente: repertoriu variat, sonorizare proprie și atmosferă memorabilă. Cere oferta personalizată!"
         },
         "hero": {
             "h1": "Formația Florentina Pană | Live Band și Muzică Populară",
@@ -174,6 +174,7 @@
     "schema": {
         "@context": "https://schema.org",
         "@type": "MusicGroup",
+        "@id": "https://www.florentinapanaofficial.ro/#music-group",
         "name": "Formația Florentina Pană",
         "alternateName": "Florentina Pană",
         "description": "Formația Florentina Pană este un live band și band premium din Pitești, cu show 100% live, muzică populară de petrecere și repertoriu variat pentru nunți și evenimente.",
