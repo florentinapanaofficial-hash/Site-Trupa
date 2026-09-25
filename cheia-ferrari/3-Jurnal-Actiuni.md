@@ -2241,5 +2241,19 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - Pentru activarea IndexNow în Cloudflare Pages trebuie configurate `INDEXNOW_KEY` și, dacă este necesar, `INDEXNOW_KEY_LOCATION`; fișierul cheii trebuie publicat la URL-ul indicat de IndexNow.
 - Reindexarea Ahrefs trebuie rerulată după publicare pentru confirmarea eliminării redirect chains.
 
+## 📝 25 sep 2026 — Adăugare cheie IndexNow
+
+### Obiectiv
+- Publicarea fișierului de verificare IndexNow în folderul `public/`.
+
+### Modificări
+- Adăugat `public/f7b9c2a4d6e811ed9b3d0242ac120002.txt` cu valoarea cheii IndexNow.
+
+### Validări
+- Conținutul fișierului a fost verificat pentru valoarea exactă a cheii.
+
+### Riscuri / pași următori
+- Niciunul identificat.
+
 
 
