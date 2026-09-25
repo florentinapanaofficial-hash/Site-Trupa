@@ -2241,6 +2241,23 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - Pentru activarea IndexNow în Cloudflare Pages trebuie configurate `INDEXNOW_KEY` și, dacă este necesar, `INDEXNOW_KEY_LOCATION`; fișierul cheii trebuie publicat la URL-ul indicat de IndexNow.
 - Reindexarea Ahrefs trebuie rerulată după publicare pentru confirmarea eliminării redirect chains.
 
+## 📝 25 sep 2026 — Prerandare și lazy loading pentru galeria cu mirii
+
+### Obiectiv
+- Reducerea TTFB pentru ruta `/momente-cu-mirii/` prin generarea HTML-ului static la build.
+
+### Modificări
+- `src/pages/momente-cu-mirii.astro`: activat `export const prerender = true`.
+- Imaginile galeriei și miniaturile create din JavaScript folosesc `loading="lazy"` și `decoding="async"`.
+
+### Validări
+- `npx astro check`: 0 erori, 0 warnings, 0 hints.
+- `npm run build`: PASS; ruta `/momente-cu-mirii/index.html` a fost prerandată.
+- `npm run seo:check`: 58 pagini, 0 FAIL | 0 WARN.
+
+### Riscuri / pași următori
+- Build-ul local folosește fallback-ul pentru interogarea DB deoarece `MYSQL_URL` nu este configurat; prerandarea se finalizează cu succes.
+
 ## 📝 25 sep 2026 — Adăugare cheie IndexNow
 
 ### Obiectiv

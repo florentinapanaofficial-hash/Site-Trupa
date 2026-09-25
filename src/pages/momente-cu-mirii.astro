@@ -1,12 +1,12 @@
 ---
+export const prerender = true;
+
 import BaseLayout from '../layouts/BaseLayout.astro';
 import siteContent from '../data/siteContent.json';
 import BackButton from '../components/BackButton.astro';
 import { query as dbQuery } from '../lib/db.js';
 
 const { realMoments, brand } = siteContent;
-
-export const prerender = false;
 
 let dbMomentPhotos: Array<{
   id: number;
@@ -153,7 +153,7 @@ const eventsJsonLd = realMoments.events
                   data-lightbox-quote={event.coupleQuote ?? ''}
                   aria-label={`Deschide fotografia ${event.couple}`}
                 >
-                  <img src={event.image} alt={event.couple} loading={isAboveFold ? "eager" : "lazy"} decoding="async" width="600" height="400" fetchpriority={isAboveFold ? "high" : "auto"} />
+                  <img src={event.image} alt={event.couple} loading="lazy" decoding="async" width="600" height="400" fetchpriority={isAboveFold ? "high" : "auto"} />
                   <div class="cc-name-overlay">
                     <span class="cc-name">{event.couple}</span>
                     <span class="cc-meta">{event.city} &bull; {event.date}</span>
@@ -199,7 +199,7 @@ const eventsJsonLd = realMoments.events
       <div class="lightbox-stage">
         <button type="button" class="lightbox-nav-btn lightbox-nav-prev" data-lightbox-prev aria-label="Fotografia anterioară" disabled>&#8249;</button>
         <div class="lightbox-image-shell">
-          <img id="photo-lightbox-image" src="" alt="Fotografie din albumul cu mirii" class="lightbox-image" />
+          <img id="photo-lightbox-image" src="" alt="Fotografie din albumul cu mirii" class="lightbox-image" loading="lazy" decoding="async" />
         </div>
         <button type="button" class="lightbox-nav-btn lightbox-nav-next" data-lightbox-next aria-label="Fotografia următoare" disabled>&#8250;</button>
       </div>
@@ -819,7 +819,8 @@ const eventsJsonLd = realMoments.events
         const img = document.createElement('img');
         img.src = String(photo.image ?? '');
         img.alt = String(photo.title ?? '');
-        img.loading = i < 8 ? 'eager' : 'lazy';
+        img.loading = 'lazy';
+        img.decoding = 'async';
         img.className = 'film-thumb-img';
         img.style.borderRadius = '14px';
         img.draggable = false;
