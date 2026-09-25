@@ -71,6 +71,11 @@ const compactSeoText = (value: string, maxLength: number) => {
   const shortened = value.slice(0, maxLength - 1).replace(/\s+\S*$/, '').trim();
   return `${shortened}…`;
 };
+const ensureSeoDescription = (value: string) => {
+  const normalized = value.replace(/\s+/g, ' ').trim();
+  const context = ` Află detalii și citește articolul complet despre ${articleHeading}.`;
+  return normalized.length >= 120 ? normalized : `${normalized}${normalized ? ' ' : ''}${context.trim()}`;
+};
 
 // ── Share URL-uri pentru distribuire pe Facebook / WhatsApp ──
 const SITE_URL = 'https://www.florentinapanaofficial.ro';
@@ -109,6 +114,8 @@ if (type === 'local') {
   publishedDate = formatDate(item.created_at || new Date());
   publishedIso = new Date(item.created_at || new Date()).toISOString();
 }
+
+pageDescription = compactSeoText(ensureSeoDescription(pageDescription), 155);
 
 const articleJsonLd = {
   '@context': 'https://schema.org',

@@ -21,8 +21,8 @@ const LNG            = 24.6814;
 const INTRO          = 'Curtea de Argeș — orașul Mănăstirii și al tradițiilor — este unul dintre locurile noastre preferate pentru evenimente live. Formația Florentina Pană aduce Show Live 100% la nunțile din această zonă pitorească a județului Argeș.';
 const PARAGRAF2      = 'Știm ce înseamnă o nuntă cu adevărat românească: horă la intrarea mirilor, muzică de petrecere, momente emoționante și dans până în zori. Repertoriul nostru include muzică populară de petrecere, grecească, arăbească, machedonească, latino, muzică românească și manele, într-un program live fără pauze, fără DJ sau MC.';
 const PARAGRAF3      = 'Zonele montane din jurul Curții de Argeș oferă locații de nuntă spectaculoase. Noi ne ocupăm de tot ce ține de muzică — sonorizare, lumini și un program muzical pe gustul vostru, discutat cu cel puțin două săptămâni înainte de eveniment.';
-const CONTENT_INTRO    = 'Curtea de Argeș este un loc special pentru noi. Am cântat la zeci de nunți memorabile aici și știm exact cum să facem ca fiecare eveniment să fie unic. Formația Florentina Pană — muzică live care se simte.';
-const CONTENT_SERVICES = 'Suntem recunoscuți ca top formații nuntă Curtea de Argeș datorită energiei de pe scenă și atenției la detalii. Pentru fiecare eveniment construim programe artistice alternate, cu repertoriu complet: populară de petrecere, grecească, arăbească, machedonească, latino, românească și manele, 100% live fără DJ sau MC.';
+const CONTENT_INTRO    = 'Nunta ta în Curtea de Argeș merită cea mai bună coloană sonoră. Noi suntem Formația Florentina Pană și de peste 10 ani aducem energie, emoție și profesionalism la cele mai frumoase evenimente din zonă.';
+const CONTENT_SERVICES = 'Ce ne face diferiți? Ascultăm. Fiecare cuplu din Curtea de Argeș primește un program muzical unic, construit împreună cu noi, cu repertoriu complet: populară de petrecere, grecească, arăbească, machedonească, latino, românească și manele. Totul este 100% live, fără pauze, fără DJ sau MC.';
 const CONTENT_OUTRO    = 'Nu lăsa muzica pe ultimul loc — este ingredientul care leagă totul. Contactează-ne astăzi pentru disponibilitate în Curtea de Argeș și hai să planificăm împreună coloana sonoră perfectă pentru nunta ta.';
 const LOCATII_POP    = ["Conacul Manasia","Complex Marami","Hanul Posada"];
 const ZONE_ACOPERITE = ["Curtea de Argeș","Câmpulung","Domnești","Corbeni","Arefu"];
@@ -30,7 +30,8 @@ const FAQ_ITEMS      = [{"question":"Cât costă o formație de nuntă în Curte
 const META_DESC      = 'Formație nuntă Curtea de Argeș cu show band live și repertoriu variat. Sonorizare proprie, program personalizat și ofertă clară pentru evenimentul tău!';
 const KEYWORDS_SCHEMA: string[] = [];
 
-const SEO_TITLE = 'Formație Nuntă Curtea de Argeș | Florentina Pană' || `${KEYWORD} | ${brand.name}`;
+const SEO_TITLE_TEMPLATE = 'Formație Nuntă Curtea de Argeș | Florentina Pană';
+const SEO_TITLE = SEO_TITLE_TEMPLATE || `${KEYWORD} | ${brand.name}`;
 const SEO_DESC  = META_DESC || `${KEYWORD} cu show band live în ${ORAS}. Repertoriu variat, sonorizare proprie și ofertă personalizată. Cere disponibilitatea!`;
 
 const whatsappNumber = contact.phoneRaw.replace(/\\D/g, '');

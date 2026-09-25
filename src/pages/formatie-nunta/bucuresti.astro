@@ -21,7 +21,7 @@ const LNG            = 26.1025;
 const INTRO          = 'Cauți o formație de nuntă pentru un eveniment în București? Formația Florentina Pană se deplasează frecvent în capitală, oferind spectacole live de excepție la cele mai prestigioase locații din oraș.';
 const PARAGRAF2      = 'Ne-am construit o reputație solidă în fața cuplurilor din București prin show-uri pline de energie și un repertoriu vast: muzică populară de petrecere, muzică grecească, arăbească, machedonească, latino, muzică românească și manele. Cântăm fără pauze, alternăm programele artistice după specificul fiecărui eveniment și nu folosim DJ sau MC.';
 const PARAGRAF3      = 'Fie că este vorba de o nuntă elegantă într-un hotel de 5 stele sau o petrecere vibrantă într-un restaurant cu tradiție, ne adaptăm perfect stilului evenimentului tău. Transportul și logistica sunt incluse — tu te bucuri doar de muzică.';
-const CONTENT_INTRO    = 'Nunta ta în București merită cea mai bună coloană sonoră. Noi suntem Formația Florentina Pană și de peste 10 ani aducem energie, emoție și profesionalism la cele mai frumoase evenimente din zonă.';
+const CONTENT_INTRO    = 'Visezi la o nuntă perfectă în București? Totul începe cu muzica potrivită. Formația Florentina Pană creează momente magice prin muzică live — adaptată stilului tău, gusturilor invitaților și atmosferei locației.';
 const CONTENT_SERVICES = 'Repertoriul nostru este complet 100% live: muzică populară de petrecere, muzică grecească, arăbească, machedonească, latino, muzică românească și manele, toate dozate corect pentru energia serii în București. Cântăm fără pauze, alternăm programele artistice după specificul evenimentului și nu folosim DJ sau MC.';
 const CONTENT_OUTRO    = 'Ești gata să transformi nunta ta din București într-o poveste de neuitat? Formația Florentina Pană este aici pentru tine. Cere o ofertă personalizată — fără obligații, cu drag.';
 const LOCATII_POP    = ["Palatul Snagov","Hanul Drumeților","Ballrooms by Bamboo"];
@@ -30,7 +30,8 @@ const FAQ_ITEMS      = [{"question":"Cât costă o formație de nuntă în Bucur
 const META_DESC      = 'Formație nuntă București cu show band live, repertoriu variat și sonorizare proprie. Verifică data evenimentului și cere oferta personalizată!';
 const KEYWORDS_SCHEMA: string[] = [];
 
-const SEO_TITLE = 'Formație Nuntă București | Formația Florentina Pană' || `${KEYWORD} | ${brand.name}`;
+const SEO_TITLE_TEMPLATE = 'Formație Nuntă București | Formația Florentina Pană';
+const SEO_TITLE = SEO_TITLE_TEMPLATE || `${KEYWORD} | ${brand.name}`;
 const SEO_DESC  = META_DESC || `${KEYWORD} cu show band live în ${ORAS}. Repertoriu variat, sonorizare proprie și ofertă personalizată. Cere disponibilitatea!`;
 
 const whatsappNumber = contact.phoneRaw.replace(/\\D/g, '');

@@ -47,8 +47,13 @@ const compactSeoText = (value: string, maxLength: number) => {
   const shortened = value.slice(0, maxLength - 1).replace(/\s+\S*$/, '').trim();
   return `${shortened}…`;
 };
+const seoDescriptionContext = ' Află detalii despre servicii, disponibilitate și ofertă personalizată. Contactează-ne pentru informații.';
+const ensureSeoDescription = (value: string) => {
+  const normalized = value.replace(/\s+/g, ' ').trim();
+  return normalized.length >= 120 ? normalized : `${normalized}${normalized ? ' ' : ''}${seoDescriptionContext.trim()}`;
+};
 const seoTitle = compactSeoText(title, 60);
-const seoDescription = compactSeoText(description, 160);
+const seoDescription = compactSeoText(ensureSeoDescription(description), 155);
 
 const ga4Id = import.meta.env.PUBLIC_GA4_ID;
 const metaPixelId = import.meta.env.PUBLIC_META_PIXEL_ID;

@@ -21,8 +21,8 @@ const LNG            = 24.8692;
 const INTRO          = 'Formația Florentina Pană este una dintre cele mai căutate formații de nuntă din Pitești. Cu sediul chiar în inima orașului, oferim muzică live premium la nunți, botezuri și evenimente corporate în tot județul Argeș.';
 const PARAGRAF2      = 'Repertoriul nostru acoperă toate tipurile de muzică: muzică populară de petrecere, muzică grecească, arăbească, machedonească, latino, muzică românească și manele — totul adaptat gusturilor mirilor și atmosferei evenimentului. Cântăm fără pauze, alternăm programele artistice și nu folosim DJ sau MC.';
 const PARAGRAF3      = 'Echipa noastră știe exact cum să mențină ringul de dans plin de la prima secundă până la ultimul cântec. Fiecare eveniment beneficiază de sonorizare profesională, lumini de atmosferă și un program muzical personalizat, discutat în detaliu cu mirii.';
-const CONTENT_INTRO    = 'Dacă ești în căutarea unei atmosfere de neuitat în Pitești, ai ajuns unde trebuie. Formația Florentina Pană transformă fiecare eveniment într-o experiență muzicală de excepție — de la primul dans și până la ultimul cântec al serii.';
-const CONTENT_SERVICES = 'Oferim un pachet complet de Formație Nuntă Pitești: sonorizare profesională, lumini de atmosferă și repertoriu complet cu muzică populară de petrecere, grecească, arăbească, machedonească, latino, muzică românească și manele. Cântăm fără pauze, alternăm programele artistice după specificul evenimentului și nu avem DJ sau MC.';
+const CONTENT_INTRO    = 'Pitești este un loc special pentru noi. Am cântat la zeci de nunți memorabile aici și știm exact cum să facem ca fiecare eveniment să fie unic. Formația Florentina Pană — muzică live care se simte.';
+const CONTENT_SERVICES = 'Ce ne face diferiți? Ascultăm. Fiecare cuplu din Pitești primește un program muzical unic, construit împreună cu noi, cu repertoriu complet: populară de petrecere, grecească, arăbească, machedonească, latino, românească și manele. Totul este 100% live, fără pauze, fără DJ sau MC.';
 const CONTENT_OUTRO    = 'Nu lăsa muzica pe ultimul loc — este ingredientul care leagă totul. Contactează-ne astăzi pentru disponibilitate în Pitești și hai să planificăm împreună coloana sonoră perfectă pentru nunta ta.';
 const LOCATII_POP    = ["Restaurant & Events Noblesse","La Noblesse Events","Pensiunea Flowers"];
 const ZONE_ACOPERITE = ["Pitești","Mioveni","Ștefănești","Bascov","Bradu"];
@@ -30,7 +30,8 @@ const FAQ_ITEMS      = [{"question":"Cât costă o formație de nuntă în Pite�
 const META_DESC      = 'Formație nuntă Pitești cu show band live, sonorizare proprie și repertoriu variat. Verifică disponibilitatea și cere oferta personalizată!';
 const KEYWORDS_SCHEMA: string[] = ["Formație Nuntă Pitești","Formații Nuntă Pitești","trupa nunta Pitesti","muzica live nunta Pitesti"];
 
-const SEO_TITLE = 'Formație Nuntă Pitești | Formația Florentina Pană' || `${KEYWORD} | ${brand.name}`;
+const SEO_TITLE_TEMPLATE = 'Formație Nuntă Pitești | Formația Florentina Pană';
+const SEO_TITLE = SEO_TITLE_TEMPLATE || `${KEYWORD} | ${brand.name}`;
 const SEO_DESC  = META_DESC || `${KEYWORD} cu show band live în ${ORAS}. Repertoriu variat, sonorizare proprie și ofertă personalizată. Cere disponibilitatea!`;
 
 const whatsappNumber = contact.phoneRaw.replace(/\\D/g, '');

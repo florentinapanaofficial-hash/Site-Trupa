@@ -271,7 +271,7 @@
             '/galerie-foto/',
             '/muzica-non-stop/',
             '/comunitate/',
-            '/blog/',
+            '/publicatii/',
             '/vlog/',
             '/aparitii-tv/',
             '/live/',

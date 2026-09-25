@@ -2215,5 +2215,31 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 ### Riscuri / pași următori
 - Niciunul identificat.
 
+## 📝 25 sep 2026 — Remedieri Ahrefs: schema, metadata, redirecturi și IndexNow
+
+### Obiectiv
+- Verificarea JSON-LD FAQ și a paginilor programatice, eliminarea linkurilor interne către redirectul `/blog/`, extinderea meta descriptions dinamice și adăugarea unei utilități IndexNow pentru post-build.
+
+### Modificări
+- `scripts/programmatic-seo/template.astro`: eliminată expresia constantă mereu adevărată din fallback-ul `SEO_TITLE`; paginile `pitesti`, `bucuresti` și `curtea-de-arges` au fost regenerate prin `generate-pages.js`.
+- `src/components/Header.astro` și `src/data/siteContent.json`: navigația Blog indică direct `/publicatii/`.
+- `src/layouts/BaseLayout.astro`: meta descriptions sunt normalizate, extinse la minimum 120 de caractere și limitate la 155.
+- `src/pages/publicatii/[slug].astro`: descrierile scurte primesc contextul articolului și CTA-ul de citire înainte de limitare.
+- `scripts/indexnow-submit.mjs` și `package.json`: trimitere batch post-build către IndexNow, activată doar când există `INDEXNOW_KEY`.
+- `src/pages/_comunitatea-noastra.astro.bak` și `public/js/mobile-swipe.js`: linkurile vechi `/blog/{slug}` și ruta statică `/blog/` au fost actualizate la `/publicatii/{slug}/` și `/publicatii/`.
+- Imaginile dinamice din galeria `public/` nu au fost migrate artificial la `<Image />`; componenta existentă `GalerieAutomata.astro` folosește deja `<Image />` pentru activele reale din `src/assets`, iar folderul automat este momentan gol.
+
+### Validări
+- `npx astro check`: 0 errors, 0 warnings, 0 hints.
+- `npm run build`: PASS; fallback local Supabase folosit deoarece DNS-ul nu a fost disponibil în build.
+- `npm run seo:audit`: 57 pagini, 0 FAIL | 0 WARN.
+- Verificare custom: toate cele 57 meta descriptions au minimum 120 de caractere; toate FAQPage au `acceptedAnswer.text`.
+- `npm run check-links`: 63 URL-uri externe valide.
+- `npm run indexnow:submit` fără `INDEXNOW_KEY`: omite trimiterea fără eroare.
+
+### Riscuri / pași următori
+- Pentru activarea IndexNow în Cloudflare Pages trebuie configurate `INDEXNOW_KEY` și, dacă este necesar, `INDEXNOW_KEY_LOCATION`; fișierul cheii trebuie publicat la URL-ul indicat de IndexNow.
+- Reindexarea Ahrefs trebuie rerulată după publicare pentru confirmarea eliminării redirect chains.
+
 
 

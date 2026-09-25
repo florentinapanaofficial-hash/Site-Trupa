@@ -30,7 +30,8 @@ const FAQ_ITEMS      = {{FAQ_ITEMS}};
 const META_DESC      = '{{META_DESC}}';
 const KEYWORDS_SCHEMA: string[] = {{KEYWORDS_SCHEMA}};
 
-const SEO_TITLE = '{{META_TITLE}}' || `${KEYWORD} | ${brand.name}`;
+const SEO_TITLE_TEMPLATE = '{{META_TITLE}}';
+const SEO_TITLE = SEO_TITLE_TEMPLATE || `${KEYWORD} | ${brand.name}`;
 const SEO_DESC  = META_DESC || `${KEYWORD} cu show band live în ${ORAS}. Repertoriu variat, sonorizare proprie și ofertă personalizată. Cere disponibilitatea!`;
 
 const whatsappNumber = contact.phoneRaw.replace(/\\D/g, '');

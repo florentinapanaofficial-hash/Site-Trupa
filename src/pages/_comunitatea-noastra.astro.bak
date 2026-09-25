@@ -231,7 +231,7 @@ const schemas = [collectionPageLd, itemListLd, aggregateRatingLd].filter(Boolean
                   <p class="tc-location">{event.city} &bull; {event.date}</p>
                 </div>
                 {blogSlug && (
-                  <a class="tc-blog-link" href={`/blog/${blogSlug}`}>Povestea lor →</a>
+                  <a class="tc-blog-link" href={`/publicatii/${blogSlug}/`}>Povestea lor →</a>
                 )}
               </footer>
             </article>
@@ -280,7 +280,7 @@ const schemas = [collectionPageLd, itemListLd, aggregateRatingLd].filter(Boolean
           const bg = accentBgMap[post.categoryAccent] ?? 'rgba(245,166,35,0.22)';
           const color = accentColorMap[post.categoryAccent] ?? 'var(--gold)';
           return (
-            <a href={`/blog/${post.slug}`} class="blog-card">
+            <a href={`/publicatii/${post.slug}/`} class="blog-card">
               <div
                 class="blog-card-thumb"
                 aria-hidden="true"
@@ -306,7 +306,7 @@ const schemas = [collectionPageLd, itemListLd, aggregateRatingLd].filter(Boolean
           );
         })}
       </div>
-      <a href={`/blog/${((blogPosts as any).items as any[])[0]?.slug ?? ''}`} class="blog-aside-cta">
+      <a href={`/publicatii/${((blogPosts as any).items as any[])[0]?.slug ?? ''}/`} class="blog-aside-cta">
         Citește ultimul articol
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
       </a>
