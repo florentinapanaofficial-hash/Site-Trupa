@@ -11,6 +11,8 @@ interface ImageItem {
   src: string;
   alt: string;
   caption: string;
+  width: number;
+  height: number;
 }
 
 interface Props {
@@ -49,8 +51,8 @@ const pageUrl = `${siteUrl}${pagePath}`;
             class="pg-img"
             loading="lazy"
             decoding="async"
-            width="800"
-            height="600"
+            width={img.width}
+            height={img.height}
           />
 
           {/* ── Caption ── */}

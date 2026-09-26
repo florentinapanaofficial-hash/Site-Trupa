@@ -17,6 +17,8 @@
 interface Props {
   imageSrc: string;
   imageAlt: string;
+  imageWidth: number;
+  imageHeight: number;
   pageUrl?: string;
   credit?: string;
 }
@@ -27,12 +29,14 @@ const site = Astro.site?.toString().replace(/\/$/, '') ?? SITE_FALLBACK;
 const {
   imageSrc,
   imageAlt,
+  imageWidth,
+  imageHeight,
   pageUrl = Astro.url.href || site,
   credit = 'Formația Florentina Pană',
 } = Astro.props;
 
 const absoluteImg = imageSrc.startsWith('http') ? imageSrc : `${site}${imageSrc}`;
-const embedCode = `<a href="${pageUrl}" target="_blank" rel="noopener noreferrer" title="${credit}"><img src="${absoluteImg}" alt="${imageAlt}" style="max-width:100%;height:auto;" loading="lazy" /></a><p style="font-size:12px;margin-top:4px;">Foto: <a href="${pageUrl}" target="_blank" rel="noopener noreferrer">${credit}</a></p>`;
+const embedCode = `<a href="${pageUrl}" target="_blank" rel="noopener noreferrer" title="${credit}"><img src="${absoluteImg}" alt="${imageAlt}" width="${imageWidth}" height="${imageHeight}" style="max-width:100%;height:auto;" loading="lazy" decoding="async" /></a><p style="font-size:12px;margin-top:4px;">Foto: <a href="${pageUrl}" target="_blank" rel="noopener noreferrer">${credit}</a></p>`;
 ---
 
 <div class="embed-snippet" data-embed>
@@ -41,7 +45,7 @@ const embedCode = `<a href="${pageUrl}" target="_blank" rel="noopener noreferrer
 
   <!-- Preview imagine -->
   <div class="embed-snippet-preview">
-    <img src={imageSrc} alt={imageAlt} loading="lazy" decoding="async" width="400" height="267"
+    <img src={imageSrc} alt={imageAlt} loading="lazy" decoding="async" width={imageWidth} height={imageHeight}
          class="embed-snippet-img" />
   </div>
 

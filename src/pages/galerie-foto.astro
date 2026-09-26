@@ -6,6 +6,7 @@ import PhotoGallery from '../components/PhotoGallery.astro';
 import seo from '../data/seo-content.json';
 import { readdir, stat } from 'node:fs/promises';
 import path from 'node:path';
+import sharp from 'sharp';
 
 /* ── Date galerie: toate pozele din colecție ──
    REGULĂ: Pozele NOI se adaugă ÎNTOTDEAUNA la începutul array-ului (sus),
@@ -61,7 +62,12 @@ try {
   latestPhotos = [];
 }
 
-const photos = [...latestPhotos, ...basePhotos];
+const photos = await Promise.all([...latestPhotos, ...basePhotos].map(async (photo) => {
+  const { width, height } = await sharp(path.join(process.cwd(), 'public', decodeURIComponent(photo.src.slice(1)))).metadata();
+  if (!width || !height) throw new Error(`Dimensiuni indisponibile pentru ${photo.src}`);
+  return { ...photo, width, height };
+}));
+const embedPhoto = photos.find((photo) => photo.src === basePhotos[0].src)!;
 
 const SITE = 'https://www.florentinapanaofficial.ro';
 const galleryPageLd = {
@@ -115,7 +121,7 @@ const galleryPageLd = {
       <div class="gal-montage-stage" data-montage-stage data-preset="elegant">
         {photos.map((p, i) => (
           <figure class={`gal-montage-slide${i === 0 ? ' is-active' : ''}`} data-montage-slide data-index={i}>
-            <img src={p.src} alt={p.alt} loading={i === 0 ? 'eager' : 'lazy'} decoding="async" width="1400" height="900" />
+            <img src={p.src} alt={p.alt} loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : 'auto'} decoding="async" width={p.width} height={p.height} />
             <figcaption>{p.alt}</figcaption>
           </figure>
         ))}
@@ -166,6 +172,8 @@ const galleryPageLd = {
           data-fx={String((i % 6) + 1)}
           data-index={i}
           data-src={p.src}
+          data-width={p.width}
+          data-height={p.height}
           tabindex="0"
         >
           <img
@@ -174,8 +182,8 @@ const galleryPageLd = {
             class="gal-photo-img"
             loading="lazy"
             decoding="async"
-            width="800"
-            height="600"
+            width={p.width}
+            height={p.height}
           />
           <figcaption class="gal-caption">{p.alt}</figcaption>
           {/* Hover overlay */}
@@ -195,7 +203,7 @@ const galleryPageLd = {
       <h2 class="gal-title" style="font-size:1.15rem;margin-bottom:0.75rem;">Galeria Virală — Distribuie Momentele</h2>
       <p style="font-size:0.85rem;color:rgba(255,255,255,0.7);margin-bottom:1rem;">Fiecare fotografie are link unic. Distribuie pe WhatsApp sau Facebook, sau copiază link-ul pentru a genera backlinks!</p>
       <PhotoGallery
-        images={photos.map((p) => ({ src: p.src, alt: p.alt, caption: p.alt }))}
+        images={photos.map((p) => ({ src: p.src, alt: p.alt, caption: p.alt, width: p.width, height: p.height }))}
         pagePath="/galerie-foto/"
       />
     </div>
@@ -205,9 +213,11 @@ const galleryPageLd = {
       <h2 class="gal-title" style="font-size:1.15rem;margin-bottom:0.75rem;">Distribuie fotografiile noastre</h2>
       <p style="font-size:0.85rem;color:rgba(255,255,255,0.7);margin-bottom:1rem;">Folosește butoanele de mai jos pentru a include o fotografie autentică de la evenimentele noastre pe site-ul tău, cu credit și backlink automat.</p>
       <EmbedSnippet
-        imageSrc="/images/galerie-foto-site/Eveniment Arabesc.jpg"
+        imageSrc={embedPhoto.src}
         imageAlt="Formația Florentina Pană alături de trupa Arabesc — eveniment live Pitești"
-        pageUrl="https://www.florentinapanaofficial.ro/galerie-foto#foto-1"
+        imageWidth={embedPhoto.width}
+        imageHeight={embedPhoto.height}
+        pageUrl={`https://www.florentinapanaofficial.ro/galerie-foto/#foto-${photos.indexOf(embedPhoto) + 1}`}
         credit="Formația Florentina Pană"
       />
     </div>
@@ -225,7 +235,7 @@ const galleryPageLd = {
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg>
     </button>
     <div class="lb-img-wrap">
-      <img id="lb-img" src="" alt="Fotografie din galerie" />
+      <img id="lb-img" src="" alt="Fotografie din galerie" loading="lazy" decoding="async" width={photos[0].width} height={photos[0].height} />
     </div>
   </div>
 
@@ -576,6 +586,8 @@ const galleryPageLd = {
     const item = visible[idx];
     const src = item.dataset.src ?? '';
     const alt = item.querySelector('figcaption')?.textContent ?? '';
+    lbImg.width = Number(item.dataset.width);
+    lbImg.height = Number(item.dataset.height);
     lbImg.src = src;
     lbImg.alt = alt;
     lbCounter.textContent = `${idx + 1} / ${visible.length}`;

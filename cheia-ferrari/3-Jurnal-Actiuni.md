@@ -2272,5 +2272,25 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 ### Riscuri / pași următori
 - Niciunul identificat.
 
+## 📝 26 sep 2026 — Optimizare LCP și CLS pentru galeria foto
+
+### Obiectiv
+- Remedierea încărcării primei imagini și rezervarea spațiului imaginilor pe `/galerie-foto/` după un scor PageSpeed mobil de 74.
+
+### Modificări
+- `src/pages/galerie-foto.astro`: prioritate ridicată pentru prima imagine din montaj; dimensiunile WebP sunt citite la build și aplicate în montaj, grilă și lightbox, inclusiv la schimbarea fotografiei. Imaginea pentru embed folosește varianta optimizată și ancora corectă.
+- `src/components/PhotoGallery.astro` și `src/components/EmbedSnippet.astro`: dimensiuni reale pentru fotografiile distribuite și codul embed; imaginile din afara ecranului rămân lazy cu decodare asincronă.
+- `cheia-ferrari/2-Tracker-SEO.md` și acest jurnal: consemnarea optimizării și a auditului.
+- Ruta nu interoghează baza de date și este deja generată static prin `output: 'static'`; nu este necesar `prerender = true` suplimentar.
+
+### Validări
+- `npx astro build` și `npm run seo:check`: PASS; audit local 58 pagini, 0 FAIL | 0 WARN.
+- HTML prerandat: o singură imagine cu prioritate high, 47 imagini din galerie verificate, 0 imagini din galerie fără lazy/async în afara celei prioritare și 0 `<img>` fără width/height.
+- Diagnostice editor: 0 erori în cele trei fișiere Astro schimbate; `git diff --check`: PASS.
+- `node seo-agent/seo-analyzer.js`: 13 oportunități existente, fără modificări SEO suplimentare în această sesiune.
+
+### Riscuri / pași următori
+- Scorul LCP/CLS din PageSpeed trebuie remăsurat pe versiunea live după publicare; buildul local al altei rute folosește fallback deoarece `MYSQL_URL` nu este configurat.
+
 
 
