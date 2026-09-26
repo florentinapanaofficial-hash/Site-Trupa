@@ -2,12 +2,12 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BackButton from '../components/BackButton.astro';
 
-const lastUpdated = '24 martie 2026';
+const lastUpdated = '26 septembrie 2026';
 ---
 
 <BaseLayout
-  title="Politică cookie-uri | Formația Florentina Pană"
-  description="Lista completă a cookie-urilor utilizate pe florentinapanaofficial.ro: cookie-uri tehnice, Google Analytics și YouTube."
+  title="Politică cookie-uri și tracking | Formația Florentina Pană"
+  description="Află cum folosim cookie-urile, Meta și TikTok Pixel și când înregistrăm bugetul ales în formular după consimțământ. Citește politica de cookie-uri."
 >
   <section class="section-container py-16 max-w-3xl mx-auto">
     <div class="mb-8"><BackButton href="/" label="Acasă" /></div>
@@ -15,7 +15,7 @@ const lastUpdated = '24 martie 2026';
     <header class="mb-10 text-center">
       <p class="kicker mx-auto">ePrivacy · RGPD</p>
       <h1 class="section-title">Politică de cookie-uri</h1>
-      <p class="section-copy">Ultima actualizare: <time datetime="2026-03-24">{lastUpdated}</time></p>
+      <p class="section-copy">Ultima actualizare: <time datetime="2026-09-26">{lastUpdated}</time></p>
     </header>
 
     <div class="prose-policy">
@@ -33,7 +33,7 @@ const lastUpdated = '24 martie 2026';
       <p>
         La prima vizită pe site afișăm un <strong>banner de consimțământ</strong> cu opțiuni
         clare: <em>„Acceptă cookie-urile"</em> sau <em>„Refuz"</em>.
-        Cookie-urile non-esențiale (analiză, YouTube) sunt blocate până la acceptare.
+        Cookie-urile non-esențiale (analiză, publicitate, YouTube) sunt blocate până la acceptare.
         Alegerea ta este salvată în <code>localStorage</code> (cheia <code>cookie_consent</code>)
         — aceasta nu este un cookie HTTP și nu necesită consimțământ separat.
         Poți revoca consimțământul în orice moment apăsând butonul
@@ -125,6 +125,15 @@ const lastUpdated = '24 martie 2026';
         sunt stocate în browser timp de 2 ani, însă durata de retenție a datelor configurată
         în contul Google Analytics 4 este de <strong>14 luni</strong> — după acest interval,
         datele de utilizare sunt șterse de pe serverele Google.
+      </p>
+
+      <h2>Pixelii Meta și TikTok și intenția de buget</h2>
+      <p>
+        După acceptarea bannerului se activează Meta Pixel și TikTok Pixel. Dacă modifici sliderul
+        de buget din formularul de contact, evenimentul BudgetIntent trimite valoarea selectată
+        acestor furnizori pentru măsurare și retargeting. Salvăm separat suma, pagina și momentul
+        selecției în baza noastră de date, fără nume sau telefon. Poți retrage acordul oricând
+        din „Preferințe cookie”; fără acord nu trimitem acest eveniment.
       </p>
 
       <!-- ──────────────────────────────── -->

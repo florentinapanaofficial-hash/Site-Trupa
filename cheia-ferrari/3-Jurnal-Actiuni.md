@@ -2314,4 +2314,25 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - De verificat comportamentul vizual pe dispozitive reale după publicare. Buildul folosește fallback-ul local cunoscut pentru altă pagină, fără `MYSQL_URL`.
 
 
+## 📝 26 sep 2026 — Tracking BudgetIntent pe sliderul de contact
+
+### Obiectiv
+- Înregistrarea selecției bugetului la eliberarea sliderului, fără a interfera cu trimiterea ofertei sau cu consimțământul.
+
+### Modificări
+- `src/pages/contact.astro`: slider opțional cu ID-urile cerute, afișaj sincronizat și input ascuns `Buget`; eveniment BudgetIntent Meta/TikTok și POST la API numai după consimțământ, cu inițializare idempotentă pentru Astro View Transitions și reset corect.
+- `src/pages/api/track-budget-intent.ts`, `schema.sql`, `scripts/create-budget-intents-table.mjs`, `package.json`: endpoint limitat la origin permis, bugete valide și maximum un eveniment la 15 secunde/IP; tabelă fără IP/nume/telefon și comandă `npm run db:migrate:budget-intents`, cu curățare oportunistă după 12 luni.
+- `src/components/CookieBanner.astro`, `src/pages/politica-confidentialitate.astro`, `src/pages/politica-cookie.astro`: informare clară despre intenția de buget, publicitate și destinatarii datelor.
+- `cheia-ferrari/2-Tracker-SEO.md` și acest jurnal: rezultate documentate.
+
+### Validări
+- `npx astro check`: 0 erori, 0 avertismente; `npm run seo:check`: build PASS, 58 pagini, 0 FAIL | 0 WARN; `npm test`: 40/40; `git diff --check`: PASS.
+- HTML prerandat: ID-uri prezente, title/description în limite (contact 52/145, confidențialitate 56/148, cookie 58/147). Imaginile și schema JSON-LD existente nu au fost modificate.
+- HTTP local: contact 200, origin străin 403, buget invalid 400; test de interacțiune: input, reset, consimțământ refuzat/acceptat și `astro:page-load` fără dublare.
+- `node seo-agent/seo-analyzer.js`: aceleași 13 oportunități SEO existente.
+
+### Riscuri / pași următori
+- Fără `MYSQL_URL` local, POST-ul valid întoarce 500; execută `npm run db:migrate:budget-intents` în mediul conectat la MySQL înainte de utilizarea colectării live și verifică o cerere validă (204). Pixelii necesită ID-uri configurate și consimțământ acceptat.
+
+
 

@@ -170,14 +170,17 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
             <label class="form-label">
               Care este bugetul alocat pentru evenimentul dvs.?
               <input
-                class="input-glass"
-                type="text"
-                name="Buget"
-                placeholder="Ex: 3.000 €"
-                inputmode="decimal"
-                autocomplete="off"
-                maxlength="20"
+                id="budget-slider"
+                class="w-full accent-amber-400"
+                type="range"
+                min="1000"
+                max="10000"
+                step="100"
+                value="3000"
+                aria-describedby="budget-display"
               />
+              <output id="budget-display" for="budget-slider">Alege o sumă</output>
+              <input id="buget-input-hidden" type="hidden" name="Buget" value="" />
               <span class="text-[11px] font-normal normal-case leading-snug text-white/65">
                 Câmp opțional. Ne ajută să alegem formula potrivită de trupă și să vă trimitem o propunere aliniată la bugetul alocat.
               </span>
@@ -948,4 +951,59 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
 
   revealContactEmail();
   document.addEventListener('astro:page-load', revealContactEmail);
+</script>
+
+<script>
+  const setupSlider = () => {
+    const slider = document.getElementById('budget-slider') as HTMLInputElement | null;
+    const display = document.getElementById('budget-display');
+    const hiddenInput = document.getElementById('buget-input-hidden') as HTMLInputElement | null;
+
+    if (!slider || !display || !hiddenInput || slider.dataset.trackingReady === 'true') return;
+    slider.dataset.trackingReady = 'true';
+
+    slider.addEventListener('input', () => {
+      display.textContent = `${Number(slider.value).toLocaleString('ro-RO')} €`;
+      hiddenInput.value = slider.value;
+    });
+
+    slider.addEventListener('change', async () => {
+      const intentValue = Number(slider.value);
+      const tracking = window as typeof window & {
+        FPTracking?: { hasConsent: () => boolean };
+        fbq?: (method: string, event: string, data: { selected_budget: number }) => void;
+        ttq?: { track: (event: string, data: { value: number }) => void };
+      };
+
+      if (!tracking.FPTracking?.hasConsent()) return;
+
+      tracking.fbq?.('trackCustom', 'BudgetIntent', { selected_budget: intentValue });
+      tracking.ttq?.track('BudgetIntent', { value: intentValue });
+
+      try {
+        await fetch('/api/track-budget-intent/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            budget: intentValue,
+            timestamp: new Date().toISOString(),
+            url: window.location.pathname,
+          }),
+          keepalive: true,
+        });
+      } catch {
+        // Trackingul nu trebuie să blocheze formularul.
+      }
+    });
+
+    slider.form?.addEventListener('reset', () => {
+      display.textContent = 'Alege o sumă';
+      queueMicrotask(() => {
+        hiddenInput.value = '';
+      });
+    });
+  };
+
+  document.addEventListener('astro:page-load', setupSlider);
+  setupSlider();
 </script>

@@ -2,12 +2,12 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BackButton from '../components/BackButton.astro';
 
-const lastUpdated = '24 martie 2026';
+const lastUpdated = '26 septembrie 2026';
 ---
 
 <BaseLayout
   title="Politică de confidențialitate | Formația Florentina Pană"
-  description="Politica de confidențialitate a Formației Florentina Pană. Află cum sunt prelucrate datele tale personale, drepturile tale și cum ne poți contacta."
+  description="Află cum prelucrăm datele tale în formular și intenția de buget după consimțământ, ce drepturi ai și cum ne poți contacta. Citește politica noastră."
 >
   <section class="section-container py-16 max-w-3xl mx-auto">
     <div class="mb-8"><BackButton href="/" label="Acasă" /></div>
@@ -15,7 +15,7 @@ const lastUpdated = '24 martie 2026';
     <header class="mb-10 text-center">
       <p class="kicker mx-auto">RGPD · Art. 13</p>
       <h1 class="section-title">Politică de confidențialitate</h1>
-      <p class="section-copy">Ultima actualizare: <time datetime="2026-03-24">{lastUpdated}</time></p>
+      <p class="section-copy">Ultima actualizare: <time datetime="2026-09-26">{lastUpdated}</time></p>
     </header>
 
     <div class="prose-policy">
@@ -39,15 +39,21 @@ const lastUpdated = '24 martie 2026';
       <ul>
         <li><strong>Nume și prenume</strong> — pentru identificare</li>
         <li><strong>Număr de telefon</strong> — pentru comunicare în legătură cu solicitarea</li>
-        <li><strong>Tip eveniment, dată eveniment, mesaj</strong> — pentru pregătirea ofertei personalizate</li>
+        <li><strong>Tip eveniment, dată eveniment, buget ales, mesaj</strong> — pentru pregătirea ofertei personalizate</li>
       </ul>
+      <p>
+        Dacă accepți bannerul cookie și ajustezi sliderul de buget, înregistrăm separat suma aleasă,
+        pagina de contact și momentul selecției, fără nume sau telefon. Trimitem valoarea și către
+        Meta Pixel și TikTok Pixel pentru măsurare și retargeting. Fără acest acord, sliderul funcționează
+        în continuare, dar nu trimite evenimentul de intenție.
+      </p>
       <p>
         Nu colectăm date sensibile (date medicale, etnice, politice etc.) și nu solicităm
         date ale minorilor.
       </p>
       <p>
         De asemenea, utilizăm cookie-uri tehnice și, cu consimțământul tău, cookie-uri de analiză
-        (Google Analytics) și cookie-uri terțe (YouTube). Detalii complete în
+        (Google Analytics), publicitate (Meta și TikTok) și cookie-uri terțe (YouTube). Detalii complete în
         <a href="/politica-cookie/">Politica de cookie-uri</a>.
       </p>
 
@@ -72,6 +78,10 @@ const lastUpdated = '24 martie 2026';
           <tr>
             <td>Analiză statistică a traficului (Google Analytics)</td>
             <td>Art. 6 alin. (1) lit. (a) — consimțământul tău explicit prin bannerul cookie</td>
+          </tr>
+          <tr>
+            <td>Măsurarea intenției de buget și retargeting (Meta și TikTok Pixel)</td>
+            <td>Art. 6 alin. (1) lit. (a) — consimțământul tău prin bannerul cookie</td>
           </tr>
           <tr>
             <td>Vizionare videoclipuri YouTube (embed)</td>
@@ -108,8 +118,12 @@ const lastUpdated = '24 martie 2026';
           Clauzelor Contractuale Standard adoptate de Comisia Europeană.
           Politică: <a href="https://www.facebook.com/privacy/explanation" target="_blank" rel="noopener noreferrer">facebook.com/privacy/explanation</a>.
         </li>
+        <li>
+          <strong>Meta și TikTok</strong> — numai după acceptarea bannerului, primesc evenimentul
+          BudgetIntent cu valoarea bugetului selectat, potrivit politicilor proprii de confidențialitate.
+        </li>
       </ul>
-      <p>Nu vindem, nu închiriem și nu transferăm datele tale altor terțe părți.</p>
+      <p>Nu vindem și nu închiriem datele tale altor terțe părți.</p>
 
       <!-- 5. Perioada de retenție -->
       <h2>5. Perioada de retenție</h2>
@@ -132,6 +146,10 @@ const lastUpdated = '24 martie 2026';
           <tr>
             <td>Date de analiză (Google Analytics)</td>
             <td>14 luni (setare implicită Google Analytics 4)</td>
+          </tr>
+          <tr>
+            <td>Selecții anonime de buget salvate local</td>
+            <td>12 luni; înregistrările expirate sunt șterse la următoarea colectare</td>
           </tr>
           <tr>
             <td>Cookie-uri tehnice (sesiune)</td>

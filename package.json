@@ -30,6 +30,7 @@
     "seo:errors:only": "node seo-agent/gsc-errors.js --only-errors",
     "audio:sync": "node scripts/sync-audio-catalog.mjs",
     "db:migrate:track-plays": "node scripts/create-track-plays-table.mjs",
+    "db:migrate:budget-intents": "node scripts/create-budget-intents-table.mjs",
     "ferrari": "node ferrari.js"
   },
   "dependencies": {
