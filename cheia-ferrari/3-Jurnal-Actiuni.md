@@ -2294,3 +2294,24 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 
 
 
+## 📝 26 sep 2026 — Simplificare UX și marketing pe homepage
+
+### Obiectiv
+- Reducerea zgomotului vizual și a numărului de acțiuni concurente pentru vizitatorii de pe mobil.
+
+### Modificări
+- `src/data/seo-content.json`: descrierea hero înlocuită cu mesajul scurt cerut; metadata și schema FAQ nu au fost schimbate.
+- `src/pages/index.astro`: eliminate CTA-urile hero, textele poetice și butoanele showcase-ului; eliminate cardurile individuale ale echipei, păstrat linkul către `/membri/`; beneficiile în listă HTML; zona de preț are un singur CTA către `/contact/`. Importurile și variabilele nefolosite au fost eliminate; lista și butonul au stiluri responsive.
+- `cheia-ferrari/2-Tracker-SEO.md` și acest jurnal: rezultate și validări consemnate.
+
+### Validări
+- Audit inițial și `npm run seo:weekly`: build PASS, 58 pagini SEO, 0 FAIL | 0 WARN; 62 linkuri externe valide, 40/40 teste trecute.
+- `npx astro check`: 0 erori, 0 avertismente, 0 indicii; diagnostice editor curate.
+- HTML-ul prerandat verificat pentru hero, trei video, absența cardurilor individuale, patru beneficii și CTA unic; title 54 caractere, description 137 caractere; `git diff --check` PASS.
+- `node seo-agent/seo-analyzer.js`: 13 oportunități existente, fără intervenții suplimentare în metadata.
+
+### Riscuri / pași următori
+- De verificat comportamentul vizual pe dispozitive reale după publicare. Buildul folosește fallback-ul local cunoscut pentru altă pagină, fără `MYSQL_URL`.
+
+
+
