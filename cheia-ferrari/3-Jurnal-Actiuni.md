@@ -2352,5 +2352,22 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 ### Riscuri / pași următori
 - Trimiterea formularului trebuie reconfirmată pe site-ul live după deploy, prin ambele variante de host acceptate.
 
+## 📝 27 sep 2026 — Metadata CTR pentru rezervări 2027-2028
+
+### Obiectiv
+- Creșterea CTR-ului pentru căutările locale pe homepage și pentru intenția de preț pe pagina Contact, adaptată sezonului de rezervări 2027-2028.
+
+### Modificări
+- `src/data/seo-content.json`: actualizate exact `acasa.meta.title`, `acasa.meta.description`, `contact.meta.title` și `contact.meta.description`.
+- `cheia-ferrari/2-Tracker-SEO.md` și acest jurnal: optimizarea și rezultatele documentate.
+
+### Validări
+- Lungimi metadata: homepage 58/139 caractere; Contact 59/138 caractere.
+- `npm run seo:check`: build PASS, 58 pagini, 0 FAIL | 0 WARN.
+- JSON valid și fără diagnostice în editor; `node seo-agent/seo-analyzer.js`: 13 oportunități SEO existente, inclusiv homepage și Contact.
+
+### Riscuri / pași următori
+- CTR-ul trebuie remăsurat în Google Search Console după recrawl și acumularea de impresii pentru noile metadata.
+
 
 
