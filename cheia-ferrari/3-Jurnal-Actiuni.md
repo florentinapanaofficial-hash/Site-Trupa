@@ -2334,5 +2334,23 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 ### Riscuri / pași următori
 - Fără `MYSQL_URL` local, POST-ul valid întoarce 500; execută `npm run db:migrate:budget-intents` în mediul conectat la MySQL înainte de utilizarea colectării live și verifică o cerere validă (204). Pixelii necesită ID-uri configurate și consimțământ acceptat.
 
+## 📝 27 sep 2026 — Remediere POST formular prin Cloudflare
+
+### Obiectiv
+- Eliminarea erorii Astro `Cross-site POST form submissions are forbidden` la trimiterea formularului de contact prin proxy sau între origin-urile cu și fără `www`.
+
+### Modificări
+- `astro.config.mjs`: adăugat `security.checkOrigin: false` în `defineConfig`; CORS, honeypot-ul și validările endpoint-urilor nu au fost modificate.
+- `cheia-ferrari/2-Tracker-SEO.md` și acest jurnal: remedierea tehnică documentată.
+
+### Validări
+- Audit pre-editare: 58 pagini, 0 FAIL | 0 WARN.
+- `npx astro check`: 0 erori, 0 avertismente, 0 indicii.
+- `npm run build`: PASS; 77 fișiere comprimate.
+- `npm run seo:check`: 58 pagini, 0 FAIL | 0 WARN.
+
+### Riscuri / pași următori
+- Trimiterea formularului trebuie reconfirmată pe site-ul live după deploy, prin ambele variante de host acceptate.
+
 
 
