@@ -2369,5 +2369,25 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 ### Riscuri / pași următori
 - CTR-ul trebuie remăsurat în Google Search Console după recrawl și acumularea de impresii pentru noile metadata.
 
+## 📝 27 sep 2026 — Formular ofertă în dialog mobil
+
+### Obiectiv
+- Simplificarea formularului de ofertă pe mobil prin păstrarea bugetului în pagină și mutarea detaliilor într-o fereastră dedicată.
+
+### Modificări
+- `src/pages/contact.astro`: sliderul de buget rămâne inline, urmat de triggerul „Continuă cu detaliile”; câmpurile, consimțământul GDPR și submitul sunt mutate într-un `<dialog id="offer-modal">` nativ.
+- Dialogul are backdrop opac, dimensiuni responsive, scroll intern, închidere explicită și textul submitului „Accept și Trimite Cererea”.
+- Feedbackul de validare este afișat în dialog; planificatorul rapid deschide modalul după transferul tipului de eveniment, datei și locației.
+- `cheia-ferrari/2-Tracker-SEO.md` și acest jurnal: rezultatele documentate.
+
+### Validări
+- `npx astro check`: 0 erori, 0 avertismente, 0 indicii.
+- Playwright mobil 390×844: slider vizibil inline, dialog 351×760 px în viewport, backdrop `rgba(0,0,0,0.7)`, scroll intern, trigger/închidere funcționale și submit cu textul cerut.
+- Fluxuri browser: validarea focalizează Nume și afișează feedbackul în modal; planificatorul deschide dialogul și transferă corect datele.
+- `npm run seo:check`: build PASS, 58 pagini, 0 FAIL | 0 WARN.
+
+### Riscuri / pași următori
+- După deploy, se recomandă o verificare tactilă pe iOS Safari și Android Chrome pentru comportamentul tastaturii virtuale în dialog.
+
 
 
