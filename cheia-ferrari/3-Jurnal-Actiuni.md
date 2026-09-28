@@ -2389,5 +2389,25 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 ### Riscuri / pași următori
 - După deploy, se recomandă o verificare tactilă pe iOS Safari și Android Chrome pentru comportamentul tastaturii virtuale în dialog.
 
+---
+
+## 📝 28 sep 2026 — Eliminare Google Maps și link direct la recenzii
+
+### Obiectiv
+- Reducerea frecării la scroll pe mobil pe pagina Contact și deschiderea directă a listei de recenzii Google din butonul dedicat.
+
+### Modificări
+- `src/pages/contact.astro`: eliminate `<iframe>`-ul Google Maps, linkul „Deschide în Google Maps” și iconița SVG asociată; `<ZoneAcoperite />` păstrată, învelită în `mt-6` pentru spațiere față de FAQ. Commit `5765562c`.
+- `src/pages/index.astro`, `src/pages/despre.astro`, `src/pages/cauti-formatie-nunta.astro`: `googleBusinessProfileUrl` schimbat din `maps.google.com/?cid=12446885825212959918` în `https://search.google.com/local/reviews?placeid=ChIJcaRxWQa9skARrsypK7Y4vKw` (Place ID verificat ca aceeași afacere cu CID-ul și linkul `g.page/r/...`). Commit `b7638f44`.
+- `cheia-ferrari/2-Tracker-SEO.md` și acest jurnal: rezultatele documentate.
+
+### Validări
+- `npx astro check`: 0 erori, 0 avertismente, 0 indicii (după fiecare modificare).
+- `npm run seo:check`: build PASS, 58 pagini, 0 FAIL | 0 WARN.
+
+### Riscuri / pași următori
+- `frame-src` din `src/lib/csp.mjs` încă permite `https://www.google.com` și `https://maps.google.com` (adăugate pe 20 sep pentru Maps); pot fi restrânse dacă nu mai există alte iframe-uri Google.
+- După deploy, de verificat pe mobil că linkul de recenzii deschide lista (pe unele dispozitive Android poate deschide aplicația Maps).
+
 
 
