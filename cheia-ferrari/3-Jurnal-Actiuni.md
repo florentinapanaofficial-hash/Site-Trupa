@@ -2406,7 +2406,7 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - `npm run seo:check`: build PASS, 58 pagini, 0 FAIL | 0 WARN.
 
 ### Riscuri / pași următori
-- `frame-src` din `src/lib/csp.mjs` încă permite `https://www.google.com` și `https://maps.google.com` (adăugate pe 20 sep pentru Maps); pot fi restrânse dacă nu mai există alte iframe-uri Google.
+- `frame-src` din `src/lib/csp.mjs`: eliminate `https://www.google.com` și `https://maps.google.com` (nu mai există iframe-uri Google în `src/` sau `public/`). Validare: build + audit 58 pagini, 0 FAIL | 0 WARN; Jest 40/40.
 - După deploy, de verificat pe mobil că linkul de recenzii deschide lista (pe unele dispozitive Android poate deschide aplicația Maps).
 
 
