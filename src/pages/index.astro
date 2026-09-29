@@ -1,5 +1,5 @@
 ---
-import { getImage, Image } from 'astro:assets';
+import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import YoutubeEmbed from '../components/YoutubeEmbed.astro';
 import GoogleBusinessReviews from '../components/GoogleBusinessReviews.astro';
@@ -7,10 +7,10 @@ import siteContent from '../data/siteContent.json';
 import seo from '../data/seo-content.json';
 import couplesData from '../data/couples.json';
 import heroImg from '../assets/card-1-panoramica.jpg';
-
-const heroSliderMobile = await getImage({ src: heroImg, format: 'webp', width: 520, height: 324, quality: 62 });
-const heroSliderPrimary = await getImage({ src: heroImg, format: 'webp', width: 900, height: 560, quality: 68 });
-const heroLcpPreload = heroSliderPrimary.src;
+import anaFlorentinaImg from '../assets/hp-ana-florentina.webp';
+import evenimentLiveImg from '../assets/hp-eveniment-live.webp';
+import claudiuScenaImg from '../assets/hp-claudiu-scena.webp';
+import scenaPanoramicaImg from '../assets/hp-scena-panoramica.webp';
 
 const { acasa } = seo;
 const { contact } = siteContent;
@@ -43,58 +43,35 @@ const heroVideos = siteContent.videos.slice(0, 3).map((video) => ({
   youtubeId: video.youtubeId,
 }));
 
-type HomepagePhotoSource = {
-  fallbackSrc: string;
-  avifSrcSet?: string;
-  webpSrcSet?: string;
-};
-
-const homepagePhotoSources: Record<'claudiuFlorentina' | 'anaFlorentina' | 'evenimentOne' | 'claudiuTwo', HomepagePhotoSource> = {
-  claudiuFlorentina: {
-    avifSrcSet: `${heroSliderMobile.src} 520w, ${heroSliderPrimary.src} 900w`,
-    webpSrcSet: `${heroSliderMobile.src} 520w, ${heroSliderPrimary.src} 900w`,
-    fallbackSrc: heroSliderPrimary.src,
-  },
-  anaFlorentina: {
-    fallbackSrc: '/images/galerie-foto-site-optimized/placerea-scenei-ana-florentina.webp',
-  },
-  evenimentOne: {
-    fallbackSrc: '/images/galerie-foto-site/Galerie Evenimente 1.jpg',
-  },
-  claudiuTwo: {
-    fallbackSrc: '/images/galerie-foto-site-optimized/Claudiu 2.webp',
-  },
-} as const;
-
 const heroSliderPhotos = [
   {
-    ...homepagePhotoSources.claudiuFlorentina,
+    src: heroImg,
     alt: 'Formația Florentina Pană în plin show live pe scenă',
     position: '40% 30%',
   },
   {
-    ...homepagePhotoSources.anaFlorentina,
+    src: anaFlorentinaImg,
     alt: 'Moment live de scenă la un eveniment premium',
     position: '50% 14%',
   },
   {
-    ...homepagePhotoSources.evenimentOne,
+    src: evenimentLiveImg,
     alt: 'Public și formație într-un moment live energic pe scenă',
     position: '38% 16%',
   }
-] as const;
+];
 
-const heroPhotos: Array<{ variant: keyof typeof homepagePhotoSources; alt: string }> = [
+const heroPhotos = [
   {
-    variant: 'claudiuFlorentina',
+    src: heroImg,
     alt: 'Formația Florentina Pană în plin show live pe scenă',
   },
   {
-    variant: 'anaFlorentina',
+    src: anaFlorentinaImg,
     alt: 'Moment live în duet pe scenă la un eveniment premium',
   },
   {
-    variant: 'claudiuTwo',
+    src: claudiuScenaImg,
     alt: 'Public și formație într-un moment live energic pe scenă',
   },
 ];
@@ -113,7 +90,6 @@ const googleBusinessReviews = featuredCouple
 
 <BaseLayout title={acasa.meta.title} description={acasa.meta.description} ogImage={siteContent.seo.ogImage}>
   <Fragment slot="head">
-    <link rel="preload" href={heroLcpPreload} as="image" type="image/webp" fetchpriority="high" media="(min-width: 768px)" />
     <script is:inline type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>
 
@@ -125,36 +101,18 @@ const googleBusinessReviews = featuredCouple
 
       {heroSliderPhotos.map((slide, index) => (
         <div class={`hero-slider-slide${index === 0 ? ' is-active' : ''}`} data-hero-slide style={`--slide-pos: ${slide.position};`}>
-          <picture>
-            {slide.avifSrcSet && (
-              <source
-                type="image/avif"
-                srcset={index === 0 ? slide.avifSrcSet : undefined}
-                sizes="(max-width: 767px) 92vw, (max-width: 1280px) 96vw, 1120px"
-              />
-            )}
-            {slide.webpSrcSet && (
-              <source
-                type="image/webp"
-                srcset={index === 0 ? slide.webpSrcSet : undefined}
-                sizes="(max-width: 767px) 92vw, (max-width: 1280px) 96vw, 1120px"
-              />
-            )}
-            <img
-              src={index === 0 ? slide.fallbackSrc : ''}
-              srcset={index === 0 ? (slide.webpSrcSet || slide.fallbackSrc) : undefined}
-              data-src={slide.fallbackSrc}
-              data-srcset={slide.webpSrcSet || undefined}
-              alt={slide.alt}
-              class="hero-slider-image"
-              loading={index === 0 ? 'eager' : 'lazy'}
-              fetchpriority={index === 0 ? 'high' : 'auto'}
-              decoding="async"
-              width={index === 0 ? 900 : 1400}
-              height={index === 0 ? 560 : 900}
-              sizes="(max-width: 767px) 92vw, (max-width: 1280px) 96vw, 1120px"
-            />
-          </picture>
+          {/* Slide-urile sunt display:none până la reveal, deci lazy amână complet descărcarea. */}
+          <Image
+            src={slide.src}
+            alt={slide.alt}
+            class="hero-slider-image"
+            widths={[768, 1120, 1600]}
+            sizes="(max-width: 1280px) 96vw, 1120px"
+            format="webp"
+            quality={68}
+            loading="lazy"
+            decoding="async"
+          />
         </div>
       ))}
     </div>
@@ -300,31 +258,34 @@ const googleBusinessReviews = featuredCouple
             youtubeId={video.youtubeId}
             title={video.title}
             class="hp-home-video-gate"
-            thumbnailSrc={`https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`}
-            eagerThumbnail={true}
+            thumbnailSrc={`https://i.ytimg.com/vi/${video.youtubeId}/mqdefault.jpg`}
+            facade
           />
           <span class="hp-cine-chip" aria-hidden="true">LIVE</span>
           <span class="hp-cine-caption">{video.title}</span>
         </div>
       ))}
 
-      {heroPhotos.map((photo, index) => {
-        const source = homepagePhotoSources[photo.variant];
-        return (
+      {heroPhotos.map((photo, index) => (
         <div
           class="hp-cine-card hp-cine-card--photo reveal-on-scroll from-right"
           style={`--reveal-delay: ${160 + index * 100}ms`}
           aria-label="Cadru autentic de la eveniment"
         >
-          <picture>
-            {source.avifSrcSet && <source type="image/avif" srcset={source.avifSrcSet} sizes="(max-width: 767px) 92vw, 399px" />}
-            {source.webpSrcSet && <source type="image/webp" srcset={source.webpSrcSet} sizes="(max-width: 767px) 92vw, 399px" />}
-            <img src={source.fallbackSrc} alt={photo.alt} loading="lazy" decoding="async" width="500" height="889" />
-          </picture>
+          <Image
+            src={photo.src}
+            alt={photo.alt}
+            widths={[400, 800]}
+            sizes="(max-width: 767px) 92vw, 399px"
+            format="webp"
+            quality={70}
+            loading="lazy"
+            decoding="async"
+          />
           <span class="hp-cine-overlay" aria-hidden="true"></span>
           <span class="hp-cine-caption">Cadru autentic de la eveniment</span>
         </div>
-      );})}
+      ))}
 
     </div>
   </section>
@@ -332,16 +293,16 @@ const googleBusinessReviews = featuredCouple
   <section class="hp-meet-teaser section-container hp-deferred-section" aria-label="Cunoaște Formația Florentina Pană">
     <div class="hp-meet-wrap reveal-on-scroll from-bottom" style="--reveal-delay: 30ms">
       <div class="hp-meet-media">
-        <picture>
-          <img
-            src="/images/galerie-foto-site-optimized/placerea-scenei-ana-florentina.webp"
-            alt="Florentina și Claudiu în timpul unui moment live"
-            loading="lazy"
-            decoding="async"
-            width="500"
-            height="889"
-          />
-        </picture>
+        <Image
+          src={anaFlorentinaImg}
+          alt="Florentina și Claudiu în timpul unui moment live"
+          widths={[480, 960]}
+          sizes="(max-width: 767px) 92vw, 480px"
+          format="webp"
+          quality={70}
+          loading="lazy"
+          decoding="async"
+        />
       </div>
       <div class="hp-meet-content">
         <p class="hp-meet-kicker">Conexiune reală</p>
@@ -582,14 +543,16 @@ const googleBusinessReviews = featuredCouple
     </div>
 
     <a href="/despre/" class="hp-card hp-card--story anim-on-scroll anim-d1 anim-card-hover reveal-on-scroll from-left" style="--reveal-delay: 100ms">
-      <img
-        src="/images/galerie-foto-site/placerea-scenei-panoramica-1.jpg"
+      <Image
+        src={scenaPanoramicaImg}
         alt="Formația Florentina Pană pe scenă — moment live de la un eveniment"
         class="hp-card-bg"
+        widths={[480, 800, 1200]}
+        sizes="(max-width: 767px) 92vw, 50vw"
+        format="webp"
+        quality={70}
         loading="lazy"
         decoding="async"
-        width="800"
-        height="500"
       />
       <div class="hp-card-overlay" aria-hidden="true"></div>
       <div class="hp-card-content">
@@ -654,15 +617,6 @@ const googleBusinessReviews = featuredCouple
 
       const revealSlider = () => {
         slider.setAttribute('data-ready', 'true');
-
-        slides.forEach((slide, index) => {
-          if (index === 0) return;
-          const img = slide.querySelector('img[data-src]');
-          if (!img || img.dataset.loaded === 'true') return;
-          img.src = img.dataset.src || img.src;
-          if (img.dataset.srcset) img.srcset = img.dataset.srcset;
-          img.dataset.loaded = 'true';
-        });
       };
 
       const scheduleReveal = () => {
@@ -692,14 +646,6 @@ const googleBusinessReviews = featuredCouple
           slides[activeIndex].classList.remove('is-active');
           activeIndex = (activeIndex + 1) % slides.length;
           slides[activeIndex].classList.add('is-active');
-
-          const nextSlide = slides[activeIndex];
-          const img = nextSlide.querySelector('img[data-src]');
-          if (img && img.dataset.loaded !== 'true') {
-            img.src = img.dataset.src || img.src;
-            if (img.dataset.srcset) img.srcset = img.dataset.srcset;
-            img.dataset.loaded = 'true';
-          }
         }, 4200);
       };
 

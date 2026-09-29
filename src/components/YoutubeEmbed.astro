@@ -41,6 +41,8 @@ interface Props {
   thumbnailSrc?: string;
   youtubeUrl?: string;
   globalConsentOnly?: boolean;
+  /** Iframe-ul se injectează exclusiv la click pe Play, chiar dacă există consimțământ. */
+  facade?: boolean;
 }
 
 const {
@@ -53,6 +55,7 @@ const {
   thumbnailSrc,
   youtubeUrl,
   globalConsentOnly = false,
+  facade = false,
 } = Astro.props;
 
 const hasPlaylist = typeof playlistId === 'string' && playlistId.length > 0;
@@ -76,6 +79,7 @@ const ytLink = youtubeUrl || (hasPlaylist
   data-yt-title={title}
   data-yt-src={embedSrc}
   data-yt-mini-on-scroll={miniOnScroll ? 'true' : undefined}
+  data-yt-facade={facade ? 'true' : undefined}
   role="figure"
   aria-label={title}
 >
@@ -182,6 +186,16 @@ const ytLink = youtubeUrl || (hasPlaylist
       if (event.relatedTarget && gate.contains(event.relatedTarget)) return;
       playVideoHoverTone();
     }, { passive: true });
+
+    function isFacadeGate(gate) {
+      return gate && gate.getAttribute('data-yt-facade') === 'true';
+    }
+
+    function syncConsentClass() {
+      var granted = false;
+      try { granted = localStorage.getItem('cookie_consent') === 'granted'; } catch (_) {}
+      document.documentElement.classList.toggle('yt-consent-granted', granted);
+    }
 
     function hasMiniOnScroll(gate) {
       return gate && gate.getAttribute('data-yt-mini-on-scroll') === 'true';
@@ -373,7 +387,8 @@ const ytLink = youtubeUrl || (hasPlaylist
       // Adaugă enablejsapi=1 pentru YouTube IFrame API și postMessage support
       var separator = src.includes('?') ? '&' : '?';
       var embedOrigin = encodeURIComponent(window.location.origin);
-      iframe.src = src + separator + 'enablejsapi=1&playsinline=1&origin=' + embedOrigin;
+      var autoplay = isFacadeGate(gate) ? '&autoplay=1' : '';
+      iframe.src = src + separator + 'enablejsapi=1&playsinline=1' + autoplay + '&origin=' + embedOrigin;
       iframe.title = title;
       iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
       iframe.setAttribute('allowfullscreen', '');
@@ -512,8 +527,10 @@ const ytLink = youtubeUrl || (hasPlaylist
     }
 
     /** Activează doar embed-urile vizibile; cele ascunse se activează la afișare. */
+    var AUTO_GATE_SELECTOR = '.yt-gate:not([data-yt-facade="true"])';
+
     function activateAllGates() {
-      document.querySelectorAll('.yt-gate').forEach(activateGate);
+      document.querySelectorAll(AUTO_GATE_SELECTOR).forEach(activateGate);
     }
 
     function activateVisibleGates() {
@@ -532,13 +549,14 @@ const ytLink = youtubeUrl || (hasPlaylist
       }, { rootMargin: '240px 0px' });
       activationObservers.push(observer);
 
-      document.querySelectorAll('.yt-gate').forEach(function (gate) {
+      document.querySelectorAll(AUTO_GATE_SELECTOR).forEach(function (gate) {
         if (!gate.querySelector('iframe')) observer.observe(gate);
       });
     }
 
     // ── La încărcarea paginii: așteaptă DOM-ul complet pentru toate embed-urile ──
     function activateGrantedGates() {
+      syncConsentClass();
       try {
         if (localStorage.getItem('cookie_consent') === 'granted') {
           activateVisibleGates();
@@ -550,6 +568,7 @@ const ytLink = youtubeUrl || (hasPlaylist
     document.addEventListener('astro:page-load', activateGrantedGates);
 
     // ── Reacționează la acceptarea din CookieBanner ──
+    window.addEventListener('cookie:granted', syncConsentClass);
     window.addEventListener('cookie:granted', activateVisibleGates);
 
     window.addEventListener('yt:play', function (e) {
@@ -567,6 +586,9 @@ const ytLink = youtubeUrl || (hasPlaylist
 
       try { localStorage.setItem('cookie_consent', 'granted'); } catch (_) {}
       window.dispatchEvent(new CustomEvent('cookie:granted'));
+
+      var gate = btn.closest('.yt-gate');
+      if (isFacadeGate(gate)) activateAndPlayGate(gate);
     });
 
     document.addEventListener('click', function (e) {
@@ -757,7 +779,10 @@ const ytLink = youtubeUrl || (hasPlaylist
     height: 100%;
     border: 0;
   }
-
+  /* Facade: după consimțământ rămâne doar butonul de Play peste copertă. */
+  :global(html.yt-consent-granted) .yt-gate[data-yt-facade='true'] .yt-gate__msg {
+    display: none;
+  }
   /* ── Placeholder ─────────────────────────────────────────── */
   .yt-gate__placeholder {
     position: absolute;

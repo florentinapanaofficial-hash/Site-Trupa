@@ -2411,3 +2411,22 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 
 
 
+
+## 📝 29 sep 2026 — Optimizare media homepage: Astro Image și Video Facade
+
+### Obiectiv
+- Creșterea scorului PageSpeed (58) prin eliminarea încărcărilor media grele la accesarea homepage-ului, fără regresii SEO/Accesibilitate.
+
+### Modificări
+- `src/assets/hp-*.webp` (4 fișiere): generate prin pipeline-ul `_raw_images/` → `scripts/optimize-images.js` din copii ale imaginilor publice folosite pe homepage (originalele din `public/` rămân pentru celelalte pagini).
+- `src/pages/index.astro`: toate `<img>`/`<picture>` de conținut înlocuite cu `<Image>` (WebP, `widths`/`sizes`, `loading="lazy"`); imaginea Hero rămâne singura `eager` + `fetchpriority="high"`. Eliminat preload-ul de 900 px pentru slider-ul desktop (slide-urile sunt `display:none` până la reveal) și logica `data-src` devenită inutilă.
+- `src/components/YoutubeEmbed.astro`: prop nou `facade` — gate-urile marcate nu se mai activează automat la consimțământ/scroll; iframe-ul (cu `autoplay=1`) se injectează doar la click pe Play. După consimțământ se ascunde textul despre cookie-uri. Comportamentul celorlalte pagini (Apariții TV, Smart TV) este neschimbat.
+- Homepage: cele 3 video folosesc `facade` și coperta `mqdefault.jpg` (16:9, ~30% mai mică) cu `loading="lazy"`.
+
+### Validări
+- `npx astro check`: 0 erori, 0 avertismente, 0 indicii.
+- `npm run seo:check`: build PASS, 58 pagini, 0 FAIL | 0 WARN; `npm test`: 40/40.
+- HTML prerandat homepage: 15 `<img>`, 0 fără `alt`, 0 fără `width`, 1 singură imagine `fetchpriority="high"`, 0 `<iframe>`, 0 preload-uri de imagine.
+
+### Riscuri / pași următori
+- Remăsurare PageSpeed pe live după deploy. Pe iOS, autoplay-ul după click poate necesita un al doilea tap dacă browserul blochează redarea.
