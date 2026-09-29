@@ -2445,3 +2445,5 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 
 ### Riscuri / pași următori
 - Remăsurare PageSpeed mobil și desktop după publicare.
+- Remăsurare PageSpeed după deploy `1455c8a9` (29 sep 2026, 14:15): **mobil 98** / Accesibilitate 100 / Bune practici 96 / SEO 100; **desktop 100** / 100 / 96 / 100. Scorul inițial era 58.
+- Test direct pe `https://www.florentinapanaofficial.ro/` (14:18): **mobil 97** (FCP 1,2 s, LCP 2,6 s, TBT 10 ms, CLS 0,004); **desktop 100** / 100 / 96 / 100. LCP mobil rămâne singura metrică portocalie (prag 2,5 s).
