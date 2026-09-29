@@ -2503,3 +2503,23 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 
 ### Riscuri / pași următori
 - Impactul exact în PSI depinde de cache/CDN și de variabilitatea testului mobil throttled; necesară remăsurare live după deploy pe aceeași rută.
+
+## 📝 29 sep 2026 — PSI mobil: eliminare erori consolă 403 la miniaturile YouTube
+
+### Obiectiv
+- Eliminarea erorilor din categoria „Browser errors” din PageSpeed Insights mobil, unde încărcarea miniaturilor YouTube (`i.ytimg.com/vi/*/mqdefault.jpg`) raporta status 403.
+
+### Modificări
+- [src/pages/index.astro](src/pages/index.astro):
+  - adăugat `heroVideoThumbnails` cu surse locale Astro (`heroImg.src`, `anaFlorentinaImg.src`, `claudiuScenaImg.src`);
+  - în cele 3 carduri video din secțiunea cinematică, `thumbnailSrc` nu mai pointează la `i.ytimg.com`, ci la imaginile locale din build;
+  - păstrat comportamentul `facade` (iframe YouTube se injectează doar la interacțiune), fără schimbări UX în fluxul de play.
+
+### Validări
+- Start sesiune: `npm run seo:audit` → 58 pagini, 0 FAIL | 0 WARN.
+- După modificări: `npm run seo:check` PASS (build + audit), 58 pagini, 0 FAIL | 0 WARN.
+- Verificare output: `dist/client/index.html` nu mai conține URL-uri `i.ytimg.com` / `mqdefault`.
+- `get_errors` pe homepage: fără erori în [src/pages/index.astro](src/pages/index.astro).
+
+### Riscuri / pași următori
+- Pe alte pagini video (non-homepage) se folosesc încă miniaturi YouTube externe; dacă PSI va semnala 403 și acolo, se poate aplica același pattern (fallback local) punctual, pe fiecare rută.

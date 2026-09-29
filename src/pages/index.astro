@@ -76,6 +76,12 @@ const heroPhotos = [
   },
 ];
 
+const heroVideoThumbnails = [
+  heroImg.src,
+  anaFlorentinaImg.src,
+  claudiuScenaImg.src,
+];
+
 const googleBusinessProfileUrl = 'https://search.google.com/local/reviews?placeid=ChIJcaRxWQa9skARrsypK7Y4vKw';
 const googleBusinessWriteUrl = 'https://g.page/r/Ca7MqSu2OLysEAE/review';
 const featuredCouple = couplesData.couples[0];
@@ -258,7 +264,7 @@ const googleBusinessReviews = featuredCouple
             youtubeId={video.youtubeId}
             title={video.title}
             class="hp-home-video-gate"
-            thumbnailSrc={`https://i.ytimg.com/vi/${video.youtubeId}/mqdefault.jpg`}
+            thumbnailSrc={heroVideoThumbnails[index] || '/images/logo-fp-stage.svg'}
             facade
           />
           <span class="hp-cine-chip" aria-hidden="true">LIVE</span>
