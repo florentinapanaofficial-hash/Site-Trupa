@@ -2466,3 +2466,4 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 
 ### Riscuri / pași următori
 - Remăsurare PageSpeed mobil pe `www` după deploy. Următorul cost major rămâne CSS-ul inline (~182 KB/pagină, `inlineStylesheets: 'always'`).
+- Rezultat live după deploy `f28c5171` (29 sep 2026, 14:30, `www`, mobil): **Performanță 98** — FCP 1,3 s, **LCP 2,3 s** (de la 2,6 s, acum verde), TBT 30 ms, CLS 0,004, Speed Index 1,7 s. Toate metricile Core Web Vitals verzi.
