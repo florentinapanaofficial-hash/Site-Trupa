@@ -2523,3 +2523,51 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 
 ### Riscuri / pași următori
 - Pe alte pagini video (non-homepage) se folosesc încă miniaturi YouTube externe; dacă PSI va semnala 403 și acolo, se poate aplica același pattern (fallback local) punctual, pe fiecare rută.
+
+## 📝 29 sep 2026 — VideoFacade: componentă nouă, unificare showcase video și politică GDPR
+
+### Obiectiv
+- Înlocuirea secțiunii video de pe homepage cu o fațadă proprie, mai ușoară, și uniformizarea porții de consimțământ pentru toate embed-urile video de pe site.
+
+### Modificări
+- [src/components/VideoFacade.astro](src/components/VideoFacade.astro) — componentă nouă:
+  - props `imageSrc` (ImageMetadata), `title`, `subtitle`, `logoSrc`, `videoUrl`, `class`;
+  - fundal prin `<Image>` din `astro:assets` (`widths=[480,800,1280]`, `format="webp"`, `quality=80`, `loading="lazy"`), overlay gradient, siglă dreapta-sus, buton Play SVG auriu, `<h3>` + `<p>` cu textele SEO **native în HTML** (nu injectate prin JS, deci indexabile);
+  - iframe-ul se creează abia la interacțiune; `videoUrl` și `logoSrc` trec prin `sanitizeUrl` la build, iar la runtime hostul e validat pe allowlist (`youtube-nocookie`, `youtube`, `player.vimeo`, `videodelivery`, `customer-*.cloudflarestream`) înainte de injectare;
+  - poartă GDPR: la click, dacă `localStorage.cookie_consent !== 'granted'`, se afișează panoul de consimțământ (mesaj + „Acceptă și vizionează" + link `/politica-cookie/`); acceptul scrie `cookie_consent=granted` și emite `cookie:granted`, exact evenimentul ascultat deja de `CookieBanner`, `YoutubeEmbed`, `SmartTvVideoPlayer` și `aparitii-tv.astro`. Componenta ascultă la rândul ei `cookie:granted`, deci acceptul din bannerul global pornește fațadele care așteptau;
+  - accesibilitate: `role="button"`, `tabindex="0"`, Enter/Space, focus mutat pe butonul de accept, atribute ARIA curățate după activare.
+- [src/pages/index.astro](src/pages/index.astro):
+  - adăugată secțiunea `#video-showcase` (`max-w-7xl mx-auto px-4 py-16`, grid `1 / md:2`) cu 2 instanțe `VideoFacade` (ID-uri `xdcdjAtxZlA` și `FyrQQqFMZvg`, imagini `hp-eveniment-live` / `hp-scena-panoramica` — **placeholdere**, de înlocuit la montajele oficiale 2027-2028);
+  - eliminată complet secțiunea `#showcase-cinematic` (3 carduri `YoutubeEmbed` + 3 carduri foto);
+  - eliminate importurile `YoutubeEmbed` și `claudiuScenaImg`, constantele `heroVideos`, `heroPhotos`, `heroVideoThumbnails`;
+  - eliminat blocul `<script is:inline>` cu parallax pe `.hp-cine-card` (rămăsese fără ținte în DOM);
+  - eliminate ~330 linii CSS: `.hp-cinematic*`, `.hp-cine-*`, `.hp-home-video-gate`, regulile din cele 3 media queries, `@keyframes cinematicMarquee` și selectorii orfani din blocurile `min-width` și `reveal-on-scroll`.
+
+### Impact asupra performanței
+- Homepage-ul nu mai încarcă `YoutubeEmbed.astro_astro_type_script_index_0_lang.*.js` (**8,8 KB** JS) — componenta nu mai e referită de nicio secțiune a paginii. Bundle-ul rămâne generat pentru celelalte rute video care încă folosesc `YoutubeEmbed`.
+- Scriptul `VideoFacade` este mic (~1,5 KB minificat) și Astro îl inline-ază **o singură dată** pe pagină, deși componenta are 2 instanțe (verificat: 1 ocurență în `dist/client/index.html`). Zero request de rețea suplimentar.
+- 3 embed-uri video → 2, iar imaginile de copertă sunt servite din `_astro/` ca WebP responsive generat de Astro, nu din surse externe.
+- CSS-ul global al homepage-ului scade cu ~330 linii; `inlineStylesheets: 'always'` înseamnă că economia se vede direct în greutatea HTML-ului.
+- **Nemăsurat încă:** scorul PageSpeed live. Valorile din sesiunile anterioare (mobil 98 / desktop 100) sunt anterioare acestei modificări și trebuie remăsurate după deploy.
+
+### Uniformizare GDPR
+- Înainte: homepage-ul avea 3 embed-uri cu poartă de consimțământ (`YoutubeEmbed` cu `facade`), iar orice componentă fațadă nouă ar fi încărcat iframe-ul la primul click, fără acord — două comportamente diferite pentru același furnizor, pe aceeași pagină.
+- Acum: toate embed-urile video de pe site (homepage, `/galerie-video/`, `/aparitii-tv/`, Smart TV player) folosesc același contract: cheia `localStorage.cookie_consent` și evenimentul `cookie:granted`. Consimțământul dat oriunde se propagă instantaneu în toate componentele, în ambele sensuri.
+- Temeiul legal rămâne cel documentat în `YoutubeEmbed.astro`: Rec. 30 & 32 RGPD + Directiva ePrivacy art. 5 alin. 3 — cookie-urile furnizorului video cer acord **prealabil** încărcării iframe-ului.
+
+### Greșeli descoperite în timpul sesiunii
+- Prima versiune a scriptului atașa listenerii o singură dată, la execuția modulului. Cu `ClientRouter` activ, modulele nu se re-execută la navigare client-side, deci fațada ar fi rămas moartă după prima navigare înapoi pe homepage — exact pattern-ul documentat în auditul View Transitions din 18 sep 2026. Corectat: logica e izolată în `bindFacades()`, apelată la încărcare și pe `astro:page-load`, cu gard `data-video-bound` împotriva dublării listenerilor.
+- Diagnostic fals-pozitiv pe parcurs: am căutat în `dist/client/_astro/*.js` un bundle separat pentru script și nu l-am găsit, concluzionând greșit că scriptul lipsește din build. În realitate Astro îl inline-ase în HTML (sub pragul de externalizare). Verificarea corectă e căutarea unui literal din script (`iframe.videodelivery.net`) în `dist/client/index.html`.
+
+### Validări
+- `npx astro check` → 0 errors | 0 warnings | 0 hints (82 fișiere).
+- `npx astro build` → PASS (rebuild curat, după ștergerea `dist` și `node_modules/.vite`).
+- `npm run seo:check` → 58 pagini, **0 FAIL | 0 WARN**.
+- `npm test` (Jest) → 40/40.
+- Verificări pe output: markup-ul fațadei prezent în `dist/client/index.html`; scriptul inline prezent o singură dată; `astro:page-load` prezent în scriptul inline; nicio referință rămasă la `hp-cine-`, `hp-cinematic`, `cinematicMarquee` sau `showcase-cinematic` în sursă.
+
+### Riscuri / pași următori
+- ID-urile YouTube și imaginile sunt **placeholdere**; titlurile SEO („Show Live Nuntă Pitești", „Colaj Folclor & Petrecere 2027") nu corespund neapărat conținutului real al clipurilor. De corelat la montajele oficiale.
+- `src/assets/hp-claudiu-scena.webp` nu mai e referit pe homepage; de verificat dacă e folosit altundeva înainte de ștergere.
+- Homepage-ul a pierdut 4 elemente vizuale (1 card video + 3 carduri foto) față de varianta anterioară; de urmărit timpul pe pagină și bounce-ul în GA4, în caz că densitatea de conținut vizual conta pentru engagement.
+- De remăsurat PageSpeed mobil și desktop după deploy.

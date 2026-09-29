@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import YoutubeEmbed from '../components/YoutubeEmbed.astro';
+import VideoFacade from '../components/VideoFacade.astro';
 import GoogleBusinessReviews from '../components/GoogleBusinessReviews.astro';
 import siteContent from '../data/siteContent.json';
 import seo from '../data/seo-content.json';
@@ -9,7 +9,6 @@ import couplesData from '../data/couples.json';
 import heroImg from '../assets/card-1-panoramica.jpg';
 import anaFlorentinaImg from '../assets/hp-ana-florentina.webp';
 import evenimentLiveImg from '../assets/hp-eveniment-live.webp';
-import claudiuScenaImg from '../assets/hp-claudiu-scena.webp';
 import scenaPanoramicaImg from '../assets/hp-scena-panoramica.webp';
 
 const { acasa } = seo;
@@ -38,11 +37,6 @@ const faqJsonLd = {
 };
 const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%83%20ziua!%20A%C8%99%20dori%20s%C4%83%20rezerv%20Forma%C8%9Bia%20Florentina%20Pan%C4%83%20pentru%20evenimentul%20meu.`;
 
-const heroVideos = siteContent.videos.slice(0, 3).map((video) => ({
-  title: video.title,
-  youtubeId: video.youtubeId,
-}));
-
 const heroSliderPhotos = [
   {
     src: heroImg,
@@ -59,27 +53,6 @@ const heroSliderPhotos = [
     alt: 'Public și formație într-un moment live energic pe scenă',
     position: '38% 16%',
   }
-];
-
-const heroPhotos = [
-  {
-    src: heroImg,
-    alt: 'Formația Florentina Pană în plin show live pe scenă',
-  },
-  {
-    src: anaFlorentinaImg,
-    alt: 'Moment live în duet pe scenă la un eveniment premium',
-  },
-  {
-    src: claudiuScenaImg,
-    alt: 'Public și formație într-un moment live energic pe scenă',
-  },
-];
-
-const heroVideoThumbnails = [
-  heroImg.src,
-  anaFlorentinaImg.src,
-  claudiuScenaImg.src,
 ];
 
 const googleBusinessProfileUrl = 'https://search.google.com/local/reviews?placeid=ChIJcaRxWQa9skARrsypK7Y4vKw';
@@ -248,51 +221,27 @@ const googleBusinessReviews = featuredCouple
     </div>
   </section>
 
-  <section id="showcase-cinematic" class="hp-cinematic section-container free-scroll-section hp-deferred-section" aria-label="Showcase live foto-video">
-    <div class="hp-cinematic-head reveal-on-scroll from-bottom" style="--reveal-delay: 0ms">
-      <h2 class="hp-cinematic-title">Așa arată o petrecere cu noi:</h2>
-    </div>
-
-    <div class="hp-cinematic-grid">
-      {heroVideos.map((video, index) => (
-        <div
-          class="hp-cine-card hp-cine-card--video reveal-on-scroll from-left"
-          style={`--reveal-delay: ${index * 90}ms`}
-          aria-label={`Videoclip live: ${video.title}`}
-        >
-          <YoutubeEmbed
-            youtubeId={video.youtubeId}
-            title={video.title}
-            class="hp-home-video-gate"
-            thumbnailSrc={heroVideoThumbnails[index] || '/images/logo-fp-stage.svg'}
-            facade
-          />
-          <span class="hp-cine-chip" aria-hidden="true">LIVE</span>
-          <span class="hp-cine-caption">{video.title}</span>
-        </div>
-      ))}
-
-      {heroPhotos.map((photo, index) => (
-        <div
-          class="hp-cine-card hp-cine-card--photo reveal-on-scroll from-right"
-          style={`--reveal-delay: ${160 + index * 100}ms`}
-          aria-label="Cadru autentic de la eveniment"
-        >
-          <Image
-            src={photo.src}
-            alt={photo.alt}
-            widths={[400, 800]}
-            sizes="(max-width: 767px) 92vw, 399px"
-            format="webp"
-            quality={70}
-            loading="lazy"
-            decoding="async"
-          />
-          <span class="hp-cine-overlay" aria-hidden="true"></span>
-          <span class="hp-cine-caption">Cadru autentic de la eveniment</span>
-        </div>
-      ))}
-
+  <section id="video-showcase" class="hp-deferred-section" aria-labelledby="video-showcase-title">
+    <div class="mx-auto max-w-7xl px-4 py-16">
+      <h2 id="video-showcase-title" class="mb-10 text-center text-3xl font-bold text-white sm:text-4xl">
+        Video Showcase
+      </h2>
+      <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+        <VideoFacade
+          imageSrc={evenimentLiveImg}
+          title="Show Live Nuntă Pitești"
+          subtitle="Formația Florentina Pană"
+          logoSrc="/images/logo-fp-stage.svg"
+          videoUrl="https://www.youtube-nocookie.com/embed/xdcdjAtxZlA?autoplay=1"
+        />
+        <VideoFacade
+          imageSrc={scenaPanoramicaImg}
+          title="Colaj Folclor & Petrecere 2027"
+          subtitle="Formația Florentina Pană"
+          logoSrc="/images/logo-fp-stage.svg"
+          videoUrl="https://www.youtube-nocookie.com/embed/FyrQQqFMZvg?autoplay=1"
+        />
+      </div>
     </div>
   </section>
 
@@ -780,34 +729,6 @@ const googleBusinessReviews = featuredCouple
     })();
   </script>
 
-  <script is:inline data-astro-rerun>
-    (() => {
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-      if (window.matchMedia('(max-width: 1024px)').matches) return;
-      if (!window.matchMedia('(hover: hover)').matches) return;
-
-      const cinematicCards = Array.from(document.querySelectorAll('.hp-cine-card'));
-      if (!cinematicCards.length) return;
-
-      cinematicCards.forEach((card) => {
-        let rect = null;
-        const cacheRect = () => { rect = card.getBoundingClientRect(); };
-        const clear = () => { card.style.transform = ''; };
-
-        card.addEventListener('mouseenter', cacheRect);
-        card.addEventListener('mousemove', (event) => {
-          if (!rect) cacheRect();
-          const px = (event.clientX - rect.left) / rect.width;
-          const py = (event.clientY - rect.top) / rect.height;
-          const x = (px - 0.5) * 5;
-          const y = (py - 0.5) * 5;
-          card.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) scale(1.015)`;
-        });
-        card.addEventListener('mouseleave', clear);
-      });
-    })();
-  </script>
-
 </BaseLayout>
 
 
@@ -1032,7 +953,6 @@ const googleBusinessReviews = featuredCouple
     }
   }
 
-  .hp-cinematic-grid,
   .hp-team-grid,
   .hp-seo-grid,
   .hp-seo-grid--3,
@@ -1040,9 +960,6 @@ const googleBusinessReviews = featuredCouple
     min-width: 0;
   }
 
-  .hp-cine-card,
-  .hp-cine-story,
-  .hp-cine-editorial,
   .hp-team-card,
   .hp-seo-block,
   .hp-proof-card {
@@ -3103,316 +3020,6 @@ const googleBusinessReviews = featuredCouple
     text-wrap: pretty;
   }
 
-  /* ════════════════════════════════════════════════════════════════
-     SHOWCASE CINEMATIC — layout mixt text + video + foto
-  ════════════════════════════════════════════════════════════════ */
-  .hp-cinematic {
-    max-width: var(--container-max);
-    margin: 0 auto;
-    padding-block: var(--hp-section-pad);
-  }
-
-  .hp-cinematic-head {
-    max-width: 68ch;
-    margin: 0 auto 1.5rem;
-    text-align: center;
-  }
-
-  .hp-cinematic-eyebrow {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 0.45rem;
-    padding: 0.24rem 0.65rem;
-    border-radius: 999px;
-    border: 1px solid rgba(11, 188, 214, 0.42);
-    background: rgba(11, 188, 214, 0.12);
-    color: rgba(172, 240, 248, 0.95);
-    font-size: 0.62rem;
-    font-weight: 700;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-  }
-
-  .hp-cinematic-kicker {
-    display: inline-block;
-    margin: 0 0 0.55rem;
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: rgba(241, 229, 172, 0.9);
-  }
-
-  .hp-cinematic-title {
-    margin: 0;
-    font-family: 'Oswald', sans-serif;
-    font-size: clamp(1.6rem, 4.4vw, 2.4rem);
-    line-height: 1.15;
-    color: #fff;
-    text-wrap: balance;
-  }
-
-  .hp-cinematic-copy {
-    margin: 0.85rem auto 0;
-    color: #d0d8e8;
-    line-height: 1.75;
-    font-size: clamp(0.9rem, 1.3vw, 1rem);
-    max-width: 62ch;
-    text-wrap: pretty;
-  }
-
-  .hp-cinematic-grid {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: clamp(0.75rem, 1.8vw, 1.2rem);
-    align-items: stretch;
-  }
-
-  .hp-cine-card,
-  .hp-cine-story {
-    position: relative;
-    border-radius: 1.1rem;
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    background: rgba(9, 18, 42, 0.58);
-    min-height: 220px;
-  }
-
-  .hp-home-video-gate {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: inherit;
-    overflow: hidden;
-  }
-
-  .hp-home-video-gate .yt-gate__thumb {
-    object-fit: cover;
-  }
-
-  .hp-home-video-gate .yt-gate__click-overlay,
-  .hp-home-video-gate .yt-gate__fullscreen-btn {
-    z-index: 4;
-  }
-
-  .hp-cine-card {
-    text-decoration: none;
-    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.34);
-    transition: transform 280ms ease, box-shadow 280ms ease, border-color 280ms ease;
-  }
-
-  .hp-cine-card img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    transition: transform 420ms ease;
-  }
-
-  .hp-cine-card picture {
-    display: block;
-    width: 100%;
-    height: 100%;
-  }
-
-  .hp-cine-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0.12) 60%, transparent 100%);
-    pointer-events: none;
-  }
-
-  .hp-cine-caption {
-    position: absolute;
-    left: 0.9rem;
-    right: 0.9rem;
-    bottom: 0.75rem;
-    color: #fff;
-    font-size: 0.84rem;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    z-index: 3;
-    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
-  }
-
-  .hp-cine-chip {
-    position: absolute;
-    top: 0.7rem;
-    left: 0.7rem;
-    z-index: 3;
-    padding: 0.2rem 0.55rem;
-    border-radius: 999px;
-    background: rgba(240, 59, 59, 0.9);
-    color: #fff;
-    font-size: 0.62rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-
-  .hp-cine-play {
-    position: absolute;
-    right: 0.7rem;
-    top: 0.62rem;
-    z-index: 3;
-    width: 1.95rem;
-    height: 1.95rem;
-    border-radius: 999px;
-    display: grid;
-    place-items: center;
-    background: rgba(0, 0, 0, 0.55);
-    color: #fff;
-    font-size: 0.9rem;
-    font-weight: 700;
-  }
-
-  .hp-cine-card--video:nth-of-type(1) { grid-column: span 4; }
-  .hp-cine-card--video:nth-of-type(2) { grid-column: span 4; }
-  .hp-cine-card--video:nth-of-type(3) { grid-column: span 4; }
-
-  .hp-cine-card--video,
-  .hp-cine-card--photo {
-    aspect-ratio: 16 / 9;
-    min-height: 0;
-  }
-
-  .hp-cine-card--photo {
-    aspect-ratio: 4 / 5;
-  }
-
-  .hp-cine-card--photo img {
-    object-position: center 24%;
-  }
-
-  .hp-cine-story {
-    grid-column: span 6;
-    padding: 1.4rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 0.8rem;
-    background:
-      radial-gradient(circle at 80% 15%, rgba(245, 166, 35, 0.2), transparent 40%),
-      radial-gradient(circle at 10% 90%, rgba(11, 188, 214, 0.24), transparent 45%),
-      rgba(8, 16, 36, 0.82);
-  }
-
-  .hp-cine-story h3,
-  .hp-cine-story-title {
-    margin: 0;
-    color: #fff;
-    font-family: 'Oswald', sans-serif;
-    font-size: clamp(1.2rem, 2.1vw, 1.6rem);
-    line-height: 1.15;
-  }
-
-  .hp-cine-story p {
-    margin: 0;
-    color: #d4dcef;
-    line-height: 1.75;
-    font-size: 0.92rem;
-  }
-
-  .hp-cine-actions {
-    display: flex;
-    gap: 0.7rem;
-    flex-wrap: wrap;
-    margin-top: 0.25rem;
-  }
-
-  .hp-cine-card--photo {
-    grid-column: span 6;
-  }
-
-  .hp-cine-editorial {
-    grid-column: span 6;
-    border-radius: 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    background:
-      radial-gradient(circle at 85% 20%, rgba(245, 166, 35, 0.22), transparent 42%),
-      rgba(9, 18, 40, 0.72);
-    padding: 1.2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.32);
-  }
-
-  .hp-cine-editorial-kicker {
-    margin: 0;
-    font-size: 0.64rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: rgba(255, 225, 160, 0.9);
-    font-weight: 700;
-  }
-
-  .hp-cine-editorial h3,
-  .hp-cine-editorial-title {
-    margin: 0;
-    color: #f8fbff;
-    font-family: 'Oswald', sans-serif;
-    font-size: clamp(1.08rem, 1.9vw, 1.32rem);
-    line-height: 1.2;
-  }
-
-  .hp-cine-editorial p {
-    margin: 0;
-    color: rgba(211, 224, 243, 0.94);
-    line-height: 1.72;
-    font-size: 0.86rem;
-  }
-
-  .hp-cine-editorial-cta {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: fit-content;
-    margin-top: 0.25rem;
-    min-height: 44px;
-    border-radius: 999px;
-    border: 1px solid rgba(245, 166, 35, 0.46);
-    padding: 0.45rem 0.9rem;
-    text-decoration: none;
-    color: #ffe8bd;
-    background: linear-gradient(135deg, rgba(245, 166, 35, 0.22), rgba(255, 209, 102, 0.16));
-    font-family: 'Oswald', sans-serif;
-    font-size: 0.68rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    font-weight: 700;
-    transition: transform 180ms ease, filter 180ms ease;
-  }
-
-  .hp-cine-editorial-cta:hover {
-    transform: translateY(-1px);
-    filter: brightness(1.05);
-  }
-
-  .hp-cinematic-marquee {
-    margin-top: 0.95rem;
-    border-radius: 0.95rem;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    background: rgba(8, 16, 38, 0.6);
-    overflow: hidden;
-  }
-
-  .hp-cinematic-track {
-    display: flex;
-    align-items: center;
-    gap: 0.9rem;
-    min-width: max-content;
-    padding: 0.62rem 0.8rem;
-    color: rgba(227, 238, 255, 0.88);
-    font-size: 0.7rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    font-weight: 700;
-    animation: cinematicMarquee 18s linear infinite;
-  }
-
   .hp-proof {
     max-width: var(--container-max);
     margin: 0 auto;
@@ -3535,76 +3142,13 @@ const googleBusinessReviews = featuredCouple
     }
   }
 
-  @media (hover: hover) and (pointer: fine) {
-    .hp-cine-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 22px 44px rgba(0, 0, 0, 0.4);
-      border-color: rgba(245, 166, 35, 0.5);
-    }
-
-    .hp-cine-card:hover img {
-      transform: scale(1.05);
-    }
-  }
-
   @media (max-width: 1024px) {
-    .hp-cinematic-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .hp-cine-card--video:nth-of-type(1),
-    .hp-cine-card--video:nth-of-type(2),
-    .hp-cine-card--video:nth-of-type(3) {
-      grid-column: span 1;
-      grid-row: auto;
-      min-height: 0;
-    }
-
-    .hp-cine-story {
-      grid-column: span 2;
-    }
-
-    .hp-cine-editorial {
-      grid-column: span 2;
-    }
-
     .hp-proof-grid {
       grid-template-columns: 1fr 1fr;
-    }
-
-    .hp-cine-card--photo {
-      grid-column: span 1;
     }
   }
 
   @media (max-width: 767px) {
-    .hp-cinematic-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .hp-cine-card--video:nth-of-type(1),
-    .hp-cine-card--video:nth-of-type(2),
-    .hp-cine-card--video:nth-of-type(3),
-    .hp-cine-story,
-    .hp-cine-editorial,
-    .hp-cine-card--photo {
-      grid-column: 1 / -1;
-    }
-
-    .hp-cine-card,
-    .hp-cine-story {
-      min-height: 210px;
-    }
-
-    .hp-cine-card--photo {
-      aspect-ratio: 3 / 4;
-      min-height: 280px;
-    }
-
-    .hp-cine-card--photo img {
-      object-position: center 22%;
-    }
-
     .hp-proof-grid {
       grid-template-columns: 1fr;
       gap: 0.7rem;
@@ -3646,14 +3190,12 @@ const googleBusinessReviews = featuredCouple
   }
 
   /* Cardurile media intră cu un reveal mai cinematic: blur + scale subtil */
-  .reveal-on-scroll.hp-cine-card,
   .reveal-on-scroll.hp-team-card,
   .reveal-on-scroll.hp-proof-card {
     filter: blur(8px) saturate(0.92);
     transform-origin: center;
   }
 
-  .reveal-on-scroll.hp-cine-card.is-visible,
   .reveal-on-scroll.hp-team-card.is-visible,
   .reveal-on-scroll.hp-proof-card.is-visible {
     filter: blur(0) saturate(1);
@@ -3672,10 +3214,6 @@ const googleBusinessReviews = featuredCouple
       opacity: 1;
       transform: none;
       transition: none;
-    }
-
-    .hp-cinematic-track {
-      animation: none;
     }
 
 
@@ -3708,16 +3246,6 @@ const googleBusinessReviews = featuredCouple
 
     to {
       transform: translate3d(0, -14px, 0) scale(1.05);
-    }
-  }
-
-  @keyframes cinematicMarquee {
-    from {
-      transform: translateX(0);
-    }
-
-    to {
-      transform: translateX(-35%);
     }
   }
 
