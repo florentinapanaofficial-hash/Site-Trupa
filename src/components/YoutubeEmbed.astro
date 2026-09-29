@@ -130,7 +130,9 @@ const ytLink = youtubeUrl || (hasPlaylist
   )}
 </div>
 
-<script is:inline>
+<!-- Script procesat: Astro îl emite o singură dată ca modul extern, nu inline pentru fiecare embed. -->
+<script>
+  // @ts-nocheck
   (function () {
     if (window.__ytGateInit) return;
     window.__ytGateInit = true;
@@ -315,7 +317,7 @@ const ytLink = youtubeUrl || (hasPlaylist
 
     /**
      * Pauzează TOȚI playerele YouTube de pe pagină mai puțin cel activ
-     * @param {Window} activeSource - contentWindow-ul playerului activ
+     * @param activeSource - contentWindow-ul playerului activ
      */
     function pauseAllExcept(activeSource) {
       document.querySelectorAll('iframe[src*="youtube"]').forEach(function (iframe) {

@@ -2447,3 +2447,22 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - Remăsurare PageSpeed mobil și desktop după publicare.
 - Remăsurare PageSpeed după deploy `1455c8a9` (29 sep 2026, 14:15): **mobil 98** / Accesibilitate 100 / Bune practici 96 / SEO 100; **desktop 100** / 100 / 96 / 100. Scorul inițial era 58.
 - Test direct pe `https://www.florentinapanaofficial.ro/` (14:18): **mobil 97** (FCP 1,2 s, LCP 2,6 s, TBT 10 ms, CLS 0,004); **desktop 100** / 100 / 96 / 100. LCP mobil rămâne singura metrică portocalie (prag 2,5 s).
+
+## 📝 29 sep 2026 — LCP mobil: script YouTube scos din HTML-ul inline
+
+### Obiectiv
+- Reducerea LCP mobil (2,6 s în PageSpeed) sub pragul de 2,5 s.
+
+### Diagnostic
+- Elementul LCP este `span.hero-title-gold` (text Georgia, fără font web și fără animație; `anim-hero-load` este noop). LCP observat = FCP (~0,95 s); cele 2,6 s sunt estimarea simulată de Lighthouse, dominată de munca pe main thread înainte de paint („Element render delay” ~736 ms).
+- Homepage-ul avea ~121 KB JS inline, din care scriptul `YoutubeEmbed` (18,5 KB) era duplicat de 3 ori (`is:inline` se emite per instanță).
+
+### Modificări
+- `src/components/YoutubeEmbed.astro`: `<script is:inline>` → `<script>` procesat (`// @ts-nocheck`), emis o singură dată ca modul extern, cache-uit între pagini. HTML homepage: 383 KB → 319 KB necomprimat.
+
+### Validări
+- `npx astro check`: 0/0/0; `npm run seo:check`: 58 pagini, 0 FAIL | 0 WARN.
+- Test Chrome (Pixel 5) pe build local: 0 iframe-uri la încărcare cu consimțământ dat, 1 iframe cu `autoplay=1` după click, 0 erori JS; `/aparitii-tv/` activează în continuare 3 embed-uri automat; facade funcțional și după navigare ClientRouter `/despre/` → `/`.
+
+### Riscuri / pași următori
+- Remăsurare PageSpeed mobil pe `www` după deploy. Următorul cost major rămâne CSS-ul inline (~182 KB/pagină, `inlineStylesheets: 'always'`).
