@@ -2481,3 +2481,25 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - Lighthouse desktop local: scor 100; forced reflow rămas doar în `ClientRouter` Astro (~50 ms, cod de framework).
 - Rezultat live după deploy `cc75c362` (29 sep 2026, `www`): **mobil 98 / desktop 100** (de la 58 la începutul zilei).
 - Detaliu desktop (14:38): FCP 0,4 s, LCP 0,6 s, TBT 30 ms, CLS 0, Speed Index 0,7 s.
+
+## 📝 29 sep 2026 — PSI mobil: reducere lanț critic rețea (preconnect + prefetch)
+
+### Obiectiv
+- Reducerea latenței pe „Arborele de dependențe al rețelei” din PageSpeed mobil, fără regresii SEO/UX.
+
+### Modificări
+- `src/layouts/BaseLayout.astro`:
+  - condiția `hasYouTube` include și homepage-ul (`/`), unde există miniaturi YouTube;
+  - adăugate hint-uri `preconnect` pentru `https://www.youtube-nocookie.com`, `https://www.youtube.com`, `https://i.ytimg.com`;
+  - actualizat `dns-prefetch` pentru aceleași origini relevante.
+- `astro.config.mjs`:
+  - `prefetch.prefetchAll` schimbat din `true` în `false` (strategia rămâne `hover`) pentru a reduce costul runtime de prefetch pe mobil.
+
+### Validări
+- Start sesiune: `npm run seo:audit` → 58 pagini, 0 FAIL | 0 WARN.
+- După modificări: `npx astro build` PASS.
+- După modificări: `npm run seo:check` PASS (build + audit), 58 pagini, 0 FAIL | 0 WARN.
+- Verificare output homepage (`dist/client/index.html`): hint-urile de preconnect către YouTube/ytimg sunt prezente.
+
+### Riscuri / pași următori
+- Impactul exact în PSI depinde de cache/CDN și de variabilitatea testului mobil throttled; necesară remăsurare live după deploy pe aceeași rută.

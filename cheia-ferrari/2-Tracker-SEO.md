@@ -67,3 +67,4 @@ Aici vom nota evoluția săptămânală pentru a ne asigura că creștem, nu bat
 | 29 sep 2026 | LCP mobil homepage | - | - | ✅ Script `YoutubeEmbed` mutat din inline (duplicat ×3) în modul extern unic; −64 KB HTML homepage. Validare: `astro check` 0/0/0; audit 58 pagini, 0 FAIL \| 0 WARN; test browser facade/Apariții TV/ClientRouter OK. |
 | 29 sep 2026 | PageSpeed mobil după fix LCP | - | - | ✅ Mobil 98: FCP 1,3 s, LCP 2,3 s, TBT 30 ms, CLS 0,004, SI 1,7 s — toate metricile verzi (scor inițial 58). |
 | 29 sep 2026 | PageSpeed după fix forced reflow | - | - | ✅ Mobil 98, desktop 100 (de la 58 / desktop 80 intermediar). |
+| 29 sep 2026 | PSI mobil — arbore dependențe rețea | - | - | ✅ `BaseLayout`: preconnect real pentru `youtube-nocookie`, `youtube.com`, `i.ytimg.com` și pe homepage; `astro.config`: `prefetchAll=false` pentru reducerea costului de runtime în lanțul critic. Validare: `npx astro build` PASS, `seo:check` 58 pagini, 0 FAIL \| 0 WARN. |

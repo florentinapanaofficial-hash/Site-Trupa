@@ -16,7 +16,7 @@ export default defineConfig({
   // Prefetch-ul la hover păstrează navigarea rapidă după intenția explicită
   // a utilizatorului, fără să consume thread-ul principal la încărcarea mobilă.
   prefetch: {
-    prefetchAll: true,
+    prefetchAll: false,
     defaultStrategy: 'hover',
   },
   build: {
