@@ -2430,3 +2430,18 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 
 ### Riscuri / pași următori
 - Remăsurare PageSpeed pe live după deploy. Pe iOS, autoplay-ul după click poate necesita un al doilea tap dacă browserul blochează redarea.
+
+## 📝 29 sep 2026 — Rezultat PageSpeed și forced reflow bară de progres
+
+### Obiectiv
+- Confirmarea deploy-ului `72ef6cae` și eliminarea forced reflow-ului de 145 ms raportat de PageSpeed desktop.
+
+### Modificări
+- PageSpeed desktop după deploy: **99** (de la 58); mobil: **97** (FCP 1,3 s, LCP 2,6 s, TBT 60 ms, CLS 0,004, Speed Index 1,8 s).
+- `src/layouts/BaseLayout.astro`: bara de progres la scroll nu mai citește `scrollHeight` sincron la încărcare; înălțimea se citește leneș în `requestAnimationFrame` după scroll/resize și este invalidată la `load`.
+
+### Validări
+- `npx astro check`: 0/0/0; `npm run seo:check`: 58 pagini, 0 FAIL | 0 WARN.
+
+### Riscuri / pași următori
+- Remăsurare PageSpeed mobil și desktop după publicare.

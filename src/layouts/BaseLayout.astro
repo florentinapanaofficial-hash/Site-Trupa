@@ -569,10 +569,13 @@ const breadcrumbLd = {
             const root = document.documentElement;
             let ticking = false;
             let scrollableHeight = 0;
-            const cacheHeight = () => {
-                scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
-            };
+            let heightDirty = true;
+            // Înălțimea se citește leneș, în rAF după scroll, ca să evităm forced reflow la încărcare.
             const updateScrollProgress = () => {
+                if (heightDirty) {
+                    scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
+                    heightDirty = false;
+                }
                 const progress = scrollableHeight > 0 ? Math.min(Math.max(window.scrollY / scrollableHeight, 0), 1) : 0;
                 root.style.setProperty('--scroll-progress', progress.toFixed(4));
             };
@@ -581,10 +584,11 @@ const breadcrumbLd = {
                 ticking = true;
                 progressRaf = requestAnimationFrame(() => { updateScrollProgress(); ticking = false; });
             };
-            cacheHeight();
               window.addEventListener('scroll', onScroll, { passive: true, signal: controller.signal });
-              window.addEventListener('resize', () => { cacheHeight(); updateScrollProgress(); }, { signal: controller.signal });
-            updateScrollProgress();
+              window.addEventListener('resize', () => { heightDirty = true; onScroll(); }, { signal: controller.signal });
+              window.addEventListener('load', () => { heightDirty = true; }, { once: true, signal: controller.signal });
+            root.style.setProperty('--scroll-progress', '0');
+            if (window.scrollY > 0) onScroll();
         }
             initScrollProgress();
             document.addEventListener('astro:before-swap', () => {
