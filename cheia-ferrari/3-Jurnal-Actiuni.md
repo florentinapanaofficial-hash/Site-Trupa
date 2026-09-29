@@ -278,6 +278,13 @@ git push origin main
 - **Fișier modificat:** `src/pages/youtube-redirect.astro`
 - **Validări:** `npm run build` — succes; `get_errors` — fără erori.
 
+## 📝 2026-09-29 — Galerie video VOD premium
+- **Obiectiv:** Refactorizarea galeriei video într-o experiență cinematică de streaming, cu hero, carusele orizontale și filtre.
+- **Fișiere modificate:** `src/pages/galerie-video.astro`, `cheia-ferrari/2-Tracker-SEO.md`, `cheia-ferrari/3-Jurnal-Actiuni.md`.
+- **Implementat:** Hero și carusele de categorie/playlist cu `VideoFacade`, coperți locale WebP, embed-uri `youtube-nocookie`, snap orizontal, hover scale și filtrare animată. Păstrate playlist-urile și linkurile individuale indexabile; metadata și JSON-LD neschimbate.
+- **Validări:** `npx astro check` — 0 erori / 0 warnings / 0 hints; `npm run build` — succes; `npm run seo:check` — 58 pagini, 0 FAIL / 0 WARN; `git diff --check` — curat.
+- **Riscuri/pași următori:** Build-ul local a folosit fallback-ul Supabase deoarece DNS nu este disponibil și a notat lipsa `MYSQL_URL` pentru galeria foto; ruta video s-a generat corect. Nu a fost rulat un test browser interactiv.
+
 ## 📝 2026-08-28 — Galerie video Smart TV
 - **Obiectiv:** Înlocuirea galeriei video pe categorii cu interfața Smart TV, videoclipuri selectabile, filtre și taburi pentru playlisturi.
 - **Fișiere modificate:** `src/components/SmartTvVideoPlayer.astro`, `src/pages/galerie-video.astro`.
