@@ -587,8 +587,8 @@ const breadcrumbLd = {
               window.addEventListener('scroll', onScroll, { passive: true, signal: controller.signal });
               window.addEventListener('resize', () => { heightDirty = true; onScroll(); }, { signal: controller.signal });
               window.addEventListener('load', () => { heightDirty = true; }, { once: true, signal: controller.signal });
-            root.style.setProperty('--scroll-progress', '0');
-            if (window.scrollY > 0) onScroll();
+            // Fără citiri geometrice aici: scrierea pe :root urmată de scrollY forța recalcularea întregii pagini.
+            if (root.style.getPropertyValue('--scroll-progress')) root.style.removeProperty('--scroll-progress');
         }
             initScrollProgress();
             document.addEventListener('astro:before-swap', () => {

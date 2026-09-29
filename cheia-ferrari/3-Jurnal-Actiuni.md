@@ -2467,3 +2467,15 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 ### Riscuri / pași următori
 - Remăsurare PageSpeed mobil pe `www` după deploy. Următorul cost major rămâne CSS-ul inline (~182 KB/pagină, `inlineStylesheets: 'always'`).
 - Rezultat live după deploy `f28c5171` (29 sep 2026, 14:30, `www`, mobil): **Performanță 98** — FCP 1,3 s, **LCP 2,3 s** (de la 2,6 s, acum verde), TBT 30 ms, CLS 0,004, Speed Index 1,7 s. Toate metricile Core Web Vitals verzi.
+
+## 📝 29 sep 2026 — Forced reflow 213 ms (desktop 80)
+
+### Obiectiv
+- PageSpeed desktop a coborât la 80, cu „Rearanjare forțată” 213 ms la linia 1258 din HTML (bara de progres la scroll).
+
+### Cauză și modificare
+- `src/layouts/BaseLayout.astro`: la inițializare, scriptul scria `--scroll-progress` pe `:root` și imediat citea `window.scrollY` → recalculare sincronă de stil + layout pentru toată pagina. Eliminată citirea sincronă; resetul folosește `removeProperty` doar dacă valoarea există (fallback `0` din `globals.css`).
+
+### Validări
+- `npx astro check`: 0/0/0; `npm run seo:check`: 58 pagini, 0 FAIL | 0 WARN.
+- Lighthouse desktop local: scor 100; forced reflow rămas doar în `ClientRouter` Astro (~50 ms, cod de framework).
