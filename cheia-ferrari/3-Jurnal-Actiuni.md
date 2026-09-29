@@ -2479,3 +2479,5 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 ### Validări
 - `npx astro check`: 0/0/0; `npm run seo:check`: 58 pagini, 0 FAIL | 0 WARN.
 - Lighthouse desktop local: scor 100; forced reflow rămas doar în `ClientRouter` Astro (~50 ms, cod de framework).
+- Rezultat live după deploy `cc75c362` (29 sep 2026, `www`): **mobil 98 / desktop 100** (de la 58 la începutul zilei).
+- Detaliu desktop (14:38): FCP 0,4 s, LCP 0,6 s, TBT 30 ms, CLS 0, Speed Index 0,7 s.
