@@ -263,6 +263,13 @@ git push origin main
 
 ---
 
+## 📝 2026-09-30 — Componentă HeroVideo (video background) pe Home și Membri
+- **Obiectiv:** Hero premium cu video de fundal, reutilizabil pe homepage și pagina de echipă.
+- **Fișiere modificate:** `src/components/HeroVideo.astro` (nou), `src/pages/index.astro`, `src/pages/membri.astro`, `cheia-ferrari/3-Jurnal-Actiuni.md`.
+- **Implementat:** props `videoUrl`, `title`, `subtitle`, `showReviews`, `posterImage`, `titleTag`; overlay gradient pentru lizibilitate, badge 5 stele spre `/momente-cu-mirii/`, `<slot />` pentru CTA. Homepage: hero vechi `#acasa` înlocuit, H1 păstrat cu keyword („Formația Florentina Pană | Trupă Live Nuntă Pitești”), buton spre `/galerie-video/`, social row mutat în secțiune proprie. Membri: `titleTag="h2"` pentru a evita al doilea H1.
+- **Validări:** `npx astro check` — 0 erori / 0 warnings / 0 hints; `npx astro build` — succes.
+- **Riscuri/pași următori:** videoclipurile sunt momentan de pe CDN extern Pixabay (fișiere mari, impact LCP mobil) — de înlocuit cu MP4/WebM local optimizat în `public/videos/`. CSS-ul vechi al hero-ului (`.hero-stage-copy`, `.hero-photo-card`, `.hero-title-xl`) a rămas în `index.astro` și poate fi curățat separat.
+
 ## 📝 2026-08-25 — Galerie video TV premium
 - **Obiectiv:** Interfață video originală, mai luminoasă și premium, cu selector de genuri.
 - **Fișier modificat:** `src/pages/galerie-video.astro`

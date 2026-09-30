@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import siteContent from '../data/siteContent.json';
 import BackButton from '../components/BackButton.astro';
+import HeroVideo from '../components/HeroVideo.astro';
 
 const { brand, membri, colaboratori: colaboratoriData } = siteContent as any;
 const allMembri: any[] = membri ?? [];
@@ -55,6 +56,14 @@ const membriListLd = {
 <Fragment slot="head">
   <script is:inline type="application/ld+json" set:html={JSON.stringify(membriListLd)} />
 </Fragment>
+<HeroVideo
+  videoUrl="https://cdn.pixabay.com/video/2021/08/11/84687-587217983_large.mp4"
+  posterImage="/images/galerie-foto-site/Florentina%20Pan%C4%83%201.jpg"
+  title="Echipa Noastră"
+  subtitle="Oamenii care dau tonul distracției la evenimentul tău"
+  titleTag="h2"
+/>
+
 <div class="stage-wrap">
   <div class="stage-back"><BackButton href="/" label="Acasă" /></div>
 

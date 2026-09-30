@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import VideoFacade from '../components/VideoFacade.astro';
+import HeroVideo from '../components/HeroVideo.astro';
 import GoogleBusinessReviews from '../components/GoogleBusinessReviews.astro';
 import siteContent from '../data/siteContent.json';
 import seo from '../data/seo-content.json';
@@ -15,9 +16,6 @@ const { acasa } = seo;
 const { contact } = siteContent;
 const faqItems = acasa.faq;
 
-// H1 SEO complet ("Brand | Tagline") — despărțit vizual în două nivele
-// (nume brand mai discret + tagline gold) ca titlul să nu domine tot ecranul.
-const [heroTitleBrand, heroTitleTagline] = acasa.hero.h1.split('|').map((s: string) => s.trim());
 import { sanitizeUrl } from '../lib/sanitize-url';
 
 const socialLinks = {
@@ -98,66 +96,20 @@ const googleBusinessReviews = featuredCouple
   </section>
 
     {/* ═══════════════════════════════════════════
-      HERO — Scenă, titlu mare
+      HERO — Video background
   ═══════════════════════════════════════════ */}
-  <section id="acasa" class="hero-stage hero-fullscreen hp-hero-wrap snap-section" aria-label="Secțiunea principală">
+  <HeroVideo
+    videoUrl="https://cdn.pixabay.com/video/2020/05/25/40140-425268448_large.mp4"
+    posterImage={heroImg.src}
+    title="Formația Florentina Pană | Trupă Live Nuntă Pitești"
+    subtitle="Muzică Live pentru Evenimente de Neuitat"
+    showReviews={true}
+  >
+    <a href="/galerie-video/" class="btn-solid">Vezi Video</a>
+  </HeroVideo>
+
+  <section class="hero-stage hp-hero-wrap" aria-label="Rețele sociale">
     <div class="hero-stage-inner">
-      <div class="hero-light-orbs" aria-hidden="true">
-        <span class="hero-orb hero-orb--one"></span>
-        <span class="hero-orb hero-orb--two"></span>
-        <span class="hero-orb hero-orb--three"></span>
-      </div>
-
-      {/* hero-stage-copy = display:contents pe mobil (flow identic ca înainte),
-          devine coloana din stânga a grid-ului de 2 coloane de la 768px în sus. */}
-      <div class="hero-stage-copy">
-        <span class="kicker-badge anim-hero-load anim-hero-d1" aria-hidden="true">
-          <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M11.3 1.046A1 1 0 0 1 12 2v5h4a1 1 0 0 1 .82 1.573l-7 10A1 1 0 0 1 8 18v-5H4a1 1 0 0 1-.82-1.573l7-10a1 1 0 0 1 1.12-.38Z"/></svg>
-          {acasa.hero.kicker}
-        </span>
-
-        <h1 class="hero-title-xl anim-hero-load anim-hero-d2">
-          <span class="hero-kicker-text">{heroTitleBrand}</span>
-          {heroTitleTagline && <span class="hero-title-gold hero-title-gold--compact">{heroTitleTagline}</span>}
-        </h1>
-
-        <p class="hero-lead anim-hero-load anim-hero-d3">
-          {acasa.hero.descriere}
-        </p>
-
-        {/* Stat pills */}
-        <div class="hero-stats anim-hero-load anim-hero-d4" aria-label="Statistici formație">
-          <div class="hero-stat-pill">
-            <span class="hero-stat-num" data-target="10+">10+</span>
-            <span class="hero-stat-label">ani experiență</span>
-          </div>
-          <div class="hero-stat-pill">
-            <span class="hero-stat-num" data-target="500+">500+</span>
-            <span class="hero-stat-label">evenimente</span>
-          </div>
-          <div class="hero-stat-pill">
-            <span class="hero-stat-num" data-target="100%">100%</span>
-            <span class="hero-stat-label">live</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Card foto — pe mobil rămâne primul (order:-1), pe desktop devine coloana dreaptă */}
-      <div class="hero-photo-card anim-hero-load anim-hero-d2">
-        <Image
-          src={heroImg}
-          alt="Formația Florentina Pană — spectacol live pe scenă"
-          class="hero-photo-img anim-img-hover"
-          width="320"
-          height="213"
-          format="webp"
-          quality={68}
-          loading="eager"
-          fetchpriority="high"
-          decoding="async"
-        />
-      </div>
-
       {/* Social media icons — vizibile doar pe mobil, umplu spațiul gol */}
       <div class="hero-social-row" aria-label="Rețele sociale">
         <span class="hero-social-label">Urmărește-ne</span>
