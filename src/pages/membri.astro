@@ -85,57 +85,36 @@ const membriListLd = {
       <span class="stl-line stl-line--r" aria-hidden="true"></span>
     </div>
     <div class="ac-grid ac-grid--duo">
-      {solisti.map((m: any, i: number) => (
-        <div class="member-card-wrap">
-          <article class={`ac ac--solist${areGalerieFoto(m) ? ' has-gal' : ''}`} data-member={m.nume}>
-            <div class="ac-photos">
+      {solisti.map((m: any) => (
+        <div class="relative mx-auto w-full max-w-xs">
+          <article
+            class:list={['member-card-cinematic group relative aspect-[3/4] w-full cursor-pointer overflow-hidden rounded-2xl border border-white/10 bg-black shadow-2xl', areGalerieFoto(m) && 'has-gal']}
+            data-member={m.nume}
+            tabindex="0"
+            aria-label={`${m.nume}, ${m.specialitate || m.rol}`}
+          >
+            <div class="member-card-photos absolute inset-0 overflow-hidden rounded-2xl">
               {m.imagine && m.imagine.trim() !== '' ? (
-                <img class="ac-photo is-active" src={m.imagine} alt={`${m.nume} — ${m.rol}, Formația Florentina Pană Pitești`} loading="eager" decoding="async" width="560" height="840" />
+                <img class="ac-photo is-active absolute inset-0 h-full w-full object-cover grayscale transition-all duration-700 ease-in-out group-hover:grayscale-0 group-hover:scale-105 group-focus:grayscale-0 group-focus:scale-105" src={m.imagine} alt={`${m.nume} — ${m.rol}, Formația Florentina Pană Pitești`} loading="eager" decoding="async" width="560" height="840" />
               ) : (
-                <div class="ac-ph"><div class="ac-ph-light" aria-hidden="true"></div><span class="ac-initials">{initiale(m.nume)}</span></div>
+                <div class="ac-ph absolute inset-0 flex items-center justify-center"><div class="ac-ph-light" aria-hidden="true"></div><span class="ac-initials">{initiale(m.nume)}</span></div>
               )}
               {areGalerieFoto(m) && m.galpisFoto.slice(1).map((foto: any, n: number) => (
-                <img class="ac-photo" src={foto.src} alt={foto.alt ?? m.nume} loading="lazy" decoding="async" width="560" height="840" data-slide={n + 1} />
+                <img class="ac-photo absolute inset-0 h-full w-full object-cover grayscale transition-all duration-700 ease-in-out group-hover:grayscale-0 group-hover:scale-105 group-focus:grayscale-0 group-focus:scale-105" src={foto.src} alt={foto.alt ?? m.nume} loading="lazy" decoding="async" width="560" height="840" data-slide={n + 1} />
               ))}
             </div>
-            <div class="ac-scanlines" aria-hidden="true"></div>
-            <div class="ac-grad" aria-hidden="true"></div>
-            <div class="ac-beam" aria-hidden="true"></div>
-            <div class="ac-top">
-              <span class="ac-badge ac-b--solist">Solist Vocal</span>
-              {m.experienta && m.experienta.trim() !== '' && <span class="ac-star">★ {m.experienta}</span>}
+            <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" aria-hidden="true"></div>
+            <div class="absolute bottom-0 left-0 z-10 w-full p-4 transition-opacity duration-300 group-hover:opacity-0 group-focus:opacity-0 group-focus-within:opacity-0 md:p-6">
+              <p class="text-xs font-medium uppercase tracking-[0.16em] text-amber-300">{m.specialitate || m.rol}</p>
+              <h3 class="mt-1 font-display text-2xl font-bold leading-tight text-white md:text-3xl">{m.nume}</h3>
             </div>
-            <div class="ac-body">
-              <p class="ac-spec">{m.specialitate}</p>
-              <h3 class="ac-name">{m.nume}</h3>
-              <div class="ac-reveal">
-                {m.citat && <blockquote class="ac-citat"><p>{m.citat}</p></blockquote>}
-                {areGalerieFoto(m) && (
-                  <div class="ac-strip" role="list" aria-label={`Galerie ${m.nume}`}>
-                    {m.galpisFoto.map((foto: any, n: number) => (
-                      <button class="ac-th gallery-thumb" type="button" role="listitem"
-                        data-src={foto.src} data-alt={foto.alt ?? m.nume} data-member={m.nume}
-                        data-fx={String((n % 6) + 1)} tabindex="-1" aria-label={foto.alt ?? `Foto ${n + 1}`}>
-                        <img src={foto.src} alt={foto.alt ?? `Foto ${n + 1} ${m.nume}`} loading="lazy" width="72" height="72" />
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+            <div class="absolute inset-0 z-20 flex translate-y-full flex-col justify-end overflow-y-auto bg-black/85 p-4 backdrop-blur-sm transition-transform duration-500 ease-out group-hover:translate-y-0 group-focus:translate-y-0 group-focus-within:translate-y-0 md:p-6" role="group" aria-label={`Biografie ${m.nume}`}>
+              <p class="text-xs font-medium uppercase tracking-[0.16em] text-amber-300">{m.specialitate || m.rol}</p>
+              <p class="mt-1 font-display text-2xl font-bold leading-tight text-white md:text-3xl">{m.nume}</p>
+              <p class="mt-3 text-sm leading-relaxed text-white/85">{m.bio}</p>
+              {areGalerieFoto(m) && <button class="mt-4 self-start text-xs text-white/65 underline decoration-white/30 underline-offset-4 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" type="button" data-gallery-open aria-label={`Deschide galeria foto ${m.nume}`}>Vezi fotografiile</button>}
             </div>
-            <button class="bio-btn" type="button" aria-expanded="false" aria-controls={`bio-s${i}`} aria-label={`Biografie ${m.nume}`}>
-              <span class="bio-btn-text">BIO</span>
-            </button>
           </article>
-          <div class="bio-panel" id={`bio-s${i}`} aria-hidden="true">
-            {m.citat && <blockquote class="bio-quote"><p>{m.citat}</p></blockquote>}
-            <p class="bio-text">{m.bio}</p>
-            {m.taguri && m.taguri.length > 0 && (
-              <div class="bio-tags" aria-label="Specializări">
-                {m.taguri.map((tag: string) => <span class="bio-tag">{tag}</span>)}
-              </div>
-            )}
-          </div>
         </div>
       ))}
     </div>
@@ -159,56 +138,36 @@ const membriListLd = {
       <span class="stl-line stl-line--r" aria-hidden="true"></span>
     </div>
     <div class="ac-grid ac-grid--trio">
-      {instrumentisti.map((m: any, i: number) => (
-        <div class="member-card-wrap">
-          <article class={`ac ac--instr${areGalerieFoto(m) ? ' has-gal' : ''}`} data-member={m.nume}>
-            <div class="ac-photos">
+      {instrumentisti.map((m: any) => (
+        <div class="relative mx-auto w-full max-w-xs">
+          <article
+            class:list={['member-card-cinematic group relative aspect-[3/4] w-full cursor-pointer overflow-hidden rounded-2xl border border-white/10 bg-black shadow-2xl', areGalerieFoto(m) && 'has-gal']}
+            data-member={m.nume}
+            tabindex="0"
+            aria-label={`${m.nume}, ${m.specialitate || m.rol}`}
+          >
+            <div class="member-card-photos absolute inset-0 overflow-hidden rounded-2xl">
               {m.imagine && m.imagine.trim() !== '' ? (
-                <img class="ac-photo is-active" src={m.imagine} alt={`${m.nume} — ${m.specialitate}, Formația Florentina Pană`} loading="lazy" decoding="async" width="560" height="840" />
+                <img class="ac-photo is-active absolute inset-0 h-full w-full object-cover grayscale transition-all duration-700 ease-in-out group-hover:grayscale-0 group-hover:scale-105 group-focus:grayscale-0 group-focus:scale-105" src={m.imagine} alt={`${m.nume} — ${m.specialitate}, Formația Florentina Pană`} loading="lazy" decoding="async" width="560" height="840" />
               ) : (
-                <div class="ac-ph"><div class="ac-ph-light" aria-hidden="true"></div><span class="ac-initials">{initiale(m.nume)}</span></div>
+                <div class="ac-ph absolute inset-0 flex items-center justify-center"><div class="ac-ph-light" aria-hidden="true"></div><span class="ac-initials">{initiale(m.nume)}</span></div>
               )}
               {areGalerieFoto(m) && m.galpisFoto.slice(1).map((foto: any, n: number) => (
-                <img class="ac-photo" src={foto.src} alt={foto.alt ?? m.nume} loading="lazy" decoding="async" width="560" height="840" data-slide={n + 1} />
+                <img class="ac-photo absolute inset-0 h-full w-full object-cover grayscale transition-all duration-700 ease-in-out group-hover:grayscale-0 group-hover:scale-105 group-focus:grayscale-0 group-focus:scale-105" src={foto.src} alt={foto.alt ?? m.nume} loading="lazy" decoding="async" width="560" height="840" data-slide={n + 1} />
               ))}
             </div>
-            <div class="ac-scanlines" aria-hidden="true"></div>
-            <div class="ac-grad" aria-hidden="true"></div>
-            <div class="ac-beam" aria-hidden="true"></div>
-            <div class="ac-top">
-              <span class="ac-badge ac-b--instr">Instrumentist</span>
-              {m.specialitate && <span class="ac-instr-pill">{m.specialitate}</span>}
+            <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" aria-hidden="true"></div>
+            <div class="absolute bottom-0 left-0 z-10 w-full p-4 transition-opacity duration-300 group-hover:opacity-0 group-focus:opacity-0 group-focus-within:opacity-0 md:p-6">
+              <p class="text-xs font-medium uppercase tracking-[0.16em] text-amber-300">{m.specialitate || m.rol}</p>
+              <h3 class="mt-1 font-display text-2xl font-bold leading-tight text-white md:text-3xl">{m.nume}</h3>
             </div>
-            <div class="ac-body">
-              <h3 class="ac-name">{m.nume}</h3>
-              <div class="ac-reveal">
-                {m.citat && <blockquote class="ac-citat"><p>{m.citat}</p></blockquote>}
-                {areGalerieFoto(m) && (
-                  <div class="ac-strip" role="list" aria-label={`Galerie ${m.nume}`}>
-                    {m.galpisFoto.map((foto: any, n: number) => (
-                      <button class="ac-th gallery-thumb" type="button" role="listitem"
-                        data-src={foto.src} data-alt={foto.alt ?? m.nume} data-member={m.nume}
-                        data-fx={String((n % 6) + 1)} tabindex="-1" aria-label={foto.alt ?? `Foto ${n + 1}`}>
-                        <img src={foto.src} alt={foto.alt ?? `Foto ${n + 1} ${m.nume}`} loading="lazy" width="72" height="72" />
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+            <div class="absolute inset-0 z-20 flex translate-y-full flex-col justify-end overflow-y-auto bg-black/85 p-4 backdrop-blur-sm transition-transform duration-500 ease-out group-hover:translate-y-0 group-focus:translate-y-0 group-focus-within:translate-y-0 md:p-6" role="group" aria-label={`Biografie ${m.nume}`}>
+              <p class="text-xs font-medium uppercase tracking-[0.16em] text-amber-300">{m.specialitate || m.rol}</p>
+              <p class="mt-1 font-display text-2xl font-bold leading-tight text-white md:text-3xl">{m.nume}</p>
+              <p class="mt-3 text-sm leading-relaxed text-white/85">{m.bio}</p>
+              {areGalerieFoto(m) && <button class="mt-4 self-start text-xs text-white/65 underline decoration-white/30 underline-offset-4 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" type="button" data-gallery-open aria-label={`Deschide galeria foto ${m.nume}`}>Vezi fotografiile</button>}
             </div>
-            <button class="bio-btn" type="button" aria-expanded="false" aria-controls={`bio-in${i}`} aria-label={`Biografie ${m.nume}`}>
-              <span class="bio-btn-text">BIO</span>
-            </button>
           </article>
-          <div class="bio-panel" id={`bio-in${i}`} aria-hidden="true">
-            {m.citat && <blockquote class="bio-quote"><p>{m.citat}</p></blockquote>}
-            <p class="bio-text">{m.bio}</p>
-            {m.taguri && m.taguri.length > 0 && (
-              <div class="bio-tags" aria-label="Specializări">
-                {m.taguri.map((tag: string) => <span class="bio-tag">{tag}</span>)}
-              </div>
-            )}
-          </div>
         </div>
       ))}
     </div>
@@ -232,57 +191,36 @@ const membriListLd = {
       <span class="stl-line stl-line--r" aria-hidden="true"></span>
     </div>
     <div class="ac-grid ac-grid--auto">
-      {colaboratori.map((m: any, i: number) => (
-        <div class="member-card-wrap">
-          <article class={`ac ac--colab${areGalerieFoto(m) ? ' has-gal' : ''}`} data-member={m.nume}>
-            <div class="ac-photos">
+      {colaboratori.map((m: any) => (
+        <div class="relative mx-auto w-full max-w-xs">
+          <article
+            class:list={['member-card-cinematic group relative aspect-[3/4] w-full cursor-pointer overflow-hidden rounded-2xl border border-white/10 bg-black shadow-2xl', areGalerieFoto(m) && 'has-gal']}
+            data-member={m.nume}
+            tabindex="0"
+            aria-label={`${m.nume}, ${m.specialitate || m.rol}`}
+          >
+            <div class="member-card-photos absolute inset-0 overflow-hidden rounded-2xl">
               {m.imagine && m.imagine.trim() !== '' ? (
-                <img class="ac-photo is-active" src={m.imagine} alt={`${m.nume} — ${m.specialitate}, colaborator Formația Florentina Pană`} loading="lazy" decoding="async" width="560" height="840" />
+                <img class="ac-photo is-active absolute inset-0 h-full w-full object-cover grayscale transition-all duration-700 ease-in-out group-hover:grayscale-0 group-hover:scale-105 group-focus:grayscale-0 group-focus:scale-105" src={m.imagine} alt={`${m.nume} — ${m.specialitate}, colaborator Formația Florentina Pană`} loading="lazy" decoding="async" width="560" height="840" />
               ) : (
-                <div class="ac-ph"><div class="ac-ph-light" aria-hidden="true"></div><span class="ac-initials">{initiale(m.nume)}</span></div>
+                <div class="ac-ph absolute inset-0 flex items-center justify-center"><div class="ac-ph-light" aria-hidden="true"></div><span class="ac-initials">{initiale(m.nume)}</span></div>
               )}
               {areGalerieFoto(m) && m.galpisFoto.slice(1).map((foto: any, n: number) => (
-                <img class="ac-photo" src={foto.src} alt={foto.alt ?? m.nume} loading="lazy" decoding="async" width="560" height="840" data-slide={n + 1} />
+                <img class="ac-photo absolute inset-0 h-full w-full object-cover grayscale transition-all duration-700 ease-in-out group-hover:grayscale-0 group-hover:scale-105 group-focus:grayscale-0 group-focus:scale-105" src={foto.src} alt={foto.alt ?? m.nume} loading="lazy" decoding="async" width="560" height="840" data-slide={n + 1} />
               ))}
             </div>
-            <div class="ac-scanlines" aria-hidden="true"></div>
-            <div class="ac-grad" aria-hidden="true"></div>
-            <div class="ac-beam" aria-hidden="true"></div>
-            <div class="ac-top">
-              <span class="ac-badge ac-b--colab">Colaborator</span>
-              {m.experienta && m.experienta.trim() !== '' && <span class="ac-star">★ {m.experienta}</span>}
+            <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" aria-hidden="true"></div>
+            <div class="absolute bottom-0 left-0 z-10 w-full p-4 transition-opacity duration-300 group-hover:opacity-0 group-focus:opacity-0 group-focus-within:opacity-0 md:p-6">
+              <p class="text-xs font-medium uppercase tracking-[0.16em] text-amber-300">{m.specialitate || m.rol}</p>
+              <h3 class="mt-1 font-display text-2xl font-bold leading-tight text-white md:text-3xl">{m.nume}</h3>
             </div>
-            <div class="ac-body">
-              <p class="ac-spec">{m.specialitate}</p>
-              <h3 class="ac-name">{m.nume}</h3>
-              <div class="ac-reveal">
-                {m.citat && <blockquote class="ac-citat"><p>{m.citat}</p></blockquote>}
-                {areGalerieFoto(m) && (
-                  <div class="ac-strip" role="list" aria-label={`Galerie ${m.nume}`}>
-                    {m.galpisFoto.map((foto: any, n: number) => (
-                      <button class="ac-th gallery-thumb" type="button" role="listitem"
-                        data-src={foto.src} data-alt={foto.alt ?? m.nume} data-member={m.nume}
-                        data-fx={String((n % 6) + 1)} tabindex="-1" aria-label={foto.alt ?? `Foto ${n + 1}`}>
-                        <img src={foto.src} alt={foto.alt ?? `Foto ${n + 1} ${m.nume}`} loading="lazy" width="72" height="72" />
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+            <div class="absolute inset-0 z-20 flex translate-y-full flex-col justify-end overflow-y-auto bg-black/85 p-4 backdrop-blur-sm transition-transform duration-500 ease-out group-hover:translate-y-0 group-focus:translate-y-0 group-focus-within:translate-y-0 md:p-6" role="group" aria-label={`Biografie ${m.nume}`}>
+              <p class="text-xs font-medium uppercase tracking-[0.16em] text-amber-300">{m.specialitate || m.rol}</p>
+              <p class="mt-1 font-display text-2xl font-bold leading-tight text-white md:text-3xl">{m.nume}</p>
+              <p class="mt-3 text-sm leading-relaxed text-white/85">{m.bio}</p>
+              {areGalerieFoto(m) && <button class="mt-4 self-start text-xs text-white/65 underline decoration-white/30 underline-offset-4 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70" type="button" data-gallery-open aria-label={`Deschide galeria foto ${m.nume}`}>Vezi fotografiile</button>}
             </div>
-            <button class="bio-btn" type="button" aria-expanded="false" aria-controls={`bio-co${i}`} aria-label={`Biografie ${m.nume}`}>
-              <span class="bio-btn-text">BIO</span>
-            </button>
           </article>
-          <div class="bio-panel" id={`bio-co${i}`} aria-hidden="true">
-            {m.citat && <blockquote class="bio-quote"><p>{m.citat}</p></blockquote>}
-            <p class="bio-text">{m.bio}</p>
-            {m.taguri && m.taguri.length > 0 && (
-              <div class="bio-tags" aria-label="Specializări">
-                {m.taguri.map((tag: string) => <span class="bio-tag">{tag}</span>)}
-              </div>
-            )}
-          </div>
         </div>
       ))}
     </div>
@@ -317,46 +255,6 @@ const membriListLd = {
     }
   })();
 
-  document.querySelectorAll('.bio-btn').forEach((btn) => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const wrap = btn.closest('.member-card-wrap');
-      if (!wrap) return;
-      const panel = wrap.querySelector('.bio-panel');
-      if (!panel) return;
-      const isOpen = panel.classList.contains('open');
-
-      // Închide toate celelalte paneluri
-      document.querySelectorAll('.bio-panel.open').forEach((p) => {
-        p.classList.remove('open');
-        p.setAttribute('aria-hidden', 'true');
-      });
-      document.querySelectorAll('.bio-btn.active').forEach((b) => {
-        b.classList.remove('active');
-        b.setAttribute('aria-expanded', 'false');
-      });
-
-      if (!isOpen) {
-        panel.classList.add('open');
-        panel.setAttribute('aria-hidden', 'false');
-        btn.classList.add('active');
-        btn.setAttribute('aria-expanded', 'true');
-      }
-    });
-  });
-
-  // Click în afara închide panelul
-  document.addEventListener('click', () => {
-    document.querySelectorAll('.bio-panel.open').forEach((p) => {
-      p.classList.remove('open');
-      p.setAttribute('aria-hidden', 'true');
-    });
-    document.querySelectorAll('.bio-btn.active').forEach((b) => {
-      b.classList.remove('active');
-      b.setAttribute('aria-expanded', 'false');
-    });
-  }, { signal: controller.signal });
-
   // ═══ GALLERY POPUP FX + NAVIGARE GRUP ═══
   const fxMap = {
     '1': { enter: 'fx-pop-in',      leave: 'fx-pop-out'      },
@@ -375,7 +273,7 @@ const membriListLd = {
   const popupCounter = document.getElementById('gallery-popup-counter');
 
   let currentFx  = '1';
-  let lastFocusedThumb = null;
+  let lastFocusedElement = null;
 
   // Grupurile de poze per membru — populate la click
   let currentGroup = [];   // Array<{src, alt, fx}>
@@ -414,16 +312,20 @@ const membriListLd = {
     updateNav();
   }
 
-  function openPopup(memberName, startIdx, fx) {
-    // Colectează toate thumb-urile aceluiași membru
-    const thumbs = Array.from(document.querySelectorAll('.gallery-thumb[data-member="' + CSS.escape(memberName) + '"]'));
-    currentGroup = thumbs.map(function(t) {
-      return { src: t.dataset.src || '', alt: t.dataset.alt || '', fx: t.dataset.fx || '1' };
-    });
+  function openPopup(memberName, startIdx, fx, trigger) {
+    const card = document.querySelector('.member-card-cinematic[data-member="' + CSS.escape(memberName) + '"]');
+    const photos = card ? Array.from(card.querySelectorAll('.ac-photo')) : [];
+    currentGroup = photos.map(function(photo, idx) {
+      return {
+        src: photo.getAttribute('src') || '',
+        alt: photo.getAttribute('alt') || memberName,
+        fx: String((idx % 6) + 1),
+      };
+    }).filter(function(photo) { return photo.src; });
     currentIndex = startIdx;
     currentFx = fx;
 
-    lastFocusedThumb = document.activeElement;
+    lastFocusedElement = trigger;
     popupImg.classList.remove(...allFxClasses());
     popup.classList.add('active');
 
@@ -461,9 +363,9 @@ const membriListLd = {
       currentGroup = [];
       currentIndex = 0;
       popupCounter.textContent = '';
-      if (lastFocusedThumb && lastFocusedThumb.focus) {
-        lastFocusedThumb.focus();
-        lastFocusedThumb = null;
+      if (lastFocusedElement && lastFocusedElement.focus) {
+        lastFocusedElement.focus();
+        lastFocusedElement = null;
       }
     }, { once: true });
   }
@@ -475,32 +377,15 @@ const membriListLd = {
     }
   }, { signal: controller.signal });
 
-  // ═══ GALLERY SLIDER — dots + mouse drag ═══
-  let galleryDragged = false;
-
-  document.querySelectorAll('.gallery-thumb').forEach(function(thumb) {
-    function activateThumb() {
-      var fx     = thumb.dataset.fx     || '1';
-      var member = thumb.dataset.member || '';
-      // Determină indexul în grupul membrului
-      var siblings = Array.from(document.querySelectorAll('.gallery-thumb[data-member="' + CSS.escape(member) + '"]'));
-      var idx = siblings.indexOf(thumb);
-      currentFx = fx;
-      openPopup(member, idx >= 0 ? idx : 0, fx);
-    }
-
-    thumb.addEventListener('click', function(e) {
-      e.stopPropagation();
-      if (galleryDragged) { galleryDragged = false; return; }
-      activateThumb();
-    });
-
-    thumb.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        e.stopPropagation();
-        activateThumb();
-      }
+  document.querySelectorAll('[data-gallery-open]').forEach(function(button) {
+    button.addEventListener('click', function(event) {
+      event.stopPropagation();
+      const card = button.closest('.member-card-cinematic');
+      const memberName = card?.dataset.member || '';
+      const photos = card ? Array.from(card.querySelectorAll('.ac-photo')) : [];
+      const activeIndex = photos.findIndex(function(photo) { return photo.classList.contains('is-active'); });
+      const startIndex = Math.max(0, activeIndex);
+      openPopup(memberName, startIndex, String((startIndex % 6) + 1), button);
     });
   });
 
@@ -623,7 +508,7 @@ const membriListLd = {
   });
 
   // ── Photo cycling on hover (membrii cu galerie) ──
-  document.querySelectorAll('.ac.has-gal').forEach(function(card) {
+  document.querySelectorAll('.member-card-cinematic.has-gal').forEach(function(card) {
     var photos = Array.from(card.querySelectorAll('.ac-photo'));
     if (photos.length < 2) return;
     var timer = null;
@@ -643,7 +528,7 @@ const membriListLd = {
   });
   document.addEventListener('astro:before-swap', function() {
     controller.abort();
-    document.querySelectorAll('.ac.has-gal').forEach(function(card) {
+    document.querySelectorAll('.member-card-cinematic.has-gal').forEach(function(card) {
       card.dispatchEvent(new Event('mouseleave'));
     });
     popup.classList.remove('active');
@@ -1026,170 +911,12 @@ const membriListLd = {
     .ac-grid--duo, .ac-grid--trio, .ac-grid--auto { grid-template-columns: 1fr; }
   }
 
-  /* ══ ARTIST CARD ══ */
-  .member-card-wrap {
-    position: relative;
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-    box-sizing: border-box;
-    overflow-x: clip;
-    --card-neon: rgba(6, 214, 255, 0.86);
-    --card-neon-soft: rgba(6, 214, 255, 0.42);
-  }
-
-  .member-card-wrap::before {
-    content: '';
-    position: absolute;
-    inset: -28px;
-    z-index: 0;
-    pointer-events: none;
-    border-radius: 1.35rem;
-    background:
-      radial-gradient(circle at 50% 18%, var(--card-neon) 0%, transparent 44%),
-      radial-gradient(circle at 50% 88%, var(--card-neon-soft) 0%, transparent 62%);
-    filter: blur(28px) saturate(1.35);
-    mix-blend-mode: screen;
-    opacity: 1;
-    transform: translateY(6px) scale(1);
-    animation: card-neon-breathe 2.8s ease-in-out infinite;
-    transition: opacity 320ms ease, transform 380ms cubic-bezier(0.22, 1, 0.36, 1), filter 320ms ease;
-  }
-
-  @keyframes card-neon-breathe {
-    0%, 100% { opacity: 0.85; filter: blur(26px) saturate(1.22); }
-    50% { opacity: 1; filter: blur(32px) saturate(1.42); }
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .member-card-wrap:hover::before {
-      opacity: 1;
-      filter: blur(34px) saturate(1.5);
-      transform: translateY(3px) scale(1.03);
-    }
-  }
-
-  .member-card-wrap:nth-child(6n + 1) { --card-neon: rgba(0, 224, 255, 0.92); --card-neon-soft: rgba(0, 224, 255, 0.50); }
-  .member-card-wrap:nth-child(6n + 2) { --card-neon: rgba(255, 210, 74, 0.92); --card-neon-soft: rgba(255, 210, 74, 0.50); }
-  .member-card-wrap:nth-child(6n + 3) { --card-neon: rgba(255, 106, 186, 0.92); --card-neon-soft: rgba(255, 106, 186, 0.50); }
-  .member-card-wrap:nth-child(6n + 4) { --card-neon: rgba(167, 112, 255, 0.92); --card-neon-soft: rgba(167, 112, 255, 0.50); }
-  .member-card-wrap:nth-child(6n + 5) { --card-neon: rgba(82, 255, 166, 0.92); --card-neon-soft: rgba(82, 255, 166, 0.50); }
-  .member-card-wrap:nth-child(6n + 6) { --card-neon: rgba(255, 134, 66, 0.92); --card-neon-soft: rgba(255, 134, 66, 0.50); }
-
-  .ac {
-    position: relative; aspect-ratio: 2 / 3;
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-    box-sizing: border-box;
-    border-radius: 1.1rem; overflow: hidden; cursor: pointer;
-    border: 1px solid rgba(255,255,255,0.10);
-    background:
-      linear-gradient(160deg, rgba(7, 18, 42, 0.80) 0%, rgba(3, 10, 25, 0.90) 100%);
-    box-shadow:
-      0 14px 36px rgba(0, 0, 0, 0.45),
-      0 0 0 1px color-mix(in srgb, var(--card-neon) 65%, transparent),
-      0 0 24px color-mix(in srgb, var(--card-neon) 75%, transparent),
-      0 0 56px color-mix(in srgb, var(--card-neon-soft) 92%, transparent),
-      inset 0 1px 0 rgba(255, 255, 255, 0.07),
-      inset 0 -1px 0 rgba(255, 255, 255, 0.03);
-    transition: transform 380ms cubic-bezier(0.22,1,0.36,1), border-color 380ms ease, box-shadow 380ms ease;
-    isolation: isolate;
-    z-index: 1;
-  }
-
-  .ac::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 3;
-    pointer-events: none;
-    border-radius: inherit;
-    border: 1px solid color-mix(in srgb, var(--card-neon) 88%, white 12%);
-    opacity: 1;
-    transition: opacity 320ms ease, box-shadow 320ms ease, border-color 320ms ease;
-    box-shadow:
-      inset 0 0 0 1px color-mix(in srgb, var(--card-neon) 40%, transparent),
-      0 0 20px color-mix(in srgb, var(--card-neon) 65%, transparent);
-  }
-
-  .ac::after {
-    content: '';
-    position: absolute;
-    inset: -45% auto auto -60%;
-    width: 56%;
-    height: 190%;
-    transform: rotate(17deg);
-    z-index: 4;
-    pointer-events: none;
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.00) 25%,
-      rgba(255, 255, 255, 0.15) 50%,
-      rgba(255, 255, 255, 0.00) 75%,
-      transparent 100%
-    );
-    opacity: 0;
-    transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1), opacity 420ms ease;
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .ac:hover {
-      transform: translateY(-6px) scale(1.012);
-      border-color: color-mix(in srgb, var(--card-neon) 90%, white 10%);
-      box-shadow:
-        0 0 0 1px color-mix(in srgb, var(--card-neon) 70%, transparent),
-        0 0 34px color-mix(in srgb, var(--card-neon) 78%, transparent),
-        0 0 76px color-mix(in srgb, var(--card-neon-soft) 96%, transparent),
-        0 18px 55px rgba(0,0,0,0.42);
-    }
-
-    .ac:hover::after {
-      opacity: 1;
-      transform: translateX(170%) rotate(17deg);
-    }
-
-    .ac:hover::before {
-      border-color: color-mix(in srgb, var(--card-neon) 90%, white 10%);
-      box-shadow:
-        inset 0 0 0 1px color-mix(in srgb, var(--card-neon) 70%, transparent),
-        0 0 28px color-mix(in srgb, var(--card-neon) 90%, transparent),
-        0 0 52px color-mix(in srgb, var(--card-neon-soft) 96%, transparent);
-    }
-  }
-
-  .ac:focus-within { outline: 2px solid rgba(6,214,255,0.65); outline-offset: 3px; }
-
-  /* ── Photos ── */
-  .ac-photos {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-    border-radius: inherit;
-    background: rgba(4, 10, 25, 0.72);
-  }
-
   .ac-photo {
-    position: absolute; inset: 0;
-    width: 100%; height: 100%;
-    object-fit: cover; object-position: center top;
     opacity: 0;
-    border-radius: inherit;
-    clip-path: inset(0 round inherit);
-    transition: opacity 900ms ease;
+    object-position: center top;
   }
 
-  .ac-photo.is-active {
-    opacity: 1;
-    animation: ac-kenburns 12s ease-in-out infinite alternate;
-  }
-
-  @keyframes ac-kenburns {
-    0%   { transform: scale(1.04) translate(0%, 0%); }
-    50%  { transform: scale(1.09) translate(-1.2%, -0.6%); }
-    100% { transform: scale(1.04) translate(1.2%, 0.6%); }
-  }
+  .ac-photo.is-active { opacity: 1; }
 
   .ac-photo[src*="oprea-marian"]     { object-position: center 5%; }      /* portret inalt -> cap sus */
   .ac-photo[src*="catalin-matei"]    { object-position: center 15%; }     /* portret standard */
@@ -1202,231 +929,14 @@ const membriListLd = {
 
   /* ── Placeholder ── */
   .ac-ph {
-    position: absolute; inset: 0;
-    display: flex; align-items: center; justify-content: center;
-    background: linear-gradient(160deg, #0c1e44 0%, #17305a 45%, #0c1e44 100%);
-  }
-
-  .ac-ph-light {
-    position: absolute; top: -30%; left: 50%; transform: translateX(-50%);
-    width: 160%; height: 160%;
-    background: radial-gradient(ellipse at 50% 0%, rgba(6,214,255,0.14) 0%, transparent 55%);
-    pointer-events: none;
+    background: #151515;
   }
 
   .ac-initials {
     font-family: 'Oswald', sans-serif;
-    font-size: clamp(3.5rem, 8vw, 5.5rem); font-weight: 700; letter-spacing: 0.04em;
-    background: linear-gradient(135deg, #e8c85b 0%, #fff3a0 55%, #e8c85b 100%);
-    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 20px rgba(232,200,91,0.40));
+    font-size: clamp(3.5rem, 8vw, 5.5rem); font-weight: 600;
+    color: rgba(255,255,255,0.72);
     line-height: 1;
-  }
-
-  /* ── Atmosphere overlays ── */
-  .ac-scanlines {
-    position: absolute; inset: 0; pointer-events: none; z-index: 1;
-    background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 3px);
-  }
-
-  .ac-grad {
-    position: absolute; inset: 0; pointer-events: none; z-index: 2;
-    background: linear-gradient(to bottom, transparent 0%, transparent 22%, rgba(0,2,12,0.22) 52%, rgba(0,2,12,0.90) 80%, rgba(0,2,12,0.97) 100%);
-  }
-
-  .ac--solist .ac-grad {
-    background:
-      radial-gradient(circle at 50% 18%, rgba(232, 200, 91, 0.12) 0%, transparent 36%),
-      linear-gradient(to bottom, transparent 0%, transparent 20%, rgba(0,2,12,0.22) 52%, rgba(0,2,12,0.90) 80%, rgba(0,2,12,0.97) 100%);
-  }
-
-  .ac--instr .ac-grad {
-    background:
-      radial-gradient(circle at 50% 18%, rgba(6, 214, 255, 0.13) 0%, transparent 36%),
-      linear-gradient(to bottom, transparent 0%, transparent 20%, rgba(0,2,12,0.22) 52%, rgba(0,2,12,0.90) 80%, rgba(0,2,12,0.97) 100%);
-  }
-
-  .ac--colab .ac-grad {
-    background:
-      radial-gradient(circle at 50% 18%, rgba(168, 85, 247, 0.12) 0%, transparent 36%),
-      linear-gradient(to bottom, transparent 0%, transparent 20%, rgba(0,2,12,0.22) 52%, rgba(0,2,12,0.90) 80%, rgba(0,2,12,0.97) 100%);
-  }
-
-  .ac-beam {
-    position: absolute; top: -20%; left: 50%; transform: translateX(-50%);
-    width: 70%; height: 90%;
-    clip-path: polygon(28% 0%, 72% 0%, 100% 100%, 0% 100%);
-    pointer-events: none; z-index: 1;
-    opacity: 0; transition: opacity 500ms ease;
-  }
-
-  .ac--solist .ac-beam { background: linear-gradient(to bottom, rgba(255,230,80,0.14), transparent); }
-  .ac--instr  .ac-beam { background: linear-gradient(to bottom, rgba(6,214,255,0.14), transparent); }
-  .ac--colab  .ac-beam { background: linear-gradient(to bottom, rgba(168,85,247,0.14), transparent); }
-
-  @media (hover: hover) and (pointer: fine) { .ac:hover .ac-beam { opacity: 1; } }
-
-  /* ── Top badge row ── */
-  .ac-top {
-    position: absolute; top: 0.85rem; left: 0.85rem; right: 0.85rem;
-    display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; z-index: 5;
-  }
-
-  .ac-badge {
-    font-size: 0.52rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
-    padding: 0.25em 0.75em; border-radius: 999px;
-  }
-
-  .ac-b--solist { background: rgba(232,200,91,0.14); color: rgba(255,240,160,0.95); border: 1px solid rgba(232,200,91,0.35); }
-  .ac-b--instr  { background: rgba(6,214,255,0.10);  color: rgba(100,240,255,0.95); border: 1px solid rgba(6,214,255,0.28); }
-  .ac-b--colab  { background: rgba(168,85,247,0.12); color: rgba(210,160,255,0.95); border: 1px solid rgba(168,85,247,0.30); }
-
-  .ac-star {
-    font-size: 0.50rem; letter-spacing: 0.08em; color: rgba(255,230,120,0.80);
-    background: rgba(255,200,50,0.08); border: 1px solid rgba(255,200,50,0.20);
-    padding: 0.22em 0.65em; border-radius: 999px;
-  }
-
-  .ac-instr-pill {
-    font-size: 0.50rem; letter-spacing: 0.06em; color: rgba(100,240,255,0.80);
-    background: rgba(6,214,255,0.08); border: 1px solid rgba(6,214,255,0.20);
-    padding: 0.22em 0.65em; border-radius: 999px;
-  }
-
-  /* ── Bottom content ── */
-  .ac-body {
-    position: absolute; bottom: 0; left: 0; right: 0;
-    padding: 1.1rem 3.8rem 1.1rem 1.1rem;
-    z-index: 5; display: flex; flex-direction: column; gap: 0.32rem;
-    backdrop-filter: blur(3px);
-    -webkit-backdrop-filter: blur(3px);
-  }
-
-  .ac-spec {
-    font-size: 0.68rem; letter-spacing: 0.06em;
-    color: rgba(160,200,240,0.80); font-style: italic; margin: 0; line-height: 1.4;
-  }
-
-  .ac-name {
-    font-family: 'Oswald', sans-serif;
-    font-size: clamp(1.1rem, 2.2vw, 1.6rem); font-weight: 700;
-    letter-spacing: 0.04em; color: #ffffff; margin: 0; line-height: 1.1;
-    text-shadow: 0 2px 14px rgba(0,0,0,0.65);
-    transition: transform 380ms ease;
-  }
-
-  @media (hover: hover) and (pointer: fine) { .ac:hover .ac-name { transform: translateY(-2px); } }
-
-  /* ── Hover reveal (citat + gallery) ── */
-  .ac-reveal {
-    overflow: hidden; max-height: 0; opacity: 0; transform: translateY(8px);
-    transition: max-height 480ms cubic-bezier(0.22,1,0.36,1), opacity 380ms ease 80ms, transform 380ms ease 80ms;
-    display: flex; flex-direction: column; gap: 0.55rem;
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .ac:hover .ac-reveal { max-height: 280px; opacity: 1; transform: translateY(0); }
-  }
-
-  .ac-citat { margin: 0; padding-left: 0.65rem; border-left: 2px solid rgba(6,214,255,0.55); }
-  .ac--solist .ac-citat { border-left-color: rgba(232,200,91,0.60); }
-  .ac--colab  .ac-citat { border-left-color: rgba(168,85,247,0.60); }
-
-  .ac-citat p {
-    font-size: 0.70rem; font-style: italic; color: rgba(200,225,255,0.82); line-height: 1.55; margin: 0;
-  }
-
-  .ac-strip { display: flex; gap: 0.35rem; flex-wrap: nowrap; overflow: hidden; }
-
-  .ac-th {
-    flex: 0 0 52px; width: 52px; height: 52px; border-radius: 0.4rem; overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.14); padding: 0; cursor: pointer;
-    background: transparent; transition: border-color 200ms, transform 200ms;
-  }
-
-  .ac-th img { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-  @media (hover: hover) and (pointer: fine) {
-    .ac-th:hover { border-color: rgba(6,214,255,0.70); transform: scale(1.1); }
-  }
-
-  /* ══ BIO BUTTON ══ */
-  @keyframes bio-pulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(0,200,255,0.60); }
-    50%       { box-shadow: 0 0 0 10px rgba(0,200,255,0.00); }
-  }
-
-  .bio-btn {
-    position: absolute; bottom: 0.85rem; right: 0.85rem;
-    width: 48px; height: 48px; border-radius: 50%;
-    background: linear-gradient(135deg, #00c8ff 0%, #0066ff 100%);
-    border: none; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    color: #ffffff;
-    animation: bio-pulse 2.2s ease-in-out infinite;
-    transition: background 0.35s cubic-bezier(0.34,1.56,0.64,1), transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
-    z-index: 10;
-  }
-
-  .bio-btn:hover { transform: scale(1.14); }
-
-  .ac--solist .bio-btn {
-    background: linear-gradient(135deg, #f0d77a 0%, #b88a17 100%);
-    box-shadow: 0 0 18px rgba(232, 200, 91, 0.40);
-  }
-
-  .ac--instr .bio-btn {
-    background: linear-gradient(135deg, #00dcff 0%, #006dff 100%);
-    box-shadow: 0 0 18px rgba(6, 214, 255, 0.40);
-  }
-
-  .ac--colab .bio-btn {
-    background: linear-gradient(135deg, #bb82ff 0%, #6a2fcb 100%);
-    box-shadow: 0 0 18px rgba(168, 85, 247, 0.40);
-  }
-
-  .bio-btn.active {
-    background: linear-gradient(135deg, #ff4060 0%, #cc0033 100%);
-    animation: none; transform: rotate(45deg) scale(1.08);
-  }
-
-  .bio-btn-text { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; pointer-events: none; }
-  .bio-btn.active .bio-btn-text::before { content: '×'; font-size: 1.2rem; font-weight: 400; letter-spacing: 0; }
-  .bio-btn.active .bio-btn-text { font-size: 0; }
-
-  /* ══ BIO PANEL ══ */
-  .bio-panel {
-    max-height: 0; overflow: hidden; opacity: 0;
-    transform: scaleY(0.85) translateY(-10px); transform-origin: top center;
-    background: rgba(4,12,32,0.72);
-    border: 1px solid rgba(0,200,255,0.18); border-top: none;
-    border-radius: 0 0 1.1rem 1.1rem; padding: 0 1.75rem;
-    transition:
-      max-height 0.5s cubic-bezier(0.34,1.56,0.64,1),
-      opacity    0.35s ease,
-      transform  0.5s cubic-bezier(0.34,1.56,0.64,1),
-      padding    0.35s ease;
-  }
-
-  .bio-panel.open {
-    max-height: 1000px; opacity: 1;
-    transform: scaleY(1) translateY(0);
-    padding: 1.5rem 1.75rem 2rem;
-  }
-
-  @media (max-width: 767px) { .bio-panel.open { padding: 1.25rem 1.25rem 1.5rem; } }
-
-  .bio-quote { margin: 0 0 1rem; padding-left: 1rem; border-left: 3px solid rgba(0,200,255,0.65); }
-  .bio-quote p { font-size: clamp(0.88rem, 1.1vw, 0.98rem); font-style: italic; color: rgba(180,215,255,0.85); line-height: 1.75; margin: 0; }
-
-  .bio-text { font-size: clamp(0.85rem, 1.1vw, 0.95rem); line-height: 1.82; color: rgba(210,225,245,0.85); margin: 0 0 1rem; }
-
-  .bio-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-
-  .bio-tag {
-    font-size: 0.60rem; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
-    padding: 0.26em 0.75em; border-radius: 9999px;
-    background: rgba(0,200,255,0.08); color: rgba(0,220,255,0.75); border: 1px solid rgba(0,200,255,0.20);
   }
 
   /* ══ SCROLL HINT ══ */
@@ -1449,77 +959,6 @@ const membriListLd = {
   @keyframes bounce-down {
     0%, 100% { transform: translateY(0); }
     50%       { transform: translateY(4px); }
-  }
-
-  /* ══ MOBILE ══ */
-  @media (max-width: 1024px) {
-    .ac {
-      aspect-ratio: auto;
-      min-height: unset;
-      display: flex;
-      flex-direction: column;
-      border-radius: 1.45rem;
-    }
-
-    .ac-photos {
-      position: relative;
-      inset: auto;
-      width: 100%;
-      aspect-ratio: 4 / 5;
-      min-height: clamp(260px, 58vw, 360px);
-      flex: none;
-      border-radius: 1.45rem 1.45rem 0 0;
-      background: rgba(4, 10, 25, 0.72);
-    }
-
-    .ac-body {
-      position: relative;
-      left: auto;
-      right: auto;
-      bottom: auto;
-      padding: 0.9rem 3.6rem 0.95rem 0.9rem;
-      background: linear-gradient(180deg, rgba(4, 10, 25, 0.14), rgba(4, 10, 25, 0.9));
-      border-radius: 0 0 1.45rem 1.45rem;
-    }
-
-    .ac-name {
-      line-height: 1.15;
-      text-shadow: none;
-    }
-
-    .ac::after {
-      opacity: 0.65;
-      transform: translateX(95%) rotate(17deg);
-    }
-
-    .member-card-wrap::before {
-      inset: -12px;
-      opacity: 1;
-      filter: blur(22px) saturate(1.35);
-      transform: translateY(4px) scale(1);
-    }
-
-    .ac-spec {
-      line-height: 1.5;
-    }
-
-    .ac-photo {
-      pointer-events: none;
-      border-radius: inherit;
-      clip-path: inset(0 round inherit);
-    }
-
-    .ac-photos,
-    .ac-ph,
-    .ac-scanlines,
-    .ac-grad,
-    .ac-beam {
-      border-radius: inherit;
-    }
-
-    .ac-beam {
-      clip-path: inset(0 round 1.45rem 1.45rem 0 0);
-    }
   }
 
   @media (max-width: 767px) {
@@ -1568,24 +1007,9 @@ const membriListLd = {
       height: 0 !important;
     }
 
-    .ac-photos {
-      aspect-ratio: 3 / 4;
-      min-height: clamp(280px, 68vw, 420px);
-    }
-
-    .ac,
-    .ac-photos,
-    .ac-body,
-    .bio-panel {
-      border-radius: 1.35rem;
-    }
-
     .stage-wrap,
     .stage-section,
-    .ac-grid,
-    .member-card-wrap,
-    .ac,
-    .bio-panel {
+    .ac-grid {
       max-width: 100%;
       box-sizing: border-box;
     }
@@ -1595,30 +1019,12 @@ const membriListLd = {
       overflow-y: visible;
     }
 
-    .member-card-wrap {
-      overflow-x: clip;
-      overflow-y: visible;
-    }
-
-    .member-card-wrap,
-    .ac,
-    .ac-photos,
-    .bio-btn,
-    .gallery-thumb {
+    .member-card-cinematic {
       touch-action: pan-y pinch-zoom;
-    }
-
-    .ac-body {
-      padding: 0.85rem 3.15rem 0.9rem 0.85rem;
     }
 
     .ac-photo {
       touch-action: pan-y pinch-zoom;
-    }
-
-    /* Pe telefon eliminam drift-ul lateral ca subiectul sa nu "iasa" din cadru. */
-    .ac-photo.is-active {
-      animation: ac-kenburns-mobile 10s ease-in-out infinite alternate;
     }
 
     .ac-photo[src*="cristian-ograbek"],
@@ -1633,24 +1039,5 @@ const membriListLd = {
       object-position: center 12%;
     }
 
-    .ac-name { font-size: clamp(0.95rem, 4vw, 1.25rem); }
-    .bio-btn { width: 44px; height: 44px; bottom: 0.7rem; right: 0.7rem; }
-
-    .ac::before {
-      opacity: 0.6;
-    }
-
-    .member-card-wrap::before {
-      inset: -8px;
-      opacity: 0.14;
-      filter: blur(10px) saturate(1.08);
-      transform: translateY(0) scale(1);
-    }
-  }
-
-  @keyframes ac-kenburns-mobile {
-    0%   { transform: scale(1.03) translate(0%, 0%); }
-    50%  { transform: scale(1.06) translate(0%, -0.45%); }
-    100% { transform: scale(1.03) translate(0%, 0.45%); }
   }
 </style>

@@ -2654,3 +2654,14 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 
 ### Riscuri
 - Buildul a folosit fallbackurile existente pentru indisponibilitatea DNS Supabase și lipsa `MYSQL_URL` la galeria completă; procesul și auditul au trecut.
+
+## 📝 30 sep 2026 — Carduri Cinematic Hover pentru Membri
+
+### Modificări
+- [src/pages/membri.astro](src/pages/membri.astro): cardurile soliștilor, instrumentiștilor și colaboratorilor folosesc raport 3:4, imagini grayscale cu zoom, gradient și panou BIO glisant la hover/focus.
+- Eliminat butonul BIO, benzile de miniaturi și stilurile/handler-ele neon și BIO vechi; accesul la popup-ul foto rămâne în panoul BIO.
+
+### Validări
+- `npx astro check` → 0 errors | 0 warnings | 0 hints.
+- `npm run build` → PASS.
+- `npm run seo:check` → 58 pagini verificate, **0 FAIL | 0 WARN**.
