@@ -31,6 +31,8 @@ interface Props {
   videoUrl: string;
   /** Descriere bogată (SEO), randată nativ în DOM în panoul „Informații”. */
   description?: string;
+  /** Strategia de încărcare a imaginii de fațadă. */
+  loading?: 'lazy' | 'eager';
   /** Clase Tailwind suplimentare pe container. */
   class?: string;
 }
@@ -42,6 +44,7 @@ const {
   logoSrc,
   videoUrl,
   description,
+  loading = 'lazy',
   class: className = '',
 } = Astro.props;
 
@@ -54,7 +57,7 @@ const brandName = 'Formația Florentina Pană';
 
 <div
   class:list={[
-    'video-facade group relative aspect-video w-full cursor-pointer overflow-hidden rounded-2xl bg-black shadow-xl',
+    'video-facade group relative aspect-video w-full cursor-pointer overflow-hidden rounded-2xl bg-[#050a18] shadow-xl',
     className,
   ]}
   data-video-facade
@@ -64,6 +67,13 @@ const brandName = 'Formația Florentina Pană';
   tabindex="0"
   aria-label={`Redă videoclipul: ${title}`}
 >
+  <!-- Schelet neutru: acoperă cerul albastru până se decodează imaginea -->
+  <div
+    class="absolute inset-0 bg-gradient-to-br from-[#0d1428] to-[#050a18]"
+    aria-hidden="true"
+  >
+  </div>
+
   <Image
     src={imageSrc}
     alt={title}
@@ -71,7 +81,7 @@ const brandName = 'Formația Florentina Pană';
     sizes="(max-width: 768px) 100vw, 800px"
     format="webp"
     quality={80}
-    loading="lazy"
+    loading={loading}
     decoding="async"
     class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
   />

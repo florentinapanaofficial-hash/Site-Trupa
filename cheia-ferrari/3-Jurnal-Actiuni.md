@@ -2700,3 +2700,24 @@ Rezolvarea a trei probleme pe ecrane tactile: padding insuficient în panoul BIO
 
 ### Riscuri / observații
 - Clasele `.ac-photos` și `.ac-nav` din guard nu există momentan în pagină (containerul real este `.member-card-photos`, iar săgețile de carusel sunt doar în popup). Guard-ul este inofensiv, dar dacă apare un carusel în card trebuie actualizat selectorul.
+
+## 📝 30 sep 2026 — UX tactil carduri Membri + glitch încărcare homepage
+
+### Obiectiv
+Separarea logicii hover (desktop) de tap (mobil) pe cardurile de membri, încadrarea corectă a biografiilor lungi și eliminarea benzilor albastre vizibile la încărcarea homepage-ului.
+
+### Modificări
+- [src/pages/membri.astro](src/pages/membri.astro): panoul BIO (toate cele 3 variante de carduri) trece la `z-[60]` (acoperă săgețile galeriei cu `z-50`), păstrează `overflow-y-auto`, iar variantele `group-hover` / `group-focus` / `group-focus-within` sunt prefixate cu `md:` — efectul pur CSS rulează doar pe desktop. `group-[.is-open]:translate-y-0` rămâne singurul declanșator pe mobil.
+- Conținutul BIO (rol, nume, descriere, link galerie) mutat într-un `<div class="mt-auto pb-4">` în interiorul containerului `flex flex-col` — textele scurte stau ancorate jos, cele lungi umplu panoul și permit scroll fără să fie tăiate sus.
+- Adăugat buton „X” de închidere (`.js-bio-close`), sticky sus, vizibil doar pe mobil (`md:hidden`).
+- Eticheta de jos (rol + nume) primește `group-[.is-open]:opacity-0` și `md:` pe variantele de hover, ca să nu mai dispară la hover emulat pe touch.
+- Scriptul `.js-member-card`: `classList.toggle('is-open')` cu guard-uri prin `e.target.closest()` — „X” închide explicit, click pe `a` / `[data-gallery-open]` nu comută, click în interiorul `.js-bio-panel` deschis nu închide panoul.
+- [src/components/VideoFacade.astro](src/components/VideoFacade.astro): adăugat strat schelet neutru (`bg-gradient-to-br from-[#0d1428] to-[#050a18]`) sub imagine, container `bg-[#050a18]` și prop nou `loading` (`lazy` implicit).
+- [src/pages/index.astro](src/pages/index.astro): `#video-showcase.hp-deferred-section` primește `content-visibility: visible` — cauza dungilor albastre era `content-visibility: auto` + `contain-intrinsic-size: auto 900px`, care lăsa secțiunea goală (se vedea SkyBackground-ul) până intra în viewport. Prima fațadă video folosește `loading="eager"`.
+
+### Validări
+- `npx astro check` → 0 errors | 0 warnings | 0 hints (83 fișiere).
+- `npm run seo:check` → 58 pagini verificate, **0 FAIL | 0 WARN**.
+
+### Riscuri / observații
+- `content-visibility: visible` pe `#video-showcase` renunță la o mică optimizare de randare pentru prima secțiune de sub hero; restul secțiunilor `hp-deferred-section` rămân deferite. Dacă apar din nou dungi mai jos pe pagină, aceeași soluție se poate aplica punctual.

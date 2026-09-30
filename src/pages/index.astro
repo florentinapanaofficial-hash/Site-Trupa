@@ -185,6 +185,7 @@ const googleBusinessReviews = featuredCouple
           subtitle="Formația Florentina Pană"
           logoSrc="/images/logo-fp-stage.svg"
           videoUrl="https://www.youtube-nocookie.com/embed/xdcdjAtxZlA?autoplay=1"
+          loading="eager"
           description="Moment extraordinar de muzică live la o nuntă de vis în Pitești, județul Argeș. Formația Florentina Pană oferă un spectacol complet și interactiv, capabil să țină toți invitații pe ringul de dans până dimineața. Cu un repertoriu perfect adaptat, prezență scenică impecabilă și sonorizare profesională premium (sistem Dynacord de ultimă generație), garantăm un eveniment memorabil. Alege echipa perfectă pentru nunta ta din 2026 sau 2027!"
         />
         <VideoFacade
@@ -692,6 +693,14 @@ const googleBusinessReviews = featuredCouple
   .hp-deferred-section {
     content-visibility: auto;
     contain-intrinsic-size: auto 900px;
+  }
+
+  /* Prima secțiune de sub hero rămâne randată de la început:
+     cu content-visibility apărea o bandă goală de cer albastru
+     până când VideoFacade intra în viewport. */
+  #video-showcase.hp-deferred-section {
+    content-visibility: visible;
+    contain-intrinsic-size: none;
   }
 
   /* ✅ SEO: text ascuns vizual, vizibil pentru motoarele de căutare */
