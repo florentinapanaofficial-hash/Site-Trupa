@@ -955,6 +955,12 @@ const heroPoster = await getImage({
     display: none;
   }
 
+  @media (min-width: 768px) {
+    .hero-stage.hp-hero-wrap {
+      display: none;
+    }
+  }
+
   /* ════════════════════════════════════════════════════════════════
      CONTAINER INTERIOR
   ════════════════════════════════════════════════════════════════ */
@@ -1028,7 +1034,7 @@ const heroPoster = await getImage({
 
   @media (max-width: 767px) {
     .hero-stage-inner {
-      min-height: 600px;
+      min-height: 0;
     }
 
     .hero-light-orbs {
@@ -1038,7 +1044,7 @@ const heroPoster = await getImage({
 
   @media (max-width: 374px) {
     .hero-stage-inner {
-      min-height: 560px;
+      min-height: 0;
     }
   }
 

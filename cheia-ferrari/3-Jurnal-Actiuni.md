@@ -2771,3 +2771,20 @@ Click-ul pe card făcea două lucruri care latch-uiau panoul deschis:
 
 ### Riscuri / observații
 - Comportamentul cu tastatura rămâne neschimbat: `focus-within` deschide panoul la Tab, iar `mouseleave` nu se declanșează pentru navigarea cu tastatura.
+
+## 📝 30 sep 2026 — Eliminare spațiu gol înainte de Video Showcase
+
+### Obiectiv
+Eliminarea containerului gol de pe desktop și a spațiului excesiv de pe mobil înainte de showcase-ul video din homepage.
+
+### Modificări
+- `src/pages/index.astro`: secțiunea de rețele sociale, al cărei conținut este ascuns pe desktop, nu mai ocupă spațiu la lățimi de minimum 768px; pe mobil, `.hero-stage-inner` nu mai păstrează minimum 600/560px pentru un singur rând de iconițe.
+- `cheia-ferrari/2-Tracker-SEO.md`: consemnată intervenția tehnică. `VideoFacade.astro`, imaginile și metadatele au rămas neschimbate.
+
+### Validări
+- Chrome local la 1440px, 390px și 360px: secțiunea socială desktop are înălțime 0, iar pe mobil 142px; cele două coperți WebP se încarcă și cardurile rămân sub titlul „Video Showcase”.
+- `npm run seo:check`: 58 pagini verificate, 0 FAIL | 0 WARN. Title 58 caractere, description 139; schema FAQ și alt-urile copertelor prezente (ampersandul din al doilea alt este codificat HTML).
+- `npx astro check`: 0 erori, 0 avertismente, 0 hint-uri.
+
+### Riscuri / observații
+- Nu au fost observate imagini blocate; fundalul dark blue din `VideoFacade` este doar stratul de încărcare din interiorul cardurilor reale.
