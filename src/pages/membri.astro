@@ -814,6 +814,11 @@ const membriListLd = {
 </style>
 
 <script is:inline data-astro-rerun>
+(() => {
+  // Pe desktop panoul BIO e condus exclusiv de :hover; tap-ul care comută
+  // `is-open` are sens doar pe ecrane tactile.
+  const isTouchOnly = !window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
   document.querySelectorAll('.js-member-card').forEach((card) => {
     card.addEventListener('click', (e) => {
       // Butonul „X" închide explicit panoul
@@ -824,9 +829,17 @@ const membriListLd = {
       }
       // Click pe link / buton galerie / navigație — nu comută panoul
       if (e.target.closest('a, [data-gallery-open], .ac-photos, .ac-nav')) return;
+      if (!isTouchOnly) return;
       // Click în interiorul panoului deschis (pe text) — rămâne deschis
       if (card.classList.contains('is-open') && e.target.closest('.js-bio-panel')) return;
       card.classList.toggle('is-open');
+    });
+
+    // Fără asta, focusul lăsat de click ține panoul deschis prin :focus-within.
+    card.addEventListener('mouseleave', () => {
+      if (isTouchOnly) return;
+      card.classList.remove('is-open');
+      if (card.contains(document.activeElement)) document.activeElement.blur();
     });
 
     const images = card.querySelectorAll('.js-member-img');
@@ -839,6 +852,7 @@ const membriListLd = {
     card.addEventListener('mouseenter', keepColor, { once: true });
     card.addEventListener('focusin', keepColor, { once: true });
   });
+})();
 </script>
 
 <style>

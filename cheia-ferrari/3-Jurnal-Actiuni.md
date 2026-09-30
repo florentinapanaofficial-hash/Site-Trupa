@@ -2742,3 +2742,25 @@ Rezolvarea recomandărilor PageSpeed „Îmbunătățește livrarea imaginilor" 
 ### Riscuri / observații
 - Poster-ul la 1024px cu `quality: 62` e suficient pentru afișajul de 964x643 cu overlay negru 50% peste; dacă pe ecrane 2K apare bandă vizibilă, crește `width` la 1280.
 - Întârzierea bannerului de cookie-uri este de maximum 1,5 s; consimțământul rămâne prealabil — niciun script de tracking nu se încarcă înainte de accept.
+
+## 📝 30 sep 2026 — Fix: panoul BIO rămânea deschis pe desktop după mouseleave
+
+### Obiectiv
+Panoul BIO al cardurilor de membri (vizibil întâi pe cardul Florentina Pană, primul din grilă) apărea la hover, dar nu se mai retrăgea după ce mouse-ul părăsea cardul.
+
+### Cauză
+Click-ul pe card făcea două lucruri care latch-uiau panoul deschis:
+1. comuta `is-open` — clasa destinată exclusiv tap-ului pe mobil;
+2. focaliza `<article tabindex="0">`, iar `md:group-focus-within:translate-y-0` ținea panoul tras în sus cât timp focusul rămânea în card, adică și după `mouseleave`.
+
+### Modificări
+- [src/pages/membri.astro](src/pages/membri.astro): comutarea `is-open` la click se aplică doar pe dispozitive fără hover fin (`!matchMedia('(hover: hover) and (pointer: fine)')`). Pe desktop panoul rămâne condus exclusiv de `:hover`.
+- Adăugat handler `mouseleave` (doar desktop) care elimină `is-open` și face `blur()` dacă `document.activeElement` e în interiorul cardului — curăță latch-ul de `:focus-within` lăsat de click.
+- Scriptul a fost împachetat într-un IIFE: `const isTouchOnly` la nivel global ar fi aruncat „already been declared" la re-rularea prin `data-astro-rerun` pe navigare client-side.
+
+### Validări
+- `npx astro check` → 0 errors | 0 warnings | 0 hints (83 fișiere).
+- `npm run seo:check` → 58 pagini verificate, **0 FAIL | 0 WARN**.
+
+### Riscuri / observații
+- Comportamentul cu tastatura rămâne neschimbat: `focus-within` deschide panoul la Tab, iar `mouseleave` nu se declanșează pentru navigarea cu tastatura.
