@@ -2641,3 +2641,16 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - `npm run build` → PASS; textul generic nu mai apare în `/galerie-video/`, descrierile noi prezente în `/video/*/`.
 - `npm run seo:check` → **0 FAIL | 0 WARN**.
 - Inginerul Șef a confirmat echipamentele (Dynacord, VoiceLive, Korg) și a asumat duplicarea clipurilor placeholder.
+
+## 📝 30 sep 2026 — UX mobil VideoFacade
+
+### Modificări
+- [src/components/VideoFacade.astro](src/components/VideoFacade.astro): text redus și trunchiat pe mobil, ancorat în partea de jos; butonul Play centrat absolut; butoanele de colț micșorate pe ecranele mici.
+
+### Validări
+- `npx astro check` → 0 errors | 0 warnings | 0 hints.
+- `npm run build` → PASS.
+- `npm run seo:check` → 58 pagini verificate, **0 FAIL | 0 WARN**.
+
+### Riscuri
+- Buildul a folosit fallbackurile existente pentru indisponibilitatea DNS Supabase și lipsa `MYSQL_URL` la galeria completă; procesul și auditul au trecut.
