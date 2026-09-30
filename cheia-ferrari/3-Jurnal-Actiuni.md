@@ -263,6 +263,13 @@ git push origin main
 
 ---
 
+## 📝 2026-09-30 — Video Hero local optimizat (eliminare Pixabay)
+- **Obiectiv:** Înlocuirea videoclipurilor externe Pixabay din HeroVideo cu fișierul local optimizat `/videos/bg-nunta-live-2027.mp4` (5,33 MB).
+- **Fișiere modificate:** `src/pages/index.astro`, `src/pages/membri.astro`, `cheia-ferrari/3-Jurnal-Actiuni.md`.
+- **Implementat:** `videoUrl` pe ambele pagini → `/videos/bg-nunta-live-2027.mp4`; eliminată dependența de CDN extern (cdn.pixabay.com). `<video>` din `HeroVideo.astro` păstrează `autoplay loop muted playsinline` + `preload="metadata"` + `poster`.
+- **Validări:** `npx astro check` — 0 erori / 0 warnings / 0 hints; `npm run seo:check` — build + compresie OK, audit SEO: 58 pagini verificate, 0 FAIL | 0 WARN.
+- **Riscuri/pași următori:** de verificat LCP mobil pe live după deploy; opțional variantă WebM/versiune mai ușoară pentru mobil.
+
 ## 📝 2026-09-30 — Componentă HeroVideo (video background) pe Home și Membri
 - **Obiectiv:** Hero premium cu video de fundal, reutilizabil pe homepage și pagina de echipă.
 - **Fișiere modificate:** `src/components/HeroVideo.astro` (nou), `src/pages/index.astro`, `src/pages/membri.astro`, `cheia-ferrari/3-Jurnal-Actiuni.md`.
