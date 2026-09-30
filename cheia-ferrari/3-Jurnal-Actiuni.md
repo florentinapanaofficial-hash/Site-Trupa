@@ -2652,6 +2652,16 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - `npm run build` → PASS.
 - `npm run seo:check` → 58 pagini verificate, **0 FAIL | 0 WARN**.
 
+## 📝 30 sep 2026 — Persistență culoare la hover pe cardurile Membri
+
+### Modificări
+- [src/pages/membri.astro](src/pages/membri.astro): toate cardurile și imaginile lor primesc clase de identificare; `mouseenter` și `focusin` elimină `grayscale` o singură dată, inclusiv pentru fotografiile din slideshow.
+
+### Validări
+- `npx astro check` → 0 errors | 0 warnings | 0 hints.
+- `npm run build` → PASS.
+- `npm run seo:check` → 58 pagini verificate, **0 FAIL | 0 WARN**.
+
 ### Riscuri
 - Buildul a folosit fallbackurile existente pentru indisponibilitatea DNS Supabase și lipsa `MYSQL_URL` la galeria completă; procesul și auditul au trecut.
 
