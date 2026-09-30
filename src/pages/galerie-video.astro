@@ -27,6 +27,7 @@ const videos = siteContent.videos.map((video, index) => ({
   youtubeId: video.youtubeId,
   youtubeUrl: video.youtubeUrl,
   uploadDate: (video as any).uploadDate as string | undefined,
+  description: video.description,
   slug: `${slugify(video.title)}-${video.youtubeId.toLowerCase()}`,
   imageSrc: coverImages[index % coverImages.length],
 }));
@@ -82,7 +83,7 @@ const videoCollectionLd = {
       item: {
         '@type': 'VideoObject',
         name: v.title,
-        description: `${v.title} — Formația Florentina Pană, muzică live la nunți și evenimente.`,
+        description: v.description,
         thumbnailUrl: [
           `https://img.youtube.com/vi/${v.youtubeId}/maxresdefault.jpg`,
           `https://img.youtube.com/vi/${v.youtubeId}/hqdefault.jpg`,
@@ -117,6 +118,7 @@ const videoCollectionLd = {
           subtitle="Formația Florentina Pană · Muzică live"
           logoSrc="/images/logo-fp-stage.svg"
           videoUrl={`https://www.youtube-nocookie.com/embed/${videos[0].youtubeId}`}
+          description={videos[0].description}
           class="rounded-3xl shadow-2xl shadow-black/50"
         />
       </section>
@@ -148,6 +150,7 @@ const videoCollectionLd = {
                       subtitle={`${category.title} · Formația Florentina Pană`}
                       logoSrc="/images/logo-fp-stage.svg"
                       videoUrl={`https://www.youtube-nocookie.com/embed/${video.youtubeId}`}
+                      description={video.description}
                       class="rounded-2xl shadow-2xl shadow-black/50"
                     />
                   </div>

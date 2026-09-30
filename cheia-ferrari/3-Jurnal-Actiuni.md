@@ -2578,3 +2578,66 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - `src/assets/hp-claudiu-scena.webp` nu mai e referit pe homepage; de verificat dacă e folosit altundeva înainte de ștergere.
 - Homepage-ul a pierdut 4 elemente vizuale (1 card video + 3 carduri foto) față de varianta anterioară; de urmărit timpul pe pagină și bounce-ul în GA4, în caz că densitatea de conținut vizual conta pentru engagement.
 - De remăsurat PageSpeed mobil și desktop după deploy.
+
+## 📝 30 sep 2026 — VideoFacade: buton „Informații” și panou de descriere SEO
+
+### Obiectiv
+- Buton Info (stil Netflix) pe fațadă, cu panou de descriere randat nativ în DOM pentru SEO și UX.
+
+### Modificări
+- [src/components/VideoFacade.astro](src/components/VideoFacade.astro):
+  - prop nou opțional `description`; butonul și panoul se randează doar dacă e setat;
+  - buton „i” rotund translucid stânga-sus (40×40 px), `aria-controls`, `aria-expanded`, `aria-label`;
+  - panou `bg-black/90`, `z-30`, `role="dialog"` + `aria-labelledby`, ascuns prin `opacity-0 pointer-events-none` + `inert` (textul rămâne în HTML-ul static, necolapsat cu `display:none`); tranziție `opacity` 300 ms;
+  - JS: `stopPropagation()` pe click-ul butonului Info și pe tot panoul; buton X și Escape închid panoul; focus mutat pe X la deschidere și înapoi pe „i” la închidere;
+  - fix: `keydown` pe fațadă ignoră evenimentele care vin din butoanele interne (înainte, Enter/Space pe un buton intern ar fi pornit redarea).
+
+### Validări
+- `npx astro check` → 0 errors | 0 warnings | 0 hints.
+- `npm run build` → PASS.
+- `npm run seo:check` → 58 pagini, **0 FAIL | 0 WARN**.
+
+### Pași următori
+- Instanțele din `src/pages/index.astro` nu au încă `description`; de adăugat texte reale când se înlocuiesc clipurile placeholder.
+
+## 📝 30 sep 2026 — Descrieri SEO pentru toate instanțele VideoFacade
+
+### Modificări
+- [src/pages/index.astro](src/pages/index.astro): `description` pe „Show Live Nuntă Pitești” (text Hero) și „Colaj Folclor & Petrecere 2027” (text Petrecere).
+- [src/pages/galerie-video.astro](src/pages/galerie-video.astro): map `categoryDescriptions` (petrecere, tineret-manele, usoara-diverse, instrumentala) + `playlistCategoryMap` (populara/usoara/tineret/instrumentala → categorii video); aplicat pe clipul „În prim-plan” (categoria petrecere), pe cele 12 carduri și pe cele 4 playlisturi.
+
+### Validări
+- `npx astro check` → 0 errors | 0 warnings | 0 hints.
+- `npm run build` → PASS; panouri randate: 17 în `/galerie-video/`, 2 pe homepage.
+- `npm run seo:check` → **0 FAIL | 0 WARN**.
+
+### Riscuri
+- Pe `/galerie-video/` fiecare text de categorie se repetă de 4–5 ori pe aceeași pagină (conținut duplicat intern); de înlocuit treptat cu descrieri unice per clip.
+- Afirmațiile „sistem Dynacord” și „100% live” trebuie să fie reale — de confirmat cu formația.
+
+## 📝 30 sep 2026 — Descrieri video unice mutate în siteContent.json
+
+### Modificări
+- [src/data/siteContent.json](src/data/siteContent.json): câmp `description` pe toate cele 12 obiecte din `videos`, variante A/B/C rotite în ordinea clipurilor din fiecare categorie (3 clipuri × 3 variante → text unic per card).
+- [src/pages/galerie-video.astro](src/pages/galerie-video.astro): eliminate `categoryDescriptions` și `playlistCategoryMap`; `description={video.description}` pe carduri și `videos[0].description` pe „În prim-plan”; playlisturile nu mai primesc descriere (orice text reutilizat ar fi fost duplicat).
+
+### Validări
+- `npx astro check` → 0 errors | 0 warnings | 0 hints.
+- `npm run build` → PASS; 13 panouri Info în `/galerie-video/`.
+- `npm run seo:check` → **0 FAIL | 0 WARN**.
+
+### Riscuri
+- „În prim-plan” este același clip ca primul card Petrecere, deci descrierea lui apare de 2 ori pe pagină.
+- Afirmațiile tehnice (Dynacord, VoiceLive, Korg) trebuie confirmate cu formația.
+
+## 📝 30 sep 2026 — Sincronizare descrieri VideoObject cu siteContent.json
+
+### Modificări
+- [src/pages/galerie-video.astro](src/pages/galerie-video.astro): `description` din `ItemList` → `VideoObject` preia `v.description` (eliminat textul generic).
+- [src/pages/video/[slug].astro](src/pages/video/[slug].astro): `VideoObject.description` preia `video.description`; meta description a paginii rămâne neschimbată (limita de 155 caractere).
+
+### Validări
+- `npx astro check` → 0 errors | 0 warnings | 0 hints.
+- `npm run build` → PASS; textul generic nu mai apare în `/galerie-video/`, descrierile noi prezente în `/video/*/`.
+- `npm run seo:check` → **0 FAIL | 0 WARN**.
+- Inginerul Șef a confirmat echipamentele (Dynacord, VoiceLive, Korg) și a asumat duplicarea clipurilor placeholder.

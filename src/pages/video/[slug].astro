@@ -32,6 +32,7 @@ const { video } = Astro.props as {
     youtubeUrl?: string;
     category?: string;
     uploadDate?: string;
+    description: string;
   };
 };
 
@@ -52,7 +53,7 @@ const videoJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'VideoObject',
   name: video.title,
-  description: pageDescription,
+  description: video.description,
   thumbnailUrl: ogImage,
   uploadDate: video.uploadDate ?? '2024-01-01',
   embedUrl: `https://www.youtube.com/embed/${video.youtubeId}`,
