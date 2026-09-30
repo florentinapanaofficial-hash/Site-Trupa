@@ -2675,3 +2675,21 @@ Claudiu a transmis că este foarte recunoscător pentru tot ce am făcut pentru 
 - `npx astro check` → 0 errors | 0 warnings | 0 hints.
 - `npm run build` → PASS.
 - `npm run seo:check` → 58 pagini verificate, **0 FAIL | 0 WARN**.
+
+## 📝 30 sep 2026 — UX mobil carduri Membri: z-index, padding și toggle BIO la tap
+
+### Obiectiv
+Rezolvarea a trei probleme pe ecrane tactile: padding insuficient în panoul BIO, suprapunerea săgeților caruselului peste text și panoul BIO rămas blocat peste fotografie după tap.
+
+### Modificări
+- [src/pages/membri.astro](src/pages/membri.astro): panoul BIO din toate cele 3 variante de carduri (Soliști, Instrumentiști, Colaboratori) trece de la `z-20` la `z-50`, iar padding-ul `p-4 … md:p-6` devine `px-6 py-8`; `overflow-y-auto` rămâne activ pentru scroll intern.
+- Adăugat `group-[.is-open]:translate-y-0` lângă variantele hover/focus, pentru a permite deschiderea panoului prin clasă.
+- Scriptul `.js-member-card` primește un listener `click` care comută `is-open`, cu guard `e.target.closest('a, button, .ac-photos, .ac-nav')` ca să nu se declanșeze pe „Vezi fotografiile”. Pe desktop rămâne hover-ul fluid, pe mobil tap deschide/închide BIO-ul, iar fotografia rămâne colorată prin `keepColor`.
+
+### Validări
+- `npx astro check` → 0 errors | 0 warnings | 0 hints (82 fișiere).
+- `npm run build` → PASS.
+- `npm run seo:check` → 58 pagini verificate, **0 FAIL | 0 WARN**.
+
+### Riscuri / observații
+- Clasele `.ac-photos` și `.ac-nav` din guard nu există momentan în pagină (containerul real este `.member-card-photos`, iar săgețile de carusel sunt doar în popup). Guard-ul este inofensiv, dar dacă apare un carusel în card trebuie actualizat selectorul.
