@@ -78,10 +78,21 @@
     } else if (consent === 'denied') {
       // consimțământ refuzat – nu se face nimic
     } else {
-      // Niciun consimțământ înregistrat – afișăm bannerul
-      if (banner) {
-        banner.hidden = false;
-        banner.removeAttribute('hidden');
+      // Niciun consimțământ înregistrat – afișăm bannerul după ce fonturile
+      // sunt gata, altfel font-display:swap îi reflowa textul și genera CLS.
+      var showBanner = function () {
+        if (banner) {
+          banner.hidden = false;
+          banner.removeAttribute('hidden');
+        }
+      };
+      if (document.fonts && document.fonts.ready) {
+        var shown = false;
+        var showOnce = function () { if (!shown) { shown = true; showBanner(); } };
+        document.fonts.ready.then(showOnce);
+        setTimeout(showOnce, 1500);
+      } else {
+        showBanner();
       }
     }
 

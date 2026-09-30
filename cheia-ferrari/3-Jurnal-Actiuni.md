@@ -2721,3 +2721,24 @@ Separarea logicii hover (desktop) de tap (mobil) pe cardurile de membri, încadr
 
 ### Riscuri / observații
 - `content-visibility: visible` pe `#video-showcase` renunță la o mică optimizare de randare pentru prima secțiune de sub hero; restul secțiunilor `hp-deferred-section` rămân deferite. Dacă apar din nou dungi mai jos pe pagină, aceeași soluție se poate aplica punctual.
+
+## 📝 30 sep 2026 — PageSpeed: livrare imagini, LCP și CLS pe homepage
+
+### Obiectiv
+Rezolvarea recomandărilor PageSpeed „Îmbunătățește livrarea imaginilor" (~289 KiB), „Descoperirea solicitării LCP", CLS 0.115 și preconnect nefolosit.
+
+### Modificări
+- [src/pages/index.astro](src/pages/index.astro): poster-ul `<HeroVideo>` (elementul LCP) nu mai este JPG-ul brut `card-1-panoramica.jpg` (328,7 KiB, 1426x1280). Generat prin `getImage()` la `width: 1024`, `format: 'webp'`, `quality: 62` → **43,5 KiB** (−285 KiB). Adăugat `<link rel="preload" as="image" fetchpriority="high">` în `slot="head"` (randat înaintea preload-urilor de fonturi) ca resursa LCP să fie descoperită din documentul inițial.
+- [src/pages/index.astro](src/pages/index.astro): `hp-ana-florentina.webp` primește `widths={[480, 720, 960]}` și `sizes="(max-width: 767px) 92vw, 660px"` — înainte `sizes="480px"` forța varianta 960w pentru un afișaj de 644px.
+- [src/components/VideoFacade.astro](src/components/VideoFacade.astro): `widths={[480, 640, 800, 1280]}` + `sizes="(max-width: 768px) 100vw, (max-width: 1280px) 46vw, 620px"` — grila e pe 2 coloane pe desktop, nu 800px per card.
+- [src/components/CookieBanner.astro](src/components/CookieBanner.astro): bannerul se afișează după `document.fonts.ready` (fallback `setTimeout` 1500 ms). `font-display: swap` îi reflowa textul după apariție și producea 0,112 din CLS-ul total de 0,115.
+- [src/layouts/BaseLayout.astro](src/layouts/BaseLayout.astro): homepage-ul scos din `hasYouTube` — `<VideoFacade>` injectează iframe-ul abia la click, deci cele 3 `preconnect` (youtube-nocookie, youtube, i.ytimg) erau raportate ca nefolosite. `dns-prefetch` rămâne pentru toate paginile.
+
+### Validări
+- `npx astro check` → 0 errors | 0 warnings | 0 hints (83 fișiere).
+- `npm run seo:check` → 58 pagini verificate, **0 FAIL | 0 WARN**.
+- Verificat în `dist/client/index.html`: `poster` și `preload` indică același `card-1-panoramica.NzU7LKQ3_13qfxt.webp` (43,5 KiB).
+
+### Riscuri / observații
+- Poster-ul la 1024px cu `quality: 62` e suficient pentru afișajul de 964x643 cu overlay negru 50% peste; dacă pe ecrane 2K apare bandă vizibilă, crește `width` la 1280.
+- Întârzierea bannerului de cookie-uri este de maximum 1,5 s; consimțământul rămâne prealabil — niciun script de tracking nu se încarcă înainte de accept.

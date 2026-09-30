@@ -236,7 +236,8 @@ const repertoireItemListLd = {
 };
 
 const isHomePage = Astro.url.pathname === '/';
-const hasYouTube = isHomePage || ['/galerie-video', '/aparitii-tv', '/video/', '/colaboratori/', '/comunitate', '/live'].some(p => Astro.url.pathname.startsWith(p));
+// Homepage folosea preconnect degeaba: <VideoFacade> injectează iframe-ul abia la click.
+const hasYouTube = ['/galerie-video', '/aparitii-tv', '/video/', '/colaboratori/', '/comunitate', '/live'].some(p => Astro.url.pathname.startsWith(p));
 const isCommunityDetailPage = /^\/comunitate\/[^/]+\/$/.test(Astro.url.pathname);
 
 // JSON-LD: WebPage — fiecare pagină primește schema WebPage

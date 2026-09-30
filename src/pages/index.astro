@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import VideoFacade from '../components/VideoFacade.astro';
 import HeroVideo from '../components/HeroVideo.astro';
@@ -63,10 +63,18 @@ const googleBusinessReviews = featuredCouple
       text: featuredCouple.recommendation,
     }]
   : [];
+// Poster-ul video-ului hero este elementul LCP: WebP redimensionat, nu JPG-ul brut de 1426px.
+const heroPoster = await getImage({
+  src: heroImg,
+  width: 1024,
+  format: 'webp',
+  quality: 62,
+});
 ---
 
 <BaseLayout title={acasa.meta.title} description={acasa.meta.description} ogImage={siteContent.seo.ogImage}>
   <Fragment slot="head">
+    <link rel="preload" as="image" href={heroPoster.src} fetchpriority="high" />
     <script is:inline type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>
 
@@ -100,7 +108,7 @@ const googleBusinessReviews = featuredCouple
   ═══════════════════════════════════════════ */}
   <HeroVideo
     videoUrl="https://cdn.pixabay.com/video/2020/05/25/40140-425268448_large.mp4"
-    posterImage={heroImg.src}
+    posterImage={heroPoster.src}
     title="Formația Florentina Pană | Trupă Live Nuntă Pitești"
     subtitle="Muzică Live pentru Evenimente de Neuitat"
     showReviews={true}
@@ -206,8 +214,8 @@ const googleBusinessReviews = featuredCouple
         <Image
           src={anaFlorentinaImg}
           alt="Florentina și Claudiu în timpul unui moment live"
-          widths={[480, 960]}
-          sizes="(max-width: 767px) 92vw, 480px"
+          widths={[480, 720, 960]}
+          sizes="(max-width: 767px) 92vw, 660px"
           format="webp"
           quality={70}
           loading="lazy"
