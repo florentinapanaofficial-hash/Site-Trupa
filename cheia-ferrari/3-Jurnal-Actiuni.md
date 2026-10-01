@@ -2885,3 +2885,14 @@ Trimiterea unei notificări email către `SMTP_USER` imediat după salvarea reze
 
 ### Riscuri / pași următori
 - Setează `SMTP_USER` și `SMTP_PASS` (Gmail App Password) în Railway, altfel emailul eșuează silențios (logat).
+
+## 📝 02 oct 2026 — Fix: formular blocat pe „Se trimite...”
+
+### Cauză
+`await transporter.sendMail()` bloca răspunsul; timeout-urile implicite nodemailer (2 min conectare, 10 min socket) țineau request-ul agățat când SMTP-ul nu răspundea.
+
+### Modificări
+- `src/pages/api/rezervare.ts`: `createTransport` + `sendMail` mutate în `trimiteNotificare()` cu `try/catch` complet; `connectionTimeout: 5000`; apel fire-and-forget (`void`) — 200 OK returnat imediat după insert-ul MySQL. Skip logat dacă lipsesc variabilele; spațiile din `SMTP_PASS` sunt eliminate.
+
+### Validări
+- `npx astro check`: 0 erori | 0 warnings | 0 hints (84 fișiere).

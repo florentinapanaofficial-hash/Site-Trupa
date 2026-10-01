@@ -21,16 +21,6 @@ import { secureLogger } from '../../lib/secure-logger.js';
 export const prerender = false;
 
 // ── Notificare email (SMTP Gmail) ─────────────────────────────────────────
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
-    auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-    },
-});
-
 function escapeHtml(val: string): string {
     return val
         .replace(/&/g, '&amp;')
@@ -38,6 +28,37 @@ function escapeHtml(val: string): string {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
+}
+
+async function trimiteNotificare(campuri: [string, string][], nume: string): Promise<void> {
+    try {
+        const user = process.env.SMTP_USER?.trim();
+        const pass = process.env.SMTP_PASS?.replace(/\s+/g, '');
+        if (!user || !pass) {
+            secureLogger.error('[/api/rezervare] Email skip: SMTP_USER/SMTP_PASS lipsesc.');
+            return;
+        }
+
+        const transporter = nodemailer.createTransport({
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true,
+            connectionTimeout: 5000,
+            auth: { user, pass },
+        });
+
+        await transporter.sendMail({
+            from: user,
+            to: user,
+            subject: `Cerere nouă eveniment: ${nume}`,
+            text: campuri.map(([k, v]) => `- ${k}: ${v}`).join('\n'),
+            html: `<ul>${campuri
+                .map(([k, v]) => `<li><strong>${k}:</strong> ${escapeHtml(v)}</li>`)
+                .join('')}</ul>`,
+        });
+    } catch (err) {
+        secureLogger.error('[/api/rezervare] Email error:', err);
+    }
 }
 
 // ── Rate limiting ─────────────────────────────────────────────────────────
@@ -159,28 +180,17 @@ export const POST: APIRoute = async ({ request }) => {
         return jsonErr('Eroare server. Încearcă din nou sau contactează-ne direct la +40767369658.', 500);
     }
 
-    // Rezervarea e deja salvată — un eșec SMTP nu trebuie să returneze eroare clientului.
-    try {
-        const campuri: [string, string][] = [
+    // Fire-and-forget: răspunsul nu așteaptă SMTP; erorile sunt prinse în trimiteNotificare.
+    void trimiteNotificare(
+        [
             ['Nume', nume],
             ['Telefon', telefon],
             ['Tip Eveniment', eveniment],
             ['Data', data],
             ['Mesaj', mesaj || '-'],
-        ];
-
-        await transporter.sendMail({
-            from: process.env.SMTP_USER,
-            to: process.env.SMTP_USER,
-            subject: `Cerere nouă eveniment: ${nume}`,
-            text: campuri.map(([k, v]) => `- ${k}: ${v}`).join('\n'),
-            html: `<ul>${campuri
-                .map(([k, v]) => `<li><strong>${k}:</strong> ${escapeHtml(v)}</li>`)
-                .join('')}</ul>`,
-        });
-    } catch (err) {
-        secureLogger.error('[/api/rezervare] Email error:', err);
-    }
+        ],
+        nume,
+    );
 
     return new Response(JSON.stringify({ ok: true }), {
         status: 200,
