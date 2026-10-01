@@ -31,6 +31,9 @@ Thumbs.db
 _raw_images/
 _raw_videos/
 
+# Copertă GIF locală neoptimizată (205 MB, peste limita GitHub)
+public/videos/Coperta 1-videi.gif
+
 # Lighthouse reports (artefacte locale)
 lighthouse-*.report.html
 lighthouse-*.report.json

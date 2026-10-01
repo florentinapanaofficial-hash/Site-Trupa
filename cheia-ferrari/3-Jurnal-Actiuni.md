@@ -2795,3 +2795,38 @@ Eliminarea containerului gol de pe desktop și a spațiului excesiv de pe mobil 
 
 ### Riscuri / observații
 - Nu au fost observate imagini blocate; fundalul dark blue din `VideoFacade` este doar stratul de încărcare din interiorul cardurilor reale.
+
+## 📝 01 oct 2026 — Migrare Video Showcase la Cloudflare Stream
+
+### Obiectiv
+Înlocuirea celor două videoclipuri YouTube din Video Showcase cu montajele Cloudflare Stream furnizate de Inginerul Șef.
+
+### Modificări
+- `src/components/VideoFacade.astro`: adăugat `iframe.cloudflarestream.com` în allowlist-ul runtime; iframe-ul este construit în continuare doar după click și consimțământ.
+- `src/pages/index.astro` și `scripts/programmatic-seo/template.astro`: actualizate URL-urile către noile ID-uri Cloudflare Stream.
+- Pagini locale regenerate pentru Pitești, București și Curtea de Argeș.
+- Coperțile WebP locale existente au fost păstrate pentru LCP; coperțile noi din `public/videos/` rămân disponibile pentru o actualizare ulterioară.
+
+### Validări
+- `npx astro check`: 0 erori | 0 warnings | 0 hints (83 fișiere).
+- `npm run build`: PASS; 58 pagini prerandate și 78 fișiere comprimate.
+- `npm run seo:audit`: 58 pagini verificate, **0 FAIL | 0 WARN**.
+
+### Riscuri / observații
+- Build-ul a afișat fallback-urile existente pentru Supabase și galeria dependentă de `MYSQL_URL`; nu au blocat build-ul și nu sunt legate de această modificare.
+
+## 📝 01 oct 2026 — Actualizare titluri și informații Video Showcase
+
+### Obiectiv
+Alinierea titlurilor și descrierilor accesibile prin butonul „ⓘ” cu noul conținut al celor două montaje Cloudflare Stream.
+
+### Modificări
+- `src/pages/index.astro`: Card 1 devine „Cover-uri Hit-uri Românești de Petrecere”, iar Card 2 „Show Live Manele”; descrierile panoului de informații au fost rescrise corespunzător.
+- `scripts/programmatic-seo/template.astro`: aceleași titluri și descrieri propagate în template-ul paginilor locale.
+- `aria-label`-ul butonului „ⓘ” rămâne sincronizat automat deoarece este derivat din titlul cardului.
+- Coperțile locale optimizate au fost păstrate pentru LCP.
+
+### Validări
+- `npx astro check`: 0 erori | 0 warnings | 0 hints (83 fișiere).
+- `npm run build`: PASS.
+- `npm run seo:audit`: 58 pagini verificate, **0 FAIL | 0 WARN**.
