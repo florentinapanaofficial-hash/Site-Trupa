@@ -14,13 +14,13 @@
  */
 
 import type { APIRoute } from 'astro';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import { query } from '../../lib/db.js';
 import { secureLogger } from '../../lib/secure-logger.js';
 
 export const prerender = false;
 
-// ── Notificare email (SMTP Gmail) ─────────────────────────────────────────
+// ── Notificare email (Resend API) ─────────────────────────────────────────
 function escapeHtml(val: string): string {
     return val
         .replace(/&/g, '&amp;')
@@ -32,30 +32,25 @@ function escapeHtml(val: string): string {
 
 async function trimiteNotificare(campuri: [string, string][], nume: string): Promise<void> {
     try {
-        const user = process.env.SMTP_USER?.trim();
-        const pass = process.env.SMTP_PASS?.replace(/\s+/g, '');
-        if (!user || !pass) {
-            secureLogger.error('[/api/rezervare] Email skip: SMTP_USER/SMTP_PASS lipsesc.');
+        const apiKey = process.env.RESEND_API_KEY?.trim();
+        if (!apiKey) {
+            secureLogger.error('[/api/rezervare] Email skip: RESEND_API_KEY lipsește.');
             return;
         }
 
-        const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 465,
-            secure: true,
-            connectionTimeout: 5000,
-            auth: { user, pass },
-        });
+        const resend = new Resend(apiKey);
 
-        await transporter.sendMail({
-            from: user,
-            to: user,
+        // SDK-ul Resend returnează { error } în loc să arunce excepție.
+        const { error } = await resend.emails.send({
+            from: 'onboarding@resend.dev',
+            to: 'contact@florentinapanaofficial.ro',
             subject: `Cerere nouă eveniment: ${nume}`,
             text: campuri.map(([k, v]) => `- ${k}: ${v}`).join('\n'),
             html: `<ul>${campuri
                 .map(([k, v]) => `<li><strong>${k}:</strong> ${escapeHtml(v)}</li>`)
                 .join('')}</ul>`,
         });
+        if (error) secureLogger.error('[/api/rezervare] Resend error:', error);
     } catch (err) {
         secureLogger.error('[/api/rezervare] Email error:', err);
     }

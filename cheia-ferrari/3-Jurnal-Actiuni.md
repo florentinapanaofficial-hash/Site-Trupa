@@ -2896,3 +2896,16 @@ Trimiterea unei notificări email către `SMTP_USER` imediat după salvarea reze
 
 ### Validări
 - `npx astro check`: 0 erori | 0 warnings | 0 hints (84 fișiere).
+
+## 📝 02 oct 2026 — Migrare notificări email: nodemailer → Resend
+
+### Modificări
+- `src/pages/api/rezervare.ts`: `trimiteNotificare()` folosește `resend.emails.send()` (`from: onboarding@resend.dev`, `to: contact@florentinapanaofficial.ro`), cheie din `RESEND_API_KEY`; rămâne fire-and-forget, 200 OK imediat după insert. Erorile Resend (`{ error }`) și excepțiile sunt logate.
+- `src/env.d.ts`, `.env.example`: `RESEND_API_KEY` în locul `SMTP_USER`/`SMTP_PASS`.
+- `package.json`/`package-lock.json`: adăugat `resend`, eliminat `nodemailer` + `@types/nodemailer`.
+
+### Validări
+- `npx astro check`: 0 erori | 0 warnings | 0 hints (84 fișiere).
+
+### Riscuri
+- Expeditorul de test `onboarding@resend.dev` livrează doar către emailul contului Resend; pentru alt destinatar trebuie verificat domeniul în Resend.
