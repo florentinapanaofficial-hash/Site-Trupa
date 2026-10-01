@@ -2909,3 +2909,7 @@ Trimiterea unei notificări email către `SMTP_USER` imediat după salvarea reze
 
 ### Riscuri
 - Expeditorul de test `onboarding@resend.dev` livrează doar către emailul contului Resend; pentru alt destinatar trebuie verificat domeniul în Resend.
+
+## 📝 02 oct 2026 — Resend sandbox: destinatar actualizat
+- `src/pages/api/rezervare.ts`: `to` → `florentinapanaofficial@gmail.com` (emailul contului Resend, cerință sandbox).
+- `npx astro check`: 0 erori | 0 warnings | 0 hints (84 fișiere).

@@ -43,7 +43,7 @@ async function trimiteNotificare(campuri: [string, string][], nume: string): Pro
         // SDK-ul Resend returnează { error } în loc să arunce excepție.
         const { error } = await resend.emails.send({
             from: 'onboarding@resend.dev',
-            to: 'contact@florentinapanaofficial.ro',
+            to: 'florentinapanaofficial@gmail.com',
             subject: `Cerere nouă eveniment: ${nume}`,
             text: campuri.map(([k, v]) => `- ${k}: ${v}`).join('\n'),
             html: `<ul>${campuri
