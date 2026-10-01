@@ -263,6 +263,26 @@ git push origin main
 
 ---
 
+## 📝 2026-10-01 — /api/views/: persistență reală în Supabase
+- **Obiectiv:** Contorul ochișor din `VideoFacade` persistent pe termen lung; eliminat stocarea în memorie.
+- **Fișiere modificate:** `src/pages/api/views.ts`, `src/env.d.ts`, `.env.example`, `scripts/supabase-video-stats.sql` (nou), `cheia-ferrari/3-Jurnal-Actiuni.md`.
+- **Implementat:** tabel `video_stats (video_id TEXT PK, views INT DEFAULT 0)` cu RLS fără politici + RPC `increment_video_view` (`INSERT … ON CONFLICT DO UPDATE … RETURNING`, atomic), executabil doar de `service_role`. GET → `select … in(ids)`, ID-urile lipsă = 0; POST → RPC, rate-limit 30s/IP/video păstrat. Client `@supabase/supabase-js` cu `SUPABASE_SERVICE_ROLE_KEY` (doar server), 503 dacă lipsesc variabilele. Eliminat `RAILWAY_DB_URL`.
+- **Validări:** `npx astro check` 0 erori / 0 warnings / 0 hints.
+- **Pași următori:** rulat `scripts/supabase-video-stats.sql` în Supabase SQL Editor; setat `SUPABASE_SERVICE_ROLE_KEY` (și `SUPABASE_URL`) în Railway + `.env` local.
+
+## 📝 2026-10-01 — VideoFacade: buton Play roșu cu puls (CTR)
+- **Obiectiv:** Buton Play mai vizibil, în stil YouTube, pentru mai multe click-uri.
+- **Fișiere modificate:** `src/components/VideoFacade.astro`, `cheia-ferrari/3-Jurnal-Actiuni.md`.
+- **Implementat:** cerc cu gradient `red-500 → red-700`, triunghi alb, glow roșu; inel `animate-ping` în spate + animație `vf-heartbeat` (scale 1 → 1.08) pe elementul interior, astfel încât centrarea `translate` a containerului nu e afectată. Ambele animații sunt dezactivate la `prefers-reduced-motion`. Elementul e `absolute`, deci nu decalează ochișorul sau titlul.
+- **Validări:** `npx astro check` 0 erori / 0 warnings / 0 hints.
+
+## 📝 2026-10-01 — VideoFacade: exclusivitate la redare + contor vizualizări
+- **Obiectiv:** Un singur video activ simultan și contor de vizualizări (ochișor) pe cardurile video, cu endpoint pregătit pentru Railway.
+- **Fișiere modificate:** `src/components/VideoFacade.astro`, `src/pages/api/views.ts` (nou), `src/env.d.ts`, `cheia-ferrari/3-Jurnal-Actiuni.md`.
+- **Implementat:** la play, orice altă fațadă activă revine la copertă (iframe eliminat, nodurile originale restaurate cu listener-ii intacți); consimțământul în așteptare de pe alte carduri se închide. Badge „ochi” + număr compact (`ro-RO`) în colțul dreapta-jos, ascuns până la primul răspuns. ID video derivat automat din `videoUrl` (sau prop `videoId`). `/api/views/` GET `?ids=` (max 50) și POST `{ videoId }`, CORS `checkOrigin`, rate-limit 30s/IP/video, fallback în memorie + `TODO: Conexiune Railway (Redis/Postgres)` pe `RAILWAY_DB_URL`.
+- **Validări:** `npx astro check` 0 erori / 0 warnings / 0 hints; `npm run build` OK; `npm run seo:check` 58 pagini, 0 FAIL | 0 WARN.
+- **Riscuri/pași următori:** contorul în memorie se resetează la redeploy până la conectarea Redis/Postgres pe Railway; local, POST-ul primește 403 dacă originea nu e în `PUBLIC_SITE_URL`.
+
 ## 📝 2026-10-01 — Hero video și showcase pe paginile SEO locale
 - **Obiectiv:** Experiență vizuală premium above the fold pe paginile formație nuntă, cu textul SEO păstrat sub showcase.
 - **Fișiere modificate:** `scripts/programmatic-seo/template.astro`, `scripts/programmatic-seo/generate-pages.js`, `scripts/programmatic-seo/locations.json`, cele trei pagini regenerate din `src/pages/formatie-nunta/`, `cheia-ferrari/2-Tracker-SEO.md`, `cheia-ferrari/3-Jurnal-Actiuni.md`.

@@ -29,6 +29,8 @@ interface Props {
   logoSrc?: string;
   /** Sursa iframe-ului injectat la click. */
   videoUrl: string;
+  /** ID stabil pentru contorul de vizualizări; implicit derivat din `videoUrl`. */
+  videoId?: string;
   /** Descriere bogată (SEO), randată nativ în DOM în panoul „Informații”. */
   description?: string;
   /** Strategia de încărcare a imaginii de fațadă. */
@@ -43,6 +45,7 @@ const {
   subtitle,
   logoSrc,
   videoUrl,
+  videoId,
   description,
   loading = 'lazy',
   class: className = '',
@@ -53,6 +56,18 @@ const infoId = `vf-info-${Math.random().toString(36).slice(2, 10)}`;
 const safeVideoUrl = sanitizeUrl(videoUrl, '');
 const safeLogoSrc = logoSrc ? sanitizeUrl(logoSrc, '') : '';
 const brandName = 'Formația Florentina Pană';
+
+function deriveVideoId(raw: string): string {
+  try {
+    const url = new URL(raw, 'https://local.invalid');
+    const candidate = url.searchParams.get('list') || url.pathname.split('/').filter(Boolean).pop() || '';
+    return /^[A-Za-z0-9_-]{1,64}$/.test(candidate) ? candidate : '';
+  } catch {
+    return '';
+  }
+}
+
+const viewsId = videoId && /^[A-Za-z0-9_-]{1,64}$/.test(videoId) ? videoId : deriveVideoId(safeVideoUrl);
 ---
 
 <div
@@ -63,6 +78,7 @@ const brandName = 'Formația Florentina Pană';
   data-video-facade
   data-video-url={safeVideoUrl}
   data-video-title={title}
+  data-video-id={viewsId || undefined}
   role="button"
   tabindex="0"
   aria-label={`Redă videoclipul: ${title}`}
@@ -127,26 +143,51 @@ const brandName = 'Formația Florentina Pană';
   </div>
 
   <span
-    class="pointer-events-none absolute left-1/2 top-1/2 z-10 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 transform items-center justify-center rounded-full bg-black/40 ring-1 ring-amber-300/60 backdrop-blur-sm transition-transform duration-300 group-hover:scale-110 group-focus-visible:scale-110 md:h-20 md:w-20"
+    class="pointer-events-none absolute left-1/2 top-1/2 z-10 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 transform items-center justify-center transition-transform duration-300 group-hover:scale-110 group-focus-visible:scale-110 md:h-20 md:w-20"
   >
-    <svg
-      viewBox="0 0 24 24"
-      fill="currentColor"
+    <span
+      class="absolute inset-0 rounded-full bg-red-600/50 motion-safe:animate-ping"
       aria-hidden="true"
-      class="ml-1 h-6 w-6 text-amber-300 drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)] md:h-9 md:w-9"
     >
-      <path d="M8 5.14v13.72a1 1 0 0 0 1.52.85l11.14-6.86a1 1 0 0 0 0-1.7L9.52 4.29A1 1 0 0 0 8 5.14Z" />
-    </svg>
+    </span>
+    <span
+      class="vf-play-heartbeat relative flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-red-500 to-red-700 shadow-[0_8px_24px_rgba(220,38,38,0.55)] ring-2 ring-white/20 transition-colors duration-300 group-hover:from-red-500 group-hover:to-red-600"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        aria-hidden="true"
+        class="ml-1 h-6 w-6 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.35)] md:h-9 md:w-9"
+      >
+        <path d="M8 5.14v13.72a1 1 0 0 0 1.52.85l11.14-6.86a1 1 0 0 0 0-1.7L9.52 4.29A1 1 0 0 0 8 5.14Z" />
+      </svg>
+    </span>
   </span>
 
-  <div class="absolute inset-x-0 bottom-0 z-10 flex flex-col justify-end p-3 md:p-6">
-    <h3 class="line-clamp-1 text-base font-bold leading-snug text-white drop-shadow-md md:text-2xl">
-      {title}
-    </h3>
-    {subtitle && (
-      <p class="mt-1 line-clamp-1 text-xs text-amber-200/90 md:text-sm">
-        {subtitle}
-      </p>
+  <div class="absolute inset-x-0 bottom-0 z-10 flex items-end justify-between gap-3 p-3 md:p-6">
+    <div class="min-w-0 flex-1">
+      <h3 class="line-clamp-1 text-base font-bold leading-snug text-white drop-shadow-md md:text-2xl">
+        {title}
+      </h3>
+      {subtitle && (
+        <p class="mt-1 line-clamp-1 text-xs text-amber-200/90 md:text-sm">
+          {subtitle}
+        </p>
+      )}
+    </div>
+    {viewsId && (
+      <span
+        data-video-views
+        hidden
+        class="flex shrink-0 items-center gap-1.5 rounded-full bg-[#0a1630]/70 px-2.5 py-1 text-[11px] font-medium tabular-nums text-white/90 ring-1 ring-amber-300/30 backdrop-blur-md md:px-3 md:text-xs"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="h-3.5 w-3.5 text-amber-300 md:h-4 md:w-4">
+          <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" />
+          <circle cx="12" cy="12" r="3" />
+        </svg>
+        <span data-video-views-count>0</span>
+        <span class="sr-only">vizualizări</span>
+      </span>
     )}
   </div>
 
@@ -208,6 +249,21 @@ const brandName = 'Formația Florentina Pană';
   )}
 </div>
 
+<style>
+  @keyframes vf-heartbeat {
+    0%, 40%, 100% { transform: scale(1); }
+    15% { transform: scale(1.08); }
+    28% { transform: scale(1.03); }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .vf-play-heartbeat {
+      animation: vf-heartbeat 1.8s ease-in-out infinite;
+      will-change: transform;
+    }
+  }
+</style>
+
 <script>
   const ALLOWED_HOSTS = [
     'www.youtube-nocookie.com',
@@ -239,11 +295,94 @@ const brandName = 'Formația Florentina Pană';
     }
   }
 
+  const VIEWS_ENDPOINT = '/api/views/';
+  const viewsFormatter = new Intl.NumberFormat('ro-RO', { notation: 'compact', maximumFractionDigits: 1 });
+  // Copertele originale, restaurate când alt video preia redarea.
+  const coverNodes = new WeakMap<HTMLElement, Node[]>();
+
+  function renderViews(facade: HTMLElement, views: number): void {
+    facade.dataset.videoViews = String(views);
+    const badge = facade.querySelector<HTMLElement>('[data-video-views]');
+    if (!badge) return;
+    const count = badge.querySelector<HTMLElement>('[data-video-views-count]');
+    if (count) count.textContent = viewsFormatter.format(views);
+    badge.hidden = false;
+    badge.setAttribute('aria-label', `${views} vizualizări`);
+  }
+
+  async function loadViews(facades: HTMLElement[]): Promise<void> {
+    const ids = [...new Set(facades.map((f) => f.dataset.videoId).filter((id): id is string => !!id))];
+    if (ids.length === 0) return;
+    try {
+      const res = await fetch(`${VIEWS_ENDPOINT}?ids=${encodeURIComponent(ids.join(','))}`, {
+        headers: { Accept: 'application/json' },
+      });
+      if (!res.ok) return;
+      const data = (await res.json()) as { views?: Record<string, number> };
+      facades.forEach((facade) => {
+        const value = data.views?.[facade.dataset.videoId || ''];
+        if (typeof value === 'number') renderViews(facade, value);
+      });
+    } catch {
+      // Contorul e decorativ — eșecul rețelei nu afectează redarea.
+    }
+  }
+
+  async function trackView(facade: HTMLElement): Promise<void> {
+    const videoId = facade.dataset.videoId;
+    if (!videoId) return;
+    try {
+      const res = await fetch(VIEWS_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ videoId }),
+        keepalive: true,
+      });
+      if (!res.ok) return;
+      const data = (await res.json()) as { views?: number };
+      if (typeof data.views !== 'number') return;
+      // Sincronizează toate cardurile cu același video (ex: aceeași piesă în mai multe secțiuni).
+      document.querySelectorAll<HTMLElement>('[data-video-facade]').forEach((f) => {
+        if (f.dataset.videoId === videoId) renderViews(f, data.views as number);
+      });
+    } catch {
+      // Ignorat intenționat — vezi loadViews.
+    }
+  }
+
+  function resetFacade(facade: HTMLElement): void {
+    const nodes = coverNodes.get(facade);
+    if (!nodes) return;
+    facade.replaceChildren(...nodes);
+    coverNodes.delete(facade);
+    delete facade.dataset.videoActive;
+    facade.classList.add('cursor-pointer', 'group');
+    facade.setAttribute('role', 'button');
+    facade.setAttribute('tabindex', '0');
+    facade.setAttribute('aria-label', `Redă videoclipul: ${facade.dataset.videoTitle || 'Videoclip'}`);
+    if (facade.dataset.videoViews) renderViews(facade, Number(facade.dataset.videoViews));
+  }
+
+  function stopOthers(current: HTMLElement): void {
+    document.querySelectorAll<HTMLElement>('[data-video-facade]').forEach((facade) => {
+      if (facade === current) return;
+      if (facade.dataset.videoActive === 'true') resetFacade(facade);
+      if (facade.dataset.videoPending === 'true') {
+        delete facade.dataset.videoPending;
+        toggleConsentPanel(facade, false);
+      }
+    });
+  }
+
   function activate(facade: HTMLElement): void {
     if (facade.dataset.videoActive === 'true') return;
     const src = buildAutoplayUrl(facade.dataset.videoUrl || '');
     if (!src) return;
 
+    stopOthers(facade);
+    delete facade.dataset.videoPending;
+    toggleConsentPanel(facade, false);
+    coverNodes.set(facade, Array.from(facade.childNodes));
     facade.dataset.videoActive = 'true';
     facade.classList.remove('cursor-pointer', 'group');
     facade.removeAttribute('role');
@@ -261,6 +400,7 @@ const brandName = 'Formația Florentina Pană';
 
     facade.replaceChildren(iframe);
     iframe.focus();
+    void trackView(facade);
   }
 
   function hasConsent(): boolean {
@@ -286,6 +426,7 @@ const brandName = 'Formația Florentina Pană';
       activate(facade);
       return;
     }
+    stopOthers(facade);
     facade.dataset.videoPending = 'true';
     toggleConsentPanel(facade, true);
   }
@@ -337,9 +478,11 @@ const brandName = 'Formația Florentina Pană';
   }
 
 function bindFacades(): void {
+  const fresh: HTMLElement[] = [];
   document.querySelectorAll<HTMLElement>('[data-video-facade]').forEach((facade) => {
     if (facade.dataset.videoBound === 'true') return;
     facade.dataset.videoBound = 'true';
+    fresh.push(facade);
     bindInfo(facade);
 
     facade.addEventListener('click', (event) => {
@@ -360,6 +503,7 @@ function bindFacades(): void {
       }
     });
   });
+  void loadViews(fresh);
 }
 
 // Acceptarea din CookieBanner redă fațadele care așteptau consimțământ.
