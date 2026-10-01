@@ -51,7 +51,7 @@ async function readViews(ids: string[]): Promise<Record<string, number>> {
 }
 
 async function incrementView(id: string): Promise<number> {
-    const { data, error } = await getSupabase().rpc('increment_video_view', { p_video_id: id });
+    const { data, error } = await getSupabase().rpc('increment_video_view', { vid_id: id });
     if (error) throw error;
     if (typeof data !== 'number') throw new Error('Răspuns RPC invalid pentru increment_video_view.');
     return data;

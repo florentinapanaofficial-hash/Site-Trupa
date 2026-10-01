@@ -269,6 +269,7 @@ git push origin main
 - **Implementat:** tabel `video_stats (video_id TEXT PK, views INT DEFAULT 0)` cu RLS fără politici + RPC `increment_video_view` (`INSERT … ON CONFLICT DO UPDATE … RETURNING`, atomic), executabil doar de `service_role`. GET → `select … in(ids)`, ID-urile lipsă = 0; POST → RPC, rate-limit 30s/IP/video păstrat. Client `@supabase/supabase-js` cu `SUPABASE_SERVICE_ROLE_KEY` (doar server), 503 dacă lipsesc variabilele. Eliminat `RAILWAY_DB_URL`.
 - **Validări:** `npx astro check` 0 erori / 0 warnings / 0 hints.
 - **Pași următori:** rulat `scripts/supabase-video-stats.sql` în Supabase SQL Editor; setat `SUPABASE_SERVICE_ROLE_KEY` (și `SUPABASE_URL`) în Railway + `.env` local.
+- **Verificare 2026-10-02:** conexiune OK (proiect `ygluzeynvkgiltaezuqn`); funcția din Supabase folosește parametrul `vid_id` → cod + migrare aliniate; increment testat 1 → 2, rând de test șters. ⚠️ Funcția era apelabilă cu cheia anon — necesită `REVOKE … FROM PUBLIC, anon, authenticated`. Atenție: `PUBLIC_SUPABASE_URL` indică alt proiect (`uhqujllxujfbyvwrafzn`); endpoint-ul folosește `SUPABASE_URL`.
 
 ## 📝 2026-10-01 — VideoFacade: buton Play roșu cu puls (CTR)
 - **Obiectiv:** Buton Play mai vizibil, în stil YouTube, pentru mai multe click-uri.

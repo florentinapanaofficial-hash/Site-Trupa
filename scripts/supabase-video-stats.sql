@@ -13,14 +13,14 @@ CREATE TABLE IF NOT EXISTS public.video_stats (
 ALTER TABLE public.video_stats ENABLE ROW LEVEL SECURITY;
 
 -- Increment atomic (UPSERT) — evită race condition-ul read-then-write.
-CREATE OR REPLACE FUNCTION public.increment_video_view(p_video_id TEXT)
+CREATE OR REPLACE FUNCTION public.increment_video_view(vid_id TEXT)
 RETURNS INTEGER
 LANGUAGE sql
 SECURITY INVOKER
 SET search_path = public
 AS $$
   INSERT INTO public.video_stats AS vs (video_id, views)
-  VALUES (p_video_id, 1)
+  VALUES (vid_id, 1)
   ON CONFLICT (video_id)
   DO UPDATE SET views = vs.views + 1, updated_at = now()
   RETURNING vs.views;
@@ -28,3 +28,6 @@ $$;
 
 REVOKE ALL ON FUNCTION public.increment_video_view(TEXT) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.increment_video_view(TEXT) TO service_role;
+
+-- Face funcția vizibilă imediat pentru API-ul REST (altfel: eroare PGRST202).
+NOTIFY pgrst, 'reload schema';
