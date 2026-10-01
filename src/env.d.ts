@@ -8,5 +8,8 @@ interface ImportMetaEnv {
     readonly PUBLIC_SUPABASE_ANON_KEY?: string;
     /** Doar server-side (/api/views/) — nu se expune niciodată în client. */
     readonly SUPABASE_SERVICE_ROLE_KEY?: string;
+    /** Doar server-side — notificări email formular contact (Gmail App Password). */
+    readonly SMTP_USER: string;
+    readonly SMTP_PASS: string;
 }
 

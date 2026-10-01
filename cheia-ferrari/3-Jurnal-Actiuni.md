@@ -2869,3 +2869,19 @@ Publicarea noilor coperți pentru cele două montaje Cloudflare Stream în homep
 
 ### Riscuri / observații
 - Coperțile din `public/` sunt servite direct, fără redimensionarea automată Astro; fișierele au 128300 și 58220 octeți. Build-ul afișează fallback-ul existent pentru galeria dependentă de `MYSQL_URL`, fără a bloca build-ul.
+
+## 📝 02 oct 2026 — Notificări email pentru formularul de contact (nodemailer)
+
+### Obiectiv
+Trimiterea unei notificări email către `SMTP_USER` imediat după salvarea rezervării în MySQL.
+
+### Modificări
+- `src/pages/api/rezervare.ts`: transportator nodemailer (`smtp.gmail.com:465`, `secure: true`); după insert-ul reușit se trimite emailul „Cerere nouă eveniment: [Nume]” cu Nume, Telefon, Tip Eveniment, Data, Mesaj (text + HTML escapat). Eșecul SMTP e doar logat — clientul primește tot `ok: true`.
+- `src/env.d.ts`, `.env.example`: declarate `SMTP_USER`, `SMTP_PASS`.
+- `package.json` / `package-lock.json`: `nodemailer` + `@types/nodemailer` (dev).
+
+### Validări
+- Diagnostice TS: 0 erori. `npx astro build`: PASS. Nicio pagină/metadata atinsă — audit SEO nerelevant.
+
+### Riscuri / pași următori
+- Setează `SMTP_USER` și `SMTP_PASS` (Gmail App Password) în Railway, altfel emailul eșuează silențios (logat).

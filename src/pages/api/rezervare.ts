@@ -14,10 +14,31 @@
  */
 
 import type { APIRoute } from 'astro';
+import nodemailer from 'nodemailer';
 import { query } from '../../lib/db.js';
 import { secureLogger } from '../../lib/secure-logger.js';
 
 export const prerender = false;
+
+// ── Notificare email (SMTP Gmail) ─────────────────────────────────────────
+const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+    },
+});
+
+function escapeHtml(val: string): string {
+    return val
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
 
 // ── Rate limiting ─────────────────────────────────────────────────────────
 const RATE_WINDOW_MS = 60_000; // 1 minut
@@ -136,6 +157,29 @@ export const POST: APIRoute = async ({ request }) => {
     } catch (err) {
         secureLogger.error('[/api/rezervare] DB error:', err);
         return jsonErr('Eroare server. Încearcă din nou sau contactează-ne direct la +40767369658.', 500);
+    }
+
+    // Rezervarea e deja salvată — un eșec SMTP nu trebuie să returneze eroare clientului.
+    try {
+        const campuri: [string, string][] = [
+            ['Nume', nume],
+            ['Telefon', telefon],
+            ['Tip Eveniment', eveniment],
+            ['Data', data],
+            ['Mesaj', mesaj || '-'],
+        ];
+
+        await transporter.sendMail({
+            from: process.env.SMTP_USER,
+            to: process.env.SMTP_USER,
+            subject: `Cerere nouă eveniment: ${nume}`,
+            text: campuri.map(([k, v]) => `- ${k}: ${v}`).join('\n'),
+            html: `<ul>${campuri
+                .map(([k, v]) => `<li><strong>${k}:</strong> ${escapeHtml(v)}</li>`)
+                .join('')}</ul>`,
+        });
+    } catch (err) {
+        secureLogger.error('[/api/rezervare] Email error:', err);
     }
 
     return new Response(JSON.stringify({ ok: true }), {
