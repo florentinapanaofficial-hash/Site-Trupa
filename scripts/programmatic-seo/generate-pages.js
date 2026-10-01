@@ -7,7 +7,7 @@
  * Rulare:  node scripts/programmatic-seo/generate-pages.js
  * ──────────────────────────────────────────────────────────
  */
-import { readFileSync, writeFileSync, mkdirSync, readdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -66,7 +66,11 @@ const contentReport = {}; // Pentru verificare conținut unic
 for (const loc of locations) {
     let page = template;
 
-    // Construiește conținut unic din content blocks
+    const outputPath = join(OUTPUT_DIR, `${loc.slug}.astro`);
+    const previousPage = existsSync(outputPath) ? readFileSync(outputPath, 'utf-8') : '';
+    const previousBlocks = ['CONTENT_INTRO', 'CONTENT_SERVICES', 'CONTENT_OUTRO'].map((key) =>
+        previousPage.match(new RegExp(`^const ${key}\\s*=\\s*('(?:\\\\.|[^'\\\\])*');`, 'm'))?.[1]
+    );
     const content = buildContent(loc);
 
     // Înlocuiește variabilele simple (string)
@@ -79,9 +83,9 @@ for (const loc of locations) {
     page = page.replace(/\{\{INTRO\}\}/g, escapeAstroString(loc.intro));
     page = page.replace(/\{\{PARAGRAF2\}\}/g, escapeAstroString(loc.paragraf2));
     page = page.replace(/\{\{PARAGRAF3\}\}/g, escapeAstroString(loc.paragraf3));
-    page = page.replace(/\{\{CONTENT_INTRO\}\}/g, escapeAstroString(content.intro));
-    page = page.replace(/\{\{CONTENT_SERVICES\}\}/g, escapeAstroString(content.service));
-    page = page.replace(/\{\{CONTENT_OUTRO\}\}/g, escapeAstroString(content.outro));
+    page = page.replace("'{{CONTENT_INTRO}}'", previousBlocks[0] || `'${escapeAstroString(content.intro)}'`);
+    page = page.replace("'{{CONTENT_SERVICES}}'", previousBlocks[1] || `'${escapeAstroString(content.service)}'`);
+    page = page.replace("'{{CONTENT_OUTRO}}'", previousBlocks[2] || `'${escapeAstroString(content.outro)}'`);
 
     // Înlocuiește metadata și întrebările specifice locației
     page = page.replace(/\{\{META_TITLE\}\}/g, escapeAstroString(loc.meta_title || ''));
@@ -94,7 +98,6 @@ for (const loc of locations) {
     page = page.replace(/\{\{KEYWORDS_SCHEMA\}\}/g, JSON.stringify(loc.keywords_schema || []));
 
     // Scrie fișierul
-    const outputPath = join(OUTPUT_DIR, `${loc.slug}.astro`);
     writeFileSync(outputPath, page, 'utf-8');
 
     const title = loc.meta_title || `${loc.keyword} | Formația Florentina Pană`;

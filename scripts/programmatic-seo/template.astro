@@ -1,7 +1,13 @@
 ---
+import { getImage } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import siteContent from '../../data/siteContent.json';
 import BackButton from '../../components/BackButton.astro';
+import HeroVideo from '../../components/HeroVideo.astro';
+import VideoFacade from '../../components/VideoFacade.astro';
+import heroImg from '../../assets/card-1-panoramica.jpg';
+import evenimentLiveImg from '../../assets/hp-eveniment-live.webp';
+import scenaPanoramicaImg from '../../assets/hp-scena-panoramica.webp';
 
 const { contact, brand } = siteContent;
 
@@ -33,6 +39,7 @@ const KEYWORDS_SCHEMA: string[] = {{KEYWORDS_SCHEMA}};
 const SEO_TITLE_TEMPLATE = '{{META_TITLE}}';
 const SEO_TITLE = SEO_TITLE_TEMPLATE || `${KEYWORD} | ${brand.name}`;
 const SEO_DESC  = META_DESC || `${KEYWORD} cu show band live în ${ORAS}. Repertoriu variat, sonorizare proprie și ofertă personalizată. Cere disponibilitatea!`;
+const heroPoster = await getImage({ src: heroImg, width: 1024, format: 'webp', quality: 62 });
 
 const whatsappNumber = contact.phoneRaw.replace(/\\D/g, '');
 const whatsappText   = encodeURIComponent(`Bună ziua! Aș dori să rezerv formația pentru un eveniment în ${ORAS}.`);
@@ -97,16 +104,52 @@ const localBusinessLd = {
 
 <BaseLayout title={SEO_TITLE} description={SEO_DESC}>
   <Fragment slot="head">
+    <link rel="preload" as="image" href={heroPoster.src} fetchpriority="high" />
     <script is:inline type="application/ld+json" set:html={JSON.stringify(localBusinessLd)} />
     <script is:inline type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>
 
-  <section class="section-container py-16">
+  <HeroVideo
+    videoUrl="/videos/bg-nunta-live-2027.mp4"
+    posterImage={heroPoster.src}
+    title={`${KEYWORD} — Muzică Live Premium`}
+    subtitle={`Formația Florentina Pană în ${ORAS}`}
+    showReviews={true}
+  >
+    <a href="/contact/" class="btn-solid">Verifică disponibilitatea</a>
+  </HeroVideo>
+
+  <section aria-labelledby="local-video-showcase-title">
+    <div class="mx-auto max-w-7xl px-4 py-12 sm:py-16">
+      <h2 id="local-video-showcase-title" class="mb-10 text-center text-3xl font-bold text-white sm:text-4xl">Video Showcase</h2>
+      <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+        <VideoFacade
+          imageSrc={evenimentLiveImg}
+          title="Show Live Nuntă Pitești"
+          subtitle="Formația Florentina Pană"
+          logoSrc="/images/logo-fp-stage.svg"
+          videoUrl="https://www.youtube-nocookie.com/embed/xdcdjAtxZlA?autoplay=1"
+          loading="eager"
+          description="Moment extraordinar de muzică live la o nuntă în Pitești, județul Argeș. Formația Florentina Pană oferă un spectacol complet și interactiv, cu repertoriu adaptat și sonorizare profesională."
+        />
+        <VideoFacade
+          imageSrc={scenaPanoramicaImg}
+          title="Colaj Folclor & Petrecere 2027"
+          subtitle="Formația Florentina Pană"
+          logoSrc="/images/logo-fp-stage.svg"
+          videoUrl="https://www.youtube-nocookie.com/embed/FyrQQqFMZvg?autoplay=1"
+          description="Muzică populară, folclor autentic și muzică de petrecere interpretate live de Florentina Pană și echipa sa."
+        />
+      </div>
+    </div>
+  </section>
+
+  <section class="section-container pt-8 pb-16 sm:pt-12">
     <div class="mb-8"><BackButton href="/" label="Acasă" /></div>
 
     <header class="section-head mx-auto text-center">
       <p class="kicker">{KEYWORD}</p>
-      <h1 class="section-title">{KEYWORD} — Muzică Live Premium</h1>
+      <h2 class="section-title">Formația Florentina Pană în {ORAS}</h2>
       <p class="section-copy">{INTRO}</p>
     </header>
 

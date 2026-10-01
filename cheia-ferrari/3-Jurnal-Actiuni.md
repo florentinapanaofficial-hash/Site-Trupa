@@ -263,6 +263,13 @@ git push origin main
 
 ---
 
+## 📝 2026-10-01 — Hero video și showcase pe paginile SEO locale
+- **Obiectiv:** Experiență vizuală premium above the fold pe paginile formație nuntă, cu textul SEO păstrat sub showcase.
+- **Fișiere modificate:** `scripts/programmatic-seo/template.astro`, `scripts/programmatic-seo/generate-pages.js`, `scripts/programmatic-seo/locations.json`, cele trei pagini regenerate din `src/pages/formatie-nunta/`, `cheia-ferrari/2-Tracker-SEO.md`, `cheia-ferrari/3-Jurnal-Actiuni.md`.
+- **Implementat:** `HeroVideo` cu MP4 local și poster optimizat, urmat de cele două `VideoFacade` de pe homepage; H1 local mutat în hero, textul și butonul Acasă sub showcase. Generatorul păstrează blocurile SEO unice existente la regenerare; titlurile Pitești și Curtea de Argeș și descrierea Curtea de Argeș aduse în intervalele stricte (54/53, respectiv 145 caractere). Schema JSON-LD neschimbată.
+- **Validări:** `npx astro check` 0 erori / 0 warnings / 0 hints; `npm run seo:check` build PASS, audit 58 pagini, 0 FAIL | 0 WARN; `git diff --check` curat. `seo-analyzer.js` raportează 13 oportunități GSC preexistente.
+- **Riscuri/pași următori:** de remăsurat LCP mobil pe paginile locale după publicare; build-ul local folosește fallback pentru Supabase și nu are `MYSQL_URL` pentru galeria completă.
+
 ## 📝 2026-09-30 — Video Hero local optimizat (eliminare Pixabay)
 - **Obiectiv:** Înlocuirea videoclipurilor externe Pixabay din HeroVideo cu fișierul local optimizat `/videos/bg-nunta-live-2027.mp4` (5,33 MB).
 - **Fișiere modificate:** `src/pages/index.astro`, `src/pages/membri.astro`, `cheia-ferrari/3-Jurnal-Actiuni.md`.
