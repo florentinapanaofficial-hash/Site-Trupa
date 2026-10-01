@@ -2851,3 +2851,21 @@ Alinierea titlurilor și descrierilor accesibile prin butonul „ⓘ” cu noul 
 - `npx astro check`: 0 erori | 0 warnings | 0 hints (83 fișiere).
 - `npm run build`: PASS.
 - `npm run seo:audit`: 58 pagini verificate, **0 FAIL | 0 WARN**.
+
+## 📝 02 oct 2026 — Coperți WebP pentru Video Showcase
+
+### Obiectiv
+Publicarea noilor coperți pentru cele două montaje Cloudflare Stream în homepage și paginile locale.
+
+### Modificări
+- `src/components/VideoFacade.astro`: acceptă URL-uri de imagini din `public/` prin `<img>` cu alt, păstrând `<Image>` pentru importurile din `src/assets/`.
+- `src/pages/index.astro` și `scripts/programmatic-seo/template.astro`: fațadele folosesc `/videos/Coperta 1-videi.webp` și `/videos/Coperta 2.webp`.
+- Regenerate `src/pages/formatie-nunta/pitesti.astro`, `bucuresti.astro` și `curtea-de-arges.astro`; actualizat `cheia-ferrari/2-Tracker-SEO.md`.
+
+### Validări
+- `npx astro check`: 0 erori, 0 avertismente, 0 indicii.
+- `npm run seo:weekly`: build PASS; audit 59 pagini, **0 FAIL | 0 WARN**; 62 linkuri externe valide; 40/40 teste trecute.
+- Ambele fișiere WebP prezente în `dist/client/videos/`; ambele URL-uri `src` confirmate în HTML-ul homepage și al celor 3 pagini locale. Title, description și schema neschimbate; imaginile au alt.
+
+### Riscuri / observații
+- Coperțile din `public/` sunt servite direct, fără redimensionarea automată Astro; fișierele au 128300 și 58220 octeți. Build-ul afișează fallback-ul existent pentru galeria dependentă de `MYSQL_URL`, fără a bloca build-ul.
