@@ -3029,3 +3029,23 @@ Scriptul inline rerulat de Astro ClientRouter declara `const` în scope global; 
 
 ### Riscuri / pași următori
 - `rg` nu este disponibil în shell-ul PowerShell local; căutarea workspace și inspecția configurațiilor nu au găsit redirect pentru `/admin/`.
+
+## 📝 02 oct 2026 — Eliminare modal ofertă și centralizare rezervare
+
+### Obiectiv
+Eliminarea formularului vechi care trimitea `FormData` la endpointul JSON și direcționarea cererilor de ofertă către `/rezervare/`.
+
+### Modificări
+- `src/pages/contact.astro`: eliminate planificatorul, sliderul, dialogul, formularul și scripturile de submit/tracking aferente; păstrate informațiile de contact, FAQ-ul, schema SEO și linkul către pagina nouă.
+- `src/components/Header.astro`, `src/components/Footer.astro`, `src/layouts/BaseLayout.astro`, `src/pages/index.astro`, `src/pages/oferta-premium.astro`: CTA-uri de ofertă/rezervare direcționate către `/rezervare/`; schema Service și FAQ sincronizate.
+- `src/data/seo-content.json`: metadata Contact în intervalul intern (title 54, description 135 caractere), textul formularului actualizat.
+- `cheia-ferrari/2-Tracker-SEO.md`: sesiunea consemnată.
+
+### Validări
+- `npx astro check`: 0 erori | 0 warnings | 0 hints (90 fișiere).
+- `npm run seo:check`: build PASS; audit 60 pagini, 0 FAIL | 0 WARN.
+- Smoke HTML: linkuri de rezervare prezente; modalul, formularul vechi și sliderul lipsesc din Contact.
+- `node seo-agent/seo-analyzer.js`: 13 oportunități GSC existente, fără blocaje noi.
+
+### Riscuri / pași următori
+- Galeria folosește fallback la build când lipsește `MYSQL_URL`; trimiterea reală a rezervării necesită variabilele DB/email în mediul de producție.
