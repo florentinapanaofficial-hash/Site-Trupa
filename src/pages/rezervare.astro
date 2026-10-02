@@ -119,46 +119,61 @@ import Layout from '../layouts/Layout.astro';
     </div>
   </main>
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/themes/dark.css">
 
-  <script is:inline src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <script is:inline src="https://npmcdn.com/flatpickr/dist/l10n/ro.js"></script>
+  <style is:global>
+    .flatpickr-calendar { z-index: 99999 !important; }
+  </style>
+
+  <script is:inline src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
+  <script is:inline src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/ro.js"></script>
 
   <script is:inline data-astro-rerun>
-    const initializeReservationForm = async () => {
-      const form = document.getElementById('bookingForm');
-      if (!form || form.dataset.calendarInitialized === 'true') return;
-      form.dataset.calendarInitialized = 'true';
-
-      let dateOcupate = [];
-
+    const loadBookedDates = async () => {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 5000);
       try {
-        const response = await fetch('/api/date-rezervate/', {
-          cache: 'no-store',
-          signal: AbortSignal.timeout(5000)
-        });
-
-        if (!response.ok) throw new Error('Nu s-au putut încărca datele rezervate.');
-
+        const response = await fetch('/api/date-rezervate/', { cache: 'no-store', signal: controller.signal });
+        if (!response.ok) return [];
         const dates = await response.json();
-        if (!Array.isArray(dates)) throw new Error('Răspuns invalid pentru datele rezervate.');
-
-        dateOcupate = dates.filter((date) => typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date));
+        if (!Array.isArray(dates)) return [];
+        return dates.filter((date) => typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date));
       } catch (error) {
         console.error('Calendarul va continua fără date rezervate.', error);
+        return [];
+      } finally {
+        clearTimeout(timer);
+      }
+    };
+
+    const initializeReservationForm = () => {
+      const form = document.getElementById('bookingForm');
+      const calendarInput = document.getElementById('datePicker');
+      if (!form || !calendarInput || form.dataset.calendarInitialized === 'true') return;
+
+      if (typeof window.flatpickr !== 'function') {
+        console.error('Flatpickr nu s-a încărcat de pe CDN.');
+        calendarInput.removeAttribute('readonly');
+        calendarInput.placeholder = 'AAAA-LL-ZZ';
+        return;
       }
 
-      if (!form.isConnected) return;
+      form.dataset.calendarInitialized = 'true';
 
-      flatpickr("#datePicker", {
-        locale: "ro",
-        minDate: "today",
-        disable: dateOcupate,
-        dateFormat: "Y-m-d",
+      // Instanța se creează imediat; datele ocupate se aplică după fetch (sau rămân [] la eroare/timeout).
+      const picker = flatpickr(calendarInput, {
+        locale: flatpickr.l10ns && flatpickr.l10ns.ro ? 'ro' : 'default',
+        minDate: 'today',
+        disable: [],
+        dateFormat: 'Y-m-d',
         altInput: true,
-        altFormat: "j F Y",
+        altFormat: 'j F Y',
         disableMobile: true
+      });
+
+      loadBookedDates().then((dateOcupate) => {
+        if (dateOcupate.length && calendarInput.isConnected) picker.set('disable', dateOcupate);
       });
 
       const submitBtn = document.getElementById('submitBtn');
@@ -185,6 +200,7 @@ import Layout from '../layouts/Layout.astro';
 
           if (res.ok) {
             form.reset();
+            picker.clear();
             statusMsg.textContent = "Solicitarea a fost trimisă cu succes! Vă vom contacta în cel mai scurt timp.";
             statusMsg.className = "text-center text-lg font-medium p-4 rounded-xl bg-green-500/20 text-green-400 border border-green-500/30";
           } else {
@@ -207,6 +223,6 @@ import Layout from '../layouts/Layout.astro';
       document.addEventListener('astro:page-load', initializeReservationForm);
     }
 
-    void initializeReservationForm();
+    initializeReservationForm();
   </script>
 </Layout>
