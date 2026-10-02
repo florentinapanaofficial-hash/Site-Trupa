@@ -3049,3 +3049,24 @@ Eliminarea formularului vechi care trimitea `FormData` la endpointul JSON și di
 
 ### Riscuri / pași următori
 - Galeria folosește fallback la build când lipsește `MYSQL_URL`; trimiterea reală a rezervării necesită variabilele DB/email în mediul de producție.
+
+## 📝 02 oct 2026 — Fix calendar Flatpickr înghețat pe /rezervare/
+
+### Obiectiv
+Repararea calendarului Flatpickr de pe `/rezervare/`, care nu se deschidea la click (commit `727ac012`).
+
+### Modificări
+- `src/lib/csp.mjs`: adăugat `https://cdn.jsdelivr.net` în `style-src`; CSP-ul bloca CSS-ul Flatpickr.
+- `src/pages/rezervare.astro`: CSS, tema dark, scriptul și locale `ro` încărcate de pe jsdelivr cu versiune fixată `4.6.13` (`npmcdn.com` era blocat de CSP și este deprecat).
+- `src/pages/rezervare.astro`: regulă globală `.flatpickr-calendar { z-index: 99999 !important; }`.
+- `src/pages/rezervare.astro`: `flatpickr(calendarInput, {...})` se creează imediat, independent de `fetch`; datele ocupate se aplică ulterior prin `picker.set('disable', ...)`, cu fallback `[]` la eroare/timeout 5s (`AbortController` în loc de `AbortSignal.timeout`, pentru Safari vechi).
+- Fallback-uri: input editabil manual dacă scriptul CDN lipsește; locale `default` dacă `ro` nu se încarcă; `picker.clear()` după trimitere reușită.
+- Inputul rămâne `type="text" readonly`, cu `disableMobile: true`.
+
+### Validări
+- `npx astro build`: PASS.
+- `npm run seo:check`: 60 pagini, 0 FAIL | 0 WARN.
+
+### Riscuri / pași următori
+- Fix neverificat încă în browser pe site-ul live.
+- De verificat dacă `required` se propagă pe `altInput` (formularul nu ar trebui să poată fi trimis fără dată).
