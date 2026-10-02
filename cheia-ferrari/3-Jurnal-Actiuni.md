@@ -3011,3 +3011,21 @@ Scriptul inline rerulat de Astro ClientRouter declara `const` în scope global; 
 
 ### Riscuri / pași următori
 - Browser headless nu este instalat în mediul local; consola și navigarea vizuală nu au fost inspectate cu Playwright.
+
+## 📝 02 oct 2026 — Eliminare fișiere CMS care suprascriau Admin
+
+### Obiectiv
+Înlăturarea paginii statice Decap/Netlify Identity care intra în conflict cu ruta Astro `/admin/`.
+
+### Modificări
+- Șterse `public/admin/index.html` și `public/admin/config.yml`; vechiul HTML încărca Netlify Identity și Decap CMS.
+- Verificat că nu există `public/_redirects`; configurațiile Astro/Railway nu declară reguli pentru ruta admin.
+
+### Validări
+- Build: PASS; `dist/client/admin/index.html` este generat din Astro, conține formularul de login și nu conține `decap-cms` sau `netlify-identity`.
+- `npx astro check`: 0 erori | 0 warnings | 0 hints (90 fișiere).
+- `npm run seo:check`: PASS.
+- `git diff --check`: PASS.
+
+### Riscuri / pași următori
+- `rg` nu este disponibil în shell-ul PowerShell local; căutarea workspace și inspecția configurațiilor nu au găsit redirect pentru `/admin/`.
