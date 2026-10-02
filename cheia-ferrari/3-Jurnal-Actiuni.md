@@ -2951,3 +2951,21 @@ Alinierea endpointului `/api/rezervare/` la payloadul trimis de noul formular de
 ### Riscuri / pași următori
 - Salvarea cu succes în MySQL și livrarea emailului nu au putut fi testate local fără `MYSQL_URL` și `RESEND_API_KEY`. Build-ul a raportat separat fallback-ul existent pentru galeria care folosește MySQL.
 - Formularul nu colectează consimțământ GDPR; API-ul nu mai cere checkbox și înregistrează `gdpr_consent = 0`. Confirmați temeiul și informarea GDPR pentru colectarea datelor înainte de publicare.
+
+## 📝 02 oct 2026 — Calendar rezervare: date ocupate dinamice
+
+### Obiectiv
+Blocarea în calendar a datelor evenimentelor deja salvate în MySQL.
+
+### Modificări
+- `src/pages/api/date-rezervate.ts`: endpoint GET interoghează distinct `rezervari.data_eveniment`, o formatează în SQL ca `YYYY-MM-DD`, filtrează valori nevalide și răspunde cu array JSON; la eroare DB răspunde cu 500 JSON și `Cache-Control: no-store`.
+- `src/pages/rezervare.astro`: datele hardcodate au fost înlocuite cu fetch către `/api/date-rezervate/`; calendarul primește lista validată în `disable`, iar timeout/eroare folosește array gol. Inițializarea rulează la încărcarea directă și `astro:page-load`, compatibil cu ClientRouter, fără listeneri dublați.
+
+### Validări
+- `npx astro check`: 0 erori | 0 warnings | 0 hints (87 fișiere).
+- `npm run seo:check`: build PASS; audit 60 pagini, 0 FAIL | 0 WARN.
+- `npm test`: 40/40 teste trecute.
+- Smoke test fără `MYSQL_URL`: endpointul întoarce 500 JSON controlat; verificarea HTML generat confirmă fetch, `disable`, timeout, ClientRouter și eliminarea datei hardcodate.
+
+### Riscuri / pași următori
+- Lista reală de date ocupate nu poate fi verificată local fără `MYSQL_URL`; în acest caz interfața continuă cu toate datele selectabile, conform fallbackului cerut.

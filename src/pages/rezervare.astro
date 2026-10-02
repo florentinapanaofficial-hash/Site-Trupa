@@ -125,10 +125,31 @@ import Layout from '../layouts/Layout.astro';
   <script is:inline src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script is:inline src="https://npmcdn.com/flatpickr/dist/l10n/ro.js"></script>
 
-  <script is:inline>
-    document.addEventListener('DOMContentLoaded', async () => {
-      // Configurăm calendarul să blocheze datele (vom conecta API-ul mai târziu)
-      const dateOcupate = ["2026-10-15", "2026-11-20"];
+  <script is:inline data-astro-rerun>
+    const initializeReservationForm = async () => {
+      const form = document.getElementById('bookingForm');
+      if (!form || form.dataset.calendarInitialized === 'true') return;
+      form.dataset.calendarInitialized = 'true';
+
+      let dateOcupate = [];
+
+      try {
+        const response = await fetch('/api/date-rezervate/', {
+          cache: 'no-store',
+          signal: AbortSignal.timeout(5000)
+        });
+
+        if (!response.ok) throw new Error('Nu s-au putut încărca datele rezervate.');
+
+        const dates = await response.json();
+        if (!Array.isArray(dates)) throw new Error('Răspuns invalid pentru datele rezervate.');
+
+        dateOcupate = dates.filter((date) => typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date));
+      } catch (error) {
+        console.error('Calendarul va continua fără date rezervate.', error);
+      }
+
+      if (!form.isConnected) return;
 
       flatpickr("#datePicker", {
         locale: "ro",
@@ -140,7 +161,6 @@ import Layout from '../layouts/Layout.astro';
         disableMobile: true
       });
 
-      const form = document.getElementById('bookingForm');
       const submitBtn = document.getElementById('submitBtn');
       const spinner = document.getElementById('loadingSpinner');
       const statusMsg = document.getElementById('statusMessage');
@@ -180,6 +200,13 @@ import Layout from '../layouts/Layout.astro';
           statusMsg.classList.remove('hidden');
         }
       });
-    });
+    };
+
+    if (document.documentElement.dataset.reservationCalendarListener !== 'true') {
+      document.documentElement.dataset.reservationCalendarListener = 'true';
+      document.addEventListener('astro:page-load', initializeReservationForm);
+    }
+
+    void initializeReservationForm();
   </script>
 </Layout>
