@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { query } from '../../lib/db.js';
+import { ensureReservationStatusColumn } from '../../lib/reservation-status.js';
 import { secureLogger } from '../../lib/secure-logger.js';
 
 export const prerender = false;
@@ -10,11 +11,13 @@ type ReservedDateRow = {
 
 export const GET: APIRoute = async () => {
     try {
+        await ensureReservationStatusColumn();
         const rows = await query(
             `SELECT DISTINCT DATE_FORMAT(data_eveniment, '%Y-%m-%d') AS data_eveniment
              FROM rezervari
              WHERE data_eveniment IS NOT NULL
                AND data_eveniment >= '1000-01-01'
+                             AND status = 'confirmat'
              ORDER BY data_eveniment ASC`,
         ) as ReservedDateRow[];
 

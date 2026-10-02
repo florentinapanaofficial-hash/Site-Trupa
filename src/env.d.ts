@@ -10,5 +10,7 @@ interface ImportMetaEnv {
     readonly SUPABASE_SERVICE_ROLE_KEY?: string;
     /** Doar server-side — notificări email formular contact (Resend API). */
     readonly RESEND_API_KEY: string;
+    /** Doar server-side — parolă pentru panoul de administrare. */
+    readonly ADMIN_PASSWORD?: string;
 }
 

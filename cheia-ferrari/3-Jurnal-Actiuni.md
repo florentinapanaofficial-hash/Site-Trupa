@@ -2969,3 +2969,26 @@ Blocarea în calendar a datelor evenimentelor deja salvate în MySQL.
 
 ### Riscuri / pași următori
 - Lista reală de date ocupate nu poate fi verificată local fără `MYSQL_URL`; în acest caz interfața continuă cu toate datele selectabile, conform fallbackului cerut.
+
+## 📝 02 oct 2026 — Panou admin pentru rezervări și date blocate
+
+### Obiectiv
+Administrarea cererilor de rezervare, aprobarea lor și adăugarea manuală a datelor ocupate.
+
+### Modificări
+- `src/lib/reservation-status.ts`: migrare comună idempotentă a coloanei `status VARCHAR(20) NOT NULL DEFAULT 'nou'`, inclusiv toleranță la ALTER concurent.
+- `src/pages/api/rezervare.ts`: cererile noi inserează statusul `nou` după migrare.
+- `src/pages/api/date-rezervate.ts`: selectează numai date cu status `confirmat`.
+- `src/pages/api/admin-rezervari.ts`: GET listă descrescătoare și POST pentru `confirma`/`adauga_manual`; toate cererile cer `Authorization: Bearer ...`, comparat constant-time. Parola vine din `ADMIN_PASSWORD` sau fallback-ul solicitat.
+- `src/pages/admin.astro`: pagină noindex dark, autentificare client-side cu `sessionStorage`, aprobare, listă și adăugare manuală.
+- `schema.sql`, `src/env.d.ts`, `.env.example`: schema și documentația env actualizate.
+
+### Validări
+- `npx astro check`: 0 erori | 0 warnings | 0 hints (90 fișiere).
+- `npm run seo:check`: PASS; 60 pagini, 0 FAIL | 0 WARN.
+- `npm test`: 40/40 teste trecute.
+- Smoke HTTP: `/admin/` 200, API GET fără auth 401, POST fără auth 401; fallbackul de parolă trece auth, apoi API-ul răspunde 500 din cauza lipsei `MYSQL_URL` locale.
+
+### Riscuri / pași următori
+- Setează obligatoriu o parolă puternică `ADMIN_PASSWORD` în Railway; `formatia2026` rămâne fallback de dezvoltare, nu secret de producție.
+- Fluxurile de listare, confirmare, inserare manuală și blocarea DB nu au putut fi exercitate local fără `MYSQL_URL`.

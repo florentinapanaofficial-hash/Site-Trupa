@@ -14,6 +14,7 @@
 import type { APIRoute } from 'astro';
 import { Resend } from 'resend';
 import { query } from '../../lib/db.js';
+import { ensureReservationStatusColumn } from '../../lib/reservation-status.js';
 import { secureLogger } from '../../lib/secure-logger.js';
 
 export const prerender = false;
@@ -173,10 +174,11 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Salvare în baza de date
     try {
+        await ensureReservationStatusColumn();
         await query(
             `INSERT INTO rezervari
-         (nume, telefon, eveniment, data_eveniment, mesaj, gdpr_consent, creat_la)
-       VALUES (?, ?, ?, ?, ?, 0, NOW())`,
+                 (nume, telefon, eveniment, data_eveniment, mesaj, gdpr_consent, creat_la, status)
+             VALUES (?, ?, ?, ?, ?, 0, NOW(), 'nou')`,
             [nume, telefon, eveniment, data, detaliiEveniment],
         );
     } catch (err) {

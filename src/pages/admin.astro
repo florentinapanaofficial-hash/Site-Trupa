@@ -1,0 +1,333 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Administrare rezervări | Formația Florentina Pană"
+  description="Panou privat pentru administrarea rezervărilor și datelor evenimentelor."
+  noindex={true}
+  hideFooter={true}
+>
+  <main data-admin-root class="min-h-[calc(100dvh-5rem)] bg-[#0b1017] px-4 py-10 text-slate-100 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-6xl">
+      <header class="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-6">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-400">Administrare</p>
+          <h1 class="mt-2 text-3xl font-bold text-white">Rezervări</h1>
+        </div>
+        <button
+          id="adminLogout"
+          type="button"
+          class="hidden rounded-lg border border-white/15 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-white/30 hover:bg-white/5"
+        >
+          Deconectare
+        </button>
+      </header>
+
+      <p id="adminNotice" class="mb-6 hidden rounded-lg border px-4 py-3 text-sm" role="status" aria-live="polite"></p>
+
+      <section id="adminLoginPanel" class="mx-auto max-w-md rounded-xl border border-white/10 bg-[#121a24] p-6 shadow-xl sm:p-8">
+        <h2 class="text-xl font-semibold text-white">Conectare</h2>
+        <form id="adminLoginForm" class="mt-6 space-y-4">
+          <div>
+            <label for="adminPassword" class="mb-2 block text-sm font-medium text-slate-300">Parolă de administrare</label>
+            <input
+              id="adminPassword"
+              type="password"
+              name="password"
+              autocomplete="current-password"
+              required
+              class="w-full rounded-lg border border-white/15 bg-[#0b1017] px-4 py-3 text-base text-white outline-none transition placeholder:text-slate-500 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20"
+            >
+          </div>
+          <button
+            id="adminLoginSubmit"
+            type="submit"
+            class="w-full rounded-lg bg-emerald-400 px-4 py-3 font-bold text-[#07110d] transition hover:bg-emerald-300 disabled:cursor-wait disabled:opacity-60"
+          >
+            Conectează-te
+          </button>
+        </form>
+      </section>
+
+      <div id="adminDashboard" class="hidden space-y-8">
+        <section class="rounded-xl border border-white/10 bg-[#121a24] p-5 shadow-lg sm:p-6">
+          <div class="mb-5">
+            <h2 class="text-lg font-semibold text-white">Adaugă Dată Manuală</h2>
+          </div>
+          <form id="manualDateForm" class="flex flex-col gap-3 sm:flex-row sm:items-end">
+            <div class="w-full sm:max-w-xs">
+              <label for="manualDate" class="mb-2 block text-sm font-medium text-slate-300">Data evenimentului</label>
+              <input
+                id="manualDate"
+                name="data"
+                type="date"
+                required
+                class="w-full rounded-lg border border-white/15 bg-[#0b1017] px-4 py-3 text-base text-white outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20"
+              >
+            </div>
+            <button
+              id="manualDateSubmit"
+              type="submit"
+              class="rounded-lg bg-emerald-400 px-5 py-3 font-bold text-[#07110d] transition hover:bg-emerald-300 disabled:cursor-wait disabled:opacity-60"
+            >
+              Blochează data
+            </button>
+          </form>
+        </section>
+
+        <section class="overflow-hidden rounded-xl border border-white/10 bg-[#121a24] shadow-lg">
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-5 py-4 sm:px-6">
+            <h2 class="text-lg font-semibold text-white">Cereri primite</h2>
+            <button
+              id="refreshReservations"
+              type="button"
+              class="rounded-lg border border-white/15 px-3 py-2 text-sm font-semibold text-slate-200 transition hover:border-white/30 hover:bg-white/5"
+            >
+              Reîncarcă
+            </button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full min-w-[850px] border-collapse text-left text-sm">
+              <thead class="bg-white/[0.03] text-xs uppercase tracking-wide text-slate-400">
+                <tr>
+                  <th class="px-5 py-3 font-semibold">Nume</th>
+                  <th class="px-5 py-3 font-semibold">Telefon</th>
+                  <th class="px-5 py-3 font-semibold">Data</th>
+                  <th class="px-5 py-3 font-semibold">Detalii / Mesaj</th>
+                  <th class="px-5 py-3 font-semibold">Status</th>
+                  <th class="px-5 py-3 font-semibold">Acțiune</th>
+                </tr>
+              </thead>
+              <tbody id="reservationRows" class="divide-y divide-white/10"></tbody>
+            </table>
+          </div>
+          <p id="emptyReservations" class="hidden px-5 py-10 text-center text-sm text-slate-400">Nu există cereri de afișat.</p>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <script is:inline data-astro-rerun>
+    const initializeAdminPanel = () => {
+      const adminRoot = document.querySelector('[data-admin-root]');
+      if (!adminRoot || adminRoot.dataset.initialized === 'true') return;
+      adminRoot.dataset.initialized = 'true';
+
+      const storageKey = 'reservation-admin-password';
+      const loginPanel = adminRoot.querySelector('#adminLoginPanel');
+      const loginForm = adminRoot.querySelector('#adminLoginForm');
+      const passwordInput = adminRoot.querySelector('#adminPassword');
+      const loginButton = adminRoot.querySelector('#adminLoginSubmit');
+      const dashboard = adminRoot.querySelector('#adminDashboard');
+      const logoutButton = adminRoot.querySelector('#adminLogout');
+      const notice = adminRoot.querySelector('#adminNotice');
+      const reservationsBody = adminRoot.querySelector('#reservationRows');
+      const emptyReservations = adminRoot.querySelector('#emptyReservations');
+      const manualDateForm = adminRoot.querySelector('#manualDateForm');
+      const manualDateInput = adminRoot.querySelector('#manualDate');
+      const manualDateButton = adminRoot.querySelector('#manualDateSubmit');
+      const refreshButton = adminRoot.querySelector('#refreshReservations');
+
+      const setNotice = (message, isError = false) => {
+        notice.textContent = message;
+        notice.className = `mb-6 rounded-lg border px-4 py-3 text-sm ${isError ? 'border-rose-400/30 bg-rose-400/10 text-rose-200' : 'border-emerald-400/30 bg-emerald-400/10 text-emerald-200'}`;
+        notice.hidden = !message;
+      };
+
+      const showDashboard = () => {
+        loginPanel.hidden = true;
+        dashboard.classList.remove('hidden');
+        dashboard.hidden = false;
+        logoutButton.classList.remove('hidden');
+      };
+
+      const showLogin = () => {
+        dashboard.classList.add('hidden');
+        dashboard.hidden = true;
+        loginPanel.hidden = false;
+        logoutButton.classList.add('hidden');
+      };
+
+      const adminRequest = async (password, path, options = {}) => {
+        const response = await fetch(path, {
+          ...options,
+          cache: 'no-store',
+          headers: {
+            'Authorization': `Bearer ${password}`,
+            ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+            ...options.headers
+          }
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Cererea nu a putut fi procesată.');
+        return result;
+      };
+
+      const renderReservations = (reservations) => {
+        reservationsBody.replaceChildren();
+        emptyReservations.hidden = reservations.length > 0;
+        emptyReservations.classList.toggle('hidden', reservations.length > 0);
+
+        for (const reservation of reservations) {
+          const row = document.createElement('tr');
+          row.className = 'align-top text-slate-200';
+
+          const nameCell = document.createElement('td');
+          nameCell.className = 'px-5 py-4 font-medium text-white';
+          nameCell.textContent = reservation.nume || '—';
+
+          const phoneCell = document.createElement('td');
+          phoneCell.className = 'px-5 py-4 whitespace-nowrap';
+          phoneCell.textContent = reservation.telefon || '—';
+
+          const dateCell = document.createElement('td');
+          dateCell.className = 'px-5 py-4 whitespace-nowrap';
+          dateCell.textContent = String(reservation.data_eveniment || '').slice(0, 10) || '—';
+
+          const detailsCell = document.createElement('td');
+          detailsCell.className = 'max-w-sm whitespace-pre-wrap px-5 py-4 text-slate-300';
+          const eventType = document.createElement('p');
+          eventType.className = 'mb-1 font-semibold text-slate-100';
+          eventType.textContent = reservation.eveniment || 'Eveniment';
+          const message = document.createElement('p');
+          message.className = 'break-words text-slate-400';
+          message.textContent = reservation.mesaj || '—';
+          detailsCell.append(eventType, message);
+
+          const statusCell = document.createElement('td');
+          statusCell.className = 'px-5 py-4';
+          const statusBadge = document.createElement('span');
+          const confirmed = reservation.status === 'confirmat';
+          statusBadge.className = `inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${confirmed ? 'bg-emerald-400/15 text-emerald-300' : 'bg-amber-400/15 text-amber-200'}`;
+          statusBadge.textContent = reservation.status || 'nou';
+          statusCell.append(statusBadge);
+
+          const actionCell = document.createElement('td');
+          actionCell.className = 'px-5 py-4';
+          if (!confirmed && reservation.status === 'nou') {
+            const approveButton = document.createElement('button');
+            approveButton.type = 'button';
+            approveButton.dataset.confirmId = String(reservation.id);
+            approveButton.className = 'min-w-48 rounded-lg bg-emerald-400 px-3 py-2 text-xs font-bold text-[#07110d] transition hover:bg-emerald-300 disabled:cursor-wait disabled:opacity-60';
+            approveButton.textContent = 'Aprobă și blochează data';
+            actionCell.append(approveButton);
+          } else {
+            actionCell.textContent = '—';
+          }
+
+          row.append(nameCell, phoneCell, dateCell, detailsCell, statusCell, actionCell);
+          reservationsBody.append(row);
+        }
+      };
+
+      const loadReservations = async (password) => {
+        const reservations = await adminRequest(password, '/api/admin-rezervari/');
+        if (!Array.isArray(reservations)) throw new Error('Răspuns invalid de la server.');
+        renderReservations(reservations);
+      };
+
+      loginForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const password = passwordInput.value;
+        if (!password) return;
+
+        loginButton.disabled = true;
+        setNotice('Se verifică parola…');
+        try {
+          await loadReservations(password);
+          sessionStorage.setItem(storageKey, password);
+          passwordInput.value = '';
+          showDashboard();
+          setNotice('Conectare reușită.');
+        } catch (error) {
+          sessionStorage.removeItem(storageKey);
+          setNotice(error.message || 'Nu s-a putut conecta.', true);
+        } finally {
+          loginButton.disabled = false;
+        }
+      });
+
+      logoutButton.addEventListener('click', () => {
+        sessionStorage.removeItem(storageKey);
+        showLogin();
+        setNotice('Sesiune închisă.');
+      });
+
+      refreshButton.addEventListener('click', async () => {
+        refreshButton.disabled = true;
+        try {
+          await loadReservations(sessionStorage.getItem(storageKey));
+          setNotice('Lista a fost actualizată.');
+        } catch (error) {
+          setNotice(error.message || 'Nu s-a putut reîncărca lista.', true);
+        } finally {
+          refreshButton.disabled = false;
+        }
+      });
+
+      reservationsBody.addEventListener('click', async (event) => {
+        const target = event.target instanceof Element ? event.target.closest('[data-confirm-id]') : null;
+        if (!target) return;
+
+        target.disabled = true;
+        try {
+          await adminRequest(sessionStorage.getItem(storageKey), '/api/admin-rezervari/', {
+            method: 'POST',
+            body: JSON.stringify({ action: 'confirma', id: target.dataset.confirmId })
+          });
+          await loadReservations(sessionStorage.getItem(storageKey));
+          setNotice('Rezervarea a fost confirmată, iar data este blocată.');
+        } catch (error) {
+          target.disabled = false;
+          setNotice(error.message || 'Nu s-a putut confirma rezervarea.', true);
+        }
+      });
+
+      manualDateForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (!manualDateInput.value) return;
+
+        manualDateButton.disabled = true;
+        try {
+          await adminRequest(sessionStorage.getItem(storageKey), '/api/admin-rezervari/', {
+            method: 'POST',
+            body: JSON.stringify({ action: 'adauga_manual', data: manualDateInput.value })
+          });
+          manualDateForm.reset();
+          await loadReservations(sessionStorage.getItem(storageKey));
+          setNotice('Data a fost adăugată și blocată.');
+        } catch (error) {
+          setNotice(error.message || 'Nu s-a putut bloca data.', true);
+        } finally {
+          manualDateButton.disabled = false;
+        }
+      });
+
+      const today = new Date();
+      today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+      manualDateInput.min = today.toISOString().slice(0, 10);
+
+      const savedPassword = sessionStorage.getItem(storageKey);
+      if (savedPassword) {
+        loadReservations(savedPassword)
+          .then(() => {
+            showDashboard();
+            setNotice('Sesiune restaurată.');
+          })
+          .catch((error) => {
+            sessionStorage.removeItem(storageKey);
+            showLogin();
+            setNotice(error.message || 'Sesiunea nu mai este validă.', true);
+          });
+      }
+    };
+
+    if (document.documentElement.dataset.adminPanelListener !== 'true') {
+      document.documentElement.dataset.adminPanelListener = 'true';
+      document.addEventListener('astro:page-load', initializeAdminPanel);
+    }
+
+    void initializeAdminPanel();
+  </script>
+</BaseLayout>
