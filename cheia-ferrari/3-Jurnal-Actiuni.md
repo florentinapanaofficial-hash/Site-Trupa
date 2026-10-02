@@ -2992,3 +2992,22 @@ Administrarea cererilor de rezervare, aprobarea lor și adăugarea manuală a da
 ### Riscuri / pași următori
 - Setează obligatoriu o parolă puternică `ADMIN_PASSWORD` în Railway; `formatia2026` rămâne fallback de dezvoltare, nu secret de producție.
 - Fluxurile de listare, confirmare, inserare manuală și blocarea DB nu au putut fi exercitate local fără `MYSQL_URL`.
+
+## 📝 02 oct 2026 — Fix ecran alb panou admin
+
+### Cauză
+Scriptul inline rerulat de Astro ClientRouter declara `const` în scope global; o a doua execuție putea opri întregul script cu eroare de redeclarare. Legarea DOM nu verifica explicit lista completă de elemente.
+
+### Modificări
+- `src/pages/admin.astro`: scriptul este încapsulat într-un IIFE; lista elementelor obligatorii este validată înainte de bind; login/dashboard păstrează vizibilitatea corectă.
+- `adminRequest()` are timeout, parse tolerant pentru JSON și mesaje capturate de blocurile `try/catch` existente la login/listare/confirmare/adăugare.
+
+### Validări
+- `npx astro check`: 0 erori | 0 warnings | 0 hints.
+- `npm run seo:check`: PASS; 60 pagini, 0 FAIL | 0 WARN.
+- `npm test`: 40/40 teste trecute.
+- Smoke test script evaluat de două ori: fără excepții, un singur listener `astro:page-load`.
+- HTTP local `/admin/`: 200; formularul login este vizibil, dashboardul ascuns inițial.
+
+### Riscuri / pași următori
+- Browser headless nu este instalat în mediul local; consola și navigarea vizuală nu au fost inspectate cu Playwright.

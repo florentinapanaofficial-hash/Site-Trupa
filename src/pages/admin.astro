@@ -109,6 +109,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   </main>
 
   <script is:inline data-astro-rerun>
+    (() => {
     const initializeAdminPanel = () => {
       const adminRoot = document.querySelector('[data-admin-root]');
       if (!adminRoot || adminRoot.dataset.initialized === 'true') return;
@@ -128,6 +129,28 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       const manualDateInput = adminRoot.querySelector('#manualDate');
       const manualDateButton = adminRoot.querySelector('#manualDateSubmit');
       const refreshButton = adminRoot.querySelector('#refreshReservations');
+
+      const requiredElements = [
+        loginPanel,
+        loginForm,
+        passwordInput,
+        loginButton,
+        dashboard,
+        logoutButton,
+        notice,
+        reservationsBody,
+        emptyReservations,
+        manualDateForm,
+        manualDateInput,
+        manualDateButton,
+        refreshButton
+      ];
+
+      if (requiredElements.some((element) => !element)) {
+        adminRoot.dataset.initialized = 'false';
+        console.error('Panoul admin nu a fost inițializat: lipsesc elemente HTML necesare.');
+        return;
+      }
 
       const setNotice = (message, isError = false) => {
         notice.textContent = message;
@@ -150,18 +173,29 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       };
 
       const adminRequest = async (password, path, options = {}) => {
-        const response = await fetch(path, {
-          ...options,
-          cache: 'no-store',
-          headers: {
-            'Authorization': `Bearer ${password}`,
-            ...(options.body ? { 'Content-Type': 'application/json' } : {}),
-            ...options.headers
+        try {
+          const response = await fetch(path, {
+            ...options,
+            cache: 'no-store',
+            signal: AbortSignal.timeout(10000),
+            headers: {
+              'Authorization': `Bearer ${password}`,
+              ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+              ...options.headers
+            }
+          });
+          const result = await response.json().catch(() => null);
+
+          if (response.status === 401) sessionStorage.removeItem(storageKey);
+          if (!response.ok) throw new Error(result?.error || `Cererea a eșuat (${response.status}).`);
+          if (result === null) throw new Error('Serverul a returnat un răspuns invalid.');
+          return result;
+        } catch (error) {
+          if (error.name === 'TimeoutError' || error.name === 'AbortError') {
+            throw new Error('Serverul nu răspunde. Încearcă din nou.');
           }
-        });
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.error || 'Cererea nu a putut fi procesată.');
-        return result;
+          throw error instanceof Error ? error : new Error('Eroare de rețea. Încearcă din nou.');
+        }
       };
 
       const renderReservations = (reservations) => {
@@ -329,5 +363,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     }
 
     void initializeAdminPanel();
+    })();
   </script>
 </BaseLayout>
