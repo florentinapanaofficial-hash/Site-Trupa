@@ -5,9 +5,7 @@
  * Înlocuiește data-netlify="true" — funcționează pe Railway (Node standalone).
  *
  * Securitate:
- *   • Honeypot anti-spam (câmp bot-field ascuns)
- *   • Validare GDPR consent obligatoriu (Art. 7 RGPD)
- *   • Validare și sanitizare pentru toate câmpurile
+ *   • Validare și sanitizare pentru toate câmpurile JSON
  *   • Rate limiting per IP (5 cereri/minut)
  *   • Parametrizare SQL (fără SQL injection)
  *   • Validare regex telefon și dată
@@ -45,10 +43,10 @@ async function trimiteNotificare(campuri: [string, string][], nume: string): Pro
             from: 'onboarding@resend.dev',
             to: 'florentinapanaofficial@gmail.com',
             subject: `Cerere nouă eveniment: ${nume}`,
-            text: campuri.map(([k, v]) => `- ${k}: ${v}`).join('\n'),
-            html: `<ul>${campuri
-                .map(([k, v]) => `<li><strong>${k}:</strong> ${escapeHtml(v)}</li>`)
-                .join('')}</ul>`,
+            text: campuri.map(([k, v]) => `${k}: ${v}`).join('\n'),
+            html: `<div style="font-family:Arial,sans-serif;color:#1f2937;max-width:640px;margin:0 auto;padding:24px"><h1 style="font-size:22px;color:#111827">Cerere nouă de eveniment</h1><p style="color:#4b5563">Detaliile solicitării primite:</p><table style="width:100%;border-collapse:collapse"><tbody>${campuri
+                .map(([k, v]) => `<tr><th scope="row" style="padding:10px 12px;border:1px solid #e5e7eb;background:#f9fafb;text-align:left;vertical-align:top;width:38%">${escapeHtml(k)}</th><td style="padding:10px 12px;border:1px solid #e5e7eb;vertical-align:top">${escapeHtml(v)}</td></tr>`)
+                .join('')}</tbody></table></div>`,
         });
         if (error) secureLogger.error('[/api/rezervare] Resend error:', error);
     } catch (err) {
@@ -81,8 +79,8 @@ function isRateLimited(ip: string): boolean {
 }
 
 // ── Sanitizare ────────────────────────────────────────────────────────────
-function san(val: FormDataEntryValue | null, maxLen = 255): string {
-    if (!val || typeof val !== 'string') return '';
+function san(val: unknown, maxLen = 255): string {
+    if (typeof val !== 'string') return '';
     return val
         .trim()
         // Elimină control chars, normalizează spațiile și taie orice markup HTML.
@@ -107,37 +105,33 @@ export const POST: APIRoute = async ({ request }) => {
         return jsonErr('Prea multe cereri. Încearcă din nou în câteva minute.', 429);
     }
 
-    let formData: FormData;
+    let payload: unknown;
     try {
-        formData = await request.formData();
+        payload = await request.json();
     } catch {
         return jsonErr('Date invalide.', 400);
     }
 
-    // Honeypot — bots completează acest câmp, utilizatorii reali nu
-    if (formData.get('bot-field')) {
-        // Răspundem cu 200 pentru a nu dezvălui mecanismul anti-spam
-        return new Response(JSON.stringify({ ok: true }), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json; charset=utf-8' },
-        });
+    if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+        return jsonErr('Date invalide.', 400);
     }
 
-    // Validare consimțământ GDPR — obligatoriu (Art. 7 alin. 2 RGPD)
-    if (formData.get('gdpr-consent') !== 'da') {
-        return jsonErr('Consimțământul GDPR este obligatoriu.', 400);
-    }
+    const dataFormular = payload as Record<string, unknown>;
 
     // Sanitizare câmpuri
-    const nume = san(formData.get('Nume'), 90);
-    const telefon = san(formData.get('Telefon'), 20);
-    const eveniment = san(formData.get('Eveniment'), 50);
-    const data = san(formData.get('Data'), 20);
-    const buget = san(formData.get('Buget'), 30);
-    const mesaj = san(formData.get('Mesaj'), 1000);
+    const nume = san(dataFormular.nume, 90);
+    const telefon = san(dataFormular.telefon, 20).replace(/[\s()-]/g, '');
+    const eveniment = san(dataFormular.tip_eveniment, 50);
+    const data = san(dataFormular.data, 10);
+    const locatie = san(dataFormular.locatie, 180);
+    const persoane = san(dataFormular.persoane, 60) || 'Nespecificat';
+    const formula = san(dataFormular.formula, 80) || 'Nespecificat';
+    const lumini = san(dataFormular.lumini, 100) || 'Nespecificat';
+    const buget = san(dataFormular.buget, 60) || 'Nespecificat';
+    const mesaj = san(dataFormular.mesaj, 1000) || 'Nespecificat';
 
     // Validare câmpuri obligatorii
-    if (!nume || !telefon || !eveniment || !data) {
+    if (!nume || !telefon || !eveniment || !data || !locatie) {
         return jsonErr('Câmpurile obligatorii lipsesc.', 400);
     }
 
@@ -152,23 +146,38 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // Verifică că data nu este în trecut
-    const dataEveniment = new Date(data);
-    if (isNaN(dataEveniment.getTime()) || dataEveniment < new Date()) {
+    const [an, luna, zi] = data.split('-').map(Number);
+    const dataUtc = Date.UTC(an, luna - 1, zi);
+    const dataParsata = new Date(dataUtc);
+    const dataAstazi = new Date();
+    const astaziUtc = Date.UTC(dataAstazi.getUTCFullYear(), dataAstazi.getUTCMonth(), dataAstazi.getUTCDate());
+    if (
+        dataParsata.getUTCFullYear() !== an ||
+        dataParsata.getUTCMonth() !== luna - 1 ||
+        dataParsata.getUTCDate() !== zi
+    ) {
+        return jsonErr('Data evenimentului este invalidă.', 400);
+    }
+    if (dataUtc < astaziUtc) {
         return jsonErr('Data evenimentului nu poate fi în trecut.', 400);
     }
 
+    const detaliiEveniment = [
+        `Locație: ${locatie}`,
+        `Număr estimat de persoane: ${persoane}`,
+        `Formula trupei: ${formula}`,
+        `Pachet de lumini: ${lumini}`,
+        `Buget estimat: ${buget}`,
+        `Alte detalii: ${mesaj}`,
+    ].join('\n');
+
     // Salvare în baza de date
     try {
-        const mesajSalvat = [
-            buget ? `Buget alocat pentru eveniment: ${buget}.` : '',
-            mesaj,
-        ].filter(Boolean).join('\n');
-
         await query(
             `INSERT INTO rezervari
          (nume, telefon, eveniment, data_eveniment, mesaj, gdpr_consent, creat_la)
-       VALUES (?, ?, ?, ?, ?, 1, NOW())`,
-            [nume, telefon, eveniment, data, mesajSalvat || null],
+       VALUES (?, ?, ?, ?, ?, 0, NOW())`,
+            [nume, telefon, eveniment, data, detaliiEveniment],
         );
     } catch (err) {
         secureLogger.error('[/api/rezervare] DB error:', err);
@@ -178,11 +187,16 @@ export const POST: APIRoute = async ({ request }) => {
     // Fire-and-forget: răspunsul nu așteaptă SMTP; erorile sunt prinse în trimiteNotificare.
     void trimiteNotificare(
         [
-            ['Nume', nume],
+            ['Nume și prenume', nume],
             ['Telefon', telefon],
-            ['Tip Eveniment', eveniment],
-            ['Data', data],
-            ['Mesaj', mesaj || '-'],
+            ['Tip eveniment', eveniment],
+            ['Data evenimentului', data],
+            ['Oraș / locație', locatie],
+            ['Număr estimat de persoane', persoane],
+            ['Formula trupei', formula],
+            ['Pachet de lumini', lumini],
+            ['Buget estimat', buget],
+            ['Alte detalii / mesaj', mesaj],
         ],
         nume,
     );

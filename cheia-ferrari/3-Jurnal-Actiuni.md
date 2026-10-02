@@ -2913,3 +2913,41 @@ Trimiterea unei notificări email către `SMTP_USER` imediat după salvarea reze
 ## 📝 02 oct 2026 — Resend sandbox: destinatar actualizat
 - `src/pages/api/rezervare.ts`: `to` → `florentinapanaofficial@gmail.com` (emailul contului Resend, cerință sandbox).
 - `npx astro check`: 0 erori | 0 warnings | 0 hints (84 fișiere).
+
+## 📝 02 oct 2026 — Pagina nouă de rezervare
+
+### Obiectiv
+Adăugarea codului furnizat pentru solicitarea de ofertă la ruta `/rezervare/`.
+
+### Modificări
+- `src/pages/rezervare.astro`: adăugat formularul din solicitare, păstrat exact.
+- `src/layouts/Layout.astro`: adaptor către `BaseLayout.astro`, care necesită `description` și nu exista sub numele așteptat de formular.
+- Eliminat directorul gol `src/pages/rezervare.astro/`, care bloca folosirea aceleiași căi ca fișier Astro.
+
+### Validări
+- `npx astro check`: 0 erori | 0 warnings | 0 hints (86 fișiere).
+- `npm run seo:check`: build PASS; audit 60 pagini, 0 FAIL | 0 WARN.
+- Build-ul a logat fallback-ul existent pentru galeria dependentă de `MYSQL_URL` lipsă; build-ul s-a încheiat cu succes.
+
+### Riscuri / pași următori
+- Formularul atașat trimite JSON cu chei diferite, dar endpointul `/api/rezervare/` existent acceptă `FormData` și cere câmpurile `Nume`, `Telefon`, `Eveniment`, `Data` și `gdpr-consent=da`. În forma solicitată, trimiterea va fi respinsă; alinierea formularului cu API-ul și consimțământul GDPR rămâne necesară înainte de folosirea publică.
+
+## 📝 02 oct 2026 — Endpoint rezervare compatibil cu formularul JSON
+
+### Obiectiv
+Alinierea endpointului `/api/rezervare/` la payloadul trimis de noul formular de ofertă.
+
+### Modificări
+- `src/pages/api/rezervare.ts`: citire JSON; sanitizare și validare pentru `nume`, `telefon`, `data`, `locatie`, `tip_eveniment`, `persoane`, `formula`, `lumini`, `buget` și `mesaj`; fallback `Nespecificat` pentru câmpurile opționale. `src/pages/rezervare.astro` trimite la ruta canonicală `/api/rezervare/`.
+- Emailul Resend către `florentinapanaofficial@gmail.com` include toate câmpurile într-un tabel HTML, cu escaparea valorilor.
+- INSERT-ul folosește în continuare coloanele existente; detaliile fără coloane dedicate se concatenează în `mesaj`. `gdpr_consent` este salvat cu `0`, deoarece formularul nu colectează un acord.
+
+### Validări
+- `npx astro check`: 0 erori | 0 warnings | 0 hints (86 fișiere).
+- `npm test`: 40/40 teste trecute.
+- `npx astro build`: PASS.
+- Smoke test direct: JSON malformat, câmpuri obligatorii lipsă și dată imposibilă au primit fiecare HTTP 400.
+
+### Riscuri / pași următori
+- Salvarea cu succes în MySQL și livrarea emailului nu au putut fi testate local fără `MYSQL_URL` și `RESEND_API_KEY`. Build-ul a raportat separat fallback-ul existent pentru galeria care folosește MySQL.
+- Formularul nu colectează consimțământ GDPR; API-ul nu mai cere checkbox și înregistrează `gdpr_consent = 0`. Confirmați temeiul și informarea GDPR pentru colectarea datelor înainte de publicare.

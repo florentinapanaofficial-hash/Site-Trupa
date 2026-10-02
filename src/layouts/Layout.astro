@@ -1,0 +1,17 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const {
+  title,
+  description = 'Solicită o ofertă personalizată pentru evenimentul tău. Verifică disponibilitatea formației și contactează-ne pentru detalii.',
+} = Astro.props as Props;
+---
+
+<BaseLayout title={title} description={description}>
+  <slot />
+</BaseLayout>

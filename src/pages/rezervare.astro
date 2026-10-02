@@ -1,0 +1,185 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Solicită Ofertă | Formația Florentina Pană">
+  <main class="min-h-[100dvh] bg-[#0a0f1c] text-white py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+
+    <!-- Efect luminos în background -->
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-yellow-600/20 blur-[120px] rounded-full pointer-events-none"></div>
+
+    <div class="max-w-3xl mx-auto relative z-10">
+      <div class="text-center mb-10">
+        <h1 class="text-3xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-600 mb-4">
+          Configurează Evenimentul
+        </h1>
+        <p class="text-gray-400 text-lg">Oferă-ne câteva detalii pentru a-ți putea pregăti o ofertă personalizată.</p>
+      </div>
+
+      <form id="bookingForm" class="bg-white/5 backdrop-blur-xl border border-white/10 p-6 md:p-10 rounded-3xl shadow-2xl space-y-6">
+
+        <!-- Rândul 1 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-2">
+            <label class="text-sm text-gray-300 font-medium">Nume și Prenume *</label>
+            <input type="text" name="nume" required autocomplete="off"
+              class="w-full bg-black/40 border border-gray-700 rounded-xl p-4 text-white text-lg focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 outline-none transition-all placeholder:text-gray-500" placeholder="Ex: Popescu Ion">
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm text-gray-300 font-medium">Telefon *</label>
+            <input type="tel" name="telefon" required autocomplete="off"
+              class="w-full bg-black/40 border border-gray-700 rounded-xl p-4 text-white text-lg focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 outline-none transition-all placeholder:text-gray-500" placeholder="07xx xxx xxx">
+          </div>
+        </div>
+
+        <!-- Rândul 2 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-2">
+            <label class="text-sm text-gray-300 font-medium">Tip Eveniment *</label>
+            <select name="tip_eveniment" required class="w-full bg-black/40 border border-gray-700 rounded-xl p-4 text-white text-lg focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 outline-none transition-all appearance-none cursor-pointer">
+              <option value="" disabled selected>Alege tipul evenimentului...</option>
+              <option value="Nuntă">Nuntă</option>
+              <option value="Cununie Civilă">Cununie Civilă</option>
+              <option value="Botez">Botez</option>
+              <option value="Petrecere Privată / Corporate">Petrecere Privată / Corporate</option>
+              <option value="Altul">Altul</option>
+            </select>
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm text-gray-300 font-medium">Data Evenimentului *</label>
+            <input type="text" id="datePicker" name="data" required readonly autocomplete="off"
+              class="w-full bg-black/40 border border-gray-700 rounded-xl p-4 text-white text-lg focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 outline-none transition-all cursor-pointer placeholder:text-gray-500" placeholder="Alege data din calendar...">
+          </div>
+        </div>
+
+        <!-- Rândul 3 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-2">
+            <label class="text-sm text-gray-300 font-medium">Oraș / Locație *</label>
+            <input type="text" name="locatie" required autocomplete="address-level2"
+              class="w-full bg-black/40 border border-gray-700 rounded-xl p-4 text-white text-lg focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 outline-none transition-all placeholder:text-gray-500" placeholder="Ex: Pitești, Salon Magnolia">
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm text-gray-300 font-medium">Nr. Estimat de Persoane (Opțional)</label>
+            <select name="persoane" class="w-full bg-black/40 border border-gray-700 rounded-xl p-4 text-white text-lg focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 outline-none transition-all appearance-none cursor-pointer">
+              <option value="Nespecificat" selected>Nu știu încă</option>
+              <option value="Sub 100">Sub 100 persoane</option>
+              <option value="100 - 150">100 - 150 persoane</option>
+              <option value="150 - 250">150 - 250 persoane</option>
+              <option value="Peste 250">Peste 250 persoane</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Rândul 4 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-2">
+            <label class="text-sm text-gray-300 font-medium">Formula Trupei (Opțional)</label>
+            <select name="formula" class="w-full bg-black/40 border border-gray-700 rounded-xl p-4 text-white text-lg focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 outline-none transition-all appearance-none cursor-pointer">
+              <option value="Nespecificat" selected>Aștept recomandarea voastră</option>
+              <option value="Formula Completă">Formula Completă (Recomandat)</option>
+              <option value="Formula Bază">Formula de Bază (Minim 4 membri)</option>
+              <option value="DJ + Solist">DJ + Solist Vocal</option>
+            </select>
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm text-gray-300 font-medium">Schelă de Lumini (Opțional)</label>
+            <select name="lumini" class="w-full bg-black/40 border border-gray-700 rounded-xl p-4 text-white text-lg focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 outline-none transition-all appearance-none cursor-pointer">
+              <option value="Nespecificat" selected>Discutăm telefonic</option>
+              <option value="Da, pachet complet">Da, doresc pachet complet de lumini</option>
+              <option value="Nu, doar sunet">Nu, locația are lumini proprii</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Rândul 5 -->
+        <div class="space-y-2">
+          <label class="text-sm text-gray-300 font-medium">Buget Estimat / Orientativ (Opțional)</label>
+          <select name="buget" class="w-full md:w-1/2 bg-black/40 border border-gray-700 rounded-xl p-4 text-white text-lg focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 outline-none transition-all appearance-none cursor-pointer">
+            <option value="Nespecificat" selected>Nu am stabilit / Aștept oferta</option>
+            <option value="2000 - 3000 EUR">2000 - 3000 EUR</option>
+            <option value="3000 - 4500 EUR">3000 - 4500 EUR</option>
+            <option value="4500+ EUR">Peste 4500 EUR</option>
+          </select>
+        </div>
+
+        <!-- Mesaj -->
+        <div class="space-y-2">
+          <label class="text-sm text-gray-300 font-medium">Alte detalii / Mesaj (Opțional)</label>
+          <textarea name="mesaj" rows="3" class="w-full bg-black/40 border border-gray-700 rounded-xl p-4 text-white text-lg focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 outline-none transition-all placeholder:text-gray-500" placeholder="Detalii despre melodii preferate, program dorit..."></textarea>
+        </div>
+
+        <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 text-black font-bold text-xl p-5 rounded-xl hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(234,179,8,0.4)] transition-all flex justify-center items-center gap-3 mt-4">
+          <span>Verifică Disponibilitatea</span>
+          <svg id="loadingSpinner" class="hidden animate-spin h-6 w-6 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+        </button>
+
+        <div id="statusMessage" class="hidden text-center text-lg font-medium p-4 rounded-xl"></div>
+      </form>
+    </div>
+  </main>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
+
+  <script is:inline src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script is:inline src="https://npmcdn.com/flatpickr/dist/l10n/ro.js"></script>
+
+  <script is:inline>
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Configurăm calendarul să blocheze datele (vom conecta API-ul mai târziu)
+      const dateOcupate = ["2026-10-15", "2026-11-20"];
+
+      flatpickr("#datePicker", {
+        locale: "ro",
+        minDate: "today",
+        disable: dateOcupate,
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "j F Y",
+        disableMobile: true
+      });
+
+      const form = document.getElementById('bookingForm');
+      const submitBtn = document.getElementById('submitBtn');
+      const spinner = document.getElementById('loadingSpinner');
+      const statusMsg = document.getElementById('statusMessage');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-80');
+        spinner.classList.remove('hidden');
+        statusMsg.classList.add('hidden');
+
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+
+        try {
+          const res = await fetch('/api/rezervare/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+
+          if (res.ok) {
+            form.reset();
+            statusMsg.textContent = "Solicitarea a fost trimisă cu succes! Vă vom contacta în cel mai scurt timp.";
+            statusMsg.className = "text-center text-lg font-medium p-4 rounded-xl bg-green-500/20 text-green-400 border border-green-500/30";
+          } else {
+            throw new Error("Eroare server");
+          }
+        } catch (error) {
+          statusMsg.textContent = "A apărut o problemă la trimitere. Vă rugăm să ne contactați telefonic.";
+          statusMsg.className = "text-center text-lg font-medium p-4 rounded-xl bg-red-500/20 text-red-400 border border-red-500/30";
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove('opacity-80');
+          spinner.classList.add('hidden');
+          statusMsg.classList.remove('hidden');
+        }
+      });
+    });
+  </script>
+</Layout>
