@@ -263,6 +263,13 @@ git push origin main
 
 ---
 
+## 📝 2026-10-04 — VideoFacade: contor vizualizări fără cache
+- **Obiectiv:** Contorul nu trebuie înghețat de build-ul static sau de cache-ul Cloudflare.
+- **Constatare:** contorul era deja încărcat client-side (`loadViews` → `GET /api/views/?ids=…`, `prerender = false`, `Cache-Control: no-store`); HTML-ul static conține doar placeholderul ascuns `0`. Baza de date este Supabase, nu MySQL.
+- **Fișiere modificate:** `src/components/VideoFacade.astro` (`cache: 'no-store'` pe fetch-ul GET), `cheia-ferrari/3-Jurnal-Actiuni.md`.
+- **Validări:** `get_errors` 0 erori. Fără impact SEO (nu s-au atins pagini/metadata).
+- **Pași următori:** dacă un număr vechi persistă, verificat în Cloudflare să nu existe o regulă Cache Rule/Edge TTL care să forțeze cache pe `/api/*`.
+
 ## 📝 2026-10-01 — /api/views/: persistență reală în Supabase
 - **Obiectiv:** Contorul ochișor din `VideoFacade` persistent pe termen lung; eliminat stocarea în memorie.
 - **Fișiere modificate:** `src/pages/api/views.ts`, `src/env.d.ts`, `.env.example`, `scripts/supabase-video-stats.sql` (nou), `cheia-ferrari/3-Jurnal-Actiuni.md`.

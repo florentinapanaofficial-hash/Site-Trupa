@@ -326,6 +326,7 @@ const viewsId = videoId && /^[A-Za-z0-9_-]{1,64}$/.test(videoId) ? videoId : der
     try {
       const res = await fetch(`${VIEWS_ENDPOINT}?ids=${encodeURIComponent(ids.join(','))}`, {
         headers: { Accept: 'application/json' },
+        cache: 'no-store',
       });
       if (!res.ok) return;
       const data = (await res.json()) as { views?: Record<string, number> };
