@@ -61,13 +61,13 @@ function deriveVideoId(raw: string): string {
   try {
     const url = new URL(raw, 'https://local.invalid');
     const candidate = url.searchParams.get('list') || url.pathname.split('/').filter(Boolean).pop() || '';
-    return /^[A-Za-z0-9_-]{1,64}$/.test(candidate) ? candidate : '';
+    return /^[A-Za-z0-9_-]{1,255}$/.test(candidate) ? candidate : '';
   } catch {
     return '';
   }
 }
 
-const viewsId = videoId && /^[A-Za-z0-9_-]{1,64}$/.test(videoId) ? videoId : deriveVideoId(safeVideoUrl);
+const viewsId = videoId && /^[A-Za-z0-9_-]{1,255}$/.test(videoId) ? videoId : deriveVideoId(safeVideoUrl);
 ---
 
 <div
@@ -305,8 +305,66 @@ const viewsId = videoId && /^[A-Za-z0-9_-]{1,64}$/.test(videoId) ? videoId : der
     }
   }
 
-  const VIEWS_ENDPOINT = '/api/views/';
-  const viewsFormatter = new Intl.NumberFormat('ro-RO', { notation: 'compact', maximumFractionDigits: 1 });
+  const VIEWS_ENDPOINT = '/api/track-video/';
+  const viewsFormatter = new Intl.NumberFormat('ro-RO');
+  const trackedVideos = new Set<string>();
+  const latestViews = new Map<string, number>();
+  const playerCleanup = new WeakMap<HTMLElement, () => void>();
+  type StreamPlayer = {
+    addEventListener: (event: string, listener: () => void) => void;
+    removeEventListener: (event: string, listener: () => void) => void;
+  };
+  type YoutubePlayer = { destroy: () => void };
+  type VideoWindow = Window & {
+    Stream?: (iframe: HTMLIFrameElement) => StreamPlayer;
+    YT?: {
+      Player: new (iframe: HTMLIFrameElement, options: {
+        events: { onStateChange: (event: { data: number }) => void };
+      }) => YoutubePlayer;
+    };
+    onYouTubeIframeAPIReady?: () => void;
+  };
+  const videoWindow = window as VideoWindow;
+  let streamSdk: Promise<void> | undefined;
+  let youtubeSdk: Promise<void> | undefined;
+
+  function loadPlayerSdk(youtube: boolean): Promise<void> {
+    if (youtube ? videoWindow.YT?.Player : videoWindow.Stream) return Promise.resolve();
+    const existing = youtube ? youtubeSdk : streamSdk;
+    if (existing) return existing;
+    const promise = new Promise<void>((resolve, reject) => {
+      const script = document.createElement('script');
+      const timeout = window.setTimeout(() => reject(new Error('Video SDK timeout.')), 15_000);
+      const ready = () => {
+        window.clearTimeout(timeout);
+        resolve();
+      };
+      if (youtube) {
+        const previous = videoWindow.onYouTubeIframeAPIReady;
+        videoWindow.onYouTubeIframeAPIReady = () => {
+          try { previous?.(); } finally { ready(); }
+        };
+      } else {
+        script.onload = ready;
+      }
+      script.onerror = () => {
+        window.clearTimeout(timeout);
+        script.remove();
+        reject(new Error('Video SDK unavailable.'));
+      };
+      script.src = youtube
+        ? 'https://www.youtube.com/iframe_api'
+        : 'https://embed.cloudflarestream.com/embed/sdk.latest.js';
+      document.head.append(script);
+    });
+    if (youtube) youtubeSdk = promise;
+    else streamSdk = promise;
+    void promise.catch(() => {
+      if (youtube) youtubeSdk = undefined;
+      else streamSdk = undefined;
+    });
+    return promise;
+  }
   // Copertele originale, restaurate când alt video preia redarea.
   const coverNodes = new WeakMap<HTMLElement, Node[]>();
 
@@ -331,7 +389,9 @@ const viewsId = videoId && /^[A-Za-z0-9_-]{1,64}$/.test(videoId) ? videoId : der
       if (!res.ok) return;
       const data = (await res.json()) as { views?: Record<string, number> };
       facades.forEach((facade) => {
-        const value = data.views?.[facade.dataset.videoId || ''];
+        const id = facade.dataset.videoId || '';
+        const loaded = data.views?.[id];
+        const value = typeof loaded === 'number' ? Math.max(latestViews.get(id) ?? 0, loaded) : latestViews.get(id);
         if (typeof value === 'number') renderViews(facade, value);
       });
     } catch {
@@ -341,29 +401,37 @@ const viewsId = videoId && /^[A-Za-z0-9_-]{1,64}$/.test(videoId) ? videoId : der
 
   async function trackView(facade: HTMLElement): Promise<void> {
     const videoId = facade.dataset.videoId;
-    if (!videoId) return;
+    if (!videoId || trackedVideos.has(videoId)) return;
+    trackedVideos.add(videoId);
     try {
       const res = await fetch(VIEWS_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ videoId }),
+        body: JSON.stringify({ video_id: videoId }),
         keepalive: true,
       });
-      if (!res.ok) return;
-      const data = (await res.json()) as { views?: number };
-      if (typeof data.views !== 'number') return;
+      if (res.status === 429) return;
+      if (!res.ok) throw new Error('Video tracking failed.');
+      const data = (await res.json()) as { views_count?: number };
+      const views = data.views_count;
+      if (typeof views !== 'number' || !Number.isSafeInteger(views) || views < 0) {
+        throw new Error('Video count invalid.');
+      }
+      latestViews.set(videoId, views);
       // Sincronizează toate cardurile cu același video (ex: aceeași piesă în mai multe secțiuni).
       document.querySelectorAll<HTMLElement>('[data-video-facade]').forEach((f) => {
-        if (f.dataset.videoId === videoId) renderViews(f, data.views as number);
+        if (f.dataset.videoId === videoId) renderViews(f, views);
       });
     } catch {
-      // Ignorat intenționat — vezi loadViews.
+      trackedVideos.delete(videoId);
     }
   }
 
   function resetFacade(facade: HTMLElement): void {
     const nodes = coverNodes.get(facade);
     if (!nodes) return;
+    playerCleanup.get(facade)?.();
+    playerCleanup.delete(facade);
     facade.replaceChildren(...nodes);
     coverNodes.delete(facade);
     delete facade.dataset.videoActive;
@@ -385,7 +453,7 @@ const viewsId = videoId && /^[A-Za-z0-9_-]{1,64}$/.test(videoId) ? videoId : der
     });
   }
 
-  function activate(facade: HTMLElement): void {
+  async function activate(facade: HTMLElement): Promise<void> {
     if (facade.dataset.videoActive === 'true') return;
     const src = buildAutoplayUrl(facade.dataset.videoUrl || '');
     if (!src) return;
@@ -393,7 +461,8 @@ const viewsId = videoId && /^[A-Za-z0-9_-]{1,64}$/.test(videoId) ? videoId : der
     stopOthers(facade);
     delete facade.dataset.videoPending;
     toggleConsentPanel(facade, false);
-    coverNodes.set(facade, Array.from(facade.childNodes));
+    const nodes = Array.from(facade.childNodes);
+    coverNodes.set(facade, nodes);
     facade.dataset.videoActive = 'true';
     facade.classList.remove('cursor-pointer', 'group');
     facade.removeAttribute('role');
@@ -401,7 +470,13 @@ const viewsId = videoId && /^[A-Za-z0-9_-]{1,64}$/.test(videoId) ? videoId : der
     facade.removeAttribute('aria-label');
 
     const iframe = document.createElement('iframe');
-    iframe.src = src;
+    const url = new URL(src);
+    const youtube = url.hostname.includes('youtube');
+    const cloudflare = url.hostname.endsWith('.cloudflarestream.com') || url.hostname === 'iframe.videodelivery.net';
+    if (youtube) {
+      url.searchParams.set('enablejsapi', '1');
+      url.searchParams.set('origin', window.location.origin);
+    }
     iframe.title = facade.dataset.videoTitle || 'Videoclip';
     iframe.loading = 'lazy';
     iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
@@ -409,9 +484,28 @@ const viewsId = videoId && /^[A-Za-z0-9_-]{1,64}$/.test(videoId) ? videoId : der
     iframe.referrerPolicy = 'strict-origin-when-cross-origin';
     iframe.className = 'absolute inset-0 h-full w-full border-0';
 
-    facade.replaceChildren(iframe);
+    try {
+      if (youtube || cloudflare) await loadPlayerSdk(youtube);
+    } catch {}
+    if (!facade.isConnected || coverNodes.get(facade) !== nodes) return;
+    const badge = facade.querySelector<HTMLElement>('[data-video-views]')?.cloneNode(true) as HTMLElement | undefined;
+    if (badge) {
+      badge.classList.add('absolute', 'bottom-3', 'right-3', 'z-10', 'pointer-events-none');
+    }
+    iframe.src = url.toString();
+    facade.replaceChildren(iframe, ...(badge ? [badge] : []));
+    const onPlay = () => { void trackView(facade); };
+    if (cloudflare && videoWindow.Stream) {
+      const player = videoWindow.Stream(iframe);
+      player.addEventListener('play', onPlay);
+      playerCleanup.set(facade, () => player.removeEventListener('play', onPlay));
+    } else if (youtube && videoWindow.YT?.Player) {
+      const player = new videoWindow.YT.Player(iframe, {
+        events: { onStateChange: (event: { data: number }) => { if (event.data === 1) onPlay(); } },
+      });
+      playerCleanup.set(facade, () => player.destroy());
+    }
     iframe.focus();
-    void trackView(facade);
   }
 
   function hasConsent(): boolean {
@@ -527,4 +621,7 @@ window.addEventListener('cookie:granted', () => {
 bindFacades();
 // ClientRouter nu re-execută modulele la navigare — refacem legăturile la fiecare pagină.
 document.addEventListener('astro:page-load', bindFacades);
+document.addEventListener('astro:before-swap', () => {
+  document.querySelectorAll<HTMLElement>('[data-video-facade]').forEach(resetFacade);
+});
 </script>

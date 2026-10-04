@@ -263,6 +263,14 @@ git push origin main
 
 ---
 
+## 📝 2026-10-04 — Vizualizări video persistente în MySQL Railway
+- **Obiectiv:** Incrementarea tabelului existent `video_views` la redare reală și actualizarea imediată a ochișorului, fără cereri repetate la play/pause.
+- **Fișiere modificate:** `src/pages/api/views.ts`, `src/pages/api/track-video.ts` (nou), `src/components/VideoFacade.astro`, `scripts/video-views.test.cjs` (nou), `cheia-ferrari/2-Tracker-SEO.md`, `cheia-ferrari/3-Jurnal-Actiuni.md`.
+- **Implementat:** `/api/track-video/` POST `{ video_id }` returnează `{ video_id, views_count }`; ruta veche și câmpurile `videoId`/`views` rămân compatibile. Conexiunea existentă `db.js`, SQL parametrizat `INSERT ... ON DUPLICATE KEY UPDATE`, tranzacție pe aceeași conexiune pentru totalul exact, rollback/release la eroare. GET citește MySQL dinamic, cu `no-store`; CORS și limita 30s/IP/video rămân active.
+- **Frontend:** SDK Cloudflare Stream încărcat doar după consimțământ, eveniment `play`; YouTube numără starea reală de redare. Un singur POST per ID în durata documentului, rezervat înainte de fetch; retry la o redare ulterioară dacă rețeaua eșuează. Badge vizibil peste iframe, sincronizat pe carduri duplicate și la restaurarea coperții; GET întârziat nu reduce totalul primit prin POST. Cleanup la reset și `astro:before-swap`.
+- **Validări:** `npx astro check` 0 erori / 0 warnings / 0 hints; `get_errors` curat; Jest 49/49 (9 teste noi pe codul real cu DB/player simulate). `npm run seo:check` și audit final: 60 pagini verificate, 0 FAIL | 0 WARN. HTTP local: GET 200, JSON invalid 400, origine nepermisă 403, OPTIONS 204.
+- **Riscuri / pași următori:** `MYSQL_URL` lipsește local, deci persistarea și concurența în MySQL real necesită verificare în Railway după publicare. Contorul folosește exclusiv tabelul nou; totalurile vechi Supabase nu sunt migrate. Gardul client se resetează la reload complet, iar rate-limit-ul server este în memoria fiecărei instanțe, nu o protecție distribuită anti-bot. SDK-urile externe și redarea efectivă nu au fost testate într-un browser real în această sesiune.
+
 ## 📝 2026-10-04 — VideoFacade: contor vizualizări fără cache
 - **Obiectiv:** Contorul nu trebuie înghețat de build-ul static sau de cache-ul Cloudflare.
 - **Constatare:** contorul era deja încărcat client-side (`loadViews` → `GET /api/views/?ids=…`, `prerender = false`, `Cache-Control: no-store`); HTML-ul static conține doar placeholderul ascuns `0`. Baza de date este Supabase, nu MySQL.

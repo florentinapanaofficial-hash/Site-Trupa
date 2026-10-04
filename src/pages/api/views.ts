@@ -2,63 +2,55 @@
  * /api/views/ – Contor de vizualizări pentru fațadele video (VideoFacade).
  * GET  ?ids=a,b,c -> { views: { [videoId]: number } }
  * POST { videoId } -> incrementează cu 1 și returnează { videoId, views }.
- * Persistență: Supabase `video_stats` + RPC `increment_video_view` (vezi scripts/supabase-video-stats.sql).
+ * Persistență: MySQL `video_views`, prin conexiunea Railway existenta.
  */
 
 import type { APIRoute } from 'astro';
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { getPool, query } from '../../lib/db.js';
 import { checkOrigin } from '../../lib/cors.js';
 import { secureLogger } from '../../lib/secure-logger.js';
 
 export const prerender = false;
 
-const VIDEO_ID_PATTERN = /^[A-Za-z0-9_-]{1,64}$/;
+const VIDEO_ID_PATTERN = /^[A-Za-z0-9_-]{1,255}$/;
 const MAX_IDS_PER_REQUEST = 50;
 const VIEW_WINDOW_MS = 30_000;
 const lastViewByKey = new Map<string, number>();
 
-class StatsUnavailableError extends Error { }
-
-let supabase: SupabaseClient | null = null;
-
-function getSupabase(): SupabaseClient {
-    if (supabase) return supabase;
-    // process.env are prioritate: variabilele Railway sunt citite la runtime, nu la build.
-    const url = process.env.SUPABASE_URL || import.meta.env.SUPABASE_URL || import.meta.env.PUBLIC_SUPABASE_URL;
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || import.meta.env.SUPABASE_SERVICE_ROLE_KEY;
-    if (!url || !serviceKey) {
-        throw new StatsUnavailableError('Lipsesc SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY.');
-    }
-    supabase = createClient(url, serviceKey, {
-        auth: { persistSession: false, autoRefreshToken: false },
-    });
-    return supabase;
-}
-
 async function readViews(ids: string[]): Promise<Record<string, number>> {
-    const { data, error } = await getSupabase()
-        .from('video_stats')
-        .select('video_id, views')
-        .in('video_id', ids);
-    if (error) throw error;
+    const rows = await query(
+        `SELECT video_id, views_count FROM video_views WHERE video_id IN (${ids.map(() => '?').join(',')})`,
+        ids,
+    ) as Array<{ video_id: string; views_count: number }>;
 
     const views: Record<string, number> = {};
     for (const id of ids) views[id] = 0;
-    for (const row of (data ?? []) as Array<{ video_id: string; views: number }>) {
-        views[row.video_id] = row.views;
+    for (const row of rows) {
+        views[row.video_id] = Number(row.views_count);
     }
     return views;
 }
 
 async function incrementView(id: string): Promise<number> {
-    const { data, error } = await getSupabase().rpc('increment_video_view', { vid_id: id });
-    if (error) throw error;
-    if (typeof data !== 'number') throw new Error('Răspuns RPC invalid pentru increment_video_view.');
-    return data;
-}
-
-function errorStatus(error: unknown): number {
-    return error instanceof StatsUnavailableError ? 503 : 500;
+    const connection = await getPool().getConnection();
+    try {
+        await connection.beginTransaction();
+        await connection.execute(
+            'INSERT INTO video_views (video_id, views_count) VALUES (?, 1) ON DUPLICATE KEY UPDATE views_count = views_count + 1',
+            [id],
+        );
+        const [result] = await connection.execute('SELECT views_count FROM video_views WHERE video_id = ?', [id]);
+        const rows = result as Array<{ views_count: number }>;
+        const total = Number(rows[0]?.views_count);
+        if (!Number.isSafeInteger(total) || total < 1) throw new Error('Contor video invalid.');
+        await connection.commit();
+        return total;
+    } catch (error) {
+        await connection.rollback();
+        throw error;
+    } finally {
+        connection.release();
+    }
 }
 
 function jsonResponse(data: unknown, status = 200, corsOrigin: string | null = null): Response {
@@ -134,7 +126,7 @@ export const GET: APIRoute = async ({ request, url }) => {
         return jsonResponse({ views: await readViews(ids) }, 200, cors.origin);
     } catch (error) {
         secureLogger.error('Eroare la citirea vizualizărilor video:', error);
-        return jsonResponse({ error: 'Eroare internă.' }, errorStatus(error), cors.origin);
+        return jsonResponse({ error: 'Eroare internă.' }, 500, cors.origin);
     }
 };
 
@@ -142,14 +134,15 @@ export const POST: APIRoute = async ({ request }) => {
     const cors = checkOrigin(request);
     if (!cors.allowed) return forbidden();
 
-    let payload: { videoId?: unknown };
+    let payload: { video_id?: unknown; videoId?: unknown } | null;
     try {
-        payload = (await request.json()) as { videoId?: unknown };
+        payload = await request.json();
     } catch {
         return jsonResponse({ error: 'Body JSON invalid.' }, 400, cors.origin);
     }
 
-    const videoId = typeof payload.videoId === 'string' ? payload.videoId.trim() : '';
+    const rawId = payload?.video_id ?? payload?.videoId;
+    const videoId = typeof rawId === 'string' ? rawId.trim() : '';
     if (!VIDEO_ID_PATTERN.test(videoId)) {
         return jsonResponse({ error: 'videoId invalid.' }, 400, cors.origin);
     }
@@ -159,9 +152,11 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     try {
-        return jsonResponse({ videoId, views: await incrementView(videoId) }, 200, cors.origin);
+        const views = await incrementView(videoId);
+        return jsonResponse({ video_id: videoId, views_count: views, videoId, views }, 200, cors.origin);
     } catch (error) {
+        lastViewByKey.delete(`${resolveClientIp(request)}:${videoId}`);
         secureLogger.error('Eroare la incrementarea vizualizărilor video:', error);
-        return jsonResponse({ error: 'Eroare internă.' }, errorStatus(error), cors.origin);
+        return jsonResponse({ error: 'Eroare internă.' }, 500, cors.origin);
     }
 };

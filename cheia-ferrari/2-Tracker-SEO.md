@@ -3,6 +3,7 @@ Aici vom nota evoluția săptămânală pentru a ne asigura că creștem, nu bat
 
 | Data | Cuvânt Cheie Monitorizat | Poziție YouTube (Est.) | Poziție Site (Google GSC) | Notițe / Acțiuni Luate |
 |---|---|---|---|---|
+| 04 oct 2026 | video showcase / vizualizări persistente | - | - | Contor conectat la MySQL Railway (`video_views`), POST pe evenimentul real de redare, gard play/pause și ochișor vizibil peste iframe. Metadata, schema și imaginile neschimbate. Validare: Astro 0/0/0, Jest 49/49, SEO 60 pagini, 0 FAIL \| 0 WARN; scrierea MySQL live rămâne de verificat (`MYSQL_URL` absent local). |
 | [Data de azi] | formatie nunta pitesti | - | - | Inițializare sistem Autopilot |
 | 21 apr 2026 | formatie nunta pitesti | - | - | Full polish cod (0/0/0 Astro); audit SEO efectuat; 3 idei clipuri YouTube propuse; commit `92b68b1` |
 | 21 apr 2026 | formatie nunta pret | - | 14.5 | Slăbiciune identificată — propus clip YouTube #1 (video prețuri 2026) |
