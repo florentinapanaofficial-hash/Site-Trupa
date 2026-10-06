@@ -624,6 +624,56 @@ function bindFacades(): void {
   });
 }
 
+function scheduleFacadeBinding(): void {
+  const facades = Array.from(document.querySelectorAll<HTMLElement>('[data-video-facade]'));
+  if (!facades.length) return;
+
+  const runWhenReady = () => {
+    if (facades.some((facade) => facade.dataset.videoBound === 'true')) return;
+    bindFacades();
+  };
+
+  const isVisibleSoon = () => facades.some((facade) => {
+    const rect = facade.getBoundingClientRect();
+    return rect.top < window.innerHeight * 1.8 && rect.bottom > 0;
+  });
+
+  if (isVisibleSoon()) {
+    runWhenReady();
+    return;
+  }
+
+  const observer = new IntersectionObserver((entries, obs) => {
+    if (entries.some((entry) => entry.isIntersecting)) {
+      obs.disconnect();
+      runWhenReady();
+    }
+  }, {
+    rootMargin: '200px 0px',
+    threshold: 0.01,
+  });
+
+  facades.forEach((facade) => observer.observe(facade));
+
+  const idleCallback = 'requestIdleCallback' in window
+    ? window.requestIdleCallback
+    : (cb: IdleRequestCallback | (() => void), _timeout?: number) => window.setTimeout(cb as () => void, 1200);
+
+  const idleId = idleCallback(() => {
+    observer.disconnect();
+    runWhenReady();
+  }, { timeout: 1200 });
+
+  if (typeof idleId === 'number') {
+    window.setTimeout(() => {
+      if (facades.some((facade) => facade.dataset.videoBound !== 'true')) {
+        observer.disconnect();
+        runWhenReady();
+      }
+    }, 1800);
+  }
+}
+
 // Acceptarea din CookieBanner redă fațadele care așteptau consimțământ.
 window.addEventListener('cookie:granted', () => {
   document.querySelectorAll<HTMLElement>('[data-video-facade]').forEach((facade) => {
@@ -631,9 +681,9 @@ window.addEventListener('cookie:granted', () => {
   });
 });
 
-bindFacades();
+scheduleFacadeBinding();
 // ClientRouter nu re-execută modulele la navigare — refacem legăturile la fiecare pagină.
-document.addEventListener('astro:page-load', bindFacades);
+document.addEventListener('astro:page-load', scheduleFacadeBinding);
 document.addEventListener('astro:before-swap', () => {
   document.querySelectorAll<HTMLElement>('[data-video-facade]').forEach(resetFacade);
 });

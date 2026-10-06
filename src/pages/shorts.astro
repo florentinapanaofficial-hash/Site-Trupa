@@ -889,9 +889,13 @@ const shorts = rawShorts.map((s) => {
       if (liked) {
         localStorage.setItem(likeKey(id), '1');
         countEl.textContent = (base + 1).toLocaleString('ro-RO');
-        btn.querySelector('.reel-action-icon')?.classList.remove('is-liked');
-        // reporneşte animația pop
-        void (btn as HTMLElement).offsetWidth;
+        const actionIcon = btn.querySelector<HTMLElement>('.reel-action-icon');
+        if (actionIcon) {
+          actionIcon.style.animation = 'none';
+          requestAnimationFrame(() => {
+            actionIcon.style.animation = '';
+          });
+        }
       } else {
         localStorage.removeItem(likeKey(id));
         countEl.textContent = base.toLocaleString('ro-RO');

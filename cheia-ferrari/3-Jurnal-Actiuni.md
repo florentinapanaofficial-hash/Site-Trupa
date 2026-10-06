@@ -12,7 +12,24 @@
 
 ---
 
-## 🔴 REGULI CRITICE (nenegociabile)
+## � 06 oct 2026 — Eliminare reflow forțat în animații mobile
+
+### Obiectiv
+- Reducerea citirilor geometrice după scriere la relansarea animațiilor pe mobil, fără a afecta UX-ul sau funcțiile carousel/like.
+
+### Modificări
+- `src/pages/momente-cu-mirii.astro`: eliminat `void albumRoot.offsetWidth` și re-lansarea claselor se face în `requestAnimationFrame`, fără read după write.
+- `src/pages/shorts.astro`: eliminat `offsetWidth` din restart-ul animației de like; resetul se face prin `animation = 'none'` și reaplicarea în următorul frame.
+- Validare directă: verificare de tip `Select-String` pentru `void .*offsetWidth` / `offsetWidth;` în fișierele afectate → 0 rezultate.
+
+### Validări
+- `npm run build`: build complet, `Complete!` și 80 fișiere comprimate fără erori.
+- Verificare sursă: nu mai există tipare de reflow forțat în zonele afectate.
+
+### Riscuri / pași următori
+- Auditul de tip „Forced reflow” este non-scoring; valoarea exactă în Lighthouse rămâne de confirmat cu un profil de browser real după publicare, dacă este nevoie de remăsurare suplimentară.
+
+## �🔴 REGULI CRITICE (nenegociabile)
 
 ### 1. Trailing Slash obligatoriu pe toate linkurile interne
 - Site-ul are `trailingSlash: 'always'` în `astro.config.mjs`

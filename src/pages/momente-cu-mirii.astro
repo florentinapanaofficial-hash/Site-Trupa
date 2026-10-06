@@ -980,12 +980,15 @@ const eventsJsonLd = realMoments.events
         stopPetals();
         unlockPageScrollForLightbox();
 
-        // Animate album back into view after lightbox closes
+        // Animate album back into view after lightbox closes without a forced reflow.
+        // Resetăm clasa în următorul frame, astfel CSS-ul poate relansa animația
+        // fără să citim `offsetWidth` imediat după scrierea DOM.
         if (albumRoot instanceof HTMLElement) {
           albumRoot.classList.remove('album-is-returning');
-          void albumRoot.offsetWidth;
-          albumRoot.classList.add('album-is-returning');
-          window.setTimeout(() => albumRoot.classList.remove('album-is-returning'), 700);
+          requestAnimationFrame(() => {
+            albumRoot.classList.add('album-is-returning');
+            window.setTimeout(() => albumRoot.classList.remove('album-is-returning'), 700);
+          });
         }
         lightboxImage.setAttribute('src', '');
         lightboxImage.setAttribute('alt', '');
