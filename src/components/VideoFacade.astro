@@ -91,9 +91,15 @@ const viewsId = videoId && /^[A-Za-z0-9_-]{1,255}$/.test(videoId) ? videoId : de
   </div>
 
   {typeof imageSrc === 'string' ? (
-    <img
+    <Image
       src={imageSrc}
       alt={title}
+      width={800}
+      height={450}
+      widths={[480, 600, 800]}
+      sizes="(max-width: 768px) 100vw, (max-width: 1280px) 46vw, 620px"
+      format="webp"
+      quality={80}
       loading={loading}
       fetchpriority={loading === 'eager' ? 'high' : undefined}
       decoding="async"
@@ -103,7 +109,7 @@ const viewsId = videoId && /^[A-Za-z0-9_-]{1,255}$/.test(videoId) ? videoId : de
     <Image
       src={imageSrc}
       alt={title}
-      widths={[480, 640, 800, 1280]}
+      widths={[480, 600, 800, 1280]}
       sizes="(max-width: 768px) 100vw, (max-width: 1280px) 46vw, 620px"
       format="webp"
       quality={80}
