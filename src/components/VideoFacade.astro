@@ -95,6 +95,7 @@ const viewsId = videoId && /^[A-Za-z0-9_-]{1,255}$/.test(videoId) ? videoId : de
       src={imageSrc}
       alt={title}
       loading={loading}
+      fetchpriority={loading === 'eager' ? 'high' : undefined}
       decoding="async"
       class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
     />
@@ -107,6 +108,7 @@ const viewsId = videoId && /^[A-Za-z0-9_-]{1,255}$/.test(videoId) ? videoId : de
       format="webp"
       quality={80}
       loading={loading}
+      fetchpriority={loading === 'eager' ? 'high' : undefined}
       decoding="async"
       class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
     />
@@ -382,7 +384,7 @@ const viewsId = videoId && /^[A-Za-z0-9_-]{1,255}$/.test(videoId) ? videoId : de
     const ids = [...new Set(facades.map((f) => f.dataset.videoId).filter((id): id is string => !!id))];
     if (ids.length === 0) return;
     try {
-      const res = await fetch(`${VIEWS_ENDPOINT}?ids=${encodeURIComponent(ids.join(','))}`, {
+      const res = await fetch(`/api/views/?ids=${encodeURIComponent(ids.join(','))}`, {
         headers: { Accept: 'application/json' },
         cache: 'no-store',
       });
@@ -391,7 +393,8 @@ const viewsId = videoId && /^[A-Za-z0-9_-]{1,255}$/.test(videoId) ? videoId : de
       facades.forEach((facade) => {
         const id = facade.dataset.videoId || '';
         const loaded = data.views?.[id];
-        const value = typeof loaded === 'number' ? Math.max(latestViews.get(id) ?? 0, loaded) : latestViews.get(id);
+        const valid = typeof loaded === 'number' && Number.isSafeInteger(loaded) && loaded >= 0;
+        const value = valid ? Math.max(latestViews.get(id) ?? 0, loaded) : latestViews.get(id);
         if (typeof value === 'number') renderViews(facade, value);
       });
     } catch {
@@ -583,19 +586,22 @@ const viewsId = videoId && /^[A-Za-z0-9_-]{1,255}$/.test(videoId) ? videoId : de
   }
 
 function bindFacades(): void {
-  const fresh: HTMLElement[] = [];
   document.querySelectorAll<HTMLElement>('[data-video-facade]').forEach((facade) => {
     if (facade.dataset.videoBound === 'true') return;
     facade.dataset.videoBound = 'true';
-    fresh.push(facade);
     bindInfo(facade);
 
     facade.addEventListener('click', (event) => {
       const target = event.target as HTMLElement | null;
       if (target?.closest('[data-video-consent]')) {
-        if (target.closest('[data-video-consent-accept]')) grantConsent(facade);
+        if (target.closest('[data-video-consent-accept]')) {
+          void loadViews([facade]);
+          grantConsent(facade);
+        }
         return;
       }
+      if (facade.dataset.videoActive === 'true') return;
+      void loadViews([facade]);
       requestPlay(facade);
     });
 
@@ -604,11 +610,12 @@ function bindFacades(): void {
       if (event.target !== facade) return;
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
+        if (facade.dataset.videoActive === 'true') return;
+        void loadViews([facade]);
         requestPlay(facade);
       }
     });
   });
-  void loadViews(fresh);
 }
 
 // Acceptarea din CookieBanner redă fațadele care așteptau consimțământ.

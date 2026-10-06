@@ -44,6 +44,7 @@ function endpoint() {
 
 function frontend() {
     const listeners = {};
+    const facadeListeners = {};
     const badge = () => {
         const count = { textContent: '' };
         return {
@@ -57,6 +58,7 @@ function frontend() {
         childNodes: [originalBadge], isConnected: true,
         classList: { add: jest.fn(), remove: jest.fn() },
         removeAttribute: jest.fn(), setAttribute: jest.fn(),
+        addEventListener: jest.fn((name, handler) => { facadeListeners[name] = handler; }),
         querySelector(selector) { return selector === '[data-video-views]' ? this.childNodes.find((node) => node.count) : null; },
         replaceChildren(...nodes) { this.childNodes = nodes; },
     };
@@ -72,12 +74,13 @@ function frontend() {
     const context = vm.createContext({
         window: { location: { origin: 'https://site.test' }, Stream: () => player, addEventListener: jest.fn() },
         document, fetch, Intl, URL, Set, Map, WeakMap, Response,
+        localStorage: { getItem: () => 'granted' },
     });
     const source = fs.readFileSync(path.join(__dirname, '../src/components/VideoFacade.astro'), 'utf8');
     const script = source.slice(source.indexOf('<script>') + '<script>'.length, source.lastIndexOf('</script>'));
     vm.runInContext(compile(script), context);
     document.querySelectorAll = () => [facade];
-    return { context, facade, fetch, listeners, player, document };
+    return { context, facade, fetch, listeners, facadeListeners, player, document };
 }
 
 describe('MySQL video views endpoint', () => {
@@ -138,6 +141,47 @@ describe('MySQL video views endpoint', () => {
 });
 
 describe('VideoFacade playback tracking', () => {
+    test('initial binding and page-load make no requests; thumbnail click reads live views', async () => {
+        const { context, facade, fetch, facadeListeners, document } = frontend();
+        context.bindFacades();
+        document.addEventListener.mock.calls.find(([name]) => name === 'astro:page-load')[1]();
+        expect(fetch).not.toHaveBeenCalled();
+        fetch.mockResolvedValueOnce(new Response(JSON.stringify({ views: { clip: 1234 } })));
+        facadeListeners.click({ target: { closest: () => null } });
+        await new Promise((resolve) => setImmediate(resolve));
+        expect(fetch).toHaveBeenCalledTimes(1);
+        expect(fetch.mock.calls[0]).toEqual(['/api/views/?ids=clip', {
+            headers: { Accept: 'application/json' }, cache: 'no-store',
+        }]);
+        const activeBadge = facade.querySelector('[data-video-views]');
+        expect(activeBadge.hidden).toBe(false);
+        expect(activeBadge.count.textContent).toBe(new Intl.NumberFormat('ro-RO').format(1234));
+        expect(facade.dataset.videoActive).toBe('true');
+    });
+
+    test('keyboard activation reads views without waiting for the response to open the player', async () => {
+        const { context, facade, fetch, facadeListeners } = frontend();
+        context.bindFacades();
+        fetch.mockImplementationOnce(() => new Promise(() => {}));
+        const preventDefault = jest.fn();
+        facadeListeners.keydown({ target: facade, key: 'Enter', preventDefault });
+        await new Promise((resolve) => setImmediate(resolve));
+        expect(preventDefault).toHaveBeenCalledTimes(1);
+        expect(fetch).toHaveBeenCalledTimes(1);
+        expect(facade.dataset.videoActive).toBe('true');
+        expect(facade.childNodes[0].src).toContain('autoplay=1');
+    });
+
+    test('an unavailable views API does not prevent playback', async () => {
+        const { context, facade, fetch, facadeListeners } = frontend();
+        context.bindFacades();
+        fetch.mockRejectedValueOnce(new Error('Offline'));
+        facadeListeners.click({ target: { closest: () => null } });
+        await new Promise((resolve) => setImmediate(resolve));
+        expect(facade.dataset.videoActive).toBe('true');
+        expect(facade.querySelector('[data-video-views]').hidden).toBe(true);
+    });
+
     test('tracks real play only once and updates the visible badge while playing', async () => {
         const { context, facade, fetch, listeners, player } = frontend();
         await context.activate(facade);

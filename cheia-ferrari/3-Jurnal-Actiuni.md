@@ -263,6 +263,14 @@ git push origin main
 
 ---
 
+## 📝 2026-10-06 — VideoFacade: contor la interacțiune și prioritate thumbnail
+- **Obiectiv:** Eliminarea cererilor inițiale pentru vizualizări, cu păstrarea SSG și a redării fluide.
+- **Fișiere modificate:** `src/components/VideoFacade.astro`, `src/pages/galerie-video.astro`, `scripts/video-views.test.cjs`, `cheia-ferrari/2-Tracker-SEO.md`, `cheia-ferrari/3-Jurnal-Actiuni.md`.
+- **Modificări:** Eliminat `loadViews(fresh)` din inițializare; GET `/api/views/` fără cache doar la click/Enter/Space sau acceptarea video, fără await înainte de player. Numerele valide sunt formatate ro-RO în badge-ul SVG existent, inclusiv peste iframe; GET întârziat nu reduce totalul POST. POST `/api/track-video/` rămâne pe redarea reală. Consimțământul, clasele Tailwind și cleanup ClientRouter sunt păstrate.
+- **Imagini:** `fetchpriority="high"` pentru coperțile eager, pe ambele ramuri img/Image. Prima copertă din galerie primește eager; restul rămân lazy. Paginile locale generate nu au fost editate manual.
+- **Validări:** Teste focalizate 12/12 (zero fetch la bind/page-load, click, tastatură, API lent/offline și tracking); Jest complet 52/52. Astro check 0 erori / 0 warnings / 0 hints; get_errors curat. `npm run seo:check`: build PASS, 60 pagini, 0 FAIL | 0 WARN. HTML SSG verificat pentru eager/high pe prima copertă și lazy pe restul, în homepage/galerie/3 pagini locale. Metadata galerie neschimbate: title 55, description 133 caractere; schema și alt text păstrate.
+- **Riscuri / pași următori:** LCP nu a fost remăsurat în Lighthouse sau pe producție; nu promitem un scor numeric. Testele folosesc player/API simulate, nu verifică redarea furnizorului sau MySQL real. De remăsurat după publicare.
+
 ## 📝 2026-10-04 — Vizualizări video persistente în MySQL Railway
 - **Obiectiv:** Incrementarea tabelului existent `video_views` la redare reală și actualizarea imediată a ochișorului, fără cereri repetate la play/pause.
 - **Fișiere modificate:** `src/pages/api/views.ts`, `src/pages/api/track-video.ts` (nou), `src/components/VideoFacade.astro`, `scripts/video-views.test.cjs` (nou), `cheia-ferrari/2-Tracker-SEO.md`, `cheia-ferrari/3-Jurnal-Actiuni.md`.

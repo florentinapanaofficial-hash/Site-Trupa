@@ -3,6 +3,7 @@ Aici vom nota evoluția săptămânală pentru a ne asigura că creștem, nu bat
 
 | Data | Cuvânt Cheie Monitorizat | Poziție YouTube (Est.) | Poziție Site (Google GSC) | Notițe / Acțiuni Luate |
 |---|---|---|---|---|
+| 06 oct 2026 | VideoFacade / LCP mobil | - | - | Eliminat GET-ul automat la initializare si ClientRouter; citire `/api/views/` doar la interactiune, fara blocarea playerului. Prima coperta eager/high, restul lazy. SSG, consimtamant si POST la play pastrate. Build PASS; SEO 60 pagini, 0 FAIL \| 0 WARN; Jest 52/52. LCP live de remasurat dupa publicare. |
 | 04 oct 2026 | video showcase / vizualizări persistente | - | - | Contor conectat la MySQL Railway (`video_views`), POST pe evenimentul real de redare, gard play/pause și ochișor vizibil peste iframe. Metadata, schema și imaginile neschimbate. Validare: Astro 0/0/0, Jest 49/49, SEO 60 pagini, 0 FAIL \| 0 WARN; scrierea MySQL live rămâne de verificat (`MYSQL_URL` absent local). |
 | [Data de azi] | formatie nunta pitesti | - | - | Inițializare sistem Autopilot |
 | 21 apr 2026 | formatie nunta pitesti | - | - | Full polish cod (0/0/0 Astro); audit SEO efectuat; 3 idei clipuri YouTube propuse; commit `92b68b1` |
