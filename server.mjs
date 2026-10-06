@@ -23,6 +23,10 @@ const serve = sirv('dist/client', {
         else if (pathname.startsWith('/images/')) {
             res.setHeader('Cache-Control', 'public, max-age=31536000');
         }
+        // /videos/* → 7 days; multimedia background este statică și se reciclează frecvent
+        else if (pathname.startsWith('/videos/')) {
+            res.setHeader('Cache-Control', 'public, max-age=604800, stale-while-revalidate=86400');
+        }
         // .svg, .ico, .webp → 1 year
         else if (pathname.endsWith('.svg') || pathname.endsWith('.ico') || pathname.endsWith('.webp')) {
             res.setHeader('Cache-Control', 'public, max-age=31536000');

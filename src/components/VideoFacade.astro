@@ -94,12 +94,12 @@ const viewsId = videoId && /^[A-Za-z0-9_-]{1,255}$/.test(videoId) ? videoId : de
     <Image
       src={imageSrc}
       alt={title}
-      width={800}
-      height={450}
-      widths={[480, 600, 800]}
+      width={640}
+      height={360}
+      widths={[480, 600, 640]}
       sizes="(max-width: 768px) 100vw, (max-width: 1280px) 46vw, 620px"
       format="webp"
-      quality={80}
+      quality={72}
       loading={loading}
       fetchpriority={loading === 'eager' ? 'high' : undefined}
       decoding="async"

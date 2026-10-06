@@ -13,12 +13,10 @@ export default defineConfig({
   output: 'static',
   trailingSlash: 'always',
   compressHTML: true,
-  // Prefetch-ul la hover păstrează navigarea rapidă după intenția explicită
-  // a utilizatorului, fără să consume thread-ul principal la încărcarea mobilă.
-  prefetch: {
-    prefetchAll: false,
-    defaultStrategy: 'hover',
-  },
+  // Dezactivăm prefetch-ul global, deoarece site-ul este static și JS-ul de navigare
+  // adăuga lanțuri critice inutile la pagina de pornire. Prefetch-ul poate fi reactivat
+  // doar pentru secțiuni cu trafic explicit și fără impact pe LCP.
+  prefetch: false,
   build: {
     inlineStylesheets: 'always',
   },

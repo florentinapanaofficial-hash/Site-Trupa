@@ -1,5 +1,4 @@
 ---
-import { ClientRouter } from 'astro:transitions';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import SkyBackground from '../components/SkyBackground.astro';
@@ -321,7 +320,6 @@ const breadcrumbLd = {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-    <ClientRouter />
     <title>{seoTitle}</title>
     <meta name="description" content={seoDescription} />
     <meta name="robots" content={noindex ? 'noindex,nofollow' : 'index,follow,max-image-preview:large'} />
