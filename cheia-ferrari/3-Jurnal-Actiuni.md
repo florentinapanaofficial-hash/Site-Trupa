@@ -31,6 +31,24 @@
 
 ---
 
+## 🧠 06 oct 2026 — Mitigare reflow forțat în fațada video
+
+### Obiectiv
+- Reducerea rearanjării forțate la inițializarea fațadelor video și în punctele de activare din viewport, fără a afecta UX-ul și fără a încărca scripturile mai devreme.
+
+### Modificări
+- `src/components/VideoFacade.astro`: eliminată citirea directă `getBoundingClientRect()` din `scheduleFacadeBinding()`, păstrând doar observarea intersecției și `requestIdleCallback` pentru lansarea listenerilor.
+- Comportamentul rămâne identic pentru utilizator, dar evită read-after-write apărut în bootstrap-ul delicatei video cards.
+
+### Validări
+- `npm run seo:audit` → `Rezultat: 0 FAIL | 0 WARN`.
+- `npm run build` → build complet, fără regresii de compilare.
+
+### Riscuri / pași următori
+- Diagnosticarea Lighthouse pentru reflow forțat este de tip „diagnostic”, nu eroare SEO; reducerea extra este utilă pentru UX și pentru netezișea pe dispozitive mai slabe, fără să modifice scorul de validare.
+
+---
+
 ## � 06 oct 2026 — Eliminare reflow forțat în animații mobile
 
 ### Obiectiv

@@ -633,24 +633,22 @@ function scheduleFacadeBinding(): void {
     bindFacades();
   };
 
-  const isVisibleSoon = () => facades.some((facade) => {
-    const rect = facade.getBoundingClientRect();
-    return rect.top < window.innerHeight * 1.8 && rect.bottom > 0;
-  });
-
-  if (isVisibleSoon()) {
+  // Evităm orice citire geometrică pe bootstrap: nu mai apelăm `getBoundingClientRect()`
+  // în aceeași fază în care vor fi adăugate clase/aria/handlers. Intersectarea și idle
+  // sunt suficiente pentru a decide când fațada este aproape de viewport, fără reflow.
+  if (!('IntersectionObserver' in window)) {
     runWhenReady();
     return;
   }
 
   const observer = new IntersectionObserver((entries, obs) => {
-    if (entries.some((entry) => entry.isIntersecting)) {
+    if (entries.some((entry) => entry.isIntersecting || entry.intersectionRatio > 0)) {
       obs.disconnect();
       runWhenReady();
     }
   }, {
     rootMargin: '200px 0px',
-    threshold: 0.01,
+    threshold: [0, 0.01],
   });
 
   facades.forEach((facade) => observer.observe(facade));
