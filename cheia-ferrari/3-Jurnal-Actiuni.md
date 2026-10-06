@@ -15,6 +15,25 @@
 ## � 06 oct 2026 — Eliminare reflow forțat în animații mobile
 
 ### Obiectiv
+- Eliminarea încărcării scripturilor de analitică în head-ul paginii, fără a afecta GDPR și fără a lăsa `tracking-pixels.js` pe calea critică la prima renderizare.
+
+### Modificări
+- `src/layouts/BaseLayout.astro`: eliminat `<script src="/js/tracking-pixels.js" defer>` din head; rămâne doar `window.__FP_TRACKING_IDS__` pentru configurare.
+- `src/components/CookieBanner.astro`: adăugat `loadTrackingScript()` care injectează scriptul dinamic doar la nevoie, apoi invocă `window.FPTracking.init(...)` după consentul utilizatorului.
+- Comportamentul respectă fluxul GDPR: dacă consimțământul este absent, tracking-ul nu se incarcă; dacă e acordat, scriptul se montează în momentul potrivit și încarcă GA4 / Meta Pixel / TikTok doar după acceptare.
+
+### Validări
+- `npm run seo:check` → build complet + `node scripts/seo-audit.mjs` → `Rezultat: 0 FAIL | 0 WARN`.
+- `get_errors` pe fișierele modificate → `No errors found`.
+
+### Riscuri / pași următori
+- Dacă va exista nevoie de remăsurare live Lighthouse după publicare, aceasta va reflecta reduceri suplimentare de network dependency tree și critical request chain; nu există regressie de funcționalitate GDPR, însă verificarea live trebuie făcută în browser cu consimțământ real.
+
+---
+
+## � 06 oct 2026 — Eliminare reflow forțat în animații mobile
+
+### Obiectiv
 - Reducerea citirilor geometrice după scriere la relansarea animațiilor pe mobil, fără a afecta UX-ul sau funcțiile carousel/like.
 
 ### Modificări

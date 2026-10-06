@@ -393,7 +393,8 @@ const breadcrumbLd = {
     <script is:inline define:vars={{ ga4Id, metaPixelId, tiktokPixelId }}>
       window.__FP_TRACKING_IDS__ = { ga4Id: ga4Id, metaPixelId: metaPixelId, tiktokPixelId: tiktokPixelId };
     </script>
-    <script is:inline src="/js/tracking-pixels.js" defer></script>
+    {/* Trackerele se încarcă dinamic doar după consimțământ sau la idle; nu mai consume
+        calea critică la prima renderizare a paginii. */}
     {/* ── Fix ecran gol la Back pe mobil (ClientRouter + scroll restoration nativă) ──
         1) Dezactivăm restaurarea automată de scroll a browserului: fără asta,
            browserul poate aplica poziția de scroll adâncă a paginii anterioare

@@ -53,11 +53,37 @@
     var btnAccept = document.getElementById('cookie-accept');
     var btnRefuse = document.getElementById('cookie-refuse');
 
-    /** Deleagă pornirea GA4/Meta Pixel/TikTok Pixel către modulul comun */
+    /** Deleagă pornirea GA4/Meta Pixel/TikTok Pixel către modulul comun,
+        dar îl încarcă dinamic doar la nevoie pentru a nu rupe calea critică. */
+    function loadTrackingScript() {
+      if (window.FPTracking) return Promise.resolve(window.FPTracking);
+      if (window.__fpTrackingLoader) return window.__fpTrackingLoader;
+
+      window.__fpTrackingLoader = new Promise(function (resolve, reject) {
+        var script = document.createElement('script');
+        script.src = '/js/tracking-pixels.js';
+        script.async = true;
+        script.onload = function () {
+          if (window.FPTracking) resolve(window.FPTracking);
+          else reject(new Error('FPTracking not loaded.'));
+        };
+        script.onerror = function () {
+          reject(new Error('Failed to load tracking script.'));
+        };
+        document.head.appendChild(script);
+      });
+
+      return window.__fpTrackingLoader;
+    }
+
     function startTracking() {
-      if (window.FPTracking) {
-        window.FPTracking.init(window.__FP_TRACKING_IDS__);
-      }
+      loadTrackingScript().then(function () {
+        if (window.FPTracking) {
+          window.FPTracking.init(window.__FP_TRACKING_IDS__);
+        }
+      }).catch(function () {
+        // Nu blocăm renderul dacă scriptul de tracking e indisponibil.
+      });
     }
 
     function hideBanner() {
