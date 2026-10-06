@@ -11,12 +11,33 @@ import heroImg from '../assets/card-1-panoramica.jpg';
 import anaFlorentinaImg from '../assets/hp-ana-florentina.webp';
 import evenimentLiveImg from '../assets/hp-eveniment-live.webp';
 import scenaPanoramicaImg from '../assets/hp-scena-panoramica.webp';
+import { sanitizeUrl } from '../lib/sanitize-url';
 
 const { acasa } = seo;
 const { contact } = siteContent;
-const faqItems = acasa.faq;
 
-import { sanitizeUrl } from '../lib/sanitize-url';
+const sanitizeJsonLdText = (value = '') => {
+  if (value === null || value === undefined) return '';
+
+  return String(value)
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .replace(/[\u0000-\u001F\u007F]/g, '')
+    .trim();
+};
+
+const safeFaqItems = Array.isArray(acasa?.faq)
+  ? acasa.faq
+      .map((item) => ({
+        question: sanitizeJsonLdText(item?.question),
+        answer: sanitizeJsonLdText(item?.answer),
+      }))
+      .filter((item) => item.question && item.answer)
+  : [];
+
+const faqItems = safeFaqItems;
 
 const socialLinks = {
   youtube:   siteContent.socialLinks?.youtube ? sanitizeUrl(siteContent.socialLinks.youtube) : null,
@@ -27,7 +48,7 @@ const socialLinks = {
 const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
-  mainEntity: acasa.faq.map((item) => ({
+  mainEntity: safeFaqItems.map((item) => ({
     '@type': 'Question',
     name: item.question,
     acceptedAnswer: { '@type': 'Answer', text: item.answer },

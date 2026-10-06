@@ -12,6 +12,25 @@
 
 ---
 
+## 📝 06 oct 2026 — Schema FAQPage validată pentru homepage
+
+### Obiectiv
+- Verificarea și hardening-ul structurii JSON-LD `FAQPage` de pe homepage, pentru a elimina orice eroare de validare Ahrefs legată de etichete HTML sau caractere controlate în text.
+
+### Modificări
+- `src/pages/index.astro`: adăugat `sanitizeJsonLdText()` pentru a curăța întregul text FAQ înainte de serializare și a construi `mainEntity` din valori validate, fără markup HTML și fără caractere nule/control.
+- `src/data/seo-content.json`: confirmat că `acasa.faq` rămâne ca array de obiecte `{ question, answer }` în format simplu, fără HTML/markup.
+
+### Validări
+- `node -e` de validare FAQ: `faqCount=4`, `htmlInFaq=false`, `specialChars=false`.
+- `get_errors` pe `src/pages/index.astro`: `No errors found`.
+- Validare locală finală: `npm run build` și `npm run indexnow:submit` rulate după corecție.
+
+### Riscuri / pași următori
+- Dacă validatorul Ahrefs continuă să raporteze probleme, următorul punct de control este output-ul final HTML/JSON-LD și reasubmisionarea IndiceNow pentru a elimina paginile neindexate.
+
+---
+
 ## � 06 oct 2026 — Eliminare reflow forțat în animații mobile
 
 ### Obiectiv
