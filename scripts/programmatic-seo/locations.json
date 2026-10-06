@@ -133,5 +133,109 @@
                 "answer": "Da, acoperim Curtea de Argeș, Câmpulung, Domnești, Corbeni, Arefu și localitățile apropiate din județul Argeș."
             }
         ]
+    },
+    {
+        "slug": "ramnicu-valcea",
+        "oras": "Râmnicu Vâlcea",
+        "judet": "Vâlcea",
+        "keyword": "Formație Nuntă Râmnicu Vâlcea",
+        "h1": "Formație Nuntă Râmnicu Vâlcea — Trupă Cover Live",
+        "h2": "Muzică live pentru nunta voastră în Râmnicu Vâlcea",
+        "meta_title": "Formație Nuntă Râmnicu Vâlcea 2027 | Florentina Pană",
+        "meta_desc": "Formație nuntă Râmnicu Vâlcea și trupă cover live: muzică fără pauze, sonorizare proprie, ring plin. Cereți oferta pentru data voastră!",
+        "keywords_schema": [
+            "Formație Nuntă Râmnicu Vâlcea",
+            "Trupă cover Râmnicu Vâlcea",
+            "muzică live nuntă Râmnicu Vâlcea",
+            "formație evenimente Râmnicu Vâlcea"
+        ],
+        "lat": 45.1047,
+        "lng": 24.3693,
+        "intro": "Vă pregătiți de nuntă în Râmnicu Vâlcea? Formația Florentina Pană vine din Pitești cu sonorizare, lumini și un program live construit împreună cu voi, de la intrarea mirilor până la ultimul dans. Dacă vă doriți o trupă cover care să cânte melodii pe care invitații le știu pe de rost, ați ajuns unde trebuie.",
+        "paragraf2": "Repertoriul nostru acoperă muzică populară de petrecere, grecească, arăbească, machedonească, latino, românească și manele, plus cover-uri pe care le cântă toată sala. Cântăm fără pauze, alternăm programele artistice după cum se aprinde seara și nu folosim DJ sau MC.",
+        "paragraf3": "Nu vă dăm un program standard. Stabilim împreună momentele care contează, de la dansul mirilor și hora până la clipa dedicată părinților, și venim cu tot ce ține de sunet și lumini, ca voi să vă bucurați de seară. Pentru nunți în Râmnicu Vâlcea ne deplasăm cu echipament propriu.",
+        "locatii_populare": [
+            "Magic Events",
+            "Grand Hotel Sofianu",
+            "Restaurant OK",
+            "Simfonia"
+        ],
+        "zone_acoperite": [
+            "Râmnicu Vâlcea",
+            "Ocnele Mari",
+            "Băile Govora",
+            "Călimănești",
+            "Băile Olănești"
+        ],
+        "faq": [
+            {
+                "question": "Cât costă o formație de nuntă în Râmnicu Vâlcea?",
+                "answer": "Prețul depinde de data nunții, de formula artistică, de durata programului și de deplasarea din Pitești. Trimiteți-ne data și bugetul estimat și primiți o ofertă personalizată pentru Râmnicu Vâlcea."
+            },
+            {
+                "question": "Aveți sonorizare și lumini proprii pentru sălile din Râmnicu Vâlcea?",
+                "answer": "Da. Venim cu sonorizare profesională, lumini de atmosferă și microfoane wireless, pe care le dimensionăm după sală și după numărul de invitați."
+            },
+            {
+                "question": "Sunteți și trupă cover pentru petreceri private în Râmnicu Vâlcea?",
+                "answer": "Da. Cântăm și cover-uri pe care invitații le știu pe de rost, alături de muzică populară de petrecere, românească, grecească, latino și manele, într-un program stabilit împreună cu voi."
+            },
+            {
+                "question": "Vă deplasați din Pitești la nunți în Râmnicu Vâlcea?",
+                "answer": "Da, venim cu echipament propriu în Râmnicu Vâlcea, Ocnele Mari, Băile Govora, Călimănești și Băile Olănești. Discutăm din timp programul muzical și detaliile de logistică."
+            }
+        ]
+    },
+    {
+        "slug": "valcea",
+        "oras": "Vâlcea",
+        "judet": "Vâlcea",
+        "keyword": "Formație Nuntă Vâlcea",
+        "h1": "Formație Nuntă Vâlcea — Muzică Live pentru Miri",
+        "h2": "Alături de voi în tot județul Vâlcea",
+        "meta_title": "Formație Nuntă Vâlcea 2027 | Trupă Cover Florentina Pană",
+        "meta_desc": "Căutați formații nuntă Vâlcea? Cântăm live la Drăgășani, Horezu, Călimănești și în tot județul, cu sonorizare proprie. Cereți oferta!",
+        "keywords_schema": [
+            "Formație Nuntă Vâlcea",
+            "Formații nuntă Vâlcea",
+            "trupă cover Vâlcea",
+            "muzică live evenimente Vâlcea"
+        ],
+        "lat": 45.1333,
+        "lng": 24.0,
+        "intro": "Căutați o formație de nuntă în județul Vâlcea? Formația Florentina Pană cântă live la nunți, botezuri și aniversări în Râmnicu Vâlcea, Drăgășani, Horezu, Călimănești și în localitățile din jur, cu sonorizare și lumini aduse de noi.",
+        "paragraf2": "Fiecare zonă are felul ei de a petrece, iar noi ne adaptăm: de la nunți în sate pline de tradiție la petreceri într-o stațiune sau într-un restaurant din oraș. Programul include muzică populară de petrecere, românească, grecească, arăbească, machedonească, latino și manele, cântate fără pauze, fără DJ sau MC.",
+        "paragraf3": "Fie că nunta are loc la poalele munților sau printre dealurile cu vie, venim cu sonorizare, lumini și un program discutat cu voi din timp. Spuneți-ne unde și când vă căsătoriți, iar noi verificăm calendarul și revenim cu o ofertă clară.",
+        "locatii_populare": [
+            "Magic Events",
+            "Grand Hotel Sofianu",
+            "Restaurant OK",
+            "Simfonia"
+        ],
+        "zone_acoperite": [
+            "Drăgășani",
+            "Horezu",
+            "Brezoi",
+            "Berbești",
+            "Bălcești"
+        ],
+        "faq": [
+            {
+                "question": "Cât costă o formație de nuntă în județul Vâlcea?",
+                "answer": "Oferta se calculează după data evenimentului, formula artistică, durata programului și localitate. Spuneți-ne unde are loc nunta și primiți o propunere clară pentru Vâlcea."
+            },
+            {
+                "question": "În ce localități din Vâlcea cântați?",
+                "answer": "Ne deplasăm în Râmnicu Vâlcea, Drăgășani, Horezu, Brezoi, Berbești, Bălcești și în stațiunile din județ, în funcție de datele libere din calendar."
+            },
+            {
+                "question": "Ce repertoriu cântați la nunțile din Vâlcea?",
+                "answer": "Muzică populară de petrecere, românească, grecească, arăbească, machedonească, latino și manele, aleasă împreună cu mirii. Cântăm fără pauze și nu folosim DJ sau MC."
+            },
+            {
+                "question": "Cum verific dacă sunteți liberi la data nunții mele în Vâlcea?",
+                "answer": "Sunați-ne, scrieți-ne pe WhatsApp sau completați formularul de contact. Vă răspundem în maximum 24 de ore, cu disponibilitatea pentru data voastră."
+            }
+        ]
     }
 ]

@@ -19,6 +19,8 @@ const { contact, brand } = siteContent;
 const ORAS           = '{{ORAS}}';
 const JUDET          = '{{JUDET}}';
 const KEYWORD        = '{{KEYWORD}}';
+const H1             = '{{H1}}';
+const H2             = '{{H2}}';
 const SLUG           = '{{SLUG}}';
 const LAT            = {{LAT}};
 const LNG            = {{LNG}};
@@ -110,7 +112,7 @@ const localBusinessLd = {
   <HeroVideo
     videoUrl="/videos/bg-nunta-live-2027.mp4"
     posterImage={heroPoster.src}
-    title={`${KEYWORD} — Muzică Live Premium`}
+    title={H1}
     subtitle={`Formația Florentina Pană în ${ORAS}`}
     showReviews={true}
   >
@@ -147,7 +149,7 @@ const localBusinessLd = {
 
     <header class="section-head mx-auto text-center">
       <p class="kicker">{KEYWORD}</p>
-      <h2 class="section-title">Formația Florentina Pană în {ORAS}</h2>
+      <h2 class="section-title">{H2}</h2>
       <p class="section-copy">{INTRO}</p>
     </header>
 

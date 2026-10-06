@@ -263,6 +263,14 @@ git push origin main
 
 ---
 
+## 📝 2026-10-06 — Homepage Pitești/Argeș + extindere Programmatic SEO pentru Vâlcea
+- **Obiectiv:** Pitești/Argeș prioritate absolută pe homepage; Vâlcea pe locul doi, doar prin pagini programmatic, nu pe homepage.
+- **Fișiere modificate:** `src/pages/index.astro` (doar copy/alt/aria-label), `src/data/seo-content.json` (`acasa`: meta, hero, FAQ), `scripts/programmatic-seo/locations.json` (+2 locații), `scripts/programmatic-seo/template.astro` și `generate-pages.js` (H1/H2 opționale per locație, fallback identic), `astro.config.mjs` (`customPages` sitemap), `src/pages/formatie-nunta/{bucuresti,curtea-de-arges,pitesti}.astro` (regenerate; doar constantele `H1`/`H2`, randare neschimbată), pagini noi `ramnicu-valcea.astro` și `valcea.astro` (generate), tracker + jurnal.
+- **Homepage:** title `Formație Nuntă Pitești, Trupă Cover Live | Florentina Pană` (58), description 143, H1 cu „formație nuntă Pitești”; H2/H3 și alt-uri cu formație nuntă/trupă cover/muzică live/formație evenimente + Pitești/Argeș. FAQ rescris (întrebarea despre preț fără an, păstrând intervalul 2.500-4.000 euro). Clase Tailwind, scripturi, linkuri, `VideoFacade`/API neatinse.
+- **Vâlcea:** două pagini cu conținut distinct (oraș vs. județ) ca să evit canibalizarea; keywords_schema, FAQ, zone acoperite proprii. Pentru conținutul aleatoriu am re-generat pagina nouă până când blocurile nu mai afirmă evenimente anterioare în Vâlcea („zeci de nunți aici”, „am pus suflet în fiecare eveniment”).
+- **Validari:** `astro check` 0/0/0; `seo:check` 62 pagini, 0 FAIL | 0 WARN; HTML verificat (un singur H1, sitemap include ambele rute, linkuri din footer către ele, 0 imagini fără alt); `check-links` 66/66 valide; Jest 52/52; `seo-analyzer.js` 13 oportunități GSC preexistente.
+- **Riscuri / pași următori:** (1) `locatii_populare` pentru ambele pagini Vâlcea sunt acum saloanele indicate de Claudiu (Magic Events, Grand Hotel Sofianu, Restaurant OK, Simfonia), pagini regenerate; (2) paginile locale nu se generează în `npm run build`, ci prin `node scripts/programmatic-seo/generate-pages.js` (rulat acum); (3) pastilele din footer afișează Vâlcea și pe homepage (linkuri interne automate, nu copy); (4) `curtea-de-arges` avea deja pagină în sitemap prin `customPages`; (5) coordonatele Vâlcea sunt aproximative; (6) rezultatele reale de ranking apar în GSC după reindexare.
+
 ## 📝 2026-10-06 — VideoFacade: contor la interacțiune și prioritate thumbnail
 - **Obiectiv:** Eliminarea cererilor inițiale pentru vizualizări, cu păstrarea SSG și a redării fluide.
 - **Fișiere modificate:** `src/components/VideoFacade.astro`, `src/pages/galerie-video.astro`, `scripts/video-views.test.cjs`, `cheia-ferrari/2-Tracker-SEO.md`, `cheia-ferrari/3-Jurnal-Actiuni.md`.

@@ -77,6 +77,8 @@ for (const loc of locations) {
     page = page.replace(/\{\{ORAS\}\}/g, escapeAstroString(loc.oras));
     page = page.replace(/\{\{JUDET\}\}/g, escapeAstroString(loc.judet));
     page = page.replace(/\{\{KEYWORD\}\}/g, escapeAstroString(loc.keyword));
+    page = page.replace(/\{\{H1\}\}/g, escapeAstroString(loc.h1 || `${loc.keyword} — Muzică Live Premium`));
+    page = page.replace(/\{\{H2\}\}/g, escapeAstroString(loc.h2 || `Formația Florentina Pană în ${loc.oras}`));
     page = page.replace(/\{\{SLUG\}\}/g, loc.slug);
     page = page.replace(/\{\{LAT\}\}/g, String(loc.lat));
     page = page.replace(/\{\{LNG\}\}/g, String(loc.lng));

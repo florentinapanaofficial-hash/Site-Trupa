@@ -42,6 +42,8 @@ export default defineConfig({
         `${siteUrl}/vlog/`,
         `${siteUrl}/cauti-formatie-nunta/`,
         `${siteUrl}/formatie-nunta/curtea-de-arges/`,
+        `${siteUrl}/formatie-nunta/ramnicu-valcea/`,
+        `${siteUrl}/formatie-nunta/valcea/`,
       ],
       filter: (page) => {
         // Exclude pagina de redirect /comunitatea-noastra/ (301 → /comunitate/)
