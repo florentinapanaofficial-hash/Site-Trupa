@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="360" viewBox="0 0 1080 360" fill="none" role="img" aria-labelledby="title description">
+  <title id="title">FP Band</title>
+  <desc id="description">Logo muzical premium pentru FP Band, cu monogramă, note muzicale și accente luminoase în degrade.</desc>
+  <defs>
+    <linearGradient id="spectrum" x1="52" y1="36" x2="315" y2="319" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#50F5FF"/>
+      <stop offset=".48" stop-color="#8B72FF"/>
+      <stop offset="1" stop-color="#FF4FA3"/>
+    </linearGradient>
+    <linearGradient id="letters" x1="388" y1="96" x2="901" y2="275" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#61F3FF"/>
+      <stop offset=".48" stop-color="#B394FF"/>
+      <stop offset="1" stop-color="#FFD166"/>
+    </linearGradient>
+    <radialGradient id="disc" cx="0" cy="0" r="1" gradientTransform="matrix(0 224 -224 0 180 36)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#202B55"/>
+      <stop offset="1" stop-color="#090D20"/>
+    </radialGradient>
+    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="7" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <circle cx="180" cy="180" r="143" fill="url(#disc)" stroke="url(#spectrum)" stroke-width="5"/>
+  <circle cx="180" cy="180" r="128" stroke="#FFFFFF" stroke-opacity=".13" stroke-width="1.5"/>
+  <g fill="url(#spectrum)" filter="url(#softGlow)">
+    <path d="M91 225V126h54c25 0 40 14 40 36s-15 36-40 36h-29v27H91Zm25-49h26c11 0 17-5 17-14s-6-14-17-14h-26v28Z"/>
+    <path d="M194 225V126h45c30 0 50 19 50 49s-20 50-50 50h-45Zm25-22h18c17 0 27-10 27-28s-10-27-27-27h-18v55Z"/>
+  </g>
+  <path d="M72 104v-26l34-10v25M72 78v38" stroke="#61F3FF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="67" cy="119" r="9" fill="#61F3FF"/>
+  <path d="M290 259v-28l32-9v28M290 231v38" stroke="#FFD166" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="285" cy="270" r="9" fill="#FFD166"/>
+  <path d="M373 274h530" stroke="url(#spectrum)" stroke-opacity=".65" stroke-width="2"/>
+  <text x="378" y="204" fill="url(#letters)" font-family="Arial, Helvetica, sans-serif" font-size="142" font-style="italic" font-weight="800" letter-spacing="-8">FP</text>
+  <text x="707" y="198" fill="#F7F7FF" font-family="Arial, Helvetica, sans-serif" font-size="74" font-weight="700" letter-spacing="12">BAND</text>
+  <g fill="url(#spectrum)">
+    <rect x="380" y="238" width="5" height="18" rx="2.5"/>
+    <rect x="393" y="229" width="5" height="27" rx="2.5"/>
+    <rect x="406" y="234" width="5" height="22" rx="2.5"/>
+    <rect x="419" y="221" width="5" height="35" rx="2.5"/>
+    <rect x="432" y="232" width="5" height="24" rx="2.5"/>
+    <rect x="445" y="226" width="5" height="30" rx="2.5"/>
+  </g>
+</svg>
