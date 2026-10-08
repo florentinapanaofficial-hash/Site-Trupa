@@ -1,3 +1,23 @@
+## 📝 08 oct 2026 — Integrarea logo-ului FP Band în site
+
+### Obiectiv
+- Afișarea conceptului FP Band creat anterior în elementele de branding vizibile ale site-ului.
+
+### Modificări
+- `src/components/Header.astro`: logo-ul concept este acum în header și meniul mobil; descrierea accesibilă și dimensiunile corespund formatului orizontal SVG.
+- `src/components/Footer.astro`: înlocuit logo-ul vechi cu conceptul FP Band.
+- `cheia-ferrari/2-Tracker-SEO.md`: înregistrată schimbarea de branding.
+
+### Validări
+- `npm run seo:check`: build PASS; 61 pagini HTML verificate, 0 FAIL | 0 WARN. Build-ul a emis mesajul cunoscut pentru pagina `momente-cu-mirii/` fără `MYSQL_URL`, cu fallback și finalizare reușită.
+- `npm test`: 83/83 teste PASS. Homepage-ul buildat conține cele 3 utilizări ale SVG-ului (header, meniu mobil, footer), iar fișierul există în output-ul public.
+- `git diff --check` PASS; scanarea fișierelor modificate pentru secrete: fără potriviri.
+
+### Riscuri / pași următori
+- Logo-ul din bara de navigare și footer este mai lat, pe formatul conceptului FP Band; nu s-au modificat metadatele, schema JSON-LD sau linkurile.
+
+---
+
 ## 📝 08 oct 2026 — Concept logo premium FP Band
 
 ### Obiectiv
