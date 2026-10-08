@@ -96,22 +96,17 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
 
 <header class="top-header fixed inset-x-0 top-0 z-[1200] border-b border-white/20 bg-ink" data-top-header>
   <div class="section-container header-bar flex items-center justify-between gap-2 py-3">
-    <a href={isHomePage ? '#acasa' : '/#acasa'} class="inline-flex items-center gap-3" aria-label="Formația Florentina Pană — mergi la începutul paginii">
+    <a href={isHomePage ? '#acasa' : '/#acasa'} class="inline-flex items-center gap-2 sm:gap-3" aria-label="Formația Florentina Pană — mergi la începutul paginii">
       <img
-        src="/images/sigla-fp-band-110.webp"
-        alt="Sigla Formația Florentina Pană (FP Band)"
-        class="h-8 w-auto max-w-[90px] sm:h-10 sm:max-w-[110px] rounded-lg object-contain shadow-[0_8px_24px_rgba(245,166,35,0.22)]"
+        src="/images/fp-band-logo-concept.svg"
+        alt="Logo FP Band — Formația Florentina Pană"
+        class="h-auto w-[120px] sm:w-[160px] object-contain"
         loading="eager"
         decoding="async"
-        width="110"
-        height="60"
+        width="1080"
+        height="360"
       />
-      <span class="leading-tight">
-        <span class="block text-xs font-bold tracking-tight text-white sm:hidden">Formația Florentina Pană</span>
-        <span class="hidden text-sm font-bold tracking-tight text-white sm:block sm:text-base">{brand.name}</span>
-        <span class="hidden text-xs text-white/85 sm:block">Live Band Premium</span>
-        <span class="header-premium-pill hidden sm:inline-flex">Rezervări 2026-2027</span>
-      </span>
+      <span class="header-premium-pill hidden sm:inline-flex">Rezervări 2026-2027</span>
     </a>
 
     <div class="flex items-center gap-1 sm:gap-2">
