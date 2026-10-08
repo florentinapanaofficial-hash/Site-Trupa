@@ -312,7 +312,7 @@ const viewsId = videoId && /^[A-Za-z0-9_-]{1,255}$/.test(videoId) ? videoId : de
 
   const facades = document.querySelectorAll<HTMLElement>('[data-video-facade]');
   if (facades.length > 0) {
-    if ('IntersectionObserver' in window) {
+    if (typeof IntersectionObserver !== 'undefined') {
       const observer = new IntersectionObserver((entries, obs) => {
         const shouldLoad = entries.some((entry) => entry.isIntersecting || entry.intersectionRatio > 0);
         if (!shouldLoad) return;

@@ -385,7 +385,7 @@ function scheduleFacadeBinding(): void {
 
   const idleCallback = 'requestIdleCallback' in window
     ? window.requestIdleCallback
-    : (cb: IdleRequestCallback | (() => void), _timeout?: number) => window.setTimeout(cb as () => void, 1200);
+    : (cb: IdleRequestCallback, _options?: IdleRequestOptions) => window.setTimeout(cb as () => void, 1200);
 
   const idleId = idleCallback(() => {
     observer.disconnect();
@@ -405,7 +405,7 @@ function scheduleFacadeBinding(): void {
 export function initVideoFacades(): void {
   if (typeof window === 'undefined') return;
 
-  const win = window as Window & Record<string, unknown>;
+  const win = window as Window & { __fp_video_facade_runtime_initialized__?: boolean };
   if (win.__fp_video_facade_runtime_initialized__) return;
   win.__fp_video_facade_runtime_initialized__ = true;
 

@@ -72,14 +72,14 @@ function frontend() {
         createElement: () => ({ focus: jest.fn() }),
     };
     const context = vm.createContext({
+        exports: {},
         window: { location: { origin: 'https://site.test' }, Stream: () => player, addEventListener: jest.fn() },
         document, fetch, Intl, URL, Set, Map, WeakMap, Response,
         localStorage: { getItem: () => 'granted' },
     });
-    const source = fs.readFileSync(path.join(__dirname, '../src/components/VideoFacade.astro'), 'utf8');
-    const script = source.slice(source.indexOf('<script>') + '<script>'.length, source.lastIndexOf('</script>'));
-    vm.runInContext(compile(script), context);
+    vm.runInContext(compile(fs.readFileSync(path.join(__dirname, '../src/lib/video-facade.ts'), 'utf8')), context);
     document.querySelectorAll = () => [facade];
+    context.exports.initVideoFacades();
     return { context, facade, fetch, listeners, facadeListeners, player, document };
 }
 

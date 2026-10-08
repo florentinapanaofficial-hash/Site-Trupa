@@ -12,34 +12,25 @@
 
 ---
 
-## 📝 08 oct 2026 — Fix rearanjare forțată (forced reflow) mobile-swipe.js — PSI mobil
+## 📝 08 oct 2026 — Rezolvarea erorilor preexistente VideoFacade (teste + TypeScript)
 
 ### Obiectiv
-- Eliminarea rearanjărilor forțate raportate de PageSpeed Insights mobil în `/js/mobile-swipe.js` (sursă minificată `1:2082` ≈ 184 ms — `isLowerPageReached`; `1:1017` ≈ 39 ms — scrierea necondiționată `scrollLeft = 0`; apel de top `2:1003` ≈ 39 ms).
-
-### Cauză
-- `isLowerPageReached()` citea `document.documentElement.scrollHeight` + `window.innerHeight` la FIECARE frame de scroll, iar pe homepage rula imediat după scrieri DOM (clase navbar/săgeți) → reflow forțat repetat (184 ms cumulat).
-- `setArrowEligibility()` apela sincron `applyArrowVisibilityByScroll()` imediat după scrierile din `setActiveHref()` → citire layout după scriere la fiecare init.
-- rAF-ul de init scria necondiționat `main.scrollLeft = 0` (clamp = flush de layout) și scroll-spy-ul homepage rula într-un al doilea rAF care citea `scrollY`/`innerHeight` după scrierile primului rAF.
+- Eliminarea celor 6 teste eșuate și a celor 3 erori `astro check` consemnate ca „preexistente” la sesiunea Reels R2, fără schimbarea comportamentului în browser.
 
 ### Modificări
-- `public/js/mobile-swipe.js`:
-  - Cache nou `cachedScrollableHeight` + `cachedViewportH` cu flag `docMetricsDirty`: metricele de document se citesc o singură dată (init) și doar când devin „murdare” (resize, `load`, `ResizeObserver` pe `documentElement`), nu la fiecare scroll.
-  - `applyArrowVisibilityByScroll()` restructurat pe faze READ → WRITE (regula de aur anti-layout-thrashing); `isLowerPageReached(scrollY)` primește scrollY-ul deja citit.
-  - `setArrowEligibility()` aplică vizibilitatea prin rAF (`requestArrowVisibilityUpdate`), nu sincron după scrieri DOM.
-  - Reset `scrollLeft` condiționat de citire (`if (main.scrollLeft !== 0)`), în același rAF READ-phase cu citirea metricelor.
-  - Scroll-spy homepage unificat în ACELAȘI rAF cu săgețile prin `homepageScrollHook(scrollY)` — un singur pipeline READ→WRITE per frame; eliminat al doilea rAF (`hpScrollRaf`); `updateActiveSection(scrollY)` folosește `cachedViewportH` în loc de `window.innerHeight`.
-  - Cleanup actualizat: `cancelAnimationFrame(arrowRafId)` + `docResizeObserver.disconnect()`.
+- `scripts/video-views.test.cjs`: `frontend()` compilează și evaluează `src/lib/video-facade.ts` (modulul în care fuseseră mutate `bindFacades`, `activate`, `trackView`, `loadViews`, `resetFacade`) în locul scriptului inline extras din `VideoFacade.astro`; contextul VM primește `exports`, iar `initVideoFacades()` rulează după stub-ul `querySelectorAll`, astfel încât listenerul `astro:page-load` există din nou. Corpul celor 6 teste este neschimbat.
+- `src/components/VideoFacade.astro`: condiția `'IntersectionObserver' in window` înlocuită cu `typeof IntersectionObserver !== 'undefined'` (același pattern ca în `r2-reels-player.ts`); TypeScript îngusta `window` la `never` pe ramura else și bloca `window.setTimeout`.
+- `src/lib/video-facade.ts`: fallback-ul `requestIdleCallback` acceptă `(cb: IdleRequestCallback, _options?: IdleRequestOptions)`, deci apelul cu `{ timeout: 1200 }` este tipat corect; castul `Window & Record<string, unknown>` înlocuit cu `Window & { __fp_video_facade_runtime_initialized__?: boolean }` (ts2352). Runtime identic.
 
 ### Validări
-- `npm run seo:check`: build + compresie PASS; **61 pagini verificate, 0 FAIL | 0 WARN**.
-- `node --check` pe sursă și pe fișierul minificat din `dist/client/js/`: PASS.
-- Smoke test jsdom (homepage, `/despre/`, `/cauti-formatie-nunta/`): 0 erori; `scrollHeight` citit O SINGURĂ dată pe sesiune (înainte: ~1 citire/frame de scroll); săgeata next apare pe homepage la ≥80% scroll și dispare la top; subpagini: eligibilitate prev/next corectă; cleanup `astro:before-swap` fără erori.
-- `npm test`: 69/75 — cele 6 eșecuri sunt preexistente în `scripts/video-views.test.cjs` (identice și fără modificările acestei sesiuni, verificate cu `git stash`), nelegate de mobile-swipe.
+- `npx astro check`: 0 erori | 0 warnings | 0 hints (97 fișiere) — înainte: 3 erori.
+- `npm test`: 75/75 PASS (înainte: 69 PASS / 6 FAIL).
+- `npm run seo:check`: build + compresie PASS; 61 pagini, 0 FAIL | 0 WARN.
 
 ### Riscuri / pași următori
-- „Folosește perioade eficiente ale memoriei cache — 5 KiB” din PSI: `/js/*` are deja `max-age=31536000` în `server.mjs`; economia rămasă provine din resurse third-party (nu e acționabilă server-side).
-- De remăsurat PageSpeed mobil după deploy pentru confirmarea dispariției secțiunii „Rearanjare forțată”.
+- Scriptul inline din `VideoFacade.astro` (loader-ul lazy) nu mai are test dedicat; logica testabilă trăiește integral în `src/lib/video-facade.ts`. Dacă loader-ul crește, merită test separat.
+
+---
 
 ## 📝 08 oct 2026 — Componentă modulară Reels pentru Cloudflare R2
 
