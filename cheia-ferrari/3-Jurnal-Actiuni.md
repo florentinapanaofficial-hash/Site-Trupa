@@ -1,3 +1,21 @@
+## 📝 08 oct 2026 — Concept logo premium FP Band
+
+### Obiectiv
+- Crearea unui concept de logo personalizat pentru FP Band, cu identitate muzicală, aspect premium și culori strălucitoare.
+
+### Modificări
+- `public/images/fp-band-logo-concept.svg` (NOU): concept vectorial autonom, cu monogramă FP, note muzicale, elemente de egalizator și degrade cyan-violet-roz-auriu. Nu înlocuiește încă siglele folosite în site; rămâne concept de revizuit.
+- `cheia-ferrari/2-Tracker-SEO.md`: adăugată nota sesiunii.
+
+### Validări
+- SVG valid XML; `npm run seo:check` PASS — build complet, 61 pagini verificate, 0 FAIL | 0 WARN. Build-ul a afișat avertismentul cunoscut pentru pagina `momente-cu-mirii/` fără `MYSQL_URL`, dar s-a încheiat cu succes.
+- `npm test`: 83/83 teste PASS. `git diff --check` PASS. Scanare fișiere modificate pentru secrete: fără potriviri. `npm ci` a instalat dependențele fără modificarea manifestelor.
+
+### Riscuri / pași următori
+- Fonturile textului din SVG depind de fonturile disponibile pe sistem; aprobarea conceptului înainte de conectarea lui în header/footer.
+
+---
+
 # 🏎️ JURNAL AI / FERRARI — Memorie Permanentă & Cartea de Service
 > **Singurul jurnal al proiectului.** Citit la fiecare sesiune nouă, ÎNAINTE de orice modificare.
 
