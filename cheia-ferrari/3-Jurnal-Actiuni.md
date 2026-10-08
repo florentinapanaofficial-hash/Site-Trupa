@@ -1,3 +1,24 @@
+## 📝 08 oct 2026 — Siglă FP Band în galeria video
+
+### Obiectiv
+- Înlocuirea siglei vechi afișate pe videoclipuri cu sigla FP Band folosită în header.
+
+### Modificări
+- `src/pages/galerie-video.astro`: fațada videoclipului în prim-plan, cardurile din categorii și playlist-urile folosesc `/images/fp-band-logo-concept.svg` cu dimensiunile intrinseci corecte (1080×360).
+- `src/components/VideoFacade.astro`: dimensiuni configurabile pentru logo, păstrând implicitul 56×56 pentru ceilalți utilizatori.
+- `cheia-ferrari/2-Tracker-SEO.md`: înregistrată modificarea și rezultatul auditului.
+
+### Validări
+- `npm run seo:check`: build PASS; 61 pagini verificate, 0 FAIL | 0 WARN. HTML-ul generat pentru `/galerie-video/` conține noua siglă în toate cele 20 apariții ale componentei.
+- `npx astro check`: 0 erori | 0 warnings | 0 hints (96 fișiere); `npm test`: 83/83 PASS.
+- Build-ul a emis mesajul cunoscut că lipsește `MYSQL_URL` pe pagina `momente-cu-mirii/`; fallback-ul a funcționat, build-ul s-a încheiat cu succes.
+- `git diff --check` PASS; scanarea modificărilor pentru secrete: fără potriviri.
+
+### Riscuri / pași următori
+- Sigla veche rămâne favicon-ul site-ului; această cerere vizează strict siglele afișate peste videoclipurile din galeria video. Metadatele și schema JSON-LD nu s-au modificat.
+
+---
+
 ## 📝 08 oct 2026 — Integrarea logo-ului FP Band în site
 
 ### Obiectiv
