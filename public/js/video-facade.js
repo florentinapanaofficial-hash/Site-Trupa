@@ -1,3 +1,15 @@
+/**
+ * Runtime VideoFacade — încărcat LA CERERE de loader-ul `is:inline` din
+ * `src/components/VideoFacade.astro` prin `import('/js/video-facade.js')`.
+ *
+ * Trăiește în `public/js/` (URL stabil, fără hash) tocmai ca HTML-ul să nu mai
+ * aibă niciun lanț critic de module `/_astro/*` (PageSpeed: „Avoid chaining
+ * critical requests"). În `dist/client` fișierul este minificat și pre-comprimat
+ * de `scripts/compress.mjs`; sursa de aici rămâne lizibilă.
+ *
+ * Testat de `scripts/video-views.test.cjs` (funcțiile runtime — bindFacades,
+ * activate, trackView, loadViews, resetFacade — rămân aici, la nivel de modul).
+ */
 const ALLOWED_HOSTS = [
   'www.youtube-nocookie.com',
   'youtube-nocookie.com',
@@ -9,24 +21,7 @@ const ALLOWED_HOSTS = [
   'customer-*.cloudflarestream.com',
 ];
 
-type StreamPlayer = {
-  addEventListener: (event: string, listener: () => void) => void;
-  removeEventListener: (event: string, listener: () => void) => void;
-};
-
-type YoutubePlayer = { destroy: () => void };
-
-type VideoWindow = Window & {
-  Stream?: (iframe: HTMLIFrameElement) => StreamPlayer;
-  YT?: {
-    Player: new (iframe: HTMLIFrameElement, options: {
-      events: { onStateChange: (event: { data: number }) => void };
-    }) => YoutubePlayer;
-  };
-  onYouTubeIframeAPIReady?: () => void;
-};
-
-function isAllowedHost(host: string): boolean {
+function isAllowedHost(host) {
   return ALLOWED_HOSTS.some((pattern) => {
     if (!pattern.includes('*')) return host === pattern;
     const [prefix, suffix] = pattern.split('*');
@@ -34,7 +29,7 @@ function isAllowedHost(host: string): boolean {
   });
 }
 
-function buildAutoplayUrl(raw: string): string | null {
+function buildAutoplayUrl(raw) {
   try {
     const url = new URL(raw, window.location.origin);
     if (url.protocol !== 'https:' || !isAllowedHost(url.hostname)) return null;
@@ -47,18 +42,18 @@ function buildAutoplayUrl(raw: string): string | null {
 
 const VIEWS_ENDPOINT = '/api/track-video/';
 const viewsFormatter = new Intl.NumberFormat('ro-RO');
-const trackedVideos = new Set<string>();
-const latestViews = new Map<string, number>();
-const playerCleanup = new WeakMap<HTMLElement, () => void>();
-const videoWindow = window as VideoWindow;
-let streamSdk: Promise<void> | undefined;
-let youtubeSdk: Promise<void> | undefined;
+const trackedVideos = new Set();
+const latestViews = new Map();
+const playerCleanup = new WeakMap();
+const videoWindow = window;
+let streamSdk;
+let youtubeSdk;
 
-function loadPlayerSdk(youtube: boolean): Promise<void> {
+function loadPlayerSdk(youtube) {
   if (youtube ? videoWindow.YT?.Player : videoWindow.Stream) return Promise.resolve();
   const existing = youtube ? youtubeSdk : streamSdk;
   if (existing) return existing;
-  const promise = new Promise<void>((resolve, reject) => {
+  const promise = new Promise((resolve, reject) => {
     const script = document.createElement('script');
     const timeout = window.setTimeout(() => reject(new Error('Video SDK timeout.')), 15000);
     const ready = () => {
@@ -96,20 +91,20 @@ function loadPlayerSdk(youtube: boolean): Promise<void> {
   return promise;
 }
 
-const coverNodes = new WeakMap<HTMLElement, Node[]>();
+const coverNodes = new WeakMap();
 
-function renderViews(facade: HTMLElement, views: number): void {
+function renderViews(facade, views) {
   facade.dataset.videoViews = String(views);
-  const badge = facade.querySelector<HTMLElement>('[data-video-views]');
+  const badge = facade.querySelector('[data-video-views]');
   if (!badge) return;
-  const count = badge.querySelector<HTMLElement>('[data-video-views-count]');
+  const count = badge.querySelector('[data-video-views-count]');
   if (count) count.textContent = viewsFormatter.format(views);
   badge.hidden = false;
   badge.setAttribute('aria-label', String(views) + ' vizualizări');
 }
 
-async function loadViews(facades: HTMLElement[]): Promise<void> {
-  const ids: string[] = [];
+async function loadViews(facades) {
+  const ids = [];
   facades.forEach((facade) => {
     const id = facade.dataset.videoId;
     if (id) ids.push(id);
@@ -122,7 +117,7 @@ async function loadViews(facades: HTMLElement[]): Promise<void> {
       cache: 'no-store',
     });
     if (!res.ok) return;
-    const data = (await res.json()) as { views?: Record<string, number> };
+    const data = await res.json();
     facades.forEach((facade) => {
       const id = facade.dataset.videoId || '';
       const loaded = data.views?.[id];
@@ -135,7 +130,7 @@ async function loadViews(facades: HTMLElement[]): Promise<void> {
   }
 }
 
-async function trackView(facade: HTMLElement): Promise<void> {
+async function trackView(facade) {
   const videoId = facade.dataset.videoId;
   if (!videoId || trackedVideos.has(videoId)) return;
   trackedVideos.add(videoId);
@@ -148,13 +143,13 @@ async function trackView(facade: HTMLElement): Promise<void> {
     });
     if (res.status === 429) return;
     if (!res.ok) throw new Error('Video tracking failed.');
-    const data = (await res.json()) as { views_count?: number };
+    const data = await res.json();
     const views = data.views_count;
     if (typeof views !== 'number' || !Number.isSafeInteger(views) || views < 0) {
       throw new Error('Video count invalid.');
     }
     latestViews.set(videoId, views);
-    document.querySelectorAll<HTMLElement>('[data-video-facade]').forEach((f) => {
+    document.querySelectorAll('[data-video-facade]').forEach((f) => {
       if (f.dataset.videoId === videoId) renderViews(f, views);
     });
   } catch {
@@ -162,7 +157,7 @@ async function trackView(facade: HTMLElement): Promise<void> {
   }
 }
 
-function resetFacade(facade: HTMLElement): void {
+function resetFacade(facade) {
   const nodes = coverNodes.get(facade);
   if (!nodes) return;
   playerCleanup.get(facade)?.();
@@ -177,8 +172,8 @@ function resetFacade(facade: HTMLElement): void {
   if (facade.dataset.videoViews) renderViews(facade, Number(facade.dataset.videoViews));
 }
 
-function stopOthers(current: HTMLElement): void {
-  document.querySelectorAll<HTMLElement>('[data-video-facade]').forEach((facade) => {
+function stopOthers(current) {
+  document.querySelectorAll('[data-video-facade]').forEach((facade) => {
     if (facade === current) return;
     if (facade.dataset.videoActive === 'true') resetFacade(facade);
     if (facade.dataset.videoPending === 'true') {
@@ -188,7 +183,7 @@ function stopOthers(current: HTMLElement): void {
   });
 }
 
-async function activate(facade: HTMLElement): Promise<void> {
+async function activate(facade) {
   if (facade.dataset.videoActive === 'true') return;
   const src = buildAutoplayUrl(facade.dataset.videoUrl || '');
   if (!src) return;
@@ -225,7 +220,7 @@ async function activate(facade: HTMLElement): Promise<void> {
     // SDK-ul nu este critic pentru redarea statică a fațadei.
   }
   if (!facade.isConnected || coverNodes.get(facade) !== nodes) return;
-  const badge = facade.querySelector<HTMLElement>('[data-video-views]')?.cloneNode(true) as HTMLElement | undefined;
+  const badge = facade.querySelector('[data-video-views]')?.cloneNode(true);
   if (badge) {
     badge.classList.add('absolute', 'bottom-3', 'right-3', 'z-10', 'pointer-events-none');
   }
@@ -241,7 +236,7 @@ async function activate(facade: HTMLElement): Promise<void> {
   } else if (youtube && videoWindow.YT?.Player) {
     const player = new videoWindow.YT.Player(iframe, {
       events: {
-        onStateChange: (event: { data: number }) => {
+        onStateChange: (event) => {
           if (event.data === 1) onPlay();
         },
       },
@@ -251,7 +246,7 @@ async function activate(facade: HTMLElement): Promise<void> {
   iframe.focus();
 }
 
-function hasConsent(): boolean {
+function hasConsent() {
   try {
     return localStorage.getItem('cookie_consent') === 'granted';
   } catch {
@@ -259,16 +254,16 @@ function hasConsent(): boolean {
   }
 }
 
-function toggleConsentPanel(facade: HTMLElement, show: boolean): void {
-  const panel = facade.querySelector<HTMLElement>('[data-video-consent]');
+function toggleConsentPanel(facade, show) {
+  const panel = facade.querySelector('[data-video-consent]');
   if (!panel) return;
   panel.hidden = !show;
   panel.classList.toggle('hidden', !show);
   panel.classList.toggle('flex', show);
-  if (show) panel.querySelector<HTMLButtonElement>('[data-video-consent-accept]')?.focus();
+  if (show) panel.querySelector('[data-video-consent-accept]')?.focus();
 }
 
-function requestPlay(facade: HTMLElement): void {
+function requestPlay(facade) {
   if (facade.dataset.videoActive === 'true') return;
   if (hasConsent()) {
     activate(facade);
@@ -279,7 +274,7 @@ function requestPlay(facade: HTMLElement): void {
   toggleConsentPanel(facade, true);
 }
 
-function grantConsent(facade: HTMLElement): void {
+function grantConsent(facade) {
   try {
     localStorage.setItem('cookie_consent', 'granted');
   } catch {
@@ -289,22 +284,22 @@ function grantConsent(facade: HTMLElement): void {
   activate(facade);
 }
 
-function setInfoPanel(facade: HTMLElement, open: boolean): void {
-  const panel = facade.querySelector<HTMLElement>('[data-video-info-panel]');
-  const trigger = facade.querySelector<HTMLButtonElement>('[data-video-info-open]');
+function setInfoPanel(facade, open) {
+  const panel = facade.querySelector('[data-video-info-panel]');
+  const trigger = facade.querySelector('[data-video-info-open]');
   if (!panel || !trigger) return;
   panel.inert = !open;
   panel.classList.toggle('opacity-0', !open);
   panel.classList.toggle('pointer-events-none', !open);
   panel.classList.toggle('opacity-100', open);
   trigger.setAttribute('aria-expanded', String(open));
-  if (open) panel.querySelector<HTMLButtonElement>('[data-video-info-close]')?.focus();
+  if (open) panel.querySelector('[data-video-info-close]')?.focus();
   else trigger.focus();
 }
 
-function bindInfo(facade: HTMLElement): void {
-  const trigger = facade.querySelector<HTMLButtonElement>('[data-video-info-open]');
-  const panel = facade.querySelector<HTMLElement>('[data-video-info-panel]');
+function bindInfo(facade) {
+  const trigger = facade.querySelector('[data-video-info-open]');
+  const panel = facade.querySelector('[data-video-info-panel]');
   if (!trigger || !panel) return;
 
   trigger.addEventListener('click', (event) => {
@@ -314,7 +309,7 @@ function bindInfo(facade: HTMLElement): void {
 
   panel.addEventListener('click', (event) => {
     event.stopPropagation();
-    if ((event.target as HTMLElement | null)?.closest('[data-video-info-close]')) {
+    if (event.target?.closest('[data-video-info-close]')) {
       setInfoPanel(facade, false);
     }
   });
@@ -325,14 +320,14 @@ function bindInfo(facade: HTMLElement): void {
   });
 }
 
-function bindFacades(): void {
-  document.querySelectorAll<HTMLElement>('[data-video-facade]').forEach((facade) => {
+function bindFacades() {
+  document.querySelectorAll('[data-video-facade]').forEach((facade) => {
     if (facade.dataset.videoBound === 'true') return;
     facade.dataset.videoBound = 'true';
     bindInfo(facade);
 
     facade.addEventListener('click', (event) => {
-      const target = event.target as HTMLElement | null;
+      const target = event.target;
       if (target?.closest('[data-video-consent]')) {
         if (target.closest('[data-video-consent-accept]')) {
           void loadViews([facade]);
@@ -357,8 +352,8 @@ function bindFacades(): void {
   });
 }
 
-function scheduleFacadeBinding(): void {
-  const facades = Array.from(document.querySelectorAll<HTMLElement>('[data-video-facade]'));
+function scheduleFacadeBinding() {
+  const facades = Array.from(document.querySelectorAll('[data-video-facade]'));
   if (!facades.length) return;
 
   const runWhenReady = () => {
@@ -385,7 +380,7 @@ function scheduleFacadeBinding(): void {
 
   const idleCallback = 'requestIdleCallback' in window
     ? window.requestIdleCallback
-    : (cb: IdleRequestCallback, _options?: IdleRequestOptions) => window.setTimeout(cb as () => void, 1200);
+    : (cb, _options) => window.setTimeout(cb, 1200);
 
   const idleId = idleCallback(() => {
     observer.disconnect();
@@ -402,15 +397,15 @@ function scheduleFacadeBinding(): void {
   }
 }
 
-export function initVideoFacades(): void {
+export function initVideoFacades() {
   if (typeof window === 'undefined') return;
 
-  const win = window as Window & { __fp_video_facade_runtime_initialized__?: boolean };
+  const win = window;
   if (win.__fp_video_facade_runtime_initialized__) return;
   win.__fp_video_facade_runtime_initialized__ = true;
 
   window.addEventListener('cookie:granted', () => {
-    document.querySelectorAll<HTMLElement>('[data-video-facade]').forEach((facade) => {
+    document.querySelectorAll('[data-video-facade]').forEach((facade) => {
       if (facade.dataset.videoPending === 'true') {
         const src = buildAutoplayUrl(facade.dataset.videoUrl || '');
         if (src) {
@@ -423,7 +418,6 @@ export function initVideoFacades(): void {
   scheduleFacadeBinding();
   document.addEventListener('astro:page-load', scheduleFacadeBinding);
   document.addEventListener('astro:before-swap', () => {
-    document.querySelectorAll<HTMLElement>('[data-video-facade]').forEach(resetFacade);
+    document.querySelectorAll('[data-video-facade]').forEach(resetFacade);
   });
 }
-

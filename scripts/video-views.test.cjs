@@ -77,7 +77,7 @@ function frontend() {
         document, fetch, Intl, URL, Set, Map, WeakMap, Response,
         localStorage: { getItem: () => 'granted' },
     });
-    vm.runInContext(compile(fs.readFileSync(path.join(__dirname, '../src/lib/video-facade.ts'), 'utf8')), context);
+    vm.runInContext(compile(fs.readFileSync(path.join(__dirname, '../public/js/video-facade.js'), 'utf8')), context);
     document.querySelectorAll = () => [facade];
     context.exports.initVideoFacades();
     return { context, facade, fetch, listeners, facadeListeners, player, document };
