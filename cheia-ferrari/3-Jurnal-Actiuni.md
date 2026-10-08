@@ -31,12 +31,14 @@
 - `npm test`: 69 PASS / 6 FAIL; cele 6 erori provin din testele preexistente VideoFacade, care caută funcții mutate deja în modulul separat. Fișierele respective sunt nemodificate.
 - `npx astro check`: 3 erori preexistente în `VideoFacade.astro` și `video-facade.ts`; niciun diagnostic TypeScript nou în componentă/module.
 - Build-ul folosește fallback-ul existent pentru galerie în lipsa `MYSQL_URL`; nu au fost adăugate dependențe.
+- CodeQL JavaScript: 0 alerte; revizie separată code-review: fără probleme semnificative (revizorul inclus în parallel_validation nu era disponibil).
+- Scanarea celor 7 fișiere modificate: fără secrete; `git diff --check` PASS. Fișierele cu erori preexistente au fost comparate cu baza și sunt identice.
 
 ### Riscuri / pași următori
 - Nu au fost furnizate obiecte R2 reale: nu inventăm URL-uri, date de publicare sau clipuri și nu montăm secțiunea goală în homepage.
 - Pentru producție: domeniu custom R2, MP4 H.264/AAC fast-start, byte ranges 206, MIME corect și cache pe chei versionate; captions necesită CORS și `cors=true`.
 - TBT/CLS ale paginii întregi și accesul efectiv la R2 trebuie măsurate după integrarea cu fișiere reale; nu garantăm valori zero numai din cod.
-- Revizia automată și scanarea de secrete se consemnează după rulare.
+- Componenta nu schimbă metadata paginilor existente; auditul paginilor nu înlocuiește măsurarea unei integrări reale.
 
 ---
 
