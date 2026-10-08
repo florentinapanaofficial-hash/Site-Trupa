@@ -8,7 +8,8 @@
 - `cheia-ferrari/2-Tracker-SEO.md`: adăugată nota sesiunii.
 
 ### Validări
-- De rulat: validare XML/SVG, build, teste și `npm run seo:check`; `dist/client` nu exista la începutul sesiunii, deci auditul inițial nu a putut fi rulat.
+- SVG valid XML; `npm run seo:check` PASS — build complet, 61 pagini verificate, 0 FAIL | 0 WARN. Build-ul a afișat avertismentul cunoscut pentru pagina `momente-cu-mirii/` fără `MYSQL_URL`, dar s-a încheiat cu succes.
+- `npm test`: 83/83 teste PASS. `git diff --check` PASS. Scanare fișiere modificate pentru secrete: fără potriviri. `npm ci` a instalat dependențele fără modificarea manifestelor.
 
 ### Riscuri / pași următori
 - Fonturile textului din SVG depind de fonturile disponibile pe sistem; aprobarea conceptului înainte de conectarea lui în header/footer.
