@@ -1,0 +1,168 @@
+---
+/**
+ * Import R2Reels from '../components/R2Reels.astro' and render
+ * <R2Reels id="reels-acasa" reels={clips} /> inside BaseLayout.
+ * Pass R2Reel[] with real public src/poster URLs and publication dates.
+ * Each instance needs a unique id. No homepage content is changed automatically.
+ *
+ * R2: use a production custom domain, MP4 H.264/AAC with fast-start and
+ * correctly sized WebP posters. Serve Content-Type, Content-Length, byte-range
+ * requests (206) and immutable caching on versioned object keys.
+ * Allow the asset origin in deployment CSP media-src/img-src; WebVTT also
+ * requires connect-src and CORS GET/HEAD for the site's origin. Set cors=true
+ * only when R2 returns Access-Control-Allow-Origin (required for captions).
+ * Never put bucket credentials or expiring signed URLs in component props.
+ */
+import { prepareReels, reelsGraph, type R2Reel } from '../lib/r2-reels';
+
+interface Props {
+    id: string;
+    reels: readonly R2Reel[];
+    heading?: string;
+    /** Requires Access-Control-Allow-Origin on all R2 assets. */
+    cors?: boolean;
+}
+
+const {
+    id,
+    reels,
+    heading = 'Energia noastră live, în câteva secunde',
+    cors = false,
+} = Astro.props;
+if (!/^[a-zA-Z][a-zA-Z0-9_-]*$/.test(id)) {
+    throw new Error('R2Reels requires a unique HTML section id.');
+}
+const clips = prepareReels(reels);
+if (!cors && clips.some((clip) => clip.captions)) {
+    throw new Error('R2Reels captions require cors=true and R2 CORS headers.');
+}
+const pageUrl = new URL(
+    `${Astro.url.pathname.replace(/\/$/, '')}/`,
+    Astro.site ?? 'https://www.florentinapanaofficial.ro',
+).href;
+const schema = JSON.stringify(reelsGraph(clips, pageUrl, id)).replace(/</g, '\\u003c');
+---
+
+{clips.length > 0 && (
+    <section id={id} class="r2-reels mx-auto w-full max-w-6xl px-4 py-12" aria-labelledby={`${id}-heading`}>
+        <header class="mb-6">
+            <h2 id={`${id}-heading`} class="text-2xl font-bold text-white md:text-3xl">{heading}</h2>
+            <p class="mt-3 max-w-2xl text-white/80">
+                Florentina Pană și trupa aduc energie pe ring: muzică de petrecere,
+                populară, pop covers, ritmuri grecești și orientale. Alege un moment și ascultă-ne live.
+            </p>
+        </header>
+        <fp-r2-reels>
+            <ul class="r2-reels-list" aria-label="Momente video live">
+                {clips.map((clip) => (
+                    <li>
+                        <article aria-labelledby={`${id}-${clip.id}-title`} data-reel>
+                            <figure class="r2-reel-frame">
+                                <video
+                                    id={`${id}-${clip.id}-video`}
+                                    data-reel-video
+                                    data-src={clip.src}
+                                    preload="none"
+                                    playsinline
+                                    controls
+                                    crossorigin={cors ? 'anonymous' : undefined}
+                                    width="360"
+                                    height="640"
+                                    tabindex="0"
+                                    aria-label={clip.title}
+                                    aria-describedby={`${id}-${clip.id}-description`}
+                                >
+                                    {clip.captions && (
+                                        <track data-src={clip.captions} kind="captions" srclang="ro" label="Română" default />
+                                    )}
+                                    Browserul tău nu acceptă redarea video.
+                                </video>
+                                <img data-reel-poster src={clip.poster} alt={`Moment live: ${clip.title}`}
+                                    width="360" height="640" loading="lazy" decoding="async" />
+                                <button type="button" data-reel-play class="r2-reel-play"
+                                    aria-label={`Redă: ${clip.title}`} aria-controls={`${id}-${clip.id}-video`}>
+                                    <span aria-hidden="true">▶</span> Redă momentul
+                                </button>
+                            </figure>
+                            <h3 id={`${id}-${clip.id}-title`} class="mt-3 text-lg font-semibold text-white">{clip.title}</h3>
+                            <p id={`${id}-${clip.id}-description`} class="mt-1 text-sm text-white/80">{clip.description}</p>
+                            <p data-reel-status class="r2-reel-status text-sm text-white/80" role="status" aria-live="polite"></p>
+                            <a href={clip.src} class="text-sm text-white underline">Deschide videoclipul: {clip.title}</a>
+                        </article>
+                    </li>
+                ))}
+            </ul>
+        </fp-r2-reels>
+        <footer class="mt-8">
+            <p class="mb-3 text-white/80">Îți imaginezi această atmosferă la evenimentul tău?</p>
+            <a href="/contact/" class="inline-flex rounded-full bg-yellow-400 px-6 py-3 font-semibold text-slate-950">
+                Verifică disponibilitatea trupei
+            </a>
+        </footer>
+        <script is:inline type="application/ld+json" set:html={schema} />
+    </section>
+)}
+
+<style>
+    fp-r2-reels { display: block; }
+    .r2-reels-list {
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: min(80vw, 20rem);
+        gap: 1.25rem;
+        overflow-x: auto;
+        scroll-snap-type: x proximity;
+        padding: .25rem .25rem 1rem;
+        list-style: none;
+        margin: 0;
+    }
+    .r2-reels-list > li { min-width: 0; scroll-snap-align: start; }
+    .r2-reel-frame {
+        position: relative;
+        aspect-ratio: 9 / 16;
+        overflow: hidden;
+        border-radius: 1rem;
+        background: #050a18;
+        margin: 0;
+    }
+    .r2-reel-frame video, .r2-reel-frame img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+    .r2-reel-frame img { object-fit: cover; pointer-events: none; }
+    .r2-reel-play {
+        position: absolute;
+        inset: auto 1rem 1rem;
+        padding: .875rem;
+        min-height: 44px;
+        border-radius: 999px;
+        background: #facc15;
+        color: #020617;
+        font-weight: 700;
+        cursor: pointer;
+    }
+    .r2-reels :is(a, button, video):focus-visible { outline: 3px solid #facc15; outline-offset: 3px; }
+    .r2-reel-frame [hidden] { display: none; }
+    .r2-reel-status { height: 4.5rem; overflow: auto; margin: .5rem 0; }
+</style>
+
+<script>
+    import { mountR2Reels } from '../lib/r2-reels-player';
+
+    if (!customElements.get('fp-r2-reels')) {
+        customElements.define('fp-r2-reels', class extends HTMLElement {
+            cleanup?: () => void;
+            connectedCallback() {
+                this.cleanup?.();
+                this.cleanup = mountR2Reels(this);
+            }
+            disconnectedCallback() {
+                this.cleanup?.();
+                this.cleanup = undefined;
+            }
+        });
+    }
+</script>
