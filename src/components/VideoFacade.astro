@@ -32,6 +32,8 @@ interface Props {
   subtitle?: string;
   /** Siglă opțională afișată dreapta-sus (cale din `public/`). */
   logoSrc?: string;
+  logoWidth?: number;
+  logoHeight?: number;
   /** Sursa iframe-ului injectat la click. */
   videoUrl: string;
   /** ID stabil pentru contorul de vizualizări; implicit derivat din `videoUrl`. */
@@ -49,6 +51,8 @@ const {
   title,
   subtitle,
   logoSrc,
+  logoWidth = 56,
+  logoHeight = 56,
   videoUrl,
   videoId,
   description,
@@ -159,8 +163,8 @@ facadeLocals.__fpVideoFacadeLoaderRendered = true;
       <img
         src={safeLogoSrc}
         alt={brandName}
-        width="56"
-        height="56"
+        width={logoWidth}
+        height={logoHeight}
         loading="lazy"
         decoding="async"
         class="h-8 w-auto opacity-90 drop-shadow-lg md:h-12"

@@ -4,7 +4,8 @@
 - Înlocuirea siglei vechi afișate pe videoclipuri cu sigla FP Band folosită în header.
 
 ### Modificări
-- `src/pages/galerie-video.astro`: fațada videoclipului în prim-plan, cardurile din categorii și playlist-urile folosesc `/images/fp-band-logo-concept.svg`.
+- `src/pages/galerie-video.astro`: fațada videoclipului în prim-plan, cardurile din categorii și playlist-urile folosesc `/images/fp-band-logo-concept.svg` cu dimensiunile intrinseci corecte (1080×360).
+- `src/components/VideoFacade.astro`: dimensiuni configurabile pentru logo, păstrând implicitul 56×56 pentru ceilalți utilizatori.
 - `cheia-ferrari/2-Tracker-SEO.md`: înregistrată modificarea și rezultatul auditului.
 
 ### Validări
