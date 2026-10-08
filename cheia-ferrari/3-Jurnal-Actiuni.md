@@ -12,6 +12,26 @@
 
 ---
 
+## 📝 08 oct 2026 — Rezolvarea erorilor preexistente VideoFacade (teste + TypeScript)
+
+### Obiectiv
+- Eliminarea celor 6 teste eșuate și a celor 3 erori `astro check` consemnate ca „preexistente” la sesiunea Reels R2, fără schimbarea comportamentului în browser.
+
+### Modificări
+- `scripts/video-views.test.cjs`: `frontend()` compilează și evaluează `src/lib/video-facade.ts` (modulul în care fuseseră mutate `bindFacades`, `activate`, `trackView`, `loadViews`, `resetFacade`) în locul scriptului inline extras din `VideoFacade.astro`; contextul VM primește `exports`, iar `initVideoFacades()` rulează după stub-ul `querySelectorAll`, astfel încât listenerul `astro:page-load` există din nou. Corpul celor 6 teste este neschimbat.
+- `src/components/VideoFacade.astro`: condiția `'IntersectionObserver' in window` înlocuită cu `typeof IntersectionObserver !== 'undefined'` (același pattern ca în `r2-reels-player.ts`); TypeScript îngusta `window` la `never` pe ramura else și bloca `window.setTimeout`.
+- `src/lib/video-facade.ts`: fallback-ul `requestIdleCallback` acceptă `(cb: IdleRequestCallback, _options?: IdleRequestOptions)`, deci apelul cu `{ timeout: 1200 }` este tipat corect; castul `Window & Record<string, unknown>` înlocuit cu `Window & { __fp_video_facade_runtime_initialized__?: boolean }` (ts2352). Runtime identic.
+
+### Validări
+- `npx astro check`: 0 erori | 0 warnings | 0 hints (97 fișiere) — înainte: 3 erori.
+- `npm test`: 75/75 PASS (înainte: 69 PASS / 6 FAIL).
+- `npm run seo:check`: build + compresie PASS; 61 pagini, 0 FAIL | 0 WARN.
+
+### Riscuri / pași următori
+- Scriptul inline din `VideoFacade.astro` (loader-ul lazy) nu mai are test dedicat; logica testabilă trăiește integral în `src/lib/video-facade.ts`. Dacă loader-ul crește, merită test separat.
+
+---
+
 ## 📝 08 oct 2026 — Componentă modulară Reels pentru Cloudflare R2
 
 ### Obiectiv
