@@ -12,6 +12,29 @@ const whatsappNumber = contact.phoneRaw.replace(/\D/g, '');
 const whatsappBase = `https://wa.me/${whatsappNumber}`;
 const whatsappPrefilledText = encodeURIComponent('Bună ziua! Aș dori informații pentru rezervare în sezonul 2026-2027.');
 const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
+
+// Schema ContactPage + ContactPoint — legată prin @id de MusicGroup din BaseLayout
+// (înlocuiește vechea injecție `seo.schema`, care dubla schema MusicGroup globală)
+const SITE = 'https://www.florentinapanaofficial.ro';
+const contactPageLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ContactPage',
+  '@id': `${SITE}/contact/#contact-page`,
+  name: contactSeo.meta.title,
+  description: contactSeo.meta.description,
+  url: `${SITE}/contact/`,
+  inLanguage: 'ro',
+  about: { '@type': 'MusicGroup', '@id': `${SITE}/#music-group` },
+  mainEntity: {
+    '@type': 'ContactPoint',
+    contactType: 'customer service',
+    telephone: seo.schema.telephone,
+    email: seo.schema.email,
+    url: `${SITE}/contact/`,
+    availableLanguage: ['ro', 'en'],
+    areaServed: 'RO',
+  },
+};
 ---
 
 <BaseLayout title={contactSeo.meta.title} description={contactSeo.meta.description}>
@@ -106,7 +129,7 @@ const whatsappMessageLink = `${whatsappBase}?text=${whatsappPrefilledText}`;
   </section>
 
   <Fragment slot="head">
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(seo.schema)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(contactPageLd)} />
   </Fragment>
 
   <style>

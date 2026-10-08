@@ -5,8 +5,9 @@ interface Props {
   subtitle: string;
   showReviews?: boolean;
   posterImage?: string;
-  /** h1 implicit; folosește h2 când pagina are deja un H1 propriu. */
-  titleTag?: 'h1' | 'h2';
+  /** h1 implicit; h2 când pagina are deja un H1 propriu; p când H1-ul paginii
+      apare mai jos în DOM (păstrează ierarhia headings corectă, stil identic). */
+  titleTag?: 'h1' | 'h2' | 'p';
 }
 
 const { videoUrl, title, subtitle, showReviews = false, posterImage, titleTag = 'h1' } = Astro.props;
