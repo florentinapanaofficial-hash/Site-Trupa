@@ -12,6 +12,33 @@
 
 ---
 
+## 📝 08 oct 2026 — Container Google Tag Manager GTM-N44548RF
+
+### Obiectiv
+- Configurarea containerului GTM cerut pe toate paginile care folosesc layout-ul comun, fără regresii în consimțământul GDPR sau în tracking-ul existent.
+
+### Modificări
+- `src/layouts/BaseLayout.astro`: adăugat `gtmId = 'GTM-N44548RF'` și transmis în configurația comună `window.__FP_TRACKING_IDS__`. Nu exista un container GTM vechi sau un iframe noscript în cod; încărcarea Google existentă era GA4 (`gtag/js`), nu GTM.
+- `public/js/tracking-pixels.js`: încărcare unică, asincronă a `gtm.js` doar după consimțământ, păstrarea `dataLayer` existent, eveniment `gtm.js` de bootstrap și `fp_page_view` cu URL/titlu la inițializare și navigările `astro:page-load`. Fluxurile GA4/Meta/TikTok rămân intacte; evenimentele proprii verifică acordul înainte de trimitere.
+- `src/components/CookieBanner.astro`: URL versionat `/js/tracking-pixels.js?v=gtm-n44548rf` pentru a evita runtime-ul vechi din cache-ul de un an; documentația consimțământului include GTM.
+- `scripts/tracking-pixels.test.cjs`: 8 teste pentru acord/refuz, localStorage indisponibil, încărcare unică, dataLayer existent, navigare Astro, schimbarea acordului, compatibilitate GA4 și configurația layout/loader.
+- `cheia-ferrari/2-Tracker-SEO.md`: înregistrată validarea sesiunii. Titlurile, descrierile, schema JSON-LD, imaginile și linkurile interne nu au fost modificate.
+
+### Validări
+- `npm test`: 83/83 PASS (4 suite, inclusiv cele 8 teste noi).
+- `npx astro check`: 96 fișiere, 0 erori | 0 warnings | 0 hints.
+- `npm run seo:check`: build și compresie PASS; 61 pagini HTML verificate, **0 FAIL | 0 WARN**.
+- Verificare pe output: 59 pagini cu configurația comună au noul ID și loader-ul versionat; JSON-LD parsabil. Execuție VM a configurației din HTML și runtime-ului minificat: fără request GTM înainte de accept, URL container corect după accept, navigare fără reîncărcarea containerului.
+- `npm run seo:weekly`: build/audit PASS, însă etapa linkurilor externe a raportat 66 `fetch failed` (0 OK); testele au fost rulate separat și trec. Linkurile nu au fost schimbate; validarea externă rămâne neconfirmată în acest mediu.
+- `git diff --check` PASS; verificare manuală a consimțământului și scanare a fișierelor de cod modificate pentru secrete: fără potriviri. GTM ID este un identificator public, nu o credențială. Instrumentele automate CodeQL/code review nu sunt disponibile în această sesiune.
+
+### Riscuri / pași următori
+- Nu s-a introdus un iframe `noscript` necondiționat: ar trimite request-uri de tracking fără consimțământ, iar acordul existent este stocat doar în localStorage și nu poate fi verificat fără JavaScript.
+- După deploy, verificare în GTM Preview / Tag Assistant pentru containerul publicat. Pentru măsurarea navigării Astro, tagurile din container trebuie legate de Custom Event `fp_page_view`; evită un trigger Page View suplimentar pentru aceleași taguri.
+- Dacă GA4/Meta/TikTok sunt configurate și în GTM și prin ID-urile directe existente, evită dublarea acelorași taguri. Setările containerului extern și recepția live a evenimentelor nu pot fi confirmate prin build-ul local.
+
+---
+
 ## 📝 08 oct 2026 — Eliminarea lanțului critic de solicitări VideoFacade (PageSpeed 577ms)
 
 ### Obiectiv
