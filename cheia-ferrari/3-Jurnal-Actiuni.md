@@ -3249,3 +3249,32 @@ Repararea calendarului Flatpickr de pe `/rezervare/`, care nu se deschidea la cl
 ### Riscuri / pași următori
 - Fix neverificat încă în browser pe site-ul live.
 - De verificat dacă `required` se propagă pe `altInput` (formularul nu ar trebui să poată fi trimis fără dată).
+
+## 📝 08 oct 2026 — Audit SEO profund + flux narativ homepage (Atracție → Încredere → Acțiune)
+
+### Obiectiv
+Scanare profundă a întregului repository (audit tehnic SEO dincolo de `seo:audit`) și rearanjarea secțiunilor pentru un flux logic de conversie, conform cerinței „Technical SEO Auditor + UX/UI Lead”.
+
+### Probleme găsite și rezolvate
+- **BreadcrumbList fără trailing slash**: toate URL-urile din schema breadcrumb (`BaseLayout.astro`) emiteau `https://site/contact` (→ 301 la crawl). Acum toate item-urile au `/` final, inclusiv „Acasă”.
+- **Graph JSON-LD neinterconectat**: `Organization` și `WebSite` nu aveau `@id`; `WebPage.isPartOf` și `WebSite.publisher` erau obiecte inline. Acum: `#organization`, `#website`, referințe prin `@id` + `ContactPoint` partajat (telefon/email/limbă/areaServed) pe `MusicGroup` și `Organization`.
+- **Schemă MusicGroup duplicată pe `/contact/`**: pagina injecta `seo.schema` (copie integrală a MusicGroup din BaseLayout). Înlocuită cu `ContactPage` + `ContactPoint` legată prin `about.@id` de `#music-group`.
+- **Ierarhie headings ruptă**: `/galerie-video/` (H1→H3: „În prim-plan” era `<p>`, acum `<h2>` cu stil identic), `/comunitate/` (H1→H3: adăugat `<h2 class="sr-only">` peste grila cuplurilor), `/membri/` (H2 din HeroVideo randa înaintea H1 cu text duplicat; `HeroVideo` acceptă acum `titleTag="p"`, stil identic).
+- **Flux narativ homepage**: `hp-convert-strip` (Acțiune — preț + rezervare) apărea imediat după meet-teaser, înaintea dovezilor de încredere. Mutat după `#recenzii-google`, rezultând: Atracție (slider + hero video + video showcase) → Încredere (meet teaser, trust ribbon, proces, echipă, recenzii Google) → Acțiune (convert strip + early booking) → conținut SEO + FAQ → CTA final.
+- **Contrast WCAG `/live/`**: metadata replay-urilor `text-white/40` → `text-white/70`.
+
+### Verificate, fără probleme (nu necesită acțiune)
+- Title/description: unice pe toate cele 61 pagini indexabile, în limite (singurul flag „>60” la `/live/` e fals-pozitiv din entitatea `&amp;` — 57 caractere reale).
+- Canonical + OG/Twitter: corecte peste tot; fără resurse render-blocking în `<head>` (CSS ≤2 fișiere, trackere după consimțământ, fonturi preload, VideoFacade on-demand).
+- Imagini: toate au `alt`, `width/height` (singura excepție: `<img>` din popup-ul galeriei membri, populat dinamic la click).
+
+### Validări
+- `npx astro check`: 0 erori | 0 warnings | 0 hints.
+- `npm run seo:check`: PASS; 61 pagini, 0 FAIL | 0 WARN.
+- Deep-scan propriu (titluri duplicate, ierarhie headings, JSON-LD parse, scripturi blocante): 0 probleme reale rămase.
+- `npm test`: 75/75 teste trecute.
+- `npm run check-links`: doar erori `fetch failed` pe domenii externe (YouTube etc.) — rețeaua sandbox-ului e blocată; linkurile interne neafectate.
+
+### Riscuri / pași următori
+- De remăsurat CTR/poziții în GSC după reindexare și de validat schema `ContactPage` în Rich Results Test pe site-ul live.
+- `bg-nunta-live-2027.mp4` (5,6 MB, autoplay pe homepage/membri) rămâne cel mai mare consumator de bandă pe mobil; de luat în calcul o variantă re-encodată mai mică dacă PageSpeed live o cere.

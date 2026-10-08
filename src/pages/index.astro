@@ -258,24 +258,6 @@ const heroPoster = await getImage({
     </div>
   </section>
 
-  <section class="hp-convert-strip section-container hp-deferred-section" aria-label="Contact rapid și ofertă">
-    <div class="hp-convert-wrap reveal-on-scroll from-bottom" style="--reveal-delay: 45ms">
-      <div class="hp-convert-copy">
-        <p class="hp-convert-kicker">Disponibilitate rapidă</p>
-        <h2 class="hp-convert-title">Spuneți-ne data nunții și bugetul, iar în 24 de ore aveți o ofertă clară.</h2>
-        <div class="hp-offer-price" aria-label="Preț orientativ pentru formație">
-          <strong>2.500-4.000 euro</strong>
-          <span>Interval orientativ, în funcție de formulă, locație și program.</span>
-        </div>
-      </div>
-      <div class="hp-convert-actions">
-        <a href="/rezervare/" class="hp-convert-btn hp-convert-btn--offer" onclick="window.gtag&&window.gtag('event','click_contact',{event_category:'homepage',event_label:'convert-strip'})">
-          Verifică dacă suntem liberi pentru data voastră
-        </a>
-      </div>
-    </div>
-  </section>
-
   <section class="hp-trust-ribbon section-container hp-deferred-section" aria-label="De ce ne aleg mirii din Pitești și Argeș">
     <div class="hp-trust-ribbon-inner reveal-on-scroll from-bottom" style="--reveal-delay: 40ms">
       <p class="hp-trust-title">De ce ne aleg mirii din Pitești și Argeș</p>
@@ -348,6 +330,27 @@ const heroPoster = await getImage({
       googleWriteUrl={googleBusinessWriteUrl}
       reviews={googleBusinessReviews}
     />
+  </section>
+
+  {/* ═══════════════════════════════════════════
+      ACȚIUNE — contact rapid și ofertă, după dovezile de încredere
+  ═══════════════════════════════════════════ */}
+  <section class="hp-convert-strip section-container hp-deferred-section" aria-label="Contact rapid și ofertă">
+    <div class="hp-convert-wrap reveal-on-scroll from-bottom" style="--reveal-delay: 45ms">
+      <div class="hp-convert-copy">
+        <p class="hp-convert-kicker">Disponibilitate rapidă</p>
+        <h2 class="hp-convert-title">Spuneți-ne data nunții și bugetul, iar în 24 de ore aveți o ofertă clară.</h2>
+        <div class="hp-offer-price" aria-label="Preț orientativ pentru formație">
+          <strong>2.500-4.000 euro</strong>
+          <span>Interval orientativ, în funcție de formulă, locație și program.</span>
+        </div>
+      </div>
+      <div class="hp-convert-actions">
+        <a href="/rezervare/" class="hp-convert-btn hp-convert-btn--offer" onclick="window.gtag&&window.gtag('event','click_contact',{event_category:'homepage',event_label:'convert-strip'})">
+          Verifică dacă suntem liberi pentru data voastră
+        </a>
+      </div>
+    </div>
   </section>
 
   {/* ═══════════════════════════════════════════

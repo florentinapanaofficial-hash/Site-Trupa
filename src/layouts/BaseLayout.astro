@@ -34,6 +34,8 @@ const canonicalPath = rawPath === '' ? '/' : `${rawPath}/`;
 const canonicalURL = new URL(canonicalPath, Astro.site ?? SITE_FALLBACK);
 const canonical = canonicalURL.href;
 const MUSIC_GROUP_ID = `${site}/#music-group`;
+const ORGANIZATION_ID = `${site}/#organization`;
+const WEBSITE_ID = `${site}/#website`;
 const isAboutPage = Astro.url.pathname === '/despre/';
 const isMembersPage = Astro.url.pathname === '/membri/';
 
@@ -62,6 +64,17 @@ const telHref = `tel:${siteContent.contact.phoneRaw}`;
 const waFloatHref = `https://wa.me/${siteContent.contact.phoneRaw.replace('+', '')}?text=Bun%C4%83!%20Vreau%20o%20ofert%C4%83%20pentru%20Forma%C8%9Bia%20Florentina%20Pan%C4%83.`;
 const logoPngUrl = `${site}/images/logo-512.png`;
 
+// ContactPoint partajat — interconectează MusicGroup și Organization cu pagina de contact
+const contactPointLd = {
+  "@type": "ContactPoint",
+  "contactType": "customer service",
+  "telephone": seoContent.schema.telephone,
+  "email": seoContent.schema.email,
+  "url": `${site}/contact/`,
+  "availableLanguage": ["ro", "en"],
+  "areaServed": "RO"
+};
+
 const jsonLd = {
   ...seoContent.schema,
   '@id': MUSIC_GROUP_ID,
@@ -74,11 +87,13 @@ const jsonLd = {
   },
   image: logoPngUrl,
   foundingDate: '2014',
+  contactPoint: contactPointLd,
 };
 
 const organizationLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
+  "@id": ORGANIZATION_ID,
   "name": seoContent.schema.name,
   "url": site,
   "logo": {
@@ -87,6 +102,7 @@ const organizationLd = {
     "width": 512,
     "height": 512
   },
+  "contactPoint": contactPointLd,
   "sameAs": seoContent.schema.sameAs
 };
 
@@ -140,9 +156,11 @@ const localBusinessLd = {
 const webSiteLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
+  "@id": WEBSITE_ID,
   "name": seoContent.schema.name,
   "url": site,
-  "inLanguage": "ro-RO"
+  "inLanguage": "ro-RO",
+  "publisher": { "@id": ORGANIZATION_ID }
 };
 
 const serviceCatalogItems = (siteContent.services ?? []).map((service, index) => {
@@ -249,6 +267,7 @@ const webPageLd = {
   "inLanguage": "ro",
   "isPartOf": {
     "@type": "WebSite",
+    "@id": WEBSITE_ID,
     "name": siteContent.brand.name,
     "url": site
   },
@@ -276,7 +295,7 @@ const webPageLd = {
 // JSON-LD: BreadcrumbList — navigare ierarhică pentru Google
 const pathSegments = Astro.url.pathname.replace(/\/$/, '').split('/').filter(Boolean);
 const breadcrumbItems = [
-  { "@type": "ListItem", position: 1, name: "Acasă", item: site }
+  { "@type": "ListItem", position: 1, name: "Acasă", item: `${site}/` }
 ];
 const breadcrumbLabels: Record<string, string> = {
   'cauti-formatie-nunta': 'Cauți formație?',
@@ -304,7 +323,7 @@ pathSegments.forEach((seg, i) => {
     "@type": "ListItem",
     position: i + 2,
     name: breadcrumbLabels[seg] || seg.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
-    item: breadcrumbPath
+    item: `${breadcrumbPath}/`
   });
 });
 const breadcrumbLd = {
