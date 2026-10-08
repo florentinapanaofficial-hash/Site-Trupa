@@ -50,7 +50,13 @@
         if ('scrollRestoration' in history) {
             history.scrollRestoration = 'manual';
         }
-        requestAnimationFrame(function () { main.scrollLeft = 0; });
+        /* READ-phase rAF: citim scrollLeft + metrice document ÎNAINTE de orice
+           scriere — scrierea necondiționată de scrollLeft forța reflow (PSI). */
+        requestAnimationFrame(function () {
+            readDocMetricsIfDirty();
+            var needsReset = main.scrollLeft !== 0;
+            if (needsReset) main.scrollLeft = 0;
+        });
 
         /* ── bfcache fix: când browser-ul restaurează pagina din back-forward cache,
              inline styles (opacity:0, transition) sunt păstrate → conținut invizibil.
@@ -114,24 +120,53 @@
         var canShowPrevArrow = false;
         var canShowNextArrow = false;
         var arrowVisibilityTicking = false;
+        var arrowRafId = 0;
         var n = slides.length;
         var current = 0;
 
-        function isLowerPageReached() {
-            var scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
+        function isLowerPageReached(scrollY) {
+            // Folosește cache-ul de metrice — document.documentElement.scrollHeight
+            // și window.innerHeight forțează reflow dacă layout-ul e murdar, deci
+            // NU se citesc la fiecare frame de scroll (PSI: 184ms rearanjare forțată).
             // Pentru pagini foarte scurte, ascundem complet săgețile.
             // Altfel ar rămâne permanent vizibile, deși nu există scroll util.
-            if (scrollableHeight <= 120) return false;
-            var progress = (window.scrollY || window.pageYOffset) / scrollableHeight;
+            if (cachedScrollableHeight <= 120) return false;
+            var progress = scrollY / cachedScrollableHeight;
             return progress >= 0.8;
         }
 
+        /* ── Cache metrice document — citite doar când devin "murdare"
+             (init / resize / creștere conținut), nu la fiecare scroll. ── */
+        var cachedScrollableHeight = 0;
+        var cachedViewportH = 0;
+        var docMetricsDirty = true;
+
+        function readDocMetricsIfDirty() {
+            if (!docMetricsDirty) return;
+            cachedViewportH = window.innerHeight;
+            cachedScrollableHeight = document.documentElement.scrollHeight - cachedViewportH;
+            docMetricsDirty = false;
+        }
+
+        function markDocMetricsDirty() {
+            docMetricsDirty = true;
+            requestArrowVisibilityUpdate();
+        }
+
+        /* Hook homepage: consumă scrollY-ul deja citit în faza de READ
+           a aceluiași rAF — evită al doilea rAF cu READ după WRITE. */
+        var homepageScrollHook = null;
+
         function applyArrowVisibilityByScroll() {
+            /* READ-phase — toate citirile de layout înainte de orice scriere DOM */
+            readDocMetricsIfDirty();
+            var scrollY = window.scrollY || window.pageYOffset;
             // Arrows trebuie să fie vizibile când există o pagină anterioară/următoare
             // valabilă, fără a depinde de scroll-ul aproape de finalul paginii.
             // Doar pentru homepage se păstrează un hint suplimentar legat de progresul pe pagină.
-            var showByScroll = isHomepage ? isLowerPageReached() : true;
+            var showByScroll = isHomepage ? isLowerPageReached(scrollY) : true;
 
+            /* WRITE-phase */
             if (arrowPrev) {
                 if (canShowPrevArrow && showByScroll) arrowPrev.classList.remove('is-hidden');
                 else arrowPrev.classList.add('is-hidden');
@@ -141,12 +176,14 @@
                 if (canShowNextArrow && showByScroll) arrowNext.classList.remove('is-hidden');
                 else arrowNext.classList.add('is-hidden');
             }
+
+            if (homepageScrollHook) homepageScrollHook(scrollY);
         }
 
         function requestArrowVisibilityUpdate() {
             if (arrowVisibilityTicking) return;
             arrowVisibilityTicking = true;
-            requestAnimationFrame(function () {
+            arrowRafId = requestAnimationFrame(function () {
                 applyArrowVisibilityByScroll();
                 arrowVisibilityTicking = false;
             });
@@ -155,11 +192,20 @@
         function setArrowEligibility(prevEligible, nextEligible) {
             canShowPrevArrow = !!prevEligible;
             canShowNextArrow = !!nextEligible;
-            applyArrowVisibilityByScroll();
+            /* rAF, nu sincron: la init rulează imediat după scrieri DOM
+               (setActiveHref) și o citire de layout aici ar forța reflow. */
+            requestArrowVisibilityUpdate();
         }
 
         window.addEventListener('scroll', requestArrowVisibilityUpdate, { passive: true, signal: controller.signal });
-        window.addEventListener('resize', requestArrowVisibilityUpdate, { passive: true, signal: controller.signal });
+        window.addEventListener('resize', markDocMetricsDirty, { passive: true, signal: controller.signal });
+        /* Conținutul încărcat târziu (imagini, fonturi) poate schimba înălțimea documentului */
+        window.addEventListener('load', markDocMetricsDirty, { once: true, signal: controller.signal });
+        var docResizeObserver = null;
+        if (typeof ResizeObserver === 'function') {
+            docResizeObserver = new ResizeObserver(markDocMetricsDirty);
+            docResizeObserver.observe(document.documentElement);
+        }
 
         /* Ascunde săgețile dacă sliderul are un singur element */
         if (n <= 1 && hintsContainer) {
@@ -311,7 +357,8 @@
 
         cleanupMobileSwipe = function () {
             controller.abort();
-            cancelAnimationFrame(hpScrollRaf);
+            cancelAnimationFrame(arrowRafId);
+            if (docResizeObserver) docResizeObserver.disconnect();
             document.querySelector('[data-ptr-indicator]')?.remove();
             main.style.opacity = '';
             main.style.transition = '';
@@ -348,17 +395,21 @@
             }
 
             requestAnimationFrame(function () {
+                /* READ-phase: doar citiri de layout. Scrierile (setActiveHref)
+                   rulează în rAF-ul săgeților — programat DUPĂ acesta — prin
+                   homepageScrollHook, deci nicio citire nu urmează unei scrieri. */
                 cacheOffsets();
-                updateActiveSection();
             });
             /* cacheOffsets se declanșează DOAR la resize (debounced), nu la scroll */
             window.addEventListener('resize', debounce(function () {
                 requestAnimationFrame(cacheOffsets);
             }, 250), { passive: true, signal: controller.signal });
 
-            function updateActiveSection() {
-                var scrollY = window.scrollY || window.pageYOffset;
-                var threshold = scrollY + cachedNavH + (window.innerHeight - cachedNavH) * 0.35;
+            function updateActiveSection(scrollY) {
+                /* Primește scrollY deja citit în faza de READ; folosește doar
+                   cache-uri (cachedNavH, cachedViewportH, cachedOffsets) —
+                   zero citiri de layout după scrieri DOM. */
+                var threshold = scrollY + cachedNavH + (cachedViewportH - cachedNavH) * 0.35;
                 var active = null;
                 for (var i = 0; i < cachedOffsets.length; i++) {
                     if (cachedOffsets[i].top <= threshold) active = cachedOffsets[i];
@@ -369,11 +420,10 @@
                 }
             }
 
-            var hpScrollRaf;
-            window.addEventListener('scroll', function () {
-                cancelAnimationFrame(hpScrollRaf);
-                hpScrollRaf = requestAnimationFrame(updateActiveSection);
-            }, { passive: true, signal: controller.signal });
+            /* Scroll-spy rulează în ACELAȘI rAF cu vizibilitatea săgeților —
+               un singur pipeline READ→WRITE per frame, fără al doilea rAF
+               care ar citi layout după scrierile primului (PSI: forced reflow). */
+            homepageScrollHook = updateActiveSection;
 
             navBtns.forEach(function (btn) {
                 btn.addEventListener('click', function (e) {
