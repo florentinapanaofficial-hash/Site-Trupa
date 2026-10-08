@@ -12,6 +12,36 @@
 
 ---
 
+## 📝 08 oct 2026 — Componentă modulară Reels pentru Cloudflare R2
+
+### Obiectiv
+- Livrarea unei componente Astro independente pentru video vertical R2, integrabilă ulterior în homepage, fără schimbarea conținutului sau infrastructurii existente.
+
+### Modificări
+- `src/components/R2Reels.astro`: props tipizate, instrucțiuni de integrare/configurare R2 în comentariul componentei, markup semantic, controale native, coperte lazy cu alt, cadru fix 9:16, micro-copy românesc și CTA `/contact/`.
+- `src/lib/r2-reels.ts`: validare URL HTTPS/date/ID, graph `ItemList` + `VideoObject` legat de ID-ul `MusicGroup` existent; JSON-LD serializat cu escaparea `<`.
+- `src/lib/r2-reels-player.ts`: atașarea sursei doar la click, un singur clip încărcat simultan, IntersectionObserver pentru eliberarea media la ieșirea din viewport, cleanup la ascunderea paginii și deconectarea componentei.
+- `src/lib/csp.mjs`: permis R2 și pentru coperte/captions, fără modificări la script-src; domeniile custom R2 necesită includerea explicită în CSP-ul deploymentului.
+- `scripts/r2-reels.test.cjs`, `cheia-ferrari/2-Tracker-SEO.md` și acest jurnal.
+
+### Validări
+- `npm run seo:check`: build + compresie PASS; 61 pagini verificate, `0 FAIL | 0 WARN`.
+- `npx jest scripts/r2-reels.test.cjs --runInBand`: 23/23 PASS, inclusiv încărcare doar la cerere, anularea transferurilor, cleanup, retry și protecție împotriva promise-urilor întârziate.
+- Compilare componentă cu `@astrojs/compiler`: fără diagnostice; randare cu Astro Container: fără `src` video inițial, ID/ARIA corelate, JSON-LD valid și escapare verificată, listă goală fără secțiune.
+- `npm test`: 69 PASS / 6 FAIL; cele 6 erori provin din testele preexistente VideoFacade, care caută funcții mutate deja în modulul separat. Fișierele respective sunt nemodificate.
+- `npx astro check`: 3 erori preexistente în `VideoFacade.astro` și `video-facade.ts`; niciun diagnostic TypeScript nou în componentă/module.
+- Build-ul folosește fallback-ul existent pentru galerie în lipsa `MYSQL_URL`; nu au fost adăugate dependențe.
+- CodeQL JavaScript: 0 alerte; revizie separată code-review: fără probleme semnificative (revizorul inclus în parallel_validation nu era disponibil).
+- Scanarea celor 7 fișiere modificate: fără secrete; `git diff --check` PASS. Fișierele cu erori preexistente au fost comparate cu baza și sunt identice.
+
+### Riscuri / pași următori
+- Nu au fost furnizate obiecte R2 reale: nu inventăm URL-uri, date de publicare sau clipuri și nu montăm secțiunea goală în homepage.
+- Pentru producție: domeniu custom R2, MP4 H.264/AAC fast-start, byte ranges 206, MIME corect și cache pe chei versionate; captions necesită CORS și `cors=true`.
+- TBT/CLS ale paginii întregi și accesul efectiv la R2 trebuie măsurate după integrarea cu fișiere reale; nu garantăm valori zero numai din cod.
+- Componenta nu schimbă metadata paginilor existente; auditul paginilor nu înlocuiește măsurarea unei integrări reale.
+
+---
+
 ## 📝 06 oct 2026 — Schema FAQPage validată pentru homepage
 
 ### Obiectiv
