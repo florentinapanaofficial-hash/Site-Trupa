@@ -73,6 +73,13 @@ function deriveVideoId(raw: string): string {
 }
 
 const viewsId = videoId && /^[A-Za-z0-9_-]{1,255}$/.test(videoId) ? videoId : deriveVideoId(safeVideoUrl);
+
+// Loader-ul `is:inline` de mai jos nu e deduplicat automat de Astro (scripturile
+// inline se randează la fiecare instanță). Îl emitem o singură dată per pagină,
+// prin flag pe `Astro.locals` (obiect nou la fiecare randare de pagină).
+const facadeLocals = Astro.locals as { __fpVideoFacadeLoaderRendered?: boolean };
+const renderLoader = !facadeLocals.__fpVideoFacadeLoaderRendered;
+facadeLocals.__fpVideoFacadeLoaderRendered = true;
 ---
 
 <div
@@ -291,19 +298,32 @@ const viewsId = videoId && /^[A-Za-z0-9_-]{1,255}$/.test(videoId) ? videoId : de
     descarcă niciun modul `/_astro/*` pentru fațade (PageSpeed reclama lanțul
     critic HTML → VideoFacade.astro_*.js → video-facade.*.js, ~577ms). Runtime-ul
     `/js/video-facade.js` (public/, URL stabil) se importă DOAR la apropierea de
-    viewport sau la click. Guard global: componenta apare de mai multe ori pe
-    pagină, dar logica rulează o singură dată. */}
-<script is:inline>
+    viewport sau la click. Randat o dată per pagină (flag în Astro.locals);
+    guard-ul global pe window rămâne ca plasă de siguranță. */}
+{renderLoader && (
+  <script is:inline>
 (function () {
   if (window.__fpVideoFacadeLoaderInit) return;
   window.__fpVideoFacadeLoaderInit = true;
 
   var runtimeKey = '__fp_video_facade_runtime__';
 
+  // Scriptul inline rulează în timpul parsării HTML — amânăm orice
+  // querySelectorAll/init până la DOM complet, ca vechiul modul deferred.
+  function whenDomReady() {
+    return new Promise(function (resolve) {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', resolve, { once: true });
+      } else {
+        resolve();
+      }
+    });
+  }
+
   function loadRuntime() {
     if (!window[runtimeKey]) {
-      window[runtimeKey] = import('/js/video-facade.js')
-        .then(function (runtime) { runtime.initVideoFacades(); })
+      window[runtimeKey] = Promise.all([import('/js/video-facade.js'), whenDomReady()])
+        .then(function (results) { results[0].initVideoFacades(); })
         .catch(function (error) {
           // Eșec de rețea: permite o nouă încercare la următorul trigger.
           window[runtimeKey] = undefined;
@@ -319,23 +339,26 @@ const viewsId = videoId && /^[A-Za-z0-9_-]{1,255}$/.test(videoId) ? videoId : de
     if (target && target.closest && target.closest('[data-video-facade]')) loadRuntime();
   }, { capture: true });
 
-  var facades = document.querySelectorAll('[data-video-facade]');
-  if (!facades.length) return;
+  whenDomReady().then(function () {
+    var facades = document.querySelectorAll('[data-video-facade]');
+    if (!facades.length) return;
 
-  if (typeof IntersectionObserver === 'undefined') {
-    window.setTimeout(loadRuntime, 900);
-    return;
-  }
+    if (typeof IntersectionObserver === 'undefined') {
+      window.setTimeout(loadRuntime, 900);
+      return;
+    }
 
-  var observer = new IntersectionObserver(function (entries, obs) {
-    var shouldLoad = entries.some(function (entry) {
-      return entry.isIntersecting || entry.intersectionRatio > 0;
-    });
-    if (!shouldLoad) return;
-    obs.disconnect();
-    loadRuntime();
-  }, { rootMargin: '220px 0px', threshold: [0, 0.01] });
+    var observer = new IntersectionObserver(function (entries, obs) {
+      var shouldLoad = entries.some(function (entry) {
+        return entry.isIntersecting || entry.intersectionRatio > 0;
+      });
+      if (!shouldLoad) return;
+      obs.disconnect();
+      loadRuntime();
+    }, { rootMargin: '220px 0px', threshold: [0, 0.01] });
 
-  facades.forEach(function (facade) { observer.observe(facade); });
+    facades.forEach(function (facade) { observer.observe(facade); });
+  });
 })();
-</script>
+  </script>
+)}
