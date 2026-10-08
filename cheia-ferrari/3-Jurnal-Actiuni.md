@@ -12,6 +12,31 @@
 
 ---
 
+## 📝 08 oct 2026 — Eliminarea lanțului critic de solicitări VideoFacade (PageSpeed 577ms)
+
+### Obiectiv
+- Repararea problemei de render-blocking raportată de PageSpeed Insights: lanț critic secvențial HTML → `/_astro/VideoFacade.astro_astro_type_script...js` → `/_astro/video-facade.C...js` (~577ms latență), cauzat de scriptul bundlat al componentei care importa dinamic runtime-ul dintr-un al doilea chunk.
+
+### Modificări
+- `src/components/VideoFacade.astro`: scriptul procesat (`<script>` bundlat de Astro) înlocuit cu un loader `<script is:inline>` (~1,9KB, zero request-uri): guard `window.__fpVideoFacadeLoaderInit`, single-flight pe `window.__fp_video_facade_runtime__`, gating `whenDomReady()` (loader-ul inline rulează în timpul parsării, nu deferred), IntersectionObserver (rootMargin 220px) + fallback `setTimeout` 900ms + click capture pe `[data-video-facade]`, retry la eșec de rețea. Loader-ul se randează o singură dată pe pagină printr-un flag pe `Astro.locals` (`__fpVideoFacadeLoaderRendered`) — altfel `is:inline` s-ar duplica la fiecare instanță (17× pe galerie-video).
+- `public/js/video-facade.js` (NOU): runtime-ul fațadelor mutat 1:1 din `src/lib/video-facade.ts` (tipuri eliminate, logică identică), ES module cu `initVideoFacades()`, servit la URL stabil și importat la cerere cu `import('/js/video-facade.js')`; minificat + precomprimat în dist de `scripts/compress.mjs`.
+- `src/lib/video-facade.ts`: șters (mutat în public/js).
+- `scripts/video-views.test.cjs`: calea compilată/evaluată în VM actualizată la `public/js/video-facade.js`; corpul testelor neschimbat.
+
+### Validări
+- `npm test`: 75/75 PASS; `npx astro check`: 0 erori | 0 warnings | 0 hints (96 fișiere).
+- `npm run build` PASS; în dist: 0 fișiere `*facade*` în `_astro/`, exact 1 loader inline pe fiecare din cele 7 pagini cu fațade, `dist/client/js/video-facade.js` minificat (7,5KB; 2,5KB brotli) cu exportul intact.
+- Harness VM end-to-end pe artefactele buildate (loader-ul extras din HTML + runtime-ul minificat): import exact `/js/video-facade.js`, inițializare, legare fațade (`videoBound=true`), guard anti-duplicare la a doua execuție — PASS.
+- Smoke test HTTP pe `server.mjs`: `/`, `/galerie-video/`, `/formatie-nunta/pitesti/` → 200, 1 loader/pagină, 0 referințe `_astro` pentru fațadă; `/js/video-facade.js` → 200, `Cache-Control: max-age=31536000, stale-while-revalidate=86400`.
+- `npm run seo:audit`: 61 pagini, 0 FAIL | 0 WARN.
+
+### Riscuri / pași următori
+- `/js/video-facade.js` nu are hash în nume; cache-ul 1 an + `stale-while-revalidate=86400` poate servi runtime-ul vechi până la o zi după un deploy (compromis existent pentru toate scripturile din `public/js/`).
+- Primul click înainte de preload doar încălzește runtime-ul (nu redă instant) — identic cu comportamentul anterior; preload-ul de proximitate (220px) rămâne calea principală.
+- De remăsurat în PageSpeed Insights după deploy: lanțul critic trebuie să dispară din raport.
+
+---
+
 ## 📝 08 oct 2026 — Rezolvarea erorilor preexistente VideoFacade (teste + TypeScript)
 
 ### Obiectiv
