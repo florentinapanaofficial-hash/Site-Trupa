@@ -10,7 +10,7 @@
  *     ÎNAINTE de obținerea consimțământului prealabil al utilizatorului.
  *
  * Comportament:
- *   – Prima vizită: banner vizibil; GA4/Meta Pixel/TikTok Pixel NU se încarcă.
+ *   – Prima vizită: banner vizibil; GTM/GA4/Meta Pixel/TikTok Pixel NU se încarcă.
  *   – „Acceptă": salvează 'granted' în localStorage; FPTracking.init() injectează scripturile.
  *   – „Refuz":    salvează 'denied'  în localStorage; nimic nu se încarcă vreodată.
  *   – Vizite ulterioare: se citește localStorage → tracking pornit sau omis fără banner.
@@ -53,7 +53,7 @@
     var btnAccept = document.getElementById('cookie-accept');
     var btnRefuse = document.getElementById('cookie-refuse');
 
-    /** Deleagă pornirea GA4/Meta Pixel/TikTok Pixel către modulul comun,
+    /** Deleagă pornirea GTM/GA4/Meta Pixel/TikTok Pixel către modulul comun,
         dar îl încarcă dinamic doar la nevoie pentru a nu rupe calea critică. */
     function loadTrackingScript() {
       if (window.FPTracking) return Promise.resolve(window.FPTracking);
@@ -61,7 +61,7 @@
 
       window.__fpTrackingLoader = new Promise(function (resolve, reject) {
         var script = document.createElement('script');
-        script.src = '/js/tracking-pixels.js';
+        script.src = '/js/tracking-pixels.js?v=gtm-n44548rf';
         script.async = true;
         script.onload = function () {
           if (window.FPTracking) resolve(window.FPTracking);

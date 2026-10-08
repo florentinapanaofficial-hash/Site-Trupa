@@ -1,15 +1,17 @@
 /*
- * FPTracking — încarcă GA4, Meta Pixel și TikTok Pixel DOAR după consimțământul GDPR
+ * FPTracking — încarcă GTM, GA4, Meta Pixel și TikTok Pixel DOAR după consimțământul GDPR
  * (localStorage.cookie_consent === 'granted') și retrimite PageView la fiecare navigare
  * client-side (Astro View Transitions), fără dublă încărcare a scripturilor.
  *
  * Folosire:
- *   window.FPTracking.init({ ga4Id, metaPixelId, tiktokPixelId }) — apelat din CookieBanner
+ *   window.FPTracking.init({ gtmId, ga4Id, metaPixelId, tiktokPixelId }) — apelat din CookieBanner
  *   la accept, și automat pe 'astro:page-load' dacă exista deja consimțământ.
+ *   GTM primește fp_page_view pe fiecare pagină; tagurile se leagă de acest Custom Event
+ *   în container, fără un al doilea trigger Page View pentru aceleași taguri.
  */
 (function () {
     var STORAGE_KEY = 'cookie_consent';
-    var loaded = { ga4: false, meta: false, tiktok: false };
+    var loaded = { gtm: false, ga4: false, meta: false, tiktok: false };
 
     function hasConsent() {
         try {
@@ -17,6 +19,17 @@
         } catch (_) {
             return false;
         }
+    }
+
+    function loadGTM(id) {
+        if (loaded.gtm || !id) return;
+        loaded.gtm = true;
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://www.googletagmanager.com/gtm.js?id=' + id;
+        document.head.appendChild(s);
     }
 
     function loadGA4(id) {
@@ -82,6 +95,15 @@
     }
 
     function trackPageView() {
+        if (!hasConsent()) return;
+        if (loaded.gtm) {
+            window.dataLayer.push({
+                event: 'fp_page_view',
+                page_path: location.pathname + location.search,
+                page_location: location.href,
+                page_title: document.title,
+            });
+        }
         if (loaded.ga4 && window.gtag) {
             window.gtag('event', 'page_view', {
                 page_path: location.pathname + location.search,
@@ -95,6 +117,7 @@
     function init(ids) {
         ids = ids || {};
         if (!hasConsent()) return;
+        if (ids.gtmId) loadGTM(ids.gtmId);
         if (ids.ga4Id) loadGA4(ids.ga4Id);
         if (ids.metaPixelId) loadMetaPixel(ids.metaPixelId);
         if (ids.tiktokPixelId) loadTikTokPixel(ids.tiktokPixelId);
@@ -107,7 +130,7 @@
     // inclusiv la încărcarea inițială a paginii — evită dubla numărare la bootstrap.
     document.addEventListener('astro:page-load', function () {
         if (!hasConsent()) return;
-        if (!loaded.ga4 && !loaded.meta && !loaded.tiktok) {
+        if (!loaded.gtm && !loaded.ga4 && !loaded.meta && !loaded.tiktok) {
             init(window.__FP_TRACKING_IDS__);
         } else {
             trackPageView();

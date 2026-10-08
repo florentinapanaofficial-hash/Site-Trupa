@@ -56,6 +56,7 @@ const ensureSeoDescription = (value: string) => {
 const seoTitle = compactSeoText(title, 60);
 const seoDescription = compactSeoText(ensureSeoDescription(description), 155);
 
+const gtmId = 'GTM-N44548RF';
 const ga4Id = import.meta.env.PUBLIC_GA4_ID;
 const metaPixelId = import.meta.env.PUBLIC_META_PIXEL_ID;
 const tiktokPixelId = import.meta.env.PUBLIC_TIKTOK_PIXEL_ID;
@@ -406,11 +407,11 @@ const breadcrumbLd = {
     {isHomePage && <script is:inline type="application/ld+json" data-schema="repertoire-item-list" set:html={JSON.stringify(repertoireItemListLd)} />}
     <script is:inline type="application/ld+json" data-schema="webpage" set:html={JSON.stringify(webPageLd)} />
     {!isHomePage && <script is:inline type="application/ld+json" data-schema="breadcrumb" set:html={JSON.stringify(breadcrumbLd)} />}
-    {/* GA4, Meta Pixel și TikTok Pixel NU se încarcă direct în <head> — se injectează dinamic
+    {/* GTM, GA4, Meta Pixel și TikTok Pixel NU se încarcă direct în <head> — se injectează dinamic
         DUPĂ consimțământul utilizatorului (CookieBanner) prin FPTracking, conform Rec. 30 & 32
         RGPD / ePrivacy. Retrimise la fiecare navigare client-side prin astro:page-load. */}
-    <script is:inline define:vars={{ ga4Id, metaPixelId, tiktokPixelId }}>
-      window.__FP_TRACKING_IDS__ = { ga4Id: ga4Id, metaPixelId: metaPixelId, tiktokPixelId: tiktokPixelId };
+    <script is:inline define:vars={{ gtmId, ga4Id, metaPixelId, tiktokPixelId }}>
+      window.__FP_TRACKING_IDS__ = { gtmId: gtmId, ga4Id: ga4Id, metaPixelId: metaPixelId, tiktokPixelId: tiktokPixelId };
     </script>
     {/* Trackerele se încarcă dinamic doar după consimțământ sau la idle; nu mai consume
         calea critică la prima renderizare a paginii. */}
@@ -497,7 +498,7 @@ const breadcrumbLd = {
       </main>
     </div>
 
-    {/* Banner consimțământ cookie – GA4/Meta/TikTok pornite doar după accept (vezi FPTracking) */}
+    {/* Banner consimțământ cookie – GTM/GA4/Meta/TikTok pornite doar după accept (vezi FPTracking) */}
     <CookieBanner />
 
     <!-- ══ Mutual Exclusion: YouTube Player Pause on Active ══ 
