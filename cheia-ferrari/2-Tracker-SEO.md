@@ -3,6 +3,7 @@ Aici vom nota evoluția săptămânală pentru a ne asigura că creștem, nu bat
 
 | Data | Cuvânt Cheie Monitorizat | Poziție YouTube (Est.) | Poziție Site (Google GSC) | Notițe / Acțiuni Luate |
 |---|---|---|---|---|
+| 08 oct 2026 | siglă FP Band / homepage video | - | - | ✅ Cele două fațade video de pe homepage folosesc acum `/images/fp-band-logo-concept.svg` (1080×360); butoanele de informații și contorul de vizualizări rămân neschimbate. Validare SEO în curs. |
 | 08 oct 2026 | siglă FP Band / galerie video | - | - | ✅ Sigla din fațadele video de pe `/galerie-video/` actualizată de la `logo-fp-stage.svg` la `fp-band-logo-concept.svg`; SEO nemodificat. `npm run seo:check`: 61 pagini, 0 FAIL \| 0 WARN. |
 | 08 oct 2026 | logo FP Band / identitate vizuală | - | - | ✅ Conceptul SVG integrat în header, meniul mobil și footer; alt text descriptiv, metadatele și schema JSON-LD neschimbate. `npm run seo:check`: 61 pagini, 0 FAIL \| 0 WARN; `npm test`: 83/83 PASS. |
 | 08 oct 2026 | Google Tag Manager / consimțământ și navigare Astro | - | - | ✅ Container `GTM-N44548RF` transmis din BaseLayout și încărcat o singură dată după acord; evenimente `fp_page_view` la navigare și loader versionat pentru cache. Metadata/JSON-LD/imaginile neschimbate. Validare: Jest 83/83; Astro 0/0/0; `seo:check` 61 pagini, 0 FAIL \| 0 WARN; configurație verificată în 59 pagini buildate. `seo:weekly`: 66 linkuri externe cu `fetch failed`; necesită GTM Preview după deploy și trigger Custom Event `fp_page_view` fără taguri duplicate. |

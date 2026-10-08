@@ -1,3 +1,20 @@
+## 📝 08 oct 2026 — Siglă FP Band pe videoclipurile homepage-ului
+
+### Obiectiv
+- Înlocuirea siglei din ambele fațade video ale homepage-ului cu logo-ul FP Band.
+
+### Modificări
+- `src/pages/index.astro`: ambele `<VideoFacade>` folosesc `/images/fp-band-logo-concept.svg` și dimensiunile intrinseci 1080×360; butoanele de informații și contorul de vizualizări rămân neschimbate.
+- `cheia-ferrari/2-Tracker-SEO.md`: înregistrată modificarea.
+
+### Validări
+- În curs.
+
+### Riscuri / pași următori
+- Metadatele, schema JSON-LD și linkurile nu au fost modificate.
+
+---
+
 ## 📝 08 oct 2026 — Siglă FP Band în galeria video
 
 ### Obiectiv
