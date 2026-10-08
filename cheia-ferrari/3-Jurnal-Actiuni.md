@@ -8,10 +8,12 @@
 - `cheia-ferrari/2-Tracker-SEO.md`: înregistrată modificarea.
 
 ### Validări
-- În curs.
+- `npm run seo:check`: build PASS; 61 pagini verificate, 0 FAIL | 0 WARN. HTML-ul buildat confirmă noul logo și păstrează butoanele de informații și contorul de vizualizări pe ambele fațade.
+- `npm test`: 83/83 PASS; `npx astro check`: 0 erori | 0 warnings | 0 hints (96 fișiere).
+- Build-ul a emis mesajul cunoscut că lipsește `MYSQL_URL` pentru pagina `momente-cu-mirii/`; fallback-ul a funcționat. Scanarea fișierelor modificate nu a găsit secrete.
 
 ### Riscuri / pași următori
-- Metadatele, schema JSON-LD și linkurile nu au fost modificate.
+- Metadatele, schema JSON-LD și linkurile nu au fost modificate; sigla veche rămâne favicon-ul.
 
 ---
 
