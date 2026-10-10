@@ -59,17 +59,17 @@ const waHref = `https://wa.me/${contact.phoneRaw.replace('+', '')}?text=Bun%C4%8
 const heroSliderPhotos = [
   {
     src: heroImg,
-    alt: 'Formație nuntă Pitești: Florentina Pană cântând live pe scenă la un eveniment din Argeș',
+    alt: 'Florentina Pană cântând live pe scenă la un eveniment din Argeș',
     position: '40% 30%',
   },
   {
     src: anaFlorentinaImg,
-    alt: 'Florentina și Claudiu, formație evenimente Pitești, într-un moment live pe scenă',
+    alt: 'Florentina și Claudiu, într-un moment live pe scenă',
     position: '50% 14%',
   },
   {
     src: evenimentLiveImg,
-    alt: 'Trupă cover Pitești pe scenă, cu invitații dansând pe muzică live Argeș',
+    alt: 'Trupă cover pe scenă, cu invitații dansând pe muzică live',
     position: '38% 16%',
   }
 ];
@@ -99,10 +99,10 @@ const heroPoster = await getImage({
     <script is:inline type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>
 
-  <section class="hero-slider" aria-label="Galerie foto cu momente live ale formației de nuntă din Pitești">
+  <section class="hero-slider" aria-label="Galerie foto cu momente live ale formației de nuntă din Argeș">
     <div class="hero-slider-track" data-hero-slider data-ready="false">
       <div class="hero-slider-placeholder" aria-hidden="true">
-        Momente live de la nunți din Pitești și Argeș — se încarcă galeria foto
+        Momente live de la nunți din Argeș — se încarcă galeria foto
       </div>
 
       {heroSliderPhotos.map((slide, index) => (
@@ -134,14 +134,14 @@ const heroPoster = await getImage({
     subtitle="Florentina Pană, trupă cover live în Pitești și Argeș, pentru nunți pline de emoție"
     showReviews={true}
   >
-    <a href="/galerie-video/" class="btn-solid">Vezi Video</a>
+    <a href="/galerie-video/" class="btn-solid">Vedeți videoclipurile</a>
   </HeroVideo>
 
   <section class="hero-stage hp-hero-wrap" aria-label="Rețele sociale">
     <div class="hero-stage-inner">
       {/* Social media icons — vizibile doar pe mobil, umplu spațiul gol */}
       <div class="hero-social-row" aria-label="Rețele sociale">
-        <span class="hero-social-label">Urmărește-ne</span>
+        <span class="hero-social-label">Urmăriți-ne</span>
         <div class="hero-social-icons">
           {socialLinks.youtube && (
             <a href={socialLinks.youtube} class="hero-social-btn hero-social-btn--yt"
@@ -205,19 +205,19 @@ const heroPoster = await getImage({
   <section id="video-showcase" class="hp-deferred-section" aria-labelledby="video-showcase-title">
     <div class="mx-auto max-w-7xl px-4 py-16">
       <h2 id="video-showcase-title" class="mb-10 text-center text-3xl font-bold text-white sm:text-4xl">
-        Ascultă-ne live: formație nuntă Pitești pe scenă
+        Ascultați-ne live: muzică de nuntă pe scenă
       </h2>
       <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
         <VideoFacade
           imageSrc="/videos/Coperta-1-videi-640.webp"
-          title="Trupă cover Pitești: hituri românești de petrecere"
+          title="Trupă cover: hituri românești de petrecere"
           subtitle="Formația Florentina Pană"
           logoSrc="/images/fp-band-logo-concept.svg"
           logoWidth={1080}
           logoHeight={360}
           videoUrl="https://iframe.cloudflarestream.com/12ec7beeb9731f032c24447d77a97e69"
           loading="eager"
-          description="Un colaj cu hituri românești de petrecere, cântate 100% live de Formația Florentina Pană, trupă cover din Pitești. Vocea live, energia de pe scenă și repertoriul ales cu grijă țin ringul de dans plin la orice nuntă sau botez."
+          description="Un colaj cu hituri românești de petrecere, cântate 100% live de Formația Florentina Pană. Vocea live, energia de pe scenă și repertoriul ales cu grijă țin ringul de dans plin la orice nuntă sau botez."
         />
         <VideoFacade
           imageSrc="/videos/Coperta-2-640.webp"
@@ -233,12 +233,12 @@ const heroPoster = await getImage({
     </div>
   </section>
 
-  <section class="hp-meet-teaser section-container hp-deferred-section" aria-label="Cunoaște formația de nuntă din Pitești">
+  <section class="hp-meet-teaser section-container hp-deferred-section" aria-label="Cunoașteți formația de nuntă din Argeș">
     <div class="hp-meet-wrap reveal-on-scroll from-bottom" style="--reveal-delay: 30ms">
       <div class="hp-meet-media">
         <Image
           src={anaFlorentinaImg}
-          alt="Florentina și Claudiu, formația din Pitești, într-un moment live pe scenă"
+          alt="Florentina și Claudiu, într-un moment live pe scenă"
           widths={[480, 720, 960]}
           sizes="(max-width: 767px) 92vw, 660px"
           format="webp"
@@ -249,38 +249,38 @@ const heroPoster = await getImage({
       </div>
       <div class="hp-meet-content">
         <p class="hp-meet-kicker">Cine vă cântă la nuntă</p>
-        <h2 class="hp-meet-title">Trupă cover Pitești pentru nunți și evenimente private</h2>
+        <h2 class="hp-meet-title">Trupă cover pentru nunți și evenimente private</h2>
         <p class="hp-meet-copy">
           La orgă, vioară, acordeon și saxofon cântă instrumentiștii echipei, iar vocile serii sunt Florentina Pană și Cătălin Matei.
           Venim cu sonorizare proprie, lumini de scenă și atenție la fiecare obicei pe care vi-l doriți în ziua nunții.
         </p>
         <div class="hp-meet-actions">
-          <a href="/despre/" class="btn-outline" onclick="window.gtag&&window.gtag('event','click_about',{event_category:'homepage',event_label:'meet-section'})">Cunoaște-ne mai bine</a>
-          <a href="/contact/" class="btn-solid" onclick="window.gtag&&window.gtag('event','click_contact',{event_category:'homepage',event_label:'meet-section'})">Spuneți-ne data nunții</a>
+          <a href="/despre/" class="btn-outline" onclick="window.gtag&&window.gtag('event','click_about',{event_category:'homepage',event_label:'meet-section'})">Cunoașteți-ne mai bine</a>
+          <a href="/contact/" class="btn-solid" onclick="window.gtag&&window.gtag('event','click_contact',{event_category:'homepage',event_label:'meet-section'})">Spuneți-ne data nunții voastre</a>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="hp-trust-ribbon section-container hp-deferred-section" aria-label="De ce ne aleg mirii din Pitești și Argeș">
+  <section class="hp-trust-ribbon section-container hp-deferred-section" aria-label="De ce ne aleg mirii din Argeș">
     <div class="hp-trust-ribbon-inner reveal-on-scroll from-bottom" style="--reveal-delay: 40ms">
-      <p class="hp-trust-title">De ce ne aleg mirii din Pitești și Argeș</p>
+      <p class="hp-trust-title">De ce ne aleg mirii din Argeș</p>
       <div class="hp-trust-pills">
         <span class="hp-trust-pill">Recenzii reale 5 stele</span>
         <span class="hp-trust-pill">Contract clar, fără surprize</span>
         <span class="hp-trust-pill">Show 100% live</span>
         <span class="hp-trust-pill">Cântăm în toată țara</span>
       </div>
-      <a href="/rezervare/" class="hp-trust-cta">Verifică data nunții</a>
+      <a href="/rezervare/" class="hp-trust-cta">Verificați data nunții voastre</a>
     </div>
   </section>
 
   <section class="hp-signature-flow section-container free-scroll-section hp-deferred-section" aria-label="Cum pregătim împreună muzica nunții voastre">
     <div class="hp-signature-head reveal-on-scroll from-bottom" style="--reveal-delay: 20ms">
       <p class="hp-signature-kicker">Cum lucrăm împreună</p>
-      <h2 class="hp-signature-title">De la primul mesaj până la ultimul dans, nu sunteți singuri</h2>
+      <h2 class="hp-signature-title">De la primul mesaj până la ultimul dans, vă suntem alături</h2>
       <p class="hp-signature-copy">
-        Mirii au deja destule pe cap. Noi ne ocupăm de muzică, iar voi vă bucurați de invitați
+        Știm că aveți multe de organizat. Noi ne ocupăm de muzică, iar voi vă bucurați de invitați
         și de ziua voastră.
       </p>
     </div>
@@ -288,38 +288,38 @@ const heroPoster = await getImage({
     <div class="hp-signature-grid">
       <article class="hp-signature-card reveal-on-scroll from-left" style="--reveal-delay: 70ms">
         <span class="hp-signature-step">01</span>
-        <div class="hp-signature-card-title">Ne cunoaștem și alegem muzica</div>
+        <h3 class="hp-signature-card-title">Ne cunoaștem și alegem muzica</h3>
         <p>Vorbim despre voi, despre invitați și despre melodiile care contează: primul dans, hora, momentul pentru părinți.</p>
       </article>
 
       <article class="hp-signature-card reveal-on-scroll from-bottom" style="--reveal-delay: 140ms">
         <span class="hp-signature-step">02</span>
-        <div class="hp-signature-card-title">Construim seara pas cu pas</div>
+        <h3 class="hp-signature-card-title">Construim seara pas cu pas</h3>
         <p>Planificăm ritmul petrecerii: primirea invitaților, dansul mirilor, petrecerea mare și un final pe care nu-l uitați.</p>
       </article>
 
       <article class="hp-signature-card reveal-on-scroll from-right" style="--reveal-delay: 210ms">
         <span class="hp-signature-step">03</span>
-        <div class="hp-signature-card-title">Cântăm live, cu ochii pe ring</div>
+        <h3 class="hp-signature-card-title">Cântăm live, cu ochii pe ring</h3>
         <p>Citim sala în timp real și ajustăm programul, ca ringul de dans să rămână plin de la prima la ultima melodie.</p>
       </article>
     </div>
 
     <div class="hp-signature-actions reveal-on-scroll from-bottom" style="--reveal-delay: 250ms">
-      <a href="/contact/" class="btn-solid">Vreau o seară ca asta</a>
-      <a href="/galerie-video/" class="btn-outline" data-astro-reload>Vezi formația live</a>
+      <a href="/contact/" class="btn-solid">Imaginați-vă seara voastră</a>
+      <a href="/galerie-video/" class="btn-outline" data-astro-reload>Vedeți formația live</a>
     </div>
   </section>
 
-  <section class="hp-nucleu section-container free-scroll-section hp-deferred-section" aria-label="Cunoaște echipa completă a formației">
+  <section class="hp-nucleu section-container free-scroll-section hp-deferred-section" aria-label="Cunoașteți echipa completă a formației">
     <div class="hp-nucleu-head reveal-on-scroll from-bottom" style="--reveal-delay: 20ms">
-      <h2 class="hp-nucleu-title">Oamenii din spatele formației din Pitești</h2>
+      <h2 class="hp-nucleu-title">Oamenii din spatele formației</h2>
       <p class="hp-nucleu-copy">
-        Soliști și instrumentiști cu peste 10 ani de scenă, care cântă împreună la nunți din Pitești și din tot Argeșul.
+        Soliști și instrumentiști cu peste 10 ani de scenă, care cântă împreună la nunți din Argeș și din toată țara.
       </p>
     </div>
     <div class="hp-nucleu-actions reveal-on-scroll from-bottom" style="--reveal-delay: 60ms">
-      <a href="/membri/" class="hp-nucleu-cta">Cunoaște toată echipa</a>
+      <a href="/membri/" class="hp-nucleu-cta">Cunoașteți toată echipa</a>
     </div>
   </section>
 
@@ -343,7 +343,7 @@ const heroPoster = await getImage({
     <div class="hp-convert-wrap reveal-on-scroll from-bottom" style="--reveal-delay: 45ms">
       <div class="hp-convert-copy">
         <p class="hp-convert-kicker">Disponibilitate rapidă</p>
-        <h2 class="hp-convert-title">Spuneți-ne data nunții și bugetul, iar în 24 de ore aveți o ofertă clară.</h2>
+        <h2 class="hp-convert-title">Povestiți-ne cum vă imaginați nunta și ce buget aveți în minte.</h2>
         <div class="hp-offer-price" aria-label="Preț orientativ pentru formație">
           <strong>2.500-4.000 euro</strong>
           <span>Interval orientativ, în funcție de formulă, locație și program.</span>
@@ -351,7 +351,7 @@ const heroPoster = await getImage({
       </div>
       <div class="hp-convert-actions">
         <a href="/rezervare/" class="hp-convert-btn hp-convert-btn--offer" onclick="window.gtag&&window.gtag('event','click_contact',{event_category:'homepage',event_label:'convert-strip'})">
-          Verifică dacă suntem liberi pentru data voastră
+          Verificați împreună cu noi dacă data voastră este liberă
         </a>
       </div>
     </div>
@@ -362,14 +362,14 @@ const heroPoster = await getImage({
   ═══════════════════════════════════════════ */}
   <section class="hp-early-booking section-container free-scroll-section py-8 sm:py-12 hp-deferred-section" aria-label="Oferte Early Booking">
     <div class="rounded-2xl border border-amber-500/20 bg-gradient-to-r from-amber-500/10 to-orange-500/10 p-6 sm:p-8 text-center">
-      <p class="text-xs sm:text-sm font-semibold text-amber-300 mb-2">⏰ Ofertă Limitată</p>
-      <h2 class="text-lg sm:text-xl font-extrabold text-white mb-3">Nuntă în 2027? Blocați acum data și tariful</h2>
+      <p class="text-xs sm:text-sm font-semibold text-amber-300 mb-2">Pentru nunțile din 2027</p>
+      <h2 class="text-lg sm:text-xl font-extrabold text-white mb-3">Nunta voastră din 2027 începe cu o dată aleasă în tihnă</h2>
       <p class="text-sm text-white/90 mb-4">
-        Datele bune se rezervă din timp. Spuneți-ne bugetul estimat și primiți o propunere clară, cu tariful blocat în contract,
-        indiferent cum se schimbă prețurile pe piață. Fără surprize la final.
+        Vă puteți bucura de planificare fără grabă. Povestiți-ne ce buget aveți în minte, iar noi pregătim o propunere potrivită serii voastre,
+        cu toate detaliile stabilite clar de la început.
       </p>
-      <a href="/publicatii/pret-formatie-nunta-2026/" class="btn-solid inline-block" onclick="window.gtag&&window.gtag('event','click_early_booking',{event_category:'homepage',event_label:'pricing-link'})">
-        Vezi prețurile și oferta →
+      <a href="/publicatii/pret-formatie-nunta-2027/" class="btn-solid inline-block" onclick="window.gtag&&window.gtag('event','click_early_booking',{event_category:'homepage',event_label:'pricing-link'})">
+        Descoperiți detaliile Early Booking pentru 2027 →
       </a>
     </div>
   </section>
@@ -377,29 +377,29 @@ const heroPoster = await getImage({
   {/* ═══════════════════════════════════════════
       DESPRE FORMAȚIE — text SEO + H3 subtitluri
   ═══════════════════════════════════════════ */}
-  <section id="despre-formatie" class="hp-seo-section free-scroll-section hp-deferred-section" aria-label="Despre formația noastră de nuntă din Pitești">
-    <h2 class="hp-seo-title anim-on-scroll">Formație nuntă Pitești: peste 10 ani de muzică live</h2>
+  <section id="despre-formatie" class="hp-seo-section free-scroll-section hp-deferred-section" aria-label="Despre formația noastră de nuntă din Argeș">
+    <h2 class="hp-seo-title anim-on-scroll">Formație de nuntă: peste 10 ani de muzică live</h2>
 
     <div class="hp-seo-grid">
       <div class="hp-seo-block anim-on-scroll anim-d1">
-        <div class="hp-seo-subtitle">Din Pitești, la nunți în tot Argeșul și în țară</div>
+        <h3 class="hp-seo-subtitle">Din Argeș, la nunți în toată țara</h3>
         <p class="hp-seo-text">
           Din 2014 cântăm cu același gând: să vă amintiți peste ani cum v-ați simțit în seara aceea.
-          Suntem o formație din Pitești și ajungem constant la nunți în tot județul Argeș, de la Mioveni
-          și Câmpulung până la Curtea de Argeș și Topoloveni, dar și în restul țării. Ca formație pentru
-          evenimente în Pitești, cântăm și la botezuri, aniversări și gale corporate, cu soliști cu experiență,
+          Suntem o formație din Argeș și ajungem constant la nunți în tot județul, de la Mioveni
+          și Câmpulung până la Curtea de Argeș și Topoloveni, dar și în restul țării. Cântăm și la botezuri,
+          aniversări și gale corporate, cu soliști cu experiență,
           instrumentiști profesioniști și sonorizare adusă de noi.
         </p>
       </div>
       <div class="hp-seo-block anim-on-scroll anim-d2">
-        <div class="hp-seo-subtitle">Muzică live Argeș, aleasă împreună cu voi</div>
+        <h3 class="hp-seo-subtitle">Muzică live în Argeș, aleasă împreună cu voi</h3>
         <p class="hp-seo-text">
           Cântăm muzică populară de petrecere, grecească, arăbească, machedonească, latino,
           românească și manele. Dansul mirilor, valsul de deschidere, hora mare și petrecerea de noapte:
-          construim fiecare set împreună cu voi, ca nunta să sune a nunta voastră, nu a alta.
+          construim fiecare set împreună cu voi, ca nunta să aibă ritmul și atmosfera voastră.
         </p>
         <p class="hp-seo-text hp-seo-text--link">
-          Căutați sala potrivită? Citiți în jurnalul nostru de evenimente <a href="/publicatii/" class="hp-inline-link">recomandările noastre de locații din Argeș</a>.
+          Voi încă vă căutați sala potrivită? Răsfoiți <a href="/publicatii/" class="hp-inline-link">recomandările noastre de locații din Argeș</a> din jurnalul de evenimente.
         </p>
       </div>
     </div>
@@ -409,7 +409,7 @@ const heroPoster = await getImage({
       DE CE SĂ NE ALEGEȚI — beneficii + H3
   ═══════════════════════════════════════════ */}
   <section id="de-ce-noi" class="hp-seo-section free-scroll-section hp-deferred-section" aria-label="De ce să alegeți formația noastră">
-    <h2 class="hp-seo-title anim-on-scroll">De ce ne aleg mirii din Pitești</h2>
+    <h2 class="hp-seo-title anim-on-scroll">De ce ne aleg mirii</h2>
 
     <ul class="hp-benefits-list anim-on-scroll anim-d1">
       <li>Cântăm 100% live, fără pauze lungi, ca ringul de dans să rămână plin.</li>
@@ -423,20 +423,20 @@ const heroPoster = await getImage({
       TIPURI DE EVENIMENTE — servicii + H3
   ═══════════════════════════════════════════ */}
   <section id="tipuri-evenimente" class="hp-seo-section free-scroll-section hp-deferred-section" aria-label="Tipuri de evenimente">
-    <h2 class="hp-seo-title anim-on-scroll">Formație evenimente Pitești: nunți, botezuri, corporate</h2>
+    <h2 class="hp-seo-title anim-on-scroll">Formație pentru evenimente: nunți, botezuri și evenimente corporate</h2>
 
     <div class="hp-seo-grid hp-seo-grid--3">
       <div class="hp-seo-block anim-on-scroll anim-d1">
-        <div class="hp-seo-subtitle">Nunți în Pitești și Argeș</div>
+        <h3 class="hp-seo-subtitle">Nunți în Argeș și în toată țara</h3>
         <p class="hp-seo-text">
           Muzica este sufletul petrecerii. Ne ocupăm de momentele care contează:
           primirea invitaților, dansul mirilor, clipa dedicată părinților și
-          „ora de foc" de pe ringul de dans, cu seturi live pentru nunți în Pitești
-          și în tot Argeșul.
+          „ora de foc" de pe ringul de dans, cu seturi live la nunți în tot Argeșul
+          și în toată țara.
         </p>
       </div>
       <div class="hp-seo-block anim-on-scroll anim-d2">
-        <div class="hp-seo-subtitle">Botezuri și aniversări</div>
+        <h3 class="hp-seo-subtitle">Botezuri și aniversări</h3>
         <p class="hp-seo-text">
           Ritmul se adaptează tuturor generațiilor: bunicii recunosc melodiile pe care
           le-au iubit, iar cei tineri găsesc hituri de dans. Un program echilibrat,
@@ -444,7 +444,7 @@ const heroPoster = await getImage({
         </p>
       </div>
       <div class="hp-seo-block anim-on-scroll anim-d3">
-        <div class="hp-seo-subtitle">Evenimente corporate și private</div>
+        <h3 class="hp-seo-subtitle">Evenimente corporate și private</h3>
         <p class="hp-seo-text">
           Show profesionist pentru gale, seri de team-building, lansări
           de produs sau petreceri de Crăciun. Muzică elegantă în timpul cinei,
@@ -458,7 +458,7 @@ const heroPoster = await getImage({
       FAQ — Întrebări frecvente (vizibile pe pagină)
   ═══════════════════════════════════════════ */}
   <section id="intrebari-frecvente" class="hp-seo-section free-scroll-section hp-deferred-section" aria-label="Întrebări frecvente">
-    <h2 class="hp-seo-title anim-on-scroll">Întrebări despre formația de nuntă din Pitești</h2>
+    <h2 class="hp-seo-title anim-on-scroll">Întrebări despre formația noastră de nuntă</h2>
 
     <div class="hp-faq-list anim-on-scroll anim-d1">
       {faqItems.map((item) => (
@@ -482,14 +482,14 @@ const heroPoster = await getImage({
       <p class="hp-diamond-kicker">Povestea și rezervarea</p>
       <h2 class="hp-diamond-title">Muzică live pentru ziua în care spuneți „da”</h2>
       <p class="hp-diamond-copy">
-        Aflați cine suntem și verificați rapid dacă suntem liberi la data nunții voastre din Pitești sau din Argeș.
+        Voi puteți descoperi povestea noastră și verifica dacă avem liberă data nunții voastre în Argeș.
       </p>
     </div>
 
     <a href="/despre/" class="hp-card hp-card--story anim-on-scroll anim-d1 anim-card-hover reveal-on-scroll from-left" style="--reveal-delay: 100ms">
       <Image
         src={scenaPanoramicaImg}
-        alt="Formația Florentina Pană, trupă live din Pitești, pe scenă la un eveniment din Argeș"
+        alt="Formația Florentina Pană, trupă live pe scenă la un eveniment din Argeș"
         class="hp-card-bg"
         widths={[480, 800, 1200]}
         sizes="(max-width: 767px) 92vw, 50vw"
@@ -501,10 +501,10 @@ const heroPoster = await getImage({
       <div class="hp-card-overlay" aria-hidden="true"></div>
       <div class="hp-card-content">
         <span class="hp-card-kicker">Cine suntem</span>
-        <div class="hp-card-title">Povestea noastră</div>
+        <h3 class="hp-card-title">Povestea noastră</h3>
         <p class="hp-card-text">10 ani de muzică, emoție și scenă</p>
         <span class="hp-card-cta">
-          Citește povestea
+          Citiți povestea
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
         </span>
       </div>
@@ -514,20 +514,20 @@ const heroPoster = await getImage({
       <div class="hp-card-overlay" aria-hidden="true"></div>
       <div class="hp-card-content">
         <span class="hp-card-kicker">Disponibilitate</span>
-        <div class="hp-card-title">Rezervă acum</div>
-        <p class="hp-card-text">Scrieți-ne pe WhatsApp data evenimentului</p>
+        <h3 class="hp-card-title">Verificați disponibilitatea</h3>
+        <p class="hp-card-text">Povestiți-ne pe WhatsApp când sărbătoriți</p>
         <a
           href={waHref}
           class="hp-whatsapp-btn anim-cta-pulse"
           target="_blank"
           rel="noopener noreferrer"
-          aria-label={`Rezervă pe WhatsApp: ${contact.phoneDisplay}`}
+          aria-label={`Rezervați pe WhatsApp: ${contact.phoneDisplay}`}
         >
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.556 4.122 1.528 5.854L0 24l6.335-1.508A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.8 9.8 0 0 1-4.964-1.342l-.356-.211-3.765.896.953-3.671-.232-.376A9.785 9.785 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
           {contact.phoneDisplay}
         </a>
         <span class="hp-card-cta">
-          Contactează-ne
+          Contactați-ne
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
         </span>
       </div>

@@ -3383,3 +3383,26 @@ Scanare profundă a întregului repository (audit tehnic SEO dincolo de `seo:aud
 ### Riscuri / pași următori
 - De remăsurat CTR/poziții în GSC după reindexare și de validat schema `ContactPage` în Rich Results Test pe site-ul live.
 - `bg-nunta-live-2027.mp4` (5,6 MB, autoplay pe homepage/membri) rămâne cel mai mare consumator de bandă pe mobil; de luat în calcul o variantă re-encodată mai mică dacă PageSpeed live o cere.
+## 📝 10 oct 2026 — Homepage: Early Booking 2027 și ton editorial
+
+### Obiectiv
+Actualizarea destinației Early Booking pentru sezonul 2027, întărirea ierarhiei semantice și uniformizarea adresării homepage-ului la persoana a II-a plural.
+
+### Modificări
+- `src/pages/index.astro`: butonul Early Booking duce la `/publicatii/pret-formatie-nunta-2027/`; headingurile subtitlurilor și cardurilor sunt H3 cu clasele păstrate. Eliminate mențiunile locale Pitești din copy-ul repetitiv, păstrând H1-ul și primul paragraf; rescrise pasajele comerciale rigide și CTA-urile la plural.
+- `src/data/blogPosts.json`: slugul articolului Early Booking actualizat la `pret-formatie-nunta-2027`; conținutul existent rămâne ghid pentru 2026-2027.
+- `src/pages/publicatii/pret-formatie-nunta-2026.astro`: redirect 301 către noul slug; ruta veche este exclusă din sitemap în `astro.config.mjs`.
+- `src/components/Header.astro`, `src/components/HeroVideo.astro` și `src/components/GoogleBusinessReviews.astro`: CTA-urile vizibile pe homepage uniformizate la persoana a II-a plural.
+- `src/data/seo-content.json`: întrebarea FAQ despre rezervare formulată la plural; schema FAQ se generează din aceeași sursă.
+- Metadata homepage: title 58 caractere; description actualizată la vocea nouă, 146 caractere.
+
+### Validări
+- `npm run seo:check`: build PASS; 62 pagini HTML, 0 FAIL | 0 WARN; description 146 caractere.
+- `npm run seo:weekly`: 66/66 linkuri externe valide; build și audit PASS.
+- Sitemapul include slugul 2027 și exclude slugul 2026; chunk-ul compilat confirmă `Astro.redirect(..., 301)`.
+- 12 H2, 12 H3, un H1; toate imaginile au `alt`; diagnostice editor 0.
+- Jest: 46/52 teste trecute; 6 eșecuri în `scripts/video-views.test.cjs` (`bindFacades`, `activate`, `trackView` absente în contextul testului), fișier neatins de această intervenție.
+
+### Riscuri / pași următori
+- Buildul afișează fallback-ul existent pentru galeria care necesită `MYSQL_URL`; buildul nu este blocat.
+- Eșecurile din `scripts/video-views.test.cjs` rămân de investigat separat.

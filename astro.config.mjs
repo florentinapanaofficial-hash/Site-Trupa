@@ -55,6 +55,8 @@ export default defineConfig({
         if (url.pathname === '/mini-tv/') return false;
         // Exclude /blog/ — redirect 301 → /publicatii/ (Ahrefs: 3XX redirect in sitemap)
         if (url.pathname === '/blog/') return false;
+        // Exclude vechiul URL Early Booking, redirectat 301 către versiunea 2027.
+        if (url.pathname === '/publicatii/pret-formatie-nunta-2026/') return false;
         // Exclude /youtube-redirect/ — pagină intermediară noindex, fără linkuri interne (Ahrefs: canonical fără linkuri)
         if (url.pathname === '/youtube-redirect/') return false;
         // Păstrează doar versiunea cu trailing slash
