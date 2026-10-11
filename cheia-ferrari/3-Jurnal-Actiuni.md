@@ -1,3 +1,39 @@
+## 📝 11 oct 2026 — Validarea domeniului media Cloudflare, CSP pentru Consent Mode și fallback video în HeroVideo
+
+### Obiectiv
+- Deblocarea infrastructurii media rămase în suspensie din auditul Core Web Vitals: autorizarea domeniului `media.florentinapanaofficial.ro` în CSP, repararea hero video-ului care nu pornea pe producție și restabilirea cererilor Google Analytics / Consent Mode blocate de politică.
+
+### Modificări
+- `src/lib/csp.mjs`: `https://media.florentinapanaofficial.ro` adăugat în `img-src` și `connect-src`; `media-src` îl conținea deja din sesiunea precedentă. Domeniul a fost adăugat inițial și în `script-src`, apoi eliminat la cererea lui Claudiu — pe acel bucket se găzduiesc strict fișiere media, deci permiterea execuției de script ar fi lărgit inutil suprafața de atac XSS fără niciun beneficiu funcțional.
+- `src/lib/csp.mjs`: `https://www.google.com` adăugat în `img-src` și `connect-src`. Consent Mode trimite ping-uri către `/ccm/collect` și pixeli de conversie de pe `/pagead/`, ambele pe `www.google.com`, nu pe `www.google-analytics.com`, care era singurul autorizat. Nu s-a folosit wildcard `https://*.google.com`, pentru a păstra politica strictă.
+- `.gitignore`: adăugat `revista.florentinapanaofficial.ro/`. Sub-proiectul are repository Git propriu, iar un `git add .` îl capturase ca gitlink (submodul gol, inutilizabil la clonare). Commit-ul a fost corectat cu `git rm --cached` + `--amend` înainte de push, deci remote-ul nu a fost afectat.
+- `src/components/HeroVideo.astro`: lanț de surse cu degradare elegantă. Prop nou `fallbackVideoUrl`, implicit `/videos/bg-nunta-live-2027.mp4`, randat ca `data-fallback-src` pe `<video>`. `activate()` încearcă întâi sursa CDN, iar la eșec — eveniment `error` sau respingerea lui `play()` — trece pe copia locală, apoi abandonează curat (retrage `src`-ul, lasă posterul vizibil). Schimbarea de `src` anulează redarea anterioară și produce un `AbortError` întârziat care ar fi ucis fallback-ul tocmai pornit; respingerile surselor abandonate sunt filtrate printr-un token `attempt` incrementat la fiecare încercare. `giveUp()` dezabonează listener-ul de `error` înainte de `load()`, ca să nu se reintre în bucla de eșec.
+
+### Diagnostic — de ce nu pornea hero video-ul
+- Cele trei ipoteze din sesizare au fost verificate și infirmate pe rând: scriptul **este** încărcat și executat (Astro îl inline-ează ca `<script type="module">`, confirmat în HTML-ul live, iar `script-src` conține `'unsafe-inline'`); selectorii **corespund** exact (`[data-hero-video]`, `[data-hero-media]`, `dataset.src` ↔ `data-src`); listener-ul **este** atașat corect pe `window` (`load`), cu `requestIdleCallback` și fallback `setTimeout`.
+- Nu există și nu trebuie să existe listeneri de `scroll`/`click`/`mousemove`: declanșarea pe `load` + idle este deliberată, ca video-ul să nu concureze cu posterul LCP.
+- Cauza reală era infrastructura, nu codul: `https://media.florentinapanaofficial.ro/bg-nunta-live-2027.mp4` returna **404**, obiectul nefiind urcat în bucket. Domeniul funcționa deja pentru audio (200), iar copia locală răspundea 200 cu 5.589.426 octeți.
+- Simptomul raportat — tab-ul Network filtrat pe *Media* complet gol — se explică prin faptul că R2 răspunde la 404 cu o pagină HTML, pe care Chrome o clasifică drept `Document`/`Other`, nu `Media`. În plus, `catch`-ul de pe `play()` retrăgea `src`-ul, deci posterul rămânea pe ecran fără niciun semnal vizibil de eroare.
+
+### Validări
+- HTML live (`https://www.florentinapanaofficial.ro/`): 340.323 octeți, `data-hero-media` prezent, selectorul `[data-hero-video]` prezent în scriptul inline; antetul `Content-Security-Policy` servit de producție confirmă directivele actualizate.
+- `https://media.florentinapanaofficial.ro/bg-nunta-live-2027.mp4`: **200**, `Content-Type: video/mp4`, `Content-Length: 5.589.426`, `Accept-Ranges: bytes`. Obiectul a fost urcat de Claudiu în timpul sesiunii — hero video-ul rulează acum efectiv de pe CDN, nu de pe fallback.
+- `https://media.florentinapanaofficial.ro/Hore%202026%20FP%20Band.mp3` cu `Origin` setat pe originea site-ului: **200**, `Access-Control-Allow-Origin: *`, `Accept-Ranges: bytes`. CORS-ul cerut de `AudioPlaylistPlayer` (`crossOrigin = 'anonymous'`) și byte-range-ul sunt confirmate — blocantul din auditul precedent este închis.
+- `npm run build`: PASS, 83 fișiere comprimate.
+- `dist/client/index.html`: `data-fallback-src="/videos/bg-nunta-live-2027.mp4"` prezent; logica de fallback regăsită în scriptul minificat, inclusiv tokenul de încercare și dezabonarea listener-ului.
+- `npm run seo:audit`: 62 pagini HTML verificate, **0 FAIL | 0 WARN**.
+- Commit-uri și push pe `main`: `657244ae` (domeniu media în CSP, curățat de gitlink), `74ef1288` (scoatere din `script-src` + `.gitignore`), `a0f439b7` (Google Analytics în CSP), `1b5554a9` (fallback hero video).
+
+### Riscuri / pași următori
+- `bg-nunta-live-2027.mp4` este servit fără `Cache-Control` (antet gol la verificare). Fără o Cache Rule immutable în Cloudflare, fiecare vizitator desktop poate reface transferul de 5,33 MB. De configurat în dashboard.
+- `public/videos/bg-nunta-live-2027.mp4` (5,33 MB) rămâne în repository ca sursă de rezervă. Acum că CDN-ul răspunde, ștergerea ar reduce dimensiunea repo-ului și a imaginii de deploy, dar ar elimina plasa de siguranță; decizia necesită acord explicit.
+- `Access-Control-Allow-Origin: *` este permisiv. Funcțional e corect pentru media publică, dar poate fi restrâns la originea site-ului dacă se dorește o politică mai strictă.
+- Consent Mode poate emite cereri și către domeniul Google regional (`https://www.google.ro`) în funcție de locația vizitatorului. Nu a fost adăugat preventiv; de verificat în consolă după publicare dacă apar violări CSP pe alt TLD.
+- `PUBLIC_R2_MUSIC_BASE_URL` din Railway rămâne neverificată din sesiunea precedentă: dacă indică încă spre `r2.dev`, fallback-ul pieselor fără `url` explicit este blocat de CSP.
+- Fallback-ul video nu a putut fi observat în condiții reale de eșec după urcarea obiectului; a fost validat doar pe logica buildată. Nicio măsurătoare Lighthouse nu a fost efectuată în această sesiune.
+
+---
+
 ## 📝 11 oct 2026 — Migrare completă MySQL ➜ Supabase: eliminarea driverului TCP și rescrierea a 12 consumatori
 
 ### Obiectiv
