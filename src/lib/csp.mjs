@@ -2,7 +2,7 @@
 // (fișiere statice servite prin sirv) — evită desincronizarea celor două puncte de aplicare.
 export const CONTENT_SECURITY_POLICY = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://cdn.jsdelivr.net https://www.youtube.com https://s.ytimg.com https://embed.cloudflarestream.com https://connect.facebook.net https://analytics.tiktok.com https://media.florentinapanaofficial.ro",
+    "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://cdn.jsdelivr.net https://www.youtube.com https://s.ytimg.com https://embed.cloudflarestream.com https://connect.facebook.net https://analytics.tiktok.com",
     "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
     "img-src 'self' data: https://www.google-analytics.com https://i.ytimg.com https://img.youtube.com https://*.googleusercontent.com https://*.cloudflarestream.com https://videodelivery.net https://*.r2.dev https://www.facebook.com https://analytics.tiktok.com https://media.florentinapanaofficial.ro",
     "font-src 'self'",
