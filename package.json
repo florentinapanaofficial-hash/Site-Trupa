@@ -29,8 +29,6 @@
     "seo:errors:dry": "node seo-agent/gsc-errors.js --dry-run",
     "seo:errors:only": "node seo-agent/gsc-errors.js --only-errors",
     "audio:sync": "node scripts/sync-audio-catalog.mjs",
-    "db:migrate:track-plays": "node scripts/create-track-plays-table.mjs",
-    "db:migrate:budget-intents": "node scripts/create-budget-intents-table.mjs",
     "ferrari": "node ferrari.js"
   },
   "dependencies": {
@@ -44,7 +42,6 @@
     "dotenv": "^16.4.5",
     "googleapis": "^171.4.0",
     "isomorphic-dompurify": "^3.1.0",
-    "mysql2": "^3.24.4",
     "nanoid": "^5.0.8",
     "openai": "^6.34.0",
     "resend": "^6.32.0",

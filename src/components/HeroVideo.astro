@@ -1,31 +1,67 @@
 ---
+/**
+ * Poster-first: imaginea statică este elementul LCP, video-ul se încarcă abia
+ * după `load`, doar pe desktop, fără saveData și fără prefers-reduced-motion.
+ */
 interface Props {
-  videoUrl: string;
+  /** Implicit sursa R2 cu custom domain (cache CDN). Nu folosi MP4 local. */
+  videoUrl?: string;
   title: string;
   subtitle: string;
   showReviews?: boolean;
   posterImage?: string;
+  posterAlt?: string;
+  posterWidth?: number;
+  posterHeight?: number;
   /** h1 implicit; h2 când pagina are deja un H1 propriu; p când H1-ul paginii
       apare mai jos în DOM (păstrează ierarhia headings corectă, stil identic). */
   titleTag?: 'h1' | 'h2' | 'p';
 }
 
-const { videoUrl, title, subtitle, showReviews = false, posterImage, titleTag = 'h1' } = Astro.props;
+const R2_HERO_VIDEO = 'https://media.florentinapanaofficial.ro/bg-nunta-live-2027.mp4';
+
+const {
+  videoUrl = R2_HERO_VIDEO,
+  title,
+  subtitle,
+  showReviews = false,
+  posterImage,
+  posterAlt = 'Formația Florentina Pană cântând live pe scenă la o nuntă',
+  posterWidth,
+  posterHeight,
+  titleTag = 'h1',
+} = Astro.props;
 const TitleTag = titleTag;
 ---
 
-<section class="relative w-full min-h-[80vh] md:min-h-screen flex items-center justify-center overflow-hidden">
+<section
+  class="hero-video relative w-full min-h-[80vh] md:min-h-screen flex items-center justify-center overflow-hidden"
+  data-hero-video
+>
+  {posterImage && (
+    <img
+      src={posterImage}
+      alt={posterAlt}
+      width={posterWidth}
+      height={posterHeight}
+      fetchpriority="high"
+      decoding="sync"
+      loading="eager"
+      data-hero-poster
+      class="hero-video__poster absolute inset-0 z-0 h-full w-full object-cover"
+    />
+  )}
+
   <video
-    src={videoUrl}
-    poster={posterImage}
-    autoplay
-    loop
+    data-hero-media
+    data-src={videoUrl}
     muted
+    loop
     playsinline
-    preload="metadata"
+    preload="none"
     aria-hidden="true"
     tabindex="-1"
-    class="absolute inset-0 w-full h-full object-cover z-0"
+    class="hero-video__media absolute inset-0 z-0 h-full w-full object-cover"
   ></video>
 
   <div class="absolute inset-0 bg-black/50 bg-gradient-to-t from-[#0a0f1a] to-transparent z-10" aria-hidden="true"></div>
@@ -47,3 +83,87 @@ const TitleTag = titleTag;
     <slot />
   </div>
 </section>
+
+<style>
+  /* Doar opacity/transform: schimbarea de strat nu produce reflow, deci CLS = 0. */
+  .hero-video__media {
+    opacity: 0;
+    transition: opacity 600ms ease;
+  }
+
+  .hero-video[data-hero-state='playing'] .hero-video__media {
+    opacity: 1;
+  }
+
+  .hero-video__poster {
+    opacity: 1;
+    transition: opacity 600ms ease;
+  }
+
+  .hero-video[data-hero-state='playing'] .hero-video__poster {
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-video__media,
+    .hero-video__poster {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const heroes = document.querySelectorAll<HTMLElement>('[data-hero-video]');
+  if (heroes.length > 0) {
+    const canPlayBackground = () => {
+      if (!window.matchMedia('(min-width: 768px)').matches) return false;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
+      const connection = (navigator as any).connection;
+      if (connection?.saveData) return false;
+      return true;
+    };
+
+    const activate = (hero: HTMLElement) => {
+      const video = hero.querySelector<HTMLVideoElement>('[data-hero-media]');
+      const src = video?.dataset.src;
+      if (!video || !src || video.dataset.loaded === 'true') return;
+
+      video.dataset.loaded = 'true';
+      video.addEventListener(
+        'playing',
+        () => {
+          hero.dataset.heroState = 'playing';
+        },
+        { once: true },
+      );
+      video.src = src;
+      video.load();
+      video.play().catch(() => {
+        video.removeAttribute('src');
+        video.load();
+        delete video.dataset.loaded;
+      });
+    };
+
+    const start = () => {
+      if (!canPlayBackground()) return;
+      heroes.forEach(activate);
+    };
+
+    // Amânăm după `load` + idle: video-ul nu concurează cu posterul LCP.
+    const schedule = () => {
+      const idle = (window as any).requestIdleCallback;
+      if (typeof idle === 'function') {
+        idle(start, { timeout: 3000 });
+      } else {
+        window.setTimeout(start, 1200);
+      }
+    };
+
+    if (document.readyState === 'complete') {
+      schedule();
+    } else {
+      window.addEventListener('load', schedule, { once: true });
+    }
+  }
+</script>

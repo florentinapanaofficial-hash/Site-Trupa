@@ -1,7 +1,6 @@
 import { timingSafeEqual } from 'node:crypto';
 import type { APIRoute } from 'astro';
-import { query } from '../../lib/db.js';
-import { ensureReservationStatusColumn } from '../../lib/reservation-status.js';
+import { requireSupabaseAdmin } from '../../lib/supabase';
 import { secureLogger } from '../../lib/secure-logger.js';
 
 export const prerender = false;
@@ -10,10 +9,6 @@ type AdminPayload = {
     action?: unknown;
     id?: unknown;
     data?: unknown;
-};
-
-type ExistingReservation = {
-    id: number;
 };
 
 function jsonResponse(body: unknown, status = 200): Response {
@@ -53,16 +48,16 @@ export const GET: APIRoute = async ({ request }) => {
     if (!isAuthorized(request)) return jsonResponse({ error: 'Neautorizat.' }, 401);
 
     try {
-        await ensureReservationStatusColumn();
-        const reservations = await query(
-            `SELECT id, nume, telefon, eveniment,
-                    DATE_FORMAT(data_eveniment, '%Y-%m-%d') AS data_eveniment,
-                    mesaj, status, creat_la
-             FROM rezervari
-             ORDER BY data_eveniment DESC, creat_la DESC, id DESC`,
-        );
+        const { data, error } = await requireSupabaseAdmin()
+            .from('rezervari')
+            .select('id, nume, telefon, eveniment, data_eveniment, mesaj, status, creat_la')
+            .order('data_eveniment', { ascending: false })
+            .order('creat_la', { ascending: false })
+            .order('id', { ascending: false });
 
-        return jsonResponse(reservations);
+        if (error) throw error;
+
+        return jsonResponse(data ?? []);
     } catch (error) {
         secureLogger.error('[api/admin-rezervari] GET error:', error);
         return jsonResponse({ error: 'Nu s-au putut încărca rezervările.' }, 500);
@@ -84,7 +79,7 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     try {
-        await ensureReservationStatusColumn();
+        const supabase = requireSupabaseAdmin();
 
         if (payload.action === 'confirma') {
             const id = Number(payload.id);
@@ -92,16 +87,20 @@ export const POST: APIRoute = async ({ request }) => {
                 return jsonResponse({ error: 'Identificator invalid.' }, 400);
             }
 
-            const existing = await query(
-                'SELECT id FROM rezervari WHERE id = ? LIMIT 1',
-                [id],
-            ) as ExistingReservation[];
-            if (existing.length === 0) return jsonResponse({ error: 'Rezervarea nu a fost găsită.' }, 404);
+            const { data: existing, error: selectError } = await supabase
+                .from('rezervari')
+                .select('id')
+                .eq('id', id)
+                .maybeSingle();
+            if (selectError) throw selectError;
+            if (!existing) return jsonResponse({ error: 'Rezervarea nu a fost găsită.' }, 404);
 
-            await query(
-                "UPDATE rezervari SET status = 'confirmat' WHERE id = ?",
-                [id],
-            );
+            const { error: updateError } = await supabase
+                .from('rezervari')
+                .update({ status: 'confirmat' })
+                .eq('id', id);
+            if (updateError) throw updateError;
+
             return jsonResponse({ ok: true });
         }
 
@@ -110,12 +109,19 @@ export const POST: APIRoute = async ({ request }) => {
                 return jsonResponse({ error: 'Data selectată este invalidă.' }, 400);
             }
 
-            await query(
-                `INSERT INTO rezervari
-                 (nume, telefon, eveniment, data_eveniment, mesaj, gdpr_consent, creat_la, status)
-                 VALUES (?, '', ?, ?, ?, 0, NOW(), 'confirmat')`,
-                ['Rezervat Telefonic', 'Eveniment telefonic', payload.data, 'Adăugată manual din panoul admin.'],
-            );
+            const { error: insertError } = await supabase
+                .from('rezervari')
+                .insert({
+                    nume: 'Rezervat Telefonic',
+                    telefon: '',
+                    eveniment: 'Eveniment telefonic',
+                    data_eveniment: payload.data,
+                    mesaj: 'Adăugată manual din panoul admin.',
+                    gdpr_consent: false,
+                    status: 'confirmat',
+                });
+            if (insertError) throw insertError;
+
             return jsonResponse({ ok: true }, 201);
         }
 

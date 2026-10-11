@@ -4,7 +4,7 @@ import path from 'node:path';
 import sharp from 'sharp';
 import { nanoid } from 'nanoid';
 import DOMPurify from 'isomorphic-dompurify';
-import { query } from '../../lib/db.js';
+import { requireSupabaseAdmin } from '../../lib/supabase';
 import { checkOrigin } from '../../lib/cors.js';
 import { secureLogger } from '../../lib/secure-logger.js';
 
@@ -177,10 +177,10 @@ export const POST: APIRoute = async ({ request }) => {
       return jsonResponse({ error: 'Cale imagine invalidă.' }, 500, cors.origin);
     }
 
-    await query(
-      'INSERT INTO gallery (titlu, imagine_url) VALUES (?, ?)',
-      [title, publicUrl],
-    );
+    const { error: insertError } = await requireSupabaseAdmin()
+      .from('gallery')
+      .insert({ titlu: title, imagine_url: publicUrl });
+    if (insertError) throw insertError;
 
     let audioUrl = '';
     if (audioFile instanceof File) {

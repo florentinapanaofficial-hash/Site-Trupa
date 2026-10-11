@@ -2,11 +2,12 @@
  * /api/views/ – Contor de vizualizări pentru fațadele video (VideoFacade).
  * GET  ?ids=a,b,c -> { views: { [videoId]: number } }
  * POST { videoId } -> incrementează cu 1 și returnează { videoId, views }.
- * Persistență: MySQL `video_views`, prin conexiunea Railway existenta.
+ * Persistență: Supabase `video_views`; incrementul rulează prin RPC-ul atomic
+ * `increment_video_view` (INSERT ... ON CONFLICT), deci nu necesită tranzacție.
  */
 
 import type { APIRoute } from 'astro';
-import { getPool, query } from '../../lib/db.js';
+import { requireSupabaseAdmin } from '../../lib/supabase';
 import { checkOrigin } from '../../lib/cors.js';
 import { secureLogger } from '../../lib/secure-logger.js';
 
@@ -18,39 +19,30 @@ const VIEW_WINDOW_MS = 30_000;
 const lastViewByKey = new Map<string, number>();
 
 async function readViews(ids: string[]): Promise<Record<string, number>> {
-    const rows = await query(
-        `SELECT video_id, views_count FROM video_views WHERE video_id IN (${ids.map(() => '?').join(',')})`,
-        ids,
-    ) as Array<{ video_id: string; views_count: number }>;
+    const { data, error } = await requireSupabaseAdmin()
+        .from('video_views')
+        .select('video_id, views_count')
+        .in('video_id', ids);
+
+    if (error) throw error;
 
     const views: Record<string, number> = {};
     for (const id of ids) views[id] = 0;
-    for (const row of rows) {
+    for (const row of data ?? []) {
         views[row.video_id] = Number(row.views_count);
     }
     return views;
 }
 
 async function incrementView(id: string): Promise<number> {
-    const connection = await getPool().getConnection();
-    try {
-        await connection.beginTransaction();
-        await connection.execute(
-            'INSERT INTO video_views (video_id, views_count) VALUES (?, 1) ON DUPLICATE KEY UPDATE views_count = views_count + 1',
-            [id],
-        );
-        const [result] = await connection.execute('SELECT views_count FROM video_views WHERE video_id = ?', [id]);
-        const rows = result as Array<{ views_count: number }>;
-        const total = Number(rows[0]?.views_count);
-        if (!Number.isSafeInteger(total) || total < 1) throw new Error('Contor video invalid.');
-        await connection.commit();
-        return total;
-    } catch (error) {
-        await connection.rollback();
-        throw error;
-    } finally {
-        connection.release();
-    }
+    const { data, error } = await requireSupabaseAdmin()
+        .rpc('increment_video_view', { p_video_id: id });
+
+    if (error) throw error;
+
+    const total = Number(data);
+    if (!Number.isSafeInteger(total) || total < 1) throw new Error('Contor video invalid.');
+    return total;
 }
 
 function jsonResponse(data: unknown, status = 200, corsOrigin: string | null = null): Response {

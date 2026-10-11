@@ -4,7 +4,7 @@ export const prerender = true;
 import BaseLayout from '../layouts/BaseLayout.astro';
 import siteContent from '../data/siteContent.json';
 import BackButton from '../components/BackButton.astro';
-import { query as dbQuery } from '../lib/db.js';
+import { getSupabasePublic } from '../lib/supabase';
 
 const { realMoments, brand } = siteContent;
 
@@ -16,20 +16,61 @@ let dbMomentPhotos: Array<{
 }> = [];
 
 try {
-  const rows = (await dbQuery(
-    `SELECT id, titlu, imagine_url, data_upload
-     FROM gallery
-     WHERE imagine_url LIKE '/uploads/%'
-     ORDER BY data_upload DESC, id DESC
-     LIMIT 60`,
-  )) as Array<{ id: number; titlu: string; imagine_url: string; data_upload: string }>;
+  const supabase = getSupabasePublic();
+  if (supabase) {
+    const { data, error } = await supabase
+      .from('gallery')
+      .select('id, titlu, imagine_url, data_upload')
+      .like('imagine_url', '/uploads/%')
+      .order('data_upload', { ascending: false })
+      .order('id', { ascending: false })
+      .limit(60);
 
-  dbMomentPhotos = rows.filter((row) => typeof row.imagine_url === 'string' && row.imagine_url.startsWith('/uploads/'));
+    if (error) throw error;
+    dbMomentPhotos = (data ?? []).filter(
+      (row) => typeof row.imagine_url === 'string' && row.imagine_url.startsWith('/uploads/'),
+    );
+  }
 } catch (error) {
   console.error('Nu s-au putut citi pozele pentru galeria completă:', error);
 }
 
 const hasDbMomentPhotos = dbMomentPhotos.length > 0;
+
+// Ordinea trebuie sa fie identica cu a cardurilor: lightbox-ul se pozitioneaza dupa `image`.
+const eventLightboxPhotos = realMoments.events
+  .filter((ev: any) => typeof ev.image === 'string' && ev.image.trim() !== '')
+  .map((ev: any) => ({
+    image: ev.image,
+    title: ev.couple,
+    caption: `${ev.couple} \u2022 ${ev.city} \u2022 ${ev.date}`,
+    audio: ev.audioUrl ?? '',
+    quote: ev.coupleQuote ?? '',
+  }));
+
+const dateFormatter = new Intl.DateTimeFormat('ro-RO', { dateStyle: 'long' });
+const formatUploadDate = (value: string) => {
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? '' : dateFormatter.format(parsed);
+};
+
+const seenLightboxImages = new Set(eventLightboxPhotos.map((photo: any) => photo.image));
+const dbLightboxPhotos = dbMomentPhotos
+  .filter((row) => !seenLightboxImages.has(row.imagine_url))
+  .map((row) => {
+    const title = typeof row.titlu === 'string' && row.titlu.trim() !== '' ? row.titlu.trim() : 'Fotografie Album';
+    const uploadedOn = formatUploadDate(row.data_upload);
+    return {
+      image: row.imagine_url,
+      title,
+      caption: uploadedOn ? `${title} \u2022 ${uploadedOn}` : title,
+      audio: '',
+      quote: '',
+    };
+  });
+
+// Cardurile randate server-side stau primele, ca indexul initial sa fie corect.
+const lightboxPhotos = [...eventLightboxPhotos, ...dbLightboxPhotos];
 
 const SITE_FALLBACK = 'https://florentinapanaofficial.ro';
 const site = Astro.site?.toString().replace(/\/$/, '') ?? SITE_FALLBACK;
@@ -235,7 +276,7 @@ const eventsJsonLd = realMoments.events
     </dialog>
   </section>
 
-  <script is:inline data-astro-rerun>
+  <script is:inline data-astro-rerun define:vars={{ lightboxPhotos }}>
     (() => {
     const lightbox = document.getElementById('photo-lightbox');
     const lightboxImage = document.getElementById('photo-lightbox-image');
@@ -247,33 +288,9 @@ const eventsJsonLd = realMoments.events
     const lightboxDemoSoundButton = document.querySelector('[data-lightbox-demo-sound]');
     const lightboxSizeToggleButton = document.querySelector('[data-lightbox-size-toggle]');
 
-    const albumRoot = document.querySelector('[data-home-gallery-grid]');
-    const filmStripTrack = /** @type {HTMLElement|null} */ (document.querySelector('[data-film-strip-track]'));
-    const albumPrevButton = document.querySelector('[data-album-prev]');
-    const albumNextButton = document.querySelector('[data-album-next]');
-    const albumIndicator = document.querySelector('[data-album-indicator]');
-    const albumSearchInput = document.querySelector('[data-album-search-input]');
-    const albumSearchButton = document.querySelector('[data-album-search-button]');
-    const albumSearchClearButton = document.querySelector('[data-album-search-clear]');
-    const albumSearchResult = document.querySelector('[data-album-search-result]');
-
     const sizePresetStorageKey = 'fp-lightbox-size-preset';
-    const rawAlbumPhotos = albumRoot?.getAttribute('data-album-photos') ?? '[]';
-    let allAlbumPhotos = [];
-    let albumPhotos = [];
+    const albumPhotos = Array.isArray(lightboxPhotos) ? lightboxPhotos : [];
 
-    try {
-      const parsed = JSON.parse(rawAlbumPhotos);
-      allAlbumPhotos = Array.isArray(parsed) ? parsed : [];
-      albumPhotos = [...allAlbumPhotos];
-    } catch {
-      allAlbumPhotos = [];
-      albumPhotos = [];
-    }
-
-    let activePhotoIndex = 0;
-    let currentSearchTerm = '';
-    let searchDebounceTimer = null;
     let currentSizePreset = window.localStorage.getItem(sizePresetStorageKey) || 'normal';
     let isClosingLightbox = false;
     let currentLightboxIndex = -1;
@@ -720,27 +737,6 @@ const eventsJsonLd = realMoments.events
       startPetals();
     };
 
-    const normalizeSearchText = (value) =>
-      String(value ?? '')
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .trim();
-
-    const updateSearchResultText = () => {
-      if (!(albumSearchResult instanceof HTMLElement)) return;
-
-      if (!currentSearchTerm) {
-        albumSearchResult.textContent = `Se afișează toate fotografiile (${albumPhotos.length}).`;
-        return;
-      }
-
-      albumSearchResult.textContent = `Rezultate pentru „${currentSearchTerm}”: ${albumPhotos.length}`;
-    };
-
-    const coupleCards = /** @type {HTMLElement[]} */ ([...document.querySelectorAll('.couple-card')]);
-    const coupleCardsSection = /** @type {HTMLElement|null} */ (document.querySelector('.couple-cards-section'));
-
     // Click pe fotografia unui cuplu → deschide lightbox cu petale + cer
     document.querySelector('.couple-cards-grid')?.addEventListener('click', (event) => {
       const btn = event.target instanceof Element
@@ -748,184 +744,6 @@ const eventsJsonLd = realMoments.events
         : null;
       if (!(btn instanceof HTMLElement)) return;
       openLightboxFromTrigger(btn);
-    });
-
-    const filterCoupleCards = (needle) => {
-      let visibleCount = 0;
-      coupleCards.forEach((card) => {
-        const haystack = normalizeSearchText(card.getAttribute('data-couple-search') ?? '');
-        const match = !needle || haystack.includes(needle);
-        card.style.display = match ? '' : 'none';
-        if (match) visibleCount++;
-      });
-      if (coupleCardsSection instanceof HTMLElement) {
-        coupleCardsSection.style.display = visibleCount === 0 ? 'none' : '';
-      }
-    };
-
-    const applyAlbumSearch = () => {
-      const needle = normalizeSearchText(currentSearchTerm);
-
-      if (!needle) {
-        albumPhotos = [...allAlbumPhotos];
-      } else {
-        albumPhotos = allAlbumPhotos.filter((photo) => {
-          const title = normalizeSearchText(photo?.title);
-          const caption = normalizeSearchText(photo?.caption);
-          return title.includes(needle) || caption.includes(needle);
-        });
-      }
-
-      filterCoupleCards(needle);
-      activePhotoIndex = 0;
-      renderFilmStrip();
-      updateSearchResultText();
-    };
-
-    // ── Film strip ────────────────────────────────────────────────────────────
-    const THUMB_W = 210;
-    const THUMB_GAP = 12;
-
-    const renderFilmStrip = () => {
-      if (!filmStripTrack) return;
-      filmStripTrack.innerHTML = '';
-
-      if (albumPhotos.length === 0) {
-        const empty = document.createElement('p');
-        empty.className = 'film-empty-msg';
-        empty.textContent = 'Nu am găsit fotografii pentru această căutare.';
-        filmStripTrack.appendChild(empty);
-        updateStripIndicator();
-        updateStripNavButtons();
-        return;
-      }
-
-      albumPhotos.forEach((photo, i) => {
-        const item = document.createElement('div');
-        item.className = 'film-thumb' + (i === activePhotoIndex ? ' film-thumb--active' : '');
-
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'film-thumb-btn';
-        btn.style.borderRadius = '16px';
-        btn.setAttribute('data-film-idx', String(i));
-        btn.setAttribute('data-lightbox-src', String(photo.image ?? ''));
-        btn.setAttribute('data-lightbox-alt', String(photo.title ?? 'Fotografie eveniment'));
-        btn.setAttribute('data-lightbox-caption', String(photo.caption ?? ''));
-        btn.setAttribute('data-lightbox-audio', String(photo.audio ?? ''));
-        btn.setAttribute('data-lightbox-quote', String(photo.quote ?? ''));
-        btn.setAttribute('aria-label', String(photo.title ?? 'Fotografie eveniment'));
-
-        const img = document.createElement('img');
-        img.src = String(photo.image ?? '');
-        img.alt = String(photo.title ?? '');
-        img.loading = 'lazy';
-        img.decoding = 'async';
-        img.className = 'film-thumb-img';
-        img.style.borderRadius = '14px';
-        img.draggable = false;
-        btn.appendChild(img);
-
-        if (i === activePhotoIndex) {
-          const pill = document.createElement('span');
-          pill.className = 'film-active-open-hint';
-          pill.setAttribute('aria-hidden', 'true');
-          pill.textContent = '▶ Deschide';
-          btn.appendChild(pill);
-        }
-
-        item.appendChild(btn);
-        filmStripTrack.appendChild(item);
-      });
-
-      scrollToActive(false);
-      updateStripIndicator();
-      updateStripNavButtons();
-    };
-
-    const scrollToActive = (animated = true) => {
-      const outer = filmStripTrack?.parentElement;
-      if (!outer || !filmStripTrack) return;
-      const outerW = outer.clientWidth;
-      const itemW = THUMB_W + THUMB_GAP;
-      const activeMidX = activePhotoIndex * itemW + THUMB_W / 2;
-      const scrollLeft = activeMidX - outerW / 2;
-      filmStripTrack.style.transition = animated ? 'transform 440ms cubic-bezier(0.22,1,0.36,1)' : 'none';
-      filmStripTrack.style.transform = `translateX(${-Math.max(0, scrollLeft)}px)`;
-    };
-
-    const updateStripIndicator = () => {
-      if (albumIndicator) {
-        albumIndicator.textContent = albumPhotos.length > 0
-          ? `${activePhotoIndex + 1} / ${albumPhotos.length}`
-          : '—';
-      }
-    };
-
-    const updateStripNavButtons = () => {
-      if (albumPrevButton instanceof HTMLButtonElement) albumPrevButton.disabled = activePhotoIndex <= 0;
-      if (albumNextButton instanceof HTMLButtonElement) albumNextButton.disabled = activePhotoIndex >= albumPhotos.length - 1;
-    };
-
-    renderFilmStrip();
-    updateSearchResultText();
-
-    const runSearchFromInput = () => {
-      if (!(albumSearchInput instanceof HTMLInputElement)) return;
-      currentSearchTerm = albumSearchInput.value.trim();
-      applyAlbumSearch();
-    };
-
-    albumSearchButton?.addEventListener('click', runSearchFromInput);
-
-    albumSearchInput?.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        runSearchFromInput();
-      }
-    });
-
-    albumSearchInput?.addEventListener('input', () => {
-      if (searchDebounceTimer) {
-        window.clearTimeout(searchDebounceTimer);
-      }
-
-      searchDebounceTimer = window.setTimeout(() => {
-        runSearchFromInput();
-      }, 220);
-    });
-
-    albumSearchClearButton?.addEventListener('click', () => {
-      if (albumSearchInput instanceof HTMLInputElement) {
-        albumSearchInput.value = '';
-      }
-      currentSearchTerm = '';
-      applyAlbumSearch();
-    });
-
-    albumPrevButton?.addEventListener('click', () => {
-      if (activePhotoIndex <= 0) return;
-      activePhotoIndex -= 1;
-      renderFilmStrip();
-    });
-
-    albumNextButton?.addEventListener('click', () => {
-      if (activePhotoIndex >= albumPhotos.length - 1) return;
-      activePhotoIndex += 1;
-      renderFilmStrip();
-    });
-
-    albumRoot?.addEventListener('click', (event) => {
-      const btn = event.target instanceof Element ? event.target.closest('[data-film-idx]') : null;
-      if (!btn) return;
-      const idx = parseInt(btn.getAttribute('data-film-idx') ?? '-1', 10);
-      if (isNaN(idx) || idx < 0 || idx >= albumPhotos.length) return;
-      if (idx === activePhotoIndex) {
-        openLightboxFromTrigger(btn);
-      } else {
-        activePhotoIndex = idx;
-        renderFilmStrip();
-      }
     });
 
     if (lightbox && lightboxImage && lightboxCaption) {
@@ -980,16 +798,6 @@ const eventsJsonLd = realMoments.events
         stopPetals();
         unlockPageScrollForLightbox();
 
-        // Animate album back into view after lightbox closes without a forced reflow.
-        // Resetăm clasa în următorul frame, astfel CSS-ul poate relansa animația
-        // fără să citim `offsetWidth` imediat după scrierea DOM.
-        if (albumRoot instanceof HTMLElement) {
-          albumRoot.classList.remove('album-is-returning');
-          requestAnimationFrame(() => {
-            albumRoot.classList.add('album-is-returning');
-            window.setTimeout(() => albumRoot.classList.remove('album-is-returning'), 700);
-          });
-        }
         lightboxImage.setAttribute('src', '');
         lightboxImage.setAttribute('alt', '');
         lightboxCaption.textContent = '';
@@ -1294,37 +1102,6 @@ const eventsJsonLd = realMoments.events
           homeGalleryUrlInput.value = data.url || '';
         }
 
-        if (albumRoot && data.url) {
-          if (albumRoot.getAttribute('data-home-gallery-source') === 'fallback') {
-            window.location.reload();
-            return;
-          }
-
-          const safeTitle = String(data.title || photoTitle);
-          const newPhoto = {
-            title: safeTitle,
-            image: String(data.url),
-            caption: `${safeTitle} • ${new Date().toLocaleDateString('ro-RO')}`,
-            audio: String(data.audioUrl || `/uploads/audio/${String(data.url).split('/').pop()?.replace(/\.[^.]+$/, '') || ''}.mp3`),
-          };
-
-          allAlbumPhotos.unshift(newPhoto);
-
-          const normalizedNeedle = normalizeSearchText(currentSearchTerm);
-          const matchesFilter =
-            !normalizedNeedle ||
-            normalizeSearchText(newPhoto.title).includes(normalizedNeedle) ||
-            normalizeSearchText(newPhoto.caption).includes(normalizedNeedle);
-
-          if (matchesFilter) {
-            albumPhotos.unshift(newPhoto);
-          }
-
-          activePhotoIndex = 0;
-          renderFilmStrip();
-          updateSearchResultText();
-        }
-
         showHomeGalleryStatus('Imagine încărcată cu succes în galerie.', 'success');
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Eroare la upload.';
@@ -1516,7 +1293,6 @@ const eventsJsonLd = realMoments.events
       }, { once: true });
     })();
     document.addEventListener('astro:before-swap', () => {
-      window.clearTimeout(searchDebounceTimer);
       stopPetals();
       if (lightboxAudio instanceof HTMLAudioElement) lightboxAudio.pause();
       if (lightbox instanceof HTMLDialogElement && lightbox.open) lightbox.close();
@@ -1816,149 +1592,10 @@ const eventsJsonLd = realMoments.events
     }
 
     /* ── Film strip ──────────────────────────────────────────────────────── */
-    .film-strip-wrap {
-      max-width: min(97vw, 1500px);
-      margin-inline: auto;
-    }
-
-    .film-strip-viewport {
-      display: flex;
-      align-items: center;
-      gap: 0;
-      position: relative;
-      overflow: hidden;
-      padding-block: 0.5rem;
-    }
-
-    .film-strip-track-outer {
-      flex: 1 1 auto;
-      overflow: hidden;
-      position: relative;
-      min-width: 0;
-    }
-
-    .film-strip-track {
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-      will-change: transform;
-      padding-block: 1rem;
-    }
-
-    .film-thumb {
-      flex-shrink: 0;
-      width: 210px;
-      opacity: 0.55;
-      transition: opacity 320ms ease;
-    }
-
-    .film-thumb--active {
-      opacity: 1;
-      z-index: 2;
-    }
-
-    .film-thumb-btn {
-      display: block;
-      width: 100%;
-      position: relative;
-      cursor: pointer;
-      border-radius: 16px;
-      overflow: hidden;
-      border: 2.5px solid transparent;
-      padding: 0;
-      background: transparent;
-      transition: border-color 250ms ease, box-shadow 250ms ease;
-    }
-
-    .film-thumb--active .film-thumb-btn {
-      border-color: #F5A623;
-      box-shadow: 0 0 26px rgba(245,166,35,0.65), 0 8px 28px rgba(0,0,0,0.55);
-    }
-
-    .film-thumb-img {
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      object-fit: cover;
-      display: block;
-      border-radius: 14px;
-    }
-
-    .film-active-open-hint {
-      position: absolute;
-      bottom: 0.4rem;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(245, 166, 35, 0.92);
-      color: #0C080F;
-      border-radius: 9999px;
-      padding: 0.18rem 0.6rem;
-      font-size: 0.6rem;
-      font-weight: 800;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      white-space: nowrap;
-      pointer-events: none;
-    }
-
-    .film-strip-arrow {
-      flex-shrink: 0;
-      width: 2.8rem;
-      height: 2.8rem;
-      border-radius: 50%;
-      border: 1.5px solid rgba(255,255,255,0.22);
-      background: rgba(255,255,255,0.08);
-      color: rgba(255,255,255,0.8);
-      font-size: 2rem;
-      line-height: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: background 160ms ease, border-color 160ms ease, opacity 160ms ease;
-      z-index: 3;
-    }
-
-    .film-strip-arrow:hover:not(:disabled) {
-      background: rgba(245,166,35,0.22);
-      border-color: rgba(245,166,35,0.6);
-      color: #F5A623;
-    }
-
-    .film-strip-arrow:disabled {
-      opacity: 0.22;
-      cursor: not-allowed;
-    }
-
-    .film-strip-controls {
-      margin-top: 0.3rem;
-      text-align: center;
-    }
-
-    .film-strip-indicator {
-      margin: 0;
-      color: rgba(233,244,255,0.75);
-      font-size: 0.64rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .film-empty-msg {
-      padding: 1.5rem;
-      color: rgba(255,255,255,0.6);
-      font-size: 0.88rem;
-      font-weight: 600;
-      text-align: center;
-    }
-
     .cinematic-album.is-turning-prev .album-flip-sheet {
       left: 0.72rem;
       transform-origin: right center;
       animation: page-sheet-prev 950ms cubic-bezier(0.2, 0.7, 0.2, 1);
-    }
-
-    .film-strip-wrap.album-is-returning {
-      animation: albumReturn 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
     }
 
     .cinematic-lightbox {
@@ -2311,11 +1948,6 @@ const eventsJsonLd = realMoments.events
       to { opacity: 1; transform: scale(1); filter: blur(0px); }
     }
 
-    @keyframes albumReturn {
-      from { opacity: 0; transform: scale(0.97) translateY(10px); }
-      to { opacity: 1; transform: none; }
-    }
-
     .gallery-stage-fade {
       opacity: 0;
       transform: translateY(12px);
@@ -2358,16 +1990,6 @@ const eventsJsonLd = realMoments.events
       .cinematic-lightbox .lightbox-image {
         max-height: var(--lightbox-image-max-height-mobile);
         max-width: var(--lightbox-image-max-width-desktop);
-      }
-
-      .film-thumb {
-        width: 160px;
-      }
-
-      .film-strip-arrow {
-        width: 2.2rem;
-        height: 2.2rem;
-        font-size: 1.5rem;
       }
     }
 

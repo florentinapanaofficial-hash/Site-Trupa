@@ -6,9 +6,6 @@ import liveReplays from '../data/liveReplays.json';
 const livePageTitle = 'Live cu Florentina Pană | Trupă Cover & Muzică Evenimente';
 const livePageDescription = 'Urmărește live stream-urile de la nunți, botezuri și evenimente cu Formația Florentina Pană. Simte energia FP Band în timp real.';
 const livePageOgImage = '/images/og-live-1200x630.jpg';
-const publicSupabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || '';
-const publicSupabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY || '';
-const isDev = import.meta.env.DEV;
 
 /* Replay-uri sortate descrescător după dată (newest-first) */
 const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
@@ -29,13 +26,25 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
     <div class="section-container relative z-10 text-center">
       <div class="mb-8"><BackButton href="/" label="Acasă" /></div>
 
-      {/* Indicator ON AIR — ascuns implicit, JS îl afișează dacă e live */}
-      <div class="mb-6 inline-flex items-center gap-2.5 rounded-full border border-red-500/30 bg-red-500/10 px-5 py-2.5" id="live-badge" style="display:none">
-        <span class="relative flex h-3.5 w-3.5">
-          <span class="absolute inline-flex h-full w-full animate-pulse rounded-full bg-red-500 opacity-75"></span>
-          <span class="relative inline-flex h-3.5 w-3.5 rounded-full bg-red-500"></span>
-        </span>
-        <span class="text-sm font-bold uppercase tracking-widest text-red-400">Transmisiune Live</span>
+      {/* Slot cu inaltime rezervata: skeleton si badge ocupa aceeasi celula de
+          grid, deci starea live/offline nu misca H1-ul de dedesubt. */}
+      <div class="mb-6 grid min-h-[2.75rem] place-items-center">
+        <span
+          id="live-badge-skeleton"
+          aria-hidden="true"
+          class="col-start-1 row-start-1 h-[2.625rem] w-48 animate-pulse rounded-full bg-white/10 transition-opacity duration-300"
+        ></span>
+        <div
+          id="live-badge"
+          aria-hidden="true"
+          class="col-start-1 row-start-1 inline-flex items-center gap-2.5 rounded-full border border-red-500/30 bg-red-500/10 px-5 py-2.5 opacity-0 transition-opacity duration-500"
+        >
+          <span class="relative flex h-3.5 w-3.5">
+            <span class="absolute inline-flex h-full w-full animate-pulse rounded-full bg-red-500 opacity-75"></span>
+            <span class="relative inline-flex h-3.5 w-3.5 rounded-full bg-red-500"></span>
+          </span>
+          <span class="text-sm font-bold uppercase tracking-widest text-red-400">Transmisiune Live</span>
+        </div>
       </div>
 
       <h1 class="mx-auto max-w-3xl font-['Oswald'] text-4xl font-bold uppercase tracking-widest leading-tight text-white sm:text-5xl lg:text-6xl">
@@ -93,24 +102,25 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      {/* ── Card Premium Offline — afișat sub player când nu suntem live ── */}
-      <div id="offline-overlay" class="live-offline-overlay" style="display:none" aria-live="polite">
-        <div class="live-offline-card">
-          <div class="live-offline-badge">
-            <span class="live-offline-pulse" aria-hidden="true"></span>
-            <span>În pauză până la următorul eveniment</span>
+            {/* ── Card Premium Offline — suprapus peste player, in interiorul
+                containerului cu aspect-ratio fix: nu ocupa spatiu in flow. ── */}
+            <div id="offline-overlay" class="live-offline-overlay" aria-live="polite" aria-hidden="true">
+              <div class="live-offline-card">
+                <div class="live-offline-badge">
+                  <span class="live-offline-pulse" aria-hidden="true"></span>
+                  <span>În pauză până la următorul eveniment</span>
+                </div>
+                <h2 class="live-offline-title">Revenim curând în direct</h2>
+                <p class="live-offline-text">
+                  Nu transmitem live în acest moment. În player rulează momente alese din ultimele evenimente — rămâi pe aproape, urcăm pe scenă în curând.
+                </p>
+                <p class="live-offline-hint">
+                  Transmisia începe pe site la 10 minute după startul evenimentului.
+                </p>
+              </div>
+            </div>
           </div>
-          <h2 class="live-offline-title">Revenim curând în direct</h2>
-          <p class="live-offline-text">
-            Nu transmitem live în acest moment. În player rulează momente alese din ultimele evenimente — rămâi pe aproape, urcăm pe scenă în curând.
-          </p>
-          <p class="live-offline-hint">
-            Transmisia începe pe site la 10 minute după startul evenimentului.
-          </p>
         </div>
       </div>
 
@@ -119,14 +129,16 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
         În player rulează momente alese din ultimele noastre evenimente. Te anunțăm aici imediat ce intrăm în direct.
       </p>
 
-      <div class="mt-3 flex justify-center">
+      {/* Inaltime rezervata cat butonul: comutarea live/offline nu misca sectiunile de dedesubt. */}
+      <div class="mt-3 flex min-h-[2.125rem] items-center justify-center">
         <a
           id="open-on-cloudflare"
           href="#"
           target="_blank"
           rel="noopener noreferrer"
-          class="inline-flex items-center gap-2 rounded-full border border-amber-500/40 bg-amber-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-amber-300 transition hover:border-amber-500/70 hover:bg-amber-500/20 hover:text-amber-200"
-          style="display:none"
+          aria-hidden="true"
+          tabindex="-1"
+          class="pointer-events-none inline-flex items-center gap-2 rounded-full border border-amber-500/40 bg-amber-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-amber-300 opacity-0 transition hover:border-amber-500/70 hover:bg-amber-500/20 hover:text-amber-200"
         >
           Deschide playerul separat
         </a>
@@ -551,21 +563,29 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
     }
   }
 
-  /* ── Card Premium Offline (sub player) ── */
+  /* ── Card Premium Offline (suprapus peste player) ── */
   .live-offline-overlay {
-    position: relative;
-    margin: 1.25rem auto 0;
+    position: absolute;
+    inset: 0;
+    z-index: 30;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 1rem;
+    padding: 1rem;
+    overflow-y: auto;
     pointer-events: none;
-    animation: liveOfflineFadeIn 0.5s ease;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 400ms ease, visibility 400ms ease;
   }
 
-  @keyframes liveOfflineFadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+  .live-offline-overlay.is-visible {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .live-offline-overlay { transition: none; }
   }
 
   .live-offline-card {
@@ -786,46 +806,27 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
   }
 </style>
 
-<script is:inline data-astro-rerun define:vars={{ publicSupabaseUrl, publicSupabaseAnonKey, isDev }}>
-  (() => {
-  let liveClient = null;
-  let liveChannel = null;
-  let disposed = false;
-  /* ═════════════════════════════════════════════════════════════════
-     SUPABASE CLIENT — Inițializare cu PUBLIC_SUPABASE_URL și PUBLIC_SUPABASE_ANON_KEY
-  ═════════════════════════════════════════════════════════════════ */
-  (async function initSupabase() {
-    const supabaseUrl = publicSupabaseUrl;
-    const supabaseKey = publicSupabaseAnonKey;
+<script>
+  import type { SupabaseClient, RealtimeChannel } from '@supabase/supabase-js';
 
-    if (!supabaseUrl || !supabaseKey) {
-      console.warn('PUBLIC_SUPABASE_URL sau PUBLIC_SUPABASE_ANON_KEY lipsesc; live likes sunt dezactivate.');
-      return;
-    }
+  const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+  const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+  const isDev = import.meta.env.DEV;
 
-    // Importăm Supabase client din CDN
-    try {
-      const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
-      if (disposed) return;
-      const client = createClient(supabaseUrl, supabaseKey);
-      liveClient = client;
-      window.supabaseClient = client;
+  let liveClient: SupabaseClient | null = null;
+  let liveChannel: RealtimeChannel | null = null;
 
-      // Inițializează Like button și Realtime listeners
-      initializeLiveFeatures();
-    } catch (err) {
-      console.error('Supabase client failed to load:', err);
-    }
-  })();
+  const teardown = () => {
+    if (liveClient && liveChannel) void liveClient.removeChannel(liveChannel);
+    liveChannel = null;
+    liveClient = null;
+  };
 
-  const initializeLiveFeatures = async () => {
-    if (!window.supabaseClient) return;
-
+  const initializeLiveFeatures = async (client: SupabaseClient) => {
     const likeBtn = document.getElementById('btn-like');
     const likeCount = document.getElementById('like-count');
     const lowerThird = document.getElementById('lower-third');
-    const client = window.supabaseClient;
-    
+
     // Identifică stream-ul după data curentă
     const streamId = 'live-stream-' + new Date().toISOString().split('T')[0];
 
@@ -846,61 +847,6 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
       }
     };
 
-    // ── Like button handler ──
-    if (likeBtn) {
-      likeBtn.addEventListener('click', async () => {
-        try {
-          // Inserează like în Supabase
-          const { error } = await client
-            .from('interactions')
-            .insert([
-              {
-                stream_id: streamId,
-                type: 'like',
-                created_at: new Date().toISOString(),
-              }
-            ]);
-
-          if (!error) {
-            likeBtn.style.transform = 'scale(1.1)';
-            setTimeout(() => {
-              likeBtn.style.transform = 'scale(1)';
-            }, 200);
-          }
-        } catch (err) {
-          console.error('Error adding like:', err);
-        }
-      });
-    }
-
-    // ── Realtime listener — ascultă noi like-uri ──
-    if (lowerThird && client) {
-      liveChannel = client
-        .channel(`interactions:stream_id=eq.${streamId}`)
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'interactions',
-            filter: `stream_id=eq.${streamId}`,
-          },
-          (payload) => {
-            if (payload.new.type === 'like') {
-              showLowerThirdNotification();
-              loadLikeCount(); // Reîncarcă numărul de like-uri
-            }
-          }
-        )
-        .subscribe((status) => {
-          if (status === 'SUBSCRIBED') {
-            if (isDev) {
-              console.log('✓ Realtime listener activ pentru like-uri');
-            }
-          }
-        });
-    }
-
     // ── Animație Lower Third ──
     const showLowerThirdNotification = () => {
       if (!lowerThird) return;
@@ -917,16 +863,80 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
       }, 3000);
     };
 
-    // Încarcă contul inițial
+    // ── Like button handler ──
+    if (likeBtn) {
+      likeBtn.addEventListener('click', async () => {
+        try {
+          const { error } = await client
+            .from('interactions')
+            .insert([
+              {
+                stream_id: streamId,
+                type: 'like',
+                created_at: new Date().toISOString(),
+              },
+            ]);
+
+          if (!error) {
+            likeBtn.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+              likeBtn.style.transform = 'scale(1)';
+            }, 200);
+          }
+        } catch (err) {
+          console.error('Error adding like:', err);
+        }
+      });
+    }
+
+    // ── Realtime listener — ascultă noi like-uri ──
+    if (lowerThird) {
+      liveChannel = client
+        .channel(`interactions:stream_id=eq.${streamId}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'interactions',
+            filter: `stream_id=eq.${streamId}`,
+          },
+          (payload: any) => {
+            if (payload.new?.type === 'like') {
+              showLowerThirdNotification();
+              loadLikeCount();
+            }
+          },
+        )
+        .subscribe((status: string) => {
+          if (status === 'SUBSCRIBED' && isDev) {
+            console.log('✓ Realtime listener activ pentru like-uri');
+          }
+        });
+    }
+
     await loadLikeCount();
   };
 
-  document.addEventListener('astro:before-swap', () => {
-    disposed = true;
-    if (liveClient && liveChannel) void liveClient.removeChannel(liveChannel);
-    if (window.supabaseClient === liveClient) delete window.supabaseClient;
-  }, { once: true });
-  })();
+  const setupLivePage = async () => {
+    if (!document.getElementById('btn-like')) return;
+    teardown();
+
+    if (!supabaseUrl || !supabaseKey) {
+      console.warn('PUBLIC_SUPABASE_URL sau PUBLIC_SUPABASE_ANON_KEY lipsesc; live likes sunt dezactivate.');
+      return;
+    }
+
+    // Chunk separat: SDK-ul nu intra in bundle-ul initial al paginii.
+    const { createClient } = await import('@supabase/supabase-js');
+    liveClient = createClient(supabaseUrl, supabaseKey);
+    await initializeLiveFeatures(liveClient);
+  };
+
+  void setupLivePage();
+  // Modulul se executa o singura data; re-initializam la navigarea ClientRouter.
+  document.addEventListener('astro:page-load', () => void setupLivePage());
+  document.addEventListener('astro:before-swap', teardown);
 </script>
 
 <script is:inline data-astro-rerun define:vars={{ replays }}>
@@ -934,6 +944,7 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
     // ── Status live + fallback playlist YouTube auto pentru offline ──
     var player = document.getElementById('live-player');
     var badge = document.getElementById('live-badge');
+    var badgeSkeleton = document.getElementById('live-badge-skeleton');
     var offlineMsg = document.getElementById('offline-msg');
     var offlineOverlay = document.getElementById('offline-overlay');
     var openExternal = document.getElementById('open-on-cloudflare');
@@ -979,9 +990,25 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
 
     function applyLiveState(nextLive) {
       isLive = !!nextLive;
-      if (badge) badge.style.display = isLive ? '' : 'none';
+      // Starea e rezolvata: skeleton-ul dispare, fara a elibera spatiul rezervat.
+      if (badgeSkeleton) badgeSkeleton.classList.add('opacity-0');
+      if (badge) {
+        badge.classList.toggle('opacity-0', !isLive);
+        badge.setAttribute('aria-hidden', isLive ? 'false' : 'true');
+      }
       if (offlineMsg) offlineMsg.style.display = isLive ? 'none' : '';
-      if (offlineOverlay) offlineOverlay.style.display = isLive ? 'none' : '';
+      if (offlineOverlay) {
+        offlineOverlay.classList.toggle('is-visible', !isLive);
+        offlineOverlay.setAttribute('aria-hidden', isLive ? 'true' : 'false');
+      }
+    }
+
+    function setExternalLinkVisible(visible) {
+      if (!openExternal) return;
+      openExternal.classList.toggle('opacity-0', !visible);
+      openExternal.classList.toggle('pointer-events-none', !visible);
+      openExternal.setAttribute('aria-hidden', visible ? 'false' : 'true');
+      openExternal.tabIndex = visible ? 0 : -1;
     }
 
     function setIframeSrc(iframe, src) {
@@ -998,7 +1025,7 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
       if (player) {
         setIframeSrc(player, 'about:blank');
       }
-      if (openExternal) openExternal.style.display = 'none';
+      if (openExternal) setExternalLinkVisible(false);
       applyLiveState(false);
       currentMode = 'offline-playlist';
     }
@@ -1020,7 +1047,7 @@ const replays = [...liveReplays].sort((a, b) => b.date.localeCompare(a.date));
           setIframeSrc(player, liveSrc);
           if (openExternal) {
             openExternal.href = buildCloudflareWatchUrl(customerCode, liveUid);
-            openExternal.style.display = '';
+            setExternalLinkVisible(true);
           }
           applyLiveState(true);
           currentMode = 'live';

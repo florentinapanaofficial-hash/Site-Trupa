@@ -584,19 +584,10 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
     const applyLiveState = (isLive) => {
       liveLinks.forEach((link) => {
         link.classList.toggle('is-live-now', isLive);
-
         if (isLive) {
           link.setAttribute('data-live-state', 'on');
-          link.style.opacity = '1';
-          link.style.filter = 'brightness(1.14) saturate(1.22)';
-          link.style.border = '2px solid rgba(239, 68, 68, 0.78)';
-          link.style.boxShadow = '0 0 0 1px rgba(127, 29, 29, 0.4), 0 0 20px rgba(239, 68, 68, 0.28)';
         } else {
           link.removeAttribute('data-live-state');
-          link.style.removeProperty('opacity');
-          link.style.removeProperty('filter');
-          link.style.removeProperty('border');
-          link.style.removeProperty('box-shadow');
         }
       });
     };

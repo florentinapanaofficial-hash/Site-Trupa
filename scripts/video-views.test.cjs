@@ -11,21 +11,24 @@ function compile(source) {
 
 function endpoint() {
     let count = 0;
-    const connection = {
-        beginTransaction: jest.fn(async () => { }),
-        execute: jest.fn(async (sql) => {
-            if (sql.startsWith('INSERT')) { count += 1; return [{}]; }
-            return [[{ views_count: count }]];
-        }),
-        commit: jest.fn(async () => { }),
-        rollback: jest.fn(async () => { }),
-        release: jest.fn(),
-    };
-    const query = jest.fn(async () => [{ video_id: 'clip', views_count: 7 }]);
+    const rpc = jest.fn(async (name, args) => {
+        if (name !== 'increment_video_view') return { data: null, error: new Error(`RPC necunoscut: ${name}`) };
+        if (!args || typeof args.p_video_id !== 'string') return { data: null, error: new Error('Argument RPC invalid') };
+        count += 1;
+        return { data: count, error: null };
+    });
+    // Lantul .from().select().in() se rezolva la { data, error }, ca in supabase-js.
+    const inFilter = jest.fn(async () => ({ data: [{ video_id: 'clip', views_count: 7 }], error: null }));
+    const select = jest.fn(() => ({ in: inFilter }));
+    const from = jest.fn(() => ({ select }));
+    const supabase = { from, select, rpc };
     const context = vm.createContext({
         exports: {}, Request, Response, Date, Map, Set,
         require: (name) => {
-            if (name.endsWith('/db.js')) return { query, getPool: () => ({ getConnection: async () => connection }) };
+            if (name.endsWith('/lib/supabase')) return {
+                requireSupabaseAdmin: () => supabase,
+                getSupabaseAdmin: () => supabase,
+            };
             if (name.endsWith('/cors.js')) return {
                 checkOrigin: (request) => ({ allowed: request.headers.get('origin') !== 'https://evil.test', origin: null }),
             };
@@ -39,7 +42,7 @@ function endpoint() {
             method: 'POST', headers: { 'Content-Type': 'application/json', 'cf-connecting-ip': ip }, body: JSON.stringify(payload),
         })
     });
-    return { api: context.exports, post, connection, query };
+    return { api: context.exports, post, supabase, rpc, from, select, inFilter };
 }
 
 function frontend() {
@@ -83,60 +86,64 @@ function frontend() {
     return { context, facade, fetch, listeners, facadeListeners, player, document };
 }
 
-describe('MySQL video views endpoint', () => {
-    test('inserts 1, increments to 2, and commits before releasing', async () => {
-        const { post, connection } = endpoint();
+describe('Supabase video views endpoint', () => {
+    test('calls the atomic RPC and returns the incremented total', async () => {
+        const { post, rpc } = endpoint();
         expect(await (await post({ video_id: 'clip' })).json()).toMatchObject({ video_id: 'clip', views_count: 1 });
         expect(await (await post({ video_id: 'clip' }, 'client-2')).json()).toMatchObject({ views_count: 2 });
-        expect(connection.execute.mock.calls[0]).toEqual([
-            'INSERT INTO video_views (video_id, views_count) VALUES (?, 1) ON DUPLICATE KEY UPDATE views_count = views_count + 1', ['clip'],
-        ]);
-        expect(connection.commit).toHaveBeenCalledTimes(2);
-        expect(connection.release).toHaveBeenCalledTimes(2);
+        expect(rpc.mock.calls[0]).toEqual(['increment_video_view', { p_video_id: 'clip' }]);
+        expect(rpc).toHaveBeenCalledTimes(2);
     });
 
     test('rejects invalid JSON payloads without writing', async () => {
-        const { post, connection } = endpoint();
+        const { post, rpc } = endpoint();
         for (const payload of [null, {}, { video_id: "'; DROP TABLE video_views" }, { video_id: 'a'.repeat(256) }]) {
             expect((await post(payload)).status).toBe(400);
         }
-        expect(connection.execute).not.toHaveBeenCalled();
+        expect(rpc).not.toHaveBeenCalled();
     });
 
     test('limits repeat requests for the same IP and clip', async () => {
-        const { post, connection } = endpoint();
+        const { post, rpc } = endpoint();
         expect((await post({ video_id: 'clip' })).status).toBe(200);
         expect((await post({ video_id: 'clip' })).status).toBe(429);
-        expect(connection.commit).toHaveBeenCalledTimes(1);
+        expect(rpc).toHaveBeenCalledTimes(1);
     });
 
-    test('rolls back and releases on database failure, allowing a retry', async () => {
-        const { post, connection } = endpoint();
-        connection.execute.mockRejectedValueOnce(new Error('DB failure'));
+    test('surfaces an RPC error as 500 and clears the rate limit so a retry works', async () => {
+        const { post, rpc } = endpoint();
+        rpc.mockResolvedValueOnce({ data: null, error: new Error('DB failure') });
         expect((await post({ video_id: 'clip' })).status).toBe(500);
-        expect(connection.rollback).toHaveBeenCalledTimes(1);
-        expect(connection.release).toHaveBeenCalledTimes(1);
         expect((await post({ video_id: 'clip' })).status).toBe(200);
+        expect(rpc).toHaveBeenCalledTimes(2);
+    });
+
+    test('rejects a non-numeric RPC result instead of reporting a bogus count', async () => {
+        const { post, rpc } = endpoint();
+        rpc.mockResolvedValueOnce({ data: 0, error: null });
+        expect((await post({ video_id: 'clip' })).status).toBe(500);
     });
 
     test('GET reads live counts and returns zero for missing IDs without cache', async () => {
-        const { api, query } = endpoint();
+        const { api, from, select, inFilter } = endpoint();
         const url = new URL('https://site.test/api/track-video/?ids=clip,missing');
         const response = await api.GET({ request: new Request(url), url });
         expect(await response.json()).toEqual({ views: { clip: 7, missing: 0 } });
         expect(response.headers.get('Cache-Control')).toBe('no-store');
-        expect(query.mock.calls[0][1]).toEqual(['clip', 'missing']);
+        expect(from).toHaveBeenCalledWith('video_views');
+        expect(select).toHaveBeenCalledWith('video_id, views_count');
+        expect(inFilter).toHaveBeenCalledWith('video_id', ['clip', 'missing']);
     });
 
     test('rejects a forbidden origin', async () => {
-        const { api, connection } = endpoint();
+        const { api, rpc } = endpoint();
         const response = await api.POST({
             request: new Request('https://site.test/api/track-video/', {
                 method: 'POST', headers: { Origin: 'https://evil.test' }, body: '{"video_id":"clip"}',
             })
         });
         expect(response.status).toBe(403);
-        expect(connection.execute).not.toHaveBeenCalled();
+        expect(rpc).not.toHaveBeenCalled();
     });
 });
 
@@ -162,7 +169,7 @@ describe('VideoFacade playback tracking', () => {
     test('keyboard activation reads views without waiting for the response to open the player', async () => {
         const { context, facade, fetch, facadeListeners } = frontend();
         context.bindFacades();
-        fetch.mockImplementationOnce(() => new Promise(() => {}));
+        fetch.mockImplementationOnce(() => new Promise(() => { }));
         const preventDefault = jest.fn();
         facadeListeners.keydown({ target: facade, key: 'Enter', preventDefault });
         await new Promise((resolve) => setImmediate(resolve));

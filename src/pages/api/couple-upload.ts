@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import DOMPurify from 'isomorphic-dompurify';
-import { query } from '../../lib/db.js';
+import { requireSupabaseAdmin } from '../../lib/supabase';
 import { secureLogger } from '../../lib/secure-logger.js';
 
 export const prerender = false;
@@ -110,10 +110,10 @@ export const POST: APIRoute = async ({ request }) => {
             return json({ error: 'Povestea trebuie să aibă între 10 și 5000 de caractere.' }, 400);
         }
         try {
-            await query(
-                'INSERT INTO couple_submissions (couple_slug, tip, continut) VALUES (?, ?, ?)',
-                [couple.slug, 'story', story],
-            );
+            const { error } = await requireSupabaseAdmin()
+                .from('couple_submissions')
+                .insert({ couple_slug: couple.slug, tip: 'story', continut: story });
+            if (error) throw error;
         } catch (error) {
             secureLogger.error('[couple-upload] Eroare la salvarea povestii:', error);
             return json({ error: 'Eroare server la salvarea povestii.' }, 500);
@@ -131,10 +131,10 @@ export const POST: APIRoute = async ({ request }) => {
         const rawSource = typeof formData.get('source') === 'string' ? String(formData.get('source')) : '';
         const source = sanitize(rawSource);
         try {
-            await query(
-                'INSERT INTO couple_submissions (couple_slug, tip, continut, sursa) VALUES (?, ?, ?, ?)',
-                [couple.slug, 'recommendation', rec, source || null],
-            );
+            const { error } = await requireSupabaseAdmin()
+                .from('couple_submissions')
+                .insert({ couple_slug: couple.slug, tip: 'recommendation', continut: rec, sursa: source || null });
+            if (error) throw error;
         } catch (error) {
             secureLogger.error('[couple-upload] Eroare la salvarea recomandarii:', error);
             return json({ error: 'Eroare server la salvarea recomandarii.' }, 500);
@@ -150,10 +150,10 @@ export const POST: APIRoute = async ({ request }) => {
             return json({ error: 'Link-ul video trebuie să fie un URL valid (https://).' }, 400);
         }
         try {
-            await query(
-                'INSERT INTO couple_submissions (couple_slug, tip, continut) VALUES (?, ?, ?)',
-                [couple.slug, 'video', videoUrl],
-            );
+            const { error } = await requireSupabaseAdmin()
+                .from('couple_submissions')
+                .insert({ couple_slug: couple.slug, tip: 'video', continut: videoUrl });
+            if (error) throw error;
         } catch (error) {
             secureLogger.error('[couple-upload] Eroare la salvarea video-ului:', error);
             return json({ error: 'Eroare server la salvarea video-ului.' }, 500);

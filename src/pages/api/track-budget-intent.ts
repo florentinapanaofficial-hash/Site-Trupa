@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { query } from '../../lib/db.js';
+import { requireSupabaseAdmin } from '../../lib/supabase';
 import { checkOrigin } from '../../lib/cors.js';
 import { secureLogger } from '../../lib/secure-logger.js';
 
@@ -41,7 +41,7 @@ export const POST: APIRoute = async ({ request }) => {
   const { budget, timestamp, url } = payload as Record<string, unknown>;
   const selectedAt = typeof timestamp === 'string' ? Date.parse(timestamp) : NaN;
   if (!Number.isInteger(budget) || (budget as number) < 1000 || (budget as number) > 10000 || (budget as number) % 100 !== 0 ||
-      !Number.isFinite(selectedAt) || Math.abs(Date.now() - selectedAt) > 300_000 || url !== '/contact/') {
+    !Number.isFinite(selectedAt) || Math.abs(Date.now() - selectedAt) > 300_000 || url !== '/contact/') {
     return jsonError('Date invalide.', 400);
   }
 
@@ -57,11 +57,16 @@ export const POST: APIRoute = async ({ request }) => {
   lastIntentByIp.set(ip, now);
 
   try {
+    const supabase = requireSupabaseAdmin();
     if (now - lastCleanupAt > 86_400_000) {
-      await query('DELETE FROM budget_intents WHERE selected_at < NOW() - INTERVAL 12 MONTH');
+      const { error: purgeError } = await supabase.rpc('purge_old_budget_intents');
+      if (purgeError) throw purgeError;
       lastCleanupAt = now;
     }
-    await query('INSERT INTO budget_intents (budget_eur, page_path) VALUES (?, ?)', [budget, url]);
+    const { error } = await supabase
+      .from('budget_intents')
+      .insert({ budget_eur: budget as number, page_path: url as string });
+    if (error) throw error;
     return new Response(null, { status: 204 });
   } catch (error) {
     secureLogger.error('[/api/track-budget-intent] DB error:', error);

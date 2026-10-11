@@ -1909,6 +1909,21 @@ html::-webkit-scrollbar-thumb:hover {
   /* glow-ul vine din ::after (opacity) — fără animare box-shadow */
 }
 
+/* Border-ul live e declarat transparent din start: starea ON AIR schimbă doar
+   culoarea, deci lățimea linkului nu se modifică după fetch (zero CLS). */
+#top-menu-panel [data-live-link="true"] {
+  border: 2px solid transparent;
+}
+
+#top-menu-panel [data-live-link="true"].is-live-now {
+  border-color: rgba(239, 68, 68, 0.78);
+  opacity: 1;
+  filter: brightness(1.14) saturate(1.22);
+  box-shadow:
+    0 0 0 1px rgba(127, 29, 29, 0.4),
+    0 0 20px rgba(239, 68, 68, 0.28);
+}
+
 /* body.top-menu-expanded #continut padding-top rules removed:
  * panoul de meniu este acum position:fixed, nu mai afectează layoutul,
  * deci #continut nu mai trebuie decalat. Decalajul cauzase flash-ul de cer. */

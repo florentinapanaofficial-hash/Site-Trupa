@@ -13,8 +13,7 @@
 
 import type { APIRoute } from 'astro';
 import { Resend } from 'resend';
-import { query } from '../../lib/db.js';
-import { ensureReservationStatusColumn } from '../../lib/reservation-status.js';
+import { requireSupabaseAdmin } from '../../lib/supabase';
 import { secureLogger } from '../../lib/secure-logger.js';
 
 export const prerender = false;
@@ -174,13 +173,18 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Salvare în baza de date
     try {
-        await ensureReservationStatusColumn();
-        await query(
-            `INSERT INTO rezervari
-                 (nume, telefon, eveniment, data_eveniment, mesaj, gdpr_consent, creat_la, status)
-             VALUES (?, ?, ?, ?, ?, 0, NOW(), 'nou')`,
-            [nume, telefon, eveniment, data, detaliiEveniment],
-        );
+        const { error } = await requireSupabaseAdmin()
+            .from('rezervari')
+            .insert({
+                nume,
+                telefon,
+                eveniment,
+                data_eveniment: data,
+                mesaj: detaliiEveniment,
+                gdpr_consent: false,
+                status: 'nou',
+            });
+        if (error) throw error;
     } catch (err) {
         secureLogger.error('[/api/rezervare] DB error:', err);
         return jsonErr('Eroare server. Încearcă din nou sau contactează-ne direct la +40767369658.', 500);

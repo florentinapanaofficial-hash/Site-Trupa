@@ -5,7 +5,7 @@
  */
 
 import type { APIRoute } from 'astro';
-import { query } from '../../lib/db.js';
+import { requireSupabaseAdmin } from '../../lib/supabase';
 import { checkOrigin } from '../../lib/cors.js';
 import { secureLogger } from '../../lib/secure-logger.js';
 
@@ -93,13 +93,14 @@ export const GET: APIRoute = async ({ request }) => {
   }
 
   try {
-    const rows = (await query('SELECT track_id, play_count FROM track_plays')) as Array<{
-      track_id: string;
-      play_count: number;
-    }>;
+    const { data, error } = await requireSupabaseAdmin()
+      .from('track_plays')
+      .select('track_id, play_count');
+
+    if (error) throw error;
 
     const plays: Record<string, number> = {};
-    for (const row of rows) {
+    for (const row of data ?? []) {
       plays[row.track_id] = row.play_count;
     }
 
@@ -137,16 +138,12 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   try {
-    await query(
-      'INSERT INTO track_plays (track_id, play_count) VALUES (?, 1) ON DUPLICATE KEY UPDATE play_count = play_count + 1',
-      [trackId],
-    );
+    const { data, error } = await requireSupabaseAdmin()
+      .rpc('increment_track_play', { p_track_id: trackId });
 
-    const rows = (await query('SELECT play_count FROM track_plays WHERE track_id = ?', [trackId])) as Array<{
-      play_count: number;
-    }>;
+    if (error) throw error;
 
-    return jsonResponse({ trackId, plays: rows[0]?.play_count ?? 0 }, 200, cors.origin);
+    return jsonResponse({ trackId, plays: Number(data) || 0 }, 200, cors.origin);
   } catch (error) {
     secureLogger.error('Eroare la incrementarea contorului de ascultari:', error);
     return jsonResponse({ error: 'Eroare interna.' }, 500, cors.origin);

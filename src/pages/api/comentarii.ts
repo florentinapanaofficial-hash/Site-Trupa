@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import DOMPurify from 'isomorphic-dompurify';
-import { query } from '../../lib/db.js';
+import { requireSupabaseAdmin } from '../../lib/supabase';
 import { checkOrigin } from '../../lib/cors.js';
 import { secureLogger } from '../../lib/secure-logger.js';
 
@@ -139,10 +139,11 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   try {
-    await query(
-      'INSERT INTO comments (post_id, nume_utilizator, text_comentariu) VALUES (?, ?, ?)',
-      [postId, numeUtilizator, textComentariu],
-    );
+    const { error } = await requireSupabaseAdmin()
+      .from('comments')
+      .insert({ post_id: postId, nume_utilizator: numeUtilizator, text_comentariu: textComentariu });
+
+    if (error) throw error;
 
     return jsonResponse({ success: true }, 201, cors.origin);
   } catch (error) {
@@ -167,21 +168,15 @@ export const GET: APIRoute = async ({ url, request }) => {
   }
 
   try {
-    const rows = (await query(
-      `SELECT id, post_id, nume_utilizator, text_comentariu, data
-       FROM comments
-       WHERE post_id = ?
-       ORDER BY data DESC`,
-      [postId],
-    )) as Array<{
-      id: number;
-      post_id: number;
-      nume_utilizator: string;
-      text_comentariu: string;
-      data: string;
-    }>;
+    const { data, error } = await requireSupabaseAdmin()
+      .from('comments')
+      .select('id, post_id, nume_utilizator, text_comentariu, data')
+      .eq('post_id', postId)
+      .order('data', { ascending: false });
 
-    return jsonResponse({ comments: rows }, 200, cors.origin);
+    if (error) throw error;
+
+    return jsonResponse({ comments: data ?? [] }, 200, cors.origin);
   } catch (error) {
     secureLogger.error('Eroare la citirea comentariilor:', error);
     return jsonResponse({ error: 'Eroare interna la citirea comentariilor.' }, 500, cors.origin);

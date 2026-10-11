@@ -3,6 +3,22 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout title="Solicită Ofertă | Formația Florentina Pană">
+  <Fragment slot="head">
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css"
+      integrity="sha384-RkASv+6KfBMW9eknReJIJ6b3UnjKOKC5bOUaNgIY778NFbQ8MtWq9Lr/khUgqtTt"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/themes/dark.css"
+      integrity="sha384-heUUtXw0Djj2DElfLOVPlASSWFKNL3JDY6s3FEqQD03GYyWOeophY5DsfEG40sYX"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </Fragment>
   <main class="min-h-[100dvh] bg-[#0a0f1c] text-white py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
 
     <!-- Efect luminos în background -->
@@ -119,15 +135,24 @@ import Layout from '../layouts/Layout.astro';
     </div>
   </main>
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/themes/dark.css">
-
   <style is:global>
     .flatpickr-calendar { z-index: 99999 !important; }
   </style>
 
-  <script is:inline src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
-  <script is:inline src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/ro.js"></script>
+  <script
+    is:inline
+    src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"
+    integrity="sha384-5JqMv4L/Xa0hfvtF06qboNdhvuYXUku9ZrhZh3bSk8VXF0A/RuSLHpLsSV9Zqhl6"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  ></script>
+  <script
+    is:inline
+    src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/ro.js"
+    integrity="sha384-aLnOiW8aFHnLXN1VvFsB3FJMG5vJ4H/tufp8GgST4F9MKGB4S9YvG2QEzAfRunDy"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  ></script>
 
   <script is:inline data-astro-rerun>
     const loadBookedDates = async () => {

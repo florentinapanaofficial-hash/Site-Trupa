@@ -1,10 +1,10 @@
 ---
 /**
- * Server Island — interogheaza MySQL (track_plays) per-request, izolat de restul
+ * Server Island — interogheaza Supabase (track_plays) per-request, izolat de restul
  * paginii statice. Se foloseste cu directiva `server:defer` din AudioPlaylistPlayer,
  * astfel incat TTFB-ul paginii nu asteapta dupa conexiunea la baza de date.
  */
-import { query } from '../lib/db.js';
+import { getSupabasePublic } from '../lib/supabase';
 
 interface Props {
   trackId: string;
@@ -14,13 +14,17 @@ const { trackId } = Astro.props;
 
 let plays = 0;
 try {
-  const rows = (await query(
-    'SELECT play_count FROM track_plays WHERE track_id = ?',
-    [trackId],
-  )) as Array<{ play_count: number }>;
-  plays = rows[0]?.play_count ?? 0;
+  const supabase = getSupabasePublic();
+  if (supabase) {
+    const { data } = await supabase
+      .from('track_plays')
+      .select('play_count')
+      .eq('track_id', trackId)
+      .maybeSingle();
+    plays = data?.play_count ?? 0;
+  }
 } catch {
-  // MySQL indisponibil - badge-ul ramane 0, nu blocheaza restul insulei
+  // Supabase indisponibil - badge-ul ramane 0, nu blocheaza restul insulei
 }
 ---
 

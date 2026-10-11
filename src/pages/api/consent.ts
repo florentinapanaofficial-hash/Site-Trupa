@@ -21,7 +21,7 @@
  */
 
 import type { APIRoute } from 'astro';
-import { query } from '../../lib/db.js';
+import { requireSupabaseAdmin } from '../../lib/supabase';
 import { checkOrigin } from '../../lib/cors.js';
 import { secureLogger } from '../../lib/secure-logger.js';
 
@@ -223,26 +223,21 @@ export const POST: APIRoute = async ({ request }) => {
         );
     }
 
-    // ── 6. Salvare în baza de date (MySQL cu query parametrizat) ─
+    // ── 6. Salvare în baza de date (Supabase RPC) ─
     //
-    // SECURITATE: IP-ul este hașat cu SHA2(..., 256) DIRECT ÎN SQL,
-    // deci nu trece prin memoria aplicației în clar.
-    // Toți parametrii sunt binding-uri – ZERO risc SQL injection.
+    // SECURITATE: IP-ul este hașat cu `digest(..., 'sha256')` din pgcrypto
+    // DIRECT ÎN BAZĂ, în interiorul `log_gdpr_consent` — la fel ca vechiul
+    // SHA2() din MySQL, deci nu se stochează niciodată în clar.
     try {
-        await query(
-            `INSERT INTO gdpr_consimtamant
-         (tip_consimtamant, canal, ip_hash, user_agent, referer,
-          data_consimtamant, versiune_politica)
-       VALUES (?, ?, SHA2(?, 256), ?, ?, NOW(), ?)`,
-            [
-                tipConsimtamant,
-                canal,
-                clientIp,           // hașat în SQL – nu stocat în clar
-                userAgent,
-                referer || null,    // null dacă referer lipsă (mai curat în DB)
-                VERSIUNE_POLITICA,
-            ],
-        );
+        const { error } = await requireSupabaseAdmin().rpc('log_gdpr_consent', {
+            p_tip: tipConsimtamant,
+            p_canal: canal,
+            p_ip: clientIp,           // hașat în bază – nu stocat în clar
+            p_user_agent: userAgent,
+            p_referer: referer || null,
+            p_versiune: VERSIUNE_POLITICA,
+        });
+        if (error) throw error;
     } catch (dbError) {
         // Logăm eroarea complet server-side, dar NU expunem detalii clientului
         secureLogger.error('[GDPR] Eroare DB la salvare consimțământ:', {
