@@ -6,6 +6,8 @@
 interface Props {
   /** Implicit sursa R2 cu custom domain (cache CDN). Nu folosi MP4 local. */
   videoUrl?: string;
+  /** Copie servită din `public/`, folosită dacă obiectul R2 lipsește (404). */
+  fallbackVideoUrl?: string;
   title: string;
   subtitle: string;
   showReviews?: boolean;
@@ -19,9 +21,11 @@ interface Props {
 }
 
 const R2_HERO_VIDEO = 'https://media.florentinapanaofficial.ro/bg-nunta-live-2027.mp4';
+const LOCAL_HERO_VIDEO = '/videos/bg-nunta-live-2027.mp4';
 
 const {
   videoUrl = R2_HERO_VIDEO,
+  fallbackVideoUrl = LOCAL_HERO_VIDEO,
   title,
   subtitle,
   showReviews = false,
@@ -55,6 +59,7 @@ const TitleTag = titleTag;
   <video
     data-hero-media
     data-src={videoUrl}
+    data-fallback-src={fallbackVideoUrl}
     muted
     loop
     playsinline
@@ -125,8 +130,12 @@ const TitleTag = titleTag;
 
     const activate = (hero: HTMLElement) => {
       const video = hero.querySelector<HTMLVideoElement>('[data-hero-media]');
-      const src = video?.dataset.src;
-      if (!video || !src || video.dataset.loaded === 'true') return;
+      const primary = video?.dataset.src;
+      if (!video || !primary || video.dataset.loaded === 'true') return;
+
+      const fallback = video.dataset.fallbackSrc;
+      let attempt = 0;
+      let triedFallback = false;
 
       video.dataset.loaded = 'true';
       video.addEventListener(
@@ -136,13 +145,38 @@ const TitleTag = titleTag;
         },
         { once: true },
       );
-      video.src = src;
-      video.load();
-      video.play().catch(() => {
-        video.removeAttribute('src');
-        video.load();
-        delete video.dataset.loaded;
-      });
+
+      function giveUp() {
+        video!.removeEventListener('error', onFailure);
+        video!.removeAttribute('src');
+        video!.load();
+        delete video!.dataset.loaded;
+      }
+
+      // Sursa de pe CDN poate lipsi (404) fără ca posterul să semnaleze ceva:
+      // încercăm copia locală înainte de a abandona redarea.
+      function onFailure() {
+        if (hero.dataset.heroState === 'playing') return;
+        if (!triedFallback && fallback && fallback !== primary) {
+          triedFallback = true;
+          start(fallback);
+          return;
+        }
+        giveUp();
+      }
+
+      function start(src: string) {
+        const current = ++attempt;
+        video!.src = src;
+        video!.load();
+        // Ignorăm respingerile sursei abandonate la schimbarea de `src`.
+        video!.play().catch(() => {
+          if (current === attempt) onFailure();
+        });
+      }
+
+      video.addEventListener('error', onFailure);
+      start(primary);
     };
 
     const start = () => {
