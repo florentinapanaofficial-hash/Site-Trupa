@@ -85,9 +85,11 @@ const googleBusinessReviews = featuredCouple
     }]
   : [];
 // Poster-ul video-ului hero este elementul LCP: WebP redimensionat, nu JPG-ul brut de 1426px.
+// Lățime unică, fără srcset, ca preload-ul din `slot="head"` să indice exact
+// aceeași resursă; 832w ≈ DPR 1,5 peste cei 551 px CSS randați de `object-cover`.
 const heroPoster = await getImage({
   src: heroImg,
-  width: 1024,
+  width: 832,
   format: 'webp',
   quality: 62,
 });
@@ -235,11 +237,14 @@ const heroPoster = await getImage({
   <section class="hp-meet-teaser section-container hp-deferred-section" aria-label="Cunoașteți formația de nuntă din Argeș">
     <div class="hp-meet-wrap reveal-on-scroll from-bottom" style="--reveal-delay: 30ms">
       <div class="hp-meet-media">
+        {/* `80vw` pe mobil este deliberat sub lățimea reală de 92vw: plafonează
+            selecția la varianta 600w (≈ DPR 1,5), fără să afecteze layout-ul.
+            Desktop-ul rămâne declarat corect, deci nu pierde claritate. */}
         <Image
           src={anaFlorentinaImg}
           alt="Florentina și Claudiu, într-un moment live pe scenă"
-          widths={[480, 720, 960]}
-          sizes="(max-width: 767px) 92vw, 660px"
+          widths={[480, 600, 720, 960]}
+          sizes="(max-width: 767px) 80vw, 660px"
           format="webp"
           quality={70}
           loading="lazy"

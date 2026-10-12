@@ -106,14 +106,14 @@ facadeLocals.__fpVideoFacadeLoaderRendered = true;
   >
   </div>
 
+  {/* Cale din `public/`: Astro nu poate transforma fișierul, deci `widths` ar
+      emite un srcset cu aceeași sursă repetată de trei ori. */}
   {typeof imageSrc === 'string' ? (
     <Image
       src={imageSrc}
       alt={title}
       width={640}
       height={360}
-      widths={[480, 600, 640]}
-      sizes="(max-width: 768px) 100vw, (max-width: 1280px) 46vw, 620px"
       format="webp"
       quality={72}
       loading={loading}

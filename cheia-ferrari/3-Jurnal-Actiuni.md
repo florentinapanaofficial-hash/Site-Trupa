@@ -1,3 +1,36 @@
+## 📝 12 oct 2026 — Dimensionarea imaginilor pe mobil: țintă DPR 1,5 și eliminarea unui srcset fictiv
+
+### Obiectiv
+- Avertismentul PageSpeed „Properly size images" pe mobil, pentru `hp-ana-florentina`, posterul hero `card-1-panoramica` și `Coperta-1-videi-640.webp`.
+
+### Diagnostic
+- Audit mobil local: 3 imagini semnalate, **90 KiB** economie estimată.
+- Formula insight-ului `image-delivery` a fost dedusă și verificată pe toate trei: compară pixelii fizici ai fișierului cu **pixelii CSS**, fără să aplice `deviceScaleFactor`. Pentru `hp-ana-florentina`: `(368×562)/(720×1100) = 0,2610`, iar `57880 × 0,2610 = 15.120 B utili` → `42.760 B` raportați ca risipiți — identic cu valoarea din raport. Potrivire exactă și pentru celelalte două (27.282 vs 27.275; 22.294 vs 22.289).
+- Emularea rulează însă la **DPR 1,75**. Raportat la necesarul real, toate trei erau deja aproape optime: 720 vs 644 (+12%), 1024 vs 964 (+6%), 640 vs 592 (+8%). Auditul este deci orb la DPR, iar aducerea lui la verde ar fi însemnat imagini vizibil neclare pe orice ecran retina.
+- Instrucțiunile inițiale nu se puteau aplica literal: variantele de 360/400w nu ar fi fost niciodată alese (browserul ia cel mai mic candidat ≥ necesar, adică tot 720w), iar `widths={[400, 768, 1200]}` pe posterul hero ar fi dus la selecția variantei **1200w** — mai mare decât 1024 de azi — pentru că `object-cover` îl randează la 551 px CSS, nu la 410.
+- Decizia lui Claudiu: **nu sacrificăm claritatea pentru o metrică oarbă**; țintim explicit DPR 1,5.
+
+### Modificări
+- `src/components/VideoFacade.astro`: eliminate `widths` și `sizes` de pe ramura cu `imageSrc` de tip string. Astro nu transformă fișierele din `public/`, deci emitea un srcset cu **aceeași sursă repetată de trei ori** (`...640.webp 480w, ...640.webp 600w, ...640.webp 640w`). Zero octeți economisiți, dar HTML corect.
+- `src/pages/index.astro`: posterul hero generat la `width: 832` (de la 1024) — ≈ DPR 1,5 peste cei 551 px CSS randați. Păstrată deliberat **lățimea unică, fără srcset**: preload-ul și `<img>`-ul folosesc același `heroPoster.src`, deci sincronizarea LCP este garantată prin construcție, nu prin `imagesrcset`/`imagesizes` care ar fi trebuit ținute manual în acord.
+- `src/pages/index.astro`: `hp-ana-florentina` din `.hp-meet-media` — `widths={[480, 600, 720, 960]}` și `sizes="(max-width: 767px) 80vw, 660px"`. Cei `80vw` sunt deliberat sub lățimea reală de `92vw`: singura pârghie din HTML pentru a plafona selecția sub DPR-ul ecranului. `330 × 1,75 = 577` → varianta 600w. Ramura desktop rămâne declarată corect (`660px`), deci nu pierde claritate.
+- `scripts/programmatic-seo/template.astro`: aceeași trecere la `width: 832`, urmată de `node scripts/programmatic-seo/generate-pages.js`. Cele 5 pagini din `src/pages/formatie-nunta/` au fost **regenerate, nu editate manual**; diff-ul conține strict linia posterului.
+
+### Validări
+- `image-delivery` pe mobil: **90 KiB → 4 KiB** economie estimată, de la 3 imagini semnalate la 1.
+- Transfer real: poster 44,6 → **36,1 KB**; `hp-ana-florentina` 57,9 → **47,3 KB**. Total ≈ **19 KB** pe mobil.
+- **LCP descărcat o singură dată**: o singură intrare `card-1-panoramica.NzU7LKQ3_1Jcrnz.webp` în `network-requests` (47ms, 36,1 KB), iar `<link rel="preload">` și `<img class="hero-video__poster">` din `dist/client/index.html` indică exact același URL.
+- `Coperta-1-videi-640.webp` rămâne semnalată cu 4,5 KB, acum raportată corect față de 592×333 (DPR aplicat). Sursa are doar 640 px lățime, deci nu există variantă mai bună de generat.
+- LCP 3,4 → **3,3 s**. `npm run build` PASS; `npm test` **84/84**; `npm run seo:audit` 62 pagini, **0 FAIL \| 0 WARN**.
+
+### Riscuri / pași următori
+- Posterul hero are lățime unică pentru toate ecranele. Pe desktop la 1920px era deja puternic scalat (1024w), iar acum pleacă de la 832w. Stă sub `bg-black/50` plus gradient, deci diferența e greu sesizabilă, dar dacă se dorește claritate pe desktop soluția curată e `<picture>` cu două surse și două `<link rel="preload" media="...">`.
+- `sizes="80vw"` pe `hp-ana-florentina` este o de-ratare intenționată, nu o eroare de layout. Dacă lățimea reală a `.hp-meet-media` se schimbă, valoarea trebuie recalculată.
+- TBT a oscilat 410 → 560 ms între rulări, fără legătură cu imaginile; e zgomot de rulare sub throttling simulat.
+- De confirmat pe PageSpeed Insights live după propagarea deploy-ului.
+
+---
+
 ## 📝 12 oct 2026 — `/js/video-facade.js` scos de pe calea critică (PageSpeed mobil)
 
 ### Obiectiv
