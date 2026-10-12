@@ -299,11 +299,13 @@ facadeLocals.__fpVideoFacadeLoaderRendered = true;
 </style>
 
 {/* Loader minuscul `is:inline` — trăiește direct în HTML, deci pagina nu mai
-    descarcă niciun modul `/_astro/*` pentru fațade (PageSpeed reclama lanțul
-    critic HTML → VideoFacade.astro_*.js → video-facade.*.js, ~577ms). Runtime-ul
-    `/js/video-facade.js` (public/, URL stabil) se importă DOAR la apropierea de
-    viewport sau la click. Randat o dată per pagină (flag în Astro.locals);
-    guard-ul global pe window rămâne ca plasă de siguranță. */}
+    descarcă niciun modul `/_astro/*` pentru fațade. Runtime-ul
+    `/js/video-facade.js` (public/, URL stabil) se importă DOAR la intenție de
+    interacțiune (hover/touch/focus) sau la prima interacțiune reală. NU există
+    pre-încălzire la scroll/viewport: pe homepage hero-ul are exact 100dvh, iar
+    fațadele intrau în `rootMargin` din primul cadru, deci importul ajungea în
+    lanțul critic al navigării raportat de PageSpeed („Latență maximă a căii
+    critice"). Randat o dată per pagină (flag în Astro.locals). */}
 {renderLoader && (
   <script is:inline>
 (function () {
@@ -338,31 +340,60 @@ facadeLocals.__fpVideoFacadeLoaderRendered = true;
     return window[runtimeKey];
   }
 
-  document.addEventListener('click', function (event) {
+  function facadeOf(event) {
     var target = event.target;
-    if (target && target.closest && target.closest('[data-video-facade]')) loadRuntime();
+    return target && target.closest ? target.closest('[data-video-facade]') : null;
+  }
+
+  // `initVideoFacades()` leagă ascultătorii abia la următorul cadru (observer +
+  // idle în runtime), deci așteptăm marcajul `videoBound` înainte de a relua
+  // interacțiunea. Plafon ~1s, ca să nu rămână un lanț de rAF agățat.
+  function whenBound(facade) {
+    return new Promise(function (resolve) {
+      var frames = 0;
+      (function check() {
+        if (facade.dataset.videoBound === 'true' || frames++ > 60) { resolve(); return; }
+        window.requestAnimationFrame(check);
+      })();
+    });
+  }
+
+  // Intenție de interacțiune: hover, atingere sau focus de tastatură. Dă
+  // runtime-ului un avans de ~100-300ms față de click, fără cost la încărcare.
+  function warm(event) {
+    if (facadeOf(event)) loadRuntime();
+  }
+  document.addEventListener('pointerover', warm, { capture: true, passive: true });
+  document.addEventListener('touchstart', warm, { capture: true, passive: true });
+  document.addEventListener('focusin', warm, { capture: true });
+
+  // Prima interacțiune reală se consumă înainte ca runtime-ul să-și lege
+  // ascultătorii, deci o reluăm pe ținta originală după inițializare.
+  document.addEventListener('click', function (event) {
+    var facade = facadeOf(event);
+    if (!facade || facade.dataset.videoBound === 'true') return;
+    var target = event.target;
+    loadRuntime()
+      .then(function () { return whenBound(facade); })
+      .then(function () {
+        if (facade.dataset.videoBound !== 'true') return;
+        target.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+      })
+      .catch(function () {});
   }, { capture: true });
 
-  whenDomReady().then(function () {
-    var facades = document.querySelectorAll('[data-video-facade]');
-    if (!facades.length) return;
-
-    if (typeof IntersectionObserver === 'undefined') {
-      window.setTimeout(loadRuntime, 900);
-      return;
-    }
-
-    var observer = new IntersectionObserver(function (entries, obs) {
-      var shouldLoad = entries.some(function (entry) {
-        return entry.isIntersecting || entry.intersectionRatio > 0;
-      });
-      if (!shouldLoad) return;
-      obs.disconnect();
-      loadRuntime();
-    }, { rootMargin: '220px 0px', threshold: [0, 0.01] });
-
-    facades.forEach(function (facade) { observer.observe(facade); });
-  });
+  document.addEventListener('keydown', function (event) {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    var facade = facadeOf(event);
+    if (!facade || facade.dataset.videoBound === 'true' || event.target !== facade) return;
+    event.preventDefault();
+    loadRuntime()
+      .then(function () { return whenBound(facade); })
+      .then(function () {
+        if (facade.dataset.videoBound === 'true') facade.click();
+      })
+      .catch(function () {});
+  }, { capture: true });
 })();
   </script>
 )}

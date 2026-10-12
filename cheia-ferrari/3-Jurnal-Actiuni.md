@@ -1,3 +1,36 @@
+## 📝 12 oct 2026 — `/js/video-facade.js` scos de pe calea critică (PageSpeed mobil)
+
+### Obiectiv
+- Eliminarea lanțului „Latență maximă a căii critice" raportat de PageSpeed Insights pe mobil pentru `https://www.florentinapanaofficial.ro`: documentul principal → `/js/video-facade.js`.
+
+### Diagnostic
+- Ipoteza inițială a lui Claudiu (tag `<script src="/js/video-facade.js">` fără `defer`) a fost infirmată: nu există niciun `<script src>` în `src/`. Runtime-ul se încarcă prin `import()` dinamic din loader-ul `is:inline`, care nu acceptă `defer`.
+- Cauza reală: pre-încălzirea prin `IntersectionObserver` cu `rootMargin: '220px 0px'`. Hero-ul homepage-ului are `min-height: 100dvh` (823px pe emularea mobilă Lighthouse), iar prima fațadă din `#video-showcase` începe la ~1007px — sub pragul de 1043px al observer-ului. Observer-ul se declanșa deci **în primul cadru**, înainte de LCP, iar `import()`-ul (prioritate High în Chrome) era atribuit lanțului critic al navigării.
+- Fallback-ul `setTimeout(900)` nu era implicat: rulează doar când `IntersectionObserver` lipsește, ceea ce nu e cazul în Chrome.
+- Audit local de referință (`lighthouse --form-factor=mobile --throttling-method=simulate` pe `server.mjs`): `/js/video-facade.js` cerut la **237ms**, lanțul cel mai lung **352ms**.
+- Prima încercare de remediere — amânarea importului la `load` + `requestIdleCallback` — a fost **respinsă prin măsurare**: Lighthouse atribuie cererea documentului indiferent de moment, iar lanțul a crescut la **891ms**. `rel="modulepreload"` ar fi ascuns cererea din audit (Lighthouse exclude `isLinkPreload`), dar ar fi descărcat-o mai devreme — optimizare pentru metrică, nu pentru utilizator; respinsă deliberat.
+
+### Modificări
+- `src/components/VideoFacade.astro` (doar loader-ul `is:inline`): eliminată complet pre-încălzirea la viewport. Runtime-ul se descarcă acum pe **intenție de interacțiune** — `pointerover`, `touchstart`, `focusin` (toate `capture`, primele două `passive`) — evenimente care nu se produc niciodată la o încărcare automată.
+- Același fișier: prima interacțiune reală se consumă înainte ca `bindFacades()` să-și lege ascultătorii, deci ar fi fost pierdută. Loader-ul o reia — `click` se redifuzează pe **ținta originală** (`MouseEvent` cu `bubbles: true`), ca să funcționeze atât redarea, cât și butonul „Informații"; `Enter`/`Space` pe fațadă se reiau prin `facade.click()`.
+- Același fișier: helper `whenBound()` — `initVideoFacades()` leagă ascultătorii abia la cadrul următor (observer + idle în runtime), deci reluarea așteaptă marcajul `data-video-bound="true"`, cu plafon de 60 de cadre (~1s) ca să nu rămână un lanț `requestAnimationFrame` agățat.
+- `public/js/video-facade.js` neatins — runtime-ul și testele lui rămân neschimbate.
+
+### Validări
+- Audit Lighthouse mobil local, după: `/js/video-facade.js` **nu mai este cerut deloc** la încărcare; lanțul cel mai lung **352ms → 178ms** (rămâne doar `/site.webmanifest`). Performanță 80 → **82**, TBT 480ms → **410ms**, FCP 1,2s, LCP 3,4s (neschimbat).
+- Verificare funcțională în Chrome headless prin CDP, pe build-ul servit de `server.mjs`:
+  - înainte de interacțiune — `0` cereri `video-facade`, fațadă nelegată;
+  - după `click` pe prima fațadă — `1` cerere, `data-video-bound="true"`, `data-video-pending="true"`, panoul de consimțământ vizibil → **prima interacțiune nu se pierde**;
+  - după `click` pe butonul „Informații" al celei de-a doua fațade — `aria-expanded="true"` → reluarea pe ținta originală funcționează și pentru controalele interne.
+- `npm run build`: PASS. `npm test`: **84/84 PASS**. `npm run seo:audit`: 62 pagini, **0 FAIL | 0 WARN**.
+
+### Riscuri / pași următori
+- Dispare pre-încălzirea la scroll: pe conexiuni foarte lente, un click fără hover/touch prealabil (rar — `touchstart` precedă orice tap) poate întârzia redarea cu durata descărcării runtime-ului (~2,5KB brotli).
+- Măsurătorile sunt locale, fără latență de rețea reală. De confirmat pe PageSpeed Insights live după propagarea deploy-ului.
+- `/js/video-facade.js` nu are hash în nume; cache-ul de 1 an + `stale-while-revalidate=86400` rămâne compromisul existent pentru tot ce stă în `public/js/`.
+
+---
+
 ## 📝 11 oct 2026 — Validarea domeniului media Cloudflare, CSP pentru Consent Mode și fallback video în HeroVideo
 
 ### Obiectiv
