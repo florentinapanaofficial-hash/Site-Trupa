@@ -55,7 +55,7 @@
 ### 🔴 3. Când adaugi pagini sau linkuri noi
 - Verifică mereu trailing slash pe orice `href="/ruta-noua/"`
 - Adaugă în `Header.astro`, `Footer.astro`, `BaseLayout.astro` dacă e pagină de navigare
-- Adaugă în `siteContent.json` + `siteContent.ts` dacă e element de navigare
+- Adaugă în `siteContent.json` dacă e element de navigare: `navigation` (bara desktop) sau `navGroups` (acordeon mobil + module desktop)
 - Adaugă în `astro.config.mjs` → `customPages` dacă e pagină prerendered nedescoperită de sitemap
 
 ### 🔴 4. Când muți/redenumești o pagină
@@ -96,8 +96,7 @@
 ```
 src/data/
 ├── seo-content.json      ← Hub centralizat SEO (titluri, descrieri, h1, schema.org)
-├── siteContent.json      ← Date principale: brand, contact, navigație, servicii, membri
-├── siteContent.ts        ← TypeScript types + navigație
+├── siteContent.json      ← Date principale: brand, contact, navigație (`navigation`, `navPrimary`, `navGroups`), servicii, membri
 ├── couples.json          ← Testimoniale și date cupluri
 ├── blogPosts.json        ← Articole blog/vlog
 └── communityPosts.json   ← Postări comunitate

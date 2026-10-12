@@ -1,3 +1,24 @@
+## 📝 12 oct 2026 — Ștergerea fișierelor de navigație moarte
+
+### Obiectiv
+- Închiderea punctului rămas deschis în sesiunea acordeonului: `src/data/siteContent.ts` și `src/data/siteContent.js` nu erau importate nicăieri. Claudiu a aprobat ștergerea integrală.
+
+### Verificare înainte de ștergere
+- Căutare în tot repository-ul după `siteContent.ts`, `siteContent.js` și orice `from '...siteContent'` fără extensia `.json`: **toate** cele ~40 de importuri din cod trimit la `siteContent.json`. Singurele mențiuni ale celor două fișiere erau în documentație (`project-summary.md`, jurnal) și în `.github/copilot-instructions.md`.
+
+### Modificări
+- Șterse `src/data/siteContent.ts` și `src/data/siteContent.js` (`git rm`).
+- `.github/copilot-instructions.md`: regula „Adaugă în `siteContent.json` + `siteContent.ts` dacă e element de navigare" trimitea către un fișier acum inexistent. Rescrisă ca „Adaugă în `siteContent.json`: `navigation` (bara desktop) sau `navGroups` (acordeon mobil + module desktop)". Eliminat și rândul `siteContent.ts` din harta fișierelor, iar descrierea lui `siteContent.json` menționează acum cele trei chei de navigație.
+- Decizie confirmată de Claudiu: butonul `/live/` din footer-ul panoului desktop **rămâne** duplicat față de grupul MEDIA & MUZICĂ — funcționează ca CTA distinct.
+
+### Validări
+- `npm run build` PASS; `npx astro check` **96 fișiere, 0 erori / 0 avertismente / 0 sugestii**; `npm test` **84/84**; `npm run seo:audit` 63 pagini, **0 FAIL | 0 WARN**.
+
+### Riscuri / pași următori
+- `project-summary.md` (snapshot generat) mai listează cele două fișiere în arborele de directoare. Este un artefact de export, nu o sursă de adevăr; se corectează la următoarea regenerare.
+
+---
+
 ## 📝 12 oct 2026 — Meniu mobil tip acordeon, centralizarea navigării și pagina Revista
 
 ### Obiectiv
