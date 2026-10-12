@@ -12,6 +12,9 @@ interface Props {
   subtitle: string;
   showReviews?: boolean;
   posterImage?: string;
+  /** Variantă servită sub breakpoint-ul mobil. Preload-urile din pagină
+      folosesc aceleași media queries, ca LCP-ul să se descarce o singură dată. */
+  posterImageMobile?: string;
   posterAlt?: string;
   posterWidth?: number;
   posterHeight?: number;
@@ -30,30 +33,36 @@ const {
   subtitle,
   showReviews = false,
   posterImage,
+  posterImageMobile,
   posterAlt = 'Formația Florentina Pană cântând live pe scenă la o nuntă',
   posterWidth,
   posterHeight,
   titleTag = 'h1',
 } = Astro.props;
 const TitleTag = titleTag;
+const POSTER_MOBILE_MEDIA = '(max-width: 767px)';
 ---
 
 <section
   class="hero-video relative w-full min-h-[80vh] md:min-h-screen flex items-center justify-center overflow-hidden"
   data-hero-video
 >
+  {/* `contents` scoate <picture> din fluxul flex; <img> rămâne absolut poziționat față de secțiune. */}
   {posterImage && (
-    <img
-      src={posterImage}
-      alt={posterAlt}
-      width={posterWidth}
-      height={posterHeight}
-      fetchpriority="high"
-      decoding="sync"
-      loading="eager"
-      data-hero-poster
-      class="hero-video__poster absolute inset-0 z-0 h-full w-full object-cover"
-    />
+    <picture class="contents">
+      {posterImageMobile && <source media={POSTER_MOBILE_MEDIA} srcset={posterImageMobile} type="image/webp" />}
+      <img
+        src={posterImage}
+        alt={posterAlt}
+        width={posterWidth}
+        height={posterHeight}
+        fetchpriority="high"
+        decoding="sync"
+        loading="eager"
+        data-hero-poster
+        class="hero-video__poster absolute inset-0 z-0 h-full w-full object-cover"
+      />
+    </picture>
   )}
 
   <video

@@ -39,8 +39,10 @@ const KEYWORDS_SCHEMA: string[] = {{KEYWORDS_SCHEMA}};
 const SEO_TITLE_TEMPLATE = '{{META_TITLE}}';
 const SEO_TITLE = SEO_TITLE_TEMPLATE || `${KEYWORD} | ${brand.name}`;
 const SEO_DESC  = META_DESC || `${KEYWORD} cu show band live în ${ORAS}. Repertoriu variat, sonorizare proprie și ofertă personalizată. Cere disponibilitatea!`;
-// 832w ≈ DPR 1,5 peste lățimea randată de `object-cover`; lățime unică, ca preload-ul să indice aceeași resursă.
-const heroPoster = await getImage({ src: heroImg, width: 832, format: 'webp', quality: 62 });
+// Poster LCP: două lățimi fixe selectate prin `media` în `<picture>`, ca preload-urile să indice exact resursa folosită.
+// 832w ≈ DPR 1,5 peste randarea mobilă; 1440w acoperă randarea de ~1410 px CSS de pe desktop.
+const heroPosterMobile = await getImage({ src: heroImg, width: 832, format: 'webp', quality: 62 });
+const heroPosterDesktop = await getImage({ src: heroImg, width: 1440, format: 'webp', quality: 62 });
 
 const whatsappNumber = contact.phoneRaw.replace(/\\D/g, '');
 const whatsappText   = encodeURIComponent(`Bună ziua! Aș dori să rezerv formația pentru un eveniment în ${ORAS}.`);
@@ -105,13 +107,16 @@ const localBusinessLd = {
 
 <BaseLayout title={SEO_TITLE} description={SEO_DESC}>
   <Fragment slot="head">
-    <link rel="preload" as="image" href={heroPoster.src} fetchpriority="high" />
+    {/* Media queries complementare și identice cu cele din `<picture>`: exact un preload se potrivește. */}
+    <link rel="preload" as="image" href={heroPosterMobile.src} media="(max-width: 767px)" fetchpriority="high" />
+    <link rel="preload" as="image" href={heroPosterDesktop.src} media="(min-width: 768px)" fetchpriority="high" />
     <script is:inline type="application/ld+json" set:html={JSON.stringify(localBusinessLd)} />
     <script is:inline type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>
 
   <HeroVideo
-    posterImage={heroPoster.src}
+    posterImage={heroPosterDesktop.src}
+    posterImageMobile={heroPosterMobile.src}
     title={H1}
     subtitle={`Formația Florentina Pană în ${ORAS}`}
     showReviews={true}

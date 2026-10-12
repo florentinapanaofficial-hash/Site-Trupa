@@ -84,20 +84,21 @@ const googleBusinessReviews = featuredCouple
       text: featuredCouple.recommendation,
     }]
   : [];
-// Poster-ul video-ului hero este elementul LCP: WebP redimensionat, nu JPG-ul brut de 1426px.
-// Lățime unică, fără srcset, ca preload-ul din `slot="head"` să indice exact
-// aceeași resursă; 832w ≈ DPR 1,5 peste cei 551 px CSS randați de `object-cover`.
-const heroPoster = await getImage({
-  src: heroImg,
-  width: 832,
-  format: 'webp',
-  quality: 62,
-});
+// Poster-ul video-ului hero este elementul LCP: WebP redimensionat, nu JPG-ul brut.
+// Două latățimi fixe, selectate prin `media` în `<picture>`, nu prin srcset: așa
+// preload-ul de mai jos poate indica exact resursa care va fi folosită.
+// 832w ≈ DPR 1,5 peste cei 551 px CSS randați de `object-cover` pe mobil;
+// 1440w acoperă randarea de ~1410 px CSS de pe desktop.
+const heroPosterMobile = await getImage({ src: heroImg, width: 832, format: 'webp', quality: 62 });
+const heroPosterDesktop = await getImage({ src: heroImg, width: 1440, format: 'webp', quality: 62 });
 ---
 
 <BaseLayout title={acasa.meta.title} description={acasa.meta.description} ogImage={siteContent.seo.ogImage}>
   <Fragment slot="head">
-    <link rel="preload" as="image" href={heroPoster.src} fetchpriority="high" />
+    {/* Media queries complementare și identice cu cele din `<picture>`: exact un
+        preload se potrivește, deci LCP-ul se descarcă o singură dată. */}
+    <link rel="preload" as="image" href={heroPosterMobile.src} media="(max-width: 767px)" fetchpriority="high" />
+    <link rel="preload" as="image" href={heroPosterDesktop.src} media="(min-width: 768px)" fetchpriority="high" />
     <script is:inline type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
   </Fragment>
 
@@ -130,7 +131,8 @@ const heroPoster = await getImage({
       HERO — Video background
   ═══════════════════════════════════════════ */}
   <HeroVideo
-    posterImage={heroPoster.src}
+    posterImage={heroPosterDesktop.src}
+    posterImageMobile={heroPosterMobile.src}
     title="Formație Nuntă Pitești: muzică live pentru ziua voastră"
     subtitle="Florentina Pană, trupă cover live în Pitești și Argeș, pentru nunți pline de emoție"
     showReviews={true}

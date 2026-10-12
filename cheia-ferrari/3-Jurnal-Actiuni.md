@@ -1,3 +1,30 @@
+## 📝 12 oct 2026 — Poster hero cu `<picture>`: claritate pe desktop, economie pe mobil
+
+### Obiectiv
+- Recuperarea claritate pe desktop pierdute la trecerea posterului hero la 832w, fără a sacrifica economia de pe mobil și fără a reintroduce descarcarea dublă a LCP-ului.
+
+### Modificări
+- `src/components/HeroVideo.astro`: posterul randat într-un `<picture>` cu `<source media="(max-width: 767px)">`. Prop nou `posterImageMobile`; `posterImage` rămâne varianta desktop și fallback-ul `<img>`.
+- Același fișier: `<picture class="contents">`. Secțiunea hero este `flex`, iar un `<picture>` implicit ar fi devenit flex item cu line box propriu; `display: contents` îl scoate din flux, deci `<img absolute inset-0>` se poziționează mai departe față de secțiune. CLS rămâne **0** pe ambele profiluri.
+- `src/pages/index.astro` și `scripts/programmatic-seo/template.astro`: două apeluri `getImage()` — **832w** pentru mobil, **1440w** pentru desktop. 1440 a fost ales pe baza randarii reale: pe viewport-ul desktop Lighthouse (1350×940), `object-cover` scalează imaginea la ~1410 px CSS lățime. Măsurători de mărime înainte de alegere: 832w 34,0 KB · 1280w 58,8 KB · 1440w 67,0 KB · 1600w 76,8 KB · 1920w 99,5 KB (sursa are exact 1920×1280, deci fără upscalare).
+- Aceleași fișiere: două `<link rel="preload" as="image">` cu `media="(max-width: 767px)"` și `media="(min-width: 768px)"` — complementare și identice cu media query-ul din `<picture>`, deci exact unul se potrivește.
+- Cele 5 pagini din `src/pages/formatie-nunta/` au fost **regenerate** cu `node scripts/programmatic-seo/generate-pages.js`, nu editate manual.
+
+### Validări
+- **LCP descărcat o singură dată pe ambele profiluri**, confirmat în `network-requests`:
+  - mobil (412×823, DPR 1,75) → **1** cerere, varianta 832w, 36,1 KB;
+  - desktop (1350×940, DPR 1) → **1** cerere, varianta 1440w, 69,1 KB.
+- URL-urile din `<link rel="preload">` și din `<picture>` coincid exact pe fiecare breakpoint, verificat în `dist/client/index.html`.
+- Desktop: performanță **100**, LCP **0,7 s**, CLS **0**. Mobil: performanță 90–91, LCP **3,3 s**, CLS **0**.
+- `npm run build` PASS; `npm test` **84/84**; `npm run seo:audit` 62 pagini, **0 FAIL \| 0 WARN**.
+
+### Riscuri / pași următori
+- Desktop-ul transferă acum 69,1 KB pentru poster, față de 44,6 KB la începutul zilei (1024w) și 36,1 KB după trecerea la 832w. Este o creștere **asumată**, în schimbul claritate la rezoluție nativă; desktop-ul rămâne la performanță 100.
+- Breakpoint-ul `767px` apare în trei locuri (`POSTER_MOBILE_MEDIA` în `HeroVideo.astro` și cele două `<link>` din pagini). Dacă se schimbă, trebuie actualizat în toate, altfel LCP-ul se descarcă de două ori într-un interval de viewport.
+- Ecranele desktop retina (DPR 2) primesc tot 1440w. Un al treilea nivel ar fi posibil, dar ar înmulți preload-urile și breakpoint-urile.
+
+---
+
 ## 📝 12 oct 2026 — Dimensionarea imaginilor pe mobil: țintă DPR 1,5 și eliminarea unui srcset fictiv
 
 ### Obiectiv
@@ -17,7 +44,7 @@
 - `scripts/programmatic-seo/template.astro`: aceeași trecere la `width: 832`, urmată de `node scripts/programmatic-seo/generate-pages.js`. Cele 5 pagini din `src/pages/formatie-nunta/` au fost **regenerate, nu editate manual**; diff-ul conține strict linia posterului.
 
 ### Validări
-- `image-delivery` pe mobil: **90 KiB → 4 KiB** economie estimată, de la 3 imagini semnalate la 1.
+- `image-delivery` pe mobil: **90 KiB → 4 KiB** economie estimată, de la 3 imagini semnalate la 1. **⚠️ Corecție (sesiunea `<picture>`, aceeași zi):** cifra de 4 KiB provenea dintr-o rulare anormală. Două rulări ulterioare consecutive au dat constant **72 KiB**. Insight-ul `image-delivery` este instabil între rulări (depinde de ce dimensiune afișată prinde trace-ul) — singurele cifre de încredere sunt octeții transferați din `network-requests`, de mai jos.
 - Transfer real: poster 44,6 → **36,1 KB**; `hp-ana-florentina` 57,9 → **47,3 KB**. Total ≈ **19 KB** pe mobil.
 - **LCP descărcat o singură dată**: o singură intrare `card-1-panoramica.NzU7LKQ3_1Jcrnz.webp` în `network-requests` (47ms, 36,1 KB), iar `<link rel="preload">` și `<img class="hero-video__poster">` din `dist/client/index.html` indică exact același URL.
 - `Coperta-1-videi-640.webp` rămâne semnalată cu 4,5 KB, acum raportată corect față de 592×333 (DPR aplicat). Sursa are doar 640 px lățime, deci nu există variantă mai bună de generat.
