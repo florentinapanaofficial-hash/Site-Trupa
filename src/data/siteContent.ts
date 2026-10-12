@@ -22,15 +22,6 @@ export const siteContent = {
     instagram: 'https://www.instagram.com/florentinaformatie/',
     tiktok: '',
   },
-  navigation: [
-    { href: '#acasa', label: 'Acasă' },
-    { href: '/cauti-formatie-nunta/', label: 'Cauți formație?', color: 'gold' },
-    { href: '/comunitate/', label: 'Noutăți' },
-    { href: '#servicii', label: 'Servicii' },
-    { href: '#membri', label: 'Membri' },
-    { href: '#faq', label: 'FAQ' },
-    { href: '#contact', label: 'Contact' },
-  ],
   hero: {
     kicker: 'Live band | Nuntă | Botez | Corporate',
     title: 'Sunet Modern, Vibe Elegant',

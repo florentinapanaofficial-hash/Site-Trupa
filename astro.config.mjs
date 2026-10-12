@@ -51,6 +51,8 @@ export default defineConfig({
         if (url.pathname === '/colaboratori/tambal/') return false;
         // Exclude /live-preview/ — pagină de campanie (teaser 60s), nu trebuie indexată
         if (url.pathname === '/live-preview/') return false;
+        // Exclude /revista/ — placeholder noindex până la publicarea conținutului
+        if (url.pathname === '/revista/') return false;
         // Exclude /mini-tv/ — redirect 301 → /live/ (pagina a fost integrată)
         if (url.pathname === '/mini-tv/') return false;
         // Exclude /blog/ — redirect 301 → /publicatii/ (Ahrefs: 3XX redirect in sitemap)

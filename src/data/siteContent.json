@@ -91,6 +91,95 @@
       "color": "cyan"
     }
   ],
+  "navPrimary": {
+    "href": "/",
+    "label": "Acasă",
+    "color": "cyan"
+  },
+  "navGroups": [
+    {
+      "label": "PREZENTARE",
+      "accent": "cyan",
+      "links": [
+        {
+          "href": "/despre/",
+          "label": "Despre noi"
+        },
+        {
+          "href": "/povestea-noastra/",
+          "label": "Povestea noastră"
+        },
+        {
+          "href": "/membri/",
+          "label": "Membri"
+        },
+        {
+          "href": "/comunitate/",
+          "label": "Comunitate"
+        },
+        {
+          "href": "/publicatii/",
+          "label": "Blog"
+        },
+        {
+          "href": "/revista/",
+          "label": "Revista"
+        }
+      ]
+    },
+    {
+      "label": "MEDIA & MUZICĂ",
+      "accent": "cyan",
+      "links": [
+        {
+          "href": "/galerie-video/",
+          "label": "Galerie Video"
+        },
+        {
+          "href": "/shorts/",
+          "label": "Reels"
+        },
+        {
+          "href": "/galerie-foto/",
+          "label": "Galerie Foto"
+        },
+        {
+          "href": "/muzica-non-stop/",
+          "label": "Bibliotecă Audio"
+        },
+        {
+          "href": "/aparitii-tv/",
+          "label": "Apariții TV"
+        },
+        {
+          "href": "/live/",
+          "label": "Momente Live"
+        }
+      ]
+    },
+    {
+      "label": "REZERVĂRI",
+      "accent": "gold",
+      "links": [
+        {
+          "href": "/cauti-formatie-nunta/",
+          "label": "Căutați formație?"
+        },
+        {
+          "href": "/oferta-premium/",
+          "label": "Ofertă Premium"
+        },
+        {
+          "href": "/rezervare/",
+          "label": "Cereți ofertă"
+        },
+        {
+          "href": "/contact/",
+          "label": "Contact"
+        }
+      ]
+    }
+  ],
   "hero": {
     "kicker": "Formație nuntă Pitești | Muzică live nunți, botezuri, evenimente",
     "title": "Sunet Modern, Vibe Elegant",

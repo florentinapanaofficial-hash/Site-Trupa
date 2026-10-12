@@ -2,7 +2,7 @@
 import siteContent from '../data/siteContent.json';
 import { sanitizeUrl } from '../lib/sanitize-url';
 
-const { brand, navigation } = siteContent;
+const { brand, navigation, navPrimary, navGroups } = siteContent;
 const socialLinks = {
   youtube: siteContent.socialLinks?.youtube ? sanitizeUrl(siteContent.socialLinks.youtube) : null,
   facebook: siteContent.socialLinks?.facebook ? sanitizeUrl(siteContent.socialLinks.facebook) : null,
@@ -33,65 +33,14 @@ const normalizedNavigation = navigation.map((item) => ({
 const topNavigation = normalizedNavigation;
 const desktopNavigation = topNavigation;
 
-// Navigare completă pentru panoul hamburger mobil
-const mobileFullNavigation = [
-  { href: '/', label: 'Acasă', color: 'cyan' },
-  { href: '/cauti-formatie-nunta/', label: 'Căutați formație?', color: 'gold' },
-  { href: '/despre/', label: 'Despre', color: 'cyan' },
-  { href: '/povestea-noastra/', label: 'Povestea noastră', color: 'cyan' },
-  { href: '/membri/', label: 'Membri', color: 'cyan' },
-  { href: '/galerie-video/', label: 'Galerie Video', color: 'cyan' },
-  { href: '/shorts/', label: 'Reels', color: 'cyan' },
-  { href: '/galerie-foto/', label: 'Galerie Foto', color: 'cyan' },
-  { href: '/muzica-non-stop/', label: 'Bibliotecă Audio', color: 'cyan' },
-  { href: '/comunitate/', label: 'Comunitate', color: 'cyan' },
-  { href: '/publicatii/', label: 'Blog', color: 'cyan' },
-  { href: '/aparitii-tv/', label: 'Apariții TV', color: 'cyan' },
-  { href: '/live/', label: 'Live', color: 'cyan' },
-  { href: '/oferta-premium/', label: 'Ofertă Premium', color: 'gold' },
-  { href: '/rezervare/', label: 'Cereți ofertă', color: 'gold' },
-  { href: '/contact/', label: 'Contact', color: 'cyan' },
-].map((item) => ({ ...item, href: normalizeNavHref(item.href) }));
-
-const desktopMenuModules = [
-  {
-    label: 'PREZENTARE',
-    accent: 'cyan',
-    links: [
-      { href: '/despre/', label: 'Despre noi' },
-      { href: '/povestea-noastra/', label: 'Povestea noastră' },
-      { href: '/membri/', label: 'Membri' },
-      { href: '/comunitate/', label: 'Comunitate' },
-    ],
-  },
-  {
-    label: 'MEDIA',
-    accent: 'cyan',
-    links: [
-      { href: '/galerie-video/', label: 'Galerie Video' },
-      { href: '/shorts/', label: 'Reels' },
-      { href: '/galerie-foto/', label: 'Galerie Foto' },
-      { href: '/aparitii-tv/', label: 'Apariții TV' },
-      { href: '/muzica-non-stop/', label: 'Bibliotecă Audio' },
-      { href: '/publicatii/', label: 'Blog' },
-    ],
-  },
-  {
-    label: 'REZERVĂRI',
-    accent: 'gold',
-    links: [
-      { href: '/cauti-formatie-nunta/', label: 'Căutați formație?' },
-      { href: '/oferta-premium/', label: 'Ofertă Premium' },
-      { href: '/rezervare/', label: 'Cereți ofertă' },
-      { href: '/contact/', label: 'Contact' },
-    ],
-  },
-].map((module) => ({
-  ...module,
-  links: module.links.map((link) => ({ ...link, href: normalizeNavHref(link.href) })),
+// Sursă unică pentru acordeonul mobil și pentru modulele din panoul desktop.
+const navPrimaryLink = { ...navPrimary, href: normalizeNavHref(navPrimary.href) };
+const navMenuGroups = navGroups.map((group) => ({
+  ...group,
+  links: group.links.map((link) => ({ ...link, href: normalizeNavHref(link.href) })),
 }));
 
-const hasExpandableTopMenu = mobileFullNavigation.length > 1;
+const hasExpandableTopMenu = navMenuGroups.length > 0;
 ---
 
 <header class="top-header fixed inset-x-0 top-0 z-[1200] border-b border-white/20 bg-ink" data-top-header>
@@ -227,12 +176,12 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
           <span class="desktop-sf-menu__title">Selectează un modul</span>
         </div>
         <div class="desktop-sf-menu__modules">
-          {desktopMenuModules.map((module) => (
-            <section class={`desktop-sf-module desktop-sf-module--${module.accent}`}>
-              <div class="desktop-sf-module__heading">{module.label}</div>
+          {navMenuGroups.map((group) => (
+            <section class={`desktop-sf-module desktop-sf-module--${group.accent}`}>
+              <div class="desktop-sf-module__heading">{group.label}</div>
               <div class="desktop-sf-module__links">
-                {module.links.map((link) => (
-                  <a href={link.href} class="desktop-sf-module__link" data-nav-link>
+                {group.links.map((link) => (
+                  <a href={link.href} class="desktop-sf-module__link" data-nav-link data-live-link={link.href === '/live/' ? 'true' : undefined}>
                     <span class="desktop-sf-module__link-back" aria-hidden="true"></span>
                     <span>{link.label}</span>
                     <span class="desktop-sf-module__arrow" aria-hidden="true">→</span>
@@ -274,12 +223,26 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
           </div>
         </div>
 
-        <!-- Mobil: listă verticală cu toate paginile -->
+        <!-- Mobil: link fix + grupuri acordeon, închise implicit la fiecare deschidere -->
         <nav class="nav-mobile-grid" aria-label="Navigație mobilă">
-          {mobileFullNavigation.map((item) => (
-            <a href={item.href} class={`left-side-link nav-link-mobile${item.color ? ` nav-btn-${item.color}` : ''}`} data-nav-link data-live-link={item.href === '/live/' ? 'true' : undefined}>
-              <span class="nav-label">{item.label}</span>
-            </a>
+          <a href={navPrimaryLink.href} class={`left-side-link nav-link-mobile${navPrimaryLink.color ? ` nav-btn-${navPrimaryLink.color}` : ''}`} data-nav-link>
+            <span class="nav-label">{navPrimaryLink.label}</span>
+          </a>
+
+          {navMenuGroups.map((group) => (
+            <details class={`nav-mobile-group nav-mobile-group--${group.accent}`} data-nav-group>
+              <summary class="nav-mobile-group__summary">
+                <span class="nav-mobile-group__label">{group.label}</span>
+                <span class="nav-mobile-group__chevron" aria-hidden="true">▾</span>
+              </summary>
+              <div class="nav-mobile-group__links">
+                {group.links.map((link) => (
+                  <a href={link.href} class={`left-side-link nav-link-mobile nav-btn-${group.accent}`} data-nav-link data-live-link={link.href === '/live/' ? 'true' : undefined}>
+                    <span class="nav-label">{link.label}</span>
+                  </a>
+                ))}
+              </div>
+            </details>
           ))}
         </nav>
 
@@ -314,6 +277,11 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
     if (!(menuAudio instanceof HTMLMediaElement)) return;
     menuAudio.pause();
     menuAudio.currentTime = 0;
+  };
+
+  // <details> își păstrează starea între deschideri; o resetam ca meniul să pornească mereu compact.
+  const collapseMobileNavGroups = () => {
+    document.querySelectorAll('[data-nav-group]').forEach((group) => { group.open = false; });
   };
 
   const unlockMobileBodyScroll = () => {
@@ -368,6 +336,7 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
     menuToggle?.setAttribute('aria-label', 'Deschide meniul principal');
     syncMobileMenuBodyState(false);
     pauseMobileMenuAudio();
+    collapseMobileNavGroups();
     sessionStorage.setItem(MENU_KEY, 'false');
   };
 
@@ -379,6 +348,7 @@ const hasExpandableTopMenu = mobileFullNavigation.length > 1;
     headerEl.classList.add('menu-open');
     menuToggle.setAttribute('aria-expanded', 'true');
     menuToggle.setAttribute('aria-label', 'Închide meniul principal');
+    collapseMobileNavGroups();
     syncMobileMenuBodyState(true);
     sessionStorage.setItem(MENU_KEY, 'true');
 

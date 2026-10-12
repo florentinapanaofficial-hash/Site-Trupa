@@ -1,3 +1,37 @@
+## 📝 12 oct 2026 — Meniu mobil tip acordeon, centralizarea navigării și pagina Revista
+
+### Obiectiv
+- Meniul mobil avea 16 rubrici vizibile simultan. Restructurat în link fix + 3 grupuri acordeon, cu datele mutate într-o sursă unică.
+
+### Modificări
+- `src/data/siteContent.json`: structuri noi `navPrimary` (link fix „Acasă") și `navGroups` (3 grupuri cu `label`, `accent`, `links`). `navigation` rămâne pentru bara orizontală desktop.
+- `src/components/Header.astro`: șterse array-urile hardcodate `mobileFullNavigation` (16 intrări) și `desktopMenuModules` (3 grupuri). Ambele navigări citesc acum din `navGroups`, deci gruparea mobilă și modulele desktop nu mai pot diverge.
+- Același fișier: acordeonul mobil folosește `<details>`/`<summary>` nativ — funcționează și fără JS, cu semantică și tastatură gratuite. Fiecare link păstrează `data-nav-link`, iar `/live/` păstrează `data-live-link="true"`.
+- Același fișier: `collapseMobileNavGroups()` rulează la deschiderea **și** la închiderea meniului. `<details>` își păstrează starea între deschideri, iar meniul se restaurează din `sessionStorage` la refresh — fără reset, s-ar fi redeschis cu grupurile expandate.
+- Același fișier: `hasExpandableTopMenu` calculat acum din `navMenuGroups.length`, nu din lista mobilă ștearsă.
+- `src/styles/globals.css`: stiluri pentru `.nav-mobile-group*`, adăugate **în interiorul** blocului `@media (max-width: 1024px)` existent, ca desktopul să rămână neatins. Marker-ul nativ ascuns, chevron rotit prin `[open]`.
+- `src/data/siteContent.ts` și `src/data/siteContent.js`: eliminate array-urile `navigation` moarte. Niciun fișier din `src/` nu importa aceste module — conțineau rubrici inexistente (`#servicii`, `#faq`, „Noutăți") care contraziceau `siteContent.json`.
+- `src/pages/revista.astro` (NOU): placeholder pe `BaseLayout`, `noindex`. Adăugat și `/revista/` în grupul PREZENTARE.
+- `src/layouts/BaseLayout.astro`: eticheta `'revista': 'Revista'` în `breadcrumbLabels`.
+- `astro.config.mjs`: `/revista/` exclus din sitemap — pagină `noindex` cu conținut subtţire; a o lăsa în sitemap ar fi fost o contradicție pe care Search Console o raportează.
+
+### Validări
+- Test funcțional în Chrome headless (CDP), cu `sessionStorage` curat înainte de fiecare profil:
+  - **mobil 412×823**: meniu deschis → „Acasă" vizibil, 3 grupuri toate **închise**, înălțime totală **237px** (față de ~900px cu 16 butoane); click pe PREZENTARE → exact cele 6 linkuri ale lui devin vizibile, celelalte două grupuri rămân închise; închis + redeschis → toate colapsate din nou;
+  - **desktop 1350×940**: 3 module cu **16 linkuri vizibile**, acordeonul mobil ascuns, bara orizontală cu 7 linkuri intactă;
+  - `data-nav-link` prezent pe **toate** linkurile din ambele navigări; `data-live-link` prezent.
+- `/revista/`: titlu 51 caractere, `robots: noindex,nofollow`, canonical corect, H1 prezent.
+- `npm run build` PASS; `npm test` **84/84**; `npm run seo:audit` **63** pagini, **0 FAIL \| 0 WARN**; `check-links` 66 URL-uri externe valide.
+
+### Greșeli / riscuri
+- **Primul test de desktop a dat un fals negativ** („panoul nu se deschide"): meniul se restaurează din `sessionStorage`, deci era deja deschis la încărcare, iar click-ul meu îl închidea. Nu era regresie. Testele pe meniu trebuie să golească `sessionStorage` înainte.
+- `offsetWidth`/`offsetHeight` sunt înșelătoare pentru conținutul unui `<details>` închis — Chrome păstrează ultimele valori de layout sub `content-visibility: hidden`. Verificarea corectă este `checkVisibility()` sau înălțimea containerului.
+- `/live/` apare acum și în grupul MEDIA & MUZICĂ, și în footer-ul panoului desktop („Deschide canalul LIVE →"). Duplicare asumată: al doilea este un CTA distinct.
+- `src/data/siteContent.ts` și `.js` rămân în repo fără niciun import. Dacă nu au alt rol, pot fi șterse integral — necesită acordul lui Claudiu.
+- Pagina Revista e `noindex` intenționat. Când apare conținut real, trebuie scos `noindex={true}` și eliminat filtrul din `astro.config.mjs`.
+
+---
+
 ## 📝 12 oct 2026 — Poster hero cu `<picture>`: claritate pe desktop, economie pe mobil
 
 ### Obiectiv

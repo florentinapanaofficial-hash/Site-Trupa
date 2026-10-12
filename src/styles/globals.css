@@ -3919,6 +3919,64 @@ select:focus-visible {
     display: inline-flex !important;
     width: min(88vw, 25rem) !important;
   }
+
+  /* ── Acordeon mobil (<details>/<summary>) ───────────────────────────── */
+  .top-menu-panel .nav-mobile-group {
+    width: min(88vw, 25rem);
+    border: 1px solid rgba(162, 234, 255, 0.34);
+    border-radius: 0.9rem;
+    background: rgba(4, 18, 36, 0.72);
+    overflow: hidden;
+  }
+
+  .top-menu-panel .nav-mobile-group--gold {
+    border-color: rgba(245, 166, 35, 0.44);
+  }
+
+  .top-menu-panel .nav-mobile-group__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    min-height: 48px;
+    padding: 0.7rem 1rem;
+    cursor: pointer;
+    list-style: none;
+    font-size: 0.86rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: #f7fbff;
+  }
+
+  .top-menu-panel .nav-mobile-group__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .top-menu-panel .nav-mobile-group--gold .nav-mobile-group__summary {
+    color: #ffd79a;
+  }
+
+  .top-menu-panel .nav-mobile-group__chevron {
+    font-size: 0.95rem;
+    line-height: 1;
+    transition: transform 200ms ease;
+  }
+
+  .top-menu-panel .nav-mobile-group[open] .nav-mobile-group__chevron {
+    transform: rotate(180deg);
+  }
+
+  .top-menu-panel .nav-mobile-group__links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.15rem 0.6rem 0.75rem;
+  }
+
+  .top-menu-panel .nav-mobile-group__links .nav-link-mobile {
+    width: 100% !important;
+  }
 }
 
 .desktop-sf-menu {

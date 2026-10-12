@@ -15,14 +15,6 @@ export const siteContent = {
         email: 'contact@florentinapanaofficial.ro',
         city: 'Argeș/Pitești, disponibilitate națională',
     },
-    navigation: [
-        { href: '#acasa', label: 'Acasă' },
-        { href: '/comunitate/', label: 'Comunitate' },
-        { href: '#servicii', label: 'Servicii' },
-        { href: '#membri', label: 'Membri' },
-        { href: '#faq', label: 'FAQ' },
-        { href: '#contact', label: 'Contact' },
-    ],
     hero: {
         kicker: 'Live band | Nuntă | Botez | Corporate',
         title: 'Sunet Modern, Vibe Elegant',
