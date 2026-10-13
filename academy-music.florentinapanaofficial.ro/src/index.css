@@ -1,0 +1,137 @@
+@import 'tailwindcss';
+
+@theme {
+    --color-brand-50: #fdf4f5;
+    --color-brand-100: #fbe8ea;
+    --color-brand-200: #f5c9cf;
+    --color-brand-300: #eda3ad;
+    --color-brand-400: #e06b7c;
+    --color-brand-500: #c9344b;
+    --color-brand-600: #a82640;
+    --color-brand-700: #871f35;
+    --color-brand-800: #651728;
+    --color-brand-900: #43101b;
+
+    --color-ink-800: #17161c;
+    --color-ink-900: #0d0c11;
+    --color-ink-950: #070609;
+
+    --color-gold-300: #f0d894;
+    --color-gold-400: #e8c468;
+    --color-gold-500: #d4a933;
+
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-sans: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+    --animate-fade-up: fade-up 0.35s ease-out both;
+}
+
+@keyframes fade-up {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        @apply bg-ink-950 text-slate-100 antialiased;
+        font-family: var(--font-sans);
+    }
+
+    h1,
+    h2,
+    h3 {
+        font-family: var(--font-display);
+    }
+
+    :focus-visible {
+        @apply outline-none ring-2 ring-gold-400 ring-offset-2 ring-offset-ink-950;
+    }
+}
+
+/* În Tailwind 4 doar utilitarele declarate cu `@utility` pot fi refolosite prin `@apply`. */
+@utility btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+@layer components {
+    .card {
+        @apply rounded-2xl border border-white/10 bg-ink-900/80 p-5 shadow-lg shadow-black/30;
+    }
+
+    .btn-primary {
+        @apply btn bg-brand-500 text-white hover:bg-brand-600;
+    }
+
+    .btn-ghost {
+        @apply btn border border-white/15 text-slate-200 hover:border-white/35 hover:bg-white/5;
+    }
+
+    .btn-gold {
+        @apply btn bg-gold-500 text-ink-950 hover:bg-gold-400;
+    }
+
+    .input {
+        @apply w-full rounded-xl border border-white/15 bg-ink-800 px-4 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-brand-400;
+    }
+
+    .label {
+        @apply mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-400;
+    }
+
+    .badge {
+        @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+    }
+}
+
+/*
+  Protecția conținutului este descurajare, nu DRM: blochează selecția, meniul
+  contextual, drag-and-drop și printarea pentru zonele marcate `.protected`.
+*/
+.protected,
+.protected * {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+}
+
+.protected img,
+.protected canvas,
+.protected video {
+    -webkit-user-drag: none;
+    pointer-events: auto;
+}
+
+@media print {
+    .protected {
+        display: none !important;
+    }
+
+    body::after {
+        content: 'Materialele Academy Music nu pot fi printate.';
+        display: block;
+        font-size: 20px;
+        padding: 40px;
+    }
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.14);
+    border-radius: 999px;
+}

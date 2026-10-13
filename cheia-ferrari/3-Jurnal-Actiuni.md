@@ -1,3 +1,176 @@
+## 📝 14 oct 2026 — Academy Music: închiderea sesiunii
+
+### Stare la final
+- **Schema SQL rulată cu succes în Supabase**, confirmat de Claudiu. Conține: `student_pieces`, `study_groups`, `group_pieces`, `group_members`, `profiles.avatar_path`, bucketul privat `avatars` și funcția `can_access_piece()` care guvernează accesul atât pe tabelul `pieces`, cât și pe `storage.objects`.
+- **Panoul de profesor** are acum cinci zone funcționale: „Clasa mea" (carduri cu avatar → `StudentDetail.jsx` cu player individual și încărcare fotografie), „Predare" (player dual pe grupe Începători/Avansați), „Piese" (modal cu comutator Local/Online și alocare directă pe grupe sau elevi la upload), plus Teme și Activitate.
+- **Interfața elevului este izolată**: fără acces la cataloagele Orgă/Canto, doar „Repertoriul meu" și `RecordingStudio.jsx` pentru înregistrarea temelor peste negativ, cu mixaj prin Web Audio API.
+- `server.mjs`: `Permissions-Policy` corectat la `camera=(self)` — valoarea anterioară `camera=()` ar fi blocat complet modul video al studioului.
+
+### Validări finale
+- `npm run build` PASS (126 module). `get_errors` curat.
+- `git status`: doar jurnalul modificat și folderul nou al proiectului. Dry-run `git add`: **56 fișiere**, fără `node_modules/`, `dist/` sau `.env` — singura potrivire pe filtru a fost `.env.example`, care trebuie versionat.
+
+### Pași următori (sesiunea de mâine)
+1. Buton rapid „+ Adaugă piesă" direct în paginile Orgă și Canto, vizibil doar profesorilor, plus testarea completă a fluxului de upload din panou.
+2. Configurarea contului de profesor pentru Florentina (înregistrare, apoi `UPDATE` de promovare **cu verificarea** prin `SELECT` — „1 row affected" nu dovedește schimbarea).
+3. Testarea practică a studioului cu microfon și căști: o probă audio și una video, ideal și pe telefon. Nu a putut fi validată din mediul de dezvoltare.
+
+### Rămase deschise din sesiunile de azi
+- Elevii existenți nu sunt încă în nicio grupă; până la bifarea lor în `StudentDetail`, văd doar alocările individuale.
+- RLS-ul de izolare nu a fost testat cu un cont real de elev. Verificarea obligatorie: un elev fără alocări nu trebuie să vadă nicio piesă, iar `/orga` trebuie să redirecționeze.
+- Avatarurile se încarcă fără redimensionare; la volum mare merită conversie client-side la ~400px.
+
+---
+
+## 📝 14 oct 2026 — Academy Music: izolarea repertoriului per elev și alocare directă la upload
+
+### Obiectiv
+- Elevul să nu mai vadă catalogul general și nici repertoriul altui elev; profesorul să aloce piesa direct din formularul de upload.
+
+### Lipsa descoperită în schemă
+- Cerința vorbea despre „repertoriul grupei lui", dar **nu exista nicio legătură elev↔grupă**. `profiles.grade_level` e text liber, iar `group_pieces` lega doar grupa de piese. Adăugat `group_members` (PK compus `group_id` + `student_id`), altfel regula nu avea ce evalua.
+
+### Modificări — RLS
+- `can_access_piece(uuid)`, `SECURITY DEFINER`: sursa unică de adevăr pentru accesul unui elev la o piesă (alocare individuală **sau** prin grupele lui). Folosită și de politica pe `pieces`, și de cea pe `storage.objects`, ca regula să nu poată diverge între tabel și fișiere.
+- `pieces_select`: elevul vede doar piese publicate care îi sunt alocate. Anterior vedea **tot catalogul**.
+- `media_read_authenticated` pe storage: anterior `using (bucket_id = 'academy-media')` — orice elev autentificat putea cere URL semnat pentru **orice** fișier, dacă îi afla calea. Acum calea trebuie să aparțină unei piese la care are acces sau unei resurse RED (care rămâne comună).
+- `group_pieces_select`: restrâns la grupele din care elevul face parte.
+
+### Modificări — frontend
+- `AdminPieces`: secțiune „Destinație / alocare directă" cu grupe și elevi. La o singură grupă țintă, fișierele se urcă în `groups/<slug>/...`; altfel pe disciplină. După insert, alocarea se scrie în `group_pieces` / `student_pieces`.
+- `src/lib/useMyRepertoire.js` (NOU): unifică piesele individuale cu cele de grupă, deduplicate. Folosit de dashboard și de pagina dedicată, ca logica să nu existe în două locuri.
+- `RepertoriulMeu.jsx` (NOU) pe `/repertoriul-meu`; dashboardul arată primele 3 cu link către pagină.
+- `Layout` + `App`: `/orga` și `/canto` au trecut sub `requireTeacher` și au dispărut din navigarea elevului. `SHORTCUTS` din dashboard nu mai trimit elevul către cataloage.
+- `StudentDetail`: gestionarea apartenenței la grupe.
+
+### Validări
+- `npm run build` PASS (126 module). `get_errors` curat.
+
+### Observații pentru Claudiu
+- Uploadul folosea deja JWT-ul sesiunii prin clientul Supabase — nicio cheie în interfață, nimic de schimbat.
+- **Elevii existenți nu sunt în nicio grupă.** Până la bifarea lor în `StudentDetail`, văd doar alocările individuale.
+- Politica de storage face un `EXISTS` peste `pieces` la fiecare cerere de URL semnat. La volumul unei clase e neglijabil; la mii de fișiere ar merita index pe coloanele de cale.
+- Nu am putut testa RLS-ul cu un cont real de elev din acest mediu. Verificarea obligatorie: logare cu un elev fără alocări — nu trebuie să vadă nicio piesă, iar `/orga` trebuie să redirecționeze.
+
+---
+
+## 📝 14 oct 2026 — Academy Music: repertoriul elevului și studio de înregistrare peste negativ
+
+### Obiectiv
+- Închiderea cercului pedagogic: elevul vede piesele alocate de profesor și își înregistrează tema direct în platformă, cântând peste negativ.
+
+### Modificări
+- `supabase/schema.sql`: **neschimbat**. `submissions.media_type` accepta deja `audio` și `video`, iar bucketul `portfolio` avea politicile necesare. Nicio migrare.
+- `src/lib/recorder.js` (NOU): `createStudioSession()` construiește lanțul Web Audio — microfon și negativ converg într-un `MediaStreamAudioDestinationNode`, iar `MediaRecorder` înregistrează mixul. Negativul se conectează **și** la `audioCtx.destination`, altfel elevul nu l-ar auzi în timp ce cântă.
+- `src/components/RecordingStudio.jsx` (NOU): modal cu stările idle → preparing → ready → recording → review → uploading. Previzualizare, reluare, mesaj pentru profesor, upload în `portfolio` și insert în `submissions`.
+- `DualAudioRow`: controalele de reordonare apar doar când se trimite `onRemove`; prop nou `actions` pentru butonul elevului.
+- `Dashboard`: secțiunea „Piesele mele de studiu" din `student_pieces`, cu player dual și buton „Înregistrează tema".
+- `server.mjs`: `Permissions-Policy` avea `camera=()`, care **blochează complet** camera. Corectat în `camera=(self)`.
+
+### Decizii tehnice
+- **CORS peste Web Audio**: `createMediaElementSource` pe o sursă cross-origin fără CORS produce tăcere, nu eroare. Elementul se încarcă întâi cu `crossOrigin='anonymous'`; dacă dă `error`, se reia fără CORS și se anunță elevul că negativul nu intră în mix. Fallback explicit, nu înregistrare mută descoperită după trimitere.
+- `createMediaElementSource` poate fi apelat o singură dată pe același element, deci fiecare sesiune își creează propriul `new Audio()` în loc să refolosească un element din DOM.
+- `echoCancellation`, `noiseSuppression` și `autoGainControl` dezactivate: sunt calibrate pentru voce vorbită și ar distruge dinamica muzicală. Compensat prin avertismentul de a folosi căști.
+- Limită de 10 minute cu oprire automată, ca o înregistrare uitată pornită să nu umple bucketul.
+
+### Validări
+- `npm run build` PASS (124 module). `get_errors` curat.
+
+### Riscuri / pași următori
+- Fluxul nu a fost testat cu microfon real din acest mediu — necesită o probă pe dispozitivul lui Claudiu, ideal și pe un telefon.
+- iOS Safari suportă `MediaRecorder` doar din versiuni recente și preferă `video/mp4`; selecția de tip acoperă cazul, dar merită verificat pe un iPhone.
+- Fișierele `.webm` nu sunt redabile nativ în Safari mai vechi. Dacă apar elevi pe iPhone, panoul profesorului ar putea avea nevoie de transcodare.
+
+---
+
+## 📝 14 oct 2026 — Academy Music: player dual, grupe de studiu și Classroom cu avataruri
+
+### Obiectiv
+- Trei extinderi cerute succesiv: surse audio Online/Local per variantă, repertoriu pe grupe (Începători/Avansați) și o secțiune Classroom cu fotografii de profil și repertoriu individual per elev.
+
+### Modificări — bază de date
+- `pieces`: coloane noi `positive_url` / `negative_url`, cu `CHECK (~* '^https?://')`. Validarea stă în DB, nu doar în formular — o interfață ocolită nu poate strecura `javascript:` în `src`.
+- `study_groups` + `group_pieces` (tabel de legătură, PK compus, `position`), cu seed pentru „Începători" și „Avansați".
+- `student_pieces`: repertoriul individual, cu RLS care îi dă elevului acces la propriile piese și profesorului la toate.
+- `profiles.avatar_path` + bucket privat `avatars` cu politici pe folderul `auth.uid()`.
+
+### Modificări — frontend
+- `src/lib/pieces.js` (NOU): `resolveAudioSource()` decide între cale privată și link extern, cu fișierul local prioritar. `isSafeHttpUrl()` respinge orice schemă în afară de http/https.
+- `SecureAudioPlayer`: primește acum `source = { kind, value }`. Pentru `kind: 'url'` nu mai încearcă regenerarea la eroare — doar URL-urile semnate expiră, un link extern căzut rămâne căzut.
+- `DualAudioRow` (NOU): un rând = titlu + două coloane (Pozitiv / Negativ), cu „Indisponibil" când varianta lipsește.
+- `PieceSelectorModal` (NOU): selecție multiplă cu căutare și filtrare; pornește de fiecare dată de la selecția salvată.
+- `AdminTeaching` (NOU, tab „Predare"): comutare între grupe, repertoriu persistat, reordonare sus/jos.
+- `AdminStudents` rescris ca **Classroom**: carduri cu avatar, nume și numărul de piese alocate. Click → `StudentDetail` (NOU) cu player dual, selector de piese și încărcare fotografie.
+- `AdminPieces`: formularul a trecut în modal; fiecare variantă are comutator **Local / Online**.
+
+### Decizii semnalate lui Claudiu
+- A cerut ca uploadul local să producă **URL public**. Refuzat: ar fi anulat protecția cerută în prima sesiune. Fișierele rămân în bucket privat, redate prin URL semnat; coloanele `*_url` servesc exclusiv modul Online.
+- A cerut coloana `avatar_url`. Numită `avatar_path`, în bucket **privat**: sunt fotografii de minori, iar un bucket public ar fi o expunere GDPR mult mai gravă decât partajarea unui negativ audio. Numele reflectă ce conține cu adevărat coloana.
+
+### Validări
+- `npm run build` PASS (122 module). `get_errors` curat.
+
+### Greșeli / riscuri
+- La rescrierea `AdminStudents` am înlocuit doar antetul componentei și am lăsat vechiul `return` cu tabelul orfan la finalul fișierului. Prins imediat prin recitirea fișierului. **Când o componentă se rescrie integral, se citește fișierul complet înainte, nu doar zona editată.**
+- `EmptyState` cu ghilimele românești în atribut JSX a rupt parsarea; mutat în expresie `{'…'}`.
+- Elevul **nu** vede încă piesele alocate — RLS-ul permite, dar nu există interfață. Pasul firesc următor este o secțiune „Piesele mele de studiu" în dashboardul elevului.
+- Avatarurile se încarcă fără redimensionare: o fotografie de 5 MB rămâne 5 MB în bucket. Dacă se adună elevi, merită o conversie client-side la ~400px.
+
+---
+
+## 📝 14 oct 2026 — Academy Music: triggerul care anula silențios promovarea profesorului
+
+### Obiectiv
+- Contul `pana_claudiu_profesor@yahoo.ro` apărea ca elev în interfață, deși UPDATE-ul de promovare rulase cu „Success. 1 row affected".
+
+### Cauza
+- Nu era în React. `src/lib/auth.jsx` citește explicit coloana `role` din `profiles` și derivă `isTeacher: profile?.role === 'teacher'` — nicăieri nu există un `'student'` hardcodat în stare.
+- Vinovat era triggerul `lock_profile_role` din `supabase/schema.sql`, scris de mine în sesiunea precedentă. Condiția `if not public.is_teacher()` se evalua și pentru UPDATE-urile rulate din SQL Editor, unde `auth.uid()` este **NULL** → `is_teacher()` returna false → `new.role := old.role`. Rândul se rescria cu valoarea veche, dar Postgres raporta oricum „1 row affected". Promovarea era imposibilă exact pe calea documentată în README.
+
+### Modificări
+- `supabase/schema.sql`: condiția devine `if auth.uid() is not null and not public.is_teacher()`. Contextele fără JWT (SQL Editor, `service_role`, migrații) pot scrie; un elev autentificat cu cheia anon are mereu `auth.uid()` setat, deci protecția împotriva auto-promovării rămâne intactă.
+- `supabase/schema.sql` + `README.md`: adăugat `SELECT`-ul de verificare după UPDATE, cu avertismentul explicit că „1 row affected" nu dovedește că valoarea s-a schimbat.
+
+### Validări
+- Codul client lăsat **nemodificat** — era deja corect. Grep peste `src/**` confirmă că singurele apariții ale lui `'student'` sunt filtrul de numărare din `AdminOverview` și `<option value="student">` din `AdminStudents`.
+
+### Greșeli / riscuri
+- **Lecția**: un trigger `BEFORE UPDATE` care rescrie `NEW` eșuează fără zgomot. Orice astfel de trigger are nevoie de o verificare post-scriere în documentație, altfel debugging-ul pleacă din direcția greșită — în cazul de față, către frontend.
+- Triggerele care depind de `auth.uid()` trebuie testate în ambele contexte: prin API (JWT prezent) și din SQL Editor (JWT absent).
+
+---
+
+## 📝 13 oct 2026 — Academy Music: platformă LMS pentru Palatul Copiilor Pitești
+
+### Obiectiv
+- Aplicație web separată (React 18 + Vite 6 + Tailwind 4 + Supabase) pentru cursurile de orgă și canto, destinată subdomeniului `academy-music.florentinapanaofficial.ro`. Proiect nou, izolat în folderul `academy-music.florentinapanaofficial.ro/`, după modelul `revista.florentinapanaofficial.ro/`. **Site-ul principal nu a fost atins.**
+
+### Modificări
+- **Schema Supabase** (`supabase/schema.sql`): 7 tabele (`profiles`, `pieces`, `resources`, `submissions`, `activity_sessions`, `activity_events`, `quiz_results`), RLS pe fiecare, 2 buckete **private** cu politici proprii. Trigger `lock_profile_role` împiedică un elev să-și seteze singur `role='teacher'` printr-un UPDATE pe propriul rând. Funcția `is_teacher()` e `SECURITY DEFINER` cu `search_path` fixat, ca politicile de pe `profiles` să nu se auto-apeleze recursiv.
+- **Durata sesiunilor** se calculează pe server în `touch_activity_session()` din `now() - started_at`; clientul trimite doar un semnal, deci nu poate raporta ore false. Heartbeat la 60s, oprit când fila e ascunsă; la `pagehide` se folosește `fetch(..., { keepalive: true })` — `sendBeacon` nu acceptă anteturi de autorizare.
+- **Protecția conținutului**: fișierele stau în buckete private, accesate doar prin URL-uri semnate de 5 minute (`src/lib/media.js`). Playerul audio are controale proprii peste un `<audio>` **fără** atributul `controls`, deci browserul nu mai afișează meniul „Salvează audio ca…". Partiturile se randează pagină cu pagină pe `<canvas>` cu pdf.js — viewerul nativ al browserului, cu butoanele Download/Print, nu mai apare deloc. Plus filigran cu numele elevului, blocare clic-dreapta/drag/selecție și interceptarea `Ctrl+S` / `Ctrl+P`.
+- **Module**: Orgă, Canto, RED, Jocuri (quiz 10 întrebări + rebus cu coloană-cheie „PORTATIV"), Portofoliu (upload video/audio/foto cu limite 200/50/10 MB), panou profesor cu 6 tab-uri (Sumar, Piese, RED, Elevi, Teme, Activitate) și comutator Elev ⇄ Profesor.
+- **`server.mjs`**: sirv + CSP fără `unsafe-eval` (pdf.js rulează cu `isEvalSupported: false`), `frame-ancestors 'none'`, HSTS, `X-Robots-Tag: noindex` — platforma e privată.
+
+### Validări
+- `npm run build` PASS (114 module, 1.5s). `npm audit` **0 vulnerabilități**.
+- Auditul inițial a raportat 9 vulnerabilități: `react-router` 6.x avea **open redirect prin backslash în `<Link>`/`useNavigate`** (risc runtime real), iar Tailwind 3 trăgea `braces`/`micromatch`/`postcss-selector-parser` cu DoS. Rezolvate prin upgrade la React Router 7 și Tailwind 4.
+- Eliminat `dangerouslySetInnerHTML` din quiz (folosit doar pentru două `<em>`) — nu merită suprafața de atac pentru o nuanță tipografică.
+
+### Greșeli / riscuri
+- **Vite urcă în arbore după configurația PostCSS**: build-ul a eșuat cu „`@layer base` is used but no matching `@tailwind base`" fiindcă prelua `postcss.config.mjs` al site-ului principal (Tailwind 3) peste CSS-ul Tailwind 4 al subproiectului. Rezolvat cu `css: { postcss: { plugins: [] } }` în `vite.config.js`. Orice subproiect nou cu alt Tailwind are nevoie de aceeași izolare.
+- **În Tailwind 4, `@apply` nu mai acceptă clase definite în `@layer components`.** `.btn` a trebuit declarat cu `@utility` ca să poată fi refolosit în `.btn-primary` / `.btn-ghost` / `.btn-gold`.
+- Indexii coloanei-cheie din rebus erau greșiți la prima scriere (nu formau „PORTATIV"). Verificați literă cu literă și corectați.
+- Protecția conținutului este **descurajare, nu DRM**: captura de ecran și înregistrarea analogică rămân posibile. Ce se elimină este descărcarea cu un clic și distribuirea de linkuri permanente.
+- Fișierele încărcate de elevi păstrează `Content-Type`-ul trimis de client. Fiind servite de pe `*.supabase.co`, un fișier HTML mascat nu ar afecta sesiunea de pe domeniul nostru, dar merită o validare server-side dacă platforma se deschide către mai mulți utilizatori.
+
+### Pași următori
+- Rulat `supabase/schema.sql` în proiectul Supabase, completat `.env`, promovat contul profesorului cu UPDATE-ul din finalul schemei.
+- DNS: `CNAME academy-music` → host Railway; adăugat subdomeniul la Redirect URLs în Supabase.
+- Platforma e `noindex` intenționat; nu se adaugă în sitemap-ul site-ului principal și nu primește linkuri interne din el.
+
+---
+
 ## 📝 12 oct 2026 — Ștergerea fișierelor de navigație moarte
 
 ### Obiectiv

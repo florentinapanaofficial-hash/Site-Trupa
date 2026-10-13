@@ -1,0 +1,166 @@
+{
+    "quiz": {
+        "id": "teorie-muzicala-1",
+        "title": "Quiz de teorie muzicală",
+        "questions": [
+            {
+                "q": "Câte linii are portativul?",
+                "options": [
+                    "3",
+                    "4",
+                    "5",
+                    "6"
+                ],
+                "answer": 2,
+                "explain": "Portativul are 5 linii și 4 spații."
+            },
+            {
+                "q": "Ce valoare are o notă întreagă în măsura de 4/4?",
+                "options": [
+                    "1 timp",
+                    "2 timpi",
+                    "3 timpi",
+                    "4 timpi"
+                ],
+                "answer": 3,
+                "explain": "Nota întreagă ocupă toată măsura de 4/4."
+            },
+            {
+                "q": "Cum se numește semnul care urcă sunetul cu un semiton?",
+                "options": [
+                    "Bemol",
+                    "Diez",
+                    "Becar",
+                    "Coroană"
+                ],
+                "answer": 1,
+                "explain": "Diezul (#) urcă sunetul cu un semiton."
+            },
+            {
+                "q": "Ce înseamnă nuanța forte?",
+                "options": [
+                    "Încet",
+                    "Tare",
+                    "Repede",
+                    "Rar"
+                ],
+                "answer": 1,
+                "explain": "Forte (f) înseamnă tare, puternic."
+            },
+            {
+                "q": "Câte sunete are gama do major?",
+                "options": [
+                    "5",
+                    "6",
+                    "7",
+                    "8"
+                ],
+                "answer": 2,
+                "explain": "Gama are 7 sunete: do, re, mi, fa, sol, la, si."
+            },
+            {
+                "q": "Cheia sol se mai numește și cheia de…",
+                "options": [
+                    "violină",
+                    "bas",
+                    "alto",
+                    "tenor"
+                ],
+                "answer": 0,
+                "explain": "Cheia sol este cheia de violină."
+            },
+            {
+                "q": "Ce studiază solfegiul?",
+                "options": [
+                    "Istoria muzicii",
+                    "Citirea și intonarea notelor",
+                    "Construcția instrumentelor",
+                    "Dansul popular"
+                ],
+                "answer": 1,
+                "explain": "Solfegiul antrenează citirea și intonarea corectă a notelor."
+            },
+            {
+                "q": "În canto, respirația corectă este cea…",
+                "options": [
+                    "claviculară",
+                    "costo-diafragmatică",
+                    "superficială",
+                    "pe gură, scurtă"
+                ],
+                "answer": 1,
+                "explain": "Respirația costo-diafragmatică susține sunetul uniform."
+            },
+            {
+                "q": "Pauza de pătrime durează cât:",
+                "options": [
+                    "o pătrime",
+                    "o doime",
+                    "o optime",
+                    "o notă întreagă"
+                ],
+                "answer": 0,
+                "explain": "Fiecare pauză are durata notei cu același nume."
+            },
+            {
+                "q": "Ce indică semnul crescendo?",
+                "options": [
+                    "Sunetul scade treptat",
+                    "Sunetul crește treptat",
+                    "Tempo mai rapid",
+                    "Pauză lungă"
+                ],
+                "answer": 1,
+                "explain": "Crescendo = creștere treptată a intensității."
+            }
+        ]
+    },
+    "rebus": {
+        "id": "rebus-muzical-1",
+        "title": "Rebus muzical",
+        "keyword": "PORTATIV",
+        "hint": "Pe coloana colorată obții locul unde își au casa notele.",
+        "rows": [
+            {
+                "answer": "PIAN",
+                "keyIndex": 0,
+                "clue": "Instrument cu clape, fratele mai mare al orgii."
+            },
+            {
+                "answer": "DO",
+                "keyIndex": 1,
+                "clue": "Prima treaptă a gamei."
+            },
+            {
+                "answer": "ARIE",
+                "keyIndex": 1,
+                "clue": "Fragment vocal solistic din operă."
+            },
+            {
+                "answer": "RITM",
+                "keyIndex": 2,
+                "clue": "Pulsul muzicii."
+            },
+            {
+                "answer": "NOTA",
+                "keyIndex": 3,
+                "clue": "Semnul care arată înălțimea sunetului."
+            },
+            {
+                "answer": "CANTO",
+                "keyIndex": 3,
+                "clue": "Arta cântului vocal."
+            },
+            {
+                "answer": "VIOARA",
+                "keyIndex": 1,
+                "clue": "Instrument cu arcuș și patru corzi."
+            },
+            {
+                "answer": "VOCE",
+                "keyIndex": 0,
+                "clue": "Instrumentul pe care îl porți cu tine mereu."
+            }
+        ]
+    }
+}
