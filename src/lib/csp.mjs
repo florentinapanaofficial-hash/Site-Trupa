@@ -6,7 +6,9 @@ export const CONTENT_SECURITY_POLICY = [
     "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
     "img-src 'self' data: https://www.google-analytics.com https://i.ytimg.com https://img.youtube.com https://*.googleusercontent.com https://*.cloudflarestream.com https://videodelivery.net https://*.r2.dev https://www.facebook.com https://analytics.tiktok.com https://media.florentinapanaofficial.ro https://www.google.com",
     "font-src 'self'",
-    "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://api.whatsapp.com https://*.supabase.co wss://*.supabase.co https://*.cloudflarestream.com https://videodelivery.net https://*.r2.dev https://www.facebook.com https://analytics.tiktok.com https://business-api.tiktok.com https://media.florentinapanaofficial.ro https://www.google.com",
+    // GA4 rutează colectarea pe endpoint-uri regionale (region1..regionN) și, cu Google
+    // Signals activ, face ping către ad.doubleclick.net — de aici wildcard-urile.
+    "connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://ad.doubleclick.net https://api.whatsapp.com https://*.supabase.co wss://*.supabase.co https://*.cloudflarestream.com https://videodelivery.net https://*.r2.dev https://www.facebook.com https://analytics.tiktok.com https://business-api.tiktok.com https://media.florentinapanaofficial.ro https://www.google.com",
     "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://ec.europa.eu https://*.cloudflarestream.com https://iframe.cloudflarestream.com",
     "media-src 'self' blob: https://*.cloudflarestream.com https://videodelivery.net https://media.florentinapanaofficial.ro",
     "object-src 'none'",
