@@ -176,7 +176,7 @@ describe('GTM consent and dataLayer routing', () => {
 
     test('the shared layout passes the requested container to the consent-gated runtime', () => {
         const layout = fs.readFileSync(path.join(__dirname, '../src/layouts/BaseLayout.astro'), 'utf8');
-        expect(layout).toContain("const gtmId = 'GTM-N44548RF';");
+        expect(layout).toContain("import.meta.env.PUBLIC_GTM_ID ?? 'GTM-N44548RF'");
         expect(layout).toContain('define:vars={{ gtmId, ga4Id, metaPixelId, tiktokPixelId }}');
         expect(layout).toContain('window.__FP_TRACKING_IDS__ = { gtmId: gtmId,');
         expect(layout).not.toContain('googletagmanager.com/ns.html');

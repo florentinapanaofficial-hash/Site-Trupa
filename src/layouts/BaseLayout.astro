@@ -56,7 +56,8 @@ const ensureSeoDescription = (value: string) => {
 const seoTitle = compactSeoText(title, 60);
 const seoDescription = compactSeoText(ensureSeoDescription(description), 155);
 
-const gtmId = 'GTM-N44548RF';
+// Fallback pe containerul cunoscut: un PUBLIC_GTM_ID lipsă la build nu trebuie să oprească tracking-ul.
+const gtmId = import.meta.env.PUBLIC_GTM_ID ?? 'GTM-N44548RF';
 const ga4Id = import.meta.env.PUBLIC_GA4_ID;
 const metaPixelId = import.meta.env.PUBLIC_META_PIXEL_ID;
 const tiktokPixelId = import.meta.env.PUBLIC_TIKTOK_PIXEL_ID;
