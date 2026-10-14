@@ -55,18 +55,18 @@ const contactPageLd = {
           <a
             href="/oferta-premium/"
             class="premium-offer-link mt-3"
-            onclick="window.gtag&&window.gtag('event','click_premium_offer',{event_category:'contact'})"
+            onclick="window.dataLayer = window.dataLayer || []; window.dataLayer.push({ 'event': 'fp_interaction', 'action': 'click_premium_offer', 'label': 'contact' });"
           >
             Vezi oferta premium 2026-2027 și serviciile incluse
           </a>
 
           <div class="mt-4 flex min-w-0 flex-wrap gap-2">
-            <a class="btn-solid" href={`tel:${contact.phoneRaw}`} onclick="window.gtag&&window.gtag('event','click_phone',{event_category:'contact'})">Telefon: {contact.phoneDisplay}</a>
+            <a class="btn-solid" href={`tel:${contact.phoneRaw}`} data-fp-manual="1" onclick="window.dataLayer = window.dataLayer || []; window.dataLayer.push({ 'event': 'fp_interaction', 'action': 'click_phone', 'label': 'contact' });">Telefon: {contact.phoneDisplay}</a>
             <span class="btn-outline ob-email-contact" data-u="contact" data-d="florentinapanaofficial.ro">Email: [email protejat]</span>
           </div>
 
           <div class="desktop-whatsapp-actions mt-3 flex flex-wrap gap-2" aria-label="Comunicare rapidă desktop">
-            <a class="btn-whatsapp" href={whatsappBase} target="_blank" rel="noopener noreferrer" aria-label="Deschide WhatsApp pentru comunicare rapidă" onclick="window.gtag&&window.gtag('event','click_whatsapp',{event_category:'contact'})">
+            <a class="btn-whatsapp" href={whatsappBase} target="_blank" rel="noopener noreferrer" aria-label="Deschide WhatsApp pentru comunicare rapidă" data-fp-manual="1" onclick="window.dataLayer = window.dataLayer || []; window.dataLayer.push({ 'event': 'fp_interaction', 'action': 'click_whatsapp', 'label': 'contact' });">
               <span class="btn-whatsapp-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" role="img" fill="none">
                   <path
@@ -84,8 +84,8 @@ const contactPageLd = {
               </span>
               <span>WhatsApp: Comunică rapid</span>
             </a>
-            <a class="btn-outline" href={`tel:${contact.phoneRaw}`} onclick="window.gtag&&window.gtag('event','click_phone',{event_category:'contact'})">Apelează direct</a>
-            <a class="btn-outline" href={whatsappMessageLink} target="_blank" rel="noopener noreferrer" onclick="window.gtag&&window.gtag('event','click_whatsapp',{event_category:'contact'})">Trimite mesaj WhatsApp</a>
+            <a class="btn-outline" href={`tel:${contact.phoneRaw}`} data-fp-manual="1" onclick="window.dataLayer = window.dataLayer || []; window.dataLayer.push({ 'event': 'fp_interaction', 'action': 'click_phone', 'label': 'contact' });">Apelează direct</a>
+            <a class="btn-outline" href={whatsappMessageLink} target="_blank" rel="noopener noreferrer" data-fp-manual="1" onclick="window.dataLayer = window.dataLayer || []; window.dataLayer.push({ 'event': 'fp_interaction', 'action': 'click_whatsapp', 'label': 'contact' });">Trimite mesaj WhatsApp</a>
           </div>
 
           <p class="mt-3 text-xs text-white/90">{contactSeo.city}</p>

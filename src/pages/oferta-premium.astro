@@ -159,7 +159,7 @@ const whatsappHref = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
           <a
             class="btn-solid"
             href="/rezervare/"
-            onclick="window.gtag&&window.gtag('event','premium_offer_contact_click',{event_category:'offer'})"
+            onclick="window.dataLayer = window.dataLayer || []; window.dataLayer.push({ 'event': 'fp_interaction', 'action': 'click_offer', 'label': 'oferta-premium' });"
           >
             Cere ofertă personalizată
           </a>
@@ -168,7 +168,8 @@ const whatsappHref = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
             href={whatsappHref}
             target="_blank"
             rel="noopener noreferrer"
-            onclick="window.gtag&&window.gtag('event','premium_offer_whatsapp_click',{event_category:'offer'})"
+            data-fp-manual="1"
+            onclick="window.dataLayer = window.dataLayer || []; window.dataLayer.push({ 'event': 'fp_interaction', 'action': 'click_whatsapp', 'label': 'oferta-premium' });"
           >
             Discută pe WhatsApp
           </a>

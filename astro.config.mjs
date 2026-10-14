@@ -47,6 +47,8 @@ export default defineConfig({
         // Exclude pagina de redirect /comunitatea-noastra/ (301 → /comunitate/)
         const url = new URL(page);
         if (url.pathname === '/comunitatea-noastra/') return false;
+        // Exclude pagina de eroare 404 (noindex, servită doar pe rute inexistente)
+        if (url.pathname === '/404/') return false;
         // Exclude pagina eliminata /colaboratori/tambal/ (redirect + noindex)
         if (url.pathname === '/colaboratori/tambal/') return false;
         // Exclude /live-preview/ — pagină de campanie (teaser 60s), nu trebuie indexată

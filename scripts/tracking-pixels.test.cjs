@@ -7,27 +7,58 @@ const ids = { gtmId: 'GTM-N44548RF' };
 function tracking(consent = 'granted', dataLayer = []) {
     const listeners = {};
     const scripts = [];
+    const timers = [];
     const localStorage = { getItem: jest.fn(() => consent) };
-    const window = { dataLayer, __FP_TRACKING_IDS__: ids };
+    const location = {
+        pathname: '/', search: '', href: 'https://www.florentinapanaofficial.ro/',
+    };
+    const window = {
+        dataLayer,
+        __FP_TRACKING_IDS__: ids,
+        location,
+        setTimeout: (run) => { timers.push(run); },
+    };
     const document = {
         title: 'Formația Florentina Pană',
         head: { appendChild: (script) => scripts.push(script) },
         createElement: () => ({}),
         addEventListener: (name, handler) => { listeners[name] = handler; },
     };
-    const location = {
-        pathname: '/', search: '', href: 'https://www.florentinapanaofficial.ro/',
-    };
     const context = vm.createContext({ window, document, location, localStorage, Date });
     vm.runInContext(fs.readFileSync(path.join(__dirname, '../public/js/tracking-pixels.js'), 'utf8'), context);
-    return { window, document, location, localStorage, listeners, scripts };
+    return { window, document, location, localStorage, listeners, scripts, timers };
 }
 
-describe('GTM consent and Astro navigation', () => {
+function anchor(attributes, className = '') {
+    const node = {
+        className,
+        getAttribute: (name) => (name in attributes ? attributes[name] : null),
+        hasAttribute: (name) => name in attributes,
+    };
+    node.closest = (selector) => (selector === 'a[href]' ? node : null);
+    return node;
+}
+
+function click(app, node) {
+    const event = {
+        target: node,
+        button: 0,
+        defaultPrevented: false,
+        metaKey: false,
+        ctrlKey: false,
+        shiftKey: false,
+        altKey: false,
+        preventDefault() { this.defaultPrevented = true; },
+    };
+    app.listeners.click(event);
+    return event;
+}
+
+describe('GTM consent and dataLayer routing', () => {
     test.each([null, 'denied'])('does not load or track without consent (%s)', (consent) => {
         const app = tracking(consent);
         app.window.FPTracking.init(ids);
-        app.listeners['astro:page-load']();
+        click(app, anchor({ href: 'tel:+40767369658' }, 'quick-dock-btn quick-dock-btn--call'));
         expect(app.scripts).toHaveLength(0);
         expect(app.window.dataLayer).toHaveLength(0);
     });
@@ -53,16 +84,16 @@ describe('GTM consent and Astro navigation', () => {
         expect(dataLayer[1]['gtm.start']).toEqual(expect.any(Number));
     });
 
-    test('initializes on page-load and records client-side navigation without reloading GTM', () => {
+    test('records one page view per initialization without reloading GTM', () => {
         const app = tracking();
-        app.listeners['astro:page-load']();
+        app.window.FPTracking.init(ids);
         expect(app.window.dataLayer.filter((entry) => entry.event === 'fp_page_view')).toHaveLength(1);
         Object.assign(app.location, {
             pathname: '/contact/', search: '?source=nav',
             href: 'https://www.florentinapanaofficial.ro/contact/?source=nav',
         });
         app.document.title = 'Contact';
-        app.listeners['astro:page-load']();
+        app.window.FPTracking.init(ids);
         expect(app.scripts).toHaveLength(1);
         expect(app.window.dataLayer.filter((entry) => entry.event === 'fp_page_view')).toHaveLength(2);
         expect(app.window.dataLayer.at(-1)).toEqual({
@@ -71,7 +102,7 @@ describe('GTM consent and Astro navigation', () => {
         });
     });
 
-    test('starts after acceptance and stops sending page views when consent is denied', () => {
+    test('starts after acceptance and stops sending events when consent is denied', () => {
         const app = tracking('denied');
         app.window.FPTracking.init(ids);
         app.localStorage.getItem.mockReturnValue('granted');
@@ -79,8 +110,8 @@ describe('GTM consent and Astro navigation', () => {
         expect(app.scripts).toHaveLength(1);
         const count = app.window.dataLayer.length;
         app.localStorage.getItem.mockReturnValue('denied');
-        app.listeners['astro:page-load']();
         app.window.FPTracking.trackPageView();
+        app.window.FPTracking.trackInteraction('click_phone', 'quick-dock');
         expect(app.window.dataLayer).toHaveLength(count);
     });
 
@@ -98,6 +129,51 @@ describe('GTM consent and Astro navigation', () => {
         }]);
     });
 
+    test('routes phone clicks through dataLayer and delays the navigation', () => {
+        const app = tracking();
+        app.window.FPTracking.init(ids);
+        const event = click(app, anchor({ href: 'tel:+40767369658' }, 'quick-dock-btn quick-dock-btn--call'));
+        expect(app.window.dataLayer.at(-1)).toEqual({
+            event: 'fp_interaction', action: 'click_phone', label: 'quick-dock',
+        });
+        expect(event.defaultPrevented).toBe(true);
+        expect(app.location.href).toBe('https://www.florentinapanaofficial.ro/');
+        app.timers.forEach((run) => run());
+        expect(app.location.href).toBe('tel:+40767369658');
+    });
+
+    test('labels the floating WhatsApp button and leaves new-tab navigation untouched', () => {
+        const app = tracking();
+        app.window.FPTracking.init(ids);
+        const event = click(app, anchor({ href: 'https://wa.me/40767369658', target: '_blank' }, 'wa-float'));
+        expect(app.window.dataLayer.at(-1)).toEqual({
+            event: 'fp_interaction', action: 'click_whatsapp', label: 'floating-whatsapp',
+        });
+        expect(event.defaultPrevented).toBe(false);
+        expect(app.timers).toHaveLength(0);
+    });
+
+    test('tracks the quick dock offer button and ignores unrelated links', () => {
+        const app = tracking();
+        app.window.FPTracking.init(ids);
+        click(app, anchor({ href: '/rezervare/' }, 'quick-dock-btn quick-dock-btn--offer'));
+        expect(app.window.dataLayer.at(-1)).toEqual({
+            event: 'fp_interaction', action: 'click_offer', label: 'quick-dock',
+        });
+        const count = app.window.dataLayer.length;
+        click(app, anchor({ href: '/despre/' }, 'btn-outline'));
+        expect(app.window.dataLayer).toHaveLength(count);
+    });
+
+    test('skips elements that already push their own event', () => {
+        const app = tracking();
+        app.window.FPTracking.init(ids);
+        const count = app.window.dataLayer.length;
+        click(app, anchor({ href: 'tel:+40767369658', 'data-fp-manual': '1' }, 'btn-solid'));
+        expect(app.window.dataLayer).toHaveLength(count);
+        expect(app.timers).toHaveLength(0);
+    });
+
     test('the shared layout passes the requested container to the consent-gated runtime', () => {
         const layout = fs.readFileSync(path.join(__dirname, '../src/layouts/BaseLayout.astro'), 'utf8');
         expect(layout).toContain("const gtmId = 'GTM-N44548RF';");
@@ -106,5 +182,7 @@ describe('GTM consent and Astro navigation', () => {
         expect(layout).not.toContain('googletagmanager.com/ns.html');
         const banner = fs.readFileSync(path.join(__dirname, '../src/components/CookieBanner.astro'), 'utf8');
         expect(banner).toContain("script.src = '/js/tracking-pixels.js?v=gtm-n44548rf';");
+        const runtime = fs.readFileSync(path.join(__dirname, '../public/js/tracking-pixels.js'), 'utf8');
+        expect(runtime).not.toContain('astro:page-load');
     });
 });

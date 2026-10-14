@@ -1,3 +1,44 @@
+## 📝 14 oct 2026 — Web Analytics: trecere la GTM ca sursă unică de adevăr
+
+### Obiectiv
+- Eliminarea arhitecturii hibride (page view prin GTM, click-uri prin `gtag`) și recuperarea click-urilor care nu ajungeau niciodată în raport.
+
+### Diagnostic înainte de modificări
+- Cele 31 de handlere `onclick="window.gtag&&window.gtag(...)"` depindeau de `window.gtag`, definit **exclusiv** de `loadGA4()`, care rulează doar dacă `PUBLIC_GA4_ID` există. În repo nu există `.env`, doar `.env.example` cu placeholder — garda `&&` înghițea tăcut fiecare click, fără eroare în consolă.
+- Butonul WhatsApp flotant și întregul `quick-dock` (Sună acum / WhatsApp / Ofertă) apar pe **fiecare pagină** și nu aveau niciun fel de tracking.
+- Submit-ul formularului de pe `/rezervare/` nu raporta nicio conversie.
+- Nu exista pagină 404, deci traficul pe rute inexistente era invizibil.
+- `ClientRouter`/`ViewTransitions` **nu este importat nicăieri** în `src/` — listener-ul `astro:page-load` din runtime era cod mort. Page view-urile funcționau doar pentru că `CookieBanner` rulează la fiecare încărcare completă.
+
+### Modificări
+- `public/js/tracking-pixels.js`: `trackInteraction()` + listener delegat pe `document.body` (fallback `document`) care prinde `tel:`, `wa.me`/`api.whatsapp.com`, `.wa-float` și `.quick-dock-btn*`. Elementele cu `data-fp-manual` sunt sărite, ca să nu se dubleze cu push-ul lor inline. Șters blocul `astro:page-load`.
+- Navigație întârziată **300ms** pe `tel:`/WhatsApp fără `target="_blank"`, ca beacon-ul să plece înainte ca dialer-ul să scoată utilizatorul din pagină. Click-urile cu modificator (Ctrl/Meta/Shift/Alt) sau buton non-primă sunt ignorate.
+- 31 de handlere `window.gtag` → `dataLayer.push({ 'event': 'fp_interaction', 'action', 'label' })` în `contact.astro`, `index.astro`, `oferta-premium.astro` și cele 5 pagini `formatie-nunta/`.
+- `scripts/programmatic-seo/template.astro` primit aceeași schimbare, ca regenerarea să nu reintroducă `gtag`.
+- `src/pages/rezervare.astro`: `fp_conversion` / `booking_request` pe răspuns `res.ok`.
+- `src/pages/404.astro` (NOU): `BaseLayout`, `noindex`, H1 și buton către `/`. Exclusă din sitemap în `astro.config.mjs`.
+- `scripts/tracking-pixels.test.cjs`: suita rescrisă pe noul model, cu 4 teste noi pentru listener-ul delegat.
+
+### Decizii tehnice
+- **Doar `tel:` și WhatsApp ajung în `window.location`**, validate prin regex ancorat — niciun href arbitrar din DOM nu devine sink de navigație.
+- Push-ul în `dataLayer` fără consimțământ rămâne inofensiv (array local, GTM neîncărcat), dar `trackInteraction()` verifică oricum acordul înainte de a scrie.
+- Paginile din `formatie-nunta/` au fost editate punctual, nu regenerate: generatorul folosește `pickRandom` pe blocurile anti-duplicat și ar fi rescris textul a 5 pagini deja indexate. Șablonul a primit modificarea identică, deci nu apare drift.
+
+### Validări
+- `npm test`: **88/88** PASS (4 suite). `get_errors`: fără erori.
+- `npm run build` PASS — 65 pagini HTML. Verificare pe output: **0** handlere `window.gtag&&` rămase, 8 pagini cu `fp_interaction`, 1 cu `fp_conversion`, `404.html` conține configurația GTM, `/404/` absent din sitemap.
+- Runtime minificat în `dist`: 3.785 octeți, conține listener-ul delegat, fără `astro:page-load`.
+- Smoke test pe `server.mjs`: `/pagina-inexistenta-test/` → **404** cu pagina nouă și tracking prezent.
+- `npm run seo:audit`: 65 pagini, **0 FAIL | 0 WARN**.
+
+### Riscuri / pași următori
+- **Containerul GTM trebuie configurat**: taguri legate de Custom Event `fp_interaction` și `fp_conversion`. Până atunci evenimentele ajung în `dataLayer`, dar nu pleacă nicăieri.
+- Dacă `PUBLIC_GA4_ID` este setat pe Railway, GA4 se încarcă și direct, și (eventual) prin container — de verificat în Tag Assistant să nu existe dubluri de page view.
+- Întârzierea de 300ms pe `tel:` este perceptibilă pe mobil; de redus dacă se dovedește supărătoare după deploy.
+- Nu am putut valida recepția live a evenimentelor din acest mediu; necesită GTM Preview după publicare.
+
+---
+
 ## 📝 14 oct 2026 — Revista: publicarea articolului despre Zilele Comunei
 
 ### Obiectiv

@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Pagina nu a fost găsită (404) | Formația Florentina Pană"
+  description="Pagina căutată nu există sau a fost mutată. Reveniți la prima pagină pentru a descoperi formația, galeria video și oferta pentru nunta voastră."
+  noindex={true}
+>
+  <section class="section-container py-20 sm:py-28">
+    <div class="mx-auto max-w-2xl text-center">
+      <p class="text-sm font-extrabold uppercase tracking-[0.2em] text-amber-400">Eroare 404</p>
+      <h1 class="mt-4 text-3xl font-extrabold text-white sm:text-4xl">Pagina nu a fost găsită</h1>
+      <p class="mt-4 text-base text-white/85">
+        Linkul accesat nu mai este valabil sau adresa a fost scrisă greșit. Vă putem ajuta să găsiți ce căutați.
+      </p>
+      <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <a href="/" class="btn-solid">Înapoi la prima pagină</a>
+        <a href="/contact/" class="btn-outline">Contactați-ne</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

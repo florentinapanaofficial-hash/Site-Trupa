@@ -1,17 +1,22 @@
 /*
  * FPTracking — încarcă GTM, GA4, Meta Pixel și TikTok Pixel DOAR după consimțământul GDPR
- * (localStorage.cookie_consent === 'granted') și retrimite PageView la fiecare navigare
- * client-side (Astro View Transitions), fără dublă încărcare a scripturilor.
+ * (localStorage.cookie_consent === 'granted').
+ *
+ * GTM este sursa unică de adevăr: toate evenimentele pleacă prin dataLayer
+ * (fp_page_view, fp_interaction, fp_conversion), iar tagurile din container se leagă
+ * de aceste Custom Events. Nu se mai folosește window.gtag pentru evenimente de click.
  *
  * Folosire:
  *   window.FPTracking.init({ gtmId, ga4Id, metaPixelId, tiktokPixelId }) — apelat din CookieBanner
- *   la accept, și automat pe 'astro:page-load' dacă exista deja consimțământ.
- *   GTM primește fp_page_view pe fiecare pagină; tagurile se leagă de acest Custom Event
- *   în container, fără un al doilea trigger Page View pentru aceleași taguri.
+ *   la accept și la încărcarea paginii dacă există deja consimțământ.
  */
 (function () {
     var STORAGE_KEY = 'cookie_consent';
+    // Răgaz pentru plecarea beacon-ului înainte ca tel:/WhatsApp să scoată utilizatorul din pagină.
+    var NAV_DELAY_MS = 300;
+    var WHATSAPP_URL = /^https:\/\/(wa\.me|api\.whatsapp\.com)\//i;
     var loaded = { gtm: false, ga4: false, meta: false, tiktok: false };
+    var delegatedBound = false;
 
     function hasConsent() {
         try {
@@ -114,6 +119,63 @@
         if (loaded.tiktok && window.ttq) window.ttq.page();
     }
 
+    function trackInteraction(action, label) {
+        if (!action || !hasConsent()) return;
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ event: 'fp_interaction', action: action, label: label || 'unknown' });
+    }
+
+    /** Traduce un <a> în perechea acțiune/etichetă, sau null dacă nu ne interesează. */
+    function resolveInteraction(link) {
+        var href = link.getAttribute('href') || '';
+        var classes = typeof link.className === 'string' ? link.className : '';
+        var action;
+
+        if (href.indexOf('tel:') === 0) action = 'click_phone';
+        else if (WHATSAPP_URL.test(href)) action = 'click_whatsapp';
+        else if (classes.indexOf('quick-dock-btn--offer') !== -1) action = 'click_offer';
+        else return null;
+
+        var label = link.getAttribute('data-fp-label');
+        if (!label) {
+            if (classes.indexOf('wa-float') !== -1) label = 'floating-whatsapp';
+            else if (classes.indexOf('quick-dock-btn') !== -1) label = 'quick-dock';
+            else label = 'inline-link';
+        }
+
+        return { action: action, label: label, href: href };
+    }
+
+    function bindDelegatedClicks() {
+        if (delegatedBound) return;
+        var root = document.body || document;
+        if (!root || !root.addEventListener) return;
+        delegatedBound = true;
+
+        root.addEventListener('click', function (event) {
+            if (event.defaultPrevented) return;
+            if (event.button) return;
+            if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+            var target = event.target;
+            if (!target || typeof target.closest !== 'function') return;
+            var link = target.closest('a[href]');
+            // data-fp-manual = elementul își trimite singur evenimentul din onclick.
+            if (!link || link.hasAttribute('data-fp-manual')) return;
+
+            var info = resolveInteraction(link);
+            if (!info || !hasConsent()) return;
+            trackInteraction(info.action, info.label);
+
+            // Doar schemele validate mai sus ajung în window.location — niciun href arbitrar.
+            var leavesPage = info.href.indexOf('tel:') === 0 || WHATSAPP_URL.test(info.href);
+            if (!leavesPage || link.getAttribute('target') === '_blank') return;
+
+            event.preventDefault();
+            window.setTimeout(function () { window.location.href = info.href; }, NAV_DELAY_MS);
+        });
+    }
+
     function init(ids) {
         ids = ids || {};
         if (!hasConsent()) return;
@@ -124,16 +186,12 @@
         trackPageView();
     }
 
-    window.FPTracking = { init: init, trackPageView: trackPageView, hasConsent: hasConsent };
+    window.FPTracking = {
+        init: init,
+        trackPageView: trackPageView,
+        trackInteraction: trackInteraction,
+        hasConsent: hasConsent,
+    };
 
-    // Re-declanșează PageView la fiecare navigare client-side (View Transitions),
-    // inclusiv la încărcarea inițială a paginii — evită dubla numărare la bootstrap.
-    document.addEventListener('astro:page-load', function () {
-        if (!hasConsent()) return;
-        if (!loaded.gtm && !loaded.ga4 && !loaded.meta && !loaded.tiktok) {
-            init(window.__FP_TRACKING_IDS__);
-        } else {
-            trackPageView();
-        }
-    });
+    bindDelegatedClicks();
 })();

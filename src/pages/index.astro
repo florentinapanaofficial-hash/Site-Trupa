@@ -261,8 +261,8 @@ const heroPosterDesktop = await getImage({ src: heroImg, width: 1440, format: 'w
           Venim cu sonorizare proprie, lumini de scenă și atenție la fiecare obicei pe care vi-l doriți în ziua nunții.
         </p>
         <div class="hp-meet-actions">
-          <a href="/despre/" class="btn-outline" onclick="window.gtag&&window.gtag('event','click_about',{event_category:'homepage',event_label:'meet-section'})">Cunoașteți-ne mai bine</a>
-          <a href="/contact/" class="btn-solid" onclick="window.gtag&&window.gtag('event','click_contact',{event_category:'homepage',event_label:'meet-section'})">Spuneți-ne data nunții voastre</a>
+          <a href="/despre/" class="btn-outline" onclick="window.dataLayer = window.dataLayer || []; window.dataLayer.push({ 'event': 'fp_interaction', 'action': 'click_about', 'label': 'homepage-meet-section' });">Cunoașteți-ne mai bine</a>
+          <a href="/contact/" class="btn-solid" onclick="window.dataLayer = window.dataLayer || []; window.dataLayer.push({ 'event': 'fp_interaction', 'action': 'click_contact', 'label': 'homepage-meet-section' });">Spuneți-ne data nunții voastre</a>
         </div>
       </div>
     </div>
@@ -356,7 +356,7 @@ const heroPosterDesktop = await getImage({ src: heroImg, width: 1440, format: 'w
         </div>
       </div>
       <div class="hp-convert-actions">
-        <a href="/rezervare/" class="hp-convert-btn hp-convert-btn--offer" onclick="window.gtag&&window.gtag('event','click_contact',{event_category:'homepage',event_label:'convert-strip'})">
+        <a href="/rezervare/" class="hp-convert-btn hp-convert-btn--offer" onclick="window.dataLayer = window.dataLayer || []; window.dataLayer.push({ 'event': 'fp_interaction', 'action': 'click_contact', 'label': 'homepage-convert-strip' });">
           Verificați împreună cu noi dacă data voastră este liberă
         </a>
       </div>
@@ -374,7 +374,7 @@ const heroPosterDesktop = await getImage({ src: heroImg, width: 1440, format: 'w
         Vă puteți bucura de planificare fără grabă. Povestiți-ne ce buget aveți în minte, iar noi pregătim o propunere potrivită serii voastre,
         cu toate detaliile stabilite clar de la început.
       </p>
-      <a href="/publicatii/pret-formatie-nunta-2027/" class="btn-solid inline-block" onclick="window.gtag&&window.gtag('event','click_early_booking',{event_category:'homepage',event_label:'pricing-link'})">
+      <a href="/publicatii/pret-formatie-nunta-2027/" class="btn-solid inline-block" onclick="window.dataLayer = window.dataLayer || []; window.dataLayer.push({ 'event': 'fp_interaction', 'action': 'click_early_booking', 'label': 'homepage-pricing-link' });">
         Descoperiți detaliile Early Booking pentru 2027 →
       </a>
     </div>

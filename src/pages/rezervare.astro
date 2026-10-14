@@ -226,6 +226,8 @@ import Layout from '../layouts/Layout.astro';
           if (res.ok) {
             form.reset();
             picker.clear();
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({ 'event': 'fp_conversion', 'action': 'booking_request', 'label': 'rezervare-form' });
             statusMsg.textContent = "Solicitarea a fost trimisă cu succes! Vă vom contacta în cel mai scurt timp.";
             statusMsg.className = "text-center text-lg font-medium p-4 rounded-xl bg-green-500/20 text-green-400 border border-green-500/30";
           } else {
