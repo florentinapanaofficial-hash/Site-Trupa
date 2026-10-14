@@ -1,0 +1,67 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const articles = await getCollection('revista');
+
+  return articles.map((article) => ({
+    params: { slug: article.id },
+    props: { article },
+  }));
+}
+
+const { article } = Astro.props;
+const { Content } = await render(article);
+const publishedAt = article.data.date.toISOString();
+---
+
+<BaseLayout
+  title={article.data.title}
+  description={article.data.description}
+  ogImage={article.data.image}
+  ogType="article"
+  datePublished={publishedAt}
+  dateModified={publishedAt}
+>
+  <main class="bg-white text-gray-800">
+    <article class="mx-auto max-w-5xl px-5 pb-20 pt-10 sm:px-8 sm:pb-28 sm:pt-16">
+      <a
+        href="/revista/"
+        class="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-[#9a741f] transition-colors hover:text-[#7b1113] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#c5a059]"
+      >
+        <span aria-hidden="true">←</span> Revista
+      </a>
+
+      <header class="mx-auto max-w-3xl pb-9 pt-9 text-center sm:pb-12 sm:pt-12">
+        <p class="mb-4 text-xs font-semibold uppercase tracking-[0.16em] text-[#9a741f] sm:text-sm">
+          Revista <span aria-hidden="true">·</span>
+          <time datetime={publishedAt}>{article.data.date.toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' })}</time>
+        </p>
+        <h1 class="font-display text-3xl font-semibold leading-tight text-[#7b1113] sm:text-4xl">
+          {article.data.title}
+        </h1>
+        <div class="mx-auto mb-6 mt-6 h-px w-20 bg-[#c5a059]" aria-hidden="true"></div>
+        <p class="text-sm text-gray-600">De {article.data.author}</p>
+      </header>
+
+      <figure class="mx-auto mb-10 max-w-4xl overflow-hidden rounded-md">
+        <img
+          src={article.data.image}
+          alt="Florentina Pană și colegii săi pe scenă, într-un moment de spectacol live"
+          class="max-h-[34rem] w-full object-cover"
+          loading="eager"
+          decoding="async"
+        />
+      </figure>
+
+      <div class="mx-auto max-w-3xl">
+        <div class="prose prose-base max-w-none prose-headings:font-display prose-headings:font-semibold prose-headings:text-[#7b1113] prose-p:leading-8 prose-p:text-gray-800 prose-a:text-[#9a741f] prose-a:decoration-[#c5a059] prose-strong:text-gray-900 sm:prose-lg">
+          <Content />
+        </div>
+      </div>
+    </article>
+  </main>
+</BaseLayout>

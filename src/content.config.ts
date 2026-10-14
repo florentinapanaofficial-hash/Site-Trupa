@@ -14,6 +14,18 @@ const publicatii = defineCollection({
   }),
 });
 
+const revista = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/revista' }),
+  schema: z.object({
+    title: z.string().min(5),
+    date: z.coerce.date(),
+    author: z.string().min(2),
+    image: z.string().min(1),
+    description: z.string().min(20).max(155),
+  }),
+});
+
 export const collections = {
   publicatii,
+  revista,
 };

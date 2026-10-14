@@ -1,3 +1,25 @@
+## 📝 14 oct 2026 — Revista: publicarea articolului despre Zilele Comunei
+
+### Obiectiv
+- Publicarea unui articol Revista adresat primăriilor și organizatorilor de evenimente publice, cu ruta disponibilă pentru indexare.
+
+### Modificări
+- `src/content.config.ts`: colecție Astro `revista` cu validare pentru `title`, `date`, `author`, `image` și `description`.
+- `src/content/revista/spectacol-comunitate-zilele-comunei.md`: frontmatter și articolul final despre Zilele Comunei, prezența scenică și colaborarea tehnică.
+- `src/pages/revista/[...slug].astro`: rută prerandată, layout alb, titlu grena centrat, accent auriu, imagine cu alt și corp `prose` limitat la `max-w-3xl`.
+- `@tailwindcss/typography` instalat și conectat în `tailwind.config.mjs`.
+- Eliminat `noindex={true}` din ruta articolului; `astro.config.mjs` exclude acum doar pagina-index `/revista/`, nu articolele individuale.
+
+### Validări
+- `npm run build` și `npm run seo:check` PASS; audit: 64 pagini, **0 FAIL | 0 WARN**.
+- Verificat HTML-ul prerandat: `index,follow`, canonical corect, articol inclus în sitemap; `/revista/` rămâne exclusă.
+- `get_errors` pentru fișierele de configurare și rută: fără erori.
+
+### Pași următori
+- Publică buildul; după deploy, trimite URL-ul articolului pentru indexare în Google Search Console și urmărește procesarea sitemapului.
+
+---
+
 ## 📝 14 oct 2026 — Academy Music: închiderea sesiunii
 
 ### Stare la final
