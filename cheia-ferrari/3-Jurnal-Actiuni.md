@@ -1,3 +1,33 @@
+## 📝 14 oct 2026 — CSP: deblocarea colectării GA4 (endpoint-uri regionale + Google Signals)
+
+### Obiectiv
+- Eliminarea erorilor de Content Security Policy din consolă care blocau trimiterea datelor către Google Analytics 4.
+
+### Diagnostic
+- CSP este definit într-un **singur** loc, `src/lib/csp.mjs`, importat identic de `src/middleware.ts` (SSR) și `server.mjs` (static prin sirv). Nu există meta tag CSP în `BaseLayout.astro` și nici configurație Vercel/Netlify — modificarea într-un singur fișier acoperă ambele puncte de aplicare.
+- `connect-src` autoriza doar `https://www.google-analytics.com` și `https://analytics.google.com`. GA4 rutează însă colectarea pe endpoint-uri **regionale** (`region1.google-analytics.com` pentru traficul din Europa), iar cu Google Signals activ face ping și către `ad.doubleclick.net` — ambele erau respinse de browser.
+
+### Modificări
+- `src/lib/csp.mjs` → `connect-src`: adăugate `https://region1.google-analytics.com`, `https://*.google-analytics.com`, `https://*.analytics.google.com` și `https://ad.doubleclick.net`.
+- Comentariu scurt deasupra directivei care explică motivul wildcard-urilor, ca să nu fie eliminate la o viitoare curățenie.
+
+### Decizii tehnice
+- `https://*.google-analytics.com` acoperă deja `region1`, dar varianta explicită a fost păstrată la cererea lui Claudiu: dacă wildcard-ul e restrâns cândva, endpoint-ul regional efectiv folosit rămâne autorizat.
+- Wildcard-urile sunt limitate strict la cele două domenii de analytics; nu s-a lărgit `script-src` sau `img-src` și nu s-a introdus `https://*.google.com`, conform politicii stricte din sesiunile precedente.
+- `ad.doubleclick.net` adăugat **doar** în `connect-src`, nu și în `img-src` — eroarea raportată viza exclusiv `connect-src`.
+
+### Validări
+- `npm test`: **88/88** PASS (4 suite). `get_errors`: fără erori.
+- `npm run build` PASS; verificare pe constanta importată — toate cele 4 domenii prezente în `connect-src`.
+- `npm run seo:audit`: 64 pagini, **0 FAIL | 0 WARN**.
+- Commit: `fix: actualizare CSP connect-src pentru GA4` (doar `src/lib/csp.mjs`).
+
+### Riscuri / pași următori
+- De confirmat în consolă **după deploy** că nu mai apar erori CSP și că evenimentele ajung în GA4 Realtime; validarea live nu e posibilă din acest mediu.
+- Dacă apar blocaje și pe `img-src` (pixeli de conversie Google Signals), domeniul `ad.doubleclick.net` va trebui adăugat și acolo.
+
+---
+
 ## 📝 14 oct 2026 — Web Analytics: trecere la GTM ca sursă unică de adevăr
 
 ### Obiectiv
