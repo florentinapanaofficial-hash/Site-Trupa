@@ -29,6 +29,15 @@
 - Verificare pe bundle: `connect.facebook.net` apare **doar** în JS-ul compilat, niciodată ca `<script src>` în markup.
 - `/shorts/` nu e blocată în `robots.txt` și nu are `noindex`, deci crawler-ul Facebook poate citi `data-href` pentru a lega firul de comentarii.
 
+### Refactor ulterior — bottom sheet nativ (același ciclu)
+- **Simptom raportat:** imposibil de scris un comentariu în panou.
+- **Cauze structurale găsite în cod:** panoul era `position: absolute` în interiorul `.reels-overlay`, care are `overflow: hidden` — orice depășea foaia era tăiat și inaccesibil; iar foaia avea doar `max-height: 72%`, fără înălțime deterministă, deci plugin-ul Facebook nu avea un container stabil de măsurat pentru iframe.
+- **Modificări:** foaia trecută pe `position: fixed` (scapă de clipping — overlay-ul nu are `transform`/`filter`, deci nu devine containing block), `height: 75svh` cu rezervă `75vh`, `z-index: 60` peste toate suprafețele surori, fundal `#242526`, colțuri `1rem 1rem 0 0`. Zona scrollabilă e acum `flex: 1 1 auto; min-height: 0` cu `overflow-y: auto`, `overscroll-behavior: contain` și `pointer-events: auto` explicit.
+- Backdrop propriu `[data-comments-backdrop]` care închide la click; comutarea s-a mutat de pe atributul `hidden` pe clasa `is-open`, ca `transform: translateY(100%) → 0` și opacitatea backdrop-ului să poată tranziționa (300ms `ease-out`, anulate la `prefers-reduced-motion`). `visibility: hidden` în starea închisă scoate panoul din ordinea de tabulare.
+- Header fix cu „Comentarii" auriu la stânga și buton rotund „X" la dreapta; focusul sare pe butonul de închidere la deschidere.
+- **`z-[60]` funcționează doar pentru că panoul rămâne în interiorul `.reels-overlay`** (z-index 1250, care creează contextul de stivuire și ridică totul peste site). Scos de acolo, 60 l-ar fi plasat sub overlay.
+- Validare: `npm test` **94/94**, build PASS, `seo:audit` 64 pagini **0 FAIL | 0 WARN**. Clickul efectiv în iframe rămâne neverificat local — widgetul nu randează pe localhost.
+
 ### Riscuri / pași următori
 - **Plugin-ul nu va randa comentarii până când pagina nu e accesibilă public** — pe `localhost` widgetul rămâne gol. De validat după deploy, cu URL-ul rulat prin Sharing Debugger.
 - Un singur fir de comentarii pentru toate clipurile (`data-href` = `/shorts/`). Fire separate per clip ar cere URL-uri distincte și crawlabile — fragmentele `#id` sunt ignorate de Facebook.

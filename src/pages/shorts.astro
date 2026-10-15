@@ -251,7 +251,8 @@ const shorts = rawShorts.map((s) => {
     </div>
 
     {/* ─── Panou comentarii Meta (gat pe categoria `marketing`) ─── */}
-    <div class="reels-comments" id="reels-comments" hidden>
+    <div class="reels-comments" id="reels-comments" aria-hidden="true">
+      <div class="reels-comments-backdrop" data-comments-backdrop></div>
       <div class="reels-comments-sheet" role="dialog" aria-modal="true" aria-labelledby="reels-comments-title">
         <header class="reels-comments-head">
           <h2 id="reels-comments-title">Comentarii</h2>
@@ -716,28 +717,48 @@ const shorts = rawShorts.map((s) => {
     outline-offset: 3px;
   }
 
-  /* ═══ Panou comentarii Meta ═══ */
+  /* ═══ Panou comentarii Meta — bottom sheet ═══ */
+  /* `position: fixed` ca iframe-ul Facebook să nu fie tăiat de `overflow: hidden`
+     al overlay-ului. Overlay-ul (z-index 1250) e cel care ridică tot peste site. */
   .reels-comments {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    visibility: hidden;
+  }
+  .reels-comments.is-open { visibility: visible; }
+
+  .reels-comments-backdrop {
     position: absolute;
     inset: 0;
-    z-index: 30;
-    display: flex;
-    align-items: flex-end;
     background: rgba(0, 0, 0, 0.6);
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
   }
-  .reels-comments[hidden] { display: none; }
+  .reels-comments.is-open .reels-comments-backdrop { opacity: 1; }
+
   .reels-comments-sheet {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
     display: flex;
     flex-direction: column;
     width: 100%;
     max-width: 480px;
     margin: 0 auto;
-    max-height: 72%;
+    height: 75vh;
+    height: 75svh;
     border-radius: 1rem 1rem 0 0;
-    background: #16181c;
+    background: #242526;
     box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.6);
+    transform: translateY(100%);
+    transition: transform 0.3s ease-out;
   }
+  .reels-comments.is-open .reels-comments-sheet { transform: translateY(0); }
+
   .reels-comments-head {
+    flex: 0 0 auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -748,6 +769,8 @@ const shorts = rawShorts.map((s) => {
     font-family: 'Oswald', sans-serif;
     font-size: 1.05rem;
     font-weight: 700;
+    letter-spacing: 0.02em;
+    color: #facc15;
     margin: 0;
   }
   .reels-comments-close {
@@ -758,15 +781,24 @@ const shorts = rawShorts.map((s) => {
     height: 40px;
     border: 0;
     border-radius: 9999px;
-    background: rgba(255, 255, 255, 0.08);
-    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+    color: #e4e6eb;
     cursor: pointer;
   }
+  .reels-comments-close:hover { background: rgba(255, 255, 255, 0.18); }
+
+  /* Zona scrollabilă: aici trăiește iframe-ul Facebook, deci are nevoie de
+     înălțime proprie și de evenimente de pointer neblocate. */
   .reels-comments-body {
+    flex: 1 1 auto;
+    min-height: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    pointer-events: auto;
     padding: 1rem;
     padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem);
+    color: #e4e6eb;
   }
   .reels-comments-gate p {
     font-size: 0.92rem;
@@ -790,6 +822,8 @@ const shorts = rawShorts.map((s) => {
     cursor: pointer;
   }
   .reels-comments-widget[hidden] { display: none; }
+  .reels-comments-widget, .reels-comments-widget .fb-comments { width: 100%; }
+  .reels-comments-widget iframe { max-width: 100%; }
 
   @media (min-width: 1024px) {
     .reels-feed { max-width: 480px; margin: 0 auto; }
@@ -799,6 +833,7 @@ const shorts = rawShorts.map((s) => {
     .reel-song-marquee span { animation: none; }
     .reel-heart-burst.is-active { animation-duration: 0.5s; }
     .reels-wa-btn { transition: none; }
+    .reels-comments-sheet, .reels-comments-backdrop { transition: none; }
   }
 </style>
 
@@ -1225,19 +1260,24 @@ const shorts = rawShorts.map((s) => {
       else loadFacebookSDK();
     }
 
+    const commentsOpen = () => commentsPanel?.classList.contains('is-open') === true;
+
     function toggleComments(open: boolean) {
       if (!commentsPanel) return;
-      commentsPanel.hidden = !open;
-      if (open) syncCommentsConsent();
+      commentsPanel.classList.toggle('is-open', open);
+      commentsPanel.setAttribute('aria-hidden', String(!open));
+      if (!open) return;
+      syncCommentsConsent();
+      commentsPanel.querySelector<HTMLElement>('[data-comments-close]')?.focus();
     }
 
     // Acordul dat din bannerul granular activează widgetul fără reîncărcare.
     window.addEventListener('fp:consent-updated', () => {
-      if (commentsPanel && !commentsPanel.hidden) syncCommentsConsent();
+      if (commentsOpen()) syncCommentsConsent();
     }, { signal: consentAbort.signal });
 
     document.addEventListener('keydown', (ev) => {
-      if (ev.key === 'Escape' && commentsPanel && !commentsPanel.hidden) toggleComments(false);
+      if (ev.key === 'Escape' && commentsOpen()) toggleComments(false);
     }, { signal: consentAbort.signal });
 
     /* ─── Delegare evenimente pe overlay ─── */
@@ -1262,7 +1302,7 @@ const shorts = rawShorts.map((s) => {
         return;
       }
 
-      if (target.closest<HTMLElement>('[data-comments-close]') || target === commentsPanel) {
+      if (target.closest<HTMLElement>('[data-comments-close]') || target.closest<HTMLElement>('[data-comments-backdrop]')) {
         toggleComments(false);
         return;
       }
