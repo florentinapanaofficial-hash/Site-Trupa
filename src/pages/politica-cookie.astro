@@ -2,7 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BackButton from '../components/BackButton.astro';
 
-const lastUpdated = '26 septembrie 2026';
+const lastUpdated = '15 octombrie 2026';
 ---
 
 <BaseLayout
@@ -15,7 +15,7 @@ const lastUpdated = '26 septembrie 2026';
     <header class="mb-10 text-center">
       <p class="kicker mx-auto">ePrivacy · RGPD</p>
       <h1 class="section-title">Politică de cookie-uri</h1>
-      <p class="section-copy">Ultima actualizare: <time datetime="2026-09-26">{lastUpdated}</time></p>
+      <p class="section-copy">Ultima actualizare: <time datetime="2026-10-15">{lastUpdated}</time></p>
     </header>
 
     <div class="prose-policy">
@@ -31,14 +31,23 @@ const lastUpdated = '26 septembrie 2026';
 
       <h2>Cum gestionăm consimțământul</h2>
       <p>
-        La prima vizită pe site afișăm un <strong>banner de consimțământ</strong> cu opțiuni
-        clare: <em>„Acceptă cookie-urile"</em> sau <em>„Refuz"</em>.
-        Cookie-urile non-esențiale (analiză, publicitate, YouTube) sunt blocate până la acceptare.
-        Alegerea ta este salvată în <code>localStorage</code> (cheia <code>cookie_consent</code>)
-        — aceasta nu este un cookie HTTP și nu necesită consimțământ separat.
-        Poți revoca consimțământul în orice moment apăsând butonul
-        <strong>„Preferințe cookie"</strong> din subsolul oricărei pagini a site-ului —
-        acesta șterge preferința salvată și reafișează bannerul de consimțământ.
+        La prima vizită pe site afișăm un <strong>banner de consimțământ</strong> cu trei categorii
+        pe care le poți bifa <strong>separat</strong>: <em>Analiză</em>, <em>Marketing</em> și
+        <em>Conținut video</em>. Poți apela <em>„Acceptă tot”</em>, <em>„Refuz tot”</em> sau
+        <em>„Preferințe”</em> pentru a alege individual. Cookie-urile non-esențiale rămân blocate
+        până la acordul tău, iar un acord dat pentru o categorie nu activează celelalte categorii.
+      </p>
+      <p>
+        Alegerea ta este salvată în <code>localStorage</code> — analiza și marketingul în cheia
+        <code>fp_consent</code>, iar redarea clipurilor în cheia separată <code>video_consent</code>.
+        Niciuna nu este cookie HTTP și nu părăsește browserul tău.
+        Transmitem deciziile către Google prin <strong>Consent Mode v2</strong>
+        (<code>ad_storage</code>, <code>ad_user_data</code>, <code>ad_personalization</code>,
+        <code>analytics_storage</code>), setate implicit pe <em>denied</em> înainte de încărcarea
+        oricărui script de măsurare.
+        Poți modifica sau revoca consimțământul oricând apăsând butonul
+        <strong>„Preferințe cookie”</strong> din subsolul oricărei pagini — bannerul se redeschide
+        cu opțiunile tale curente bifate.
       </p>
 
       <!-- ──────────────────────────────── -->
@@ -73,9 +82,9 @@ const lastUpdated = '26 septembrie 2026';
         </tbody>
       </table>
       <p class="policy-note">
-        <strong>Notă:</strong> Stocăm preferința ta de consimțământ în
-        <code>localStorage.cookie_consent</code> — aceasta este stocată local în browserul tău,
-        nu pe serverele noastre, și nu este un cookie HTTP.
+        <strong>Notă:</strong> Stocăm preferințele de consimțământ în
+        <code>localStorage.fp_consent</code> și <code>localStorage.video_consent</code> — acestea
+        sunt stocate local în browserul tău, nu pe serverele noastre, și nu sunt cookie-uri HTTP.
       </p>
 
       <!-- ──────────────────────────────── -->

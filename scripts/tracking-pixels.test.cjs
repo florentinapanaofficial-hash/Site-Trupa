@@ -3,12 +3,18 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const ids = { gtmId: 'GTM-N44548RF' };
+const ALL = { analytics: true, marketing: true };
 
-function tracking(consent = 'granted', dataLayer = []) {
+function stored(consent) {
+    if (consent === null) return null;
+    return JSON.stringify({ ...consent, ts: 1760000000000 });
+}
+
+function tracking(consent = ALL, dataLayer = []) {
     const listeners = {};
     const scripts = [];
     const timers = [];
-    const localStorage = { getItem: jest.fn(() => consent) };
+    const localStorage = { getItem: jest.fn(() => stored(consent)) };
     const location = {
         pathname: '/', search: '', href: 'https://www.florentinapanaofficial.ro/',
     };
@@ -24,9 +30,10 @@ function tracking(consent = 'granted', dataLayer = []) {
         createElement: () => ({}),
         addEventListener: (name, handler) => { listeners[name] = handler; },
     };
-    const context = vm.createContext({ window, document, location, localStorage, Date });
+    const context = vm.createContext({ window, document, location, localStorage, Date, JSON });
     vm.runInContext(fs.readFileSync(path.join(__dirname, '../public/js/tracking-pixels.js'), 'utf8'), context);
-    return { window, document, location, localStorage, listeners, scripts, timers };
+    const setConsent = (next) => localStorage.getItem.mockReturnValue(stored(next));
+    return { window, document, location, localStorage, listeners, scripts, timers, setConsent };
 }
 
 function anchor(attributes, className = '') {
@@ -55,7 +62,7 @@ function click(app, node) {
 }
 
 describe('GTM consent and dataLayer routing', () => {
-    test.each([null, 'denied'])('does not load or track without consent (%s)', (consent) => {
+    test.each([null, { analytics: false, marketing: false }])('does not load or track without consent (%p)', (consent) => {
         const app = tracking(consent);
         app.window.FPTracking.init(ids);
         click(app, anchor({ href: 'tel:+40767369658' }, 'quick-dock-btn quick-dock-btn--call'));
@@ -63,16 +70,27 @@ describe('GTM consent and dataLayer routing', () => {
         expect(app.window.dataLayer).toHaveLength(0);
     });
 
-    test('does not load when localStorage is unavailable', () => {
+    test('ignores a video-only consent stored under its own key', () => {
+        const app = tracking(null);
+        app.localStorage.getItem.mockImplementation((key) => (key === 'video_consent' ? 'granted' : null));
+        app.window.FPTracking.init(ids);
+        expect(app.scripts).toHaveLength(0);
+        expect(app.window.dataLayer).toHaveLength(0);
+        expect(app.window.FPTracking.getConsent()).toEqual({ analytics: false, marketing: false });
+    });
+
+    test('does not load when localStorage is unavailable or the payload is corrupt', () => {
         const app = tracking();
         app.localStorage.getItem.mockImplementation(() => { throw new Error('Blocked'); });
+        app.window.FPTracking.init(ids);
+        app.localStorage.getItem.mockReturnValue('{ not json');
         app.window.FPTracking.init(ids);
         expect(app.scripts).toHaveLength(0);
     });
 
     test('loads the requested container once and preserves existing dataLayer entries', () => {
         const dataLayer = [{ event: 'existing' }];
-        const app = tracking('granted', dataLayer);
+        const app = tracking(ALL, dataLayer);
         app.window.FPTracking.init(ids);
         app.window.FPTracking.init(ids);
         expect(app.window.dataLayer).toBe(dataLayer);
@@ -102,17 +120,40 @@ describe('GTM consent and dataLayer routing', () => {
         });
     });
 
-    test('starts after acceptance and stops sending events when consent is denied', () => {
-        const app = tracking('denied');
+    test('starts after acceptance and stops sending events when consent is withdrawn', () => {
+        const app = tracking({ analytics: false, marketing: false });
         app.window.FPTracking.init(ids);
-        app.localStorage.getItem.mockReturnValue('granted');
+        app.setConsent(ALL);
         app.window.FPTracking.init(ids);
         expect(app.scripts).toHaveLength(1);
         const count = app.window.dataLayer.length;
-        app.localStorage.getItem.mockReturnValue('denied');
+        app.setConsent({ analytics: false, marketing: false });
         app.window.FPTracking.trackPageView();
         app.window.FPTracking.trackInteraction('click_phone', 'quick-dock');
         expect(app.window.dataLayer).toHaveLength(count);
+    });
+
+    test('loads only the vendors approved for each category', () => {
+        const full = { ...ids, ga4Id: 'G-TEST', metaPixelId: '123', tiktokPixelId: 'TT1' };
+
+        const analyticsOnly = tracking({ analytics: true, marketing: false });
+        analyticsOnly.window.FPTracking.init(full);
+        expect(analyticsOnly.scripts.map((script) => script.src)).toEqual([
+            'https://www.googletagmanager.com/gtm.js?id=GTM-N44548RF',
+            'https://www.googletagmanager.com/gtag/js?id=G-TEST',
+        ]);
+        expect(analyticsOnly.window.fbq).toBeUndefined();
+        expect(analyticsOnly.window.ttq).toBeUndefined();
+
+        const marketingOnly = tracking({ analytics: false, marketing: true });
+        marketingOnly.document.getElementsByTagName = () => [{ parentNode: { insertBefore: () => { } } }];
+        marketingOnly.document.createElement = () => ({});
+        marketingOnly.window.FPTracking.init(full);
+        expect(marketingOnly.scripts.map((script) => script.src)).toEqual([
+            'https://www.googletagmanager.com/gtm.js?id=GTM-N44548RF',
+        ]);
+        expect(marketingOnly.window.fbq).toEqual(expect.any(Function));
+        expect(marketingOnly.window.ttq).toEqual(expect.any(Array));
     });
 
     test('preserves direct GA4 configuration and page views', () => {
@@ -181,8 +222,48 @@ describe('GTM consent and dataLayer routing', () => {
         expect(layout).toContain('window.__FP_TRACKING_IDS__ = { gtmId: gtmId,');
         expect(layout).not.toContain('googletagmanager.com/ns.html');
         const banner = fs.readFileSync(path.join(__dirname, '../src/components/CookieBanner.astro'), 'utf8');
-        expect(banner).toContain("script.src = '/js/tracking-pixels.js?v=gtm-n44548rf';");
+        expect(banner).toContain("script.src = '/js/tracking-pixels.js?v=consent-v2';");
         const runtime = fs.readFileSync(path.join(__dirname, '../public/js/tracking-pixels.js'), 'utf8');
         expect(runtime).not.toContain('astro:page-load');
+    });
+
+    test('declares Consent Mode v2 defaults before any container can load', () => {
+        const layout = fs.readFileSync(path.join(__dirname, '../src/layouts/BaseLayout.astro'), 'utf8');
+        const defaults = layout.indexOf("window.gtag('consent', 'default'");
+        expect(defaults).toBeGreaterThan(-1);
+        expect(defaults).toBeLessThan(layout.indexOf('window.__FP_TRACKING_IDS__'));
+        ['ad_storage', 'ad_user_data', 'ad_personalization', 'analytics_storage'].forEach((signal) => {
+            expect(layout).toMatch(new RegExp(signal + ": 'denied'"));
+        });
+        expect(layout).toContain("window.gtag('consent', 'update', signals(prefs))");
+    });
+
+    test('keeps video consent on a dedicated key across every embed surface', () => {
+        const sources = [
+            '../public/js/video-facade.js',
+            '../src/components/YoutubeEmbed.astro',
+            '../src/components/SmartTvVideoPlayer.astro',
+            '../src/pages/aparitii-tv.astro',
+        ].map((file) => fs.readFileSync(path.join(__dirname, file), 'utf8'));
+
+        sources.forEach((source) => {
+            expect(source).toContain('video_consent');
+            expect(source).not.toContain("'cookie_consent'");
+            expect(source).not.toContain("CustomEvent('cookie:granted')");
+        });
+
+        const runtime = fs.readFileSync(path.join(__dirname, '../public/js/tracking-pixels.js'), 'utf8');
+        expect(runtime).toContain("var STORAGE_KEY = 'fp_consent';");
+        expect(runtime).not.toMatch(/getItem\(\s*['"]video_consent['"]\s*\)/);
+    });
+
+    test('the banner exposes a separate switch for every purpose', () => {
+        const banner = fs.readFileSync(path.join(__dirname, '../src/components/CookieBanner.astro'), 'utf8');
+        ['cookie-cat-analytics', 'cookie-cat-marketing', 'cookie-cat-video', 'cookie-prefs-toggle', 'cookie-save']
+            .forEach((id) => expect(banner).toContain(id));
+        expect(banner).toContain("apply({ analytics: false, marketing: false, video: false })");
+        const footer = fs.readFileSync(path.join(__dirname, '../src/components/Footer.astro'), 'utf8');
+        expect(footer).toContain("CustomEvent('fp:open-consent')");
+        expect(banner).toContain("window.addEventListener('fp:open-consent'");
     });
 });

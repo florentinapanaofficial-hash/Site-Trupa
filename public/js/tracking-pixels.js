@@ -1,6 +1,10 @@
 /*
- * FPTracking — încarcă GTM, GA4, Meta Pixel și TikTok Pixel DOAR după consimțământul GDPR
- * (localStorage.cookie_consent === 'granted').
+ * FPTracking — încarcă GTM, GA4, Meta Pixel și TikTok Pixel DOAR după consimțământul GDPR,
+ * separat pe categorii (localStorage.fp_consent = { analytics, marketing }).
+ *
+ * Categoriile sunt scrise exclusiv de window.FPConsent (definit în <head>, BaseLayout),
+ * împreună cu semnalele Google Consent Mode v2. Cheia `video_consent` aparține embed-urilor
+ * video și NU este citită aici — un click pe „play" nu pornește niciun pixel.
  *
  * GTM este sursa unică de adevăr: toate evenimentele pleacă prin dataLayer
  * (fp_page_view, fp_interaction, fp_conversion), iar tagurile din container se leagă
@@ -11,19 +15,31 @@
  *   la accept și la încărcarea paginii dacă există deja consimțământ.
  */
 (function () {
-    var STORAGE_KEY = 'cookie_consent';
+    var STORAGE_KEY = 'fp_consent';
     // Răgaz pentru plecarea beacon-ului înainte ca tel:/WhatsApp să scoată utilizatorul din pagină.
     var NAV_DELAY_MS = 300;
     var WHATSAPP_URL = /^https:\/\/(wa\.me|api\.whatsapp\.com)\//i;
+    var DENIED = { analytics: false, marketing: false };
     var loaded = { gtm: false, ga4: false, meta: false, tiktok: false };
     var delegatedBound = false;
 
-    function hasConsent() {
+    function getConsent() {
         try {
-            return localStorage.getItem(STORAGE_KEY) === 'granted';
+            var raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return DENIED;
+            var parsed = JSON.parse(raw);
+            if (!parsed || typeof parsed !== 'object') return DENIED;
+            return { analytics: parsed.analytics === true, marketing: parsed.marketing === true };
         } catch (_) {
-            return false;
+            return DENIED;
         }
+    }
+
+    // Containerul GTM se încarcă dacă măcar o categorie non-esențială e aprobată;
+    // ce taguri pornesc în interior rămâne decis de semnalele Consent Mode v2.
+    function hasConsent() {
+        var consent = getConsent();
+        return consent.analytics || consent.marketing;
     }
 
     function loadGTM(id) {
@@ -102,6 +118,7 @@
     function trackPageView() {
         if (!hasConsent()) return;
         if (loaded.gtm) {
+            window.dataLayer = window.dataLayer || [];
             window.dataLayer.push({
                 event: 'fp_page_view',
                 page_path: location.pathname + location.search,
@@ -178,11 +195,12 @@
 
     function init(ids) {
         ids = ids || {};
-        if (!hasConsent()) return;
+        var consent = getConsent();
+        if (!consent.analytics && !consent.marketing) return;
         if (ids.gtmId) loadGTM(ids.gtmId);
-        if (ids.ga4Id) loadGA4(ids.ga4Id);
-        if (ids.metaPixelId) loadMetaPixel(ids.metaPixelId);
-        if (ids.tiktokPixelId) loadTikTokPixel(ids.tiktokPixelId);
+        if (consent.analytics && ids.ga4Id) loadGA4(ids.ga4Id);
+        if (consent.marketing && ids.metaPixelId) loadMetaPixel(ids.metaPixelId);
+        if (consent.marketing && ids.tiktokPixelId) loadTikTokPixel(ids.tiktokPixelId);
         trackPageView();
     }
 
@@ -191,6 +209,7 @@
         trackPageView: trackPageView,
         trackInteraction: trackInteraction,
         hasConsent: hasConsent,
+        getConsent: getConsent,
     };
 
     bindDelegatedClicks();

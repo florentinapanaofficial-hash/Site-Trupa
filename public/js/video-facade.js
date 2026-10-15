@@ -246,9 +246,9 @@ async function activate(facade) {
   iframe.focus();
 }
 
-function hasConsent() {
+function hasVideoConsent() {
   try {
-    return localStorage.getItem('cookie_consent') === 'granted';
+    return localStorage.getItem('video_consent') === 'granted';
   } catch {
     return false;
   }
@@ -265,7 +265,7 @@ function toggleConsentPanel(facade, show) {
 
 function requestPlay(facade) {
   if (facade.dataset.videoActive === 'true') return;
-  if (hasConsent()) {
+  if (hasVideoConsent()) {
     activate(facade);
     return;
   }
@@ -274,13 +274,15 @@ function requestPlay(facade) {
   toggleConsentPanel(facade, true);
 }
 
+/* Acord strict pentru embed-uri video — cheie separată de `fp_consent`,
+   ca o redare să nu pornească GA4/Meta/TikTok (Art. 4(11) RGPD). */
 function grantConsent(facade) {
   try {
-    localStorage.setItem('cookie_consent', 'granted');
+    localStorage.setItem('video_consent', 'granted');
   } catch {
     // localStorage indisponibil — consimțământul rămâne valabil doar pentru această redare
   }
-  window.dispatchEvent(new CustomEvent('cookie:granted'));
+  window.dispatchEvent(new CustomEvent('video:granted'));
   activate(facade);
 }
 
@@ -404,7 +406,7 @@ export function initVideoFacades() {
   if (win.__fp_video_facade_runtime_initialized__) return;
   win.__fp_video_facade_runtime_initialized__ = true;
 
-  window.addEventListener('cookie:granted', () => {
+  window.addEventListener('video:granted', () => {
     document.querySelectorAll('[data-video-facade]').forEach((facade) => {
       if (facade.dataset.videoPending === 'true') {
         const src = buildAutoplayUrl(facade.dataset.videoUrl || '');

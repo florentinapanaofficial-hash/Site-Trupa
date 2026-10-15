@@ -409,6 +409,97 @@ const breadcrumbLd = {
     {isHomePage && <script is:inline type="application/ld+json" data-schema="repertoire-item-list" set:html={JSON.stringify(repertoireItemListLd)} />}
     <script is:inline type="application/ld+json" data-schema="webpage" set:html={JSON.stringify(webPageLd)} />
     {!isHomePage && <script is:inline type="application/ld+json" data-schema="breadcrumb" set:html={JSON.stringify(breadcrumbLd)} />}
+    {/* ── Google Consent Mode v2 (mod „Basic") ──────────────────────────────
+        Semnalele `default: denied` intră în dataLayer ÎNAINTE de orice container
+        GTM. În modul Basic containerul nici nu se încarcă până la accept, dar
+        semnalele rămân în coadă și sunt citite de GTM la pornire.
+        `window.FPConsent` este singura sursă de adevăr pentru preferințe:
+          • fp_consent    → { analytics, marketing } (JSON) — citit de FPTracking
+          • video_consent → 'granted' | 'denied'     — citit DOAR de embed-urile video
+        Separarea cheilor împiedică un click pe „play" să pornească GA4/Meta/TikTok. */}
+    <script is:inline>
+      (function () {
+        if (window.FPConsent) return;
+
+        var KEY = 'fp_consent';
+        var VIDEO_KEY = 'video_consent';
+        var LEGACY_KEY = 'cookie_consent';
+
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { window.dataLayer.push(arguments); }
+        window.gtag = window.gtag || gtag;
+
+        window.gtag('consent', 'default', {
+          ad_storage: 'denied',
+          ad_user_data: 'denied',
+          ad_personalization: 'denied',
+          analytics_storage: 'denied',
+          functionality_storage: 'granted',
+          security_storage: 'granted',
+          wait_for_update: 500,
+        });
+
+        function load(key) {
+          try { return localStorage.getItem(key); } catch (_) { return null; }
+        }
+        function store(key, value) {
+          try { localStorage.setItem(key, value); } catch (_) { /* mod privat strict */ }
+        }
+
+        // Migrare: `cookie_consent` era scris și de butoanele „play" ale embed-urilor, deci nu
+        // dovedește un acord informat pentru analiză/marketing — se degradează la acord video.
+        var legacy = load(LEGACY_KEY);
+        if (legacy !== null) {
+          if (load(VIDEO_KEY) === null) store(VIDEO_KEY, legacy === 'granted' ? 'granted' : 'denied');
+          try { localStorage.removeItem(LEGACY_KEY); } catch (_) {}
+        }
+
+        function read() {
+          var raw = load(KEY);
+          if (!raw) return null;
+          try {
+            var parsed = JSON.parse(raw);
+            if (!parsed || typeof parsed !== 'object') return null;
+            return { analytics: parsed.analytics === true, marketing: parsed.marketing === true };
+          } catch (_) {
+            return null;
+          }
+        }
+
+        function signals(prefs) {
+          var ads = prefs && prefs.marketing ? 'granted' : 'denied';
+          return {
+            ad_storage: ads,
+            ad_user_data: ads,
+            ad_personalization: ads,
+            analytics_storage: prefs && prefs.analytics ? 'granted' : 'denied',
+          };
+        }
+
+        function update(prefs) {
+          window.gtag('consent', 'update', signals(prefs));
+        }
+
+        function save(prefs) {
+          var clean = { analytics: prefs.analytics === true, marketing: prefs.marketing === true };
+          store(KEY, JSON.stringify({ analytics: clean.analytics, marketing: clean.marketing, ts: Date.now() }));
+          store(VIDEO_KEY, prefs.video === true ? 'granted' : 'denied');
+          update(clean);
+          return clean;
+        }
+
+        window.FPConsent = {
+          read: read,
+          save: save,
+          update: update,
+          signals: signals,
+          video: function () { return load(VIDEO_KEY) === 'granted'; },
+        };
+
+        var stored = read();
+        if (stored && (stored.analytics || stored.marketing)) update(stored);
+      })();
+    </script>
     {/* GTM, GA4, Meta Pixel și TikTok Pixel NU se încarcă direct în <head> — se injectează dinamic
         DUPĂ consimțământul utilizatorului (CookieBanner) prin FPTracking, conform Rec. 30 & 32
         RGPD / ePrivacy. Retrimise la fiecare navigare client-side prin astro:page-load. */}

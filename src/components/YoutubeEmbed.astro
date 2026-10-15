@@ -13,12 +13,14 @@
  * Comportament:
  *   – Înainte de consimțământ: afișează thumbnail (img.youtube.com,
  *     fără cookie-uri) + overlay cu două opțiuni.
- *   – După „Acceptă cookie-urile" (CookieBanner) → toate embed-urile
- *     de pe pagină se activează automat (event cookie:granted).
+ *   – După bifarea categoriei „Conținut video" în CookieBanner → toate
+ *     embed-urile de pe pagină se activează automat (event video:granted).
  *   – Butonul „Acceptă și vizionează" per video → activează consimțământul
- *     global și deschide acel video specific.
- *   – Dacă consimțământul e deja „granted" în localStorage → iframe
- *     se injectează imediat la încărcarea paginii, fără banner.
+ *     video și deschide acel video specific.
+ *   – Consimțământul video stă în `localStorage.video_consent`, SEPARAT de
+ *     `fp_consent` (analiză/marketing) — o redare nu pornește niciun pixel.
+ *   – Dacă e deja „granted" în localStorage → iframe se injectează imediat
+ *     la încărcarea paginii, fără banner.
  *
  * Utilizare:
  *   <YoutubeEmbed youtubeId="aDB9Aa9cFLY" title="Titlul videoclipului" />
@@ -195,7 +197,7 @@ const ytLink = youtubeUrl || (hasPlaylist
 
     function syncConsentClass() {
       var granted = false;
-      try { granted = localStorage.getItem('cookie_consent') === 'granted'; } catch (_) {}
+      try { granted = localStorage.getItem('video_consent') === 'granted'; } catch (_) {}
       document.documentElement.classList.toggle('yt-consent-granted', granted);
     }
 
@@ -560,7 +562,7 @@ const ytLink = youtubeUrl || (hasPlaylist
     function activateGrantedGates() {
       syncConsentClass();
       try {
-        if (localStorage.getItem('cookie_consent') === 'granted') {
+        if (localStorage.getItem('video_consent') === 'granted') {
           activateVisibleGates();
         }
       } catch (_) { /* localStorage indisponibil */ }
@@ -569,9 +571,9 @@ const ytLink = youtubeUrl || (hasPlaylist
     activateGrantedGates();
     document.addEventListener('astro:page-load', activateGrantedGates);
 
-    // ── Reacționează la acceptarea din CookieBanner ──
-    window.addEventListener('cookie:granted', syncConsentClass);
-    window.addEventListener('cookie:granted', activateVisibleGates);
+    // ── Reacționează la acceptarea conținutului video (banner sau poartă per clip) ──
+    window.addEventListener('video:granted', syncConsentClass);
+    window.addEventListener('video:granted', activateVisibleGates);
 
     window.addEventListener('yt:play', function (e) {
       activateAndPlayGate(e.detail && e.detail.gate);
@@ -586,8 +588,8 @@ const ytLink = youtubeUrl || (hasPlaylist
       pauseAllExcept(null);
       pauseAllNativeMediaExcept(null);
 
-      try { localStorage.setItem('cookie_consent', 'granted'); } catch (_) {}
-      window.dispatchEvent(new CustomEvent('cookie:granted'));
+      try { localStorage.setItem('video_consent', 'granted'); } catch (_) {}
+      window.dispatchEvent(new CustomEvent('video:granted'));
 
       var gate = btn.closest('.yt-gate');
       if (isFacadeGate(gate)) activateAndPlayGate(gate);

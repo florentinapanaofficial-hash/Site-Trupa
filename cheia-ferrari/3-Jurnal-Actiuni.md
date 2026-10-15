@@ -1,3 +1,46 @@
+## 📝 15 oct 2026 — Consimțământ GDPR: scope video separat, Consent Mode v2 și banner granular
+
+### Obiectiv
+- Audit de conformitate cerut de Claudiu pe două axe (robots.txt vs. resurse de randare, GTM vs. consimțământ), urmat de refacerea completă a logicii de consimțământ.
+
+### Diagnostic
+- **robots.txt: curat.** `Disallow` acoperă doar `/api/`, `/admin/`, `/upload/`. Niciun blocaj pe `/_astro/*`, `/js/*`, `/fonts/`, `/images/`; `inlineStylesheets: 'always'` livrează oricum CSS-ul inline. `X-Robots-Tag` din `middleware.ts` se aplică strict pe `/api/` și `/admin/`.
+- **Blocare prealabilă: conformă.** Niciun snippet GTM în `<head>`, fără `<noscript>` iframe; `FPTracking.init()` ieșea devreme fără acord.
+- **Consent Mode v2: absent complet.** Zero apariții pentru `gtag('consent', ...)`, `ad_storage`, `analytics_storage`, `ad_user_data`, `ad_personalization`, `wait_for_update` — deci zero modelare de conversii și risc pe Google Ads în SEE.
+- **🔴 Scope încălcat (finding critic).** `video-facade.js`, `YoutubeEmbed.astro`, `aparitii-tv.astro` și `SmartTvVideoPlayer.astro` scriau `localStorage.cookie_consent = 'granted'` — exact cheia citită de `FPTracking.hasConsent()`. Un click pe „play" la un clip YouTube pornea GA4 + Meta Pixel + TikTok Pixel la următoarea încărcare de pagină, fără acord informat (Art. 4(11) și 6(1)(a) RGPD).
+- Bannerul oferea o singură alegere „tot sau nimic", împachetând analiza cu publicitatea.
+
+### Modificări
+- `src/layouts/BaseLayout.astro`: bloc `is:inline` nou în `<head>`, înaintea `__FP_TRACKING_IDS__` — stub `gtag` + `consent: default` cu toate cele 4 semnale v2 pe `denied` (`functionality_storage`/`security_storage` granted, `wait_for_update: 500`). Expune `window.FPConsent` (`read`/`save`/`update`/`signals`/`video`) ca sursă unică de adevăr și trimite `consent: update` la încărcare dacă există preferințe salvate.
+- **Migrare legacy:** `cookie_consent` se degradează la `video_consent` și se șterge. Nu moștenește analiză/marketing — vechea cheie putea proveni dintr-un click pe „play", deci nu dovedește acord informat.
+- `src/components/CookieBanner.astro`: rescris. Trei categorii bifabile separat (Analiză / Marketing / Conținut video) + rând „Strict necesare" dezactivat, buton `Preferințe` cu `aria-expanded`/`aria-controls`, `Refuz tot`, `Acceptă tot`, `Salvează preferințele`. Ascultă `fp:open-consent`.
+- `public/js/tracking-pixels.js`: citește `fp_consent` (JSON) și încarcă selectiv — GTM dacă măcar o categorie e activă, GA4 doar pe `analytics`, Meta + TikTok doar pe `marketing`. Expus `getConsent()`.
+- `public/js/video-facade.js`, `src/components/YoutubeEmbed.astro`, `src/components/SmartTvVideoPlayer.astro`, `src/pages/aparitii-tv.astro`: trecute pe `video_consent` și pe evenimentul `video:granted`.
+- `src/components/Footer.astro`: butonul „Preferințe" emite `fp:open-consent` în loc să șteargă cheia — bannerul se redeschide cu valorile curente bifate (Art. 7(3) RGPD).
+- `src/pages/politica-cookie.astro`: documentate cele trei categorii, cheile `fp_consent` / `video_consent` și semnalele Consent Mode v2; dată actualizată.
+- `scripts/tracking-pixels.test.cjs`: suita rescrisă pe modelul granular — 5 teste noi (consimțământ video ignorat de tracking, payload corupt, încărcare selectivă pe categorie, ordinea semnalelor v2 în layout, comutatoarele din banner).
+
+### Decizii tehnice
+- **Consent Mode v2 în modul „Basic"**, cerut explicit: containerul GTM rămâne blocat până la accept, iar semnalele `default: denied` stau în `dataLayer` și sunt citite de GTM la pornire. Fără ping-uri cookieless, dar cu conformitate maximă și migrare ușoară spre „Advanced" dacă se dorește modelare.
+- **Două chei, fiecare cu un singur proprietar**: `fp_consent` (JSON, analiză + marketing, scris doar de `FPConsent`) și `video_consent` (string, scris de porțile video și de bifa din banner). Fără duplicare de stare.
+- `FPConsent` trăiește inline în `<head>`, nu într-un fișier separat: semnalele trebuie să preceadă orice container, iar o cerere nouă ar fi reintrodus un lanț critic.
+- Evenimentul `cookie:granted` a fost redenumit `video:granted` — toate ascultările existente erau video, deci redenumirea e completă, fără cod orfan.
+- Migrarea conservatoare pierde volum de analytics pentru vizitatorii vechi, dar e singura variantă apărabilă: nu putem demonstra că vechiul `granted` a venit din banner, nu dintr-un click pe video.
+
+### Validări
+- `npm test`: **93/93** PASS (4 suite). `get_errors`: fără erori pe cele 8 fișiere atinse.
+- `npm run build` PASS, 83 fișiere comprimate. `npm run seo:audit`: **64 pagini, 0 FAIL | 0 WARN**.
+- Verificare pe `dist/client`: `gtag('consent', 'default', ...)` la linia 14 și `'consent', 'update'` la linia 62 din `index.html`, ambele înaintea `__FP_TRACKING_IDS__`; **0** apariții `googletagmanager.com/gtm.js` în HTML; **0** `getItem('cookie_consent')` și **0** `CustomEvent('cookie:granted')` în tot output-ul; 9 referințe la comutatoarele de categorii.
+
+### Riscuri / pași următori
+- **Containerul GTM trebuie actualizat**: tagurile GA4/Ads au nevoie de „Consent Settings" cu `analytics_storage`, respectiv `ad_storage` + `ad_user_data` + `ad_personalization`, altfel semnalele noastre nu au efect în container.
+- Vizitatorii cu acord vechi vor revedea bannerul o singură dată (efect intenționat al migrării) — de așteptat o scădere temporară de volum în GA4.
+- Revocarea nu oprește scripturile deja încărcate în pagina curentă și nu șterge cookie-urile scrise anterior de GA/Meta/TikTok; se aplică de la următoarea încărcare. De evaluat o ștergere activă dacă se cere.
+- Validarea live (Tag Assistant / GTM Preview pe semnalele de consimțământ) nu e posibilă din acest mediu; de rulat după deploy.
+- Terminalul PowerShell a rămas blocat într-un prompt de continuare după un regex cu ghilimele escapate; verificările pe `dist` au fost făcute prin căutare în workspace.
+
+---
+
 ## 📝 14 oct 2026 — CSP: deblocarea colectării GA4 (endpoint-uri regionale + Google Signals)
 
 ### Obiectiv

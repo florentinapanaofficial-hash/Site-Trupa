@@ -194,13 +194,8 @@ const isHomePage = Astro.url.pathname === '/';
     var btn = document.getElementById('cookie-prefs-btn');
     if (!btn) return;
     btn.addEventListener('click', function () {
-      try { localStorage.removeItem('cookie_consent'); } catch (_) {}
-      var banner = document.getElementById('cookie-banner');
-      if (banner) {
-        banner.hidden = false;
-        banner.removeAttribute('hidden');
-        banner.removeAttribute('aria-hidden');
-      }
+      // Nu ștergem preferințele: bannerul se redeschide cu valorile curente bifate.
+      window.dispatchEvent(new CustomEvent('fp:open-consent'));
     });
   })();
 </script>

@@ -8,20 +8,28 @@
  *   • Rec. 30 & 32 RGPD + Directiva ePrivacy 2002/58/CE (art. 5 alin. 3)
  *   • Cookie-urile non-esențiale (ex. Google Analytics) nu se pot instala
  *     ÎNAINTE de obținerea consimțământului prealabil al utilizatorului.
+ *   • Art. 4(11) RGPD — consimțământul trebuie să fie *specific* pe scop,
+ *     de unde categoriile separate de mai jos.
+ *
+ * Categorii (fiecare cu propriul comutator):
+ *   – Analiză   → GTM + GA4            (fp_consent.analytics)
+ *   – Marketing → GTM + Meta + TikTok  (fp_consent.marketing)
+ *   – Video     → embed-uri YouTube    (video_consent)
  *
  * Comportament:
- *   – Prima vizită: banner vizibil; GTM/GA4/Meta Pixel/TikTok Pixel NU se încarcă.
- *   – „Acceptă": salvează 'granted' în localStorage; FPTracking.init() injectează scripturile.
- *   – „Refuz":    salvează 'denied'  în localStorage; nimic nu se încarcă vreodată.
- *   – Vizite ulterioare: se citește localStorage → tracking pornit sau omis fără banner.
+ *   – Prima vizită: banner vizibil; niciun script non-esențial încărcat.
+ *   – „Acceptă tot" / „Salvează preferințele": scrie prin window.FPConsent
+ *     (care trimite și `gtag('consent','update')`), apoi FPTracking.init().
+ *   – „Refuz tot": toate categoriile pe false; nimic nu se încarcă.
+ *   – Butonul „Preferințe" din Footer emite `fp:open-consent` și redeschide
+ *     bannerul cu valorile curente precompletate (Art. 7(3) RGPD).
  *
- * Consimțământul se stochează în localStorage (nu cookie) pentru a nu crea
- * un cookie înainte de consimțământ — localStorage nu este reglementat de
- * Directiva ePrivacy în același mod cu cookie-urile.
+ * Preferințele stau în localStorage (nu cookie), ca să nu creăm un cookie
+ * înainte de consimțământ. Sursa de adevăr e `window.FPConsent`, definit în
+ * <head> (BaseLayout) împreună cu blocul Consent Mode v2 `default: denied`.
  *
- * Încrcarea efectivă a scripturilor (GA4/Meta/TikTok) e centralizată în
- * public/js/tracking-pixels.js (window.FPTracking) — folosit și la fiecare
- * navigare client-side (astro:page-load), nu doar la accept.
+ * Încărcarea efectivă a scripturilor e centralizată în
+ * public/js/tracking-pixels.js (window.FPTracking), care citește aceleași chei.
  */
 ---
 
@@ -36,22 +44,82 @@
 >
   <div class="cookie-banner__inner">
     <p id="cookie-banner-desc" class="cookie-banner__text">
-      Folosim cookie-uri de analiză și publicitate și măsurăm bugetul ales în formular <strong>doar cu acordul tău</strong>.
+      Folosim cookie-uri de analiză, de marketing și pentru redarea clipurilor YouTube
+      <strong>doar cu acordul tău</strong>. Poți alege separat fiecare categorie.
       <a href="/politica-cookie/" class="cookie-banner__link" aria-label="Detalii despre politica de cookie-uri">Detalii cookie-uri</a>
     </p>
+
     <div class="cookie-banner__actions">
-      <button id="cookie-refuse" type="button" class="cookie-btn cookie-btn--refuse">Refuz</button>
-      <button id="cookie-accept" type="button" class="cookie-btn cookie-btn--accept">Acceptă</button>
+      <button
+        id="cookie-prefs-toggle"
+        type="button"
+        class="cookie-btn cookie-btn--ghost"
+        aria-expanded="false"
+        aria-controls="cookie-prefs-panel"
+      >Preferințe</button>
+      <button id="cookie-refuse" type="button" class="cookie-btn cookie-btn--refuse">Refuz tot</button>
+      <button id="cookie-accept" type="button" class="cookie-btn cookie-btn--accept">Acceptă tot</button>
+    </div>
+
+    <div id="cookie-prefs-panel" class="cookie-prefs" hidden>
+      <fieldset class="cookie-prefs__group">
+        <legend class="cookie-prefs__legend">Alege ce permiți</legend>
+
+        <div class="cookie-prefs__row cookie-prefs__row--locked">
+          <input id="cookie-cat-necessary" type="checkbox" checked disabled />
+          <label for="cookie-cat-necessary">
+            <span class="cookie-prefs__name">Strict necesare</span>
+            <span class="cookie-prefs__desc">Securitate și funcționarea site-ului. Nu pot fi dezactivate.</span>
+          </label>
+        </div>
+
+        <div class="cookie-prefs__row">
+          <input id="cookie-cat-analytics" type="checkbox" />
+          <label for="cookie-cat-analytics">
+            <span class="cookie-prefs__name">Analiză</span>
+            <span class="cookie-prefs__desc">Google Analytics 4 — statistici anonime de trafic.</span>
+          </label>
+        </div>
+
+        <div class="cookie-prefs__row">
+          <input id="cookie-cat-marketing" type="checkbox" />
+          <label for="cookie-cat-marketing">
+            <span class="cookie-prefs__name">Marketing</span>
+            <span class="cookie-prefs__desc">Meta Pixel și TikTok Pixel — măsurarea campaniilor.</span>
+          </label>
+        </div>
+
+        <div class="cookie-prefs__row">
+          <input id="cookie-cat-video" type="checkbox" />
+          <label for="cookie-cat-video">
+            <span class="cookie-prefs__name">Conținut video</span>
+            <span class="cookie-prefs__desc">Redarea clipurilor YouTube direct în pagină.</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <button id="cookie-save" type="button" class="cookie-btn cookie-btn--accept cookie-prefs__save">
+        Salvează preferințele
+      </button>
     </div>
   </div>
 </div>
 
 <script is:inline data-astro-rerun>
   (function () {
-    var STORAGE_KEY = 'cookie_consent'; // valori: 'granted' | 'denied'
     var banner = document.getElementById('cookie-banner');
+    var panel = document.getElementById('cookie-prefs-panel');
+    var btnToggle = document.getElementById('cookie-prefs-toggle');
     var btnAccept = document.getElementById('cookie-accept');
     var btnRefuse = document.getElementById('cookie-refuse');
+    var btnSave = document.getElementById('cookie-save');
+    var boxAnalytics = document.getElementById('cookie-cat-analytics');
+    var boxMarketing = document.getElementById('cookie-cat-marketing');
+    var boxVideo = document.getElementById('cookie-cat-video');
+
+    // FPConsent e definit în <head> (BaseLayout) înaintea oricărui container GTM.
+    var consentApi = window.FPConsent;
+    if (!banner || !consentApi) return;
 
     /** Deleagă pornirea GTM/GA4/Meta Pixel/TikTok Pixel către modulul comun,
         dar îl încarcă dinamic doar la nevoie pentru a nu rupe calea critică. */
@@ -61,7 +129,7 @@
 
       window.__fpTrackingLoader = new Promise(function (resolve, reject) {
         var script = document.createElement('script');
-        script.src = '/js/tracking-pixels.js?v=gtm-n44548rf';
+        script.src = '/js/tracking-pixels.js?v=consent-v2';
         script.async = true;
         script.onload = function () {
           if (window.FPTracking) resolve(window.FPTracking);
@@ -87,58 +155,93 @@
     }
 
     function hideBanner() {
-      if (banner) {
-        banner.hidden = true;
-        banner.setAttribute('aria-hidden', 'true');
-      }
+      banner.hidden = true;
+      banner.setAttribute('aria-hidden', 'true');
+      togglePanel(false);
+    }
+
+    function showBanner() {
+      banner.hidden = false;
+      banner.removeAttribute('hidden');
+      banner.removeAttribute('aria-hidden');
+    }
+
+    function togglePanel(open) {
+      if (!panel || !btnToggle) return;
+      panel.hidden = !open;
+      btnToggle.setAttribute('aria-expanded', String(open));
+    }
+
+    function syncBoxes() {
+      var stored = consentApi.read();
+      if (boxAnalytics) boxAnalytics.checked = !!(stored && stored.analytics);
+      if (boxMarketing) boxMarketing.checked = !!(stored && stored.marketing);
+      if (boxVideo) boxVideo.checked = consentApi.video();
+    }
+
+    /** Scrie preferințele, trimite `consent: update` și pornește doar ce s-a aprobat. */
+    function apply(prefs) {
+      consentApi.save(prefs);
+      hideBanner();
+      if (prefs.analytics || prefs.marketing) startTracking();
+      if (prefs.video) window.dispatchEvent(new CustomEvent('video:granted'));
     }
 
     // ── Verifică consimțământul existent la încărcarea paginii ──
-    var consent = null;
-    try {
-      consent = localStorage.getItem(STORAGE_KEY);
-    } catch (_) { /* localStorage indisponibil (ex. mod privat strict) */ }
+    var current = consentApi.read();
 
-    if (consent === 'granted') {
-      startTracking();
-    } else if (consent === 'denied') {
-      // consimțământ refuzat – nu se face nimic
+    if (current) {
+      if (current.analytics || current.marketing) startTracking();
     } else {
-      // Niciun consimțământ înregistrat – afișăm bannerul după ce fonturile
-      // sunt gata, altfel font-display:swap îi reflowa textul și genera CLS.
-      var showBanner = function () {
-        if (banner) {
-          banner.hidden = false;
-          banner.removeAttribute('hidden');
-        }
-      };
+      // Niciun răspuns înregistrat – afișăm bannerul după ce fonturile sunt gata,
+      // altfel font-display:swap îi reflowa textul și genera CLS.
+      syncBoxes();
+      var shown = false;
+      var showOnce = function () { if (!shown) { shown = true; showBanner(); } };
       if (document.fonts && document.fonts.ready) {
-        var shown = false;
-        var showOnce = function () { if (!shown) { shown = true; showBanner(); } };
         document.fonts.ready.then(showOnce);
         setTimeout(showOnce, 1500);
       } else {
-        showBanner();
+        showOnce();
       }
     }
 
     // ── Butoane ──
+    if (btnToggle) {
+      btnToggle.addEventListener('click', function () {
+        togglePanel(panel ? panel.hidden : false);
+      });
+    }
+
     if (btnAccept) {
       btnAccept.addEventListener('click', function () {
-        try { localStorage.setItem(STORAGE_KEY, 'granted'); } catch (_) {}
-        hideBanner();
-        startTracking();
-        // Notifică componentele YoutubeEmbed și altele care ascultă
-        window.dispatchEvent(new CustomEvent('cookie:granted'));
+        apply({ analytics: true, marketing: true, video: true });
       });
     }
 
     if (btnRefuse) {
       btnRefuse.addEventListener('click', function () {
-        try { localStorage.setItem(STORAGE_KEY, 'denied'); } catch (_) {}
-        hideBanner();
+        apply({ analytics: false, marketing: false, video: false });
       });
     }
+
+    if (btnSave) {
+      btnSave.addEventListener('click', function () {
+        apply({
+          analytics: !!(boxAnalytics && boxAnalytics.checked),
+          marketing: !!(boxMarketing && boxMarketing.checked),
+          video: !!(boxVideo && boxVideo.checked),
+        });
+      });
+    }
+
+    // ── Redeschidere din butonul „Preferințe" al Footer-ului (Art. 7(3) RGPD) ──
+    window.addEventListener('fp:open-consent', function () {
+      syncBoxes();
+      showBanner();
+      togglePanel(true);
+      if (btnToggle) btnToggle.focus();
+    });
   })();
 </script>
 
@@ -182,11 +285,13 @@
 
     .cookie-banner__actions {
       justify-content: stretch;
+      flex-wrap: wrap;
     }
 
     .cookie-banner__actions .cookie-btn {
-      flex: 1;
+      flex: 1 1 30%;
       text-align: center;
+      padding-inline: 0.5rem;
     }
   }
 
@@ -219,6 +324,84 @@
     flex-shrink: 0;
   }
 
+  /* Panoul de preferințe ocupă o linie proprie sub text + butoane. */
+  .cookie-prefs {
+    flex: 1 0 100%;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    padding-top: 0.65rem;
+    margin-top: 0.15rem;
+  }
+
+  .cookie-prefs[hidden] {
+    display: none;
+  }
+
+  .cookie-prefs__group {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  }
+
+  .cookie-prefs__legend {
+    padding: 0;
+    margin-bottom: 0.45rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .cookie-prefs__row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.45rem;
+  }
+
+  .cookie-prefs__row input {
+    margin-top: 0.15rem;
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    accent-color: #818cf8;
+    cursor: pointer;
+  }
+
+  .cookie-prefs__row--locked input {
+    cursor: not-allowed;
+    opacity: 0.65;
+  }
+
+  .cookie-prefs__row label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    cursor: pointer;
+    line-height: 1.3;
+  }
+
+  .cookie-prefs__row--locked label {
+    cursor: default;
+  }
+
+  .cookie-prefs__name {
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .cookie-prefs__desc {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  .cookie-prefs__save {
+    margin-top: 0.65rem;
+  }
+
   .cookie-btn {
     padding: 0.35rem 0.8rem;
     border-radius: 5px;
@@ -230,10 +413,28 @@
     white-space: nowrap;
   }
 
+  .cookie-btn:focus-visible {
+    outline: 2px solid #a5b4fc;
+    outline-offset: 2px;
+  }
+
+  .cookie-btn--ghost {
+    background: transparent;
+    border-color: rgba(255, 255, 255, 0.25);
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .cookie-btn--ghost:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+  }
+
   .cookie-btn--refuse {
     background: transparent;
     border-color: rgba(255, 255, 255, 0.25);
-    color: rgba(255, 255, 255, 0.75);
+    color: rgba(255, 255, 255, 0.85);
   }
 
   .cookie-btn--refuse:hover {

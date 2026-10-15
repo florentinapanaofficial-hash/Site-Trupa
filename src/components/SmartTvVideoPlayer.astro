@@ -95,9 +95,9 @@ const activePlayerId = `video-${initialVideo.id}`;
       }
       window.requestAnimationFrame(() => {
         let consentGranted = false;
-        try { consentGranted = localStorage.getItem('cookie_consent') === 'granted'; } catch (_) {}
+        try { consentGranted = localStorage.getItem('video_consent') === 'granted'; } catch (_) {}
         if (!consentGranted) return;
-        window.dispatchEvent(new CustomEvent('cookie:granted'));
+        window.dispatchEvent(new CustomEvent('video:granted'));
         const player = gallery.querySelector(`.smart-tv-player[data-player-id="${playerId}"]`);
         window.dispatchEvent(new CustomEvent('yt:play', { detail: { gate: player?.querySelector('.yt-gate') } }));
       });

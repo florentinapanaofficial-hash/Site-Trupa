@@ -110,7 +110,7 @@ const videoObjectsLd = {
 
       const isGranted = () => {
         try {
-          return localStorage.getItem('cookie_consent') === 'granted';
+          return localStorage.getItem('video_consent') === 'granted';
         } catch {
           return false;
         }
@@ -122,13 +122,13 @@ const videoObjectsLd = {
 
       consentBtn.addEventListener('click', () => {
         try {
-          localStorage.setItem('cookie_consent', 'granted');
+          localStorage.setItem('video_consent', 'granted');
         } catch {}
-        window.dispatchEvent(new CustomEvent('cookie:granted'));
+        window.dispatchEvent(new CustomEvent('video:granted'));
         syncVisibility();
       });
 
-      window.addEventListener('cookie:granted', syncVisibility, { signal: controller.signal });
+      window.addEventListener('video:granted', syncVisibility, { signal: controller.signal });
       document.addEventListener('astro:before-swap', () => controller.abort(), { once: true });
       syncVisibility();
     })();
