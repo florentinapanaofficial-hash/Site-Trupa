@@ -913,6 +913,18 @@ const shorts = rawShorts.map((s) => {
     -webkit-user-select: auto !important;
     user-select: auto !important;
   }
+
+  /* Plasă de siguranță independentă de JS: cât timp SDK-ul nu a injectat nimic
+     în container, zona afișează un mesaj în loc să rămână goală. */
+  #reels-comments .fb-comments:empty::after {
+    content: 'Comentariile nu s-au încărcat. Verifică dacă un blocant de reclame oprește Facebook.';
+    display: block;
+    padding: 1rem 0;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.72);
+    text-align: center;
+  }
 </style>
 
 
@@ -1298,9 +1310,21 @@ const shorts = rawShorts.map((s) => {
     let commentsWatchdog = 0;
     let commentsSettleTimer = 0;
 
+    const logComments = (...args: unknown[]) => console.info('[reels:comments]', ...args);
+
+    logComments('noduri', {
+      panel: !!commentsPanel,
+      gate: !!commentsGate,
+      widget: !!commentsWidget,
+      status: !!commentsStatus,
+      fallback: !!commentsFallback,
+      mount: !!fbMount,
+    });
+
     function showCommentsFallback() {
       if (commentsStatus) commentsStatus.hidden = true;
       if (commentsFallback) commentsFallback.hidden = false;
+      logComments('fallback afișat');
     }
 
     // Plugin-ul randează un <iframe> în .fb-comments; până apare, zona nu rămâne goală.
@@ -1308,19 +1332,38 @@ const shorts = rawShorts.map((s) => {
       window.clearTimeout(commentsWatchdog);
       const startedAt = Date.now();
       const tick = () => {
-        if (fbMount?.querySelector('iframe')) {
-          if (commentsStatus) commentsStatus.hidden = true;
-          if (commentsFallback) commentsFallback.hidden = true;
-          return;
+        try {
+          if (fbMount?.querySelector('iframe')) {
+            if (commentsStatus) commentsStatus.hidden = true;
+            if (commentsFallback) commentsFallback.hidden = true;
+            logComments('iframe randat');
+            return;
+          }
+          if (Date.now() - startedAt > 8000) {
+            logComments('8s fără iframe');
+            showCommentsFallback();
+            return;
+          }
+          commentsWatchdog = window.setTimeout(tick, 400);
+        } catch (err) {
+          logComments('watchdog a eșuat', err);
+          showCommentsFallback();
         }
-        if (Date.now() - startedAt > 8000) { showCommentsFallback(); return; }
-        commentsWatchdog = window.setTimeout(tick, 400);
       };
       tick();
     }
 
     function parseComments() {
-      if (window.FB?.XFBML?.parse) window.FB.XFBML.parse(commentsWidget ?? undefined);
+      try {
+        if (window.FB?.XFBML?.parse) {
+          logComments('FB.XFBML.parse()');
+          window.FB.XFBML.parse(commentsWidget ?? undefined);
+        } else {
+          logComments('FB.XFBML indisponibil la parsare');
+        }
+      } catch (err) {
+        logComments('parsarea a eșuat', err);
+      }
       watchCommentsRender();
     }
 
@@ -1335,46 +1378,72 @@ const shorts = rawShorts.map((s) => {
       if (fbSdkRequested) return;
       fbSdkRequested = true;
 
-      if (!document.getElementById('fb-root')) {
-        const root = document.createElement('div');
-        root.id = 'fb-root';
-        document.body.appendChild(root);
+      try {
+        if (!document.getElementById('fb-root')) {
+          const root = document.createElement('div');
+          root.id = 'fb-root';
+          document.body.appendChild(root);
+        }
+
+        // `load` pe script garantează doar descărcarea; `fbAsyncInit` e apelat de SDK
+        // abia după ce FB.XFBML există efectiv în memorie.
+        window.fbAsyncInit = () => {
+          try {
+            logComments('fbAsyncInit');
+            window.FB?.init?.({ xfbml: false, version: 'v21.0' });
+            parseCommentsAfterSlide();
+          } catch (err) {
+            logComments('fbAsyncInit a eșuat', err);
+            showCommentsFallback();
+          }
+        };
+
+        const tag = document.createElement('script');
+        tag.id = 'facebook-jssdk';
+        tag.src = 'https://connect.facebook.net/ro_RO/sdk.js';
+        tag.async = true;
+        tag.defer = true;
+        tag.crossOrigin = 'anonymous';
+        // Blocantele de reclame opresc cererea: afișăm imediat, fără să așteptăm watchdog-ul.
+        tag.addEventListener('error', () => {
+          logComments('SDK blocat sau indisponibil');
+          showCommentsFallback();
+        });
+        document.body.appendChild(tag);
+        logComments('SDK cerut');
+
+        watchCommentsRender();
+      } catch (err) {
+        logComments('injectarea SDK a eșuat', err);
+        showCommentsFallback();
       }
-
-      // `load` pe script garantează doar descărcarea; `fbAsyncInit` e apelat de SDK
-      // abia după ce FB.XFBML există efectiv în memorie.
-      window.fbAsyncInit = () => {
-        window.FB?.init?.({ xfbml: false, version: 'v21.0' });
-        parseCommentsAfterSlide();
-      };
-
-      const tag = document.createElement('script');
-      tag.id = 'facebook-jssdk';
-      tag.src = 'https://connect.facebook.net/ro_RO/sdk.js';
-      tag.async = true;
-      tag.defer = true;
-      tag.crossOrigin = 'anonymous';
-      tag.addEventListener('error', showCommentsFallback);
-      document.body.appendChild(tag);
-
-      watchCommentsRender();
     }
 
     function syncCommentsConsent() {
-      const granted = hasMarketingConsent();
-      if (commentsGate) commentsGate.hidden = granted;
-      if (commentsWidget) commentsWidget.hidden = !granted;
-      if (!granted) return;
-      if (commentsStatus) commentsStatus.hidden = false;
-      if (commentsFallback) commentsFallback.hidden = true;
-      if (fbSdkRequested) parseCommentsAfterSlide();
-      else loadFacebookSDK();
+      try {
+        const granted = hasMarketingConsent();
+        logComments('acord marketing', granted);
+        if (commentsGate) commentsGate.hidden = granted;
+        if (commentsWidget) commentsWidget.hidden = !granted;
+        if (!granted) return;
+        if (commentsStatus) commentsStatus.hidden = false;
+        if (commentsFallback) commentsFallback.hidden = true;
+        if (fbSdkRequested) parseCommentsAfterSlide();
+        else loadFacebookSDK();
+      } catch (err) {
+        logComments('sincronizarea stărilor a eșuat', err);
+        showCommentsFallback();
+      }
     }
 
     const commentsOpen = () => commentsPanel?.classList.contains('is-open') === true;
 
     function toggleComments(open: boolean) {
-      if (!commentsPanel) return;
+      if (!commentsPanel) {
+        logComments('panoul lipsește din DOM');
+        return;
+      }
+      logComments('toggle', open);
       window.clearTimeout(commentsSettleTimer);
       commentsPanel.classList.toggle('is-open', open);
       commentsPanel.setAttribute('aria-hidden', String(!open));
