@@ -8,7 +8,7 @@ export const CONTENT_SECURITY_POLICY = [
     "font-src 'self'",
     // GA4 rutează colectarea pe endpoint-uri regionale (region1..regionN) și, cu Google
     // Signals activ, face ping către ad.doubleclick.net — de aici wildcard-urile.
-    "connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://ad.doubleclick.net https://api.whatsapp.com https://*.supabase.co wss://*.supabase.co https://*.cloudflarestream.com https://videodelivery.net https://*.r2.dev https://www.facebook.com https://*.facebook.com https://analytics.tiktok.com https://business-api.tiktok.com https://media.florentinapanaofficial.ro https://www.google.com",
+    "connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://ad.doubleclick.net https://api.whatsapp.com https://*.supabase.co wss://*.supabase.co https://*.cloudflarestream.com https://videodelivery.net https://*.r2.dev https://www.facebook.com https://*.facebook.com https://connect.facebook.net https://analytics.tiktok.com https://business-api.tiktok.com https://media.florentinapanaofficial.ro https://www.google.com",
     // Comments Plugin randează iframe de pe www.facebook.com/plugins/comments.php;
     // SDK-ul se injectează doar după consimțământul de marketing.
     "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://ec.europa.eu https://*.cloudflarestream.com https://iframe.cloudflarestream.com https://www.facebook.com https://*.facebook.com",

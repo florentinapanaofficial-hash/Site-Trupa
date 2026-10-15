@@ -38,6 +38,17 @@
 - **`z-[60]` funcționează doar pentru că panoul rămâne în interiorul `.reels-overlay`** (z-index 1250, care creează contextul de stivuire și ridică totul peste site). Scos de acolo, 60 l-ar fi plasat sub overlay.
 - Validare: `npm test` **94/94**, build PASS, `seo:audit` 64 pagini **0 FAIL | 0 WARN**. Clickul efectiv în iframe rămâne neverificat local — widgetul nu randează pe localhost.
 
+### Refactor 2 — mecanismul de randare (panou gol)
+- **Simptom:** panoul culisa corect, dar corpul era gol — nici widget, nici poartă.
+- **Diagnostic:** cu acordul de marketing deja dat, `syncCommentsConsent()` ascundea corect poarta și afișa containerul widgetului — care rămânea gol pentru că SDK-ul nu randa nimic. Două cauze: `window.FB?.XFBML?.parse(...)` era apelat pe evenimentul `load` al scriptului, care garantează doar **descărcarea**, nu și inițializarea — optional chaining-ul înghițea tăcut apelul dacă `FB.XFBML` nu exista încă; iar parsarea pornea în același tick cu adăugarea clasei `is-open`, deci plugin-ul măsura containerul în timpul culisării.
+- **Modificări:** `window.fbAsyncInit` definit **înainte** de injectarea scriptului, cu `FB.init({ xfbml: false, version: 'v21.0' })` — singurul moment garantat în care `FB.XFBML` există. Scos `#xfbml=1` din URL (parsăm manual). Parsarea amânată `SHEET_SLIDE_MS = 300`, cât durează animația.
+- **Panoul nu mai poate fi gol:** `[data-comments-status]` („Se încarcă comentariile…") vizibil din start, plus `[data-comments-fallback]` cu link către pagina de Facebook. Un watchdog verifică la 400ms dacă a apărut `<iframe>` în `.fb-comments`; la 8s fără randare, sau pe `error` la încărcarea scriptului, comută pe fallback.
+- `.reels-comments-gate` primit `display: flex` + `min-height: 100%` + `text-align: center` — fără acord, mesajul și butonul sunt centrate în panou, nu lipite sus.
+- `.reels-comments-widget`: `display: flex; flex: 1 1 auto; width: 100%`; iframe-ul și `.fb-comments > span` forțate pe `width: 100%`, pentru că plugin-ul scrie lățimea inline.
+- `src/lib/csp.mjs`: `connect-src` += `https://connect.facebook.net` (SDK-ul face cereri către propriul domeniu după init).
+- Temporizatoarele noi oprite în `cleanup`. Testul actualizat pe `fbAsyncInit`, `FB.init` și prezența celor două stări vizuale.
+- Validare: `npm test` **94/94**, build PASS, `seo:audit` 64 pagini **0 FAIL | 0 WARN**.
+
 ### Riscuri / pași următori
 - **Plugin-ul nu va randa comentarii până când pagina nu e accesibilă public** — pe `localhost` widgetul rămâne gol. De validat după deploy, cu URL-ul rulat prin Sharing Debugger.
 - Un singur fir de comentarii pentru toate clipurile (`data-href` = `/shorts/`). Fire separate per clip ar cere URL-uri distincte și crawlabile — fragmentele `#id` sunt ignorate de Facebook.

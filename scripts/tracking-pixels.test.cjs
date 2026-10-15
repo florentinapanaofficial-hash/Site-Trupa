@@ -273,7 +273,15 @@ describe('GTM consent and dataLayer routing', () => {
 
         // SDK-ul nu are voie să apară în HTML-ul livrat — doar injectat din JS, după acord.
         expect(page).not.toMatch(/<script[^>]*connect\.facebook\.net/);
-        expect(page).toContain("tag.src = 'https://connect.facebook.net/ro_RO/sdk.js#xfbml=1&version=v21.0'");
+        expect(page).toContain("tag.src = 'https://connect.facebook.net/ro_RO/sdk.js'");
+
+        // Randarea așteaptă fbAsyncInit, nu doar `load` pe script.
+        expect(page).toContain('window.fbAsyncInit = () =>');
+        expect(page).toContain("window.FB?.init?.({ xfbml: false, version: 'v21.0' })");
+
+        // Fără acord sau fără randare, panoul afișează mereu ceva.
+        expect(page).toContain('data-comments-status');
+        expect(page).toContain('data-comments-fallback');
 
         // Poarta citește categoria `marketing`, nu acordul video.
         expect(page).toContain('function hasMarketingConsent');

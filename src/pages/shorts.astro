@@ -28,6 +28,7 @@ const DEFAULT_SONG = `${BRAND} · Moment live`;
 const WHATSAPP_HREF = `https://wa.me/${siteContent.contact.phoneRaw.replace('+', '')}?text=${encodeURIComponent(
   'Bună! Am văzut momentele video și aș dori o ofertă pentru evenimentul meu.'
 )}`;
+const FACEBOOK_PAGE = siteContent.socialLinks?.facebook ?? 'https://www.facebook.com/florentinapanaofficial/';
 
 // Număr de aprecieri pseudo-aleator, dar stabil per clip (nu se schimbă la refresh)
 function pseudoLikes(id: string): number {
@@ -276,6 +277,7 @@ const shorts = rawShorts.map((s) => {
           </div>
 
           <div class="reels-comments-widget" data-comments-widget hidden>
+            <p class="reels-comments-status" data-comments-status role="status">Se încarcă comentariile…</p>
             <div
               class="fb-comments"
               data-href={`${SITE_URL}/shorts/`}
@@ -283,6 +285,10 @@ const shorts = rawShorts.map((s) => {
               data-numposts="5"
               data-colorscheme="dark"
             ></div>
+            <p class="reels-comments-fallback" data-comments-fallback hidden>
+              Comentariile nu s-au putut încărca.
+              <a href={FACEBOOK_PAGE} target="_blank" rel="noopener noreferrer">Scrie-ne pe pagina de Facebook</a>.
+            </p>
           </div>
         </div>
       </div>
@@ -800,6 +806,14 @@ const shorts = rawShorts.map((s) => {
     padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem);
     color: #e4e6eb;
   }
+  .reels-comments-gate {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100%;
+    text-align: center;
+  }
+  .reels-comments-gate[hidden] { display: none; }
   .reels-comments-gate p {
     font-size: 0.92rem;
     line-height: 1.5;
@@ -822,8 +836,26 @@ const shorts = rawShorts.map((s) => {
     cursor: pointer;
   }
   .reels-comments-widget[hidden] { display: none; }
-  .reels-comments-widget, .reels-comments-widget .fb-comments { width: 100%; }
-  .reels-comments-widget iframe { max-width: 100%; }
+  .reels-comments-widget {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    flex: 1 1 auto;
+  }
+  .reels-comments-widget .fb-comments,
+  .reels-comments-widget .fb-comments > span,
+  .reels-comments-widget iframe { width: 100% !important; max-width: 100%; }
+  .reels-comments-status,
+  .reels-comments-fallback {
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.72);
+    margin: 0 0 0.75rem;
+    text-align: center;
+  }
+  .reels-comments-status[hidden],
+  .reels-comments-fallback[hidden] { display: none; }
+  .reels-comments-fallback a { color: #facc15; }
 
   @media (min-width: 1024px) {
     .reels-feed { max-width: 480px; margin: 0 auto; }
@@ -874,7 +906,11 @@ const shorts = rawShorts.map((s) => {
       YT?: any;
       onYouTubeIframeAPIReady?: () => void;
       Stream?: (el: HTMLIFrameElement) => any;
-      FB?: { XFBML?: { parse: (el?: HTMLElement) => void } };
+      FB?: {
+        init?: (options: { xfbml: boolean; version: string }) => void;
+        XFBML?: { parse: (el?: HTMLElement) => void };
+      };
+      fbAsyncInit?: () => void;
     }
   }
 
@@ -1227,7 +1263,46 @@ const shorts = rawShorts.map((s) => {
     const commentsPanel = document.getElementById('reels-comments');
     const commentsGate = commentsPanel?.querySelector<HTMLElement>('[data-comments-gate]') ?? null;
     const commentsWidget = commentsPanel?.querySelector<HTMLElement>('[data-comments-widget]') ?? null;
+    const commentsStatus = commentsPanel?.querySelector<HTMLElement>('[data-comments-status]') ?? null;
+    const commentsFallback = commentsPanel?.querySelector<HTMLElement>('[data-comments-fallback]') ?? null;
+    const fbMount = commentsPanel?.querySelector<HTMLElement>('.fb-comments') ?? null;
+    const SHEET_SLIDE_MS = 300;
     let fbSdkRequested = false;
+    let commentsParseTimer = 0;
+    let commentsWatchdog = 0;
+
+    function showCommentsFallback() {
+      if (commentsStatus) commentsStatus.hidden = true;
+      if (commentsFallback) commentsFallback.hidden = false;
+    }
+
+    // Plugin-ul randează un <iframe> în .fb-comments; până apare, zona nu rămâne goală.
+    function watchCommentsRender() {
+      window.clearTimeout(commentsWatchdog);
+      const startedAt = Date.now();
+      const tick = () => {
+        if (fbMount?.querySelector('iframe')) {
+          if (commentsStatus) commentsStatus.hidden = true;
+          if (commentsFallback) commentsFallback.hidden = true;
+          return;
+        }
+        if (Date.now() - startedAt > 8000) { showCommentsFallback(); return; }
+        commentsWatchdog = window.setTimeout(tick, 400);
+      };
+      tick();
+    }
+
+    function parseComments() {
+      if (window.FB?.XFBML?.parse) window.FB.XFBML.parse(commentsWidget ?? undefined);
+      watchCommentsRender();
+    }
+
+    // Parsarea se amână până după culisarea panoului: altfel plugin-ul măsoară
+    // containerul în timp ce e încă translatat și randează la lățime greșită.
+    function parseCommentsAfterSlide() {
+      window.clearTimeout(commentsParseTimer);
+      commentsParseTimer = window.setTimeout(parseComments, SHEET_SLIDE_MS);
+    }
 
     function loadFacebookSDK() {
       if (fbSdkRequested) return;
@@ -1239,16 +1314,23 @@ const shorts = rawShorts.map((s) => {
         document.body.appendChild(root);
       }
 
+      // `load` pe script garantează doar descărcarea; `fbAsyncInit` e apelat de SDK
+      // abia după ce FB.XFBML există efectiv în memorie.
+      window.fbAsyncInit = () => {
+        window.FB?.init?.({ xfbml: false, version: 'v21.0' });
+        parseCommentsAfterSlide();
+      };
+
       const tag = document.createElement('script');
       tag.id = 'facebook-jssdk';
-      tag.src = 'https://connect.facebook.net/ro_RO/sdk.js#xfbml=1&version=v21.0';
+      tag.src = 'https://connect.facebook.net/ro_RO/sdk.js';
       tag.async = true;
       tag.defer = true;
       tag.crossOrigin = 'anonymous';
-      tag.addEventListener('load', () => {
-        window.FB?.XFBML?.parse(commentsWidget ?? undefined);
-      });
+      tag.addEventListener('error', showCommentsFallback);
       document.body.appendChild(tag);
+
+      watchCommentsRender();
     }
 
     function syncCommentsConsent() {
@@ -1256,7 +1338,9 @@ const shorts = rawShorts.map((s) => {
       if (commentsGate) commentsGate.hidden = granted;
       if (commentsWidget) commentsWidget.hidden = !granted;
       if (!granted) return;
-      if (fbSdkRequested) window.FB?.XFBML?.parse(commentsWidget ?? undefined);
+      if (commentsStatus) commentsStatus.hidden = false;
+      if (commentsFallback) commentsFallback.hidden = true;
+      if (fbSdkRequested) parseCommentsAfterSlide();
       else loadFacebookSDK();
     }
 
@@ -1458,6 +1542,8 @@ const shorts = rawShorts.map((s) => {
       window.clearTimeout(initialPlaybackTimer);
       window.clearTimeout(tapTimer);
       window.clearTimeout(toastTimer);
+      window.clearTimeout(commentsParseTimer);
+      window.clearTimeout(commentsWatchdog);
       consentAbort.abort();
       preloadObserver?.disconnect();
       io.disconnect();
