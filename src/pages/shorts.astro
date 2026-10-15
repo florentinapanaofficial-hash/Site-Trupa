@@ -731,8 +731,9 @@ const shorts = rawShorts.map((s) => {
     inset: 0;
     z-index: 60;
     visibility: hidden;
+    pointer-events: none;
   }
-  .reels-comments.is-open { visibility: visible; }
+  .reels-comments.is-open { visibility: visible; pointer-events: auto; }
 
   .reels-comments-backdrop {
     position: absolute;
@@ -762,6 +763,18 @@ const shorts = rawShorts.map((s) => {
     transition: transform 0.3s ease-out;
   }
   .reels-comments.is-open .reels-comments-sheet { transform: translateY(0); }
+  /* iOS Safari ratează hit-testul pe un iframe aflat într-un strat transformat:
+     după culisare ștergem transformul, altfel tap-ul în căsuța Meta nu ajunge. */
+  .reels-comments.is-settled .reels-comments-sheet { transform: none; transition: none; }
+
+  /* Zona interactivă nu moștenește restricțiile de gest ale feedului. */
+  .reels-comments-sheet,
+  .reels-comments-body {
+    pointer-events: auto;
+    touch-action: auto;
+    -webkit-user-select: auto;
+    user-select: auto;
+  }
 
   .reels-comments-head {
     flex: 0 0 auto;
@@ -844,7 +857,7 @@ const shorts = rawShorts.map((s) => {
   }
   .reels-comments-widget .fb-comments,
   .reels-comments-widget .fb-comments > span,
-  .reels-comments-widget iframe { width: 100% !important; max-width: 100%; }
+  .reels-comments-widget iframe { max-width: 100%; }
   .reels-comments-status,
   .reels-comments-fallback {
     font-size: 0.88rem;
@@ -886,6 +899,19 @@ const shorts = rawShorts.map((s) => {
   }
   body:has(#reels-overlay) {
     overflow: hidden;
+  }
+
+  /* Conținutul injectat de SDK-ul Meta nu poartă atributul de scope Astro,
+     deci regulile pentru el trebuie să fie globale, limitate la panou. */
+  #reels-comments .fb-comments,
+  #reels-comments .fb-comments > span,
+  #reels-comments iframe {
+    width: 100% !important;
+    max-width: 100%;
+    pointer-events: auto !important;
+    touch-action: auto !important;
+    -webkit-user-select: auto !important;
+    user-select: auto !important;
   }
 </style>
 
@@ -1270,6 +1296,7 @@ const shorts = rawShorts.map((s) => {
     let fbSdkRequested = false;
     let commentsParseTimer = 0;
     let commentsWatchdog = 0;
+    let commentsSettleTimer = 0;
 
     function showCommentsFallback() {
       if (commentsStatus) commentsStatus.hidden = true;
@@ -1348,12 +1375,50 @@ const shorts = rawShorts.map((s) => {
 
     function toggleComments(open: boolean) {
       if (!commentsPanel) return;
+      window.clearTimeout(commentsSettleTimer);
       commentsPanel.classList.toggle('is-open', open);
       commentsPanel.setAttribute('aria-hidden', String(!open));
-      if (!open) return;
+
+      if (!open) {
+        commentsPanel.classList.remove('is-settled');
+        return;
+      }
+
       syncCommentsConsent();
-      commentsPanel.querySelector<HTMLElement>('[data-comments-close]')?.focus();
+      commentsSettleTimer = window.setTimeout(
+        () => commentsPanel.classList.add('is-settled'),
+        SHEET_SLIDE_MS + 50,
+      );
+      // Focus doar pe poartă; când widgetul e activ, focusul aparține iframe-ului Meta.
+      if (commentsGate && !commentsGate.hidden) {
+        commentsPanel.querySelector<HTMLElement>('[data-open-consent]')?.focus({ preventScroll: true });
+      }
     }
+
+    // Gesturile din foaie nu ajung la feedul cu scroll-snap și nici la plasa de
+    // siguranță care repornește playerul. Interiorul iframe-ului Meta e cross-origin,
+    // deci nu propagă nimic — izolarea privește doar elementele proprii ale foii.
+    const commentsSheet = commentsPanel?.querySelector<HTMLElement>('.reels-comments-sheet') ?? null;
+
+    (['pointerdown', 'touchstart'] as const).forEach((evt) => {
+      commentsSheet?.addEventListener(evt, (ev) => ev.stopPropagation(), {
+        passive: true,
+        signal: consentAbort.signal,
+      });
+    });
+
+    commentsSheet?.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      const target = ev.target as HTMLElement;
+      if (target.closest('[data-comments-close]')) {
+        toggleComments(false);
+        return;
+      }
+      if (target.closest('[data-open-consent]')) {
+        toggleComments(false);
+        window.dispatchEvent(new CustomEvent('fp:open-consent'));
+      }
+    }, { signal: consentAbort.signal });
 
     // Acordul dat din bannerul granular activează widgetul fără reîncărcare.
     window.addEventListener('fp:consent-updated', () => {
@@ -1375,18 +1440,12 @@ const shorts = rawShorts.map((s) => {
         return;
       }
 
-      if (target.closest<HTMLElement>('[data-open-consent]')) {
-        toggleComments(false);
-        window.dispatchEvent(new CustomEvent('fp:open-consent'));
-        return;
-      }
-
       if (target.closest<HTMLElement>('[data-comments-btn]')) {
         toggleComments(true);
         return;
       }
 
-      if (target.closest<HTMLElement>('[data-comments-close]') || target.closest<HTMLElement>('[data-comments-backdrop]')) {
+      if (target.closest<HTMLElement>('[data-comments-backdrop]')) {
         toggleComments(false);
         return;
       }
@@ -1544,6 +1603,7 @@ const shorts = rawShorts.map((s) => {
       window.clearTimeout(toastTimer);
       window.clearTimeout(commentsParseTimer);
       window.clearTimeout(commentsWatchdog);
+      window.clearTimeout(commentsSettleTimer);
       consentAbort.abort();
       preloadObserver?.disconnect();
       io.disconnect();

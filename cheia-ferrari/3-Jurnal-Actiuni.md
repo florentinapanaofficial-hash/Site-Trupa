@@ -49,6 +49,17 @@
 - Temporizatoarele noi oprite în `cleanup`. Testul actualizat pe `fbAsyncInit`, `FB.init` și prezența celor două stări vizuale.
 - Validare: `npm test` **94/94**, build PASS, `seo:audit` 64 pagini **0 FAIL | 0 WARN**.
 
+### Refactor 3 — tastarea în căsuța Meta pe mobil
+- **Simptom:** widgetul randează, dar tastatura nu se deschide la tap în căsuța de comentarii.
+- **Corecție de premisă:** căsuța trăiește într-un **iframe cross-origin**; evenimentele din interiorul lui nu traversează frontiera de frame. `stopPropagation()` în pagina părinte nu le poate influența, iar `user-select` moștenit nu afectează conținutul iframe-ului. Cauza trebuia căutată în ce blochează iframe-ul din afară.
+- **Cauza principală: transformul rămas pe foaie.** `.reels-comments-sheet` păstra `transform: translateY(0)` după animație, deci stătea permanent într-un strat compozitat. iOS Safari ratează hit-testul pe un iframe aflat într-un strat transformat — vizual apare corect, dar tapul nu ajunge. Adăugată clasa `is-settled` după `SHEET_SLIDE_MS + 50`, care pune `transform: none`.
+- **A doua cauză: regulile scoped nu ajungeau la conținutul Meta.** `.reels-comments-widget iframe { ... }` se compilează de Astro în `iframe[data-astro-cid-…]`, iar iframe-ul injectat de SDK nu are acel atribut — regula nu se aplica niciodată. Mutate în blocul `is:global`, limitate la `#reels-comments`, cu `pointer-events`, `touch-action` și `user-select` pe `auto !important`.
+- **Izolare de evenimente:** `pointerdown`/`touchstart` pe foaie opresc propagarea (pasiv), ca plasa de siguranță `unlockActivePlayback` de pe overlay să nu repornească playerul YouTube la tap în panou — `playVideo()` putea fura focusul către iframe-ul YouTube.
+- Pentru că `click` e acum oprit la foaie, butoanele de închidere și de consimțământ au primit **handler direct pe foaie**, nu prin delegare pe overlay; delegarea păstrează doar butonul de deschidere și backdrop-ul.
+- **Fără focus trap.** Focusul se mută programatic doar pe butonul porții, și doar când poarta e vizibilă (`preventScroll: true`). Când widgetul e activ, pagina nu atinge focusul — ar fi fost exact mecanismul care închide tastatura.
+- `.reels-comments` primit `pointer-events: none` în starea închisă și `auto` pe `.is-open`; foaia și corpul au `touch-action: auto` și `user-select: auto` explicit.
+- Validare: `npm test` **94/94**, build PASS, `seo:audit` 64 pagini **0 FAIL | 0 WARN**. Tastarea efectivă rămâne neverificată local.
+
 ### Riscuri / pași următori
 - **Plugin-ul nu va randa comentarii până când pagina nu e accesibilă public** — pe `localhost` widgetul rămâne gol. De validat după deploy, cu URL-ul rulat prin Sharing Debugger.
 - Un singur fir de comentarii pentru toate clipurile (`data-href` = `/shorts/`). Fire separate per clip ar cere URL-uri distincte și crawlabile — fragmentele `#id` sunt ignorate de Facebook.
