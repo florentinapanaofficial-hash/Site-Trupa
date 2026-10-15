@@ -224,7 +224,8 @@ const shorts = rawShorts.map((s) => {
               <span class="reel-action-label">Distribuie</span>
             </button>
 
-            <button class="reel-action" data-mute-btn aria-label="Activează sau dezactivează sunetul">
+            <button class="reel-action relative animate-pulse motion-reduce:animate-none" data-mute-btn aria-label="Activează sunetul" aria-pressed="true">
+              <span class="reel-unmute-hint absolute right-full mr-2 text-xs text-white/90 bg-black/50 px-2 py-1 rounded-full whitespace-nowrap">Apasă pentru sunet</span>
               <span class="reel-action-icon">
                 <svg class="reel-icon-muted" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M11 5L6 9H2v6h4l5 4V5z" />
@@ -600,6 +601,7 @@ const shorts = rawShorts.map((s) => {
   .reel-icon-sound { display: none; }
   .reels-overlay[data-muted="false"] .reel-icon-muted { display: none; }
   .reels-overlay[data-muted="false"] .reel-icon-sound { display: inline; }
+  .reels-overlay[data-muted="false"] .reel-unmute-hint { display: none; }
 
   /* ═══ CTA fix jos: WhatsApp ═══ */
   .reels-wa {
@@ -726,6 +728,8 @@ const shorts = rawShorts.map((s) => {
     mute: () => void;
     unMute: () => void;
     setVolume: (v: number) => void;
+    isMuted: () => boolean;
+    getVolume: () => number;
     setPlaybackQuality?: (quality: string) => void;
   };
 
@@ -743,6 +747,7 @@ const shorts = rawShorts.map((s) => {
     pause: () => void;
     reset: () => void;
     setMuted: (m: boolean) => void;
+    isMuted: () => boolean;
   };
 
   // Sursa de adevăr e window.FPConsent (BaseLayout). Cheia `video_consent` e izolată
@@ -869,6 +874,7 @@ const shorts = rawShorts.map((s) => {
                 pause: () => yt.pauseVideo(),
                 reset: () => yt.seekTo(0, true),
                 setMuted: (m: boolean) => { if (m) yt.mute(); else { yt.unMute(); yt.setVolume(100); } },
+                isMuted: () => yt.isMuted() || yt.getVolume() === 0,
               };
               players.set(index, ctl);
               ready.add(index);
@@ -889,6 +895,7 @@ const shorts = rawShorts.map((s) => {
               if (e.data === window.YT.PlayerState.PLAYING) {
                 enforceHDPlayback(e.target);
                 card.classList.add('is-playing');
+                if (index === activeIndex) syncMuteState();
               } else if (e.data === window.YT.PlayerState.PAUSED || e.data === window.YT.PlayerState.CUED) {
                 card.classList.remove('is-playing');
               }
@@ -935,7 +942,8 @@ const shorts = rawShorts.map((s) => {
           play: () => { const pr = cf.play(); if (pr && typeof pr.catch === 'function') pr.catch(() => {}); },
           pause: () => cf.pause(),
           reset: () => { try { cf.currentTime = 0; } catch { /* noop */ } },
-          setMuted: (m: boolean) => { cf.muted = m; },
+          setMuted: (m: boolean) => { cf.muted = m; if (!m && cf.volume === 0) cf.volume = 1; },
+          isMuted: () => cf.muted || cf.volume === 0,
         };
         players.set(index, ctl);
         ready.add(index);
@@ -1005,10 +1013,34 @@ const shorts = rawShorts.map((s) => {
     feed.addEventListener('scrollend', onScrollSettled, { passive: true });
 
     /* ─── Sunet global (Mute / Unmute) ─── */
-    function applyMuteState() {
+    function renderMuteState() {
       overlay!.dataset.muted = String(isMuted);
-      players.forEach((p) => p.setMuted(isMuted));
+      overlay!.querySelectorAll<HTMLElement>('[data-mute-btn]').forEach((button) => {
+        button.classList.toggle('animate-pulse', isMuted);
+        button.setAttribute('aria-pressed', String(isMuted));
+        button.setAttribute('aria-label', isMuted ? 'Activează sunetul' : 'Dezactivează sunetul');
+      });
+      cards.forEach((card) => {
+        card.querySelector('[data-tap]')?.setAttribute('aria-label', isMuted ? 'Activează sunetul' : 'Redă sau pune pauză');
+      });
     }
+
+    function applyMuteState() {
+      players.forEach((p) => p.setMuted(isMuted));
+      renderMuteState();
+    }
+
+    function syncMuteState() {
+      const player = players.get(activeIndex);
+      if (!player) return;
+      const muted = player.isMuted();
+      if (muted === isMuted) return;
+      isMuted = muted;
+      renderMuteState();
+    }
+
+    renderMuteState();
+    const muteSyncTimer = window.setInterval(syncMuteState, 250);
 
     /* ─── Like: persistență în localStorage, fără login ─── */
     const likeKey = (id: string) => `liked_shorts_${id}`;
@@ -1095,6 +1127,7 @@ const shorts = rawShorts.map((s) => {
 
       const muteBtn = target.closest<HTMLElement>('[data-mute-btn]');
       if (muteBtn) {
+        syncMuteState();
         isMuted = !isMuted;
         applyMuteState();
         return;
@@ -1114,6 +1147,14 @@ const shorts = rawShorts.map((s) => {
       const tapLayer = card.querySelector<HTMLElement>('[data-tap]');
       if (!tapLayer) return;
       tapLayer.addEventListener('click', () => {
+        const player = players.get(Number(card.dataset.index));
+        if (isMuted || player?.isMuted()) {
+          window.clearTimeout(tapTimer);
+          lastTap = 0;
+          isMuted = false;
+          applyMuteState();
+          return;
+        }
         const now = Date.now();
         if (now - lastTap < 280) {
           // DOUBLE TAP → like + inimă
@@ -1231,6 +1272,7 @@ const shorts = rawShorts.map((s) => {
       window.clearTimeout(initialPlaybackTimer);
       window.clearTimeout(tapTimer);
       window.clearTimeout(toastTimer);
+      window.clearInterval(muteSyncTimer);
       consentAbort.abort();
       preloadObserver?.disconnect();
       io.disconnect();

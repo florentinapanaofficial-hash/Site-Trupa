@@ -1,3 +1,28 @@
+## 📝 15 oct 2026 — Shorts: primul tap activează sunetul
+
+### Obiectiv
+- Primul tap pe video activează exclusiv sunetul; Play/Pause funcționează după unmute.
+
+### Modificări
+- `src/pages/shorts.astro`: verificare mute/volum zero înainte de single/double-tap, anularea timerului de pauză și resetarea double-tap la unmute. Butoanele laterale rămân independente.
+- Puls pe butonul de volum doar la mute, cu respectarea mișcării reduse; badge „Apasă pentru sunet” legat de `data-muted` global și etichete accesibile sincronizate.
+- Citire mute/volum efectiv din adaptoarele YouTube/Cloudflare, sincronizare la redare YouTube și la 250 ms pentru playerul activ; interval curățat la ieșire. Unmute restaurează volumul zero.
+- `scripts/shorts.test.cjs`: 7 teste, inclusiv gardă pentru cleanup. Trackerul SEO actualizat.
+- Revizia înainte de commit: `clearInterval(muteSyncTimer)` mutat din `showToast()` în `cleanup()`, pentru ca distribuirea să nu oprească sincronizarea sunetului.
+
+### Validări
+- `npx astro check`: 98 fișiere, 0 erori / avertismente / hints; `get_errors` fără erori.
+- Teste focalizate 7/7; `npm test`: 101/101 PASS.
+- `npm run seo:check`: build PASS, **64 pagini, 0 FAIL | 0 WARN**.
+- Metadata Shorts neschimbate: title 54, description 144 caractere. Fără imagini, linkuri sau schema modificate.
+- Ruta locală `/shorts/`: HTTP 200, stare inițială muted.
+
+### Riscuri / pași următori
+- API-urile sunt simulate în teste; sunetul efectiv și politicile autoplay necesită verificare pe dispozitive reale, în special iOS Safari.
+- Commit și push pe `main` solicitate de Claudiu pentru testarea live pe telefon; deploy-ul și sunetul efectiv rămân de confirmat.
+
+---
+
 ## 📝 15 oct 2026 — Reels: Facebook Comments Plugin eliminat (dezafectat de Meta)
 
 ### Obiectiv
