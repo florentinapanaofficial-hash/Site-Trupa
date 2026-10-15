@@ -268,42 +268,20 @@ describe('GTM consent and dataLayer routing', () => {
         expect(banner).toContain("window.addEventListener('fp:open-consent'");
     });
 
-    test('loads the Facebook comments SDK only behind marketing consent', () => {
+    test('keeps the discontinued Facebook comments plugin out of the Reels page', () => {
+        // Meta a oprit Comments Plugin pe 10 feb. 2026; SDK-ul degradează la un
+        // iframe către www.facebook.com, respins de X-Frame-Options: deny.
         const page = fs.readFileSync(path.join(__dirname, '../src/pages/shorts.astro'), 'utf8');
+        expect(page).not.toContain('connect.facebook.net');
+        expect(page).not.toContain('fb-comments');
+        expect(page).not.toContain('fbAsyncInit');
+        expect(page).not.toContain('XFBML');
 
-        // SDK-ul nu are voie să apară în HTML-ul livrat — doar injectat din JS, după acord.
-        expect(page).not.toMatch(/<script[^>]*connect\.facebook\.net/);
-        expect(page).toContain("tag.src = 'https://connect.facebook.net/ro_RO/sdk.js'");
-
-        // Randarea așteaptă fbAsyncInit, nu doar `load` pe script.
-        expect(page).toContain('window.fbAsyncInit = () =>');
-        expect(page).toContain("window.FB?.init?.({ xfbml: false, version: 'v21.0' })");
-
-        // Fără acord sau fără randare, panoul afișează mereu ceva.
-        expect(page).toContain('data-comments-status');
-        expect(page).toContain('data-comments-fallback');
-
-        // Poarta citește categoria `marketing`, nu acordul video.
-        expect(page).toContain('function hasMarketingConsent');
-        expect(page).toContain('api.read()?.marketing === true');
-
-        const sync = page.indexOf('function syncCommentsConsent');
-        const guard = page.indexOf('if (!granted) return;', sync);
-        const load = page.indexOf('else loadFacebookSDK();', sync);
-        expect(sync).toBeGreaterThan(-1);
-        expect(guard).toBeGreaterThan(-1);
-        expect(guard).toBeLessThan(load);
-
-        // Fallback-ul redeschide bannerul granular in loc să scrie singur acordul.
-        expect(page).toContain('data-open-consent');
-        expect(page).toContain("CustomEvent('fp:open-consent')");
-        expect(page).not.toMatch(/setItem\(\s*['"]fp_consent['"]/);
-
-        const banner = fs.readFileSync(path.join(__dirname, '../src/components/CookieBanner.astro'), 'utf8');
-        expect(banner).toContain("CustomEvent('fp:consent-updated'");
+        // Fără SDK terț, pagina nu are nevoie de acord de marketing.
+        expect(page).not.toContain('hasMarketingConsent');
 
         const csp = fs.readFileSync(path.join(__dirname, '../src/lib/csp.mjs'), 'utf8');
         const frameSrc = csp.split('\n').find((line) => line.includes('frame-src'));
-        expect(frameSrc).toContain('https://www.facebook.com');
+        expect(frameSrc).not.toContain('facebook.com');
     });
 });

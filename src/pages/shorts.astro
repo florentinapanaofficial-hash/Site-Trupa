@@ -198,14 +198,20 @@ const shorts = rawShorts.map((s) => {
               <span class="reel-action-count" data-like-count>{short.likesCount.toLocaleString('ro-RO')}</span>
             </button>
 
-            <button class="reel-action" data-comments-btn aria-label="Deschide comentariile" aria-haspopup="dialog" aria-controls="reels-comments">
+            <a
+              class="reel-action"
+              href={FACEBOOK_PAGE}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Comentăm pe pagina de Facebook"
+            >
               <span class="reel-action-icon">
                 <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M21 11.5a8.4 8.4 0 01-9 8.4 9 9 0 01-4.2-1L3 20l1.2-4.2A8.4 8.4 0 1121 11.5z" />
                 </svg>
               </span>
-              <span class="reel-action-label">Comentarii</span>
-            </button>
+              <span class="reel-action-label">Comentează</span>
+            </a>
 
             <button class="reel-action" data-share-btn data-url={`${SITE_URL}/shorts/#${short.id}`} aria-label="Distribuie">
               <span class="reel-action-icon">
@@ -248,49 +254,6 @@ const shorts = rawShorts.map((s) => {
           Activează și redă
         </button>
         <a class="reels-consent-link" href="/politica-cookie/">Politica de cookie-uri</a>
-      </div>
-    </div>
-
-    {/* ─── Panou comentarii Meta (gat pe categoria `marketing`) ─── */}
-    <div class="reels-comments" id="reels-comments" aria-hidden="true">
-      <div class="reels-comments-backdrop" data-comments-backdrop></div>
-      <div class="reels-comments-sheet" role="dialog" aria-modal="true" aria-labelledby="reels-comments-title">
-        <header class="reels-comments-head">
-          <h2 id="reels-comments-title">Comentarii</h2>
-          <button type="button" class="reels-comments-close" data-comments-close aria-label="Închide comentariile">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
-            </svg>
-          </button>
-        </header>
-
-        <div class="reels-comments-body">
-          <div class="reels-comments-gate" data-comments-gate>
-            <p>Pentru a vedea și lăsa comentarii, avem nevoie de acordul tău.</p>
-            <p class="reels-comments-note">
-              Comentariile sunt afișate prin Facebook, care poate stoca informații pe dispozitivul
-              tău. Se activează odată cu categoria „Marketing”.
-            </p>
-            <button type="button" class="reels-comments-accept" data-open-consent>
-              Deschide preferințele de cookie-uri
-            </button>
-          </div>
-
-          <div class="reels-comments-widget" data-comments-widget hidden>
-            <p class="reels-comments-status" data-comments-status role="status">Se încarcă comentariile…</p>
-            <div
-              class="fb-comments"
-              data-href={`${SITE_URL}/shorts/`}
-              data-width="100%"
-              data-numposts="5"
-              data-colorscheme="dark"
-            ></div>
-            <p class="reels-comments-fallback" data-comments-fallback hidden>
-              Comentariile nu s-au putut încărca.
-              <a href={FACEBOOK_PAGE} target="_blank" rel="noopener noreferrer">Scrie-ne pe pagina de Facebook</a>.
-            </p>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -723,153 +686,6 @@ const shorts = rawShorts.map((s) => {
     outline-offset: 3px;
   }
 
-  /* ═══ Panou comentarii Meta — bottom sheet ═══ */
-  /* `position: fixed` ca iframe-ul Facebook să nu fie tăiat de `overflow: hidden`
-     al overlay-ului. Overlay-ul (z-index 1250) e cel care ridică tot peste site. */
-  .reels-comments {
-    position: fixed;
-    inset: 0;
-    z-index: 60;
-    visibility: hidden;
-    pointer-events: none;
-  }
-  .reels-comments.is-open { visibility: visible; pointer-events: auto; }
-
-  .reels-comments-backdrop {
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.6);
-    opacity: 0;
-    transition: opacity 0.3s ease-out;
-  }
-  .reels-comments.is-open .reels-comments-backdrop { opacity: 1; }
-
-  .reels-comments-sheet {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    max-width: 480px;
-    margin: 0 auto;
-    height: 75vh;
-    height: 75svh;
-    border-radius: 1rem 1rem 0 0;
-    background: #242526;
-    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.6);
-    transform: translateY(100%);
-    transition: transform 0.3s ease-out;
-  }
-  .reels-comments.is-open .reels-comments-sheet { transform: translateY(0); }
-  /* iOS Safari ratează hit-testul pe un iframe aflat într-un strat transformat:
-     după culisare ștergem transformul, altfel tap-ul în căsuța Meta nu ajunge. */
-  .reels-comments.is-settled .reels-comments-sheet { transform: none; transition: none; }
-
-  /* Zona interactivă nu moștenește restricțiile de gest ale feedului. */
-  .reels-comments-sheet,
-  .reels-comments-body {
-    pointer-events: auto;
-    touch-action: auto;
-    -webkit-user-select: auto;
-    user-select: auto;
-  }
-
-  .reels-comments-head {
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.9rem 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  .reels-comments-head h2 {
-    font-family: 'Oswald', sans-serif;
-    font-size: 1.05rem;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    color: #facc15;
-    margin: 0;
-  }
-  .reels-comments-close {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border: 0;
-    border-radius: 9999px;
-    background: rgba(255, 255, 255, 0.1);
-    color: #e4e6eb;
-    cursor: pointer;
-  }
-  .reels-comments-close:hover { background: rgba(255, 255, 255, 0.18); }
-
-  /* Zona scrollabilă: aici trăiește iframe-ul Facebook, deci are nevoie de
-     înălțime proprie și de evenimente de pointer neblocate. */
-  .reels-comments-body {
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
-    pointer-events: auto;
-    padding: 1rem;
-    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem);
-    color: #e4e6eb;
-  }
-  .reels-comments-gate {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-height: 100%;
-    text-align: center;
-  }
-  .reels-comments-gate[hidden] { display: none; }
-  .reels-comments-gate p {
-    font-size: 0.92rem;
-    line-height: 1.5;
-    margin: 0 0 0.75rem;
-  }
-  .reels-comments-note { color: rgba(255, 255, 255, 0.72); font-size: 0.82rem !important; }
-  .reels-comments-accept {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    min-height: 48px;
-    margin-top: 0.5rem;
-    border: 0;
-    border-radius: 9999px;
-    background: #facc15;
-    color: #020617;
-    font-size: 0.92rem;
-    font-weight: 700;
-    cursor: pointer;
-  }
-  .reels-comments-widget[hidden] { display: none; }
-  .reels-comments-widget {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    flex: 1 1 auto;
-  }
-  .reels-comments-widget .fb-comments,
-  .reels-comments-widget .fb-comments > span,
-  .reels-comments-widget iframe { max-width: 100%; }
-  .reels-comments-status,
-  .reels-comments-fallback {
-    font-size: 0.88rem;
-    line-height: 1.5;
-    color: rgba(255, 255, 255, 0.72);
-    margin: 0 0 0.75rem;
-    text-align: center;
-  }
-  .reels-comments-status[hidden],
-  .reels-comments-fallback[hidden] { display: none; }
-  .reels-comments-fallback a { color: #facc15; }
-
   @media (min-width: 1024px) {
     .reels-feed { max-width: 480px; margin: 0 auto; }
   }
@@ -878,7 +694,6 @@ const shorts = rawShorts.map((s) => {
     .reel-song-marquee span { animation: none; }
     .reel-heart-burst.is-active { animation-duration: 0.5s; }
     .reels-wa-btn { transition: none; }
-    .reels-comments-sheet, .reels-comments-backdrop { transition: none; }
   }
 </style>
 
@@ -900,31 +715,6 @@ const shorts = rawShorts.map((s) => {
   body:has(#reels-overlay) {
     overflow: hidden;
   }
-
-  /* Conținutul injectat de SDK-ul Meta nu poartă atributul de scope Astro,
-     deci regulile pentru el trebuie să fie globale, limitate la panou. */
-  #reels-comments .fb-comments,
-  #reels-comments .fb-comments > span,
-  #reels-comments iframe {
-    width: 100% !important;
-    max-width: 100%;
-    pointer-events: auto !important;
-    touch-action: auto !important;
-    -webkit-user-select: auto !important;
-    user-select: auto !important;
-  }
-
-  /* Plasă de siguranță independentă de JS: cât timp SDK-ul nu a injectat nimic
-     în container, zona afișează un mesaj în loc să rămână goală. */
-  #reels-comments .fb-comments:empty::after {
-    content: 'Comentariile nu s-au încărcat. Verifică dacă un blocant de reclame oprește Facebook.';
-    display: block;
-    padding: 1rem 0;
-    font-size: 0.88rem;
-    line-height: 1.5;
-    color: rgba(255, 255, 255, 0.72);
-    text-align: center;
-  }
 </style>
 
 
@@ -944,11 +734,6 @@ const shorts = rawShorts.map((s) => {
       YT?: any;
       onYouTubeIframeAPIReady?: () => void;
       Stream?: (el: HTMLIFrameElement) => any;
-      FB?: {
-        init?: (options: { xfbml: boolean; version: string }) => void;
-        XFBML?: { parse: (el?: HTMLElement) => void };
-      };
-      fbAsyncInit?: () => void;
     }
   }
 
@@ -967,19 +752,6 @@ const shorts = rawShorts.map((s) => {
       const api = (window as { FPConsent?: { video?: () => boolean } }).FPConsent;
       if (api?.video) return api.video() === true;
       return localStorage.getItem('video_consent') === 'granted';
-    } catch {
-      return false;
-    }
-  }
-
-  // Comentariile Meta sunt o suprafață de marketing, nu de conținut video: SDK-ul
-  // nu se injectează decât cu `fp_consent.marketing`.
-  function hasMarketingConsent(): boolean {
-    try {
-      const api = (window as { FPConsent?: { read?: () => { marketing?: boolean } | null } }).FPConsent;
-      if (api?.read) return api.read()?.marketing === true;
-      const raw = localStorage.getItem('fp_consent');
-      return raw ? JSON.parse(raw).marketing === true : false;
     } catch {
       return false;
     }
@@ -1297,207 +1069,6 @@ const shorts = rawShorts.map((s) => {
       window.setTimeout(() => icon.classList.remove('is-visible'), 500);
     }
 
-    /* ─── Comentarii Meta: SDK injectat doar cu acord de marketing ─── */
-    const commentsPanel = document.getElementById('reels-comments');
-    const commentsGate = commentsPanel?.querySelector<HTMLElement>('[data-comments-gate]') ?? null;
-    const commentsWidget = commentsPanel?.querySelector<HTMLElement>('[data-comments-widget]') ?? null;
-    const commentsStatus = commentsPanel?.querySelector<HTMLElement>('[data-comments-status]') ?? null;
-    const commentsFallback = commentsPanel?.querySelector<HTMLElement>('[data-comments-fallback]') ?? null;
-    const fbMount = commentsPanel?.querySelector<HTMLElement>('.fb-comments') ?? null;
-    const SHEET_SLIDE_MS = 300;
-    let fbSdkRequested = false;
-    let commentsParseTimer = 0;
-    let commentsWatchdog = 0;
-    let commentsSettleTimer = 0;
-
-    const logComments = (...args: unknown[]) => console.info('[reels:comments]', ...args);
-
-    logComments('noduri', {
-      panel: !!commentsPanel,
-      gate: !!commentsGate,
-      widget: !!commentsWidget,
-      status: !!commentsStatus,
-      fallback: !!commentsFallback,
-      mount: !!fbMount,
-    });
-
-    function showCommentsFallback() {
-      if (commentsStatus) commentsStatus.hidden = true;
-      if (commentsFallback) commentsFallback.hidden = false;
-      logComments('fallback afișat');
-    }
-
-    // Plugin-ul randează un <iframe> în .fb-comments; până apare, zona nu rămâne goală.
-    function watchCommentsRender() {
-      window.clearTimeout(commentsWatchdog);
-      const startedAt = Date.now();
-      const tick = () => {
-        try {
-          if (fbMount?.querySelector('iframe')) {
-            if (commentsStatus) commentsStatus.hidden = true;
-            if (commentsFallback) commentsFallback.hidden = true;
-            logComments('iframe randat');
-            return;
-          }
-          if (Date.now() - startedAt > 8000) {
-            logComments('8s fără iframe');
-            showCommentsFallback();
-            return;
-          }
-          commentsWatchdog = window.setTimeout(tick, 400);
-        } catch (err) {
-          logComments('watchdog a eșuat', err);
-          showCommentsFallback();
-        }
-      };
-      tick();
-    }
-
-    function parseComments() {
-      try {
-        if (window.FB?.XFBML?.parse) {
-          logComments('FB.XFBML.parse()');
-          window.FB.XFBML.parse(commentsWidget ?? undefined);
-        } else {
-          logComments('FB.XFBML indisponibil la parsare');
-        }
-      } catch (err) {
-        logComments('parsarea a eșuat', err);
-      }
-      watchCommentsRender();
-    }
-
-    // Parsarea se amână până după culisarea panoului: altfel plugin-ul măsoară
-    // containerul în timp ce e încă translatat și randează la lățime greșită.
-    function parseCommentsAfterSlide() {
-      window.clearTimeout(commentsParseTimer);
-      commentsParseTimer = window.setTimeout(parseComments, SHEET_SLIDE_MS);
-    }
-
-    function loadFacebookSDK() {
-      if (fbSdkRequested) return;
-      fbSdkRequested = true;
-
-      try {
-        if (!document.getElementById('fb-root')) {
-          const root = document.createElement('div');
-          root.id = 'fb-root';
-          document.body.appendChild(root);
-        }
-
-        // `load` pe script garantează doar descărcarea; `fbAsyncInit` e apelat de SDK
-        // abia după ce FB.XFBML există efectiv în memorie.
-        window.fbAsyncInit = () => {
-          try {
-            logComments('fbAsyncInit');
-            window.FB?.init?.({ xfbml: false, version: 'v21.0' });
-            parseCommentsAfterSlide();
-          } catch (err) {
-            logComments('fbAsyncInit a eșuat', err);
-            showCommentsFallback();
-          }
-        };
-
-        const tag = document.createElement('script');
-        tag.id = 'facebook-jssdk';
-        tag.src = 'https://connect.facebook.net/ro_RO/sdk.js';
-        tag.async = true;
-        tag.defer = true;
-        tag.crossOrigin = 'anonymous';
-        // Blocantele de reclame opresc cererea: afișăm imediat, fără să așteptăm watchdog-ul.
-        tag.addEventListener('error', () => {
-          logComments('SDK blocat sau indisponibil');
-          showCommentsFallback();
-        });
-        document.body.appendChild(tag);
-        logComments('SDK cerut');
-
-        watchCommentsRender();
-      } catch (err) {
-        logComments('injectarea SDK a eșuat', err);
-        showCommentsFallback();
-      }
-    }
-
-    function syncCommentsConsent() {
-      try {
-        const granted = hasMarketingConsent();
-        logComments('acord marketing', granted);
-        if (commentsGate) commentsGate.hidden = granted;
-        if (commentsWidget) commentsWidget.hidden = !granted;
-        if (!granted) return;
-        if (commentsStatus) commentsStatus.hidden = false;
-        if (commentsFallback) commentsFallback.hidden = true;
-        if (fbSdkRequested) parseCommentsAfterSlide();
-        else loadFacebookSDK();
-      } catch (err) {
-        logComments('sincronizarea stărilor a eșuat', err);
-        showCommentsFallback();
-      }
-    }
-
-    const commentsOpen = () => commentsPanel?.classList.contains('is-open') === true;
-
-    function toggleComments(open: boolean) {
-      if (!commentsPanel) {
-        logComments('panoul lipsește din DOM');
-        return;
-      }
-      logComments('toggle', open);
-      window.clearTimeout(commentsSettleTimer);
-      commentsPanel.classList.toggle('is-open', open);
-      commentsPanel.setAttribute('aria-hidden', String(!open));
-
-      if (!open) {
-        commentsPanel.classList.remove('is-settled');
-        return;
-      }
-
-      syncCommentsConsent();
-      commentsSettleTimer = window.setTimeout(
-        () => commentsPanel.classList.add('is-settled'),
-        SHEET_SLIDE_MS + 50,
-      );
-      // Focus doar pe poartă; când widgetul e activ, focusul aparține iframe-ului Meta.
-      if (commentsGate && !commentsGate.hidden) {
-        commentsPanel.querySelector<HTMLElement>('[data-open-consent]')?.focus({ preventScroll: true });
-      }
-    }
-
-    // Gesturile din foaie nu ajung la feedul cu scroll-snap și nici la plasa de
-    // siguranță care repornește playerul. Interiorul iframe-ului Meta e cross-origin,
-    // deci nu propagă nimic — izolarea privește doar elementele proprii ale foii.
-    const commentsSheet = commentsPanel?.querySelector<HTMLElement>('.reels-comments-sheet') ?? null;
-
-    (['pointerdown', 'touchstart'] as const).forEach((evt) => {
-      commentsSheet?.addEventListener(evt, (ev) => ev.stopPropagation(), {
-        passive: true,
-        signal: consentAbort.signal,
-      });
-    });
-
-    commentsSheet?.addEventListener('click', (ev) => {
-      ev.stopPropagation();
-      const target = ev.target as HTMLElement;
-      if (target.closest('[data-comments-close]')) {
-        toggleComments(false);
-        return;
-      }
-      if (target.closest('[data-open-consent]')) {
-        toggleComments(false);
-        window.dispatchEvent(new CustomEvent('fp:open-consent'));
-      }
-    }, { signal: consentAbort.signal });
-
-    // Acordul dat din bannerul granular activează widgetul fără reîncărcare.
-    window.addEventListener('fp:consent-updated', () => {
-      if (commentsOpen()) syncCommentsConsent();
-    }, { signal: consentAbort.signal });
-
-    document.addEventListener('keydown', (ev) => {
-      if (ev.key === 'Escape' && commentsOpen()) toggleComments(false);
-    }, { signal: consentAbort.signal });
-
     /* ─── Delegare evenimente pe overlay ─── */
     overlay.addEventListener('click', (ev) => {
       const target = ev.target as HTMLElement;
@@ -1506,16 +1077,6 @@ const shorts = rawShorts.map((s) => {
       if (consentBtn) {
         try { localStorage.setItem('video_consent', 'granted'); } catch { /* mod privat strict */ }
         window.dispatchEvent(new CustomEvent('video:granted'));
-        return;
-      }
-
-      if (target.closest<HTMLElement>('[data-comments-btn]')) {
-        toggleComments(true);
-        return;
-      }
-
-      if (target.closest<HTMLElement>('[data-comments-backdrop]')) {
-        toggleComments(false);
         return;
       }
 
@@ -1670,9 +1231,6 @@ const shorts = rawShorts.map((s) => {
       window.clearTimeout(initialPlaybackTimer);
       window.clearTimeout(tapTimer);
       window.clearTimeout(toastTimer);
-      window.clearTimeout(commentsParseTimer);
-      window.clearTimeout(commentsWatchdog);
-      window.clearTimeout(commentsSettleTimer);
       consentAbort.abort();
       preloadObserver?.disconnect();
       io.disconnect();

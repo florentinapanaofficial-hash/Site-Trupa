@@ -1,3 +1,34 @@
+## 📝 15 oct 2026 — Reels: Facebook Comments Plugin eliminat (dezafectat de Meta)
+
+### Obiectiv
+- Diagnosticarea erorii `Refused to display 'https://www.facebook.com/' in a frame because it set 'X-Frame-Options' to 'deny'`, apărută după activarea diagnosticului pe `/shorts/`.
+
+### Diagnostic
+- Ipoteza raportată (`data-href` greșit sau relativ) **nu se confirmă**: markup-ul avea deja `data-href="https://www.florentinapanaofficial.ro/shorts/"`, `data-width="100%"` și `data-numposts="5"`, construite din constanta `SITE_URL`.
+- **Cauza reală: Meta a oprit Comments Plugin pe 10 februarie 2026.** Documentația proprie (`developers.facebook.com/docs/plugins/`) nu îl mai listează — au rămas doar Share Button, Page Plugin, Embedded Posts și Embedded Video. URL-ul `/docs/plugins/comments/` redirectează către index, deci pagina nu mai există.
+- FAQ-ul oficial confirmă textual: *„The plugins will gracefully degrade to invisible elements"*, *„No replacement plugins are being provided"*, *„The February 10, 2026 date is final"*.
+- Eroarea `X-Frame-Options` e chiar degradarea descrisă: SDK-ul nu mai construiește URL-ul pluginului și cade pe `https://www.facebook.com/`, care refuză încadrarea. Explică integral simptomele raportate anterior — panou gol, lipsa căsuței de text, imposibilitatea de a tasta. Nicio reglare de `data-href`, `appId` sau CSP nu putea repara asta.
+
+### Modificări
+- `src/pages/shorts.astro`: eliminate panoul `#reels-comments` (foaie, backdrop, poartă de marketing, stări de încărcare/fallback), întreaga logică SDK (`loadFacebookSDK`, `fbAsyncInit`, `FB.init`, `FB.XFBML.parse`, watchdog, temporizatoare), `hasMarketingConsent()`, tipurile `FB`/`fbAsyncInit`, regulile CSS scoped și globale aferente, plus branșele de delegare.
+- Butonul „Comentarii" înlocuit cu un link „Comentează" către pagina oficială de Facebook (`target="_blank"`, `rel="noopener noreferrer"`), păstrat pe aceeași bară verticală dreaptă.
+- `src/lib/csp.mjs`: revenite la starea dinainte — scoase `*.facebook.com` și `*.fbcdn.net` din `img-src`, `*.facebook.com` și `connect.facebook.net` din `connect-src`, și tot Facebook din `frame-src`. Politica redevine mai strictă decât înainte de integrare.
+- `scripts/tracking-pixels.test.cjs`: testul rescris ca gardă permanentă — verifică absența `connect.facebook.net`, `fb-comments`, `fbAsyncInit`, `XFBML` și `hasMarketingConsent` din pagină, plus absența Facebook din `frame-src`.
+
+### Decizii tehnice
+- **`fp:consent-updated` rămâne în `CookieBanner.astro`.** Nu mai are consumator, dar e primitiva corectă pentru orice suprafață viitoare gatuită pe categorii, iar bannerul trebuie oricum să anunțe schimbarea de preferințe.
+- Un link extern nu setează cookie-uri, deci **comentariile nu mai au nevoie de consimțământ de marketing**. Integrarea a devenit, paradoxal, mai conformă prin eliminare.
+- S-a ales linkul direct, nu păstrarea foii cu un singur link înăuntru: o foaie modală care conține un singur buton e un pas în plus fără câștig.
+
+### Validări
+- `get_errors`: fără erori. `npm test`: **94/94** PASS. `npm run build` PASS, 83 fișiere comprimate. `npm run seo:audit`: **64 pagini, 0 FAIL | 0 WARN**.
+
+### Riscuri / pași următori
+- Obiectivul inițial — comentarii pe site care hrănesc pagina oficială — **nu mai e realizabil cu Meta**. Opțiunile rămase: link extern (implementat acum), serviciu terț de comentarii (vendor nou, consimțământ nou, cost) sau sistem propriu (respins deja pentru PII și fricțiune).
+- Rămâne de verificat `YOUTUBE_API_KEY` pe Railway și ID-ul de playlistă `PLHIvkNOpOdtM`, care pare trunchiat — ID-urile YouTube au de regulă `PL` + 32 de caractere, iar `extractPlaylistId()` acceptă orice șir de minimum 10.
+
+---
+
 ## 📝 15 oct 2026 — Reels: comentarii Meta gatuite pe marketing, direct pe `/shorts/`
 
 ### Obiectiv
