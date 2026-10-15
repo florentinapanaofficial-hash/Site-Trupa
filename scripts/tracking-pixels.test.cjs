@@ -244,6 +244,7 @@ describe('GTM consent and dataLayer routing', () => {
             '../src/components/YoutubeEmbed.astro',
             '../src/components/SmartTvVideoPlayer.astro',
             '../src/pages/aparitii-tv.astro',
+            '../src/pages/shorts.astro',
         ].map((file) => fs.readFileSync(path.join(__dirname, file), 'utf8'));
 
         sources.forEach((source) => {
@@ -265,5 +266,36 @@ describe('GTM consent and dataLayer routing', () => {
         const footer = fs.readFileSync(path.join(__dirname, '../src/components/Footer.astro'), 'utf8');
         expect(footer).toContain("CustomEvent('fp:open-consent')");
         expect(banner).toContain("window.addEventListener('fp:open-consent'");
+    });
+
+    test('loads the Facebook comments SDK only behind marketing consent', () => {
+        const page = fs.readFileSync(path.join(__dirname, '../src/pages/shorts.astro'), 'utf8');
+
+        // SDK-ul nu are voie să apară în HTML-ul livrat — doar injectat din JS, după acord.
+        expect(page).not.toMatch(/<script[^>]*connect\.facebook\.net/);
+        expect(page).toContain("tag.src = 'https://connect.facebook.net/ro_RO/sdk.js#xfbml=1&version=v21.0'");
+
+        // Poarta citește categoria `marketing`, nu acordul video.
+        expect(page).toContain('function hasMarketingConsent');
+        expect(page).toContain('api.read()?.marketing === true');
+
+        const sync = page.indexOf('function syncCommentsConsent');
+        const guard = page.indexOf('if (!granted) return;', sync);
+        const load = page.indexOf('else loadFacebookSDK();', sync);
+        expect(sync).toBeGreaterThan(-1);
+        expect(guard).toBeGreaterThan(-1);
+        expect(guard).toBeLessThan(load);
+
+        // Fallback-ul redeschide bannerul granular in loc să scrie singur acordul.
+        expect(page).toContain('data-open-consent');
+        expect(page).toContain("CustomEvent('fp:open-consent')");
+        expect(page).not.toMatch(/setItem\(\s*['"]fp_consent['"]/);
+
+        const banner = fs.readFileSync(path.join(__dirname, '../src/components/CookieBanner.astro'), 'utf8');
+        expect(banner).toContain("CustomEvent('fp:consent-updated'");
+
+        const csp = fs.readFileSync(path.join(__dirname, '../src/lib/csp.mjs'), 'utf8');
+        const frameSrc = csp.split('\n').find((line) => line.includes('frame-src'));
+        expect(frameSrc).toContain('https://www.facebook.com');
     });
 });

@@ -25,6 +25,9 @@ type ShortRaw = {
 const BRAND = siteContent.brand?.name ?? 'Formația Florentina Pană';
 const DEFAULT_AVATAR = '/images/logo-512.png';
 const DEFAULT_SONG = `${BRAND} · Moment live`;
+const WHATSAPP_HREF = `https://wa.me/${siteContent.contact.phoneRaw.replace('+', '')}?text=${encodeURIComponent(
+  'Bună! Am văzut momentele video și aș dori o ofertă pentru evenimentul meu.'
+)}`;
 
 // Număr de aprecieri pseudo-aleator, dar stabil per clip (nu se schimbă la refresh)
 function pseudoLikes(id: string): number {
@@ -129,7 +132,7 @@ const shorts = rawShorts.map((s) => {
                 <iframe
                   class="reel-cf"
                   data-cf
-                  src={short.cfEmbed}
+                  data-cf-src={short.cfEmbed}
                   title={`Reels — ${short.author}`}
                   loading={index <= 1 ? 'eager' : 'lazy'}
                   allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
@@ -194,6 +197,15 @@ const shorts = rawShorts.map((s) => {
               <span class="reel-action-count" data-like-count>{short.likesCount.toLocaleString('ro-RO')}</span>
             </button>
 
+            <button class="reel-action" data-comments-btn aria-label="Deschide comentariile" aria-haspopup="dialog" aria-controls="reels-comments">
+              <span class="reel-action-icon">
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 11.5a8.4 8.4 0 01-9 8.4 9 9 0 01-4.2-1L3 20l1.2-4.2A8.4 8.4 0 1121 11.5z" />
+                </svg>
+              </span>
+              <span class="reel-action-label">Comentarii</span>
+            </button>
+
             <button class="reel-action" data-share-btn data-url={`${SITE_URL}/shorts/#${short.id}`} aria-label="Distribuie">
               <span class="reel-action-icon">
                 <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -220,6 +232,76 @@ const shorts = rawShorts.map((s) => {
           </div>
         </article>
       ))}
+    </div>
+
+    {/* ─── Poartă de consimțământ video (video_consent, izolat de marketing) ─── */}
+    <div class="reels-consent" id="reels-consent" hidden>
+      <div class="reels-consent-card" role="dialog" aria-modal="true" aria-labelledby="reels-consent-title">
+        <h2 id="reels-consent-title">Activează redarea momentelor</h2>
+        <p>
+          Clipurile sunt găzduite pe YouTube și Cloudflare Stream. La redare, aceste servicii pot
+          stoca informații pe dispozitivul tău. Acordul se aplică exclusiv conținutului video —
+          nu activează analiză sau publicitate.
+        </p>
+        <button type="button" class="reels-consent-accept" data-reels-consent-accept>
+          Activează și redă
+        </button>
+        <a class="reels-consent-link" href="/politica-cookie/">Politica de cookie-uri</a>
+      </div>
+    </div>
+
+    {/* ─── Panou comentarii Meta (gat pe categoria `marketing`) ─── */}
+    <div class="reels-comments" id="reels-comments" hidden>
+      <div class="reels-comments-sheet" role="dialog" aria-modal="true" aria-labelledby="reels-comments-title">
+        <header class="reels-comments-head">
+          <h2 id="reels-comments-title">Comentarii</h2>
+          <button type="button" class="reels-comments-close" data-comments-close aria-label="Închide comentariile">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+            </svg>
+          </button>
+        </header>
+
+        <div class="reels-comments-body">
+          <div class="reels-comments-gate" data-comments-gate>
+            <p>Pentru a vedea și lăsa comentarii, avem nevoie de acordul tău.</p>
+            <p class="reels-comments-note">
+              Comentariile sunt afișate prin Facebook, care poate stoca informații pe dispozitivul
+              tău. Se activează odată cu categoria „Marketing”.
+            </p>
+            <button type="button" class="reels-comments-accept" data-open-consent>
+              Deschide preferințele de cookie-uri
+            </button>
+          </div>
+
+          <div class="reels-comments-widget" data-comments-widget hidden>
+            <div
+              class="fb-comments"
+              data-href={`${SITE_URL}/shorts/`}
+              data-width="100%"
+              data-numposts="5"
+              data-colorscheme="dark"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* ─── CTA fix jos: WhatsApp ─── */}
+    <div class="reels-wa">
+      <a
+        class="reels-wa-btn"
+        href={WHATSAPP_HREF}
+        target="_blank"
+        rel="noopener noreferrer nofollow"
+        aria-label="Trimite mesaj pe WhatsApp Formației Florentina Pană"
+      >
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+          <path d="M17.5 14.4c-.3-.2-1.7-.9-2-1-.3-.1-.5-.2-.7.1-.2.3-.7 1-.9 1.2-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.2 5.1 4.4.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.1-.3-.2-.6-.4z"/>
+          <path d="M12 2a10 10 0 00-8.6 15L2 22l5.2-1.4A10 10 0 1012 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.1.8.8-3-.2-.3A8.2 8.2 0 1112 20.2z"/>
+        </svg>
+        <span>Trimite mesaj</span>
+      </a>
     </div>
   </div>
 </BaseLayout>
@@ -452,7 +534,7 @@ const shorts = rawShorts.map((s) => {
     right: 4.75rem;
     bottom: 0;
     z-index: 10;
-    padding: 2.75rem 1rem calc(env(safe-area-inset-bottom, 0px) + 2.5rem);
+    padding: 2.75rem 1rem calc(env(safe-area-inset-bottom, 0px) + 5.75rem);
     background: linear-gradient(0deg, rgba(0, 0, 0, 0.78) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0) 100%);
     pointer-events: none;
   }
@@ -501,14 +583,14 @@ const shorts = rawShorts.map((s) => {
   /* ═══ Overlay dreapta: acțiuni ═══ */
   .reel-actions {
     position: absolute;
-    right: 0.5rem;
+    right: 1rem;
     bottom: 0;
     z-index: 12;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 1.3rem;
-    padding: 0 0.35rem calc(env(safe-area-inset-bottom, 0px) + 1.75rem);
+    padding: 0 0.35rem calc(env(safe-area-inset-bottom, 0px) + 5.25rem);
   }
   .reel-action {
     display: flex;
@@ -549,6 +631,166 @@ const shorts = rawShorts.map((s) => {
   .reels-overlay[data-muted="false"] .reel-icon-muted { display: none; }
   .reels-overlay[data-muted="false"] .reel-icon-sound { display: inline; }
 
+  /* ═══ CTA fix jos: WhatsApp ═══ */
+  .reels-wa {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 15;
+    display: flex;
+    justify-content: center;
+    padding: 1.5rem 1rem calc(env(safe-area-inset-bottom, 0px) + 0.9rem);
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.88) 35%, rgba(0, 0, 0, 0) 100%);
+    pointer-events: none;
+  }
+  .reels-wa-btn {
+    pointer-events: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    width: 100%;
+    max-width: 26rem;
+    min-height: 48px;
+    border-radius: 9999px;
+    background: #25d366;
+    color: #04240f;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+    transition: transform 0.18s ease, background 0.18s ease;
+  }
+  .reels-wa-btn:hover { background: #1ebe5b; }
+  .reels-wa-btn:active { transform: scale(0.98); }
+
+  /* ═══ Poarta de consimțământ video ═══ */
+  .reels-consent {
+    position: absolute;
+    inset: 0;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.92);
+  }
+  .reels-consent[hidden] { display: none; }
+  .reels-consent-card { width: 100%; max-width: 24rem; text-align: center; }
+  .reels-consent-card h2 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 0 0 0.75rem;
+  }
+  .reels-consent-card p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.82);
+    margin: 0 0 1.35rem;
+  }
+  .reels-consent-accept {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 48px;
+    border: 0;
+    border-radius: 9999px;
+    background: #facc15;
+    color: #020617;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .reels-consent-link {
+    display: inline-block;
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.78);
+  }
+
+  .reels-overlay :is(a, button):focus-visible {
+    outline: 3px solid #facc15;
+    outline-offset: 3px;
+  }
+
+  /* ═══ Panou comentarii Meta ═══ */
+  .reels-comments {
+    position: absolute;
+    inset: 0;
+    z-index: 30;
+    display: flex;
+    align-items: flex-end;
+    background: rgba(0, 0, 0, 0.6);
+  }
+  .reels-comments[hidden] { display: none; }
+  .reels-comments-sheet {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    max-height: 72%;
+    border-radius: 1rem 1rem 0 0;
+    background: #16181c;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.6);
+  }
+  .reels-comments-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .reels-comments-head h2 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 0;
+  }
+  .reels-comments-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    cursor: pointer;
+  }
+  .reels-comments-body {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 1rem;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem);
+  }
+  .reels-comments-gate p {
+    font-size: 0.92rem;
+    line-height: 1.5;
+    margin: 0 0 0.75rem;
+  }
+  .reels-comments-note { color: rgba(255, 255, 255, 0.72); font-size: 0.82rem !important; }
+  .reels-comments-accept {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 48px;
+    margin-top: 0.5rem;
+    border: 0;
+    border-radius: 9999px;
+    background: #facc15;
+    color: #020617;
+    font-size: 0.92rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .reels-comments-widget[hidden] { display: none; }
+
   @media (min-width: 1024px) {
     .reels-feed { max-width: 480px; margin: 0 auto; }
   }
@@ -556,6 +798,7 @@ const shorts = rawShorts.map((s) => {
   @media (prefers-reduced-motion: reduce) {
     .reel-song-marquee span { animation: none; }
     .reel-heart-burst.is-active { animation-duration: 0.5s; }
+    .reels-wa-btn { transition: none; }
   }
 </style>
 
@@ -596,6 +839,7 @@ const shorts = rawShorts.map((s) => {
       YT?: any;
       onYouTubeIframeAPIReady?: () => void;
       Stream?: (el: HTMLIFrameElement) => any;
+      FB?: { XFBML?: { parse: (el?: HTMLElement) => void } };
     }
   }
 
@@ -607,6 +851,31 @@ const shorts = rawShorts.map((s) => {
     setMuted: (m: boolean) => void;
   };
 
+  // Sursa de adevăr e window.FPConsent (BaseLayout). Cheia `video_consent` e izolată
+  // de analiză/marketing — acordul pentru redare NU pornește GA4, Meta sau TikTok.
+  function hasVideoConsent(): boolean {
+    try {
+      const api = (window as { FPConsent?: { video?: () => boolean } }).FPConsent;
+      if (api?.video) return api.video() === true;
+      return localStorage.getItem('video_consent') === 'granted';
+    } catch {
+      return false;
+    }
+  }
+
+  // Comentariile Meta sunt o suprafață de marketing, nu de conținut video: SDK-ul
+  // nu se injectează decât cu `fp_consent.marketing`.
+  function hasMarketingConsent(): boolean {
+    try {
+      const api = (window as { FPConsent?: { read?: () => { marketing?: boolean } | null } }).FPConsent;
+      if (api?.read) return api.read()?.marketing === true;
+      const raw = localStorage.getItem('fp_consent');
+      return raw ? JSON.parse(raw).marketing === true : false;
+    } catch {
+      return false;
+    }
+  }
+
   function initShorts(): void {
     const overlay = document.getElementById('reels-overlay');
     const feed = document.getElementById('reels-feed');
@@ -616,6 +885,7 @@ const shorts = rawShorts.map((s) => {
     const cards = Array.from(document.querySelectorAll<HTMLElement>('[data-reel]'));
     if (!cards.length) return;
 
+    const consentAbort = new AbortController();
     const players = new Map<number, PlayerCtl>();
     const ready = new Set<number>();
     let isMuted = true;          // autoplay policy: primul clip pornește pe mute
@@ -918,9 +1188,84 @@ const shorts = rawShorts.map((s) => {
       window.setTimeout(() => icon.classList.remove('is-visible'), 500);
     }
 
+    /* ─── Comentarii Meta: SDK injectat doar cu acord de marketing ─── */
+    const commentsPanel = document.getElementById('reels-comments');
+    const commentsGate = commentsPanel?.querySelector<HTMLElement>('[data-comments-gate]') ?? null;
+    const commentsWidget = commentsPanel?.querySelector<HTMLElement>('[data-comments-widget]') ?? null;
+    let fbSdkRequested = false;
+
+    function loadFacebookSDK() {
+      if (fbSdkRequested) return;
+      fbSdkRequested = true;
+
+      if (!document.getElementById('fb-root')) {
+        const root = document.createElement('div');
+        root.id = 'fb-root';
+        document.body.appendChild(root);
+      }
+
+      const tag = document.createElement('script');
+      tag.id = 'facebook-jssdk';
+      tag.src = 'https://connect.facebook.net/ro_RO/sdk.js#xfbml=1&version=v21.0';
+      tag.async = true;
+      tag.defer = true;
+      tag.crossOrigin = 'anonymous';
+      tag.addEventListener('load', () => {
+        window.FB?.XFBML?.parse(commentsWidget ?? undefined);
+      });
+      document.body.appendChild(tag);
+    }
+
+    function syncCommentsConsent() {
+      const granted = hasMarketingConsent();
+      if (commentsGate) commentsGate.hidden = granted;
+      if (commentsWidget) commentsWidget.hidden = !granted;
+      if (!granted) return;
+      if (fbSdkRequested) window.FB?.XFBML?.parse(commentsWidget ?? undefined);
+      else loadFacebookSDK();
+    }
+
+    function toggleComments(open: boolean) {
+      if (!commentsPanel) return;
+      commentsPanel.hidden = !open;
+      if (open) syncCommentsConsent();
+    }
+
+    // Acordul dat din bannerul granular activează widgetul fără reîncărcare.
+    window.addEventListener('fp:consent-updated', () => {
+      if (commentsPanel && !commentsPanel.hidden) syncCommentsConsent();
+    }, { signal: consentAbort.signal });
+
+    document.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Escape' && commentsPanel && !commentsPanel.hidden) toggleComments(false);
+    }, { signal: consentAbort.signal });
+
     /* ─── Delegare evenimente pe overlay ─── */
     overlay.addEventListener('click', (ev) => {
       const target = ev.target as HTMLElement;
+
+      const consentBtn = target.closest<HTMLElement>('[data-reels-consent-accept]');
+      if (consentBtn) {
+        try { localStorage.setItem('video_consent', 'granted'); } catch { /* mod privat strict */ }
+        window.dispatchEvent(new CustomEvent('video:granted'));
+        return;
+      }
+
+      if (target.closest<HTMLElement>('[data-open-consent]')) {
+        toggleComments(false);
+        window.dispatchEvent(new CustomEvent('fp:open-consent'));
+        return;
+      }
+
+      if (target.closest<HTMLElement>('[data-comments-btn]')) {
+        toggleComments(true);
+        return;
+      }
+
+      if (target.closest<HTMLElement>('[data-comments-close]') || target === commentsPanel) {
+        toggleComments(false);
+        return;
+      }
 
       const likeBtn = target.closest<HTMLElement>('[data-like-btn]');
       if (likeBtn) {
@@ -1024,11 +1369,11 @@ const shorts = rawShorts.map((s) => {
 
     /* ─── Pornire ─── */
     initLikes();
+
+    const gate = document.getElementById('reels-consent');
     const hasYouTube = cards.some((c) => c.dataset.provider !== 'cloudflare');
     const hasCloudflare = cards.some((c) => c.dataset.provider === 'cloudflare');
-    if (hasYouTube) loadYouTubeAPI(initYouTubePlayers);
-    if (hasCloudflare) loadCloudflareSDK(buildCloudflarePlayers);
-    initialPlaybackTimer = window.setTimeout(onScrollSettled, 150);
+    let mediaBooted = false;
 
     // Plasă de siguranță: dacă browserul blochează silențios play() înainte de
     // orice gest al utilizatorului, reîncercăm la primul tap/scroll/tastă.
@@ -1039,9 +1384,32 @@ const shorts = rawShorts.map((s) => {
       const p = activeIndex !== -1 ? players.get(activeIndex) : undefined;
       if (p) p.play();
     }
-    (['pointerdown', 'touchstart', 'scroll', 'keydown'] as const).forEach((evt) => {
-      overlay!.addEventListener(evt, unlockActivePlayback, { once: true, passive: true });
-    });
+
+    // Embed-urile terțe pornesc doar după `video_consent`: iframe-urile Cloudflare
+    // primesc src-ul abia aici, nu din HTML-ul livrat de server.
+    function bootMedia() {
+      if (mediaBooted) return;
+      mediaBooted = true;
+      if (gate) gate.hidden = true;
+
+      cards.forEach((card) => {
+        const iframe = card.querySelector<HTMLIFrameElement>('[data-cf]');
+        const src = iframe?.dataset.cfSrc;
+        if (iframe && src && !iframe.getAttribute('src')) iframe.setAttribute('src', src);
+      });
+
+      if (hasYouTube) loadYouTubeAPI(initYouTubePlayers);
+      if (hasCloudflare) loadCloudflareSDK(buildCloudflarePlayers);
+      initialPlaybackTimer = window.setTimeout(onScrollSettled, 150);
+
+      (['pointerdown', 'touchstart', 'scroll', 'keydown'] as const).forEach((evt) => {
+        overlay!.addEventListener(evt, unlockActivePlayback, { once: true, passive: true });
+      });
+    }
+
+    window.addEventListener('video:granted', bootMedia, { signal: consentAbort.signal });
+    if (hasVideoConsent()) bootMedia();
+    else if (gate) gate.hidden = false;
 
     const cleanup = () => {
       players.forEach((p) => { try { p.pause(); } catch { /* noop */ } });
@@ -1050,6 +1418,7 @@ const shorts = rawShorts.map((s) => {
       window.clearTimeout(initialPlaybackTimer);
       window.clearTimeout(tapTimer);
       window.clearTimeout(toastTimer);
+      consentAbort.abort();
       preloadObserver?.disconnect();
       io.disconnect();
       resizeObserver.disconnect();

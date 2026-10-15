@@ -1,4 +1,88 @@
-## 📝 15 oct 2026 — Consimțământ GDPR: scope video separat, Consent Mode v2 și banner granular
+## 📝 15 oct 2026 — Reels: comentarii Meta gatuite pe marketing, direct pe `/shorts/`
+
+### Obiectiv
+- Revocarea deciziei de subdomeniu: playerul Reels rămâne pe `/shorts/`. Integrarea Facebook Comments Plugin fără a reintroduce încălcarea de scope închisă în aceeași zi.
+
+### Modificări
+- `src/pages/shorts.astro`:
+  - `hasMarketingConsent()` nou — citește `window.FPConsent.read().marketing`, cu `localStorage.fp_consent` ca rezervă. Separat de `hasVideoConsent()`.
+  - `loadFacebookSDK()` injectează `connect.facebook.net/ro_RO/sdk.js#xfbml=1&version=v21.0` (`async`, `defer`, `crossorigin`) și creează `#fb-root` în `document.body`. Rulează o singură dată (`fbSdkRequested`) și apelează `FB.XFBML.parse(container)` la `load`.
+  - `syncCommentsConsent()` comută între poarta de marketing și widget; iese înainte de injectare dacă acordul lipsește.
+  - Panou `#reels-comments` — foaie de jos (`role="dialog"`, `aria-modal`), deschisă din butonul nou de pe bara verticală dreaptă, închisă din buton, din fundal sau cu `Escape`.
+  - Poarta afișează „Pentru a vedea și lăsa comentarii, avem nevoie de acordul tău." + buton care emite `fp:open-consent`. Pagina **nu scrie niciodată** `fp_consent` — doar bannerul granular o face.
+  - Ascultător `fp:consent-updated` (prin `consentAbort`, oprit în `cleanup`): acordul dat din banner randează widgetul fără reîncărcare.
+  - `.reel-actions`: `right: 0.5rem` → `1rem` (`absolute right-4`), cu butonul Comentarii între Like și Distribuie.
+- `src/components/CookieBanner.astro`: `apply()` emite `fp:consent-updated` cu `{ analytics, marketing, video }`. Exista doar `video:granted`, deci suprafețele gatuite pe categorii nu aveau cum să afle de o schimbare.
+- `src/lib/csp.mjs`: `frame-src` += `https://www.facebook.com https://*.facebook.com` (iframe-ul `plugins/comments.php`); `img-src` += `https://*.facebook.com https://*.fbcdn.net` (avatare); `connect-src` += `https://*.facebook.com`. `script-src` conținea deja `connect.facebook.net`.
+- `scripts/tracking-pixels.test.cjs`: test nou care verifică absența SDK-ului din HTML, ordinea gardă-înainte-de-injectare în `syncCommentsConsent`, folosirea categoriei `marketing`, faptul că pagina nu scrie `fp_consent`, evenimentul din banner și `frame-src`. `shorts.astro` adăugată la suita existentă de verificare a cheii `video_consent`.
+
+### Decizii tehnice
+- **API-ul cerut nu există.** Specificația cerea `window.FPConsent.consent.marketing`; obiectul real expune `read()`, `save()`, `update()`, `signals()`, `video()`. Folosit `read()?.marketing === true`, fără să inventez o proprietate.
+- **Un singur widget, într-o foaie, nu unul per clip.** Markup-ul `.fb-comments` sub fiecare descriere ar fi creat câte un iframe per reel, toate pe același `data-href` — același fir de discuție, multiplicat. Butonul din bara dreaptă deschide un panou unic, ca în interfața nativă Facebook/TikTok.
+- **SDK leneș de două ori**: nu doar gatuit pe marketing, ci încărcat abia la prima deschidere a panoului. Un vizitator cu acord complet care nu atinge butonul nu plătește SDK-ul.
+- Poarta nu scrie consimțământ, ci îl cere: butonul emite `fp:open-consent` și lasă decizia în bannerul granular (Art. 7(3) RGPD, consimțământ informat per categorie).
+- `scroll-snap-type: y mandatory` și `scroll-snap-align: start` existau deja pe `.reels-feed` / `.reel-card` — echivalentul CSS al `snap-y snap-mandatory`; nu am dublat cu utilitare Tailwind.
+
+### Validări
+- `get_errors` pe cele 3 fișiere atinse: fără erori. `npm test`: **94/94** PASS (4 suite).
+- `npm run build` PASS, 83 fișiere comprimate. `npm run seo:audit`: **64 pagini, 0 FAIL | 0 WARN**.
+- Verificare pe bundle: `connect.facebook.net` apare **doar** în JS-ul compilat, niciodată ca `<script src>` în markup.
+- `/shorts/` nu e blocată în `robots.txt` și nu are `noindex`, deci crawler-ul Facebook poate citi `data-href` pentru a lega firul de comentarii.
+
+### Riscuri / pași următori
+- **Plugin-ul nu va randa comentarii până când pagina nu e accesibilă public** — pe `localhost` widgetul rămâne gol. De validat după deploy, cu URL-ul rulat prin Sharing Debugger.
+- Un singur fir de comentarii pentru toate clipurile (`data-href` = `/shorts/`). Fire separate per clip ar cere URL-uri distincte și crawlabile — fragmentele `#id` sunt ignorate de Facebook.
+- Panoul nu pune videoclipul pe pauză la deschidere, ca în interfața nativă. De schimbat dacă se dovedește deranjant pe mobil.
+- SDK-ul Meta setează cookie-uri proprii la randare; revocarea ulterioară a categoriei `marketing` nu le șterge și nu descarcă SDK-ul din pagina curentă — se aplică de la următoarea încărcare, exact ca la celelalte pixeluri.
+
+---
+
+## 📝 15 oct 2026 — Reels: poartă de consimțământ video, CTA WhatsApp fix și decizia de arhitectură hibridă
+
+### Obiectiv
+- Stabilirea arhitecturii pentru secțiunea video verticală (tip TikTok/Reels) și închiderea scurgerii de consimțământ descoperite pe `/shorts/`, pagina care implementează deja acest format.
+
+### Decizia de arhitectură (Claudiu)
+- **Subdomeniu separat** (`reels.florentinapanaofficial.ro`) pentru dezvoltarea secțiunii Reels — izolează bugetul de performanță (96/100) și suprafața de securitate a site-ului principal. Pagina `/shorts/` existentă rămâne în funcțiune până la migrare.
+- **Fără bază de date proprie și fără conturi**: s-a respins autentificarea proprie (fricțiune pentru miri + stocare de PII și obligațiile RGPD aferente).
+- **Interacțiune prin Facebook Comments Plugin** și widget-uri Meta: vizitatorii folosesc sesiunea Facebook activă de pe telefon, iar comentariile hrănesc pagina oficială.
+- **Conversie**: buton lat „Trimite mesaj" (WhatsApp), fixat în partea de jos a ecranului.
+- **UI**: full-screen mobil, scroll-snap vertical magnetic.
+
+### Diagnostic pe `/shorts/` (finding critic)
+- **Embed-urile terțe porneau fără consimțământ.** `loadYouTubeAPI()` injecta `https://www.youtube.com/iframe_api` la `initShorts()`, iar iframe-ul Cloudflare Stream primea `src` direct din HTML-ul randat de server — deci se încărca înainte de orice JS. Zero verificare de `video_consent`: toate celelalte suprafețe video (`YoutubeEmbed`, `SmartTvVideoPlayer`, `video-facade`, `aparitii-tv`) fuseseră mutate pe poartă în sesiunea anterioară, dar `/shorts/` fusese omisă.
+- **Butonul de conversie lipsea.** `.wa-float` global e ascuns pe overlay (`body:has(#reels-overlay) .wa-float { display: none }`), fără niciun înlocuitor — pagina nu avea nicio cale de conversie.
+
+### Modificări
+- `src/pages/shorts.astro`:
+  - iframe Cloudflare: `src={short.cfEmbed}` → `data-cf-src={short.cfEmbed}`; atributul `src` se setează din JS, doar după acord.
+  - `hasVideoConsent()` nou — citește `window.FPConsent.video()`, cu `localStorage.video_consent` ca rezervă.
+  - Blocul „Pornire" refăcut în `bootMedia()`: hidratează iframe-urile Cloudflare, încarcă YouTube IFrame API și Cloudflare SDK, pornește playback-ul și abia apoi înregistrează plasa de siguranță pentru autoplay. Rulează o singură dată (`mediaBooted`).
+  - Poartă vizuală `#reels-consent` (`role="dialog"`, `aria-modal`) peste feed, cu buton „Activează și redă" și link către `/politica-cookie/`. Butonul scrie **exclusiv** `video_consent` și emite `video:granted` — nu atinge `fp_consent`, deci nu pornește GA4, Meta sau TikTok.
+  - Ascultător `video:granted` pe `window` (prin `AbortController`, oprit în `cleanup`): acordul dat din bannerul de cookie-uri pornește playerele fără reîncărcare.
+  - CTA nou `.reels-wa` — bară fixată jos, buton lat „Trimite mesaj" (48px înălțime minimă, `target="_blank"`, `rel="noopener noreferrer nofollow"`), prins automat de listenerul delegat `wa.me` din `tracking-pixels.js`.
+  - `.reel-info` și `.reel-actions`: `padding-bottom` crescut la `+5.75rem`, respectiv `+5.25rem`, ca descrierea și coloana de acțiuni să nu intre sub bara WhatsApp.
+  - Adăugat `:focus-visible` pe linkurile și butoanele din overlay.
+
+### Decizii tehnice
+- **`100svh` păstrat, nu înlocuit cu `100dvh`.** Regula generală cere `dvh` în locul lui `vh`, dar aici intenția ei e deja depășită: overlay-ul e `position: fixed` cu o bară de acțiuni ancorată jos, iar `dvh` se redimensionează la ascunderea barei de browser și ar clătina exact butonul de conversie. `svh` fixează înălțimea la viewportul mic și e stabil la scroll; `100vh` rămâne doar ca rezervă pentru browsere fără `svh`.
+- **Posterele rămân încărcate înainte de acord** (`img.youtube.com`, `videodelivery.net`), identic cu politica deja aplicată în `YoutubeEmbed.astro` — imagini statice, fără cookie-uri, necesare pentru ca feedul să nu fie negru în spatele porții.
+- Plasa de siguranță pentru autoplay (`pointerdown`/`touchstart`/`scroll`/`keydown`, `once: true`) a fost mutată în `bootMedia()`: înregistrată mai devreme, ar fi fost consumată chiar de clickul pe butonul porții, când încă nu există niciun player.
+
+### Validări
+- `get_errors` pe `src/pages/shorts.astro`: fără erori.
+- `npm run build` PASS, 83 fișiere comprimate. `npm test`: **93/93** PASS (4 suite). `npm run seo:audit`: **64 pagini, 0 FAIL | 0 WARN**.
+- Verificare pe bundle-ul generat (`dist/client/_astro/shorts.*.js`): `FPConsent`, `video_consent` și `video:granted` prezente; iframe-ul Cloudflare nu mai are `src` în markup.
+
+### Riscuri / pași următori
+- **Facebook Comments Plugin este un embed Meta cu cookie-uri** — nu poate fi tratat ca `video_consent`. La implementarea pe subdomeniu trebuie pus în spatele categoriei `marketing` din `fp_consent`, altfel reintroducem exact încălcarea de scope închisă pe 15 oct. Subdomeniul are nevoie de propriul `FPConsent` sau de o stare partajată pe domeniul rădăcină.
+- Subdomeniul va avea CSP și headere proprii: `frame-src` pentru `youtube-nocookie.com`, `iframe.cloudflarestream.com` și `facebook.com`, plus `connect-src` pentru SDK-urile Meta.
+- `<link rel="preconnect">` către YouTube/Cloudflare din `<head>`-ul paginii `/shorts/` rămâne activ înainte de acord: deschide handshake-ul TCP/TLS fără să trimită cookie-uri, dar expune IP-ul. De evaluat mutarea pe `bootMedia()` dacă se dorește rigoare maximă.
+- Verificarea live a porții (acord dat din banner → pornire fără reîncărcare) nu e posibilă din acest mediu; de confirmat după deploy.
+
+---
+
+
 
 ### Obiectiv
 - Audit de conformitate cerut de Claudiu pe două axe (robots.txt vs. resurse de randare, GTM vs. consimțământ), urmat de refacerea completă a logicii de consimțământ.

@@ -181,10 +181,14 @@
 
     /** Scrie preferințele, trimite `consent: update` și pornește doar ce s-a aprobat. */
     function apply(prefs) {
-      consentApi.save(prefs);
+      var saved = consentApi.save(prefs);
       hideBanner();
       if (prefs.analytics || prefs.marketing) startTracking();
       if (prefs.video) window.dispatchEvent(new CustomEvent('video:granted'));
+      // Suprafețele gatuite pe categorii (ex: Facebook Comments) se activează fără reîncărcare.
+      window.dispatchEvent(new CustomEvent('fp:consent-updated', {
+        detail: { analytics: saved.analytics, marketing: saved.marketing, video: prefs.video === true },
+      }));
     }
 
     // ── Verifică consimțământul existent la încărcarea paginii ──
