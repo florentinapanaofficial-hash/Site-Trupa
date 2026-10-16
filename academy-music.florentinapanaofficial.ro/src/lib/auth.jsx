@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { supabase, isSupabaseConfigured } from './supabase';
+import { loginEmailForIdentity } from './studentCredentials';
 import { clearSignedUrlCache } from './media';
 import { endActivitySession, setActivityToken, startActivitySession } from './activity';
 
@@ -74,16 +75,10 @@ export function AuthProvider({ children }) {
     }, [profile?.id]);
 
     const value = useMemo(() => {
-        async function signIn(email, password) {
-            const { error } = await supabase.auth.signInWithPassword({ email, password });
-            if (error) throw error;
-        }
-
-        async function signUp(email, password, fullName) {
-            const { error } = await supabase.auth.signUp({
-                email,
+        async function signIn(identity, password) {
+            const { error } = await supabase.auth.signInWithPassword({
+                email: loginEmailForIdentity(identity),
                 password,
-                options: { data: { full_name: fullName } },
             });
             if (error) throw error;
         }
@@ -110,7 +105,6 @@ export function AuthProvider({ children }) {
             loading,
             isTeacher: profile?.role === 'teacher',
             signIn,
-            signUp,
             signOut,
             resetPassword,
         };

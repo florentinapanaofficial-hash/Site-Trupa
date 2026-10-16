@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../lib/auth';
 import { logEvent } from '../lib/activity';
@@ -29,7 +30,8 @@ const LEVELS = [
 ];
 
 export default function Discipline({ discipline }) {
-    const { profile } = useAuth();
+    const { profile, isTeacher } = useAuth();
+    const navigate = useNavigate();
     const [pieces, setPieces] = useState(null);
     const [level, setLevel] = useState('toate');
     const [search, setSearch] = useState('');
@@ -75,12 +77,23 @@ export default function Discipline({ discipline }) {
 
     return (
         <div className="space-y-6">
-            <header className="card">
-                <span className="text-3xl" aria-hidden="true">
-                    {meta.icon}
-                </span>
-                <h1 className="mt-2 font-display text-3xl text-white">{meta.title}</h1>
-                <p className="mt-1 text-sm text-slate-400">{meta.subtitle}</p>
+            <header className="card flex flex-wrap items-start justify-between gap-4">
+                <div>
+                    <span className="text-3xl" aria-hidden="true">
+                        {meta.icon}
+                    </span>
+                    <h1 className="mt-2 font-display text-3xl text-white">{meta.title}</h1>
+                    <p className="mt-1 text-sm text-slate-400">{meta.subtitle}</p>
+                </div>
+                {isTeacher && (
+                    <button
+                        type="button"
+                        className="btn-gold"
+                        onClick={() => navigate(`/admin/piese?add=${discipline}`)}
+                    >
+                        ＋ Adaugă piesă
+                    </button>
+                )}
             </header>
 
             <div className="flex flex-col gap-3 sm:flex-row">
@@ -99,8 +112,8 @@ export default function Discipline({ discipline }) {
                             type="button"
                             onClick={() => setLevel(option.value)}
                             className={`rounded-xl px-3 py-2 text-sm font-medium transition ${level === option.value
-                                    ? 'bg-brand-500 text-white'
-                                    : 'border border-white/15 text-slate-400 hover:text-slate-100'
+                                ? 'bg-brand-500 text-white'
+                                : 'border border-white/15 text-slate-400 hover:text-slate-100'
                                 }`}
                         >
                             {option.label}

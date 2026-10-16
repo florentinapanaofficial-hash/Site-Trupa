@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { supabase, BUCKET_MEDIA } from '../../lib/supabase';
 import { useAuth } from '../../lib/auth';
 import { safeFileName, uploadFile } from '../../lib/media';
@@ -24,6 +25,7 @@ const EMPTY_MODES = { pozitiv: 'local', negativ: 'local' };
 
 export default function AdminPieces() {
     const { profile } = useAuth();
+    const [searchParams, setSearchParams] = useSearchParams();
     const [pieces, setPieces] = useState(null);
     const [groups, setGroups] = useState([]);
     const [students, setStudents] = useState([]);
@@ -34,6 +36,15 @@ export default function AdminPieces() {
     const [targetStudents, setTargetStudents] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
     const [state, setState] = useState({ busy: false, error: '', info: '' });
+
+    useEffect(() => {
+        const requestedDiscipline = searchParams.get('add');
+        if (!['orga', 'canto'].includes(requestedDiscipline)) return;
+
+        setForm({ ...EMPTY_FORM, discipline: requestedDiscipline });
+        setModalOpen(true);
+        setSearchParams({}, { replace: true });
+    }, [searchParams, setSearchParams]);
 
     async function load() {
         const { data } = await supabase

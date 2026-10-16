@@ -10,6 +10,7 @@
 create table if not exists public.profiles (
   id          uuid primary key references auth.users (id) on delete cascade,
   full_name   text        not null default '',
+  username    text,
   role        text        not null default 'student' check (role in ('student', 'teacher')),
   disciplines text[]      not null default array['orga', 'canto'],
   grade_level text,
@@ -20,6 +21,29 @@ create table if not exists public.profiles (
 );
 
 alter table public.profiles add column if not exists avatar_path text;
+alter table public.profiles add column if not exists username text;
+
+create unique index if not exists profiles_username_unique
+  on public.profiles (username)
+  where username is not null;
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint
+    where conname = 'profiles_username_format'
+      and conrelid = 'public.profiles'::regclass
+  ) then
+    alter table public.profiles add constraint profiles_username_format
+      check (
+        username is null
+        or (username = lower(username)
+          and username ~ '^[a-z0-9][a-z0-9._-]{1,28}[a-z0-9]$'
+          and position('..' in username) = 0)
+      );
+  end if;
+end
+$$;
 
 -- Ocolește RLS intenționat: altfel politicile de pe `profiles` s-ar auto-apela recursiv.
 create or replace function public.is_teacher()

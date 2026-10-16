@@ -15,6 +15,8 @@ academy-music.florentinapanaofficial.ro/
 ├── server.mjs                 # server static + CSP și headere de securitate
 ├── railway.toml               # configurație deploy
 ├── supabase/schema.sql        # tabele, funcții, RLS, buckete
+├── supabase/migrations/       # migrări SQL incrementale
+└── supabase/functions/       # funcții server-side pentru administrare conturi
 ├── public/favicon.svg
 └── src/
     ├── main.jsx               # punct de intrare
@@ -63,7 +65,8 @@ academy-music.florentinapanaofficial.ro/
 
 Scriptul creează:
 - tabelele `profiles`, `pieces`, `resources`, `submissions`, `activity_sessions`, `activity_events`, `quiz_results`;
-- trigger-ul care creează automat profilul la înregistrare;
+- coloana unică `profiles.username` pentru conturile elevilor;
+- trigger-ul care creează automat profilul la crearea utilizatorului;
 - trigger-ul care **împiedică un elev să-și schimbe singur rolul**;
 - funcțiile `start_activity_session` / `touch_activity_session` (durata se calculează pe server);
 - politicile RLS pentru fiecare tabel;
@@ -74,9 +77,10 @@ Scriptul creează:
 **Authentication → URL Configuration**:
 - Site URL: `https://academy-music.florentinapanaofficial.ro`
 - Redirect URLs: adaugă și `http://localhost:5180` pentru dezvoltare.
+- În **Authentication → Settings → User Signups**, dezactivează `Allow new users to sign up`. Conturile elevilor sunt create numai de profesor; funcția administrativă confirmă adresele tehnice ale elevilor.
 
 ### 2.4. Promovează-te ca profesor
-După ce îți creezi contul din interfața de login, rulează în SQL Editor:
+Pentru primul profesor, creează un utilizator cu adresa reală în **Authentication → Users → Add user**. Trigger-ul creează profilul cu rolul `student`; promovează apoi contul în SQL Editor:
 
 ```sql
 update public.profiles set role = 'teacher'
@@ -91,9 +95,26 @@ from public.profiles p join auth.users u on u.id = p.id
 where u.email = 'adresa@ta.ro';
 ```
 
-Dacă `role` a rămas `student`, ai o versiune veche a funcției `lock_profile_role`. Rulează din nou `supabase/schema.sql` (este idempotent) și repetă UPDATE-ul. După schimbare, dă refresh în aplicație: profilul se reîncarcă la fiecare încărcare a paginii.
+Dacă `role` a rămas `student`, verifică trigger-ul `lock_profile_role` și repetă UPDATE-ul din SQL Editor. După schimbare, autentifică-te cu emailul și parola reală ale profesorului; conturile profesorilor existente continuă să funcționeze cu email.
 
-### 2.5. Variabilele de mediu
+### 2.5. Conturile elevilor și username
+1. Rulează `supabase/migrations/20261016_student_usernames.sql` în SQL Editor (sau schema completă actualizată).
+2. Din rădăcina proiectului, conectează Supabase CLI și publică funcția:
+
+```bash
+supabase login
+supabase link --project-ref <project-ref>
+supabase functions deploy create-student
+```
+
+Funcția verifică tokenul și rolul profesorului, apoi creează elevul cu Auth Admin API. Cheia `SUPABASE_SERVICE_ROLE_KEY` este folosită numai în Supabase Edge Functions și nu trebuie pusă în `.env`-ul Vite ori într-o variabilă `VITE_*`.
+
+3. În aplicație, deschide **Panou profesor → Elevi → Creează cont**. Username-ul propus poate fi editat; parola se generează din buton. După creare, transmite elevului datele afișate: parola apare o singură dată și nu este salvată în profil.
+4. Elevul se autentifică folosind username-ul și parola. Profesorii existenți se pot autentifica în continuare cu email și parola lor.
+
+Username-ul este convertit intern la o adresă tehnică din domeniul rezervat `.invalid`; nu se trimite email și resetarea prin email nu este disponibilă pentru elevi. Profesorul trebuie să păstreze parola generată și să o transmită elevului.
+
+### 2.6. Variabilele de mediu
 Copiază `.env.example` în `.env` și completează din **Project Settings → API**:
 
 ```
@@ -137,14 +158,14 @@ npm start        # servește dist/ cu headerele de securitate
 ## 5. Fluxul de lucru
 
 **Profesor**
-1. Comută switch-ul **Mod profesor** din bara laterală.
+1. Creează contul elevului din `Elevi → Creează cont` și transmite username-ul și parola generată.
 2. `Piese` → completează formularul, încarcă negativul, pozitivul și partitura PDF.
 3. `RED` → adaugă fișe teoretice și exerciții.
 4. `Teme` → ascultă/vizionează înregistrările, pune nota și observațiile.
-5. `Activitate` → vezi cine s-a logat, de câte ori și cât timp a petrecut.
+5. `Activitate` → vezi sesiunile recente și deschide `Conectați acum` pentru lista live a elevilor/profesorilor activi.
 
 **Elev**
-1. Își creează cont din pagina de login.
+1. Se autentifică cu username-ul și parola primite de la profesor.
 2. Intră la `Orgă` sau `Canto`, filtrează după nivel, ascultă negativul și deschide partitura.
 3. Rezolvă quizul și rebusul din `Jocuri`.
 4. Încarcă tema în `Portofoliu` și primește feedback.

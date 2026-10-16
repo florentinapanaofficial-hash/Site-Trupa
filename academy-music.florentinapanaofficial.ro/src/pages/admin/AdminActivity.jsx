@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { formatDuration } from '../../lib/activity';
+import Modal from '../../components/ui/Modal';
 import Spinner from '../../components/ui/Spinner';
 
 const RANGES = [
@@ -13,6 +14,72 @@ export default function AdminActivity() {
     const [days, setDays] = useState(30);
     const [data, setData] = useState(null);
     const [expanded, setExpanded] = useState(null);
+    const [onlineUsers, setOnlineUsers] = useState(null);
+    const [onlineError, setOnlineError] = useState('');
+    const [onlineOpen, setOnlineOpen] = useState(false);
+
+    useEffect(() => {
+        let active = true;
+
+        async function loadOnlineUsers() {
+            const since = new Date(Date.now() - 90_000).toISOString();
+
+            try {
+                const { data: sessions, error: sessionsError } = await supabase
+                    .from('activity_sessions')
+                    .select('user_id, last_seen_at')
+                    .gte('last_seen_at', since)
+                    .order('last_seen_at', { ascending: false });
+
+                if (sessionsError) throw sessionsError;
+
+                const latestByUser = new Map();
+                for (const session of sessions || []) {
+                    if (!latestByUser.has(session.user_id)) {
+                        latestByUser.set(session.user_id, session.last_seen_at);
+                    }
+                }
+
+                const ids = [...latestByUser.keys()];
+                if (!ids.length) {
+                    if (active) {
+                        setOnlineUsers([]);
+                        setOnlineError('');
+                    }
+                    return;
+                }
+
+                const { data: profiles, error: profilesError } = await supabase
+                    .from('profiles')
+                    .select('id, full_name, role, is_active')
+                    .in('id', ids);
+                if (profilesError) throw profilesError;
+
+                if (active) {
+                    setOnlineUsers((profiles || [])
+                        .filter((profile) => profile.is_active)
+                        .map((profile) => ({
+                            ...profile,
+                            last_seen_at: latestByUser.get(profile.id),
+                        }))
+                        .sort((first, second) => second.last_seen_at.localeCompare(first.last_seen_at)));
+                    setOnlineError('');
+                }
+            } catch {
+                if (active) {
+                    setOnlineUsers([]);
+                    setOnlineError('Lista utilizatorilor activi nu este disponibilă.');
+                }
+            }
+        }
+
+        loadOnlineUsers();
+        const timer = window.setInterval(loadOnlineUsers, 15_000);
+        return () => {
+            active = false;
+            window.clearInterval(timer);
+        };
+    }, []);
 
     useEffect(() => {
         let active = true;
@@ -88,6 +155,9 @@ export default function AdminActivity() {
                         {range.label}
                     </button>
                 ))}
+                <button type="button" className="btn-gold sm:ml-auto" onClick={() => setOnlineOpen(true)}>
+                    Conectați acum ({onlineUsers === null ? '…' : onlineUsers.length})
+                </button>
             </div>
 
             <div className="card overflow-x-auto p-0">
@@ -126,6 +196,41 @@ export default function AdminActivity() {
                     </tbody>
                 </table>
             </div>
+
+            <Modal
+                open={onlineOpen}
+                title="Elevi și profesori conectați"
+                onClose={() => setOnlineOpen(false)}
+            >
+                <p className="mb-4 text-xs text-slate-500">
+                    Activitate detectată în ultimele 90 de secunde. Lista se actualizează automat.
+                </p>
+                {onlineError ? (
+                    <p role="alert" className="text-sm text-brand-200">{onlineError}</p>
+                ) : onlineUsers === null ? (
+                    <Spinner label="Se verifică sesiunile…" />
+                ) : onlineUsers.length === 0 ? (
+                    <p className="text-sm text-slate-400">Niciun utilizator activ în acest moment.</p>
+                ) : (
+                    <ul className="divide-y divide-white/10">
+                        {onlineUsers.map((user) => (
+                            <li key={user.id} className="flex items-center justify-between gap-3 py-3">
+                                <span className="min-w-0">
+                                    <span className="block truncate text-sm font-medium text-white">
+                                        {user.full_name || '(fără nume)'}
+                                    </span>
+                                    <span className="text-xs text-slate-500">
+                                        {user.role === 'teacher' ? 'Profesor' : 'Elev'}
+                                    </span>
+                                </span>
+                                <time className="shrink-0 text-xs text-emerald-300">
+                                    {new Date(user.last_seen_at).toLocaleTimeString('ro-RO')}
+                                </time>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </Modal>
 
             {expanded && (
                 <div className="card">

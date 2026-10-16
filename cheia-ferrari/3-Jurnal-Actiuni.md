@@ -1,3 +1,53 @@
+## 📝 16 oct 2026 — Academy Music: username, parole generate și utilizatori activi
+
+### Obiectiv
+- Crearea conturilor elevilor de către profesor, login cu username/parolă și listă separată de utilizatori activi.
+
+### Modificări
+- `academy-music.florentinapanaofficial.ro/src/lib/studentCredentials.js`: normalizare username cu diacritice românești, sugestie din nume și generator de parolă de 16 caractere prin `crypto.getRandomValues`.
+- `src/lib/auth.jsx` + `src/pages/Login.jsx`: login cu username sau email (email păstrat pentru profesorii existenți); eliminată înscrierea publică. Username-ul elevului se mapează la o adresă tehnică `.invalid`, fără livrare de email.
+- `src/pages/admin/AdminStudents.jsx`: formular profesor-only pentru nume, prenume, username și parolă; parola este afișată/copiabilă o singură dată și nu este stocată în profil. Username-urile sunt afișate în lista clasei.
+- `supabase/functions/create-student/index.ts`: Edge Function verifică JWT-ul și rolul profesorului activ, validează datele, creează cont confirmat și profil student; cheia `service_role` rămâne server-side.
+- `supabase/schema.sql` + `supabase/migrations/20261016_student_usernames.sql`: coloană username, index unic și constrângeri de format.
+- `src/pages/admin/AdminActivity.jsx`: modal „Conectați acum”, deduplicat per utilizator, cu refresh la 15 secunde și sesiuni heartbeat din ultimele 90 secunde.
+- README actualizat cu migrarea, deploy-ul funcției și dezactivarea signup-ului public în Supabase.
+
+### Validări
+- Build Academy: PASS (127 module); `get_errors`: fără erori pe modulele React atinse.
+- Test helper: username românesc și maparea loginului PASS; 100 parole verificate pentru lungime 16 și clasele majuscule/minuscule/cifre/simboluri.
+- Edge Function: parsare TypeScript esbuild PASS. Deno CLI nu este instalat, deci typecheck-ul Deno nu a putut rula.
+- Nicio migrare sau funcție nu a fost executată/deployată în proiectul Supabase din această sesiune; nu s-a făcut autentificare live.
+
+### Riscuri / pași următori
+- Pentru activarea live: rulează migrarea SQL, dezactivează `Allow new users to sign up`, apoi publică `create-student` cu Supabase CLI. Acestea sunt documentate în README.
+- Testează cu un cont real de profesor crearea unui elev, loginul cu username/parolă și lista de sesiuni.
+- Lista „Conectați acum” înseamnă heartbeat în ultimele 90 secunde, nu sesiune auth exactă; fila în fundal nu este considerată activă.
+- Elevii nu au email asociat contului tehnic; parola pierdută necesită resetare administrativă, nu email.
+
+---
+
+## 📝 16 oct 2026 — Academy Music: acces local și adăugare rapidă a pieselor
+
+### Obiectiv
+- Acces local la Academy și continuarea închiderii fluxurilor prioritare pentru profesor.
+
+### Modificări
+- `academy-music.florentinapanaofficial.ro/src/pages/Discipline.jsx`: CTA „Adaugă piesă”, vizibil profesorilor în Orgă și Canto, care deschide ruta existentă de administrare cu disciplina selectată.
+- `academy-music.florentinapanaofficial.ro/src/pages/admin/AdminPieces.jsx`: query-ul `?add=orga|canto` preselectează disciplina și deschide modalul existent; query-ul este eliminat din URL după procesare.
+- Serverul local Vite este pornit la `http://127.0.0.1:5180/`. Variabilele Supabase sunt prezente în `.env`; valorile nu au fost afișate sau consemnate.
+
+### Validări
+- `npm run build` în directorul Academy: PASS (126 module).
+- `get_errors` pe cele două fișiere modificate: fără erori.
+- Smoke test local: HTTP 200.
+
+### Riscuri / pași următori
+- Fluxul de upload trebuie testat autentificat ca profesor, cu fișiere reale; build-ul nu validează RLS sau Storage în Supabase.
+- Înregistrarea audio/video trebuie probată cu microfon și căști, ideal și pe iPhone; nu se poate valida din build/headless.
+- Nicio pagină publică sau metadata SEO a site-ului principal nu a fost modificată; `seo:check` nu se aplică acestei tranșe.
+
+---
+
 ## 📝 15 oct 2026 — Shorts: primul tap activează sunetul
 
 ### Obiectiv

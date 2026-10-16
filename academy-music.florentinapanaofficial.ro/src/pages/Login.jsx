@@ -4,10 +4,10 @@ import { useAuth } from '../lib/auth';
 import Spinner from '../components/ui/Spinner';
 
 export default function Login() {
-    const { session, loading, signIn, signUp, resetPassword } = useAuth();
+    const { session, loading, signIn, resetPassword } = useAuth();
     const location = useLocation();
     const [mode, setMode] = useState('login');
-    const [form, setForm] = useState({ email: '', password: '', fullName: '' });
+    const [form, setForm] = useState({ identity: '', password: '' });
     const [status, setStatus] = useState({ busy: false, error: '', info: '' });
 
     if (loading) {
@@ -32,21 +32,12 @@ export default function Login() {
 
         try {
             if (mode === 'login') {
-                await signIn(form.email.trim(), form.password);
-            } else if (mode === 'signup') {
-                if (form.password.length < 8) {
-                    throw new Error('Parola trebuie să aibă cel puțin 8 caractere.');
-                }
-                await signUp(form.email.trim(), form.password, form.fullName.trim());
-                setStatus({
-                    busy: false,
-                    error: '',
-                    info: 'Cont creat. Verifică emailul pentru confirmare, apoi autentifică-te.',
-                });
-                setMode('login');
-                return;
+                await signIn(form.identity.trim(), form.password);
             } else {
-                await resetPassword(form.email.trim());
+                if (!form.identity.includes('@')) {
+                    throw new Error('Pentru un cont de elev, cere profesorului o parolă nouă.');
+                }
+                await resetPassword(form.identity.trim());
                 setStatus({
                     busy: false,
                     error: '',
@@ -81,39 +72,22 @@ export default function Login() {
                 </div>
 
                 <form onSubmit={handleSubmit} className="card space-y-4">
-                    {mode === 'signup' && (
-                        <div>
-                            <label className="label" htmlFor="fullName">
-                                Nume și prenume
-                            </label>
-                            <input
-                                id="fullName"
-                                className="input"
-                                value={form.fullName}
-                                onChange={update('fullName')}
-                                required
-                                autoComplete="name"
-                                maxLength={80}
-                            />
-                        </div>
-                    )}
-
                     <div>
-                        <label className="label" htmlFor="email">
-                            Email
+                        <label className="label" htmlFor="identity">
+                            {mode === 'login' ? 'Username sau email' : 'Email profesor'}
                         </label>
                         <input
-                            id="email"
-                            type="email"
+                            id="identity"
+                            type={mode === 'login' ? 'text' : 'email'}
                             className="input"
-                            value={form.email}
-                            onChange={update('email')}
+                            value={form.identity}
+                            onChange={update('identity')}
                             required
-                            autoComplete="email"
+                            autoComplete={mode === 'login' ? 'username' : 'email'}
                         />
                     </div>
 
-                    {mode !== 'reset' && (
+                    {mode === 'login' && (
                         <div>
                             <label className="label" htmlFor="password">
                                 Parolă
@@ -125,10 +99,15 @@ export default function Login() {
                                 value={form.password}
                                 onChange={update('password')}
                                 required
-                                minLength={8}
-                                autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                                autoComplete="current-password"
                             />
                         </div>
+                    )}
+
+                    {mode === 'reset' && (
+                        <p className="text-xs text-slate-400">
+                            Conturile elevilor nu folosesc email. Pentru o parolă nouă, contactează profesorul.
+                        </p>
                     )}
 
                     {status.error && (
@@ -143,27 +122,22 @@ export default function Login() {
                             ? 'Se procesează…'
                             : mode === 'login'
                                 ? 'Intră în cont'
-                                : mode === 'signup'
-                                    ? 'Creează cont de elev'
-                                    : 'Trimite linkul de resetare'}
+                                : 'Trimite linkul de resetare'}
                     </button>
 
-                    <div className="flex items-center justify-between text-xs text-slate-400">
+                    <div className="text-xs text-slate-400">
                         <button
                             type="button"
                             className="hover:text-gold-400"
-                            onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
+                            onClick={() => setMode(mode === 'login' ? 'reset' : 'login')}
                         >
-                            {mode === 'login' ? 'Nu ai cont? Înregistrează-te' : 'Am deja cont'}
-                        </button>
-                        <button type="button" className="hover:text-gold-400" onClick={() => setMode('reset')}>
-                            Am uitat parola
+                            {mode === 'login' ? 'Am uitat parola' : 'Înapoi la autentificare'}
                         </button>
                     </div>
                 </form>
 
                 <p className="mt-5 text-center text-xs text-slate-600">
-                    Platformă privată. Accesul este rezervat elevilor înscriși la cursuri.
+                    Conturile elevilor sunt create de profesor. Folosește username-ul și parola primite.
                 </p>
             </div>
         </div>
