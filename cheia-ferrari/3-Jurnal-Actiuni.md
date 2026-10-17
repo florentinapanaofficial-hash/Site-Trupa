@@ -5,13 +5,16 @@
 
 ### Modificări
 - `src/data/seo-content.json`: title actualizat la 54 de caractere și meta description la 140, în limitele SEO interne; textele din prompt (65/161 caractere) ar fi depășit limitele și ar fi fost trunchiate automat.
-- `src/layouts/BaseLayout.astro`: schema `MusicGroup` existentă extinsă cu imaginea de ofertă, locația Pitești și oferta de pachete 2027 în EUR; fără entitate duplicată. Canonical-ul normalizat existent a fost păstrat.
+- `src/layouts/BaseLayout.astro`: schema `MusicGroup` existentă extinsă cu imaginea de ofertă, locația Pitești și oferta de pachete 2027 în EUR; fără entitate duplicată. Canonical-ul normalizat existent a fost păstrat. Eliminat `availability: InStock` generic din oferta 2027 și din ofertele globale de servicii, fiindcă rezervările depind de data evenimentului.
 - `src/pages/index.astro`: imaginea Open Graph a homepage-ului setată la grafica 2027; blocul Early Booking înlocuit cu galeria, mesajul promoțional și linkul funcțional `/rezervare/`. Textele adaptate la contrastul paletei întunecate a site-ului. După ce Claudiu a indicat `public/images/3 poze/`, sursele placeholder au fost înlocuite cu cele trei fișiere reale, cu spațiile URL-encode-uite.
+- `src/pages/momente-cu-mirii.astro` și `src/pages/oferta-premium.astro`: eliminate declarațiile `InStock` care sugerau disponibilitate generală pentru servicii/evenimente cu rezervare variabilă.
+- `.github/copilot-instructions.md`: adăugate reguli permanente pentru JSON-LD factual, omiterea disponibilității neverificate, separarea auditului tehnic de rezultatele GSC și reevaluarea după 2–4 săptămâni.
 - `cheia-ferrari/2-Tracker-SEO.md`: adăugată intrarea sesiunii.
 
 ### Validări
 - `npm run seo:check`: build PASS; 64 pagini, 0 FAIL | 0 WARN.
-- `get_errors`: fără erori în toate cele 3 fișiere sursă atinse, inclusiv după ajustarea contrastului. Smoke check-ul HTML generat a confirmat title (54), description (140), canonical, OG, schema MusicGroup/Offer și CTA.
+- JSON-LD din homepage verificat după build: oferta 2027 și EUR prezente, proprietatea `availability` absentă; zero referințe `schema.org/InStock` în sursele `src/`.
+- `get_errors`: fără erori în toate cele 5 fișiere sursă verificate. Smoke check-ul HTML generat a confirmat title (54), description (140), canonical, OG, schema MusicGroup/Offer și CTA.
 - `node seo-agent/seo-analyzer.js`: 13 oportunități GSC raportate, fără legătură cu FAIL/WARN-ul auditului tehnic.
 - Serverul local: homepage `http://127.0.0.1:4321/` răspunde `200`.
 - Validare imagini după actualizarea căilor: toate cele 3 URL-uri răspund `200`; `get_errors` fără erori în `BaseLayout.astro` și `index.astro`.

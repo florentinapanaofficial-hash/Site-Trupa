@@ -104,7 +104,6 @@ const jsonLd = {
     '@type': 'Offer',
     name: 'Pachete Muzicale Nuntă 2027',
     url: site,
-    availability: 'https://schema.org/InStock',
     priceCurrency: 'EUR',
   },
   contactPoint: contactPointLd,
@@ -208,7 +207,6 @@ const serviceCatalogItems = (siteContent.services ?? []).map((service, index) =>
       offers: {
         '@type': 'Offer',
         url: serviceUrl,
-        availability: 'https://schema.org/InStock',
         priceCurrency: 'RON',
         category: 'Serviciu muzică live',
       },
@@ -254,7 +252,6 @@ const commercialServiceLd = {
   offers: {
     '@type': 'Offer',
     url: `${site}/oferta-premium/`,
-    availability: 'https://schema.org/InStock',
     priceCurrency: 'RON',
     category: 'Ofertă formație nuntă și evenimente',
   },

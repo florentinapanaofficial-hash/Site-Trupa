@@ -155,6 +155,13 @@ seo-agent/
 - Title: **max 60 caractere**, trebuie să conțină cuvântul cheie principal
 - Description: **max 155 caractere**, trebuie să includă un Call to Action
 
+### Date Structurate și Măsurarea Rezultatelor
+- JSON-LD trebuie să descrie fidel serviciile, ofertele și informațiile vizibile pe pagină. Nu inventa prețuri, ratinguri, disponibilitate sau alte date; nu promite afișarea de rich results.
+- Pentru servicii rezervate în funcție de data evenimentului, nu declara `Offer.availability` ca `InStock` generic dacă disponibilitatea nu este confirmată pentru datele respective. Omite proprietatea când starea nu poate fi verificată; folosește date exacte doar dacă există o sursă actualizată.
+- `npm run seo:check` și `npm run seo:audit` validează output-ul tehnic local, nu poziții, trafic, CTR sau conversii. Nu raporta o îmbunătățire de ranking fără date comparative din Google Search Console.
+- Când evaluezi impactul SEO după publicare, notează intervalul și interogările/paginile comparate; revino la GSC după 2–4 săptămâni și separă rezultatele observate de ipoteze și oportunități.
+- În jurnal, consemnează limitele metadata, rezultatul exact al auditului, măsurătorile GSC disponibile și ce rămâne de verificat după publicare. Oportunitățile afișate de `seo-analyzer.js` sunt recomandări, nu rezultate deja obținute.
+
 ---
 
 ## CSS
