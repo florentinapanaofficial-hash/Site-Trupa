@@ -227,4 +227,6 @@ node scripts/optimize-images.js                 # Conversie imagini brute → We
 node scripts/programmatic-seo/generate-pages.js # Regenerare pagini locale
 node scripts/check-links.mjs                    # Validare linkuri
 node scripts/qa-check.mjs                       # QA complet
+npm run seo:submit:sitemap:dry                  # Preview submit GSC sitemap (fără request)
+npm run seo:submit:sitemap                      # Submit doar după deploy, când sitemap-ul public răspunde 200
 ```

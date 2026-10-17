@@ -4,7 +4,8 @@
  * Trimite cereri URL_UPDATED către Google Indexing API pentru:
  *   1. Toate paginile statice (index, despre, membri, galerie, etc.)
  *   2. Toate paginile programmatic SEO (formatie-nunta/*)
- *   3. Sitemap-ul principal
+ *
+ * Sitemap submission is handled separately by submit-sitemap-to-gsc.js.
  *
  * Prerequisite:
  *   1. Service Account cu Indexing API activat în Google Cloud Console
@@ -15,7 +16,6 @@
  * Rulare:
  *   node seo-agent/submit-all-to-gsc.js              # trimite tot
  *   node seo-agent/submit-all-to-gsc.js --dry-run    # afișează URL-urile fără a trimite
- *   node seo-agent/submit-all-to-gsc.js --sitemap    # trimite și sitemap-ul
  * ──────────────────────────────────────────────────────────────────────────────
  */
 import { readFileSync, existsSync } from 'node:fs';
@@ -28,7 +28,11 @@ const ROOT = join(__dirname, '..');
 
 // ── CLI flags ────────────────────────────────────────────
 const DRY_RUN = process.argv.includes('--dry-run');
-const INCLUDE_SITEMAP = process.argv.includes('--sitemap');
+
+if (process.argv.includes('--sitemap')) {
+    console.error('Submit-ul sitemap-ului este separat. Rulează: npm run seo:submit:sitemap');
+    process.exit(1);
+}
 
 // ── Configurare ──────────────────────────────────────────
 const SITE_URL = 'https://www.florentinapanaofficial.ro';
@@ -118,40 +122,6 @@ async function requestIndexing(indexing, url) {
     }
 }
 
-// ── Trimitere sitemap prin Search Console API ────────────
-async function submitSitemap(auth) {
-    const searchConsole = google.searchconsole({ version: 'v1', auth });
-    const sitemapUrl = `${SITE_URL}/sitemap-index.xml`;
-    const hostname = new URL(SITE_URL).hostname;
-    const bareDomain = hostname.replace(/^www\./, '');
-    const propertyCandidates = [
-        SITE_URL,
-        `${SITE_URL}/`,
-        SITE_URL.replace('://www.', '://'),
-        `${SITE_URL.replace('://www.', '://')}/`,
-        `sc-domain:${bareDomain}`,
-    ];
-
-    let lastError = 'Permisiune insuficienta pentru proprietatile GSC testate.';
-
-    for (const siteUrl of propertyCandidates) {
-        try {
-            await searchConsole.sitemaps.submit({
-                siteUrl,
-                feedpath: sitemapUrl,
-            });
-            console.log(`  ✅ Sitemap trimis: ${sitemapUrl}`);
-            console.log(`     Proprietate GSC folosita: ${siteUrl}`);
-            return { url: sitemapUrl, status: 'OK', siteUrl };
-        } catch (err) {
-            lastError = err.response?.data?.error?.message || err.message;
-        }
-    }
-
-    console.log(`  ❌ Eroare sitemap: ${lastError}`);
-    return { url: sitemapUrl, status: 'EROARE', error: lastError };
-}
-
 // ── Main ─────────────────────────────────────────────────
 async function main() {
     console.log('\n╔══════════════════════════════════════════════════════════════════════╗');
@@ -166,7 +136,6 @@ async function main() {
     console.log(`  📋 Total pagini de trimis: ${allUrls.length}`);
     console.log(`     ├─ Pagini statice:       ${STATIC_PAGES.length}`);
     console.log(`     └─ Pagini programatice:  ${programmaticPages.length}`);
-    if (INCLUDE_SITEMAP) console.log(`     └─ Sitemap:              Da`);
     console.log('');
 
     // ── Dry Run: afișează doar URL-urile ─────────────────
@@ -176,9 +145,6 @@ async function main() {
         STATIC_PAGES.forEach((p) => console.log(`    ${SITE_URL}${p}`));
         console.log('\n  Pagini programatic SEO:');
         programmaticPages.forEach((p) => console.log(`    ${SITE_URL}${p}`));
-        if (INCLUDE_SITEMAP) {
-            console.log(`\n  Sitemap: ${SITE_URL}/sitemap-index.xml`);
-        }
         console.log(`\n  ✅ ${allUrls.length} URL-uri pregătite. Rulează fără --dry-run pentru a trimite.\n`);
         return;
     }
@@ -203,15 +169,10 @@ async function main() {
     }
 
     // ── Autentificare Google ─────────────────────────────
-    const scopes = ['https://www.googleapis.com/auth/indexing'];
-    if (INCLUDE_SITEMAP) {
-        scopes.push('https://www.googleapis.com/auth/webmasters');
-    }
-
     const auth = new google.auth.JWT({
         email: clientEmail,
         key: privateKey,
-        scopes,
+        scopes: ['https://www.googleapis.com/auth/indexing'],
     });
 
     const indexing = google.indexing({ version: 'v3', auth });
@@ -252,12 +213,6 @@ async function main() {
         }
     }
 
-    // ── Trimitere Sitemap ────────────────────────────────
-    if (INCLUDE_SITEMAP) {
-        console.log('\n  ── Sitemap ──\n');
-        await submitSitemap(auth);
-    }
-
     // ── Raport Final ─────────────────────────────────────
     const ok = results.filter((r) => r.status === 'OK').length;
     const failed = results.filter((r) => r.status === 'EROARE').length;
@@ -278,9 +233,6 @@ async function main() {
     console.log('     1. Verifică statusul în Google Search Console → URL Inspection');
     console.log('     2. Google va procesa cererile în câteva minute până la câteva ore');
     console.log('     3. Revizitează Search Console peste 24-48h pentru a verifica indexarea');
-    if (!INCLUDE_SITEMAP) {
-        console.log('     4. Rulează cu --sitemap pentru a trimite și sitemap-ul');
-    }
     console.log('');
 }
 

@@ -1,3 +1,27 @@
+## 📝 17 oct 2026 — Submit sitemap GSC separat de Indexing API
+
+### Obiectiv
+- Trimiterea sitemap-ului către Google Search Console fără a notifica toate URL-urile prin Indexing API.
+
+### Modificări
+- `seo-agent/submit-sitemap-to-gsc.js`: script dedicat cu scope `webmasters`, autentificare din environment/`.env`, preflight HTTP și validare XML pentru sitemap-ul public, apoi submit numai prin Search Console API.
+- `package.json`: `seo:submit:sitemap` a fost mutat pe scriptul dedicat; adăugat `seo:submit:sitemap:dry` fără acces la rețea sau API.
+- `seo-agent/submit-all-to-gsc.js`: eliminată ramura sitemap; vechiul flag `--sitemap` eșuează clar și indică noua comandă. Submit-ul URL-urilor rămâne separat.
+- `.github/copilot-instructions.md`: documentate comenzile și faptul că submit-ul se rulează manual doar după ce deploy-ul a făcut public sitemap-ul.
+- Trackerul SEO actualizat.
+
+### Validări
+- `npm run seo:submit:sitemap:dry`: PASS; a afișat sitemap-ul și proprietățile candidate, fără cereri externe.
+- `node --check` pentru ambele scripturi: PASS; vechiul `--sitemap` refuză submit-ul ambiguu.
+- `get_errors`: fără erori în package, scripturi și instrucțiuni; `git diff --check`: PASS.
+- Nu s-a executat submit către Google și nu s-a modificat fluxul de deploy.
+
+### Riscuri / pași următori
+- Submit-ul live necesită `GOOGLE_CLIENT_EMAIL`, `GOOGLE_PRIVATE_KEY` și permisiunea service account-ului asupra proprietății Search Console.
+- Automatizarea după deploy rămâne dezactivată până la configurarea credențialelor și a unui trigger care rulează numai după ce sitemap-ul nou este public.
+
+---
+
 ## 📝 17 oct 2026 — Homepage: oferte Formația Florentina Pană 2027
 
 ### Obiectiv
