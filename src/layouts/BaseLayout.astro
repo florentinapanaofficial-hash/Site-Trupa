@@ -36,6 +36,7 @@ const canonical = canonicalURL.href;
 const MUSIC_GROUP_ID = `${site}/#music-group`;
 const ORGANIZATION_ID = `${site}/#organization`;
 const WEBSITE_ID = `${site}/#website`;
+const offer2027Image = `${site}/images/3%20poze/grafica-oferte-2027.jpg`;
 const isAboutPage = Astro.url.pathname === '/despre/';
 const isMembersPage = Astro.url.pathname === '/membri/';
 
@@ -81,14 +82,31 @@ const jsonLd = {
   ...seoContent.schema,
   '@id': MUSIC_GROUP_ID,
   url: site || seoContent.schema.url,
+  description: 'Formație nuntă Pitești cu muzică live de excepție pentru nunți, botezuri și evenimente private.',
   logo: {
     "@type": "ImageObject",
     "url": logoPngUrl,
     "width": 512,
     "height": 512
   },
-  image: logoPngUrl,
+  image: offer2027Image,
   foundingDate: '2014',
+  location: {
+    '@type': 'Place',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Pitești',
+      addressRegion: 'Argeș',
+      addressCountry: 'RO',
+    },
+  },
+  offers: {
+    '@type': 'Offer',
+    name: 'Pachete Muzicale Nuntă 2027',
+    url: site,
+    availability: 'https://schema.org/InStock',
+    priceCurrency: 'EUR',
+  },
   contactPoint: contactPointLd,
 };
 

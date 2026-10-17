@@ -1,3 +1,26 @@
+## 📝 17 oct 2026 — Homepage: oferte Formația Florentina Pană 2027
+
+### Obiectiv
+- Actualizarea paginii principale pentru sezonul 2027, cu metadata, Open Graph, date structurate și CTA către rezervare.
+
+### Modificări
+- `src/data/seo-content.json`: title actualizat la 54 de caractere și meta description la 140, în limitele SEO interne; textele din prompt (65/161 caractere) ar fi depășit limitele și ar fi fost trunchiate automat.
+- `src/layouts/BaseLayout.astro`: schema `MusicGroup` existentă extinsă cu imaginea de ofertă, locația Pitești și oferta de pachete 2027 în EUR; fără entitate duplicată. Canonical-ul normalizat existent a fost păstrat.
+- `src/pages/index.astro`: imaginea Open Graph a homepage-ului setată la grafica 2027; blocul Early Booking înlocuit cu galeria, mesajul promoțional și linkul funcțional `/rezervare/`. Textele adaptate la contrastul paletei întunecate a site-ului. După ce Claudiu a indicat `public/images/3 poze/`, sursele placeholder au fost înlocuite cu cele trei fișiere reale, cu spațiile URL-encode-uite.
+- `cheia-ferrari/2-Tracker-SEO.md`: adăugată intrarea sesiunii.
+
+### Validări
+- `npm run seo:check`: build PASS; 64 pagini, 0 FAIL | 0 WARN.
+- `get_errors`: fără erori în toate cele 3 fișiere sursă atinse, inclusiv după ajustarea contrastului. Smoke check-ul HTML generat a confirmat title (54), description (140), canonical, OG, schema MusicGroup/Offer și CTA.
+- `node seo-agent/seo-analyzer.js`: 13 oportunități GSC raportate, fără legătură cu FAIL/WARN-ul auditului tehnic.
+- Serverul local: homepage `http://127.0.0.1:4321/` răspunde `200`.
+- Validare imagini după actualizarea căilor: toate cele 3 URL-uri răspund `200`; `get_errors` fără erori în `BaseLayout.astro` și `index.astro`.
+
+### Riscuri / pași următori
+- Imaginile sunt disponibile local; verificarea vizuală în browser și confirmarea randării pe dispozitive mobile/desktop rămân de făcut înainte de publicare.
+
+---
+
 ## 📝 16 oct 2026 — Academy Music: username, parole generate și utilizatori activi
 
 ### Obiectiv

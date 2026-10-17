@@ -93,7 +93,7 @@ const heroPosterMobile = await getImage({ src: heroImg, width: 832, format: 'web
 const heroPosterDesktop = await getImage({ src: heroImg, width: 1440, format: 'webp', quality: 62 });
 ---
 
-<BaseLayout title={acasa.meta.title} description={acasa.meta.description} ogImage={siteContent.seo.ogImage}>
+<BaseLayout title={acasa.meta.title} description={acasa.meta.description} ogImage="/images/3%20poze/grafica-oferte-2027.jpg">
   <Fragment slot="head">
     {/* Media queries complementare și identice cu cele din `<picture>`: exact un
         preload se potrivește, deci LCP-ul se descarcă o singură dată. */}
@@ -363,20 +363,50 @@ const heroPosterDesktop = await getImage({ src: heroImg, width: 1440, format: 'w
     </div>
   </section>
 
-  {/* ═══════════════════════════════════════════
-      EARLY BOOKING — Link intern la articol preț
-  ═══════════════════════════════════════════ */}
-  <section class="hp-early-booking section-container free-scroll-section py-8 sm:py-12 hp-deferred-section" aria-label="Oferte Early Booking">
-    <div class="rounded-2xl border border-amber-500/20 bg-gradient-to-r from-amber-500/10 to-orange-500/10 p-6 sm:p-8 text-center">
-      <p class="text-xs sm:text-sm font-semibold text-amber-300 mb-2">Pentru nunțile din 2027</p>
-      <h2 class="text-lg sm:text-xl font-extrabold text-white mb-3">Nunta voastră din 2027 începe cu o dată aleasă în tihnă</h2>
-      <p class="text-sm text-white/90 mb-4">
-        Vă puteți bucura de planificare fără grabă. Povestiți-ne ce buget aveți în minte, iar noi pregătim o propunere potrivită serii voastre,
-        cu toate detaliile stabilite clar de la început.
-      </p>
-      <a href="/publicatii/pret-formatie-nunta-2027/" class="btn-solid inline-block" onclick="window.dataLayer = window.dataLayer || []; window.dataLayer.push({ 'event': 'fp_interaction', 'action': 'click_early_booking', 'label': 'homepage-pricing-link' });">
-        Descoperiți detaliile Early Booking pentru 2027 →
-      </a>
+  <section class="max-w-6xl mx-auto p-6 my-12 free-scroll-section hp-deferred-section" aria-label="Oferte Formația Florentina Pană pentru 2027">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+      <div class="flex flex-col gap-4">
+        <img
+          src="/images/3%20poze/grafica-oferte-2027%202.jpg"
+          alt="Florentina Pană, solistă Formației de Nuntă"
+          class="rounded-xl shadow-lg w-full h-80 object-cover"
+          loading="lazy"
+          decoding="async"
+        />
+        <img
+          src="/images/3%20poze/grafica-oferte-2027%203.jpg"
+          alt="Atmosferă de petrecere cu Formația Florentina Pană în Pitești"
+          class="rounded-xl shadow-lg w-full h-80 object-cover"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+
+      <div class="flex flex-col gap-6 text-center md:text-left">
+        <h2 class="text-4xl md:text-5xl font-bold text-white leading-tight">
+          FORMAȚIA FLORENTINA PANĂ
+        </h2>
+        <p class="text-2xl text-white/90 font-medium">
+          TRUPA TA DE NUNTĂ • Muzică Live de Excepție
+        </p>
+
+        <a
+          href="/rezervare/"
+          class="bg-yellow-600 text-white font-bold text-xl py-4 px-8 rounded-full inline-flex self-center md:self-start shadow-xl hover:bg-yellow-700 transition transform hover:scale-105"
+        >
+          OFERTE 2027 - Rezervă Acum!
+        </a>
+
+        <p class="text-white/80 text-lg font-semibold tracking-wide">NUNȚI • BOTEZURI • EVENIMENTE</p>
+
+        <img
+          src="/images/3%20poze/grafica-oferte-2027.jpg"
+          alt="Oferte Formație Nuntă 2027 Pitești"
+          class="rounded-xl shadow-md w-full object-cover mt-2"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
     </div>
   </section>
 
