@@ -10,6 +10,35 @@ const RANGES = [
     { value: 365, label: 'Tot anul' },
 ];
 
+function getDeviceLabel(userAgent) {
+    if (!userAgent) return '';
+
+    const browser = /Edg\//.test(userAgent)
+        ? 'Edge'
+        : /OPR\//.test(userAgent)
+            ? 'Opera'
+            : /Firefox\//.test(userAgent)
+                ? 'Firefox'
+                : /Chrome\//.test(userAgent)
+                    ? 'Chrome'
+                    : /Safari\//.test(userAgent)
+                        ? 'Safari'
+                        : 'Browser necunoscut';
+    const platform = /Android/.test(userAgent)
+        ? 'Android'
+        : /iPhone|iPad|iPod/.test(userAgent)
+            ? 'iOS'
+            : /Windows/.test(userAgent)
+                ? 'Windows'
+                : /Mac OS/.test(userAgent)
+                    ? 'macOS'
+                    : /Linux/.test(userAgent)
+                        ? 'Linux'
+                        : '';
+
+    return [browser, platform].filter(Boolean).join(' · ');
+}
+
 export default function AdminActivity() {
     const [days, setDays] = useState(30);
     const [data, setData] = useState(null);
@@ -27,20 +56,20 @@ export default function AdminActivity() {
             try {
                 const { data: sessions, error: sessionsError } = await supabase
                     .from('activity_sessions')
-                    .select('user_id, last_seen_at')
+                    .select('id, user_id, started_at, last_seen_at, user_agent')
                     .gte('last_seen_at', since)
                     .order('last_seen_at', { ascending: false });
 
                 if (sessionsError) throw sessionsError;
 
-                const latestByUser = new Map();
+                const sessionsByUser = new Map();
                 for (const session of sessions || []) {
-                    if (!latestByUser.has(session.user_id)) {
-                        latestByUser.set(session.user_id, session.last_seen_at);
-                    }
+                    const userSessions = sessionsByUser.get(session.user_id) || [];
+                    userSessions.push(session);
+                    sessionsByUser.set(session.user_id, userSessions);
                 }
 
-                const ids = [...latestByUser.keys()];
+                const ids = [...sessionsByUser.keys()];
                 if (!ids.length) {
                     if (active) {
                         setOnlineUsers([]);
@@ -60,7 +89,14 @@ export default function AdminActivity() {
                         .filter((profile) => profile.is_active)
                         .map((profile) => ({
                             ...profile,
-                            last_seen_at: latestByUser.get(profile.id),
+                            activeSessions: sessionsByUser.get(profile.id) || [],
+                            activeSessionCount: (sessionsByUser.get(profile.id) || []).length,
+                            activeDevices: [...new Set(
+                                (sessionsByUser.get(profile.id) || [])
+                                    .map((session) => getDeviceLabel(session.user_agent))
+                                    .filter(Boolean)
+                            )],
+                            last_seen_at: sessionsByUser.get(profile.id)?.[0]?.last_seen_at,
                         }))
                         .sort((first, second) => second.last_seen_at.localeCompare(first.last_seen_at)));
                     setOnlineError('');
@@ -137,6 +173,38 @@ export default function AdminActivity() {
             .sort((a, b) => b.seconds - a.seconds);
     }, [data]);
 
+    const activityAlerts = useMemo(() => {
+        if (!data || !onlineUsers) return new Map();
+
+        const cutoff = Date.now() - 90_000;
+        const alertsByUser = new Map();
+
+        for (const user of onlineUsers) {
+            const alerts = [];
+            if (user.activeSessionCount > 1) alerts.push(`${user.activeSessionCount} sesiuni active`);
+
+            const activeSessionIds = new Set(user.activeSessions.map((session) => session.id));
+            const previousDevices = new Set(
+                data.sessions
+                    .filter((session) =>
+                        session.user_id === user.id
+                        && !activeSessionIds.has(session.id)
+                        && new Date(session.last_seen_at).getTime() < cutoff
+                    )
+                    .map((session) => getDeviceLabel(session.user_agent))
+                    .filter(Boolean)
+            );
+            const newDevices = user.activeDevices.filter((device) => !previousDevices.has(device));
+            if (previousDevices.size > 0 && newDevices.length > 0) {
+                alerts.push('Browser/platformă nouă în interval');
+            }
+
+            if (alerts.length > 0) alertsByUser.set(user.id, alerts);
+        }
+
+        return alertsByUser;
+    }, [data, onlineUsers]);
+
     if (!data) return <Spinner label="Se calculează activitatea…" />;
 
     return (
@@ -148,8 +216,8 @@ export default function AdminActivity() {
                         type="button"
                         onClick={() => setDays(range.value)}
                         className={`rounded-xl px-3 py-2 text-sm transition ${days === range.value
-                                ? 'bg-gold-500 text-ink-950'
-                                : 'border border-white/15 text-slate-400 hover:text-slate-100'
+                            ? 'bg-gold-500 text-ink-950'
+                            : 'border border-white/15 text-slate-400 hover:text-slate-100'
                             }`}
                     >
                         {range.label}
@@ -175,7 +243,14 @@ export default function AdminActivity() {
                     <tbody className="divide-y divide-white/5">
                         {rows.map((row) => (
                             <tr key={row.id} className={row.seconds === 0 ? 'opacity-60' : ''}>
-                                <td className="px-4 py-3 font-medium text-slate-100">{row.full_name || '(fără nume)'}</td>
+                                <td className="px-4 py-3 font-medium text-slate-100">
+                                    {row.full_name || '(fără nume)'}
+                                    {activityAlerts.has(row.id) && (
+                                        <span className="mt-1 block text-xs font-normal text-amber-300">
+                                            {activityAlerts.get(row.id).join(' · ')}
+                                        </span>
+                                    )}
+                                </td>
                                 <td className="px-4 py-3 text-slate-400">{row.role === 'teacher' ? 'Profesor' : 'Elev'}</td>
                                 <td className="px-4 py-3 text-slate-400">{row.count}</td>
                                 <td className="px-4 py-3 text-slate-200">{formatDuration(row.seconds)}</td>
@@ -203,7 +278,7 @@ export default function AdminActivity() {
                 onClose={() => setOnlineOpen(false)}
             >
                 <p className="mb-4 text-xs text-slate-500">
-                    Activitate detectată în ultimele 90 de secunde. Lista se actualizează automat.
+                    Activitate detectată în ultimele 90 de secunde. Lista se actualizează automat; sesiunile simultane pot însemna și file deschise de același elev.
                 </p>
                 {onlineError ? (
                     <p role="alert" className="text-sm text-brand-200">{onlineError}</p>
@@ -221,6 +296,8 @@ export default function AdminActivity() {
                                     </span>
                                     <span className="text-xs text-slate-500">
                                         {user.role === 'teacher' ? 'Profesor' : 'Elev'}
+                                        {' · '}{user.activeSessionCount} {user.activeSessionCount === 1 ? 'sesiune' : 'sesiuni'}
+                                        {user.activeDevices.length > 0 ? ` · ${user.activeDevices.join(', ')}` : ''}
                                     </span>
                                 </span>
                                 <time className="shrink-0 text-xs text-emerald-300">
@@ -244,7 +321,10 @@ export default function AdminActivity() {
                             .slice(0, 20)
                             .map((session) => (
                                 <li key={session.id} className="flex justify-between gap-3 border-b border-white/5 pb-1">
-                                    <span>{new Date(session.started_at).toLocaleString('ro-RO')}</span>
+                                    <span>
+                                        {new Date(session.started_at).toLocaleString('ro-RO')}
+                                        {getDeviceLabel(session.user_agent) ? ` · ${getDeviceLabel(session.user_agent)}` : ''}
+                                    </span>
                                     <span>{formatDuration(session.duration_seconds)}</span>
                                 </li>
                             ))}
