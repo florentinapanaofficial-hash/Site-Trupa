@@ -1,3 +1,69 @@
+# 📝 18 oct 2026 — Academy Music: ștergere definitivă cont elev
+
+### Obiectiv
+- Eliminarea definitivă a unui elev și a datelor sale din Academy Music, cu protecție împotriva clickurilor accidentale.
+
+### Modificări
+- `academy-music.florentinapanaofficial.ro/src/pages/admin/StudentDetail.jsx`: zonă de ștergere separată de blocarea reversibilă; cere introducerea username-ului (sau numelui/ID-ului dacă username-ul lipsește) și afișează ce date vor fi șterse.
+- `academy-music.florentinapanaofficial.ro/supabase/functions/delete-student/index.ts`: Edge Function verifică JWT-ul și rolul profesorului activ, refuză ștergerea propriului cont sau a unui profesor, curăță fișierele din `avatars` și `portfolio`, apoi șterge utilizatorul prin Auth Admin API. Datele relaționale cu `ON DELETE CASCADE` sunt eliminate de baza de date.
+- README documentat cu deploy-ul funcției și efectele ireversibile. Cheia `service_role` rămâne doar server-side; fără modificări la schema SQL.
+
+### Validări
+- Build Academy: PASS, 127 module.
+- Parsare TypeScript Edge Function prin esbuild: PASS.
+- `get_errors` pentru componentă și Edge Function: fără erori.
+- `npm run seo:check`: build PASS; 64 pagini, 0 FAIL | 0 WARN.
+- `delete-student` publicată prin Supabase CLI și verificată în lista remote cu status `ACTIVE`, `verify_jwt: true`.
+- Nu s-a șters niciun cont real.
+
+### Riscuri / pași următori
+- Operația este ireversibilă. Dacă ștergerea Storage reușește parțial și o operație ulterioară eșuează, contul rămâne în Auth/DB și funcția poate fi reîncercată; fișierele deja eliminate nu pot fi recuperate.
+- Testează fluxul cu un cont de elev de test înainte de folosirea pe conturi reale; verifică și curățarea fișierelor Storage și cascadele din DB.
+
+---
+
+# 📝 18 oct 2026 — Academy Music: semnale pentru folosirea simultană a conturilor
+
+### Obiectiv
+- Să ofere profesorului indicii când un cont de elev apare în sesiuni simultane sau dintr-un browser/dispozitiv neîntâlnit în istoricul selectat.
+
+### Modificări
+- `academy-music.florentinapanaofficial.ro/src/pages/admin/AdminActivity.jsx`: lista activă include acum numărul sesiunilor și etichete browser/platformă; tabelul semnalează sesiunile simultane și browserul/platforma neîntâlnită în istoricul perioadei selectate.
+- Folosite înregistrările existente din `activity_sessions`; fără migrare SQL, stocare de parole sau colectare de IP-uri. Sesiunile sunt create după autentificare reușită.
+- Avertismentele sunt indicii, nu identifică persoana și pot apărea legitim la mai multe file sau dispozitive.
+
+### Validări
+- Build Academy: PASS, 127 module.
+- `get_errors` pentru `AdminActivity.jsx`: fără erori.
+- `npm run seo:check`: build PASS; 64 pagini, 0 FAIL | 0 WARN.
+
+### Riscuri / pași următori
+- Comparația folosește user-agent-ul furnizat de browser și poate fi falsificat; un browser nou nu dovedește partajarea contului.
+- Modificarea nu a fost verificată cu sesiuni live în Supabase; după deploy trebuie testate două sesiuni pentru același elev, inclusiv două file legitime, pentru a evalua semnalele.
+
+---
+
+## 📝 18 oct 2026 — Academy Music: cache persistent pentru playerul audio
+
+### Obiectiv
+- Reducerea cererilor Supabase repetate pentru redarea audio, păstrând datele locale exclusiv în fluxul playerului.
+
+### Modificări
+- `academy-music.florentinapanaofficial.ro/src/lib/media.js`: adăugat cache `localStorage` pentru URL-urile semnate folosite de playerul audio, cu expirare derivată din TTL și marjă de 20 secunde; cache invalid/expirat eliminat. Cache-ul obișnuit pentru imagini/PDF-uri nu a fost schimbat, iar cache-ul audio se golește la logout.
+- `academy-music.florentinapanaofficial.ro/src/components/SecureAudioPlayer.jsx`: playerul folosește noul cache audio; butonul „Reîncarcă audio” invalidează URL-ul salvat și cere unul nou, disponibil când redarea este oprită.
+- Nicio interogare pentru repertoriu sau teme nu a fost pusă în `localStorage`.
+
+### Validări
+- Build Academy: PASS, 127 module.
+- `get_errors` pentru fișierele modificate: fără erori.
+- `npm run seo:check`: PASS, build Astro + 64 pagini, 0 FAIL | 0 WARN.
+- Academy nu are script de teste în `package.json`; nu s-a rulat un test automat de browser sau de integrare Supabase.
+
+### Riscuri / pași următori
+- `localStorage` păstrează doar URL-ul semnat și expirarea lui, nu fișierul audio pentru redare offline. URL-ul este reemis după expirare, la refresh sau la logout.
+
+---
+
 ## 📝 17 oct 2026 — Submit sitemap GSC separat de Indexing API
 
 ### Obiectiv

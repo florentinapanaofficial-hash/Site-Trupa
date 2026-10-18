@@ -5,6 +5,7 @@ import { invalidateSignedUrl, safeFileName, uploadFile } from '../../lib/media';
 import Avatar from '../../components/Avatar';
 import DualAudioRow from '../../components/DualAudioRow';
 import PieceSelectorModal from '../../components/PieceSelectorModal';
+import Modal from '../../components/ui/Modal';
 import Spinner from '../../components/ui/Spinner';
 import EmptyState from '../../components/ui/EmptyState';
 
@@ -19,7 +20,12 @@ export default function StudentDetail({ student, allPieces, onBack, onStudentCha
     const [groups, setGroups] = useState([]);
     const [memberships, setMemberships] = useState([]);
     const [status, setStatus] = useState({ busy: false, error: '' });
+    const [deleteOpen, setDeleteOpen] = useState(false);
+    const [deleteConfirmation, setDeleteConfirmation] = useState('');
+    const [deleteBusy, setDeleteBusy] = useState(false);
+    const [deleteError, setDeleteError] = useState('');
     const fileInputRef = useRef(null);
+    const deleteConfirmationValue = student.username || student.full_name || student.id;
 
     const loadRows = useCallback(async () => {
         const { data, error } = await supabase
@@ -176,6 +182,43 @@ export default function StudentDetail({ student, allPieces, onBack, onStudentCha
         }
     }
 
+    async function handleDeleteStudent() {
+        if (deleteConfirmation !== deleteConfirmationValue || deleteBusy) return;
+
+        setDeleteBusy(true);
+        setDeleteError('');
+
+        try {
+            const { data, error } = await supabase.functions.invoke('delete-student', {
+                body: { studentId: student.id },
+            });
+
+            if (error) {
+                let message = error.message;
+                if (error.context instanceof Response) {
+                    const body = await error.context.json().catch(() => null);
+                    message = body?.error || message;
+                }
+                throw new Error(message);
+            }
+            if (!data?.success) throw new Error(data?.error || 'Contul nu a putut fi șters.');
+
+            setDeleteOpen(false);
+            onBack();
+        } catch (error) {
+            setDeleteError(error?.message || 'Ștergerea contului a eșuat.');
+        } finally {
+            setDeleteBusy(false);
+        }
+    }
+
+    function closeDeleteModal() {
+        if (deleteBusy) return;
+        setDeleteOpen(false);
+        setDeleteConfirmation('');
+        setDeleteError('');
+    }
+
     return (
         <div className="space-y-5">
             <button type="button" className="btn-ghost" onClick={onBack}>
@@ -267,6 +310,26 @@ export default function StudentDetail({ student, allPieces, onBack, onStudentCha
                 </div>
             </section>
 
+            {student.role === 'student' && !isSelf && (
+                <section className="card border border-red-500/20">
+                    <h3 className="text-sm font-semibold text-red-200">Eliminare definitivă</h3>
+                    <p className="mt-1 text-xs text-slate-400">
+                        Șterge contul elevului și datele asociate. Operația nu poate fi anulată.
+                    </p>
+                    <button
+                        type="button"
+                        className="btn mt-3 bg-red-500/15 text-red-200 hover:bg-red-500/25"
+                        onClick={() => {
+                            setDeleteConfirmation('');
+                            setDeleteError('');
+                            setDeleteOpen(true);
+                        }}
+                    >
+                        Șterge definitiv contul elevului
+                    </button>
+                </section>
+            )}
+
             <section className="card">
                 <h3 className="text-sm font-semibold text-slate-200">Grupe de studiu</h3>
                 <p className="mt-1 text-xs text-slate-500">
@@ -334,6 +397,55 @@ export default function StudentDetail({ student, allPieces, onBack, onStudentCha
                 onClose={() => setSelectorOpen(false)}
                 onConfirm={handleConfirm}
             />
+
+            <Modal
+                open={deleteOpen}
+                title="Confirmă ștergerea definitivă"
+                onClose={closeDeleteModal}
+            >
+                <div className="space-y-4">
+                    <p className="text-sm text-slate-300">
+                        Se vor șterge contul, repertoriul individual, apartenența la grupe, temele încărcate,
+                        istoricul de activitate, fotografia și fișierele din portofoliu ale elevului.
+                    </p>
+                    <p className="text-sm text-red-200">
+                        Această operație este ireversibilă. Pentru confirmare, scrie exact:
+                        <span className="ml-1 font-mono font-semibold">{deleteConfirmationValue}</span>
+                    </p>
+                    <div>
+                        <label className="label" htmlFor="delete-student-confirmation">
+                            Username / nume de confirmare
+                        </label>
+                        <input
+                            id="delete-student-confirmation"
+                            className="input"
+                            value={deleteConfirmation}
+                            onChange={(event) => setDeleteConfirmation(event.target.value)}
+                            autoComplete="off"
+                            autoCapitalize="none"
+                            disabled={deleteBusy}
+                        />
+                    </div>
+                    {deleteError && (
+                        <p role="alert" className="rounded-lg bg-brand-500/15 px-3 py-2 text-sm text-brand-200">
+                            {deleteError}
+                        </p>
+                    )}
+                    <div className="flex justify-end gap-2">
+                        <button type="button" className="btn-ghost" onClick={closeDeleteModal} disabled={deleteBusy}>
+                            Anulează
+                        </button>
+                        <button
+                            type="button"
+                            className="btn bg-red-500/20 text-red-200 hover:bg-red-500/30"
+                            onClick={handleDeleteStudent}
+                            disabled={deleteBusy || deleteConfirmation !== deleteConfirmationValue}
+                        >
+                            {deleteBusy ? 'Se șterge…' : 'Șterge definitiv'}
+                        </button>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 }

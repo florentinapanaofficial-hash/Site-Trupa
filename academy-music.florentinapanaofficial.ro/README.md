@@ -105,9 +105,12 @@ Dacă `role` a rămas `student`, verifică trigger-ul `lock_profile_role` și re
 supabase login
 supabase link --project-ref <project-ref>
 supabase functions deploy create-student
+supabase functions deploy delete-student
 ```
 
-Funcția verifică tokenul și rolul profesorului, apoi creează elevul cu Auth Admin API. Cheia `SUPABASE_SERVICE_ROLE_KEY` este folosită numai în Supabase Edge Functions și nu trebuie pusă în `.env`-ul Vite ori într-o variabilă `VITE_*`.
+Funcțiile verifică tokenul și rolul profesorului activ. `create-student` creează elevul cu Auth Admin API; `delete-student` șterge definitiv numai conturi cu rol de elev și curăță fișierele din bucket-urile private `avatars` și `portfolio`. Ștergerea contului elimină în cascadă profilul, repertoriul individual, temele, sesiunile și activitatea asociată. În fișa elevului, ștergerea cere introducerea username-ului și nu poate fi anulată.
+
+Cheia `SUPABASE_SERVICE_ROLE_KEY` este folosită numai în Supabase Edge Functions și nu trebuie pusă în `.env`-ul Vite ori într-o variabilă `VITE_*`.
 
 3. În aplicație, deschide **Panou profesor → Elevi → Creează cont**. Username-ul propus poate fi editat; parola se generează din buton. După creare, transmite elevului datele afișate: parola apare o singură dată și nu este salvată în profil.
 4. Elevul se autentifică folosind username-ul și parola. Profesorii existenți se pot autentifica în continuare cu email și parola lor.
