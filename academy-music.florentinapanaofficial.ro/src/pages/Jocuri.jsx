@@ -44,7 +44,7 @@ export default function Jocuri() {
 }
 
 function Quiz() {
-    const { profile } = useAuth();
+    const { profile, isInspector } = useAuth();
     const quiz = games.quiz;
     const [answers, setAnswers] = useState({});
     const [submitted, setSubmitted] = useState(false);
@@ -56,6 +56,7 @@ function Quiz() {
     );
 
     async function finish() {
+        if (isInspector) { setSubmitted(true); return; }
         setSaving(true);
         setSubmitted(true);
         await supabase.from('quiz_results').insert({
@@ -117,7 +118,7 @@ function Quiz() {
                         <p className="text-lg font-semibold text-white">
                             Scor: {score} / {quiz.questions.length}{' '}
                             <span className="text-sm font-normal text-slate-400">
-                                {saving ? '(se salvează…)' : '(salvat)'}
+                                {isInspector ? '(local)' : saving ? '(se salvează…)' : '(salvat)'}
                             </span>
                         </p>
                         <button type="button" className="btn-ghost" onClick={reset}>

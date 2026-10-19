@@ -251,7 +251,7 @@ export default function AdminActivity() {
                                         </span>
                                     )}
                                 </td>
-                                <td className="px-4 py-3 text-slate-400">{row.role === 'teacher' ? 'Profesor' : 'Elev'}</td>
+                                <td className="px-4 py-3 text-slate-400">{['teacher', 'profesor'].includes(row.role) ? 'Profesor' : row.role === 'inspector' ? 'Inspector' : 'Elev'}</td>
                                 <td className="px-4 py-3 text-slate-400">{row.count}</td>
                                 <td className="px-4 py-3 text-slate-200">{formatDuration(row.seconds)}</td>
                                 <td className="px-4 py-3 text-slate-400">
@@ -295,7 +295,7 @@ export default function AdminActivity() {
                                         {user.full_name || '(fără nume)'}
                                     </span>
                                     <span className="text-xs text-slate-500">
-                                        {user.role === 'teacher' ? 'Profesor' : 'Elev'}
+                                        {['teacher', 'profesor'].includes(user.role) ? 'Profesor' : user.role === 'inspector' ? 'Inspector' : 'Elev'}
                                         {' · '}{user.activeSessionCount} {user.activeSessionCount === 1 ? 'sesiune' : 'sesiuni'}
                                         {user.activeDevices.length > 0 ? ` · ${user.activeDevices.join(', ')}` : ''}
                                     </span>

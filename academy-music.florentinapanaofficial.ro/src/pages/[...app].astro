@@ -1,0 +1,15 @@
+---
+import AcademyLayout from '../layouts/AcademyLayout.astro';
+export function getStaticPaths() {
+    return ['login', 'repertoriul-meu', 'orga', 'canto', 'red', 'jocuri', 'portofoliu', 'cursuri-online', '404', 'admin', 'admin/predare', 'admin/piese', 'admin/resurse', 'admin/elevi', 'admin/teme', 'admin/activitate'].map((app) => ({ params: { app } }));
+}
+---
+<AcademyLayout {...(Astro.params.app === 'cursuri-online' ? {
+    title: 'Cursuri online și grupe de elevi | Academy Music Pitești',
+    description: 'Participă la cursurile online Academy Music din Pitești. Consultă orarul grupei tale și intră în sala video pentru lecții de orgă și canto.',
+} : {})}>
+    <div id="root"></div>
+    <script>
+        import '../main.jsx';
+    </script>
+</AcademyLayout>

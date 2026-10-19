@@ -233,7 +233,7 @@ export default function StudentDetail({ student, allPieces, onBack, onStudentCha
                         {student.full_name || '(fără nume)'}
                     </h2>
                     <p className="text-sm text-slate-500">
-                        {student.role === 'teacher' ? 'Profesor' : 'Elev'}
+                        {['teacher', 'profesor'].includes(student.role) ? 'Profesor' : student.role === 'inspector' ? 'Inspector' : 'Elev'}
                         {student.grade_level ? ` · ${student.grade_level}` : ''} · înscris pe{' '}
                         {new Date(student.created_at).toLocaleDateString('ro-RO')}
                     </p>
@@ -267,12 +267,13 @@ export default function StudentDetail({ student, allPieces, onBack, onStudentCha
                     <select
                         id="student-role"
                         className="input"
-                        value={student.role}
+                        value={student.role === 'teacher' ? 'profesor' : student.role === 'student' ? 'elev' : student.role}
                         disabled={isSelf}
                         onChange={(event) => onPatch(student.id, { role: event.target.value })}
                     >
-                        <option value="student">Elev</option>
-                        <option value="teacher">Profesor</option>
+                        <option value="elev">Elev</option>
+                        <option value="profesor">Profesor</option>
+                        <option value="inspector">Inspector</option>
                     </select>
                 </div>
 
@@ -310,7 +311,7 @@ export default function StudentDetail({ student, allPieces, onBack, onStudentCha
                 </div>
             </section>
 
-            {student.role === 'student' && !isSelf && (
+            {['student', 'elev'].includes(student.role) && !isSelf && (
                 <section className="card border border-red-500/20">
                     <h3 className="text-sm font-semibold text-red-200">Eliminare definitivă</h3>
                     <p className="mt-1 text-xs text-slate-400">

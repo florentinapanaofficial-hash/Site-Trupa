@@ -6,21 +6,44 @@
     "engines": {
         "node": ">=22.12.0"
     },
+    "overrides": {
+        "@tailwindcss/typography": {
+            "postcss-selector-parser": "^7.1.6"
+        }
+    },
     "scripts": {
-        "dev": "vite",
-        "build": "vite build",
-        "preview": "vite preview",
+        "dev": "astro dev --port 5180",
+        "build": "astro build && node scripts/compress.mjs",
+        "preview": "astro preview --port 5180",
+        "test": "node --test src/lib/learning.check.mjs",
+        "test:browser": "node scripts/verify-learning.mjs",
         "start": "node server.mjs"
     },
     "dependencies": {
+        "@astrojs/mdx": "^8.1.0",
+        "@astrojs/node": "^11.1.8",
+        "@astrojs/react": "^7.1.0",
+        "@jitsi/react-sdk": "^1.4.4",
         "@supabase/supabase-js": "^2.105.4",
+        "@tailwindcss/typography": "^0.5.20",
+        "@tonejs/midi": "^2.0.28",
+        "@vexflow-fonts/academico": "^1.0.1",
+        "@vexflow-fonts/bravura": "^1.0.2",
+        "astro": "^7.4.0",
+        "googleapis": "^186.0.0",
+        "html-midi-player": "^1.6.0",
+        "lucide-react": "^1.59.0",
+        "midi-writer-js": "^3.2.1",
         "pdfjs-dist": "^4.10.38",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
         "react-router-dom": "^7.18.4",
-        "sirv": "^3.0.2"
+        "sirv": "^3.0.2",
+        "vexflow": "^5.0.0"
     },
     "devDependencies": {
+        "@electric-sql/pglite": "^0.5.10",
+        "@playwright/test": "^1.64.1",
         "@tailwindcss/vite": "^4.3.3",
         "@vitejs/plugin-react": "^4.3.4",
         "tailwindcss": "^4.3.3",

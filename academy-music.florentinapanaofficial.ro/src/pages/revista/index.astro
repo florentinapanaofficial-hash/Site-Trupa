@@ -1,0 +1,20 @@
+---
+import { getCollection } from 'astro:content';
+import AcademyLayout from '../../layouts/AcademyLayout.astro';
+const courses = (await getCollection('revista')).sort((first, second) => second.data.data_publicarii.valueOf() - first.data.data_publicarii.valueOf());
+---
+<AcademyLayout title="Revista Academy Music: mini-cursuri de orgă și canto" description="Descoperă mini-cursurile Academy Music pentru orgă și canto. Citește lecțiile, exersează în ritmul tău și verifică-ți cunoștințele muzicale.">
+    <main class="mx-auto min-h-screen max-w-6xl px-4 py-8 sm:px-6">
+        <nav class="mb-8 flex flex-wrap gap-6 text-sm text-gold-400"><a href="/">Academy Music</a><a href="/studio/">Studio</a></nav>
+        <header class="mb-8 border-b border-white/10 pb-6"><h1 class="text-3xl text-white">Revista Academy Music</h1><p class="mt-2 text-slate-400">Orgă · Canto · Teorie muzicală</p></header>
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {courses.map((course) => <article class="overflow-hidden rounded-lg border border-white/10 bg-ink-900 shadow-lg">
+                <a href={`/revista/${course.id}/`} class="block">
+                    <img src={course.data.imagine_cover} alt={`Coperta mini-cursului ${course.data.titlu}`} width="960" height="640" class="aspect-[3/2] w-full object-cover" loading="lazy" />
+                    <div class="p-5"><time class="text-xs text-gold-400" datetime={course.data.data_publicarii.toISOString()}>{course.data.data_publicarii.toLocaleDateString('ro-RO', { timeZone: 'UTC' })}</time><h2 class="mt-2 text-xl text-white">{course.data.titlu}</h2><p class="mt-2 text-sm text-slate-400">{course.data.descriere}</p></div>
+                </a>
+            </article>)}
+        </div>
+        {!courses.length && <p class="text-slate-400">Nu există încă mini-cursuri publicate.</p>}
+    </main>
+</AcademyLayout>

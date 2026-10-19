@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import Spinner from '../../components/ui/Spinner';
+import AdminDashboard from './AdminDashboard';
+import HomeworkCatalog from '../../components/HomeworkCatalog';
 
 export default function AdminOverview() {
     const [stats, setStats] = useState(null);
@@ -62,6 +64,8 @@ export default function AdminOverview() {
                     text="Cine s-a logat și cât a stat."
                 />
             </div>
+            <AdminDashboard />
+            <HomeworkCatalog />
         </div>
     );
 }

@@ -187,7 +187,7 @@ export default function AdminStudents() {
                                         <span className="block truncate text-xs text-gold-300">{student.username}</span>
                                     )}
                                     <span className="block truncate text-xs text-slate-500">
-                                        {student.role === 'teacher' ? 'Profesor' : 'Elev'}
+                                        {['teacher', 'profesor'].includes(student.role) ? 'Profesor' : student.role === 'inspector' ? 'Inspector' : 'Elev'}
                                         {student.grade_level ? ` · ${student.grade_level}` : ''} ·{' '}
                                         {assigned} {assigned === 1 ? 'piesă' : 'piese'}
                                     </span>

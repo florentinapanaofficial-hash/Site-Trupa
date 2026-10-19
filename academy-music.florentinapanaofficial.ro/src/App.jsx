@@ -11,6 +11,8 @@ import RepertoriulMeu from './pages/RepertoriulMeu';
 import SetupRequired from './pages/SetupRequired';
 import AdminPanel from './pages/admin/AdminPanel';
 import NotFound from './pages/NotFound';
+import OnlineClasses from './pages/OnlineClasses';
+import LiveClass from './components/LiveClass';
 import { isSupabaseConfigured } from './lib/supabase';
 
 export default function App() {
@@ -31,10 +33,12 @@ export default function App() {
             >
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/repertoriul-meu" element={<RepertoriulMeu />} />
+                <Route path="/cursuri-online/" element={<OnlineClasses />} />
+                <Route path="/cursuri-online/:groupId/" element={<LiveClass />} />
                 <Route
                     path="/orga"
                     element={
-                        <ProtectedRoute requireTeacher>
+                        <ProtectedRoute>
                             <Discipline discipline="orga" />
                         </ProtectedRoute>
                     }
@@ -42,7 +46,7 @@ export default function App() {
                 <Route
                     path="/canto"
                     element={
-                        <ProtectedRoute requireTeacher>
+                        <ProtectedRoute>
                             <Discipline discipline="canto" />
                         </ProtectedRoute>
                     }

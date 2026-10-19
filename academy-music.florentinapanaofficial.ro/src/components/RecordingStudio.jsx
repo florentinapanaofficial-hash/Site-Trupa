@@ -4,6 +4,7 @@ import { useAuth } from '../lib/auth';
 import { getSignedUrl, safeFileName, uploadFile } from '../lib/media';
 import { resolveAudioSource } from '../lib/pieces';
 import { logEvent } from '../lib/activity';
+import { uploadHomeworkToDrive } from '../lib/submitHomework';
 import {
     MAX_RECORDING_MS,
     createStudioSession,
@@ -164,6 +165,15 @@ export default function RecordingStudio({ open, piece, onClose, onSubmitted }) {
             const base = safeFileName(`${piece.title}-tema`);
             const path = `${profile.id}/${Date.now()}-${base}.${extension}`;
             const file = new File([result.blob], `${base}.${extension}`, { type: result.mimeType });
+
+            if (!withVideo) {
+                await uploadHomeworkToDrive({ blob: file, fileName: file.name, title: `${piece.title} — înregistrare`.slice(0, 200), studentNote: note.trim(), pieceId: piece.id });
+                logEvent(profile.id, 'recording_submitted', '/', { piece_id: piece.id, with_video: false });
+                teardown();
+                setPhase('submitted');
+                onSubmitted?.();
+                return;
+            }
 
             await uploadFile(BUCKET_PORTFOLIO, path, file);
 
@@ -339,6 +349,8 @@ export default function RecordingStudio({ open, piece, onClose, onSubmitted }) {
                         </div>
                     </>
                 )}
+
+                {phase === 'submitted' && <div className="space-y-4 py-6"><p role="status" className="text-sm text-emerald-200">Tema a fost trimisă cu succes domnului profesor!</p><button type="button" className="btn-gold" onClick={handleClose}>Închide</button></div>}
 
                 {phase === 'uploading' && (
                     <p className="py-6 text-center text-sm text-slate-400">Se trimite tema…</p>

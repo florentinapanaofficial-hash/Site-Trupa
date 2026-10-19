@@ -1,3 +1,278 @@
+## 📝 19 oct 2026 — Academy Music: player html-midi-player, upload audio+MIDI în Drive, push pe live cu pași rămași
+
+### Obiectiv
+- Înlocuit Flat.io cu `html-midi-player` (gratuit), upload dublu audio+MIDI în Drive, buton MIDI doar pentru profesor; push pe live înainte de finalizarea configurării.
+
+### Modificări
+- `InteractiveStudio.jsx`: `<midi-player>` + `<midi-visualizer>` (waterfall), Blob MIDI generat din tastele elevului la REC/STOP, buton „Încarcă Matriță / Exercițiu MIDI” vizibil doar pentru `florentinapanaofficial@gmail.com` și `pana_claudiu_profesor@yahoo.ro` (verificare doar în browser).
+- `homeworkUpload.js` + `submitHomework.js`: upload audio + MIDI (`Nume_Elev_Audio.webm`, `Nume_Elev_MIDI.mid`), apoi insert în `catalog_teme` cu `midi_url`. Limită cerere 55 MB. `HomeworkCatalog.jsx`: link „Deschide MIDI”.
+- `supabase/setup_catalog_teme.sql`: coloană nouă `midi_url`. Teste: 15/15 trec, `astro build` OK.
+
+### De făcut la următoarea sesiune (REAMINTEȘTE-I LUI CLAUDIU)
+- Rulează `setup_catalog_teme.sql` în Supabase live; fără `midi_url` catalogul de teme dă eroare.
+- Verifică/setează variabilele de mediu pe Railway: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `GOOGLE_CLIENT_EMAIL`, `GOOGLE_PRIVATE_KEY`, `GOOGLE_DRIVE_FOLDER_ID` (folderul partajat cu Service Account-ul).
+- Test real pe live: REC -> STOP -> Trimite Tema; confirmă în Drive ambele fișiere și în catalog linkurile audio + MIDI.
+- Confirmă emailul real al profesorului în Supabase (butonul MIDI depinde de el); decide dacă butonul se leagă de rol, nu de email.
+- Nu există formular public de Sign Up (conturile le creează profesorul); decide dacă se dorește unul.
+- Nume fișiere Drive identice la fiecare trimitere: decide dacă se adaugă data.
+- `npm audit` pentru avertismentele de la `html-midi-player`.
+## 📝 19 oct 2026 — Academy Music: catalog teme Drive și verificare Flat.io
+
+### Obiectiv
+- Teme audio/MIDI în Google Drive, metadata și link persistente în Supabase; evaluarea înlocuirii editorului custom cu Flat.io gratuit.
+
+### Modificări
+- Academy `src/lib/homeworkUpload.js`: după files.create și verificarea webViewLink, inserează în catalog_teme ID-ul/numele profilului autentificat, linkul și metadata opționale (titlu max. 200, mesaj max. 500, UUID piesă). Succes 201 numai după confirmarea Supabase; eșecul catalogului după upload întoarce 503 explicit, fără succes fals sau expunerea erorilor interne. Extensii verificate prin proprietăți proprii ale allowlist-ului, fără valori moștenite din Object.prototype.
+- Academy `supabase/setup_catalog_teme.sql`: migrare tranzacțională/repetabilă, referințe profiles/pieces, timestamp implicit server-side, link Drive valid/unic, RLS și granturi per coloană. Elev activ doar teme proprii și nume din profil; profesor citește catalogul; inspectorul și profilul inactiv nu pot trimite. API-ul folosește JWT-ul elevului și RLS, nu service-role. Migrarea NU a fost aplicată live.
+- Academy `src/lib/submitHomework.js`, `src/components/InteractiveStudio.jsx`, `RecordingStudio.jsx`, `src/pages/Portofoliu.jsx`: helper comun FormData/Bearer pentru audio/MIDI. Înregistrarea audio și upload-ul audio/MIDI din portofoliu nu mai apelează Storage/submissions; video/imaginile păstrează fluxul existent. Titlul, mesajul și piesa sunt păstrate în catalog; studioul nu trimite automat MIDI-ul de referință. Confirmare exactă: „Tema a fost trimisă cu succes domnului profesor!”. Reexportul helperului din InteractiveStudio păstrează compatibilitatea testelor/integrărilor existente.
+- Academy `src/components/HomeworkCatalog.jsx`, `src/pages/admin/AdminOverview.jsx`, `Portofoliu.jsx`: catalog reutilizabil cu 20 rânduri/pagină, refresh, nume/dată/metadata și linkuri externe Drive validate. Elevul vede propriul catalog în portofoliu; profesorul catalogul în pagina principală. Fără embed Drive, permisiuni publice sau schimbări CSP.
+- Academy `src/lib/learning.check.mjs`, `scripts/verify-learning.mjs`, README: teste API, limite metadata, catalog SQL/RLS și scenariu --drive-catalog pentru portofoliu/profesor pe desktop/mobil. Documentate migrarea, retenția, lipsa tranzacției distribuite/idempotency și condițiile Flat. Tracker/jurnal actualizate; modificările preexistente păstrate.
+
+### Validări
+- Audit inițial și npm run seo:check final: 64 pagini, 0 FAIL | 0 WARN. Build Academy PASS, 38 active precomprimate; avertismente JSX în pages preexistente. Metadata studio buildat: title 50 / description 145, în limitele 50–58/130–150, zero imagini fără alt. Fără metadata modificate sau JSON-LD nou de sincronizat.
+- Academy npm test: 15/15 PASS. Testul API verifică identitatea din profil, row metadata, salvare catalog după Drive, 503 la eșec DB, fără mesaje sensibile, limite titlu/mesaj/piesă și extensii moștenite respinse. PostgreSQL PGlite: migrare aplicată de două ori, RLS pe roluri, nume/ID proprii, dată generată de DB și neinjectabilă prin granturi, linkuri validate/unice și profil inactiv refuzat.
+- Browser --drive-catalog PASS la 1440×1000 și 390×844: upload MIDI și fixture audio prin multipart/JWT, metadata, eroare/retry, confirmare exactă, două linkuri în catalog elev/profesor, zero cereri Supabase Storage și lipsă overflow. Google/Supabase simulate; fixture audio verifică transportul, nu decodarea. Capturi .astro/screenshots/drive-catalog-student-1440.png, drive-catalog-student-390.png, drive-catalog-teacher-1440.png și drive-catalog-teacher-390.png.
+- Browser --drive-upload PASS desktop/mobil pentru helperul extras, eroare API/retry și webViewLink. get_errors: zero erori în implementare/teste. git diff --check Academy PASS înainte de documentare. Fără scrieri Google/Supabase live, commit sau deploy. Preview final pe port 4198, cu serverul repornit după rebuild.
+
+### Greșeli / riscuri / pași următori
+- Faza Flat este blocată de cerința explicită de gratuitate: documentația oficială https://flat.io/developers/docs/embed/javascript-editor precizează că aplicațiile gratuite pot afișa partituri, nu edita; mode edit revine la view fără eroare. Editorul cere un plan Embed cu editare și appId propriu; getMIDI returnează Uint8Array, dar existența SDK-ului nu acordă dreptul la editor gratuit. Nu s-au dezinstalat vexflow/midi-writer-js și nu s-a introdus flat-embed pentru un rezultat read-only. Este necesară aprobarea unui plan compatibil sau alegerea unei alternative gratuite.
+- Configurația finală verificată fără afișare secrete: email/folder prezente, cheia RSA din .env încă invalidă sau absentă. Credențialele nu au fost modificate. Trebuie corectată cheia (preferabil rotită după expunere), aplicată migrarea setup_catalog_teme.sql după setup_online_classes.sql și verificate permisiunile/cota Shared Drive înainte de upload real. Ultima citire live a folderului din pasul anterior era 404; acest pas nu pretinde că accesul a fost rezolvat.
+- Între Drive și Supabase nu există tranzacție atomică: un eșec DB poate lăsa fișier în folder; retry poate dubla fișiere. Rândurile se șterg prin cascade la ștergerea profilului, nu și fișierele externe; retenția trebuie administrată separat. Fișierele istorice din Storage nu au fost mutate/șterse, iar notarea/statusurile vechi din submissions rămân distincte de catalogul de linkuri. Nu s-au modificat audio/materialele profesorului din CDN sau fluxurile video/foto.
+- REC complet nu a fost rerulat: problema MP3 preexistentă din jurnal rămâne nevalidată end-to-end; motorul de captură este acoperit de testul unitar existent. Browser helper poate emite warning Tailwind content în fixture-ul Vite, fără impact asupra cererilor. Fără măsurători GSC noi; auditul local nu indică rezultate de ranking.
+
+---
+
+## 📝 19 oct 2026 — Academy Music: verificare folder Google Drive
+
+### Obiectiv
+- Verificarea folderului furnizat de Claudiu și completarea configurației locale, fără încărcări sau schimbări de permisiuni.
+
+### Modificări
+- `.env`: adăugat exclusiv GOOGLE_DRIVE_FOLDER_ID extras din URL-ul furnizat; celelalte variabile nu au fost modificate și valorile credențialelor nu au fost afișate.
+
+### Validări
+- ID-ul folderului citit prin Vite loadEnv: CORECT. JSON-ul local autorizat din Downloads conține o cheie RSA parsabilă; aceasta nu a fost copiată în .env.
+- Citire Google Drive files.get, cu scope drive.file și supportsAllDrives: HTTP 404, motiv notFound. Service Account-ul nu vede folderul; nu se poate confirma dacă acesta aparține unui Shared Drive sau dacă permite creare de fișiere.
+- Fără upload, schimbări de permisiuni, deploy sau commit. Fără modificări de pagini, metadata ori imagini; auditul SEO anterior din sesiune rămâne 64 pagini, 0 FAIL | 0 WARN, fără o nouă rulare pentru această modificare de configurație. Fără date GSC noi.
+
+### Greșeli / riscuri / pași următori
+- Acordă Service Account-ului acces la folder, verifică ID-ul și apartenența la Shared Drive, apoi reia citirea metadatelor. Un folder My Drive doar partajat nu oferă cotă proprie Service Account-ului.
+- Cheia RSA din JSON este validă sintactic, dar cheia din .env a eșuat la verificarea anterioară și nu a fost înlocuită în acest pas. Cheia expusă în conversație trebuie rotită; acordul utilizatorului pentru folosire nu înlătură riscul expunerii.
+
+---
+
+## 📝 19 oct 2026 — Academy Music: trimiterea temelor în Google Drive
+
+### Obiectiv
+- Salvarea înregistrării audio a elevului în Google Drive prin API server-side, cu confirmare și link în studio.
+
+### Modificări
+- Academy `src/pages/api/upload-homework.js`, `src/lib/homeworkUpload.js`: POST multipart, sesiune Supabase verificată server-side și profil activ elev/student/profesor/teacher; inspectorul și cererile cross-origin refuzate. Limită efectivă pe corp inclusiv fără Content-Length: 50 MB audio / 5 MB MIDI, whitelist extensii și semnături de container. MIME și nume generate server-side. JWT Google cu scope drive.file, normalizare newline, verificare RSA, files.create cu stream, parents, supportsAllDrives și fields id/webViewLink; fără permisiuni publice sau detalii sensibile în erori.
+- Academy `astro.config.mjs`, `server.mjs`, `scripts/compress.mjs`, package/lockfile: instalate googleapis și @astrojs/node, pagini statice păstrate și endpoint dinamic prin adaptor middleware, server pe dist/client + dist/server. Configurare server-only din mediul procesului, .env Academy și fallback .env workspace; fără afișare/editare credențiale. Compresie doar pentru output client, fără cod server comprimat public. npm install: zero vulnerabilități raportate.
+- Academy `src/components/InteractiveStudio.jsx`, `src/pages/studio.astro`: HomeworkStudio folosește useStudyAccess; REC numai la profil activ autorizat. Trimitere implicită FormData + Bearer către /api/upload-homework/, callback personalizat păstrat, preview/retry la eroare, confirmare și link HTTPS Drive după succes. Nu se încarcă automat MIDI-ul/negativul de referință. Metadata neschimbate; fără imagini noi sau schemă JSON-LD proprie.
+- Academy `src/lib/learning.check.mjs`, `scripts/verify-learning.mjs`, `.env.example`, README: teste autorizare/configurare/fișiere/stream/erori, cheie RSA generată local exclusiv pentru teste, browser helper cu API simulat, filtre --drive-upload și --homework. Documentate cerința Shared Drive, permisiunile private, lipsa idempotency/persistenței linkului în Supabase și configurarea Railway. Tracker și jurnal actualizate; modificările preexistente păstrate.
+
+### Validări
+- Audit inițial și npm run seo:check: 64 pagini, 0 FAIL | 0 WARN. Build Academy final PASS; avertismente JSX în pages preexistente. Metadata studio HTTP 200: title 50 / description 145, în limitele 50–58/130–150. Fără imagini modificate sau JSON-LD de sincronizat.
+- Academy npm test: 15/15 PASS. Testul Drive verifică lipsă token/utilizator, inspector/profil inactiv, origine străină, RSA invalid, newline corect pe cheie reală de test, extensie/semnătură/limită, părintele folderului, supportsAllDrives, conținut stream, webViewLink și erori fără secrete.
+- Server real: GET /api/upload-homework/ -> 405, POST fără token -> 401, ambele no-store; /studio/ -> 200. Browser --drive-upload: PASS la 1440×1000 și 390×844 pentru helperul real de frontend, multipart, Bearer, eroare API și retry cu webViewLink, servicii simulate. Nu echivalează cu validarea vizuală a confirmării după REC complet.
+- get_errors: zero erori în implementare și teste. git diff --check Academy PASS înainte de documentarea finală. Verificare locală fără afișarea valorilor: toate cele trei variabile Google prezente, nicio valoare a lor în output-ul client; GOOGLE_PRIVATE_KEY din .env workspace NU se parsează și nu are delimitările PEM așteptate. Nu s-a modificat .env și nu s-au făcut scrieri Google/Supabase live.
+
+### Greșeli / riscuri / pași următori
+- Testul --homework s-a oprit înainte de upload la problema MP3 preexistentă: time 0, readyState 1, paused false, recorder recording. Nu s-a reparat audio în acest scop și nu se raportează REC complet ca trecut. Prima rulare --drive-upload a continuat accidental în testele Jitsi după PASS pe HTTP; filtrul a fost corectat și rerularea focalizată integrală a trecut. Warning Tailwind content în fixture-ul Vite preexistent, fără impact asupra rezultatului HTTP.
+- Pentru upload real trebuie corectată GOOGLE_PRIVATE_KEY cu valoarea private_key PEM RSA completă din JSON-ul Google, în mediul serverului, fără transmiterea cheii în chat. Google Drive API activ, Service Account cu drept de creare într-un Shared Drive; un folder My Drive doar partajat nu îi oferă cotă de stocare. OAuth/delegare Workspace nu sunt implementate. Permisiunile/cota Drive nu au fost verificate live.
+- Fișierele nu sunt făcute publice; webViewLink nu conferă acces elevului fără permisiuni Drive. Verificarea semnăturii nu este scanare antivirus/decodare completă. Limita este per cerere, nu cotă globală; aplicația nu persistă linkul în Supabase și retry după răspuns pierdut poate crea duplicat. Politicile de acces, retenție și informarea privind Google Drive trebuie stabilite înainte de date reale.
+- Fără commit/deploy, schimbări Supabase live sau măsurători GSC noi; auditul tehnic nu dovedește ranking. Preview Academy pe port 4197, cu restart necesar după rebuild pentru codul server actualizat.
+
+---
+
+## 📝 19 oct 2026 — Academy Music: editor de partituri și export MIDI
+
+### Obiectiv
+- Editor React/Tailwind pentru compoziții monofonice simple: portativ interactiv, audiție ADSR și export MIDI.
+
+### Modificări
+- Academy `src/components/ScoreEditor.jsx`, `ScoreEditor.css`: VexFlow SVG cu cheia Sol, portativ centrat și scroll local, note naturale Do4–Do6 prin click sau butoane tactile. Doime/pătrime/optime, pauze, Undo/Clear, Pian/Acordeon și Play/Stop. Array de obiecte pitch/duration, maximum 128 elemente; fără măsuri automate sau persistență. Grup radio unic pentru fiecare instanță, protecție tap/swipe.
+- `src/lib/scoreEditor.js`: model comun pentru poziții, timpi și MIDI. Note de feedback și compoziție prin motorul ADSR createVoice existent, programate pe audioContext.currentTime la 120 BPM. Export midi-writer-js ca Blob cu numele compozitia-mea.mid, durate mapate 2/4/8, pauze inițiale/intermediare/finale și program General MIDI. Cleanup oscilatoare/context/URL-uri, STOP și anulare la blur/visibility.
+- `src/pages/studio.astro`: integrare client:visible după pian, fără schimbarea modulelor existente. Package/lockfile: vexflow, midi-writer-js și fonturi locale oficiale @vexflow-fonts/bravura/academico. VexFlow core fără descărcări de fonturi CDN sau modificări CSP. npm install: zero vulnerabilități raportate.
+- `src/lib/learning.check.mjs`, `scripts/verify-learning.mjs`: teste existente extinse; filtru --score-editor pentru verificare focalizată, suita implicită păstrată integral. README și tracker actualizate. Schimbările preexistente ale utilizatorului păstrate.
+
+### Validări
+- Audit inițial și npm run seo:check final: 64 pagini, 0 FAIL | 0 WARN. Build Academy PASS; avertismentele Astro despre JSX din pages rămân cele existente. Metadata studio neschimbate: title 50 / description 145, verificate în DOM în limitele 50–58/130–150; fără imagini fără alt, fără JSON-LD propriu sau imagini noi de sincronizat.
+- Academy npm test: 14/14 PASS. Testul nou verifică maparea portativului, timpii q/h/8, exportul binar recitit prin @tonejs/midi/midi-file, pauze la început/mijloc/final și compoziție numai cu pauze.
+- Browser focalizat PASS la 1440×1000 și 390×844 pe build-ul final: fonturi locale, VexFlow SVG, click pe portativ, butoane touch, durate/pauze, Undo/Clear, feedback/audio programat Pian/Acordeon, STOP și finalizare, MIDI descărcat cu pitch/timp/durată exacte, partitură lungă și lipsa overflow-ului paginii. Capturi .astro/screenshots/score-editor-1440.png și score-editor-390.png. Fără erori JS/CSP în scenariile editorului.
+- get_errors: zero erori în implementare, teste și pagina studio. git diff --check Academy PASS înaintea documentării. Fără migrări, upload sau modificări Supabase live.
+
+### Greșeli / riscuri / pași următori
+- Testele inițiale ținteau SVG-ul VexFlow cu pointer-events none și input-ul radio sr-only; corectate să folosească containerul interactiv și etichetele vizibile. Nu s-au forțat click-uri și nu s-a modificat comportamentul componentei pentru a ascunde eșecurile.
+- Suita browser completă s-a oprit înainte de editor în problema REC preexistentă/intermitentă: MP3 la time 0, readyState 1, paused false, recorder recording. Nu s-a reparat modulul REC în acest scop și nu se raportează regresiile complete ca trecute; noul filtru permite validarea reală a editorului independent. Testele unitare complete și browser-ul editorului au trecut.
+- Editorul este monofonic, cu note naturale și notație liberă, nu un înlocuitor complet Sibelius. Fără persistență, acorde/alterații, import sau paginare în măsuri. Audio/browserul și compatibilitatea Safari/iOS sau importul în aplicații MIDI externe rămân de verificat pe dispozitive reale.
+- Fără deploy, commit sau măsurători GSC noi; auditul tehnic local nu dovedește rezultate de ranking. Preview final: http://127.0.0.1:4196/studio/.
+
+---
+
+## 📝 18 oct 2026 — Academy Music: REC audio în modul Temă
+
+### Obiectiv
+- Înregistrare audio elev + negativ, doar în modul Temă, cu preview local și punct de integrare pentru upload.
+
+### Modificări
+- Academy `src/components/InteractiveStudio.jsx`: prop `isHomeworkMode = false`, condiție strictă `=== true` pentru REC/preview/trimitere. Pagina publică nu activează prop-ul și rămâne fără REC. Buton roșu REC/STOP, MP3 de la zero, A–B dezactivat și transport/tempo/fișiere blocate în timpul capturii; claviatura, instrumentul și volumul elevului rămân active. MIDI-ul mai scurt nu oprește înregistrarea negativului; STOP sau finalul MP3-ului generează preview cu audio controls.
+- `src/lib/interactiveStudio.js`: createHomeworkCapture în același AudioContext, MediaStreamAudioDestinationNode alimentat numai de master-ul elevului și MediaElementAudioSourceNode al MP3-ului. Demo/metronom neconectate la stream. Sursă MP3 unică, reutilizată la încercări; monitorizare audibilă păstrată. MediaRecorder cu negociere WebM/Opus, MP4 sau Ogg, chunks și validare Blob; maximum 50 MB și 20 minute reale. Nu se solicită microfon.
+- Callback asincron `onSubmitHomework({ blob, fileName, contentType, durationSeconds, midiName, backingName, tempoRate })` pregătit pentru integrare cu uploadFile/Supabase Storage. Fără callback, mesaj explicit de neconfigurare, fără succes fals. Protecție la dublă trimitere, retry cu preview/nume păstrate și cleanup recorder/track-uri/noduri/object URLs la închidere.
+- `src/components/InteractiveStudio.css`, `src/lib/learning.check.mjs`, `scripts/verify-learning.mjs`, README: stil responsive, test de motor și fixture React în memorie pentru modul Temă. Fără rută nouă publicată, dependențe noi, bucket sau migrare. Schimbările preexistente păstrate.
+
+### Validări
+- Audit inițial și `npm run seo:check` final: 64 pagini, 0 FAIL | 0 WARN. Academy build PASS; avertismentele Astro JSX din pages rămân cele preexistente. Metadata/JSON-LD/imaginile nu au fost modificate.
+- Academy `npm test`: 13/13 PASS. Testul nou verifică rutarea exclusiv elev/MP3, codec MP4 simulat, concatenarea chunk-urilor finale, sursă unică la repetare, stream cleanup și lipsa suportului MediaRecorder.
+- Browser Chromium cu MediaRecorder real, PASS la 1440×1000 și 390×844: REC vizibil doar în modul Temă și ascuns în studiul normal, MP3 de la zero, input elev, STOP manual și automat la final MP3, continuare după sfârșitul MIDI-ului, preview redabil, callback upload simulat cu eșec/retry/succes, nume stabil, încercări repetate, lipsa overflow-ului și oprirea stream-ului la unmount.
+- Graful real are exact două intrări în destinația de captură: MP3 și master elev. Cu MP3 silențios, fișierul MediaRecorder decodat are RMS sub 0,00001, deși demo-ul și metronomul sunt active în monitorizare; fără contaminare de la aceste surse în scenariul testat. Capturi `.astro/screenshots/homework-recording-1440.png` și `homework-recording-390.png`.
+- Regresiile studioului, pianului/temelor JSON, quiz/karaoke/MDX, mixerului/metronomului și celor trei roluri trecute pe desktop/mobil. Servicii Supabase/Jitsi și upload simulate, fără scrieri live. get_errors: zero erori în implementare și teste; git diff --check Academy PASS.
+
+### Greșeli / riscuri / pași următori
+- Primul preview folosea indexul sirv dinainte de rebuild și nu mai hidrata pagina normală; pornit server nou pe 4194. O rulare a testului de pornire REC a rămas la secunda zero; adăugată diagnoză player/recorder la eșec. Nu s-a reprodus în rularea finală completă, care a trecut; nu se revendică o cauză confirmată sau o corecție demonstrată a acelui caz intermitent. Pierderea focusului/vizibilității oprește intenționat captura.
+- Fișierul capturat nu este MP3: codec/extensie negociate de browser. Preview-ul este local și se pierde la reîncărcare. Compatibilitatea Safari/iOS, latența și orga USB fizică nu au fost validate. Microfonul și sunetul acustic extern nu sunt capturate; se înregistrează sintetizatorul elevului declanșat de MIDI/mouse/PC.
+- isHomeworkMode controlează UI, nu autorizarea. Integrarea upload trebuie să furnizeze elevul autentificat activ, bucket privat cu RLS, validare fișier și reguli de retry/idempotency potrivite. Fără bucket, politici, upload Supabase real, modificare teme JSON, deploy sau commit. Fără măsurători GSC noi.
+- Preview normal actualizat: `http://127.0.0.1:4194/studio/`, fără REC implicit. Activare în React: `<InteractiveStudio isHomeworkMode={true} onSubmitHomework={uploadHomework} />`, în contextul autorizat al temei.
+
+---
+
+## 📝 18 oct 2026 — Academy Music: mixer dual și metronom sincronizat
+
+### Obiectiv
+- Control independent demo/elev și metronom cu măsuri binare/ternare, legate de transportul global al studioului.
+
+### Modificări
+- Academy `src/lib/piano.js`: destinație audio opțională la createVoice, cu fallback la audio.destination pentru compatibilitatea pianului existent.
+- `src/lib/interactiveStudio.js`: păstrarea headerului MIDI pentru PPQ/harta de tempo, două GainNode-uri master independente și scheduler demo/metronom cu lookahead 120 ms, fără interval suplimentar. Accente 1200 Hz pe prima unitate, 800 Hz pe restul, pentru 2/4, 3/4, 4/4, 6/8, 9/8, 12/8. Click pe pătrime în /4, pe optime în /8; fază raportată la începutul MIDI-ului, inclusiv la seek/A–B.
+- `src/components/InteractiveStudio.jsx`, `InteractiveStudio.css`: demo profesor audibil cu instrumentul selectat; fadere Volum Demo/Volumul Meu și Mute Demo, cu ghidaj vizual păstrat. Metronom activabil și selector Măsură, fără BPM/ceas independent. Automatizare volum de 10 ms; mute nu afectează elevul, MP3 sau metronomul. Programări anulate/recalculate la pauză, seek, tempo, măsură/instrument, A–B, waiting/seeking MP3 și suspendare audio; note limitate la B. Refolosit tick-ul transportului de 25 ms, modul simplu fără Canvas păstrat.
+- `src/lib/learning.check.mjs`, `scripts/verify-learning.mjs`, README: extinse testele existente și documentate convențiile muzicale/limitele. Modificările preexistente, inclusiv formatarea CSS/testelor, păstrate. Metronomul separat al pianului pentru teme nu a fost schimbat.
+
+### Validări
+- Audit inițial și `npm run seo:check` final: 64 pagini, 0 FAIL | 0 WARN. Build Academy PASS; warnings Astro preexistente pentru JSX în pages, fără erori noi. Metadata/JSON-LD/imaginile nu au fost modificate.
+- Academy `npm test`: 12/12 PASS. Acoperire nouă: toate cele șase măsuri, tempo MIDI variabil, accent inițial, rutare independentă, programare raportată la transport, unicitate evenimente și anulare. După adăugarea verificărilor finale pentru limitarea la B/suspendare/reset, cele două teste audio relevante rerulate cu PASS.
+- Browser Chromium PASS la 1440×1000 și 390×844: noduri Web Audio reale, rutare master separată, niveluri demo/elev, mute cu ghidaj vizual și punctaj intact, restaurare volum, accente 3/4, selectorul celor șase măsuri. MP3 sintetic decodat real: modificări live de tempo/măsură și aliniere click-uri față de ceasul MP3 cu eroare de programare sub 20 ms în cazurile testate, inclusiv A–B. Această verificare privește timestamp-urile programate, nu latența acustică măsurată.
+- Regresii browser PASS: MIDI, waterfall/mod simplu, USB simulat, pointer/touch, scor, pian/teme JSON/quiz/karaoke/MDX și profesor/elev/inspector pe desktop/mobil. Capturi actualizate în `.astro/screenshots/interactive-studio-*.png`. Supabase/Jitsi simulate, fără scrieri live.
+- get_errors: zero erori în implementare/teste; git diff --check Academy PASS. Fără dependențe noi în această actualizare.
+
+### Greșeli / riscuri / pași următori
+- Ajustat testul de unmute după sfârșitul melodiei: gain.value pe un nod fără intrare activă nu reflecta automatizarea procesată; testul verifică acum apelul nativ setTargetAtTime, păstrând verificarea grafului/nivelurilor în timpul redării. Suita browser finală a trecut integral.
+- HTMLAudioElement + AudioContext nu garantează sincronizare sample-accurate, bucle gapless sau absența jitter-ului pe dispozitive slabe. Buffering-ul anulează sunetele viitoare la evenimentul browserului; latența hardware/audio și calitatea percepută nu au fost măsurate. MIDI și MP3 trebuie deja aliniate; în /8 click-urile sunt optimi, nu bătăi compuse de pătrime cu punct.
+- Fără deploy, commit, migrări live sau rezultate noi GSC. Preview actualizat: `http://127.0.0.1:4193/studio/`. Următorul pas: audiție pe echipamentul folosit la clasă și orgă USB fizică.
+
+---
+
+## 📝 18 oct 2026 — Academy Music: studio interactiv MIDI și MP3
+
+### Obiectiv
+- Simulator de studiu cu două claviaturi, MIDI/negativ sincronizate, tempo, buclă A–B, waterfall opțional și evaluare locală.
+
+### Modificări
+- Academy: `src/components/InteractiveStudio.jsx`, `InteractiveStudio.css`, `src/lib/interactiveStudio.js`: profesor read-only, elev click/touch/PC și Web MIDI, motor Web Audio existent Pian/Acordeon/Nai. Registru complet MIDI 0–127 cu scroll comun, aproximativ trei octave pe desktop; studiu MIDI demonstrativ preîncărcat.
+- Parser `@tonejs/midi` instalat în package/lockfile; harta de tempo din MIDI respectată, percuție exclusă, atacuri identice deduplicate. Limite: MIDI 5 MB/20.000 note/20 minute, MP3 100 MB. Fișiere locale și scor în memorie, fără upload/Supabase.
+- Transport: MP3 drept ceas principal cât timp rulează, ceas monoton în rest; tempo 25–150%, playbackRate și preservesPitch, seek, pauză și A–B sincronizate. Canvas este nemontat implicit în Mod Simplu; animație cu requestAnimationFrame doar în timpul redării, cadru unic în pauză, claviaturi memoizate.
+- Evaluare pe atacuri, ±180 ms reali ajustați tempo-ului, acorduri, o potrivire/notă/repetare, verde/roșu și procent final. Numără separat apăsările greșite; ratările rămân în numitor. Seek-ul/marcajele/schimbarea buclei resetează încercarea; repetările cumulează scorul. Fără evaluarea duratei, dinamicii sau degetației fizice.
+- `src/pages/studio.astro`: integrare înaintea pianului existent, fără înlocuirea înregistrării temelor. `src/lib/learning.check.mjs`, `scripts/verify-learning.mjs`: teste de nucleu și extensie browser desktop/mobil. README și tracker actualizate; schimbările preexistente păstrate.
+
+### Validări
+- Audit inițial și `npm run seo:check` final: 64 pagini, 0 FAIL | 0 WARN. Academy build PASS, 36 active precomprimate; avertismentele Astro despre componentele JSX din pages rămân cele existente.
+- Academy `npm test`: 10/10 PASS, inclusiv MIDI real generat, fereastră tempo, unicitate punctaj, ceas/pauză/seek și toate verificările RLS/audio existente. Instalare npm: 0 vulnerabilități raportate.
+- `npm run test:browser` pe preview-ul de producție: PASS la 1440×1000 și 390×844. Verificate import MIDI, acord, culori, rezultat final 67% pentru 2/3 note, tempo, A–B, pixeli Canvas neuniformi și modificați în redare, demontare Canvas în Mod Simplu, MIDI USB simulat, note-off velocity zero, mouse/touch, fișier invalid și lipsa overflow-ului. MP3 sintetic generat local cu ffmpeg și decodat real: sincronizare MIDI, playbackRate 0,5, preservesPitch, pauză și buclă audio PASS pe ambele dimensiuni.
+- Regresii browser PASS pentru pian/temă JSON/quiz/karaoke/MDX și profesor/elev/inspector pe desktop/mobil; servicii Supabase/Jitsi simulate, fără scrieri live. Capturi: `.astro/screenshots/interactive-studio-1440.png` și `interactive-studio-390.png`.
+- DOM buildat `/studio/`: title 50 / description 145, în limitele 50–58/130–150; noindex/nofollow păstrat, zero imagini fără alt. Metadata neschimbate, fără JSON-LD propriu de sincronizat. `get_errors`: zero erori în fișierele implementării și testelor; `git diff --check` Academy PASS.
+
+### Greșeli / riscuri / pași următori
+- În testul inițial, polling-ul Playwright rata fereastra de atac; sincronizat evenimentul tastaturii cu aprinderea profesorului în browser. Corectată ținta HTML a evenimentului sintetic și observarea frecventă a buclei. Suita finală a trecut integral. Verificarea separată metadata a necesitat here-string PowerShell pentru evitarea ghilimelelor imbricate.
+- Web MIDI cere permisiune, HTTPS/localhost și browser compatibil Chrome/Edge; nu garantează USB în Safari/iOS. Dispozitivul fizic, latența și calitatea audio percepută nu au fost verificate. MP3 trebuie aliniat cu MIDI la secunda zero; preservesPitch/time-stretch depind de browser, fără garanție de calitate la tempo extrem. A–B prin HTMLAudioElement poate avea un mic decalaj, nu este sample-accurate/gapless.
+- Fișierele/scorul nu persistă după reîncărcare; studioul public de demonstrație rămâne accesibil prin URL și noindex nu este control de acces. Fără deploy, commit sau migrări live. Auditul local nu demonstrează trafic/ranking; fără date GSC noi.
+- Preview local: `http://127.0.0.1:4192/studio/`. Verifică următorul pas cu o orgă reală și perechea MIDI/MP3 a lecției înainte de utilizarea la clasă.
+
+---
+
+## 📝 18 oct 2026 — Academy Music: grupe video, RBAC, ADSR și metronom
+
+### Obiectiv
+- Cursuri video izolate pe grupe, rol inspector read-only și instrumente de studiu Web Audio; biblioteca publicată și modulele de teme rămân independente de grupele video.
+
+### Modificări
+- Academy: `src/pages/OnlineClasses.jsx`, `src/components/LiveClass.jsx`, `src/lib/liveClass.js`, `src/App.jsx`, `src/pages/[...app].astro`, `src/components/Layout.jsx`: rută `/cursuri-online/`, orar săptămânal Europe/Bucharest, CRUD profesor și asociere elevi, acces elev numai la grupa proprie, inspector la toate grupele; SDK `@jitsi/react-sdk` instalat. Sala are nume derivat din UUID, aprobare/refuz lobby și filtre AEC/NS/AGC/AP dezactivate.
+- `supabase/setup_online_classes.sql`: roluri profesor/elev/inspector cu compatibilitate teacher/student, politici restrictive read-only inclusiv Storage, tabele video separate, un elev/o grupă, RPC atomic de salvare și verificare acces. `src/lib/useMyRepertoire.js` și accesul la Orgă/Canto folosesc biblioteca publicată globală; temele/portofoliile personale rămân private, fără filtrare pe grupa video.
+- `supabase/functions/class-access/index.ts`, `_shared/class-token.js`, `supabase/jitsi/mod_academy_roles.lua`: autorizare cu JWT Supabase/RLS, token Jitsi HS256 limitat la o sală și 5 minute, moderator și bypass lobby numai pentru profesor. Modul Prosody inclus pentru aplicarea rolului semnat, cu exceptare explicită pentru contul intern Jicofo. Emiterea tokenurilor este blocată până la configurarea serverului securizat.
+- `src/lib/auth.jsx`, `useStudyAccess.js`, componentele de studiu și paginile Dashboard/RepertoriulMeu/Portofoliu/Jocuri, AdminStudents/StudentDetail/AdminActivity, funcțiile create-student/delete-student: inspector fără scrieri de conținut și etichete/compatibilitate roluri. Telemetria sesiunilor rămâne funcțională. Inspectorul este participant vizibil, nu invizibil, cu GUM inițial oprit, mute audio/video, fără controale media și cu dispozitive interzise pe iframe.
+- `src/lib/piano.js`, `VirtualPiano.jsx`, `Metronome.jsx`, `metronome.js`, `setup_student_homework.sql`: 37 de clape C3–C6, două octave QWERTY, scroll local mobil, preseturi ADSR pian/acordeon/nai și fallback fără cancelAndHoldAtTime. Metronom 40–240 BPM, 4/4, lookahead 120 ms/interval 25 ms, accent și cleanup. Doar oscilatoare Web Audio, zero sample-uri externe; formatul temelor JSON păstrat, MIDI extins 48–84.
+- `server.mjs`, `.env.example`, `README.md`, package/lockfile: CSP și Permissions-Policy pe hostname Jitsi explicit și procedură de activare. Extinse testele existente `src/lib/learning.check.mjs` și `scripts/verify-learning.mjs`. Modificările preexistente ale utilizatorului păstrate.
+
+### Validări
+- Audit inițial și `npm run seo:check`: 64 pagini, 0 FAIL | 0 WARN. Build Academy PASS, 20 pagini statice, 34 active precomprimate. Warnings Astro pentru fișierele JSX din pages rămân cele existente.
+- `npm test` Academy: 8/8 PASS; ADSR, taste distincte, timing lookahead/cleanup, semnătură JWT, migrare SQL idempotentă, acces global la piese, izolare video, inspector fără UPDATE/DELETE/INSERT în conținut/Storage și cont inactiv blocat. RPC de grupe verificat pentru rollback atomic la elev deja înscris.
+- Browser Chromium: PASS la 1440×1000 și 390×844 pentru instrumente, tema JSON, quiz/karaoke/MDX și separat pentru profesor/elev/inspector. Verificate orarul, crearea grupei, aprobarea lobby, refuzul accesului la altă grupă și permisiunile iframe inspector; Supabase și Jitsi simulate. Capturi în `.astro/screenshots/`; fără overflow al paginii și fără erori JS în cazurile testate.
+- Edge Functions class-access/create-student/delete-student: parsare TypeScript PASS; `get_errors` fără erori în fișierele verificate; `git diff --check` PASS înaintea jurnalului.
+- Metadata ruta nouă: title 56 / description 139 caractere, în limitele 50–58/130–150. `noindex,nofollow` păstrat; fără JSON-LD propriu sau imagini noi de sincronizat. Analyzer GSC: aceleași 13 oportunități din export, fără măsurători noi de trafic/ranking.
+
+### Greșeli / riscuri / pași următori
+- Corectate în verificări: fixture SQL de cont inactiv păstra identitatea inspectorului; eticheta selectorului de instrument nu avea nume accesibil stabil; mock-ul Jitsi nu avea metoda EventEmitter `on`. Toate testele afectate au fost rerulate cu PASS.
+- Fără migrări Supabase live, publicare Edge Functions, modificare server Jitsi, deploy sau commit. Aplică schema de quiz, schema de teme actualizată și apoi setup_online_classes; publică cele trei funcții și configurează secretele/hostname-ul conform README. Nu rerula schema de bază după migrarea RBAC.
+- Instanța Jitsi trebuie să impună JWT, roluri și lobby implicit prin Prosody; `meet.jit.si` public nu garantează aceste cerințe și este refuzat. Configurarea necesită lobby_autostart, persistent_lobby, token_lobby_bypass, dezactivare allowners/auto-owner și domeniul intern Jicofo corect. Modulul Lua și interoperabilitatea pluginurilor nu au fost executate pe un server Prosody real.
+- Înainte de activare: test real profesor/elev/inspector, elev înaintea profesorului în lobby, refuz/aprobare, lipsa drepturilor de moderator la elev, token inutilizabil în altă sală și inspector fără captură media. Testele browser locale nu demonstrează comportamentul serverului video extern. Cu AEC oprit sunt recomandate căști; Web Audio/browserul nu garantează timing în condiții de suspendare a dispozitivului.
+- Preview local: `http://127.0.0.1:4187/studio/` și `/cursuri-online/`; hostname Jitsi de test intenționat nefuncțional, fără servicii live configurate în această sesiune.
+
+---
+
+## 📝 18 oct 2026 — Academy Music: linkuri Drive în Cancelaria Digitală
+
+### Obiectiv
+- Înlocuirea celor patru linkuri temporare cu folderele Google Drive furnizate de Claudiu.
+
+### Modificări
+- `academy-music.florentinapanaofficial.ro/src/pages/admin/AdminDashboard.jsx`: URL-uri individuale pentru Catalog și Prezențe, Planificări și Programe, Lista Concursuri și Documente Administrative; denumiri sincronizate cu cererea, `target="_blank"` și `rel="noopener noreferrer"` păstrate.
+- `academy-music.florentinapanaofficial.ro/README.md`: eliminată instrucțiunea depășită de completare a placeholderelor. Trackerul SEO actualizat.
+
+### Validări
+- Randare React SSR a componentei reale: PASS; patru carduri, asocieri exacte titlu/URL și atribute target/rel verificate.
+- Build Academy: PASS, 19 pagini, 33 active precomprimate. `get_errors`: fără erori în componentă.
+- `npm run seo:check`: PASS; 64 pagini, 0 FAIL | 0 WARN. Metadata, JSON-LD și imaginile nu au fost modificate.
+
+### Riscuri / pași următori
+- Permisiunile Google Drive nu au fost verificate sau modificate; accesul depinde de setările folderelor. Fără deploy sau commit.
+
+---
+
+## 📝 18 oct 2026 — Academy Music: audio CDN, karaoke, quiz, MDX și pian JSON
+
+### Obiectiv
+- Implementarea celor șase module cerute de Claudiu, cu audio direct CDN, pagini prerandate și teme de pian fără fișiere audio.
+
+### Modificări
+- `academy-music.florentinapanaofficial.ro/src/components/SecureAudioPlayer.jsx`: primește `audioUrl` HTTP(S) direct în `src`; fără signed URLs, cache audio sau apeluri Supabase Storage în componentă. Păstrate controalele proprii, `nodownload` și blocarea meniului contextual. Consumatorii `PieceCard.jsx`, `DualAudioRow.jsx` și rezolvarea din `src/lib/pieces.js` folosesc URL-urile CDN; formularul `AdminPieces.jsx` nu mai încarcă audio în Supabase.
+- `src/components/KaraokePlayer.jsx` și `src/lib/lrc.js`: parsare LRC cu fracțiuni, timestamp-uri multiple, offset, sortare, vers activ și scroll local centrat, cu respectarea reduced motion.
+- `src/pages/admin/AdminDashboard.jsx`, conectată în `AdminOverview.jsx`: Cancelarie Digitală cu patru carduri, iconițe Lucide, linkuri placeholder `# ` și atribute pentru tab extern sigur.
+- `supabase/setup_quizzes.sql`, `src/components/StudentQuizPlayer.jsx`: tabele noi quizzes/questions și extindere compatibilă a `quiz_results` existent; RLS, coloana răspunsului corect indisponibilă clientului, scor recalculat prin trigger, salvare cu retry și identificator de încercare. Rezultatele legacy sunt păstrate.
+- `src/components/VirtualPiano.jsx`, `src/lib/piano.js`, `supabase/setup_student_homework.sql`: Web Audio triangle, mouse/touch/tastatură, cleanup al notelor, înregistrare/reascultare locală și salvare JSON sub RLS; maximum 2000 de note/cinci minute, validare pe server, fără fișiere audio.
+- Academy era React/Vite, nu Astro. Adăugate `astro.config.mjs`, layout Astro, paginile statice `index.astro`, `[...app].astro`, `studio.astro`, `revista/index.astro`, `revista/[slug].astro`, colecția din `src/content/config.ts` reexportată prin `src/content.config.ts` și mini-cursul `src/content/revista/notele-muzicale.mdx`. SPA-ul React și autentificarea existente au fost păstrate; revista este legată din `Layout.jsx`.
+- `src/index.css`, `package.json`/lockfile: React/MDX, typography, iconițe și instrumente locale de verificare. `scripts/compress.mjs`, `server.mjs`: precompresie Brotli/Gzip, cache immutable pentru `/_astro/`, CSP cu hash-uri pentru scripturile Astro și origine media explicită, 404 pentru articole inexistente. `public/images/piano.webp`: copertă optimizată din sursă brută, 960×640, WebP 80%.
+- `README.md`, `.env.example`, `.gitignore`: activare SQL/R2, exemple MDX, limite de cost/acces și comenzi de verificare. `src/lib/learning.check.mjs`, `scripts/verify-learning.mjs`: teste locale SQL și browser. Modificările preexistente din `src/lib/media.js` nu au fost alterate.
+
+### Validări
+- Audit inițial și `npm run seo:check`: 64 pagini, 0 FAIL | 0 WARN.
+- `npm run seo:weekly`: PASS; build, audit 0 FAIL | 0 WARN, 63 linkuri externe valide, 101/101 teste ale site-ului principal.
+- Build Academy: PASS, 19 pagini statice și 33 fișiere precomprimate. Serverul local livrează `/studio/` cu HTTP 200 și `Content-Encoding: br`.
+- `npm test` în Academy: 4/4 PASS; inclusiv migrări SQL aplicate repetat în PGlite, scor client falsificat recalculat, răspuns corect necitibil, izolare între elevi, blocarea contului inactiv și validarea temelor.
+- Browser Chromium cu Supabase simulat: PASS la 1440×1000 și 390×844 pentru pian, mouse/tastatură, salvare JSON, quiz, karaoke/timeupdate, MDX, imagine, SPA, CSP și lipsa overflow-ului. Fără cereri Supabase Storage; capturi în `.astro/screenshots/`. Fără scrieri în baza live.
+- Metadata Academy: homepage 52/136, revistă 52/140, articol 53/141, studio 50/145 caractere (title/description). Imaginile noi au alt; nu exista schemă JSON-LD Academy de sincronizat. `noindex,nofollow` păstrat.
+- `get_errors`: fără erori în componentele/layout-urile și fișierele verificate. `npm audit` Academy: 0 vulnerabilități. `git diff --check`: PASS.
+- `seo-analyzer.js`: 13 oportunități existente din exportul GSC al site-ului principal; nu reprezintă rezultate de trafic/ranking ale acestei implementări.
+
+### Greșeli / riscuri / pași următori
+- Corectate în verificări: API-ul `manualChunks` al bundlerului actual, expunerea explicită a celor trei variabile publice VITE în Astro și indexul sirv învechit după rebuild. Testul node:test a fost numit `learning.check.mjs` ca să nu fie descoperit de Jest-ul proiectului principal.
+- Astro avertizează despre fișierele React JSX păstrate în `src/pages/`; acestea sunt importate de SPA, nu pagini Astro. Build-ul nu are erori.
+- Nu s-au rulat migrări pe Supabase live, nu s-au mutat/șters fișiere existente și nu s-a făcut deploy/commit. Aplică `setup_quizzes.sql`, apoi `setup_student_homework.sql`, după schema de bază; completează linkurile Drive și URL-urile CDN ale pieselor vechi.
+- Audio R2 public poate fi descărcat/distribuit; protecția vizuală nu este DRM. Piesele cu numai `audio_*_path` nu mai au audio până la completarea URL-urilor. Datele private/portofoliile existente nu au fost migrate.
+- Revista și studioul sunt HTML static accesibil fără login; `noindex` nu este control de acces. Nu publica materiale confidențiale sau date despre minori în MDX/props; accesul la date și salvări rămâne sub RLS.
+- Pianul stochează 0 bytes de fișiere audio, dar JSON-ul consumă spațiu Postgres. Gratuitatea R2/Supabase depinde de cote și operații; nu se garantează cost total zero. Verificarea live cu cont de elev/profesor rămâne necesară după aplicarea SQL și deploy.
+- Preview local: `http://127.0.0.1:4185/studio/` și `http://127.0.0.1:4185/revista/`.
+
+---
+
 # 📝 18 oct 2026 — Academy Music: ștergere definitivă cont elev
 
 ### Obiectiv

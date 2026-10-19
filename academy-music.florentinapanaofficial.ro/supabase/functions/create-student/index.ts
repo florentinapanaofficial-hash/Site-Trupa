@@ -56,7 +56,7 @@ Deno.serve(async (request) => {
     .eq('id', authData.user.id)
     .maybeSingle();
 
-  if (teacherError || teacher?.role !== 'teacher' || !teacher.is_active) {
+  if (teacherError || !['teacher', 'profesor'].includes(teacher?.role) || !teacher.is_active) {
     return respond(request, { error: 'Doar un profesor activ poate crea conturi.' }, 403);
   }
 

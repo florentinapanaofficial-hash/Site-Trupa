@@ -1,0 +1,19 @@
+---
+import { getCollection, render } from 'astro:content';
+import AcademyLayout from '../../layouts/AcademyLayout.astro';
+export async function getStaticPaths() {
+    return (await getCollection('revista')).map((course) => ({ params: { slug: course.id }, props: { course } }));
+}
+const { course } = Astro.props;
+const { Content } = await render(course);
+---
+<AcademyLayout title={`${course.data.titlu} | Academy Music`} description={course.data.descriere}>
+    <main class="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+        <a href="/revista/" class="text-sm text-gold-400">Înapoi la revistă</a>
+        <article class="mt-6">
+            <header class="mb-8"><h1 class="text-3xl text-white">{course.data.titlu}</h1><time class="mt-3 block text-sm text-slate-400" datetime={course.data.data_publicarii.toISOString()}>{course.data.data_publicarii.toLocaleDateString('ro-RO', { timeZone: 'UTC' })}</time></header>
+            <img src={course.data.imagine_cover} alt={`Coperta mini-cursului ${course.data.titlu}`} width="960" height="640" class="mb-8 aspect-[3/2] w-full rounded-lg object-cover" fetchpriority="high" />
+            <div class="prose prose-invert max-w-none prose-headings:font-display prose-a:text-gold-400"><Content /></div>
+        </article>
+    </main>
+</AcademyLayout>

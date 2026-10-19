@@ -1,0 +1,24 @@
+---
+import AcademyLayout from '../layouts/AcademyLayout.astro';
+import VirtualPiano from '../components/VirtualPiano.jsx';
+import StudentQuizPlayer from '../components/StudentQuizPlayer.jsx';
+import SecureAudioPlayer from '../components/SecureAudioPlayer.jsx';
+import KaraokePlayer from '../components/KaraokePlayer.jsx';
+import { HomeworkStudio } from '../components/InteractiveStudio.jsx';
+import ScoreEditor from '../components/ScoreEditor.jsx';
+const mediaUrl = 'https://media.florentinapanaofficial.ro/Hore%202026%20FP%20Band.mp3';
+---
+<AcademyLayout title="Studio Academy Music: pian virtual și quiz muzical" description="Exersează notele la pianul virtual Academy Music, înregistrează o temă și verifică-ți cunoștințele prin quiz. Începe acum studiul muzical online.">
+    <main class="mx-auto min-h-screen max-w-4xl space-y-8 px-4 py-8 sm:px-6">
+        <nav class="flex gap-6 text-sm text-gold-400"><a href="/">Academy Music</a><a href="/revista/">Revista</a></nav>
+        <h1 class="text-3xl text-white">Studio Academy Music</h1>
+        <HomeworkStudio client:load />
+        <VirtualPiano client:load />
+        <ScoreEditor client:visible />
+        <StudentQuizPlayer quizId="note-muzicale-intro" client:visible />
+        <section class="space-y-4"><h2 class="text-2xl text-white">Audiție: pulsul muzical</h2>
+            <SecureAudioPlayer audioUrl={mediaUrl} label="Hore 2026 — FP Band" client:visible />
+            <KaraokePlayer mediaUrl={mediaUrl} lyrics={'[00:00.00] Ascultă introducerea\n[00:12.50] Urmărește pulsul muzical\n[00:25.00] Păstrează ritmul'} client:visible />
+        </section>
+    </main>
+</AcademyLayout>

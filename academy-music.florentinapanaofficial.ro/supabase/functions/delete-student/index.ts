@@ -88,7 +88,7 @@ Deno.serve(async (request) => {
     .eq('id', authData.user.id)
     .maybeSingle();
 
-  if (teacherError || teacher?.role !== 'teacher' || !teacher.is_active) {
+  if (teacherError || !['teacher', 'profesor'].includes(teacher?.role) || !teacher.is_active) {
     return respond(request, { error: 'Doar un profesor activ poate șterge conturi de elev.' }, 403);
   }
 
@@ -115,7 +115,7 @@ Deno.serve(async (request) => {
 
   if (studentError) return respond(request, { error: 'Contul elevului nu a putut fi verificat.' }, 500);
   if (!student) return respond(request, { error: 'Elevul nu a fost găsit.' }, 404);
-  if (student.role !== 'student') {
+  if (!['student', 'elev'].includes(student.role)) {
     return respond(request, { error: 'Poți șterge doar conturi cu rol de elev.' }, 403);
   }
 

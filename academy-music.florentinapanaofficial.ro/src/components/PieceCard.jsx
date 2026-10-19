@@ -32,9 +32,9 @@ export default function PieceCard({ piece, onOpenScore }) {
             {piece.description && <p className="text-sm text-slate-400">{piece.description}</p>}
 
             <div className="space-y-2">
-                {negativ && <SecureAudioPlayer source={negativ} label="Negativ (acompaniament)" />}
+                {negativ && <SecureAudioPlayer audioUrl={negativ.value} label="Negativ (acompaniament)" />}
                 {pozitiv && (
-                    <SecureAudioPlayer source={pozitiv} label="Pozitiv (cu voce ghid)" accent="gold" />
+                    <SecureAudioPlayer audioUrl={pozitiv.value} label="Pozitiv (cu voce ghid)" accent="gold" />
                 )}
             </div>
 

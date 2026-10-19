@@ -30,16 +30,9 @@ export function isSafeHttpUrl(value) {
     }
 }
 
-/**
- * Fișierul local are prioritate față de link: e în bucketul privat, deci protejat.
- * Întoarce `null` când piesa nu are varianta respectivă.
- */
 export function resolveAudioSource(piece, variantKey) {
     const variant = VARIANTS[variantKey];
     if (!piece || !variant) return null;
-
-    const path = piece[variant.pathColumn];
-    if (path) return { kind: 'path', value: path };
 
     const url = piece[variant.urlColumn];
     if (isSafeHttpUrl(url)) return { kind: 'url', value: url };

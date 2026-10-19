@@ -42,7 +42,7 @@ const SHORTCUTS = [
 const DASHBOARD_PREVIEW = 3;
 
 export default function Dashboard() {
-    const { profile, isTeacher } = useAuth();
+    const { profile, isTeacher, isInspector } = useAuth();
     const [stats, setStats] = useState(null);
     const [studioPiece, setStudioPiece] = useState(null);
     const { rows: myPieces, reload: loadMyPieces } = useMyRepertoire();
@@ -131,7 +131,7 @@ export default function Dashboard() {
                         <div>
                             <h2 className="font-display text-2xl text-white">Piesele mele de studiu</h2>
                             <p className="text-sm text-slate-500">
-                                Alese de doamna profesoară pentru tine. Exersează pe negativ, apoi
+                                Biblioteca comună de studiu. Exersează pe negativ, apoi
                                 înregistrează-ți tema direct din platformă.
                             </p>
                         </div>
@@ -148,7 +148,7 @@ export default function Dashboard() {
                             index={index}
                             piece={row.pieces}
                             actions={
-                                <button
+                                !isInspector && <button
                                     type="button"
                                     className="btn-gold shrink-0 px-3 py-1.5 text-xs"
                                     onClick={() => setStudioPiece(row.pieces)}

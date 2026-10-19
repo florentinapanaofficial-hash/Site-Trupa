@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { BUCKET_MEDIA } from '../lib/supabase';
-import { getSignedUrl, invalidateSignedUrl } from '../lib/media';
+import { useEffect, useRef, useState } from 'react';
+import { isSafeHttpUrl } from '../lib/pieces';
 
 function formatTime(value) {
     if (!Number.isFinite(value)) return '0:00';
@@ -9,55 +8,15 @@ function formatTime(value) {
     return `${minutes}:${String(seconds).padStart(2, '0')}`;
 }
 
-/**
- * Player cu controale proprii peste un `<audio>` fără atributul `controls`:
- * browserul nu mai afișează meniul nativ cu „Salvează audio ca…".
- * `source` este fie `{ kind: 'path' }` dintr-un bucket privat (URL semnat, temporar),
- * fie `{ kind: 'url' }` către o sursă externă, pe care nu o putem proteja.
- */
-export default function SecureAudioPlayer({ source, label, accent = 'brand', bucket = BUCKET_MEDIA }) {
+export default function SecureAudioPlayer({ audioUrl, label = 'Audio', accent = 'brand' }) {
     const audioRef = useRef(null);
     const [ready, setReady] = useState(false);
     const [playing, setPlaying] = useState(false);
     const [current, setCurrent] = useState(0);
     const [duration, setDuration] = useState(0);
     const [volume, setVolume] = useState(1);
-    const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-
-    const sourceKind = source?.kind ?? null;
-    const sourceValue = source?.value ?? null;
-
-    const ensureSource = useCallback(
-        async (force = false) => {
-            const audio = audioRef.current;
-            if (!audio || !sourceValue) return false;
-            if (audio.src && !force) return true;
-
-            setLoading(true);
-            setError('');
-            try {
-                if (sourceKind === 'url') {
-                    audio.src = sourceValue;
-                    audio.load();
-                    return true;
-                }
-
-                if (force) invalidateSignedUrl(bucket, sourceValue);
-                const url = await getSignedUrl(bucket, sourceValue);
-                if (!url) throw new Error('Fișier indisponibil.');
-                audio.src = url;
-                audio.load();
-                return true;
-            } catch {
-                setError('Materialul nu a putut fi încărcat. Încearcă din nou.');
-                return false;
-            } finally {
-                setLoading(false);
-            }
-        },
-        [bucket, sourceKind, sourceValue]
-    );
+    const validUrl = isSafeHttpUrl(audioUrl);
 
     useEffect(() => {
         const audio = audioRef.current;
@@ -68,10 +27,9 @@ export default function SecureAudioPlayer({ source, label, accent = 'brand', buc
         setError('');
         if (audio) {
             audio.pause();
-            audio.removeAttribute('src');
             audio.load();
         }
-    }, [sourceKind, sourceValue]);
+    }, [audioUrl]);
 
     useEffect(() => {
         const audio = audioRef.current;
@@ -91,36 +49,13 @@ export default function SecureAudioPlayer({ source, label, accent = 'brand', buc
             return;
         }
 
-        const ok = await ensureSource();
-        if (!ok) return;
-
+        if (!validUrl) return;
+        setError('');
         try {
             await audio.play();
         } catch {
-            // URL-ul semnat expiră după câteva minute: îl regenerăm și reluăm din aceeași poziție.
-            const position = audio.currentTime;
-            const refreshed = await ensureSource(true);
-            if (!refreshed) return;
-            audio.currentTime = position;
-            audio.play().catch(() => setError('Redarea nu a putut porni.'));
+            setError('Redarea nu a putut porni. Verifică sursa audio.');
         }
-    }
-
-    async function handleError() {
-        const audio = audioRef.current;
-        if (!audio || !audio.src) return;
-
-        // Un link extern căzut nu se repară prin reinterogare; doar URL-ul semnat expiră.
-        if (sourceKind === 'url') {
-            setError('Sursa online nu răspunde. Verifică linkul piesei.');
-            return;
-        }
-
-        const position = audio.currentTime;
-        const refreshed = await ensureSource(true);
-        if (!refreshed) return;
-        audio.currentTime = position;
-        if (playing) audio.play().catch(() => { });
     }
 
     function seek(event) {
@@ -142,11 +77,11 @@ export default function SecureAudioPlayer({ source, label, accent = 'brand', buc
                 <button
                     type="button"
                     onClick={togglePlay}
-                    disabled={loading}
+                    disabled={!validUrl}
                     className={`grid h-11 w-11 shrink-0 place-items-center rounded-full transition ${accentClass}`}
                     aria-label={playing ? `Pauză ${label}` : `Redă ${label}`}
                 >
-                    {loading ? '…' : playing ? '❚❚' : '▶'}
+                    {playing ? '❚❚' : '▶'}
                 </button>
 
                 <div className="min-w-0 flex-1">
@@ -186,12 +121,14 @@ export default function SecureAudioPlayer({ source, label, accent = 'brand', buc
                 />
             </div>
 
+            {!validUrl && <p className="mt-2 text-xs text-brand-300">Adaugă un URL audio absolut HTTP(S).</p>}
             {error && <p className="mt-2 text-xs text-brand-300">{error}</p>}
 
             <audio
                 ref={audioRef}
+                src={validUrl ? audioUrl : undefined}
                 preload="none"
-                controlsList="nodownload noplaybackrate noremoteplayback"
+                controlsList="nodownload"
                 disableRemotePlayback
                 onContextMenu={(event) => event.preventDefault()}
                 onLoadedMetadata={(event) => {
@@ -205,7 +142,7 @@ export default function SecureAudioPlayer({ source, label, accent = 'brand', buc
                     setPlaying(false);
                     setCurrent(0);
                 }}
-                onError={handleError}
+                onError={() => setError('Sursa audio nu răspunde. Verifică linkul piesei.')}
             />
         </div>
     );

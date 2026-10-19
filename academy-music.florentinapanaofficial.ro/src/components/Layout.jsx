@@ -10,12 +10,9 @@ const STUDENT_LINKS = [
     { to: '/red', label: 'RED', icon: '📚' },
     { to: '/jocuri', label: 'Jocuri', icon: '🧩' },
     { to: '/portofoliu', label: 'Portofoliu', icon: '📁' },
-];
-
-// Cataloagele complete rămân doar la profesor: elevul își vede exclusiv repertoriul propriu.
-const TEACHER_LINKS = [
-    { to: '/orga', label: 'Orgă', icon: '🎹' },
-    { to: '/canto', label: 'Canto', icon: '🎤' },
+    { to: '/cursuri-online/', label: 'Cursuri online / grupe de elevi' },
+    { to: '/orga/', label: 'Orgă' },
+    { to: '/canto/', label: 'Canto' },
 ];
 
 function initials(name, email) {
@@ -26,7 +23,7 @@ function initials(name, email) {
 }
 
 export default function Layout() {
-    const { profile, user, isTeacher, signOut } = useAuth();
+    const { profile, user, isTeacher, isInspector, signOut } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
     const [menuOpen, setMenuOpen] = useState(false);
@@ -52,6 +49,8 @@ export default function Layout() {
             <aside className="hidden w-64 shrink-0 border-r border-white/10 bg-ink-900/60 p-4 lg:block">
                 <Brand />
                 <nav className="mt-6 space-y-1">
+                    <a href="/revista/" className="block px-3 py-2.5 text-sm font-medium text-gold-400">Revista</a>
+                    <a href="/studio/" className="block px-3 py-2.5 text-sm font-medium text-gold-400">Studio</a>
                     {STUDENT_LINKS.map((link) => (
                         <NavLink key={link.to} to={link.to} end={link.end} className={linkClass}>
                             <span aria-hidden="true">{link.icon}</span>
@@ -60,12 +59,6 @@ export default function Layout() {
                     ))}
                     {isTeacher && (
                         <>
-                            {TEACHER_LINKS.map((link) => (
-                                <NavLink key={link.to} to={link.to} className={linkClass}>
-                                    <span aria-hidden="true">{link.icon}</span>
-                                    {link.label}
-                                </NavLink>
-                            ))}
                             <NavLink to="/admin" className={linkClass}>
                                 <span aria-hidden="true">⚙️</span>
                                 Panou profesor
@@ -93,7 +86,7 @@ export default function Layout() {
                                 {profile?.full_name || user?.email}
                             </p>
                             <p className="text-xs text-slate-500">
-                                {isTeacher ? 'Profesor' : 'Elev'} · Palatul Copiilor Pitești
+                                {isTeacher ? 'Profesor' : isInspector ? 'Inspector' : 'Elev'} · Palatul Copiilor Pitești
                             </p>
                         </div>
                         <span className="grid h-10 w-10 place-items-center rounded-full bg-brand-500/20 text-sm font-bold text-brand-200">
@@ -116,6 +109,8 @@ export default function Layout() {
 
                 {menuOpen && (
                     <nav className="space-y-1 border-b border-white/10 bg-ink-900 p-4 lg:hidden">
+                        <a href="/revista/" className="block px-3 py-2.5 text-sm font-medium text-gold-400">Revista</a>
+                        <a href="/studio/" className="block px-3 py-2.5 text-sm font-medium text-gold-400">Studio</a>
                         {STUDENT_LINKS.map((link) => (
                             <NavLink key={link.to} to={link.to} end={link.end} className={linkClass}>
                                 <span aria-hidden="true">{link.icon}</span>
@@ -124,12 +119,6 @@ export default function Layout() {
                         ))}
                         {isTeacher && (
                             <>
-                                {TEACHER_LINKS.map((link) => (
-                                    <NavLink key={link.to} to={link.to} className={linkClass}>
-                                        <span aria-hidden="true">{link.icon}</span>
-                                        {link.label}
-                                    </NavLink>
-                                ))}
                                 <NavLink to="/admin" className={linkClass}>
                                     <span aria-hidden="true">⚙️</span>
                                     Panou profesor

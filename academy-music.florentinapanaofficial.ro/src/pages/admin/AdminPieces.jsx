@@ -21,7 +21,7 @@ const EMPTY_FORM = {
     negative_url: '',
 };
 
-const EMPTY_MODES = { pozitiv: 'local', negativ: 'local' };
+const EMPTY_MODES = { pozitiv: 'online', negativ: 'online' };
 
 export default function AdminPieces() {
     const { profile } = useAuth();
@@ -115,11 +115,7 @@ export default function AdminPieces() {
                 }
             }
 
-            const [negativPath, pozitivPath, scorePath] = await Promise.all([
-                modes.negativ === 'local' ? uploadIfPresent(files.negativ, 'negativ') : null,
-                modes.pozitiv === 'local' ? uploadIfPresent(files.pozitiv, 'pozitiv') : null,
-                uploadIfPresent(files.score, 'partituri'),
-            ]);
+            const scorePath = await uploadIfPresent(files.score, 'partituri');
 
             const { data: created, error } = await supabase
                 .from('pieces')
@@ -135,8 +131,8 @@ export default function AdminPieces() {
                         .map((tag) => tag.trim())
                         .filter(Boolean),
                     is_published: form.is_published,
-                    audio_negativ_path: negativPath,
-                    audio_pozitiv_path: pozitivPath,
+                    audio_negativ_path: null,
+                    audio_pozitiv_path: null,
                     negative_url: modes.negativ === 'online' ? form.negative_url.trim() || null : null,
                     positive_url: modes.pozitiv === 'online' ? form.positive_url.trim() || null : null,
                     score_path: scorePath,
@@ -469,8 +465,7 @@ function FileField({ id, label, accept, onChange }) {
 }
 
 const MODES = [
-    { value: 'local', label: 'Local' },
-    { value: 'online', label: 'Online' },
+    { value: 'online', label: 'URL CDN' },
 ];
 
 function VariantField({ variant, mode, url, onModeChange, onUrlChange, onFileChange }) {

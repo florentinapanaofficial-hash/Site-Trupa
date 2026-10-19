@@ -4,8 +4,10 @@ import DualAudioRow from '../components/DualAudioRow';
 import RecordingStudio from '../components/RecordingStudio';
 import Spinner from '../components/ui/Spinner';
 import EmptyState from '../components/ui/EmptyState';
+import { useAuth } from '../lib/auth';
 
 export default function RepertoriulMeu() {
+    const { isInspector } = useAuth();
     const { rows } = useMyRepertoire();
     const [studioPiece, setStudioPiece] = useState(null);
 
@@ -17,7 +19,7 @@ export default function RepertoriulMeu() {
                 </span>
                 <h1 className="mt-2 font-display text-3xl text-white">Repertoriul meu</h1>
                 <p className="mt-1 max-w-2xl text-sm text-slate-400">
-                    Piesele pregătite special pentru tine. Exersează pe negativ, apoi înregistrează-ți tema
+                    Biblioteca de studiu comună. Exersează pe negativ, apoi înregistrează-ți tema
                     direct din platformă.
                 </p>
             </header>
@@ -38,7 +40,7 @@ export default function RepertoriulMeu() {
                             index={index}
                             piece={row.pieces}
                             actions={
-                                <button
+                                !isInspector && <button
                                     type="button"
                                     className="btn-gold shrink-0 px-3 py-1.5 text-xs"
                                     onClick={() => setStudioPiece(row.pieces)}

@@ -71,7 +71,7 @@ export default function DualAudioRow({
 
                             {source ? (
                                 <SecureAudioPlayer
-                                    source={source}
+                                    audioUrl={source.value}
                                     label={`${variant.label} — ${piece.title}`}
                                     accent={variant.accent}
                                 />

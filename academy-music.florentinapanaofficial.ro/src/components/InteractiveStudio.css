@@ -1,0 +1,336 @@
+.interactive-studio {
+    --is-line: #36343e;
+    --is-muted: #b9b5c3;
+    border-block: 1px solid var(--is-line);
+    padding-block: 24px;
+    min-width: 0;
+    color: #f4f2f7;
+}
+
+.interactive-studio h2 {
+    font-size: 24px;
+    margin: 0;
+}
+
+.is-header,
+.is-toolbar,
+.is-transport,
+.is-loop,
+.is-score,
+.is-media {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.is-mixer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 20px;
+    padding-block: 12px;
+    margin-bottom: 16px;
+    border-block: 1px solid var(--is-line);
+}
+
+.is-mixer label {
+    display: flex;
+    flex: 1 1 240px;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    font-size: 13px;
+}
+
+.is-mixer input {
+    flex: 1;
+    width: 80px;
+    min-width: 40px;
+}
+
+.is-mixer output {
+    width: 42px;
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+}
+
+.is-header,
+.is-score {
+    justify-content: space-between;
+}
+
+.is-filename {
+    color: var(--is-muted);
+    font-size: 13px;
+    margin-top: 4px;
+    overflow-wrap: anywhere;
+}
+
+.is-button,
+.is-upload {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 40px;
+    border: 1px solid var(--is-line);
+    border-radius: 6px;
+    padding: 8px 12px;
+    background: #19171f;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.is-button:hover,
+.is-upload:hover {
+    border-color: #e8c468;
+}
+
+.is-button[aria-pressed="true"] {
+    border-color: #e8c468;
+    color: #e8c468;
+}
+
+.is-play {
+    background: #e8c468;
+    color: #161319;
+}
+
+.is-button.is-record {
+    background: #b52240;
+    border-color: #f1687f;
+    color: #fff;
+    min-width: 92px;
+    font-weight: 700;
+}
+
+.is-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.is-homework {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-block: 16px;
+}
+
+.is-homework audio {
+    flex: 1 1 240px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    height: 48px;
+}
+
+.is-upload {
+    position: relative;
+    overflow: hidden;
+}
+
+.is-upload input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    width: 100%;
+    cursor: pointer;
+}
+
+.is-upload:focus-within {
+    outline: 2px solid #e8c468;
+    outline-offset: 3px;
+}
+
+.is-toolbar label,
+.is-loop label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+}
+
+.interactive-studio select {
+    border: 1px solid var(--is-line);
+    border-radius: 4px;
+    padding: 8px;
+    background: #19171f;
+    color: #fff;
+    max-width: 180px;
+}
+
+.is-device {
+    color: var(--is-muted);
+    font-size: 12px;
+    margin-bottom: 16px;
+    overflow-wrap: anywhere;
+}
+
+.is-media span {
+    overflow-wrap: anywhere;
+    min-width: 0;
+    flex: 1;
+}
+
+.is-tempo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+    font-size: 13px;
+}
+
+.is-tempo input {
+    width: 130px;
+    min-width: 60px;
+}
+
+.is-tempo output {
+    width: 42px;
+}
+
+.interactive-studio input[type="range"],
+.interactive-studio input[type="checkbox"] {
+    accent-color: #e8c468;
+}
+
+.is-transport output {
+    font-variant-numeric: tabular-nums;
+    font-size: 13px;
+}
+
+.is-seek {
+    display: block;
+    width: 100%;
+    margin-block: 12px 18px;
+}
+
+.is-scroll {
+    width: 100%;
+    max-width: 880px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    border: 1px solid var(--is-line);
+    background: #12151a;
+}
+
+.is-boards {
+    position: relative;
+}
+
+.is-board-label {
+    height: 30px;
+    padding-left: 8px;
+    width: max-content;
+    position: sticky;
+    left: 0;
+    font-size: 12px;
+    line-height: 30px;
+    color: var(--is-muted);
+}
+
+.is-keyboard {
+    height: 150px;
+    position: relative;
+    user-select: none;
+}
+
+.is-key {
+    position: absolute;
+    top: 0;
+    border: 1px solid #aaa;
+    border-radius: 0 0 4px 4px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 10px;
+    touch-action: pan-x;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.is-white {
+    height: 150px;
+    color: #242128;
+    background: #fafafa;
+}
+
+.is-black {
+    height: 94px;
+    background: #232126;
+    color: #fff;
+    border-color: #08070a;
+    z-index: 1;
+}
+
+button.is-key {
+    cursor: pointer;
+}
+
+.is-key.is-teacher {
+    background: #e8c468;
+    color: #18131a;
+}
+
+.is-key.is-held {
+    background: #7fcbe2;
+    color: #0e2730;
+}
+
+.is-key.is-correct {
+    background: #44d49b;
+    color: #09251a;
+}
+
+.is-key.is-wrong {
+    background: #f1687f;
+    color: #290a10;
+}
+
+.is-waterfall {
+    display: block;
+    height: 180px;
+}
+
+.is-score {
+    margin-top: 20px;
+    margin-bottom: 0;
+    font-size: 14px;
+}
+
+.is-score strong {
+    color: #e8c468;
+}
+
+.is-score span {
+    color: var(--is-muted);
+    font-size: 12px;
+}
+
+.is-error {
+    color: #ff9eaf;
+    margin-top: 12px;
+    font-size: 13px;
+}
+
+@media (max-width: 520px) {
+    .is-tempo {
+        margin-left: 0;
+        flex-basis: 100%;
+    }
+
+    .is-tempo input {
+        flex: 1;
+    }
+
+    .is-header {
+        align-items: flex-start;
+    }
+
+    .interactive-studio h2 {
+        font-size: 22px;
+    }
+}
