@@ -14,6 +14,20 @@ $$;
 
 create index if not exists pieces_canto_group on public.pieces (grupa, title) where discipline = 'canto';
 
+do $$
+begin
+  if exists (
+    select 1 from pg_class where oid = to_regclass('public.canto_playlist') and relkind in ('r', 'p')
+  ) then
+    if to_regclass('public.canto_playlist_legacy') is not null then
+      raise exception 'public.canto_playlist_legacy already exists; refusing to replace the legacy Canto table';
+    end if;
+
+    alter table public.canto_playlist rename to canto_playlist_legacy;
+  end if;
+end
+$$;
+
 create or replace view public.canto_playlist with (security_invoker = true) as
 select id, title as titlu_piesa, grupa, positive_url as pozitiv_url,
        negative_url as negativ_url, versuri_text, audio_pozitiv_path,

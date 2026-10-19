@@ -4902,3 +4902,25 @@ Repetarea testului read-only pentru versiunea Academy publicată pe Railway.
 
 ### Riscuri / pași următori
 - Problema API persistă în deployment-ul accesibil; trebuie investigată maparea rutelor SSR/deployment înainte de a considera uploadul funcțional. Nicio operație de deploy sau remediere nu a fost efectuată.
+
+## 📝 20 oct 2026 — Migrații Supabase Academy: Canto și module recente
+
+### Obiectiv
+Remedierea erorilor de salvare și încărcare din Panou profesor → Canto pe Railway și aplicarea migrărilor SQL pentru modulele Academy publicate recent.
+
+### Modificări
+- `academy-music.florentinapanaofficial.ro/supabase/migrations/20261019_canto_library.sql`: adăugate coloanele Canto și view-ul `canto_playlist`; tabela veche, goală, este redenumită `canto_playlist_legacy` fără ștergere.
+- Adăugate migrări versionate pentru clase online, catalogul de teme, quiz-uri și teme de pian (`20261020000001`–`20261020000004`).
+- `academy-music.florentinapanaofficial.ro/src/lib/learning.check.mjs`: regresie pentru păstrarea rândurilor din tabela Canto legacy.
+
+### Validări
+- Supabase: toate cele 6 versiuni (`20261016`, `20261019`, `20261020000001`–`20261020000004`) sunt în `supabase_migrations.schema_migrations`.
+- Verificate live coloanele `pieces.grupa` și `pieces.versuri_text`, view-ul `canto_playlist` cu RLS invoker și arhiva `canto_playlist_legacy` (0 rânduri preexistente).
+- Rolul `is_teacher()` acceptă conturi active `teacher` și `profesor`; granturile CRUD pe `pieces`, politica `pieces_write_teacher` și politicile profesorilor pentru clase, quiz-uri și teme sunt prezente.
+- `npm test --prefix academy-music.florentinapanaofficial.ro`: 19/19 PASS, inclusiv scenariile RLS și păstrarea datelor legacy.
+- `npm run seo:audit`: 64 pagini HTML, 0 FAIL | 0 WARN; fără modificări SEO sau măsurători GSC în această sesiune.
+- `npm run seo:weekly`: build PASS; audit 64 pagini, 0 FAIL | 0 WARN; `check-links` PASS; Jest 101/101 PASS.
+
+### Riscuri / pași următori
+- `supabase db push --linked` nu s-a putut autentifica la conexiunea PostgreSQL configurată; SQL-ul a fost aplicat prin API-ul administrativ Supabase, apoi versiunile au fost înregistrate cu `supabase migration repair` și confirmate prin interogare SQL.
+- Nu este necesar redeploy Railway pentru schimbările DB. Reîncarcă panoul și verifică salvarea/încărcarea cu un cont profesor; pentru viitoare `db push`, actualizează parola DB configurată în CLI.

@@ -67,10 +67,17 @@ test('Canto migration is repeatable, preserves pieces and uses caller RLS in its
             alter table public.pieces enable row level security;
             grant select on public.pieces to authenticated;
             create policy published on public.pieces for select to authenticated using (is_published);
+            create table public.canto_playlist (
+                id text primary key, titlu_piesa text not null, grupo text, positivo_url text,
+                negativo_url text, versuri_text text, created_at timestamptz not null default now()
+            );
+            insert into public.canto_playlist (id,titlu_piesa) values ('legacy','Piesă veche');
         `);
         const migration = await readFile(new URL('../../supabase/migrations/20261019_canto_library.sql', import.meta.url), 'utf8');
         await db.exec(migration);
         await db.exec(migration);
+        const legacy = await db.query(`select id,titlu_piesa from public.canto_playlist_legacy`);
+        assert.deepEqual(legacy.rows, [{ id: 'legacy', titlu_piesa: 'Piesă veche' }]);
         await db.query(`update public.pieces set grupa = $1, versuri_text = $2 where id = 'canto'`, ['Grupa mică', 'Prima strofă\nA doua linie']);
         await assert.rejects(db.query(`update public.pieces set versuri_text = $1 where id = 'canto'`, ['x'.repeat(100001)]));
         await db.exec('set role authenticated');
