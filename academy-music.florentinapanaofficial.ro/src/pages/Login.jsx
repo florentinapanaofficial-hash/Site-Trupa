@@ -49,7 +49,7 @@ export default function Login() {
             // Mesaj uniform: nu confirmăm dacă adresa există în bază.
             const message =
                 err?.message === 'Invalid login credentials'
-                    ? 'Email sau parolă incorectă.'
+                    ? 'Username, email sau parolă incorectă.'
                     : err?.message || 'A apărut o eroare. Încearcă din nou.';
             setStatus({ busy: false, error: message, info: '' });
             return;
@@ -84,6 +84,8 @@ export default function Login() {
                             onChange={update('identity')}
                             required
                             autoComplete={mode === 'login' ? 'username' : 'email'}
+                            autoCapitalize="none"
+                            spellCheck={false}
                         />
                     </div>
 

@@ -219,6 +219,16 @@ export default function StudentDetail({ student, allPieces, onBack, onStudentCha
         setDeleteError('');
     }
 
+    async function patchStudent(changes) {
+        setStatus({ busy: true, error: '' });
+        try {
+            await onPatch(student.id, changes);
+            setStatus({ busy: false, error: '' });
+        } catch (error) {
+            setStatus({ busy: false, error: error?.message || 'Modificarea elevului a eșuat.' });
+        }
+    }
+
     return (
         <div className="space-y-5">
             <button type="button" className="btn-ghost" onClick={onBack}>
@@ -268,8 +278,8 @@ export default function StudentDetail({ student, allPieces, onBack, onStudentCha
                         id="student-role"
                         className="input"
                         value={student.role === 'teacher' ? 'profesor' : student.role === 'student' ? 'elev' : student.role}
-                        disabled={isSelf}
-                        onChange={(event) => onPatch(student.id, { role: event.target.value })}
+                        disabled={isSelf || status.busy}
+                        onChange={(event) => patchStudent({ role: event.target.value })}
                     >
                         <option value="elev">Elev</option>
                         <option value="profesor">Profesor</option>
@@ -289,7 +299,7 @@ export default function StudentDetail({ student, allPieces, onBack, onStudentCha
                         onBlur={(event) => {
                             const value = event.target.value.trim();
                             if (value !== (student.grade_level || '')) {
-                                onPatch(student.id, { grade_level: value || null });
+                                patchStudent({ grade_level: value || null });
                             }
                         }}
                     />
@@ -299,8 +309,8 @@ export default function StudentDetail({ student, allPieces, onBack, onStudentCha
                     <span className="label">Acces în platformă</span>
                     <button
                         type="button"
-                        disabled={isSelf}
-                        onClick={() => onPatch(student.id, { is_active: !student.is_active })}
+                        disabled={isSelf || status.busy}
+                        onClick={() => patchStudent({ is_active: !student.is_active })}
                         className={`btn w-full ${student.is_active
                             ? 'bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25'
                             : 'bg-brand-500/20 text-brand-200 hover:bg-brand-500/30'

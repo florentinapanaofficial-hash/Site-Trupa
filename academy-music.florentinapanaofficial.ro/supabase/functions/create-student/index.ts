@@ -95,7 +95,7 @@ Deno.serve(async (request) => {
   if (lookupError) return respond(request, { error: 'Nu am putut verifica username-ul.' }, 500);
   if (existing) return respond(request, { error: 'Username-ul este deja folosit. Alege altul.' }, 409);
 
-  const email = `${username}@students.academy.invalid`;
+  const email = `${username}@student.academy.local`;
   const { data: created, error: createError } = await admin.auth.admin.createUser({
     email,
     password,

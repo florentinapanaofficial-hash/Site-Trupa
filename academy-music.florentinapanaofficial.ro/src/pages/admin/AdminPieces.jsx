@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase, BUCKET_MEDIA } from '../../lib/supabase';
 import { useAuth } from '../../lib/auth';
 import { safeFileName, uploadFile } from '../../lib/media';
@@ -25,6 +25,7 @@ const EMPTY_MODES = { pozitiv: 'online', negativ: 'online' };
 
 export default function AdminPieces() {
     const { profile } = useAuth();
+    const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const [pieces, setPieces] = useState(null);
     const [groups, setGroups] = useState([]);
@@ -39,17 +40,22 @@ export default function AdminPieces() {
 
     useEffect(() => {
         const requestedDiscipline = searchParams.get('add');
-        if (!['orga', 'canto'].includes(requestedDiscipline)) return;
+        if (requestedDiscipline === 'canto') {
+            navigate('/admin/canto/', { replace: true });
+            return;
+        }
+        if (requestedDiscipline !== 'orga') return;
 
         setForm({ ...EMPTY_FORM, discipline: requestedDiscipline });
         setModalOpen(true);
         setSearchParams({}, { replace: true });
-    }, [searchParams, setSearchParams]);
+    }, [searchParams, setSearchParams, navigate]);
 
     async function load() {
         const { data } = await supabase
             .from('pieces')
             .select('*')
+            .eq('discipline', 'orga')
             .order('created_at', { ascending: false });
         setPieces(data || []);
     }
@@ -204,7 +210,7 @@ export default function AdminPieces() {
         <div className="space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                    <h2 className="font-display text-2xl text-white">Repertoriu</h2>
+                    <h2 className="font-display text-2xl text-white">Repertoriu Orgă</h2>
                     <p className="text-sm text-slate-500">
                         Fiecare piesă poate avea varianta pozitivă și negativă, din fișier local sau link.
                     </p>
@@ -227,7 +233,6 @@ export default function AdminPieces() {
                             </label>
                             <select id="discipline" className="input" value={form.discipline} onChange={update('discipline')}>
                                 <option value="orga">Orgă</option>
-                                <option value="canto">Canto</option>
                             </select>
                         </div>
 

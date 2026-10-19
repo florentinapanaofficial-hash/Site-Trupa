@@ -1,4 +1,5 @@
 import SecureAudioPlayer from './SecureAudioPlayer';
+import CantoAudio from './CantoAudio';
 import { VARIANT_LIST, resolveAudioSource } from '../lib/pieces';
 
 export default function DualAudioRow({
@@ -69,7 +70,9 @@ export default function DualAudioRow({
                                 {variant.label} <span className="normal-case">({variant.hint})</span>
                             </p>
 
-                            {source ? (
+                            {piece.discipline === 'canto' ? (
+                                <CantoAudio piece={piece} variant={{ ...variant, url: variant.urlColumn, path: variant.pathColumn }} />
+                            ) : source ? (
                                 <SecureAudioPlayer
                                     audioUrl={source.value}
                                     label={`${variant.label} — ${piece.title}`}

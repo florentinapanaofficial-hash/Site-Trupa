@@ -1,3 +1,114 @@
+## 📝 19 oct 2026 — Pregătire commit și push Academy
+
+### Obiectiv
+- Publicarea pe origin/main, la cererea lui Claudiu, a modificărilor locale Academy pentru Canto și administrarea elevilor, împreună cu testele, migrarea și documentația aferentă.
+
+### Modificări
+- Pregătite pentru commit modificările Academy existente și cele două fișiere oficiale de jurnal/tracker; fără includerea fișierelor .env sau a output-ului generat. Fără modificări suplimentare ale aplicației în acest pas.
+
+### Validări
+- Build Academy PASS: 42 active precomprimate; avertismente Vite privind module Node externalizate și chunk-uri mari, fără erori de build. npm test Academy: 19/19 PASS.
+- npm run seo:weekly PASS: build principal, 64 pagini verificate, 0 FAIL | 0 WARN, 63 linkuri externe valide și 101/101 teste principale trecute. git diff --check PASS înainte de documentare.
+- Metadata, JSON-LD și imaginile neschimbate în acest pas; fără date GSC noi sau afirmații de ranking.
+
+### Greșeli / riscuri / pași următori
+- Push-ul poate declanșa Railway numai dacă serviciul urmărește origin/main și directorul Academy. Succesul push-ului nu confirmă finalizarea deploy-ului sau funcționarea uploadului live.
+- Fișierele SQL și Edge Function din GitHub nu se aplică automat în Supabase. Cache-ul/schema API și fluxul autentificat Drive rămân de reverificat după publicare, conform constatărilor precedente.
+
+---
+
+## 📝 19 oct 2026 — Reverificare pe URL-ul Railway furnizat
+
+### Obiectiv
+- Verificare exclusiv pe https://academy-music-production.up.railway.app/ după confirmarea lui Claudiu că SQL-ul a fost aplicat cu succes în dashboard și cheile Google au fost configurate în Railway. Domeniul custom și cheia locală nu sunt criterii pentru producție.
+
+### Modificări
+- Actualizate numai jurnalul și trackerul; fără schimbări de cod, deploy, reload de cache sau scrieri live.
+
+### Validări
+- /, /login/, /studio/, /canto/ și /admin/canto/ răspund HTTP 200 cu același shell SPA și /assets/index-C6Rl_Flz.js. Nu dovedește implementarea rutelor React sau funcționarea după autentificare.
+- GET și POST /api/upload-homework/ întorc HTTP 200 text/html, inclusiv POST anonim și cu token invalid; răspunsul este shell-ul aplicației, nu JSON-ul endpointului actual. Bundle-ul live nu conține upload-homework, catalog_teme, /admin/canto sau versuri_text. Deploy-ul nu expune implementarea curentă Astro/API; versiune veche sau configurare build/start nepotrivită, fără acces la dashboard pentru a distinge cauza.
+- Proiectul Supabase extras din bundle-ul publicat este ygluzeynvkgiltaezuqn, același ca în configurația locală. Cereri cu cheia publicabilă din bundle, limit=0: profiles.id/username/is_active 200; pieces.id/grupa/versuri_text 400, cod 42703 pentru pieces.grupa; canto_playlist cu titlu_piesa/pozitiv_url/negativ_url 200; catalog_teme.id/midi_url 404 PGRST205. Auth settings 200, signup public oprit. Fără rânduri personale citite sau chei afișate.
+- Testele locale anterioare: 19/19 PASS; auditul local din aceeași sesiune: 64 pagini, 0 FAIL | 0 WARN. Metadata/JSON-LD/imaginile neschimbate, fără măsurători GSC noi. Extracția inițială presupunea JWT; reluată cu suport sb_publishable, cererile live au fost executate cu succes.
+
+### Greșeli / riscuri / pași următori
+- Confirmarea utilizatorului privind SQL-ul și variabilele remote rămâne distinctă de observațiile API. Verifică proiectul live și reîncarcă schema cache PostgREST înainte de a rerula migrări; cererile read-only nu stabilesc singure cauza divergenței.
+- Publică versiunea actualizată Academy cu build npm ci && npm run build și start npm start, din directorul Academy. Serverul local curent trimite /api/ spre adaptorul Astro; implementarea live observată nu o face. Fără commit/push/deploy automat.
+- După publicare: API GET 405 JSON și POST anonim 401 JSON, apoi flux autentificat audio+MIDI → Drive → catalog. Cheile/permisiunile/cota Google din Railway nu pot fi validate cât timp endpointul este înlocuit de fallback HTML.
+
+---
+
+## 📝 19 oct 2026 — Verificare live Railway și Supabase după configurare
+
+### Obiectiv
+- Verificarea configurației anunțate de Claudiu, prin cereri read-only și testele existente, fără expunerea credențialelor.
+
+### Modificări
+- Actualizate exclusiv jurnalul și trackerul cu rezultatele; fără modificări de cod, deploy, migrări sau scrieri live.
+
+### Validări
+- Audit SEO local: 64 pagini verificate, 0 FAIL | 0 WARN. Ultima verificare săptămânală consemnată pe 18 octombrie; nu este scadentă. Metadata, JSON-LD și imaginile neschimbate; fără măsurători GSC noi.
+- Academy npm test: 19/19 PASS. get_errors: zero erori în helperul de upload, clientul Supabase și endpointul API. Testele folosesc servicii simulate și PostgreSQL local; nu dovedesc funcționarea integrării live.
+- Site principal: HTTPS 200 atât cu www, cât și fără www. Academy: fetch eșuează cu ENOTFOUND; resolverul public Google DNS răspunde fără înregistrări A pentru academy-music.florentinapanaofficial.ro. Paginile și endpointul Railway nu au putut fi verificate prin acest domeniu.
+- Supabase din configurația locală: Auth settings HTTP 200, signup public dezactivat. Cereri REST limit=0, fără rânduri personale: profiles.id/username/is_active și pieces.id HTTP 200; pieces.grupa și pieces.versuri_text HTTP 400, cod 42703, coloane inexistente; catalog_teme HTTP 404, PGRST205, tabel absent din schema cache. canto_playlist răspunde 200 la select fără rânduri, dar aceasta nu confirmă compatibilitatea cu migrarea locală sau corectitudinea RLS.
+- Variabilele locale Supabase și cele trei Google sunt prezente; cheia Google locală nu se parsează ca cheie privată. Valorile nu au fost afișate. Nu există acces verificat la configurația Railway și nu se presupune că aceasta coincide cu fișierele locale.
+
+### Greșeli / riscuri / pași următori
+- Verifică domeniul custom și ținta CNAME din Railway/DNS sau furnizează URL-ul public generat de Railway. Publicarea efectivă și variabilele remote rămân neverificate.
+- În proiectul Supabase folosit de aplicație, aplică setup_catalog_teme.sql după setup_online_classes.sql și migrarea 20261019_canto_library.sql conform README; nu rerula schema de bază. Dacă au fost deja aplicate, verifică proiectul selectat și cache-ul PostgREST înainte de alte intervenții.
+- Verificarea completă REC → STOP → Trimite Tema, accesul/cota Drive, salvarea audio+MIDI și catalogul necesită domeniu accesibil și sesiune autentificată. Nu s-au solicitat parole sau chei în conversație și nu s-au creat teme de test live.
+
+---
+
+## 📝 19 oct 2026 — Academy Music: arhitectură și interfețe Canto
+
+### Obiectiv
+- Bibliotecă Canto structurată pe piesă/grupă, cu pozitiv, negativ și versuri text; administrare completă și afișare elev fără descărcarea versurilor.
+
+### Modificări
+- Academy `supabase/migrations/20261019_canto_library.sql`: migrare tranzacțională/repetabilă, adaugă grupa și versuri_text în pieces, limite 100/100.000 și index Canto; view read-only canto_playlist cu titlu_piesa/pozitiv_url/negativ_url și security_invoker. Păstrează piesele, alocările, RLS și bucketul privat; fără duplicarea catalogului. Câmpurile canonice title/positive_url/negative_url rămân compatibile cu aplicația.
+- Academy `src/lib/canto.js`: payload validat, titlu manual obligatoriu, MP3 maximum 30 MB/variantă cu extensie/MIME/antet, uploaduri unice numai pentru variante schimbate; rollback al uploadurilor noi când DB refuză salvarea și mesaj explicit dacă cleanup eșuează. `src/components/CantoAudio.jsx`: URL-uri CDN sau semnate din Storage, player nativ, retry și excludere între redări.
+- Academy `src/pages/admin/AdminCanto.jsx`: editor compact titlu/grupă/MP3+/MP3-/versuri, sugestii grupe și text liber, publicare/ciornă, tabel cinci coloane, căutare, editare, înlocuire independentă, modal textarea, confirmare ștergere și erori/retry. `src/pages/Canto.jsx`: titluri manuale, grupă, două playere, filtru/căutare și modal versuri text sigur cu strofe păstrate; acces autentificat existent păstrat.
+- Academy `src/App.jsx`, `src/pages/admin/AdminPanel.jsx`, `AdminPieces.jsx`, `src/pages/[...app].astro`: tab/rută /admin/canto/, ruta elevului și redirect de la vechiul formular Canto; repertoriul admin vechi rămâne Orgă. `src/components/DualAudioRow.jsx`: player Canto privat și în repertoriul comun. `src/components/ui/Modal.jsx`: titluri lungi cu wrap și buton de închidere stabil. README actualizat.
+- Academy `src/lib/learning.check.mjs`, `scripts/verify-learning.mjs`: teste Canto în suitele existente, fără a anula schimbările utilizatorului sau implementarea anterioară de elevi. Tracker și jurnal actualizate.
+
+### Validări
+- Audit inițial și seo:check final: 64 pagini, 0 FAIL | 0 WARN. Build Academy PASS, 42 active precomprimate. npm test: 19/19 PASS. Teste Canto: migrare aplicată de două ori, RLS caller/view, anon refuzat, limite, păstrare piese, payload și URL-uri sigure, validare MP3, păstrare variantă nemodificată, rollback upload nou.
+- Browser --canto PASS 1440×1000 și 390×844 pe ultimul build: redirect vechi, creare cu două MP3, titlu independent de fișier, editare fără upload, înlocuire negativ cu pozitiv păstrat, refuz DB/cleanup/retry, versuri text inclusiv tag HTML literal fără execuție, filtre, MP3 real generat ffmpeg redat/decodat de browser, oprire player anterior, player semnat în repertoriul comun, ștergere/anulare, refuz listare/retry, zero erori JS și fără overflow document. Supabase simulat; fără scrieri live.
+- Metadata Canto: verificate în DOM în limitele title 50–58 / description 130–150; maxime proiect 60/155 respectate, noindex/nofollow păstrat, zero img fără alt. Metadata nu au fost schimbate, fără JSON-LD propriu nou sau imagini noi. Capturi .astro/screenshots/canto-admin-{1440,390}.png, canto-student-{1440,390}.png și canto-lyrics-{1440,390}.png.
+- get_errors: zero erori în noile componente/helper/teste și integrare; git diff --check fără probleme înainte de documentare. Preview final http://127.0.0.1:4203/admin/canto/ și /canto/; utilizarea manuală necesită sesiune profesor/elev și migrarea aplicată în Supabase.
+
+### Greșeli / riscuri / pași următori
+- Mockul inițial refuza citirea legitimă Orgă înainte de redirect; permisă numai citirea, scrierile rămân filtrate canto. Testul mobil a identificat inputul sr-only de înlocuire poziționat în afara contextului etichetei după interacțiuni; adăugat relative pe label și repetat fluxul complet cu PASS. Diagnosticul de lățime rămâne în test la eșec.
+- Aplică migrarea 20261019_canto_library.sql după schema și setup_online_classes, apoi publică frontendul. Nu s-au făcut deploy, commit sau modificări Supabase live. Gruparea text este organizatorică, nu schimbă accesul global la piesele publicate sau membership-ul grupelor. Inspectorul rămâne read-only conform RLS existent.
+- Storage și DB nu formează o tranzacție atomică; tab închis/rețea întreruptă poate lăsa obiecte. Obiectele vechi după înlocuire sau ștergerea rândului sunt păstrate pentru a evita ștergerea unor referințe comune; curățare/retentie administrată separat. Validarea MP3 este client-side și de antet, nu antivirus/server decoding. URL-urile semnate expiră și se pot regenera prin retry. Controalele nodownload nu sunt DRM. Fără schimbări în motorul REC/Drive, resolverul Orgă sau înregistrările elevilor.
+- Fără date GSC comparative sau afirmații de creștere ranking. Auditul SEO local validează doar output-ul tehnic.
+
+---
+
+## 📝 19 oct 2026 — Academy Music: finalizare panou profesor și username elevi
+
+### Obiectiv
+- Administrare elevi fără email real: formular nume/prenume, username/parolă, tabel din DB, dezactivare directă și login prin username.
+
+### Modificări
+- Academy `src/pages/admin/AdminStudents.jsx`: doar profiluri student/elev, încărcare în loturi de 500, tabel cu nume/username/repertoriu/stare/acțiuni, căutare nume/username, filtru Active/Inactive/Toate. Dezactivare/reactivare cu confirmare, busy guard, erori și verificarea stării efectiv returnate; repertoriul și temele sunt păstrate. Erori de încărcare cu retry, fără listă goală interpretată ca succes. Formularul fără email existent păstrat; username cu punct tastabil, blocare submit/închidere în timpul creării și resetare filtru după succes.
+- Academy `src/lib/studentCredentials.js`, `auth.jsx`, `src/pages/Login.jsx`, `supabase/functions/create-student/index.ts`: conturi noi @student.academy.local, numele real în user_metadata.full_name și profil, Auth Admin exclusiv server-side. Loginul încearcă domeniul istoric @students.academy.invalid numai la invalid_credentials pentru username; emailurile explicite și rate-limit/network nu declanșează fallback. Mesaj login actualizat și autocapitalizare oprită.
+- Academy `src/pages/admin/StudentDetail.jsx`: capturarea erorilor de actualizare și blocarea controalelor în timpul salvării; ștergerea definitivă existentă păstrată. Academy `src/lib/learning.check.mjs`, `scripts/verify-learning.mjs`: teste funcție Edge reală transpilată cu servicii simulate, login și scenariu browser --students. README și tracker actualizate.
+
+### Validări
+- Audit inițial și seo:check: 64 pagini, 0 FAIL | 0 WARN. Ultimul audit săptămânal consemnat 18 octombrie, fără repetare în această sesiune. Metadata/JSON-LD/imaginile nu au fost modificate; limitele proiectului rămân 50–58/130–150, maxime 60/155. Fără date comparative GSC sau afirmații de ranking.
+- Build Academy PASS, 41 active precomprimate. npm test: 17/17 PASS; conturi noi/legacy, email profesor, rate-limit fără fallback, profesor activ obligatoriu, username duplicat/invalid respins, email tehnic și metadata corecte, rollback la profil nesalvat.
+- Browser Chromium --students PASS la 1440×1000 și 390×844: creare fără email, username tastat cu punct, căutare, confirmare/anulare, refuz update/retry, dezactivare/reactivare, eroare listare/retry, zero erori JS și fără overflow pagină. Capturi .astro/screenshots/students-1440.png și students-390.png. Supabase simulat, fără creare/ștergere/dezactivare reală.
+- get_errors: zero erori în JSX, helper, auth și teste. Preview final http://127.0.0.1:4201/admin/elevi/; necesită sesiune profesor reală pentru utilizare manuală.
+
+### Greșeli / riscuri / pași următori
+- Primul test a identificat eticheta selectorului incluzând opțiunile; separat label/for și select/id, apoi verificat. Mockul 503 de listare provoca retry automat Supabase peste timeout; schimbat în refuz 403 pentru testarea deterministă a erorii, fără modificarea retry-ului aplicației. Ambele dimensiuni au trecut pe ultimul build.
+- Publică funcția create-student actualizată și frontendul; păstrează migrarea username și politicile existente aplicate. Nu s-a făcut deploy/commit sau migrare live. Fallbackul păstrează conturile vechi fără schimbarea adreselor lor.
+- Dezactivarea schimbă profiles.is_active, nu elimină utilizatorul Auth și nu revocă global sesiunile existente. Protecția existentă verifică profilul la încărcare, iar API-urile/politicile verifică activitatea conform implementărilor lor; această sesiune nu revendică invalidare instantanee pe dispozitive deja conectate sau audit complet al tuturor politicilor. Ștergerea definitivă rămâne separată în detalii; fișierele externe Drive nu sunt șterse de schimbarea stării.
+
+---
+
 ## 📝 19 oct 2026 — Academy Music: player html-midi-player, upload audio+MIDI în Drive, push pe live cu pași rămași
 
 ### Obiectiv

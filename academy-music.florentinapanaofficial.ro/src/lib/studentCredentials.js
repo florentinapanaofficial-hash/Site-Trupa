@@ -1,4 +1,4 @@
-const EMAIL_DOMAIN = 'students.academy.invalid';
+const EMAIL_DOMAIN = 'student.academy.local';
 
 export function normalizeUsername(value) {
     return String(value || '')
@@ -19,6 +19,19 @@ export function loginEmailForIdentity(identity) {
     const value = String(identity || '').trim();
     if (value.includes('@')) return value.toLowerCase();
     return `${normalizeUsername(value)}@${EMAIL_DOMAIN}`;
+}
+
+export async function signInWithIdentity(auth, identity, password) {
+    const email = loginEmailForIdentity(identity);
+    let result = await auth.signInWithPassword({ email, password });
+    if (!String(identity).includes('@') && result.error?.code === 'invalid_credentials') {
+        result = await auth.signInWithPassword({
+            email: `${normalizeUsername(identity)}@students.academy.invalid`,
+            password,
+        });
+    }
+    if (result.error) throw result.error;
+    return result.data;
 }
 
 export function generateTemporaryPassword() {

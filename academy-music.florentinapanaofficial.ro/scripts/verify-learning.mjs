@@ -214,8 +214,252 @@ const scoreOnly = process.argv.includes('--score-editor');
 const homeworkOnly = process.argv.includes('--homework');
 const driveOnly = process.argv.includes('--drive-upload');
 const catalogOnly = process.argv.includes('--drive-catalog');
+const studentsOnly = process.argv.includes('--students');
+const cantoOnly = process.argv.includes('--canto');
 const shots = new URL('../.astro/screenshots/', import.meta.url);
 await mkdir(shots, { recursive: true });
+
+async function verifyCanto() {
+    const encoded = spawnSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-f', 'lavfi', '-i', 'sine=frequency=220:duration=3', '-f', 'mp3', 'pipe:1']);
+    assert.equal(encoded.status, 0, 'Canto audio test requires ffmpeg');
+    const mp3 = { name: 'nume-original.mp3', mimeType: 'audio/mpeg', buffer: encoded.stdout };
+    for (const viewport of [{ width: 1440, height: 1000 }, { width: 390, height: 844 }]) {
+        const context = await browser.newContext({ viewport });
+        const page = await context.newPage();
+        const errors = [];
+        const uploaded = [];
+        const cleaned = [];
+        let actorRole = 'teacher';
+        let rejectWrite = false;
+        let rejectList = false;
+        let rows = [{ id: 'orga', discipline: 'orga', title: 'Orga existentă', is_published: true }];
+        const lyricText = 'Strofa întâi\nAl doilea rând\n\nRefren\n<img src=x onerror="window.lyricExecuted=true">';
+        page.on('pageerror', (error) => errors.push(error.message));
+        await page.addInitScript(({ token, user }) => localStorage.setItem('academy-music-auth', JSON.stringify({ access_token: token, refresh_token: 'test-refresh', expires_at: Math.floor(Date.now() / 1000) + 3600, expires_in: 3600, token_type: 'bearer', user })), { token, user });
+        await page.route(`${new URL(env.VITE_SUPABASE_URL).origin}/**`, async (route) => {
+            const request = route.request();
+            const url = new URL(request.url());
+            const path = url.pathname;
+            let data = [];
+            let status = 200;
+            if (path === '/auth/v1/user') data = user;
+            else if (path.endsWith('/profiles')) data = { id: student, full_name: 'Cont test', role: actorRole, is_active: true };
+            else if (path.endsWith('/study_groups')) data = [{ name: 'Grupa mică' }];
+            else if (path.endsWith('/pieces')) {
+                if (request.method() === 'GET') {
+                    const discipline = url.searchParams.get('discipline');
+                    assert.ok(['eq.canto', 'eq.orga'].includes(discipline) || (!discipline && url.searchParams.get('is_published') === 'eq.true'));
+                    if (rejectList) { status = 403; data = { message: 'Denied' }; }
+                    else data = rows.filter((row) => (!discipline || `eq.${row.discipline}` === discipline) && (!url.searchParams.has('is_published') || row.is_published));
+                } else if (rejectWrite) { status = 403; data = { message: 'Denied' }; }
+                else if (request.method() === 'POST') {
+                    data = { id: '22222222-2222-4222-8222-222222222222', ...request.postDataJSON() };
+                    rows.push(data);
+                } else {
+                    assert.equal(url.searchParams.get('discipline'), 'eq.canto');
+                    const row = rows.find((row) => `eq.${row.id}` === url.searchParams.get('id'));
+                    assert.ok(row && row.discipline === 'canto');
+                    if (request.method() === 'PATCH') { Object.assign(row, request.postDataJSON()); data = row; }
+                    else { data = { id: row.id }; rows = rows.filter((entry) => entry.id !== row.id); }
+                }
+            } else if (path.startsWith('/storage/v1/object/sign/') && request.method() === 'POST') {
+                data = { signedURL: '/object/sign/academy-media/fixture.mp3?token=test' };
+            } else if (path.startsWith('/storage/v1/object/') && request.method() === 'GET') {
+                return route.fulfill({ contentType: 'audio/mpeg', body: encoded.stdout });
+            } else if (path.startsWith('/storage/v1/object/') && request.method() === 'POST') {
+                uploaded.push(path);
+                data = { Key: path };
+            } else if (path.startsWith('/storage/v1/object/') && request.method() === 'DELETE') {
+                cleaned.push(request.postDataJSON());
+            }
+            await route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(data) });
+        });
+        await page.goto(`${base}/admin/piese/?add=canto`);
+        await expect(page).toHaveURL(/\/admin\/canto\/$/);
+        const form = page.getByRole('form', { name: 'Adaugă piesă Canto' });
+        await form.getByLabel('Titlul piesei', { exact: true }).fill('Titlu ales de profesor');
+        await form.getByLabel('Grupa', { exact: true }).fill('Grupa mică');
+        await form.getByLabel('Upload MP3 Pozitiv', { exact: true }).setInputFiles(mp3);
+        await form.getByLabel('Upload MP3 Negativ', { exact: true }).setInputFiles(mp3);
+        await form.getByRole('button', { name: 'Adaugă versuri', exact: true }).click();
+        await page.getByLabel('Textul versurilor', { exact: true }).fill(lyricText);
+        await page.getByRole('button', { name: 'Aplică versurile', exact: true }).click();
+        await form.getByRole('button', { name: 'Adaugă piesa', exact: true }).click();
+        const table = page.getByRole('table', { name: 'Biblioteca Canto' });
+        await expect(table.getByText('Titlu ales de profesor', { exact: true })).toBeVisible();
+        assert.equal(uploaded.length, 2);
+        assert.equal(rows[1].title, 'Titlu ales de profesor');
+        assert.equal(rows[1].versuri_text, lyricText);
+        const positive = rows[1].audio_pozitiv_path;
+        const negative = rows[1].audio_negativ_path;
+        await page.getByRole('button', { name: 'Editează Titlu ales de profesor', exact: true }).click();
+        await page.getByLabel('Titlul piesei', { exact: true }).fill('Piesa redenumită');
+        await page.getByRole('button', { name: 'Salvează modificările', exact: true }).click();
+        await expect(table.getByText('Piesa redenumită', { exact: true })).toBeVisible();
+        assert.equal(rows[1].audio_pozitiv_path, positive);
+        assert.equal(rows[1].audio_negativ_path, negative);
+        rejectWrite = true;
+        await page.getByLabel('Înlocuiește Negativ — Piesa redenumită', { exact: true }).setInputFiles(mp3);
+        await expect(page.getByRole('alert')).toContainText('nu a putut fi salvată');
+        assert.equal(cleaned.length, 1);
+        assert.equal(rows[1].audio_negativ_path, negative);
+        rejectWrite = false;
+        await page.getByLabel('Înlocuiește Negativ — Piesa redenumită', { exact: true }).setInputFiles(mp3);
+        await expect(page.getByRole('status')).toContainText('a fost înlocuit');
+        assert.equal(rows[1].audio_pozitiv_path, positive);
+        assert.notEqual(rows[1].audio_negativ_path, negative);
+        await page.getByRole('button', { name: 'Versuri — Piesa redenumită', exact: true }).click();
+        await page.getByLabel('Textul versurilor', { exact: true }).fill(`${lyricText}\nFinal`);
+        await page.getByRole('button', { name: 'Salvează versurile', exact: true }).click();
+        await expect(page.getByRole('dialog')).toHaveCount(0);
+        const layout = await page.evaluate(() => ({ width: innerWidth, scroll: document.documentElement.scrollWidth, wide: [...document.querySelectorAll('main *')].filter((element) => element.getBoundingClientRect().width > innerWidth).slice(0, 12).map((element) => ({ tag: element.tagName, classes: element.className, width: element.getBoundingClientRect().width })) }));
+        assert.ok(layout.scroll <= layout.width, JSON.stringify(layout));
+        await page.screenshot({ path: fileURLToPath(new URL(`canto-admin-${viewport.width}.png`, shots)), fullPage: true });
+        actorRole = 'student';
+        await page.goto(`${base}/canto/`);
+        await expect(page.getByRole('heading', { name: 'Piesa redenumită', exact: true })).toBeVisible();
+        await expect(page.getByRole('link', { name: 'Adaugă piesă', exact: true })).toHaveCount(0);
+        await page.getByLabel('Grupa', { exact: true }).selectOption('Grupa mică');
+        const positiveAudio = page.getByLabel('Pozitiv — Piesa redenumită', { exact: true });
+        const negativeAudio = page.getByLabel('Negativ — Piesa redenumită', { exact: true });
+        await expect(positiveAudio).toHaveAttribute('src', /token=test/);
+        await positiveAudio.evaluate((audio) => audio.play());
+        await expect.poll(() => positiveAudio.evaluate((audio) => audio.currentTime)).toBeGreaterThan(0.05);
+        await negativeAudio.evaluate((audio) => audio.play());
+        await expect.poll(() => negativeAudio.evaluate((audio) => audio.currentTime)).toBeGreaterThan(0.05);
+        assert.equal(await positiveAudio.evaluate((audio) => audio.paused), true);
+        await negativeAudio.evaluate((audio) => audio.pause());
+        await page.getByRole('button', { name: 'Vezi versuri — Piesa redenumită', exact: true }).click();
+        const dialog = page.getByRole('dialog');
+        await expect(dialog.getByLabel('Versurile piesei', { exact: true })).toHaveText(`${lyricText}\nFinal`);
+        assert.equal(await dialog.locator('img').count(), 0);
+        assert.equal(await page.evaluate(() => Boolean(window.lyricExecuted)), false);
+        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+        await page.screenshot({ path: fileURLToPath(new URL(`canto-lyrics-${viewport.width}.png`, shots)), fullPage: true });
+        await page.keyboard.press('Escape');
+        await expect(dialog).toHaveCount(0);
+        await page.screenshot({ path: fileURLToPath(new URL(`canto-student-${viewport.width}.png`, shots)), fullPage: true });
+        const metadata = await page.evaluate(() => ({ title: document.title.length, description: document.querySelector('meta[name=description]').content.length, missingAlt: document.querySelectorAll('img:not([alt])').length, robots: document.querySelector('meta[name=robots]').content }));
+        assert.ok(metadata.title >= 50 && metadata.title <= 58 && metadata.description >= 130 && metadata.description <= 150, JSON.stringify(metadata));
+        assert.equal(metadata.missingAlt, 0);
+        assert.equal(metadata.robots, 'noindex, nofollow');
+        await page.goto(`${base}/repertoriul-meu/`);
+        await expect(page.getByLabel('Pozitiv — Piesa redenumită', { exact: true })).toHaveAttribute('src', /token=test/);
+        actorRole = 'teacher';
+        await page.goto(`${base}/admin/canto/`);
+        await page.getByRole('button', { name: 'Șterge Piesa redenumită', exact: true }).click();
+        await page.getByRole('button', { name: 'Anulează', exact: true }).click();
+        assert.equal(rows.length, 2);
+        await page.getByRole('button', { name: 'Șterge Piesa redenumită', exact: true }).click();
+        await page.getByRole('button', { name: 'Confirmă ștergerea', exact: true }).click();
+        await expect(page.getByText('Nicio piesă găsită.', { exact: true })).toBeVisible();
+        assert.equal(rows.length, 1);
+        assert.equal(rows[0].discipline, 'orga');
+        rejectList = true;
+        await page.reload();
+        await expect(page.getByRole('alert')).toContainText('nu a putut fi încărcată');
+        rejectList = false;
+        await page.getByRole('button', { name: 'Reîncarcă Canto', exact: true }).click();
+        await expect(page.getByRole('alert')).toHaveCount(0);
+        assert.deepEqual(errors, []);
+        await context.close();
+        console.log(`PASS ${viewport.width}px: Canto creation/edit, MP3 pair, independent replacement, DB denial/upload cleanup, lyrics text/XSS, group filter, real audio playback/exclusion, delete/cancel, retry, metadata and overflow`);
+    }
+}
+
+async function verifyStudents() {
+    for (const viewport of [{ width: 1440, height: 1000 }, { width: 390, height: 844 }]) {
+        const context = await browser.newContext({ viewport });
+        const page = await context.newPage();
+        const errors = [];
+        const creations = [];
+        const writes = [];
+        let rejectWrite = true;
+        let rejectList = false;
+        const rows = [{ id: '22222222-2222-4222-8222-222222222222', full_name: 'Andrei Popescu', username: 'andrei.popescu', role: 'student', is_active: true }];
+        page.on('pageerror', (error) => errors.push(error.message));
+        await page.addInitScript(({ token, user }) => localStorage.setItem('academy-music-auth', JSON.stringify({ access_token: token, refresh_token: 'test-refresh', expires_at: Math.floor(Date.now() / 1000) + 3600, expires_in: 3600, token_type: 'bearer', user })), { token, user });
+        await page.route(`${new URL(env.VITE_SUPABASE_URL).origin}/**`, async (route) => {
+            const request = route.request();
+            const url = new URL(request.url());
+            let data = [];
+            let status = 200;
+            if (url.pathname === '/auth/v1/user') data = user;
+            else if (url.pathname.endsWith('/profiles')) {
+                if (request.method() === 'PATCH') {
+                    writes.push(request.postDataJSON());
+                    if (rejectWrite) { status = 403; data = { message: 'Access denied' }; }
+                    else {
+                        Object.assign(rows.find((row) => `eq.${row.id}` === url.searchParams.get('id')), request.postDataJSON());
+                        const row = rows.find((row) => `eq.${row.id}` === url.searchParams.get('id'));
+                        data = { id: row.id, is_active: row.is_active };
+                    }
+                } else if (url.searchParams.has('role')) {
+                    assert.equal(url.searchParams.get('role'), 'in.(student,elev)');
+                    if (rejectList) { status = 403; data = { message: 'Access denied' }; }
+                    else data = rows;
+                } else data = { id: student, full_name: 'Profesor test', role: 'teacher', is_active: true };
+            } else if (url.pathname.endsWith('/create-student')) {
+                const input = request.postDataJSON();
+                creations.push(input);
+                const row = { id: '33333333-3333-4333-8333-333333333333', full_name: `${input.firstName} ${input.lastName}`, username: input.username, role: 'student', is_active: true };
+                rows.push(row);
+                data = { id: row.id, username: row.username };
+                status = 201;
+            }
+            await route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(data) });
+        });
+        await page.goto(`${base}/admin/elevi/`);
+        const table = page.getByRole('table');
+        await expect(table.getByText('andrei.popescu', { exact: true })).toBeVisible();
+        await page.getByRole('button', { name: 'Adaugă elev', exact: true }).click();
+        const create = page.getByRole('dialog', { name: 'Creează cont de elev' });
+        assert.equal(await create.locator('input[type=email]').count(), 0);
+        await create.getByLabel('Prenume', { exact: true }).fill('Maria');
+        await create.getByLabel('Nume', { exact: true }).fill('Ionescu');
+        await expect(create.getByLabel('Username', { exact: true })).toHaveValue('maria.ionescu');
+        await create.getByLabel('Username', { exact: true }).fill('');
+        await create.getByLabel('Username', { exact: true }).pressSequentially('maria.ionescu');
+        await expect(create.getByLabel('Username', { exact: true })).toHaveValue('maria.ionescu');
+        await create.getByLabel('Parolă temporară', { exact: true }).fill('ParolaTest!1234');
+        await create.getByRole('button', { name: 'Creează contul', exact: true }).click();
+        await expect(page.getByRole('dialog', { name: 'Cont creat', exact: true })).toBeVisible();
+        assert.deepEqual(creations, [{ firstName: 'Maria', lastName: 'Ionescu', username: 'maria.ionescu', password: 'ParolaTest!1234' }]);
+        await page.getByRole('button', { name: 'Am transmis parola', exact: true }).click();
+        await page.getByLabel('Caută elev', { exact: true }).fill('andrei.popescu');
+        await expect(table.getByText('maria.ionescu', { exact: true })).toHaveCount(0);
+        await page.getByRole('button', { name: 'Dezactivează Andrei Popescu', exact: true }).click();
+        await page.getByRole('button', { name: 'Anulează', exact: true }).click();
+        assert.equal(writes.length, 0);
+        await page.getByRole('button', { name: 'Dezactivează Andrei Popescu', exact: true }).click();
+        await page.getByRole('button', { name: 'Confirmă', exact: true }).click();
+        await expect(page.getByRole('dialog').getByRole('alert')).toContainText('nu a putut fi salvată');
+        rejectWrite = false;
+        await page.getByRole('button', { name: 'Confirmă', exact: true }).click();
+        await expect(page.getByRole('dialog')).toHaveCount(0);
+        await expect(table).toHaveCount(0);
+        await page.getByLabel('Conturi', { exact: true }).selectOption('inactive');
+        await expect(table.getByText('Inactiv', { exact: true })).toBeVisible();
+        await page.getByRole('button', { name: 'Reactivează Andrei Popescu', exact: true }).click();
+        await page.getByRole('button', { name: 'Confirmă', exact: true }).click();
+        await expect(page.getByRole('dialog')).toHaveCount(0);
+        await page.getByLabel('Conturi', { exact: true }).selectOption('all');
+        await page.getByLabel('Caută elev', { exact: true }).fill('');
+        await expect(table.getByText('Activ', { exact: true })).toHaveCount(2);
+        assert.deepEqual(writes, [{ is_active: false }, { is_active: false }, { is_active: true }]);
+        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+        await page.screenshot({ path: fileURLToPath(new URL(`students-${viewport.width}.png`, shots)), fullPage: true });
+        rejectList = true;
+        await page.reload();
+        await expect(page.getByRole('alert')).toContainText('nu au putut fi încărcate');
+        rejectList = false;
+        await page.getByRole('button', { name: 'Reîncearcă', exact: true }).click();
+        await expect(page.getByRole('table').getByText('andrei.popescu', { exact: true })).toBeVisible();
+        assert.deepEqual(errors, []);
+        await context.close();
+        console.log(`PASS ${viewport.width}px: student table, username search, creation without email, confirmation/cancel, denied update/retry, deactivate/reactivate, list failure/retry, no page overflow`);
+    }
+}
 
 async function verifyHomeworkRecording() {
     const encoded = spawnSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-f', 'lavfi', '-i', 'sine=frequency=220:duration=3', '-f', 'mp3', 'pipe:1']);
@@ -374,8 +618,10 @@ async function verifyHomeworkRecording() {
     }
 }
 try {
-    if (!scoreOnly && !catalogOnly) await verifyHomeworkRecording();
-    for (const viewport of homeworkOnly || driveOnly ? [] : [{ width: 1440, height: 1000 }, { width: 390, height: 844 }]) {
+    if (cantoOnly) await verifyCanto();
+    if (studentsOnly) await verifyStudents();
+    if (!scoreOnly && !catalogOnly && !studentsOnly && !cantoOnly) await verifyHomeworkRecording();
+    for (const viewport of homeworkOnly || driveOnly || studentsOnly || cantoOnly ? [] : [{ width: 1440, height: 1000 }, { width: 390, height: 844 }]) {
         const context = await browser.newContext({ viewport, hasTouch: viewport.width < 500 });
         const page = await context.newPage();
         const errors = [];
@@ -550,7 +796,7 @@ try {
         await context.close();
     }
     assert.equal((await fetch(`${base}/revista/nu-exista/`)).status, 404);
-    for (const role of scoreOnly || homeworkOnly || driveOnly || catalogOnly ? [] : ['profesor', 'elev', 'inspector']) {
+    for (const role of scoreOnly || homeworkOnly || driveOnly || catalogOnly || studentsOnly || cantoOnly ? [] : ['profesor', 'elev', 'inspector']) {
         for (const viewport of [{ width: 1440, height: 1000 }, { width: 390, height: 844 }]) {
             const context = await browser.newContext({ viewport });
             const page = await context.newPage();

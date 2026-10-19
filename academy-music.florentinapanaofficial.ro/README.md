@@ -3,9 +3,33 @@
 Platformă LMS pentru cursurile de **orgă** și **canto** de la Palatul Copiilor Pitești.
 Subdomeniu țintă: `academy-music.florentinapanaofficial.ro`
 
-Stack: **Astro 7 (pagini statice + API Node middleware) + React 18 + MDX + TailwindCSS 4 + Supabase** (Auth, Postgres, Storage pentru materialele private existente). Audio nou: URL-uri directe Cloudflare R2/CDN.
+Stack: **Astro 7 (pagini statice + API Node middleware) + React 18 + MDX + TailwindCSS 4 + Supabase** (Auth, Postgres, Storage privat). Audio: URL-uri directe Cloudflare R2/CDN; Canto acceptă și upload MP3 privat în Supabase Storage.
 
 ---
+
+## Biblioteca Canto
+
+Profesor: `/admin/canto/`, tabul **Canto**. Elev: `/canto/`, în continuare autentificat; nu se publică materiale către utilizatori anonimi. Vechiul `/admin/piese/?add=canto` redirecționează spre noul editor, iar secțiunea Piese administrează Orgă.
+
+Înainte de publicarea frontendului, rulează `supabase/migrations/20261019_canto_library.sql` în SQL Editor, după schema Academy și `setup_online_classes.sql`. Migrarea este tranzacțională, repetabilă și nu mută/șterge piesele sau alocările existente. Adaugă `pieces.grupa` (maximum 100 caractere) și `pieces.versuri_text` (maximum 100.000), apoi view-ul read-only `canto_playlist`, cu `security_invoker=true` și acces SELECT doar pentru authenticated. RLS de pe `pieces` rămâne sursa de adevăr.
+
+| View `canto_playlist` | Sursa canonică `pieces` |
+|---|---|
+| `titlu_piesa` | `title` (titlul manual, nu numele fișierului) |
+| `grupa` | `grupa` |
+| `pozitiv_url` | `positive_url` (CDN/HTTP(S), opțional) |
+| `negativ_url` | `negative_url` (CDN/HTTP(S), opțional) |
+| `versuri_text` | `versuri_text` (text simplu, cu rânduri/strofe) |
+
+Uploadurile noi păstrează căile în `audio_pozitiv_path` / `audio_negativ_path`, expuse și în view. Nu se salvează URL-uri semnate expirabile în DB. Bucketul `academy-media` rămâne privat, cu politicile existente de profesor pentru scriere și material publicat pentru citire autorizată. Playerul Canto obține temporar URL-uri semnate și permite retry la eroare; linkurile CDN existente continuă să funcționeze. Resolverul Orgă nu este modificat. Repertoriul comun utilizează playerul privat doar pentru piesele Canto.
+
+Editorul include titlu, grupă cu sugestii din `study_groups` și din bibliotecă, upload pozitiv/negativ și modal de versuri. Layoutul este pe un rând pe desktop larg și se rearanjează pe mobil; tabelul are scroll propriu. Grupa este o etichetă de organizare/filtrare, nu înscriere automată în grupă sau restricție de acces: biblioteca publicată rămâne comună conform politicilor curente. Publicarea/ciorna este păstrată. Piesele istorice fără grupă/versuri rămân disponibile și editabile.
+
+MP3: maximum 30 MB per variantă, verificare extensie/MIME/antet în browser; această verificare nu este antivirus sau validare server-side completă. Titlul nu se deduce din numele fișierului. Doar fișierele selectate sunt încărcate, iar eșecul salvării DB declanșează încercarea de curățare a uploadurilor noi. Eșecul curățării este raportat explicit. Fișierele vechi la înlocuire și fișierele asociate unei piese șterse nu sunt șterse automat din Storage, pentru a nu afecta referințe comune; retenția/curățarea obiectelor neutilizate necesită administrare separată. Nu există tranzacție distribuită Storage/DB sau garanție de cleanup după întreruperea browserului.
+
+Versurile sunt randate ca text React, nu HTML; elevul le citește în modal fără descărcare. Playerele native includ pauză, poziție și volum conform browserului, cu oprirea celuilalt audio la pornire. Ascunderea descărcării nu reprezintă DRM. Versurile goale dezactivează butonul elevului; profesorul le poate adăuga ulterior.
+
+Verificări: `npm test`, `npm run build`, `npm run test:browser -- --canto`, cu `ACADEMY_TEST_URL` setat spre preview. Testul browser necesită `ffmpeg` și verifică MP3 real la 1440/390 px, editare, înlocuire independentă, refuz DB/cleanup, versuri și XSS literal, filtrare, redare/excludere, repertoriu comun, ștergere/anulare, retry, metadata și lipsa overflow-ului. Supabase este simulat; migrarea este testată separat în PostgreSQL PGlite inclusiv repetabilitate, limite și RLS. Capturi: `.astro/screenshots/canto-{admin,student,lyrics}-{1440,390}.png`.
 
 ## Studio Interactiv MIDI + MP3
 
@@ -195,10 +219,14 @@ Funcțiile verifică tokenul și rolul profesorului activ. `create-student` cree
 
 Cheia `SUPABASE_SERVICE_ROLE_KEY` este folosită numai în Supabase Edge Functions și nu trebuie pusă în `.env`-ul Vite ori într-o variabilă `VITE_*`.
 
-3. În aplicație, deschide **Panou profesor → Elevi → Creează cont**. Username-ul propus poate fi editat; parola se generează din buton. După creare, transmite elevului datele afișate: parola apare o singură dată și nu este salvată în profil.
+3. În aplicație, deschide **Panou profesor → Elevi → Adaugă elev**. Formularul cere numai prenume, nume, username și parolă (12–128 caractere); parola poate fi și generată din buton. Numele real este salvat în `user_metadata.full_name` și profil. După creare, transmite elevului datele afișate: parola apare o singură dată și nu este salvată în profil.
 4. Elevul se autentifică folosind username-ul și parola. Profesorii existenți se pot autentifica în continuare cu email și parola lor.
 
-Username-ul este convertit intern la o adresă tehnică din domeniul rezervat `.invalid`; nu se trimite email și resetarea prin email nu este disponibilă pentru elevi. Profesorul trebuie să păstreze parola generată și să o transmită elevului.
+Conturile noi folosesc intern `[username]@student.academy.local`, fără email real sau mesaj de confirmare. Publică versiunea actualizată `create-student` împreună cu frontendul. Pentru conturile istorice `@students.academy.invalid`, loginul încearcă sufixul vechi numai după `invalid_credentials` la username; emailurile explicite ale profesorilor și erorile de rețea/rate-limit nu declanșează fallback. Resetarea prin email nu este disponibilă pentru elevi; profesorul transmite parola pe un canal sigur.
+
+Tabelul include doar rolurile `student`/`elev`, încarcă profilurile în loturi și permite căutarea după nume/username. Filtrul implicit afișează conturile active; sunt disponibile și Inactive/Toate. Dezactivarea și reactivarea direct din tabel cer confirmare și verifică valoarea `profiles.is_active` returnată de baza de date. Aceste operații păstrează repertoriul și temele, se bazează pe RLS/triggerul existent și nu reprezintă ștergere Auth sau revocare globală a sesiunilor deja emise. Ștergerea definitivă existentă rămâne în fișa elevului.
+
+Verificare focalizată: `npm run test:browser -- --students`, cu `ACADEMY_TEST_URL` spre preview. Testează desktop/mobil, creare fără email, editarea username-ului, căutare, confirmare/anulare, refuz/retry, dezactivare/reactivare și eroare de listare. Supabase este simulat, fără modificări ale conturilor reale. `npm test` verifică și funcția Edge transpilată, metadata, autorizarea, rollback-ul și compatibilitatea loginului.
 
 ### 2.6. Variabilele de mediu
 Copiază `.env.example` în `.env` și completează din **Project Settings → API**:

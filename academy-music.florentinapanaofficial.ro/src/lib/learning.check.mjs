@@ -14,6 +14,164 @@ import { scoreTimeline, scoreMidi, pitchFromStaff, scorePitchNumber } from './sc
 import { parseMidi } from 'midi-file';
 import { createHomeworkUpload } from './homeworkUpload.js';
 import { generateKeyPairSync } from 'node:crypto';
+import { loginEmailForIdentity, signInWithIdentity } from './studentCredentials.js';
+import { runInNewContext } from 'node:vm';
+import { transformWithEsbuild } from 'vite';
+import { cantoPayload, saveCantoPiece, validateCantoMp3, MAX_CANTO_MP3 } from './canto.js';
+
+test('Canto validates text and MP3, preserves unchanged audio and rolls back new uploads on failure', async () => {
+    const form = { title: ' Titlu manual ', grupa: ' Grupa 1 ', versuri_text: 'Strofa 1\n\n<script>text</script>', positive_url: 'https://cdn.example/voice.mp3', negative_url: '', is_published: true };
+    assert.equal(cantoPayload(form).title, 'Titlu manual');
+    assert.equal(cantoPayload(form).versuri_text, form.versuri_text);
+    assert.throws(() => cantoPayload({ ...form, positive_url: 'javascript:alert(1)' }));
+    assert.throws(() => cantoPayload({ ...form, title: ' ' }));
+    const mp3 = new File(['ID3audio'], 'nume-fisier.mp3', { type: 'audio/mpeg' });
+    await validateCantoMp3(mp3);
+    await assert.rejects(validateCantoMp3(new File(['<html>'], 'fals.mp3', { type: 'audio/mpeg' })));
+    await assert.rejects(validateCantoMp3({ name: 'mare.mp3', type: 'audio/mpeg', size: MAX_CANTO_MP3 + 1 }));
+    const uploaded = [];
+    const cleaned = [];
+    let saved;
+    let fail = false;
+    const response = { select: () => ({ single: async () => ({ data: fail ? null : { id: 'piece', ...saved }, error: fail ? { message: 'denied' } : null }) }) };
+    const query = { ...response, eq: () => query };
+    const client = { from: (table) => {
+        assert.equal(table, 'pieces');
+        return { insert: (payload) => { saved = payload; return response; }, update: (payload) => { saved = payload; return query; } };
+    } };
+    const options = { client, form, userId: 'teacher', upload: async (path) => uploaded.push(path), removeUploaded: async (paths) => { cleaned.push(...paths); } };
+    const created = await saveCantoPiece({ ...options, files: { pozitiv: mp3 } });
+    assert.equal(created.title, 'Titlu manual');
+    assert.equal(saved.positive_url, null);
+    assert.match(saved.audio_pozitiv_path, /^canto\/[a-f0-9-]+\/pozitiv.mp3$/);
+    await saveCantoPiece({ ...options, piece: { id: 'piece' } });
+    assert.equal('audio_pozitiv_path' in saved, false);
+    assert.equal('audio_negativ_path' in saved, false);
+    fail = true;
+    await assert.rejects(saveCantoPiece({ ...options, files: { pozitiv: mp3, negativ: mp3 } }));
+    assert.deepEqual(cleaned, uploaded.slice(1));
+});
+
+test('Canto migration is repeatable, preserves pieces and uses caller RLS in its view', async () => {
+    const db = new PGlite();
+    try {
+        await db.exec(`
+            create role anon;
+            create role authenticated;
+            create table public.pieces (
+                id text primary key, title text, discipline text, positive_url text, negative_url text,
+                audio_pozitiv_path text, audio_negativ_path text, is_published boolean
+            );
+            insert into public.pieces (id,title,discipline,is_published) values
+                ('canto','Titlu profesor','canto',true), ('draft','Ascunsa','canto',false), ('orga','Orga','orga',true);
+            alter table public.pieces enable row level security;
+            grant select on public.pieces to authenticated;
+            create policy published on public.pieces for select to authenticated using (is_published);
+        `);
+        const migration = await readFile(new URL('../../supabase/migrations/20261019_canto_library.sql', import.meta.url), 'utf8');
+        await db.exec(migration);
+        await db.exec(migration);
+        await db.query(`update public.pieces set grupa = $1, versuri_text = $2 where id = 'canto'`, ['Grupa mică', 'Prima strofă\nA doua linie']);
+        await assert.rejects(db.query(`update public.pieces set versuri_text = $1 where id = 'canto'`, ['x'.repeat(100001)]));
+        await db.exec('set role authenticated');
+        const { rows } = await db.query('select * from public.canto_playlist');
+        assert.equal(rows.length, 1);
+        assert.equal(rows[0].titlu_piesa, 'Titlu profesor');
+        assert.equal(rows[0].grupa, 'Grupa mică');
+        assert.equal(rows[0].versuri_text, 'Prima strofă\nA doua linie');
+        await assert.rejects(db.exec(`update public.canto_playlist set titlu_piesa = 'Modificat'`));
+        await db.exec('reset role; set role anon');
+        await assert.rejects(db.exec('select * from public.canto_playlist'));
+        await db.exec('reset role');
+        assert.equal((await db.query('select count(*)::int as count from public.pieces')).rows[0].count, 3);
+    } finally {
+        await db.close();
+    }
+});
+
+test('create-student requires an active teacher and stores synthetic email and real metadata', async () => {
+    let handler;
+    let role = 'teacher';
+    let active = true;
+    let duplicate = false;
+    let profileFailure = false;
+    const creations = [];
+    const deletions = [];
+    const profiles = [];
+    const admin = {
+        auth: {
+            admin: {
+                createUser: async (input) => { creations.push(input); return { data: { user: { id: 'new-student' } } }; },
+                deleteUser: async (id) => { deletions.push(id); return {}; },
+            }
+        },
+        from: () => ({
+            select: () => ({ eq: (field) => ({ maybeSingle: async () => ({ data: field === 'username' ? (duplicate ? { id: 'existing' } : null) : { role, is_active: active } }) }) }),
+            update: (changes) => {
+                profiles.push(changes);
+                return { eq: () => ({ select: () => ({ maybeSingle: async () => ({ data: profileFailure ? null : { id: 'new-student' } }) }) }) };
+            },
+        }),
+    };
+    const source = await readFile(new URL('../../supabase/functions/create-student/index.ts', import.meta.url), 'utf8');
+    const transformed = await transformWithEsbuild(source.replace(/^import .*;\r?\n/, ''), 'create-student.ts', { loader: 'ts', target: 'es2022' });
+    runInNewContext(transformed.code, {
+        Request, Response, Set,
+        Deno: { env: { get: (name) => name }, serve: (callback) => { handler = callback; } },
+        createClient: (_url, key) => key === 'SUPABASE_SERVICE_ROLE_KEY' ? admin : { auth: { getUser: async () => ({ data: { user: { id: 'teacher' } } }) } },
+    });
+    const input = { firstName: 'Andrei', lastName: 'Popescu', username: 'andrei.popescu', password: 'ParolaTest!1234' };
+    const request = (body = input, authorization = 'Bearer session') => new Request('https://academy.example/create-student', { method: 'POST', headers: { Authorization: authorization, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    assert.equal((await handler(request(input, ''))).status, 401);
+    role = 'student';
+    assert.equal((await handler(request())).status, 403);
+    role = 'teacher'; active = false;
+    assert.equal((await handler(request())).status, 403);
+    active = true;
+    assert.equal((await handler(request({ ...input, username: 'bad@name' }))).status, 400);
+    duplicate = true;
+    assert.equal((await handler(request())).status, 409);
+    duplicate = false;
+    assert.equal(creations.length, 0);
+    assert.equal((await handler(request())).status, 201);
+    assert.deepEqual(JSON.parse(JSON.stringify(creations[0])), { email: loginEmailForIdentity(input.username), password: input.password, email_confirm: true, user_metadata: { full_name: 'Andrei Popescu' } });
+    assert.deepEqual(JSON.parse(JSON.stringify(profiles[0])), { full_name: 'Andrei Popescu', username: 'andrei.popescu', role: 'student' });
+    profileFailure = true;
+    assert.equal((await handler(request())).status, 500);
+    assert.deepEqual(deletions, ['new-student']);
+});
+
+test('student username login uses the new domain and preserves legacy accounts', async () => {
+    assert.equal(loginEmailForIdentity(' Andrei.Popescu '), 'andrei.popescu@student.academy.local');
+    assert.equal(loginEmailForIdentity(' Teacher@Example.com '), 'teacher@example.com');
+    const calls = [];
+    let failure = null;
+    const auth = {
+        signInWithPassword: async (credentials) => {
+            calls.push(credentials);
+            return { error: failure, data: { user: { id: 'student' } } };
+        }
+    };
+    await signInWithIdentity(auth, 'andrei.popescu', 'secret');
+    assert.deepEqual(calls, [{ email: 'andrei.popescu@student.academy.local', password: 'secret' }]);
+    calls.length = 0;
+    failure = { code: 'invalid_credentials' };
+    await assert.rejects(() => signInWithIdentity(auth, 'andrei.popescu', 'wrong'));
+    assert.deepEqual(calls.map((call) => call.email), ['andrei.popescu@student.academy.local', 'andrei.popescu@students.academy.invalid']);
+    calls.length = 0;
+    await assert.rejects(() => signInWithIdentity(auth, 'teacher@example.com', 'wrong'));
+    assert.equal(calls.length, 1);
+    calls.length = 0;
+    failure = { code: 'over_request_rate_limit' };
+    await assert.rejects(() => signInWithIdentity(auth, 'andrei.popescu', 'secret'));
+    assert.equal(calls.length, 1);
+    calls.length = 0;
+    auth.signInWithPassword = async (credentials) => {
+        calls.push(credentials);
+        return calls.length === 1 ? { error: { code: 'invalid_credentials' } } : { data: { user: { id: 'legacy' } } };
+    };
+    assert.equal((await signInWithIdentity(auth, 'andrei.popescu', 'secret')).user.id, 'legacy');
+});
 
 test('Drive homework enforces auth, profile, origin, size and format before private upload', async () => {
     const privateKey = generateKeyPairSync('rsa', { modulusLength: 2048 }).privateKey.export({ type: 'pkcs8', format: 'pem' });
@@ -29,11 +187,13 @@ test('Drive homework enforces auth, profile, origin, size and format before priv
         env, createClient: () => ({
             auth: { getUser: async () => ({ data: { user } }) },
             from: (table) => {
-                if (table === 'catalog_teme') return { insert: async (row) => {
-                    if (catalogFail) return { error: { message: 'sensitive database error' } };
-                    catalogRows.push(row);
-                    return { error: null };
-                } };
+                if (table === 'catalog_teme') return {
+                    insert: async (row) => {
+                        if (catalogFail) return { error: { message: 'sensitive database error' } };
+                        catalogRows.push(row);
+                        return { error: null };
+                    }
+                };
                 assert.equal(table, 'profiles');
                 return { select: () => ({ eq: () => ({ single: async () => ({ data: { role, is_active: active, full_name: 'Elev test' } }) }) }) };
             },

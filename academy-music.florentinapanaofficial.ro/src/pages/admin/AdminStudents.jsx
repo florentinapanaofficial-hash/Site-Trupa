@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
+import { Plus, UserRoundCheck, UserRoundX } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../lib/auth';
-import { generateTemporaryPassword, normalizeUsername, suggestUsername } from '../../lib/studentCredentials';
+import { generateTemporaryPassword, suggestUsername } from '../../lib/studentCredentials';
 import Avatar from '../../components/Avatar';
 import StudentDetail from './StudentDetail';
 import Modal from '../../components/ui/Modal';
@@ -23,14 +24,36 @@ export default function AdminStudents() {
     const [createStatus, setCreateStatus] = useState({ busy: false, error: '' });
     const [createdCredentials, setCreatedCredentials] = useState(null);
     const [copyStatus, setCopyStatus] = useState('');
+    const [listError, setListError] = useState('');
+    const [activeFilter, setActiveFilter] = useState('active');
+    const [statusTarget, setStatusTarget] = useState(null);
+    const [statusBusy, setStatusBusy] = useState(false);
+    const [statusError, setStatusError] = useState('');
 
     const load = useCallback(async () => {
+        setListError('');
         const [profilesResult, piecesResult, assignedResult] = await Promise.all([
-            supabase.from('profiles').select('*').order('full_name', { ascending: true }),
+            (async () => {
+                const students = [];
+                for (let offset = 0; ; offset += 500) {
+                    const result = await supabase.from('profiles').select('*')
+                        .in('role', ['student', 'elev'])
+                        .order('full_name', { ascending: true }).order('id')
+                        .range(offset, offset + 499);
+                    if (result.error) return result;
+                    students.push(...(result.data || []));
+                    if ((result.data || []).length < 500) return { data: students };
+                }
+            })(),
             supabase.from('pieces').select('*').order('title'),
             supabase.from('student_pieces').select('student_id'),
         ]);
 
+        if (profilesResult.error || piecesResult.error || assignedResult.error) {
+            setListError('Datele clasei nu au putut fi încărcate complet. Încearcă din nou.');
+            setStudents((previous) => previous || []);
+            return;
+        }
         setStudents(profilesResult.data || []);
         setAllPieces(piecesResult.data || []);
 
@@ -46,8 +69,26 @@ export default function AdminStudents() {
     }, [load]);
 
     async function patch(id, changes) {
-        await supabase.from('profiles').update(changes).eq('id', id);
-        load();
+        const { data, error } = await supabase.from('profiles').update(changes)
+            .eq('id', id).in('role', ['student', 'elev']).select('id, is_active').single();
+        if (error || !data || ('is_active' in changes && data.is_active !== changes.is_active)) {
+            throw new Error('Modificarea elevului nu a putut fi salvată.');
+        }
+        await load();
+    }
+
+    async function changeStudentStatus() {
+        if (!statusTarget || statusBusy) return;
+        setStatusBusy(true);
+        setStatusError('');
+        try {
+            await patch(statusTarget.id, { is_active: !statusTarget.is_active });
+            setStatusTarget(null);
+        } catch (error) {
+            setStatusError(error.message || 'Starea contului nu a putut fi schimbată.');
+        } finally {
+            setStatusBusy(false);
+        }
     }
 
     function openCreateModal() {
@@ -70,6 +111,7 @@ export default function AdminStudents() {
 
     async function createStudent(event) {
         event.preventDefault();
+        if (createStatus.busy) return;
         setCreateStatus({ busy: true, error: '' });
 
         try {
@@ -92,6 +134,8 @@ export default function AdminStudents() {
             setCopyStatus('');
             setCreateOpen(false);
             setNewStudent(EMPTY_STUDENT_FORM);
+            setSearch('');
+            setActiveFilter('active');
             await load();
         } catch (error) {
             setCreateStatus({ busy: false, error: error?.message || 'Crearea contului a eșuat.' });
@@ -134,7 +178,8 @@ export default function AdminStudents() {
 
     const query = search.trim().toLowerCase();
     const filtered = students.filter(
-        (student) => !query || (student.full_name || '').toLowerCase().includes(query)
+        (student) => (activeFilter === 'all' || student.is_active === (activeFilter === 'active'))
+            && (!query || `${student.full_name || ''} ${student.username || ''}`.toLowerCase().includes(query))
     );
 
     return (
@@ -155,58 +200,95 @@ export default function AdminStudents() {
                         onChange={(event) => setSearch(event.target.value)}
                         aria-label="Caută elev"
                     />
-                    <button type="button" className="btn-gold" onClick={openCreateModal}>
-                        ＋ Creează cont
+                    <button type="button" className="btn-gold inline-flex items-center gap-2" onClick={openCreateModal}>
+                        <Plus size={16} aria-hidden="true" /> Adaugă elev
                     </button>
                 </div>
             </div>
 
-            {filtered.length === 0 ? (
-                <EmptyState icon="🧒" title="Niciun elev găsit" />
-            ) : (
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                    {filtered.map((student) => {
-                        const isSelf = student.id === profile.id;
-                        const assigned = counts[student.id] || 0;
+            <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-2 text-sm text-slate-300">
+                    <label htmlFor="student-status-filter">Conturi</label>
+                    <select id="student-status-filter" className="input" value={activeFilter} onChange={(event) => setActiveFilter(event.target.value)}>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                        <option value="all">Toate</option>
+                    </select>
+                </div>
+                <span className="text-sm text-slate-400">{filtered.length} elevi</span>
+            </div>
 
-                        return (
-                            <button
-                                key={student.id}
-                                type="button"
-                                onClick={() => setSelectedId(student.id)}
-                                className="card flex items-center gap-3 text-left transition hover:-translate-y-0.5 hover:border-white/25"
-                            >
-                                <Avatar path={student.avatar_path} name={student.full_name} />
-
-                                <span className="min-w-0 flex-1">
-                                    <span className="block truncate font-semibold text-white">
-                                        {student.full_name || '(fără nume)'}
-                                        {isSelf && <span className="ml-2 text-xs text-gold-400">(tu)</span>}
-                                    </span>
-                                    {student.username && (
-                                        <span className="block truncate text-xs text-gold-300">{student.username}</span>
-                                    )}
-                                    <span className="block truncate text-xs text-slate-500">
-                                        {['teacher', 'profesor'].includes(student.role) ? 'Profesor' : student.role === 'inspector' ? 'Inspector' : 'Elev'}
-                                        {student.grade_level ? ` · ${student.grade_level}` : ''} ·{' '}
-                                        {assigned} {assigned === 1 ? 'piesă' : 'piese'}
-                                    </span>
-                                </span>
-
-                                {!student.is_active && (
-                                    <span className="badge shrink-0 bg-brand-500/20 text-brand-200">Blocat</span>
-                                )}
-                            </button>
-                        );
-                    })}
+            {listError && (
+                <div role="alert" className="text-sm text-brand-200">
+                    {listError}
+                    <button type="button" className="btn-ghost ml-2" onClick={load}>Reîncearcă</button>
                 </div>
             )}
 
-            <p className="text-xs text-slate-500">
-                Apasă pe un elev pentru repertoriul lui și fotografia de profil. Parola generată este afișată o singură dată.
-            </p>
+            {!listError && filtered.length === 0 ? (
+                <EmptyState icon="🧒" title="Niciun elev găsit" />
+            ) : (
+                <div className="overflow-x-auto">
+                    <table className="w-full min-w-[620px] text-left text-sm">
+                        <caption className="sr-only">Elevii înscriși și starea conturilor</caption>
+                        <thead className="border-b border-white/10 text-slate-400">
+                            <tr>
+                                <th scope="col" className="px-3 py-3">Nume și prenume</th>
+                                <th scope="col" className="px-3 py-3">Username</th>
+                                <th scope="col" className="px-3 py-3">Repertoriu</th>
+                                <th scope="col" className="px-3 py-3">Stare</th>
+                                <th scope="col" className="px-3 py-3">Acțiuni</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filtered.map((student) => {
+                                const assigned = counts[student.id] || 0;
 
-            <Modal open={createOpen} title="Creează cont de elev" onClose={() => setCreateOpen(false)} wide>
+                                return (
+                                    <tr key={student.id} className="border-b border-white/10">
+                                        <td className="px-3 py-3">
+                                            <button type="button" className="flex items-center gap-3 text-left font-semibold text-white hover:text-gold-300" onClick={() => setSelectedId(student.id)}>
+                                                <Avatar path={student.avatar_path} name={student.full_name} />
+                                                <span className="max-w-60 break-words">{student.full_name || '(fără nume)'}</span>
+                                            </button>
+                                        </td>
+                                        <td className="px-3 py-3 text-gold-300">{student.username || '—'}</td>
+                                        <td className="px-3 py-3 text-slate-300">{assigned} {assigned === 1 ? 'piesă' : 'piese'}</td>
+                                        <td className={`px-3 py-3 ${student.is_active ? 'text-emerald-300' : 'text-brand-200'}`}>{student.is_active ? 'Activ' : 'Inactiv'}</td>
+                                        <td className="px-3 py-3">
+                                            <button type="button" className="btn-ghost inline-flex items-center gap-2" title={student.is_active ? 'Dezactivează contul' : 'Reactivează contul'}
+                                                disabled={student.id === profile?.id || statusBusy}
+                                                aria-label={`${student.is_active ? 'Dezactivează' : 'Reactivează'} ${student.full_name}`}
+                                                onClick={() => { setStatusTarget(student); setStatusError(''); }}>
+                                                {student.is_active ? <UserRoundX size={16} aria-hidden="true" /> : <UserRoundCheck size={16} aria-hidden="true" />}
+                                                {student.is_active ? 'Dezactivează' : 'Reactivează'}
+                                            </button>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+
+            <Modal open={Boolean(statusTarget)} title={statusTarget?.is_active ? 'Dezactivează elevul' : 'Reactivează elevul'} onClose={() => { if (!statusBusy) setStatusTarget(null); }}>
+                <div className="space-y-4">
+                    <p className="break-words text-sm text-slate-300">
+                        {statusTarget?.is_active ? 'Dezactivezi' : 'Reactivezi'} contul pentru {statusTarget?.full_name}?
+                        {statusTarget?.is_active && ' Repertoriul și temele rămân salvate.'}
+                    </p>
+                    {statusError && <p role="alert" className="text-sm text-brand-200">{statusError}</p>}
+                    <div className="flex flex-wrap justify-end gap-2">
+                        <button type="button" className="btn-ghost" disabled={statusBusy} onClick={() => setStatusTarget(null)}>Anulează</button>
+                        <button type="button" className="btn-gold" disabled={statusBusy} onClick={changeStudentStatus}>
+                            {statusBusy ? 'Se salvează…' : 'Confirmă'}
+                        </button>
+                    </div>
+                </div>
+            </Modal>
+
+            <Modal open={createOpen} title="Creează cont de elev" onClose={() => { if (!createStatus.busy) setCreateOpen(false); }} wide>
                 <form onSubmit={createStudent} className="space-y-4">
                     <div className="grid gap-4 sm:grid-cols-2">
                         <div>
@@ -245,7 +327,7 @@ export default function AdminStudents() {
                                 setUsernameEdited(true);
                                 setNewStudent((previous) => ({
                                     ...previous,
-                                    username: normalizeUsername(event.target.value),
+                                    username: event.target.value.toLowerCase(),
                                 }));
                             }}
                             autoCapitalize="none"
@@ -294,7 +376,7 @@ export default function AdminStudents() {
                     )}
 
                     <div className="flex justify-end gap-2">
-                        <button type="button" className="btn-ghost" onClick={() => setCreateOpen(false)}>
+                        <button type="button" className="btn-ghost" disabled={createStatus.busy} onClick={() => setCreateOpen(false)}>
                             Anulează
                         </button>
                         <button type="submit" className="btn-gold" disabled={createStatus.busy}>

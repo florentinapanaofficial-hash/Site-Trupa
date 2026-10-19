@@ -4,6 +4,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Discipline from './pages/Discipline';
+import Canto from './pages/Canto';
 import Red from './pages/Red';
 import Jocuri from './pages/Jocuri';
 import Portofoliu from './pages/Portofoliu';
@@ -47,7 +48,7 @@ export default function App() {
                     path="/canto"
                     element={
                         <ProtectedRoute>
-                            <Discipline discipline="canto" />
+                            <Canto />
                         </ProtectedRoute>
                     }
                 />

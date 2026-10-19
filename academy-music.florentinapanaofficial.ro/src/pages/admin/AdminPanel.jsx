@@ -6,11 +6,13 @@ import AdminStudents from './AdminStudents';
 import AdminActivity from './AdminActivity';
 import AdminSubmissions from './AdminSubmissions';
 import AdminTeaching from './AdminTeaching';
+import AdminCanto from './AdminCanto';
 
 const TABS = [
     { to: '/admin', label: 'Sumar', end: true },
     { to: '/admin/predare', label: 'Predare' },
     { to: '/admin/piese', label: 'Piese' },
+    { to: '/admin/canto/', label: 'Canto' },
     { to: '/admin/resurse', label: 'RED' },
     { to: '/admin/elevi', label: 'Elevi' },
     { to: '/admin/teme', label: 'Teme' },
@@ -50,6 +52,7 @@ export default function AdminPanel() {
                 <Route index element={<AdminOverview />} />
                 <Route path="predare" element={<AdminTeaching />} />
                 <Route path="piese" element={<AdminPieces />} />
+                <Route path="canto" element={<AdminCanto />} />
                 <Route path="resurse" element={<AdminResources />} />
                 <Route path="elevi" element={<AdminStudents />} />
                 <Route path="teme" element={<AdminSubmissions />} />

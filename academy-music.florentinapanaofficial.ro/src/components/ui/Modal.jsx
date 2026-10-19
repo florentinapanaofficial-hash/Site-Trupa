@@ -34,8 +34,8 @@ export default function Modal({ open, title, onClose, children, wide = false }) 
                 className={`my-8 w-full ${wide ? 'max-w-5xl' : 'max-w-lg'} animate-fade-up rounded-2xl border border-white/10 bg-ink-900 shadow-2xl`}
             >
                 <header className="flex items-center justify-between border-b border-white/10 px-5 py-4">
-                    <h2 className="text-lg font-semibold text-slate-100">{title}</h2>
-                    <button type="button" className="btn-ghost px-3 py-1.5" onClick={onClose}>
+                    <h2 className="min-w-0 break-words text-lg font-semibold text-slate-100">{title}</h2>
+                    <button type="button" className="btn-ghost shrink-0 px-3 py-1.5" onClick={onClose}>
                         Închide
                     </button>
                 </header>

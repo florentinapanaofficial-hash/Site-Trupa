@@ -1,7 +1,7 @@
 ---
 import AcademyLayout from '../layouts/AcademyLayout.astro';
 export function getStaticPaths() {
-    return ['login', 'repertoriul-meu', 'orga', 'canto', 'red', 'jocuri', 'portofoliu', 'cursuri-online', '404', 'admin', 'admin/predare', 'admin/piese', 'admin/resurse', 'admin/elevi', 'admin/teme', 'admin/activitate'].map((app) => ({ params: { app } }));
+    return ['login', 'repertoriul-meu', 'orga', 'canto', 'red', 'jocuri', 'portofoliu', 'cursuri-online', '404', 'admin', 'admin/predare', 'admin/piese', 'admin/canto', 'admin/resurse', 'admin/elevi', 'admin/teme', 'admin/activitate'].map((app) => ({ params: { app } }));
 }
 ---
 <AcademyLayout {...(Astro.params.app === 'cursuri-online' ? {
