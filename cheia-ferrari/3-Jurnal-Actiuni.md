@@ -1,3 +1,23 @@
+## 📝 20 oct 2026 — Publicare generală repository Academy
+
+### Obiectiv
+Verificarea și publicarea celor 83 de fișiere restante semnalate de Claudiu, prin commit general și push pe main.
+
+### Modificări
+- Cele 83 de fișiere sunt modificări/neversionate în repository-ul Git imbricat `academy-music.florentinapanaofficial.ro`, cu origin `florentinapanaofficial-hash/academy-music`; repository-ul principal Site-Trupa era curat și avea deja versiunile lor urmărite.
+- Commit general `b0d523d` publicat și confirmat pe origin/main din academy-music (83 fișiere); worktree Academy curat.
+- Se publică starea existentă Academy: migrarea Astro/SSR, API Drive GOOGLE_CREDENTIALS, Canto, Studio, clase online, administrare elevi, migrări SQL, teste și documentație. Fără modificări suplimentare ale funcționalității în această operație.
+- `cheia-ferrari/2-Tracker-SEO.md`: sesiunea consemnată în repository-ul principal.
+
+### Validări
+- Exact 83 de fișiere pregătite în repository-ul Academy; scanare de precauție: zero markere de secrete reale sau artefacte excluse. Fișierele .env reale, node_modules, dist și .astro nu sunt incluse.
+- Academy: 19/19 teste funcționale și 9/9 teste SSR PASS. Buildul curent fusese validat în sesiunea anterioară; nu au fost schimbate sursele între validări și publicare.
+- git diff --cached --check curat; origin/main Academy sincronizat înainte de commit. Auditul SEO precedent: 64 pagini, 0 FAIL | 0 WARN; fără schimbări de pagini/metadata în această operație.
+
+### Riscuri / pași următori
+- Push-ul vizează main din repository-ul separat academy-music, nu numai Site-Trupa. Un eventual deploy automat depinde de repository-ul conectat în Railway.
+- Publicarea migrărilor și funcțiilor Supabase nu echivalează cu aplicarea lor live; accesul Drive real și limitările Studio/CSP deja documentate rămân de verificat separat.
+
 ## 📝 20 oct 2026 — Upload teme Drive cu GOOGLE_CREDENTIALS JSON
 
 ### Obiectiv
