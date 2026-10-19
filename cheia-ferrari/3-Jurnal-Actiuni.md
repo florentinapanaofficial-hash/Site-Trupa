@@ -23,6 +23,11 @@ Activarea explicită a serverului Astro standalone pentru pagini și API, cu pub
 - `npm test` principal: 101/101 PASS; `npm run seo:check`: build PASS, 64 pagini, 0 FAIL | 0 WARN. Diagnostice editor: zero în fișierele verificate; git diff --check curat.
 - `node seo-agent/seo-analyzer.js`: 13 oportunități existente din export, nu rezultate SEO noi.
 
+### Rezultat publicare și smoke live
+- Commit implementare `63196404` publicat pe origin/main; hash-ul remote confirmat și worktree curat după push.
+- URL-ul Railway monitorizat aproximativ 3 minute și verificat din nou după statusurile GitHub Railway success: GET/POST upload și API inexistent returnează încă 200 text/html. Deployment-ul funcțional al acestui API nu este confirmat; nu se declară problema live rezolvată.
+- GitHub raportează success pentru contextele „Site Trupa - Site-Trupa” și „spectacular-inspiration - Site-Trupa”; acestea nu demonstrează că URL-ul Academy verificat servește noul backend. Este necesară verificarea în dashboard a serviciului/domeniului, branch-ului, Root Directory, config path și start override. CLI-ul Railway nu este autentificat.
+
 ### Riscuri / pași următori
 - După push trebuie confirmat deployment-ul la URL-ul Railway și JSON-ul API; CLI Railway este neautentificat, deci nu se pot inspecta setările serviciului sau logurile private. Un override SPA/static sau un Root Directory/config greșit în dashboard poate ignora fișierele acestui serviciu.
 - Uploadul autentificat și permisiunile Google Drive nu au fost testate live. Domeniul custom avea DNS nerezolvat la verificarea precedentă.
