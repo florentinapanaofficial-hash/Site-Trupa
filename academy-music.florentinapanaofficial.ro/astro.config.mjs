@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 
 const env = loadEnv(process.env.NODE_ENV || 'production', fileURLToPath(new URL('.', import.meta.url)), 'VITE_');
 const serverEnv = { ...loadEnv(process.env.NODE_ENV || 'production', fileURLToPath(new URL('..', import.meta.url)), ''), ...loadEnv(process.env.NODE_ENV || 'production', fileURLToPath(new URL('.', import.meta.url)), '') };
-for (const key of ['GOOGLE_CLIENT_EMAIL', 'GOOGLE_PRIVATE_KEY', 'GOOGLE_DRIVE_FOLDER_ID', 'VITE_SUPABASE_URL', 'VITE_SUPABASE_ANON_KEY']) {
+for (const key of ['GOOGLE_CREDENTIALS', 'GOOGLE_CLIENT_EMAIL', 'GOOGLE_PRIVATE_KEY', 'GOOGLE_DRIVE_FOLDER_ID', 'VITE_SUPABASE_URL', 'VITE_SUPABASE_ANON_KEY']) {
     if (!process.env[key] && serverEnv[key]) process.env[key] = serverEnv[key];
 }
 

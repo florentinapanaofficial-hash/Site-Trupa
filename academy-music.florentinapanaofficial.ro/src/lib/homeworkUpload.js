@@ -40,7 +40,8 @@ export function createHomeworkUpload({ env, createClient, createDrive }) {
         if (!/^Bearer \S+$/i.test(authorization)) return respond({ error: 'Autentifică-te pentru a trimite tema.' }, 401);
         const url = env.VITE_SUPABASE_URL;
         const anonKey = env.VITE_SUPABASE_ANON_KEY;
-        if (!url || !anonKey || !env.GOOGLE_CLIENT_EMAIL || !env.GOOGLE_PRIVATE_KEY || !env.GOOGLE_DRIVE_FOLDER_ID) {
+        const hasJsonCredentials = env.GOOGLE_CREDENTIALS !== undefined;
+        if (!url || !anonKey || !env.GOOGLE_DRIVE_FOLDER_ID || (!hasJsonCredentials && (!env.GOOGLE_CLIENT_EMAIL || !env.GOOGLE_PRIVATE_KEY))) {
             return respond({ error: 'Serviciul de teme nu este configurat.' }, 503);
         }
         try {
@@ -49,10 +50,26 @@ export function createHomeworkUpload({ env, createClient, createDrive }) {
             if (authError || !auth?.user) return respond({ error: 'Sesiunea a expirat. Autentifică-te din nou.' }, 401);
             const { data: profile, error: profileError } = await client.from('profiles').select('role,is_active,full_name').eq('id', auth.user.id).single();
             if (profileError || !profile?.is_active || !['student', 'elev', 'teacher', 'profesor'].includes(profile.role)) return respond({ error: 'Nu ai permisiunea de a trimite teme.' }, 403);
-            const key = env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n');
+            let email;
+            let key;
             try {
+                const credentials = hasJsonCredentials
+                    ? JSON.parse(env.GOOGLE_CREDENTIALS)
+                    : { client_email: env.GOOGLE_CLIENT_EMAIL, private_key: env.GOOGLE_PRIVATE_KEY };
+                if (!credentials || typeof credentials !== 'object' || Array.isArray(credentials)
+                    || (hasJsonCredentials && credentials.type !== 'service_account')
+                    || typeof credentials.client_email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(credentials.client_email)
+                    || typeof credentials.private_key !== 'string') {
+                    throw new Error('Invalid service account credentials');
+                }
+                email = credentials.client_email;
+                key = credentials.private_key.replace(/\\n/g, '\n');
                 if (createPrivateKey(key).asymmetricKeyType !== 'rsa') throw new Error('Invalid key type');
-            } catch { return respond({ error: 'Cheia Google Drive este invalidă. Profesorul trebuie să verifice GOOGLE_PRIVATE_KEY în configurația serverului.' }, 503); }
+            } catch {
+                return respond({ error: hasJsonCredentials
+                    ? 'Configurația Google Drive este invalidă. Profesorul trebuie să verifice GOOGLE_CREDENTIALS (JSON Service Account și cheie RSA).'
+                    : 'Cheia Google Drive este invalidă. Profesorul trebuie să verifice GOOGLE_CLIENT_EMAIL și GOOGLE_PRIVATE_KEY în configurația serverului.' }, 503);
+            }
             const contentType = request.headers.get('content-type') || '';
             if (!contentType.startsWith('multipart/form-data;')) return respond({ error: 'Trimite fișierul prin formular multipart.' }, 415);
             if (Number(request.headers.get('content-length')) > MAX_BODY_BYTES) return respond({ error: 'Fișierul depășește limita de 50 MB.' }, 413);
@@ -87,13 +104,13 @@ export function createHomeworkUpload({ env, createClient, createDrive }) {
             }
             const { extension, mimeType } = checked;
             const baseName = String(profile.full_name || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 60) || 'Elev';
-            const drive = createDrive({ email: env.GOOGLE_CLIENT_EMAIL, key });
+            const drive = await createDrive({ email, key });
             const { data } = await drive.files.create({
                 requestBody: { name: `${baseName}_Audio.${extension}`, parents: [env.GOOGLE_DRIVE_FOLDER_ID] },
                 media: { mimeType, body: Readable.fromWeb(file.stream()) },
                 fields: 'id,webViewLink', supportsAllDrives: true,
             });
-            if (!data?.webViewLink) return respond({ error: 'Drive nu a returnat linkul temei. Verifică în folder înainte de retrimitere.' }, 502);
+            if (typeof data?.id !== 'string' || !data.id || !data.webViewLink) return respond({ error: 'Drive nu a returnat linkul temei. Verifică în folder înainte de retrimitere.' }, 502);
             if (!driveLink.test(data.webViewLink)) return respond({ error: 'Drive a returnat un link neacceptat. Contactează profesorul înainte de retrimitere.' }, 502);
             let midiData = null;
             if (midiFile) {
@@ -104,7 +121,7 @@ export function createHomeworkUpload({ env, createClient, createDrive }) {
                         fields: 'id,webViewLink', supportsAllDrives: true,
                     }));
                 } catch { midiData = null; }
-                if (!midiData?.webViewLink || !driveLink.test(midiData.webViewLink)) return respond({ error: 'Audio a fost încărcat în Drive, dar fișierul MIDI nu a fost confirmat. Verifică folderul înainte de retrimitere.' }, 502);
+                if (typeof midiData?.id !== 'string' || !midiData.id || !driveLink.test(midiData.webViewLink || '')) return respond({ error: 'Audio a fost încărcat în Drive, dar fișierul MIDI nu a fost confirmat. Verifică folderul înainte de retrimitere.' }, 502);
             }
             try {
                 const { error: catalogError } = await client.from('catalog_teme').insert({
@@ -120,7 +137,7 @@ export function createHomeworkUpload({ env, createClient, createDrive }) {
             } catch {
                 return respond({ error: 'Fișierele au fost încărcate în Drive, dar înscrierea în catalog nu a fost confirmată. Contactează profesorul înainte de retrimitere.' }, 503);
             }
-            return respond({ id: data.id, webViewLink: data.webViewLink, ...(midiData ? { midiId: midiData.id, midiWebViewLink: midiData.webViewLink } : {}) }, 201);
+            return respond({ success: true, id: data.id, webViewLink: data.webViewLink, ...(midiData ? { midiId: midiData.id, midiWebViewLink: midiData.webViewLink } : {}) }, 201);
         } catch {
             return respond({ error: 'Încărcarea nu a putut fi confirmată. Verifică folderul înainte de retrimitere; dacă problema persistă, contactează profesorul.' }, 502);
         }

@@ -1,3 +1,28 @@
+## 📝 20 oct 2026 — Upload teme Drive cu GOOGLE_CREDENTIALS JSON
+
+### Obiectiv
+Suport pentru Service Account-ul configurat de Claudiu în GOOGLE_CREDENTIALS și folderul GOOGLE_DRIVE_FOLDER_ID, păstrând siguranța fluxului existent; commit și push pe main solicitate.
+
+### Modificări
+- `academy-music.florentinapanaofficial.ro/src/lib/homeworkUpload.js`: JSON server-only cu prioritate, validare type service_account / client_email / cheie RSA, eroare JSON 503 pentru date invalide fără expunerea lor. Configurația veche email/cheie funcționează numai când GOOGLE_CREDENTIALS lipsește.
+- Păstrate JWT Supabase, profil/rol activ, origine, limite, semnături fișiere, multipart audio/MIDI, folderul din mediu, upload privat și catalog_teme. Succes 201 JSON cu success:true, id și link, numai după confirmarea Drive și catalog; ID-uri lipsă și confirmări parțiale nu mai pot fi raportate ca succes.
+- `academy-music.florentinapanaofficial.ro/src/pages/api/upload-homework.js`: SDK-ul oficial googleapis și clientul Drive JWT se încarcă/inițializează după validări, fără penalizarea GET/POST neautentificat cu importul întregului SDK.
+- `academy-music.florentinapanaofficial.ro/astro.config.mjs`, `.env.example`, `README.md`: configurare JSON server-only, prioritate/compatibilitate, răspunsuri și limitări documentate. googleapis era deja instalat, fără schimbări de dependențe sau lockfile.
+- `academy-music.florentinapanaofficial.ro/src/lib/learning.check.mjs`: teste JSON și legacy, prioritate, date invalide, cheie non-RSA, newline-uri, async SDK factory, MP3/MIDI, folder, catalog, erori upstream și confirmări parțiale.
+- `cheia-ferrari/2-Tracker-SEO.md`: sesiunea consemnată.
+
+### Validări
+- Academy: 19/19 teste PASS, inclusiv uploaduri simulate cu stream-uri reale de fișiere și chei RSA generate numai pentru teste; fără scrieri în Google Drive sau Supabase live.
+- Build Academy PASS; test:server 9/9 PASS (GET 405 JSON, POST fără autentificare 401 JSON, origine externă 403, API inexistent 404 JSON, pagini/CSP/noindex).
+- Testul SSR inițial a expirat la importul la rece al SDK-ului Google; rerularea izolată a trecut. După mutarea importului după validări, testul GET a trecut în aproximativ 73 ms, întregul runner în aproximativ 636 ms, fără mărirea timeout-urilor.
+- `npm run seo:check`: build principal PASS; 64 pagini HTML, 0 FAIL | 0 WARN. Metadata, schema JSON-LD și imaginile paginilor nu au fost modificate; nu sunt date GSC noi.
+- Diagnostice editor: zero în fișierele verificate. Scanarea activelor client nu a găsit GOOGLE_CREDENTIALS sau markere PEM private. git diff --check curat.
+
+### Riscuri / pași următori
+- Testele locale demonstrează fluxul și tratarea erorilor, nu accesul Service Account-ului la folderul live. Confirmarea unui upload autentificat real necesită o temă trimisă din contul Academy și verificarea linkului/catalogului.
+- Google Drive API trebuie activat și contul trebuie să aibă drept de creare într-un Shared Drive; un folder My Drive partajat nu oferă cotă proprie unui Service Account. Nu se creează permisiuni publice.
+- Variabilele Supabase și schema catalog_teme rămân necesare. Dacă un fișier a ajuns în Drive dar catalogul/al doilea fișier eșuează, răspunsul cere verificarea folderului înainte de retrimitere pentru a evita duplicatele.
+
 ## 📝 20 oct 2026 — Comandă build Railway Academy cu npm install
 
 ### Obiectiv

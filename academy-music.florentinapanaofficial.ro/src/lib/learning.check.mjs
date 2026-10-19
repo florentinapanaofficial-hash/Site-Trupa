@@ -173,7 +173,7 @@ test('student username login uses the new domain and preserves legacy accounts',
     assert.equal((await signInWithIdentity(auth, 'andrei.popescu', 'secret')).user.id, 'legacy');
 });
 
-test('Drive homework enforces auth, profile, origin, size and format before private upload', async () => {
+test('Drive homework validates JSON/legacy service accounts, authorization, multipart uploads and partial failures', async () => {
     const privateKey = generateKeyPairSync('rsa', { modulusLength: 2048 }).privateKey.export({ type: 'pkcs8', format: 'pem' });
     const env = { VITE_SUPABASE_URL: 'https://example.supabase.co', VITE_SUPABASE_ANON_KEY: 'anon', GOOGLE_CLIENT_EMAIL: 'test@example.invalid', GOOGLE_PRIVATE_KEY: privateKey.replace(/\n/g, '\\n'), GOOGLE_DRIVE_FOLDER_ID: 'folder' };
     let role = 'student';
@@ -182,6 +182,9 @@ test('Drive homework enforces auth, profile, origin, size and format before priv
     let uploads = 0;
     let fail = false;
     let catalogFail = false;
+    let expectedEmail = env.GOOGLE_CLIENT_EMAIL;
+    let failAtUpload = null;
+    let driveResponse = { id: 'file-id', webViewLink: 'https://drive.google.com/file/d/file-id/view' };
     const catalogRows = [];
     const upload = createHomeworkUpload({
         env, createClient: () => ({
@@ -197,21 +200,22 @@ test('Drive homework enforces auth, profile, origin, size and format before priv
                 assert.equal(table, 'profiles');
                 return { select: () => ({ eq: () => ({ single: async () => ({ data: { role, is_active: active, full_name: 'Elev test' } }) }) }) };
             },
-        }), createDrive: (credentials) => {
+        }), createDrive: async (credentials) => {
             assert.equal(credentials.key, privateKey);
+            assert.equal(credentials.email, expectedEmail);
             return {
                 files: {
                     create: async (options) => {
                         uploads += 1;
                         assert.deepEqual(options.requestBody.parents, ['folder']);
                         assert.equal(options.supportsAllDrives, true);
-                        assert.equal(options.media.mimeType, 'audio/midi');
-                        assert.match(options.requestBody.name, /^Elev_test_(Audio|MIDI)\.(mid|webm)$/);
+                        assert.ok(['audio/midi', 'audio/mpeg'].includes(options.media.mimeType));
+                        assert.match(options.requestBody.name, /^Elev_test_(Audio|MIDI)\.(mid|mp3)$/);
                         let content = '';
                         for await (const chunk of options.media.body) content += chunk.toString();
-                        assert.equal(content, 'MThdtest');
-                        if (fail) throw new Error('secret upstream error');
-                        return { data: { id: 'file-id', webViewLink: 'https://drive.google.com/file/d/file-id/view' } };
+                        assert.equal(content, options.media.mimeType === 'audio/mpeg' ? 'ID3audio' : 'MThdtest');
+                        if (fail || uploads === failAtUpload) throw new Error('secret upstream error');
+                        return { data: driveResponse };
                     }
                 }
             };
@@ -246,7 +250,7 @@ test('Drive homework enforces auth, profile, origin, size and format before priv
     assert.equal(uploads, 0);
     const result = await upload(request());
     assert.equal(result.status, 201);
-    assert.equal((await result.json()).webViewLink, 'https://drive.google.com/file/d/file-id/view');
+    assert.deepEqual(await result.json(), { success: true, id: 'file-id', webViewLink: 'https://drive.google.com/file/d/file-id/view' });
     assert.equal(result.headers.get('cache-control'), 'no-store');
     assert.deepEqual(catalogRows, [{ student_id: 'student-id', student_name: 'Elev test', drive_url: 'https://drive.google.com/file/d/file-id/view', title: '', student_note: null, piece_id: null }]);
     catalogFail = true;
@@ -263,6 +267,103 @@ test('Drive homework enforces auth, profile, origin, size and format before priv
     catalogFail = false;
     assert.equal((await upload(request({}, 'tema.mid', 'MThdtest', { title: ' Studiu ', studentNote: ' Mesaj ', pieceId: '11111111-1111-4111-8111-111111111111' }))).status, 201);
     assert.deepEqual(catalogRows[1], { student_id: 'student-id', student_name: 'Elev test', drive_url: 'https://drive.google.com/file/d/file-id/view', title: 'Studiu', student_note: 'Mesaj', piece_id: '11111111-1111-4111-8111-111111111111' });
+
+    const jsonCredentials = { type: 'service_account', client_email: 'json@example.invalid', private_key: privateKey };
+    const validJson = JSON.stringify(jsonCredentials);
+    env.GOOGLE_CREDENTIALS = validJson;
+    expectedEmail = jsonCredentials.client_email;
+    // JSON credentials must win over even a complete legacy configuration.
+    const jsonResult = await upload(request({}, 'tema.mp3', 'ID3audio'));
+    assert.equal(jsonResult.status, 201);
+    assert.deepEqual(await jsonResult.json(), { success: true, id: 'file-id', webViewLink: driveResponse.webViewLink });
+    delete env.GOOGLE_CLIENT_EMAIL;
+    delete env.GOOGLE_PRIVATE_KEY;
+    env.GOOGLE_CREDENTIALS = JSON.stringify({ ...jsonCredentials, private_key: privateKey.replace(/\n/g, '\\n') });
+    assert.equal((await upload(request())).status, 201);
+    const beforeInvalid = uploads;
+    const catalogBeforeInvalid = catalogRows.length;
+    const ecKey = generateKeyPairSync('ec', { namedCurve: 'prime256v1' }).privateKey.export({ type: 'pkcs8', format: 'pem' });
+    for (const invalid of ['', '{secret-invalid-json', 'null', '[]', '"text"', '42',
+        JSON.stringify({ ...jsonCredentials, type: 'authorized_user' }),
+        JSON.stringify({ ...jsonCredentials, client_email: undefined }),
+        JSON.stringify({ ...jsonCredentials, client_email: 'invalid' }),
+        JSON.stringify({ ...jsonCredentials, private_key: undefined }),
+        JSON.stringify({ ...jsonCredentials, private_key: 'secret-invalid-key' }),
+        JSON.stringify({ ...jsonCredentials, private_key: ecKey }),
+    ]) {
+        env.GOOGLE_CREDENTIALS = invalid;
+        const invalidResponse = await upload(request());
+        assert.equal(invalidResponse.status, 503);
+        assert.equal(invalidResponse.headers.get('content-type'), 'application/json');
+        const error = await invalidResponse.json();
+        assert.match(error.error, /GOOGLE_CREDENTIALS/);
+        assert.doesNotMatch(error.error, /secret-invalid|BEGIN PRIVATE KEY|json@example/);
+    }
+    env.GOOGLE_CLIENT_EMAIL = 'legacy@example.invalid';
+    env.GOOGLE_PRIVATE_KEY = privateKey;
+    env.GOOGLE_CREDENTIALS = '{invalid-json-with-valid-legacy';
+    assert.equal((await upload(request())).status, 503);
+    assert.equal(uploads, beforeInvalid);
+    assert.equal(catalogRows.length, catalogBeforeInvalid);
+    env.GOOGLE_CREDENTIALS = validJson;
+    delete env.GOOGLE_CLIENT_EMAIL;
+    delete env.GOOGLE_PRIVATE_KEY;
+    const folder = env.GOOGLE_DRIVE_FOLDER_ID;
+    delete env.GOOGLE_DRIVE_FOLDER_ID;
+    assert.equal((await upload(request())).status, 503);
+    env.GOOGLE_DRIVE_FOLDER_ID = folder;
+    delete env.GOOGLE_CREDENTIALS;
+    assert.equal((await upload(request())).status, 503);
+    env.GOOGLE_CREDENTIALS = validJson;
+    const malformed = new Request('https://academy.example/api/upload-homework/', {
+        method: 'POST', headers: { Authorization: 'Bearer token', 'Content-Type': 'multipart/form-data; boundary=test' }, body: 'broken',
+    });
+    assert.equal((await upload(malformed)).status, 400);
+    const wrongType = new Request('https://academy.example/api/upload-homework/', {
+        method: 'POST', headers: { Authorization: 'Bearer token', 'Content-Type': 'application/json' }, body: '{}',
+    });
+    assert.equal((await upload(wrongType)).status, 415);
+    assert.equal(uploads, beforeInvalid);
+
+    const pairRequest = () => {
+        const form = new FormData();
+        form.set('file', new File(['ID3audio'], 'tema.mp3', { type: 'audio/mpeg' }));
+        form.set('midiFile', new File(['MThdtest'], 'tema.mid', { type: 'audio/midi' }));
+        return new Request('https://academy.example/api/upload-homework/', { method: 'POST', headers: { Authorization: 'Bearer token' }, body: form });
+    };
+    const beforePair = uploads;
+    const pairResult = await upload(pairRequest());
+    assert.equal(pairResult.status, 201);
+    assert.equal(uploads, beforePair + 2);
+    assert.deepEqual(await pairResult.json(), { success: true, id: 'file-id', webViewLink: driveResponse.webViewLink, midiId: 'file-id', midiWebViewLink: driveResponse.webViewLink });
+    assert.equal(catalogRows.at(-1).midi_url, driveResponse.webViewLink);
+    const beforePartial = catalogRows.length;
+    failAtUpload = uploads + 2;
+    const partialResult = await upload(pairRequest());
+    assert.equal(partialResult.status, 502);
+    const partialBody = await partialResult.json();
+    assert.match(partialBody.error, /Audio a fost încărcat/);
+    assert.equal(partialBody.success, undefined);
+    assert.equal(catalogRows.length, beforePartial);
+    failAtUpload = null;
+    const goodResponse = driveResponse;
+    for (const invalid of [{}, { webViewLink: goodResponse.webViewLink }, { id: 'id', webViewLink: 'https://untrusted.example/file' }]) {
+        driveResponse = invalid;
+        const invalidResult = await upload(request());
+        assert.equal(invalidResult.status, 502);
+        assert.equal((await invalidResult.json()).success, undefined);
+        assert.equal(catalogRows.length, beforePartial);
+    }
+    driveResponse = goodResponse;
+    catalogFail = true;
+    const jsonCatalogFailure = await upload(request());
+    assert.equal(jsonCatalogFailure.status, 503);
+    assert.match((await jsonCatalogFailure.json()).error, /înscrierea în catalog/);
+    catalogFail = false;
+    fail = true;
+    const jsonDriveFailure = await upload(request());
+    assert.equal(jsonDriveFailure.status, 502);
+    assert.doesNotMatch(await jsonDriveFailure.text(), /secret upstream/);
 });
 
 test('score editor maps staff positions and exports exact note/rest timings including trailing silence', () => {
