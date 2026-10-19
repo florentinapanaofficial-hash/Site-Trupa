@@ -1,7 +1,13 @@
 ---
 import AcademyLayout from '../layouts/AcademyLayout.astro';
-export function getStaticPaths() {
-    return ['login', 'repertoriul-meu', 'orga', 'canto', 'red', 'jocuri', 'portofoliu', 'cursuri-online', '404', 'admin', 'admin/predare', 'admin/piese', 'admin/canto', 'admin/resurse', 'admin/elevi', 'admin/teme', 'admin/activitate'].map((app) => ({ params: { app } }));
+const pathname = Astro.url.pathname;
+if (pathname.startsWith('/api/')) {
+    return new Response(JSON.stringify({ error: 'Endpoint inexistent.' }), {
+        status: 404, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+    });
+}
+if (/^\/(revista|studio)(\/|$)/.test(pathname) || pathname.split('/').pop().includes('.')) {
+    return new Response('Not found', { status: 404 });
 }
 ---
 <AcademyLayout {...(Astro.params.app === 'cursuri-online' ? {

@@ -3,7 +3,7 @@
 Platformă LMS pentru cursurile de **orgă** și **canto** de la Palatul Copiilor Pitești.
 Subdomeniu țintă: `academy-music.florentinapanaofficial.ro`
 
-Stack: **Astro 7 (pagini statice + API Node middleware) + React 18 + MDX + TailwindCSS 4 + Supabase** (Auth, Postgres, Storage privat). Audio: URL-uri directe Cloudflare R2/CDN; Canto acceptă și upload MP3 privat în Supabase Storage.
+Stack: **Astro 7 (SSR + API Node standalone) + React 18 + MDX + TailwindCSS 4 + Supabase** (Auth, Postgres, Storage privat). Audio: URL-uri directe Cloudflare R2/CDN; Canto acceptă și upload MP3 privat în Supabase Storage.
 
 ---
 
@@ -63,7 +63,7 @@ Configurare server: `GOOGLE_CLIENT_EMAIL`, `GOOGLE_PRIVATE_KEY`, `GOOGLE_DRIVE_F
 
 **Important:** activează Google Drive API și acordă Service Account-ului drept de creare în folderul unui **Shared Drive** (de exemplu Contributor). Un Service Account nu are cotă proprie de stocare; un folder My Drive doar partajat cu adresa lui nu este suficient. Alternativa necesită OAuth al unui utilizator sau delegare Workspace, neimplementate aici. Nu se creează permisiuni `anyone`: linkul nu acordă acces automat elevului; profesorul și elevul au nevoie de permisiunile Drive potrivite. Înainte de activare aplică `supabase/setup_catalog_teme.sql`, după migrarea rolurilor online; nu a fost aplicată automat pe Supabase live. Stabilește accesul, retenția și informarea privind transferul temelor în Google Drive înainte de utilizarea cu date reale. Ștergerea unui profil elimină rândurile catalogului prin cascade, nu și fișierele externe din Drive; retenția Drive se gestionează separat.
 
-Serverul `npm start` servește `dist/client` și ruta dinamică din `dist/server`; `scripts/compress.mjs` comprimă numai output-ul client. Verificare focalizată: `npm run test:browser -- --drive-upload` pentru helperul HTTP, respectiv `--homework` pentru REC + trimitere, cu `ACADEMY_TEST_URL` către serverul Academy. API-ul Drive este simulat în teste, fără scrieri live. Scenariul REC poate fi blocat de problema MP3 preexistentă consemnată în jurnal. Endpoint-ul verifică parsarea RSA a cheii și returnează 503 explicit pentru o valoare invalidă; nu afișează cheia sau răspunsurile sensibile ale serviciilor externe.
+Serverul `npm start` pornește direct `node ./dist/server/entry.mjs`, generat de adaptorul `@astrojs/node` în modul `standalone`. `output: 'server'` randează paginile și API-ul la cerere, fără fallback HTML pe `/api/`. Middleware-ul Astro păstrează CSP, hash-urile scripturilor inline, permisiunile media și `noindex`; `scripts/compress.mjs` comprimă numai activele client (negocierea fișierelor precomprimate depinde de proxy/CDN, nu de serverul standalone). Verificare focalizată: `npm run test:browser -- --drive-upload` pentru helperul HTTP, respectiv `--homework` pentru REC + trimitere, cu `ACADEMY_TEST_URL` către serverul Academy. API-ul Drive este simulat în teste, fără scrieri live. Scenariul REC poate fi blocat de problema MP3 preexistentă consemnată în jurnal. Endpoint-ul verifică parsarea RSA a cheii și returnează 503 explicit pentru o valoare invalidă; nu afișează cheia sau răspunsurile sensibile ale serviciilor externe.
 
 Verificare de catalog: `npm run test:browser -- --drive-catalog` testează trimitere MIDI/audio din portofoliu, metadata, Bearer, eșec/retry, confirmare, linkuri elev/profesor și lipsa cererilor Storage la 1440/390 px. Serviciile sunt simulate; fixture-ul audio testează upload-ul, nu decodarea/redarea. `npm test` rulează și migrarea repetabilă cu PostgreSQL PGlite: RLS, roluri, date generate de server, nume verificat și constrângeri de link.
 
@@ -119,7 +119,8 @@ Setează și `JITSI_DOMAIN` în mediul serverului Academy (Railway) pentru CSP �
 ```
 academy-music.florentinapanaofficial.ro/
 ├── index.html
-├── server.mjs                 # server static + CSP și headere de securitate
+├── server.mjs                 # compatibilitate: importă entrypoint-ul standalone
+├── src/middleware.js          # CSP și headere pentru răspunsurile SSR/API
 ├── railway.toml               # configurație deploy
 ├── supabase/schema.sql        # tabele, funcții, RLS, buckete
 ├── supabase/migrations/       # migrări SQL incrementale
@@ -263,7 +264,7 @@ npm start        # servește dist/ cu headerele de securitate
 | Clic dreapta / drag / print | `index.css` + componente | Meniu contextual blocat, selecție dezactivată, `Ctrl+S` și `Ctrl+P` interceptate, print golit. |
 | Filigran | `SecurePdfViewer.jsx` | Numele elevului apare peste partitură — descurajează capturile distribuite. |
 | RLS | Postgres | Elevul citește doar ce îi aparține; doar profesorul scrie în `pieces` și `resources`. |
-| CSP | `server.mjs` | `frame-ancestors 'none'`, fără `unsafe-eval`, hash-uri pentru scripturile inline Astro și origine media explicită. |
+| CSP | `src/middleware.js` | `frame-ancestors 'none'`, fără `unsafe-eval`, hash-uri pentru scripturile inline Astro și origine media explicită. |
 
 > Audio R2 public poate fi descărcat și distribuit prin URL, inclusiv din DevTools. `nodownload` nu împiedică accesul direct și nu este suportat identic de toate browserele. Nu publica în R2 înregistrări ale minorilor sau materiale fără drept de distribuire.
 
@@ -288,12 +289,12 @@ npm start        # servește dist/ cu headerele de securitate
 
 ## 6. Deploy pe Railway
 
-1. **New Project → Deploy from GitHub repo** (sau `railway up` din acest folder).
-2. **Variables**: adaugă `VITE_SUPABASE_URL` și `VITE_SUPABASE_ANON_KEY`.
-   Variabilele `VITE_*` se citesc **la build**, deci după modificarea lor e nevoie de redeploy.
-3. **Settings → Networking → Custom Domain**: `academy-music.florentinapanaofficial.ro`.
-4. În DNS-ul domeniului adaugă `CNAME` de la `academy-music` către hostul oferit de Railway.
-5. În Supabase → **Authentication → URL Configuration**, adaugă subdomeniul la Redirect URLs.
+1. **New Project → Deploy from GitHub repo** (sau `railway up` din acest folder). Pentru monorepo setează **Root Directory** la `academy-music.florentinapanaofficial.ro`, branch `main` și fișierul de configurare al acestui serviciu la `/academy-music.florentinapanaofficial.ro/railway.toml`. Verifică să nu rămână un override de start către un server SPA/static.
+2. **Variables**: adaugă `VITE_SUPABASE_URL` și `VITE_SUPABASE_ANON_KEY`, plus variabilele Google Drive descrise mai sus. Variabilele `VITE_*` se citesc **la build**, deci după modificarea lor e nevoie de redeploy.
+3. Build: `npm ci && npm run build`. Start: `HOST=0.0.0.0 node ./dist/server/entry.mjs` (sau `npm start` cu `HOST=0.0.0.0` în mediu). Adaptorul citește automat `PORT` injectat de Railway; nu fixa portul Railway în cod. Local, portul implicit este 4180. Healthcheck: `/`.
+4. După deploy verifică URL-ul Railway: `/` → 200; GET `/api/upload-homework/` → 405 JSON; POST fără autentificare → 401 JSON; API inexistent → 404 JSON. Un răspuns HTML 200 pe API indică încă un deployment/start/config greșit, nu confirmă funcționarea uploadului. Testul cu upload autentificat și permisiunile Drive rămâne separat.
+5. **Settings → Networking → Custom Domain**: `academy-music.florentinapanaofficial.ro`. În DNS adaugă `CNAME` de la `academy-music` către hostul oferit de Railway.
+6. În Supabase → **Authentication → URL Configuration**, adaugă subdomeniul la Redirect URLs.
 
 ---
 
@@ -346,11 +347,12 @@ Cele patru carduri Google Workspace din `src/pages/admin/AdminDashboard.jsx` fol
 
 ### Build și verificări
 
-`npm run build` prerandează paginile și generează `.br`/`.gz`; serverul livrează activele `/_astro/` cu cache immutable, iar HTML-ul cu revalidare. Rutele private rămân React + Supabase, fără prerandarea datelor elevilor. Astro avertizează despre fișierele JSX existente în `src/pages/`; acestea sunt importate de SPA, nu tratate drept pagini Astro.
+`npm run build` generează serverul SSR și activele client, plus variante `.br`/`.gz`. Adaptorul standalone livrează activele `/_astro/` cu cache immutable, iar middleware-ul setează `no-cache` pentru HTML. Rutele private rămân React + Supabase, fără randarea datelor elevilor pe server. Astro avertizează despre fișierele JSX existente în `src/pages/`; acestea sunt importate de SPA, nu tratate drept pagini Astro.
 
 ```bash
 npm test                   # LRC, audio direct, pian, migrări SQL/RLS
 npm run build
+npm run test:server        # pornește/oprește entrypoint-ul compilat pe un port liber; JSON API, SSR, CSP, noindex
 npm start                  # implicit portul 4180; PORT=4185 pentru test:browser
 npm run test:browser       # implicit http://127.0.0.1:4185; ACADEMY_TEST_URL pentru alt port
 ```

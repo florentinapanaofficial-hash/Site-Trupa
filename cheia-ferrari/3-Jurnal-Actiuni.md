@@ -1,3 +1,34 @@
+## 📝 19 oct 2026 — Academy SSR Node standalone pentru Railway
+
+### Obiectiv
+Activarea explicită a serverului Astro standalone pentru pagini și API, cu publicarea pe main solicitată de Claudiu.
+
+### Modificări
+- `academy-music.florentinapanaofficial.ro/astro.config.mjs`: output server, adaptor Node standalone, host 0.0.0.0 și port local 4180 suprascris de PORT Railway. Adaptorul @astrojs/node 11.1.8 era deja declarat și instalat; nu a fost necesară reinstalarea.
+- `academy-music.florentinapanaofficial.ro/package.json` și `railway.toml`: pornire directă dist/server/entry.mjs, test:server adăugat; server.mjs rămâne doar import de compatibilitate.
+- `academy-music.florentinapanaofficial.ro/src/middleware.js`: mutate headerele de securitate/noindex, permisiunile Jitsi și CSP cu hash-uri calculate pe HTML-ul SSR; încărcare .env locală cu prioritate pentru mediul procesului.
+- `academy-music.florentinapanaofficial.ro/src/pages/[...app].astro`: fallback React dinamic, API inexistent JSON 404 și fișiere/pagini revistă inexistente fără shell SPA.
+- `academy-music.florentinapanaofficial.ro/src/pages/revista/[slug].astro`: conținut încărcat din colecție la cerere și 404 pentru slug inexistent.
+- `academy-music.florentinapanaofficial.ro/scripts/server.check.mjs`: teste pe entrypoint-ul compilat, port liber, oprire proces la final; API, SSR, metadata, alt, CSP, noindex, redirect și active.
+- `academy-music.florentinapanaofficial.ro/README.md`: documentate SSR, Root Directory/config Railway pentru monorepo, start, port și smoke test. Comentariul din SecurePdfViewer.jsx referă noul middleware.
+- `cheia-ferrari/2-Tracker-SEO.md`: sesiunea consemnată.
+
+### Validări
+- Build Academy PASS; @astrojs/node 11.1.8 prezent. Warn-urile existente pentru componente JSX din pages și chunk-uri mari nu au fost ascunse.
+- Academy: 19/19 teste PASS. Server standalone: 9/9 PASS; GET upload 405 JSON, POST fără autentificare 401 JSON, origine externă 403 JSON și API necunoscut 404 JSON.
+- Rute directe React, Studio și revistă: 200; lipsuri reale: 404; redirect trailing slash 301; active immutable. Metadata verificată în intervalele 50–58 / 130–150 și imagini cu alt; noindex păstrat. Nu au fost schimbate date structurate sau conținutul metadata.
+- Browser Canto: PASS la 1440/390 px, inclusiv redare MP3 reală, operații și eșec/retry cu servicii simulate, fără scrieri live.
+- Test browser suplimentar --score-editor: interacțiunile editorului la 1440 px PASS, apoi runner FAIL din cauza unui apel eval blocat de CSP pe Studio; politica fără unsafe-eval nu a fost relaxată. Scenariul mobil nu a mai rulat.
+- Primul test server a avut timeout la două cereri la încărcarea inițială; trei rerulări ulterioare PASS fără schimbarea timeout-ului sau ascunderea erorilor.
+- `npm test` principal: 101/101 PASS; `npm run seo:check`: build PASS, 64 pagini, 0 FAIL | 0 WARN. Diagnostice editor: zero în fișierele verificate; git diff --check curat.
+- `node seo-agent/seo-analyzer.js`: 13 oportunități existente din export, nu rezultate SEO noi.
+
+### Riscuri / pași următori
+- După push trebuie confirmat deployment-ul la URL-ul Railway și JSON-ul API; CLI Railway este neautentificat, deci nu se pot inspecta setările serviciului sau logurile private. Un override SPA/static sau un Root Directory/config greșit în dashboard poate ignora fișierele acestui serviciu.
+- Uploadul autentificat și permisiunile Google Drive nu au fost testate live. Domeniul custom avea DNS nerezolvat la verificarea precedentă.
+- Testul suplimentar Studio/CSP rămâne de investigat separat, fără activarea unsafe-eval. Variantele precomprimate sunt generate în continuare, dar negocierea lor trebuie asigurată/verificată la proxy/CDN pentru standalone.
+- Fără măsurători GSC noi sau afirmații despre ranking/CTR; Academy rămâne noindex.
+
 ## 📝 19 oct 2026 — Pregătire commit și push Academy
 
 ### Obiectiv
@@ -4784,3 +4815,21 @@ Actualizarea destinației Early Booking pentru sezonul 2027, întărirea ierarhi
 ### Riscuri / pași următori
 - Buildul afișează fallback-ul existent pentru galeria care necesită `MYSQL_URL`; buildul nu este blocat.
 - Eșecurile din `scripts/video-views.test.cjs` rămân de investigat separat.
+
+## 📝 19 oct 2026 — Reverificare Railway Academy
+
+### Obiectiv
+Repetarea testului read-only pentru versiunea Academy publicată pe Railway.
+
+### Modificări
+- `cheia-ferrari/2-Tracker-SEO.md`: consemnat rezultatul verificării. Fără modificări de cod, deploy sau scrieri în serviciile externe.
+
+### Validări
+- `npm test --prefix academy-music.florentinapanaofficial.ro`: 19/19 teste PASS; `npm test` în proiectul principal: 101/101 PASS.
+- `npm run seo:audit`: 64 pagini HTML, 0 FAIL | 0 WARN.
+- Railway `https://academy-music-production.up.railway.app/`: homepage 200 cu `X-Robots-Tag: noindex, nofollow`.
+- GET și POST fără autentificare la `/api/upload-homework/`: ambele răspund 200 `text/html` (shell SPA), nu JSON-ul API așteptat. POST-ul fără autentificare nu poate ajunge la etapa de upload.
+- `academy-music.florentinapanaofficial.ro` nu rezolvă DNS; Railway CLI este neautentificat.
+
+### Riscuri / pași următori
+- Problema API persistă în deployment-ul accesibil; trebuie investigată maparea rutelor SSR/deployment înainte de a considera uploadul funcțional. Nicio operație de deploy sau remediere nu a fost efectuată.

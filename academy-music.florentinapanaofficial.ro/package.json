@@ -17,7 +17,8 @@
         "preview": "astro preview --port 5180",
         "test": "node --test src/lib/learning.check.mjs",
         "test:browser": "node scripts/verify-learning.mjs",
-        "start": "node server.mjs"
+        "test:server": "node --test scripts/server.check.mjs",
+        "start": "node ./dist/server/entry.mjs"
     },
     "dependencies": {
         "@astrojs/mdx": "^8.1.0",

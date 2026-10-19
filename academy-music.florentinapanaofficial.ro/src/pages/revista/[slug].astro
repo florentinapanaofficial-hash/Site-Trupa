@@ -1,10 +1,8 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { getEntry, render } from 'astro:content';
 import AcademyLayout from '../../layouts/AcademyLayout.astro';
-export async function getStaticPaths() {
-    return (await getCollection('revista')).map((course) => ({ params: { slug: course.id }, props: { course } }));
-}
-const { course } = Astro.props;
+const course = await getEntry('revista', Astro.params.slug);
+if (!course) return new Response('Not found', { status: 404 });
 const { Content } = await render(course);
 ---
 <AcademyLayout title={`${course.data.titlu} | Academy Music`} description={course.data.descriere}>

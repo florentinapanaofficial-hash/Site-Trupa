@@ -14,8 +14,9 @@ for (const key of ['GOOGLE_CLIENT_EMAIL', 'GOOGLE_PRIVATE_KEY', 'GOOGLE_DRIVE_FO
 
 export default defineConfig({
     site: 'https://academy-music.florentinapanaofficial.ro',
-    output: 'static',
-    adapter: node({ mode: 'middleware' }),
+    output: 'server',
+    adapter: node({ mode: 'standalone' }),
+    server: { host: '0.0.0.0', port: 4180 },
     trailingSlash: 'always',
     integrations: [react(), mdx()],
     vite: {

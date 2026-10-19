@@ -41,7 +41,7 @@ export default function SecurePdfViewer({ path, bucket = BUCKET_MEDIA, watermark
                 loadingTask = pdfjsLib.getDocument({
                     data: buffer,
                     disableAutoFetch: true,
-                    // Fără eval, CSP-ul din server.mjs poate rămâne fără `unsafe-eval`.
+                    // Fără eval, CSP-ul din middleware-ul Astro poate rămâne fără `unsafe-eval`.
                     isEvalSupported: false,
                 });
                 const doc = await loadingTask.promise;
