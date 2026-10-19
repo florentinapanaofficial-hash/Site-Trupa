@@ -1,3 +1,22 @@
+## 📝 20 oct 2026 — Comandă build Railway Academy cu npm install
+
+### Obiectiv
+Înlocuirea explicită a comenzii npm ci în configurația Railway Academy, la cererea lui Claudiu, urmată de commit și push pe main.
+
+### Modificări
+- `academy-music.florentinapanaofficial.ro/railway.toml`: secțiunea [build] existentă folosește exact `buildCommand = "npm install && npm run build"`; builderul și pornirea SSR au rămas neschimbate.
+- `academy-music.florentinapanaofficial.ro/README.md`: comanda de build documentată a fost sincronizată.
+- `cheia-ferrari/2-Tracker-SEO.md`: sesiunea consemnată.
+
+### Validări
+- Verificare automată a prezenței comenzii exacte în [build] și a absenței altor modificări în configurație.
+- `npm run seo:audit`: 64 pagini HTML, 0 FAIL | 0 WARN (output local existent). Fără schimbări de pagini, metadata, imagini, linkuri sau date structurate.
+- Nu s-a executat npm install local și nu s-a modificat lockfile-ul; schimbarea vizează comanda executată de Railway. Deploy-ul live nu este confirmat de validarea locală.
+
+### Riscuri / pași următori
+- După push, verifică logul Railway: configurația Academy trebuie încărcată de serviciul corect. Eventualele etape automate de instalare ale builderului pot rula separat de buildCommand; această schimbare nu demonstrează eliminarea lor.
+- Nu sunt date GSC noi sau rezultate de ranking măsurate.
+
 ## 📝 19 oct 2026 — Academy SSR Node standalone pentru Railway
 
 ### Obiectiv
