@@ -1,6 +1,8 @@
 import { defineMiddleware } from 'astro:middleware';
 import { createHash } from 'node:crypto';
 import { join } from 'node:path';
+import { createClient } from '@supabase/supabase-js';
+import { secureAcademyRequest } from './lib/securityServer.js';
 
 for (const filename of [join(process.cwd(), '.env'), join(process.cwd(), '..', '.env')]) {
     try { process.loadEnvFile(filename); } catch (error) { if (error.code !== 'ENOENT') throw error; }
@@ -22,8 +24,8 @@ const SECURITY_HEADERS = {
     'X-Robots-Tag': 'noindex, nofollow',
 };
 
-export const onRequest = defineMiddleware(async (_context, next) => {
-    const response = await next();
+export const onRequest = defineMiddleware(async (context, next) => {
+    const response = await secureAcademyRequest(context, process.env, createClient) || await next();
     // Hash the final SSR HTML so hydrated Astro components keep working under CSP.
     const html = response.headers.get('Content-Type')?.includes('text/html') ? await response.text() : null;
     const inlineScriptHashes = new Set();
@@ -56,6 +58,8 @@ export const onRequest = defineMiddleware(async (_context, next) => {
     });
     for (const [header, value] of Object.entries(SECURITY_HEADERS)) secured.headers.set(header, value);
     secured.headers.set('Content-Security-Policy', CSP);
-    if (!secured.headers.has('Cache-Control')) secured.headers.set('Cache-Control', 'no-cache');
+    if (context.url.pathname === '/' || context.locals.academySecurity || context.url.pathname.startsWith('/api/auth/')) {
+        secured.headers.set('Cache-Control', 'private, no-store');
+    } else if (!secured.headers.has('Cache-Control')) secured.headers.set('Cache-Control', 'no-cache');
     return secured;
 });

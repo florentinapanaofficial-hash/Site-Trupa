@@ -7,6 +7,26 @@ Stack: **Astro 7 (SSR + API Node standalone) + React 18 + MDX + TailwindCSS 4 + 
 
 ---
 
+## Pagina publică de start
+
+- `/` este landing-ul public Astro: Hero cu prezentare manuală Canto/Instrument-orgă/Teorie, butoane către `/login/` și site-ul oficial, plus secțiunea E-Learning către revista externă (tab nou cu `noopener noreferrer`). Ilustrațiile sunt SVG inline și elemente CSS; nu se descarcă imagini externe sau instrumentele dashboard-ului.
+- `/dashboard/` este dashboard-ul existent, protejat. Loginul și navigarea Acasă trimit aici; nu se afișează conținut educațional privat pe landing.
+- Un cookie valid la `/` produce redirect server-side către `/dashboard/`. Fără cookie, pagina este publică și nu apelează Supabase. Dacă browserul păstrează o sesiune locală, aceasta se validează prin `/api/auth/session/` înainte de redirect; serviciile indisponibile afișează o eroare explicită.
+- Prezentarea se schimbă numai la cererea vizitatorului, inclusiv din tastatură; nu există autoplay. Animația decorativă se oprește în mai puțin de 5 secunde și respectă `prefers-reduced-motion`. Fără JavaScript rămân disponibile textul, prima prezentare și toate linkurile.
+- Se păstrează politica existentă `noindex, nofollow` pentru Academy; pagina publică nu activează automat indexarea SEO.
+- Validare: `npm run build`, `npm run test:server`, `npm run test:landing` (Chromium existent, mobil/desktop, navigare, sesiuni persistente și fără JavaScript). Capturile opționale se salvează în directorul indicat de `ACADEMY_SCREENSHOT_DIR`.
+
+## Navigare privată și discipline
+
+- `/dashboard/` este ecranul minimalist cu două carduri: Canto → `/canto/` și Instrument-Orgă → `/instrument/`. Fiecare Info folosește un disclosure nativ (`details`/`summary`), separat de linkul cardului, accesibil și din tastatură. Nu se mai încarcă statistici, repertorii sau studioul de înregistrare pe ecranul de selecție.
+- `/canto/` încarcă biblioteca vocală existentă; `/instrument/` încarcă repertoriul Orgă, iar `/instrument/claviatura/` claviatura virtuală existentă. Engine-ul nou de pian rămâne separat. Canto include acum monitorizare cu reverb și karaoke pe linie/cuvânt, descrise în secțiunea Modulul 4.
+- `/orga/` rămâne compatibilă prin redirect 301 server-side către `/instrument/` pentru utilizatorii autentificați și fallback React `replace`. Toate rutele disciplinei rămân protejate prin middleware/Auth/RLS existente.
+- Paginile de discipline, uneltele, resursele comune și panoul profesorului folosesc importuri dinamice React `lazy`. Dashboard-ul nu importă playerul Canto, PDF-ul, claviatura sau panoul admin. Un fallback Suspense local păstrează layout-ul și meniul vizibile în timpul încărcării.
+- Sidebar desktop: `sticky top-0 h-screen overflow-y-auto`, cu scroll independent pe ecrane joase. Mobil: header sticky și meniu pliabil cu scroll propriu, Escape și închidere la schimbarea rutei.
+- Navigarea la dashboard arată doar Alege disciplina, REVISTA și, pentru profesor, administrarea/toggle-ul existent. În Canto se afișează biblioteca vocală; în Instrument, repertoriul și claviatura. Resursele de teorie, jocurile, portofoliul și cursurile online rămân disponibile după alegerea disciplinei, fără încărcarea lor până la acces. Schimbarea disciplinei se face prin Alege disciplina. Rutele comune vechi sunt păstrate.
+- REVISTA este același link extern pe desktop/mobil: `https://revista.florentinapanaofficial.ro/`, cu `target="_blank" rel="noopener noreferrer"`. Rolurile și drepturile profesorului nu sunt schimbate de noua navigare.
+- Validare după build: `npm run test:navigation` verifică în Chromium desktop/mobil cele două carduri, Info, meniurile, scroll-ul real, REVISTA și cererile de bundle-uri pentru izolarea disciplinelor. Opțional: `ACADEMY_SCREENSHOT_DIR` pentru capturi în afara repository-ului.
+
 ## Biblioteca Canto
 
 Profesor: `/admin/canto/`, tabul **Canto**. Elev: `/canto/`, în continuare autentificat; nu se publică materiale către utilizatori anonimi. Vechiul `/admin/piese/?add=canto` redirecționează spre noul editor, iar secțiunea Piese administrează Orgă.
@@ -27,7 +47,7 @@ Editorul include titlu, grupă cu sugestii din `study_groups` și din bibliotec�
 
 MP3: maximum 30 MB per variantă, verificare extensie/MIME/antet în browser; această verificare nu este antivirus sau validare server-side completă. Titlul nu se deduce din numele fișierului. Doar fișierele selectate sunt încărcate, iar eșecul salvării DB declanșează încercarea de curățare a uploadurilor noi. Eșecul curățării este raportat explicit. Fișierele vechi la înlocuire și fișierele asociate unei piese șterse nu sunt șterse automat din Storage, pentru a nu afecta referințe comune; retenția/curățarea obiectelor neutilizate necesită administrare separată. Nu există tranzacție distribuită Storage/DB sau garanție de cleanup după întreruperea browserului.
 
-Versurile sunt randate ca text React, nu HTML; elevul le citește în modal fără descărcare. Playerele native includ pauză, poziție și volum conform browserului, cu oprirea celuilalt audio la pornire. Ascunderea descărcării nu reprezintă DRM. Versurile goale dezactivează butonul elevului; profesorul le poate adăuga ulterior.
+Versurile sunt randate ca text React, nu HTML; elevul le poate citi în modal sau în panoul karaoke. Playerele au controale React pentru redare/pauză, poziție și volum, cu oprirea celuilalt audio la pornire. Ascunderea descărcării nu reprezintă DRM. Versurile goale dezactivează butonul elevului; profesorul le poate adăuga ulterior.
 
 Verificări: `npm test`, `npm run build`, `npm run test:browser -- --canto`, cu `ACADEMY_TEST_URL` setat spre preview. Testul browser necesită `ffmpeg` și verifică MP3 real la 1440/390 px, editare, înlocuire independentă, refuz DB/cleanup, versuri și XSS literal, filtrare, redare/excludere, repertoriu comun, ștergere/anulare, retry, metadata și lipsa overflow-ului. Supabase este simulat; migrarea este testată separat în PostgreSQL PGlite inclusiv repetabilitate, limite și RLS. Capturi: `.astro/screenshots/canto-{admin,student,lyrics}-{1440,390}.png`.
 
@@ -358,3 +378,122 @@ npm run test:browser       # implicit http://127.0.0.1:4185; ACADEMY_TEST_URL pe
 ```
 
 Testul de browser cere un build configurat cu variabilele publice Supabase existente și interceptează toate cererile către acel proiect: nu scrie în baza live. Include verificări la 1440px/390px și capturi în `.astro/screenshots/`. Chromium se instalează cu `npx playwright install chromium`. Fișierele media CDN și fonturile pot fi cerute public în timpul testelor.
+
+## Securitate: sesiune unică, IP-uri și acord parental
+
+Implementare: `src/middleware.js`, `src/lib/securityServer.js`, `src/pages/api/auth/` și migrarea
+`supabase/migrations/20261020000005_security_sessions.sql`.
+
+### Configurare și activare fără întreruperea conturilor existente
+
+1. Aplică toate migrările în ordine, după schema și modulele de bază. Migrarea de securitate este idempotentă.
+2. Configurează **doar în mediul serverului** `SUPABASE_SERVICE_ROLE_KEY`; nu folosi prefixul `VITE_` și nu publica cheia.
+3. Configurează `ACADEMY_TRUSTED_IP_HEADER=x-forwarded-for` și `ACADEMY_TRUSTED_PROXY_HOPS=1` **numai dacă** infrastructura garantează că ultimul proxy de încredere adaugă/suprascrie IP-ul real. Pentru un header `x-real-ip` suprascris de proxy folosește tot `1`. Verifică topologia Railway înainte de activare. Fără această configurație, autentificarea în producție răspunde 503, nu inventează un IP și nu acceptă orbește primul IP transmis de browser. Local se folosește `Astro.clientAddress`; modul de dezvoltare nu reprezintă o configurație de producție.
+   Pentru domeniul temporar Railway configurează și `ACADEMY_PUBLIC_ORIGIN=https://DOMENIUL-TAU.up.railway.app` înainte de build; Astro acceptă headerele Host/Forwarded doar pentru hostname-urile explicit permise. Domeniul canonical și localhost sunt deja permise.
+4. Publică aplicația Astro și funcțiile Edge actualizate `create-student` și `delete-student`. Fluxul profesorului marchează conturile provisionate exclusiv în `app_metadata`; nu pretinde că profesorul este părintele și nu inventează consimțământ.
+5. Testează loginul cu un cont de test și două sesiuni independente, apoi activează global din SQL Editor:
+
+   ```sql
+   update public.academy_security_config set enforce_sessions = true where id;
+   ```
+
+Înainte de pasul 5, conturile vechi fără `active_session_id` rămân funcționale, iar crearea conturilor prin vechiul flux nu este întreruptă. Imediat ce un cont folosește noul login, sesiunea sa devine obligatorie în RLS chiar și în etapa de tranziție. După activarea globală, toate conturile trebuie să treacă prin noul login; noile înscrieri Auth directe fără acord parental sunt refuzate și în baza de date. Nu raporta securitatea ca activată global cât timp flagul este `false`.
+
+### Comportament
+
+- `POST /api/auth/login/` verifică parola prin Supabase Auth, înregistrează atomic sesiunea și IP-ul, apoi setează un cookie HttpOnly, SameSite=Lax, Secure pe HTTPS. Tokenurile pentru client se trimit numai într-un răspuns `private, no-store`.
+- `POST /api/auth/session/` validează, dar **nu** înlocuiește sesiunea activă; refresh-ul de token păstrează `session_id`. Browserul verifică la fiecare 30 de secunde și la revenirea în fereastră. Cererile la API/DB sunt refuzate imediat după revocare; o pagină deja deschisă afișează deconectarea la următoarea verificare.
+- `DELETE /api/auth/session/` șterge cookie-ul; cu Bearer token revocă și sesiunea din profil, numai dacă încă este cea activă. Ieșirea dintr-o sesiune veche nu o revocă pe cea nouă.
+- Middleware-ul verifică tokenul cu Auth înainte de a folosi `session_id`; nu stochează tokenuri sau parole în istoricul IP. RLS restrictiv se intersectează cu permisiunile existente, inclusiv Storage; nu acordă acces suplimentar la materiale. În schema actuală nu există `lessons`: migrarea protejează tabelele reale și adaugă protecții pentru `lessons` numai dacă există deja.
+- Al treilea IP distinct blochează persistent contul și inserează o alertă în `security_alerts`, vizibilă profesorului activ prin RLS / administratorului din Supabase. Nu există notificare email configurată în această etapă.
+- `POST /api/auth/register/` cere booleanul `parentalConsent=true` înainte de `auth.signUp`. Înregistrarea este disponibilă și la `/register/`; acordul nu este preselectat. Textul, versiunea și data acceptării sunt înregistrate server-side în `parental_consents`. Acest checkbox consemnează o declarație, nu verifică identitatea sau calitatea de tutore.
+- Origin-ul trebuie să coincidă cu origin-ul cererii la endpointurile de autentificare. Pentru API, erorile sunt JSON; pentru pagini, sesiunea revocată/blocată conduce la `/login/?reason=...`. Indisponibilitatea Auth/DB produce 503, nu acces permis.
+
+### Administrarea blocărilor
+
+Consultă `security_alerts` și `user_security_logs` în Supabase cu un administrator autorizat. Pentru deblocare, verifică situația cu părintele; execută într-o tranzacție, cu UUID-ul real în loc de `USER_UUID`:
+
+```sql
+begin;
+select id from public.profiles where id = 'USER_UUID'::uuid for update;
+delete from public.user_security_logs where user_id = 'USER_UUID'::uuid;
+update public.profiles set is_locked = false, active_session_id = 'signed-out' where id = 'USER_UUID'::uuid;
+commit;
+```
+
+Nu șterge alertele la deblocare. Resetarea istoricului IP este explicită, nu automată. Cerința actuală numără IP-uri pe întreg istoricul păstrat: Wi-Fi/date mobile/VPN pot bloca un elev legitim. Înainte de utilizarea cu minori, stabilește în informarea GDPR temeiul, retenția și procedura de ștergere pentru aceste date. Nu reprezintă o certificare de conformitate juridică.
+
+### Limite și verificări
+
+- Această etapă nu implementează pragul personalizat de 5 parole greșite / 15 minute; rămân protecțiile native Supabase Auth. Nu confunda blocarea IP cu anti-brute-force.
+- URL-urile audio deja emise nu pot fi retrase prin RLS; rămân utilizabile până la expirare. Audio CDN public și streamingul anti-download necesită etapa media dedicată.
+- RLS validează sesiunea inclusiv pentru cereri directe Supabase; istoricul IP se actualizează la cererile Astro, nu pentru traficul direct care ocolește Astro.
+- Reaplicarea vechilor scripturi `setup_*.sql` poate redefini helperii de acces; migrarea de securitate trebuie să fie ultima. Tabelele noi trebuie să primească și politica restrictivă `academy_valid_session`.
+- `npm test` include teste PostgreSQL/PGlite pentru RLS, înlocuirea sesiunii, al treilea IP, acord parental și privilegii. `npm run build` validează integrarea Astro/React.
+
+## Administrare: editare și previzualizare Profesor / Elev
+
+- `/admin/piese/` (Instrument-Orgă), `/admin/canto/` și `/admin/resurse/` (RED) oferă butoane **Editează** lângă Șterge, cu formulare precompletate. Salvarea folosește UPDATE pe ID în `pieces` / `resources`, nu ștergere și recreare. Piesele rămân în disciplina lor; alocările și autorul inițial nu sunt resetate la editare.
+- Poți completa sau înlocui pozitivul/negativul MP3 (maximum 30 MB fiecare), versurile/LRC și partitura PDF (maximum 20 MB). Validările verifică extensia, MIME și semnătura fișierului. Uploadurile sunt private în `academy-media`, cu căi unice; un fișier nou actualizează numai sursa corespunzătoare. Fără selecție nouă se păstrează fișierul existent. Uploadul audio înlocuiește URL-ul extern al aceleiași variante.
+- Eșecurile la upload/salvare sunt afișate, iar uploadurile noi finalizate înainte de eroare sunt eliminate. Eșecul curățării este raportat explicit. Fișierele istorice înlocuite sau rămase după ștergerea unui rând **nu sunt șterse automat**: pot avea alte referințe. Curățarea administrativă trebuie să verifice referințele și retenția înainte de eliminare.
+- PDF-ul Canto se deschide într-un vizualizator încărcat la cerere; audio din Storage funcționează și la Instrument, prin playerul comun `PieceAudio`. URL-urile semnate expiră, dar interfața nu reprezintă DRM și nu poate împiedica absolut copierea/înregistrarea.
+- Primul element al panoului este **Vizualizare: Profesor / Elev**. Starea este comună cu sidebar-ul, implicit Profesor, actualizată fără reload și păstrată între navigările SPA. Un reload revine la Profesor. Elevul real nu primește acest comutator.
+- În previzualizare se folosesc componentele reale Canto/Instrument/RED, fără unelte administrative; piesele nepublicate sunt excluse. Rolul Supabase, token-ul și RLS rămân neschimbate. **Nu este impersonarea unui elev anume**: alocările/permisiunile sale individuale nu sunt simulate. Revino la Profesor din oricare comutator.
+- Pentru UPDATE și preview nu este necesară o migrare nouă: coloanele pentru fișiere/versuri și politicile profesor există deja. Nu activa sau modifica politicile de securitate pentru a folosi previzualizarea.
+- Validare: `npm test`, `npm run test:admin`, `npm run test:navigation`, `npm run test:landing`, `npm run test:server` și `npm run build`. Testele browser folosesc output-ul Astro construit și un backend Supabase simulat; RLS/UPDATE sunt testate separat în PostgreSQL/PGlite. Nu modifică înregistrări de producție.
+
+## Modulul 4 — Studio Canto: karaoke, microfon și AI
+
+### Karaoke și redare
+
+Pe `/canto/`, fiecare piesă are carduri Pozitiv/Negativ cu redare, pauză, progres și volum (inclusiv pe mobil). O singură sursă audio se aude la un moment dat. **Play pe negativ deschide automat versurile Karaoke**; le poți deschide și manual. Controalele Play/Pauză și Stop sunt disponibile atât în player, cât și lângă versuri și comandă aceeași sursă audio. Pauza păstrează poziția, iar Stop oprește audio și readuce sincronizarea la zero, fără a închide versurile. Redarea unei variante o selectează automat ca sursă de sincronizare. Versurile urmăresc `audio.currentTime` și salturile înainte/înapoi, cu scroll numai în panoul versurilor și respectarea reduced motion.
+
+Parserul existent `src/lib/lrc.js` suportă în continuare LRC simplu, offset și refrene repetate; adaugă acum Enhanced LRC. Nu estimează cuvinte din timpi de linie:
+
+```text
+[00:01.00]Linie evidențiată de la o secundă
+[00:05.00]<00:05.00>Text <00:05.50><00:06.00>original<00:06.80>
+```
+
+Timestamp-urile `<...>` delimitează cuvintele; un tag fără text poate marca finalul cuvântului/pauza. Textul fără timestamp rămâne lizibil, nesincronizat. Versurile trebuie verificate manual: pozitivul și negativul pot avea introduceri diferite. `KaraokePlayer` reutilizează aceleași controale/parser și păstrează interfața `mediaUrl`/`lyrics` pentru lecțiile MDX.
+
+### Microfon și reverb numai la REC pentru temă
+
+**Ascultarea pozitivului/negativului, karaoke, Play/Pauză/Stop nu cer microfonul și nu afișează regula căștilor.** Elevul poate studia folosind numai materialul salvat de profesor, fără permisiuni audio de captare și fără apeluri AI.
+
+Butonul **REC · Înregistrează tema** al piesei deschide studioul existent de teme (încărcat la cerere). Alegerea audio/video nu activează dispozitivele. **REC · Pregătește tema** afișează regula de studio; numai **Sunt gata, am conectat căștile!** poate solicita microfonul/camera și porni înregistrarea. Aplicația nu poate detecta fizic căștile: folosește căști cu microfon și volum redus, nu difuzoare.
+
+Vocea trece prin ramuri gain dry și ConvolverNode (impuls stereo Room de 1,8 s) → gain wet, apoi gain de ieșire redus și compresor/limiter. Semnalul procesat este monitorizat în căști și capturat de MediaRecorder, împreună cu negativul dacă este selectat. În timpul REC apar versurile ajutătoare sincronizate cu timpul real al negativului, folosind același parser/highlight/auto-scroll; sunt doar vizuale, nu se transformă în voce și nu se includ ca text în fișierul audio. Sliderul Dry/Wet ajustează mixul în timpul REC. Vocea nu este trimisă către AI. Nu se promite latență zero; aceasta depinde de dispozitiv/browser/căști (Bluetooth poate avea întârziere mare).
+
+Stop sau trecerea în fundal oprește REC, eliberează imediat microfonul/contextul și păstrează fișierul pentru revizuire. **Trimite tema** este o acțiune separată, explicită; audio folosește endpointul existent de teme/Drive, iar video fluxul existent de portofoliu. Înregistrarea nu se trimite automat. O nouă încercare cere din nou confirmarea căștilor. Oprire automată la 10 minute; înregistrările goale sunt respinse cu mesaj.
+
+Închiderea studioului/paginii sau schimbarea rutei eliberează dispozitivele, inclusiv dacă permisiunea era încă în așteptare. Erorile de permisiune, dispozitiv, înregistrare sau negativ sunt explicite. Negativul privat este rezolvat și din Storage; pentru includerea unei surse externe în mix este necesar CORS. Dacă sursa nu poate fi mixată, nu se recomandă difuzorul: verifică sursa sau înregistrează fără negativ. Necesită HTTPS/localhost și un browser modern cu Web Audio/getUserMedia/MediaRecorder/AbortSignal.
+
+### Generarea AI în Admin
+
+Butonul **✨ Generează Versuri Automat (AI)** există lângă textul LRC în `/admin/piese/`, în formularul `/admin/canto/` și în modalul de versuri Canto. Este disponibil numai pentru un pozitiv MP3 **deja salvat și activ în Storage, fără URL extern prioritar**. Salvează întâi un upload nou; URL-urile externe nu sunt urmărite de funcție. În timpul generării, salvarea și editarea formularului sunt blocate.
+
+Profesorul confirmă explicit drepturile și prelucrarea înainte de trimitere. **Numai acel pozitiv salvat** este trimis către API-ul OpenAI Whisper (`whisper-1`, `verbose_json`, timpi de cuvânt/segment, limba română); microfonul live nu este sursă pentru AI. Nu trimite materiale fără drepturi sau înregistrări personale/ale minorilor fără autorizările și informările necesare. Verifică termenii, retenția și transferurile furnizorului înainte de utilizare.
+
+`generate-lyrics` validează JWT prin `getUser`, sesiunea prin `academy_session_allowed`, rolul teacher/profesor activ și neblocat, apoi verifică ID-ul piesei și potrivirea exactă a căii cu pozitivul din DB. Bucketul și endpointul furnizorului sunt fixe; nu acceptă URL-uri arbitrare. Verifică dimensiunea și antetul MP3. CORS permite numai originea Academy și localhost/127.0.0.1:5180. Cheia furnizorului și service role rămân exclusiv în Edge Function.
+
+- MP3 pentru AI: maximum **24 MB** (uploadul normal rămâne maximum 30 MB).
+- O cerere la **două minute per profesor**, rezervată atomic în DB, inclusiv dacă furnizorul eșuează. Configurează suplimentar limite de buget/cotă în contul furnizorului.
+- Răspunsul este LRC extins pe cuvânt când există timestamp-uri de cuvânt; altfel LRC pe linie din segmente. AI poate greși versurile și timpii din muzică.
+- După revizuire și salvare, versurile rămân persistent în `pieces.versuri_text`. Elevul citește acest text din DB și **nu face niciun apel AI la deschiderea piesei, Play, Pauză, Stop sau reload**. Generarea se repetă numai la solicitarea explicită a profesorului.
+- Răspunsul completează **numai formularul**; revizuiește și apasă manual Salvează. Nu se scrie automat în piesă și nu se păstrează audio/transcriere în tabelul de cooldown. La eroare rămâne textul anterior.
+- Cererile au timeout și erori explicite pentru configurare lipsă, cotă, sesiune, fișier și furnizor. Părăsirea editorului anulează cererea browserului; o cerere deja ajunsă la furnizor poate totuși fi facturată.
+
+### Activarea Edge Function (separată de frontend)
+
+Această implementare nu publică automat funcția, nu setează chei și nu transmite înregistrări reale.
+
+1. Aplică `supabase/migrations/20261020000006_generate_lyrics.sql` după migrarea de securitate `20261020000005`. Creează numai tabelul/RPC service-only pentru cooldown; nu schimbă piesele sau politicile existente. Dacă folosești SQL Editor, înregistrează și versiunea în istoricul migrărilor conform fluxului proiectului.
+2. În Supabase Dashboard → Edge Functions → Secrets, configurează **OPENAI_API_KEY**, folosind un proiect cu buget controlat. Nu pune cheia în frontend, Railway `VITE_*`, Git sau mesaje. `SUPABASE_URL`, `SUPABASE_ANON_KEY` și `SUPABASE_SERVICE_ROLE_KEY` sunt variabilele server ale funcției.
+3. Din directorul Academy, cu CLI autentificat: `npx --no-install supabase functions deploy generate-lyrics --no-verify-jwt`. Configurația dezactivează doar verificarea gateway-ului; handlerul verifică explicit JWT-ul, sesiunea și rolul înainte de acces. Nu elimina aceste verificări.
+4. Publică frontendul separat. Verifică funcția cu un cont profesor și un pozitiv original/autorizat ≤24 MB. Fără secret/migrare/funcție publicată, UI afișează eroare și păstrează textul.
+5. Test audio manual: pe `/canto/`, verifică mai întâi karaoke fără microfon. Apoi alege REC pentru temă, conectează căștile, confirmă regula și testează Dry/Wet, Stop, revizuirea și trimiterea explicită. Ascultarea reală și Safari/iOS trebuie validate pe dispozitivele țintă.
+
+### Validare Modulul 4
+
+`npm test` include parser/AI, graful Web Audio, anularea/cleanup-ul microfonului, autorizarea Edge și migrarea cooldown în PostgreSQL/PGlite. După `npm run build`, rulează `npm run test:canto`: Chromium 390/1440 px, microfon virtual și audio PCM sintetic (cu byte ranges reale), gardă de căști exclusiv la REC, zero captare la Play, MediaRecorder real cu microfon virtual, permisiune refuzată, Stop/fundal și revizuire, trimitere multipart simulată cu fișier audio nenul, highlight pe cuvânt și reduced motion; UI AI cu răspunsuri simulate în ambele editoare. Browserul de test este mut. Nu se trimit fișiere sau chei către furnizor și nu se verifică automat calitatea perceptivă a reverbului/transcrierii reale.

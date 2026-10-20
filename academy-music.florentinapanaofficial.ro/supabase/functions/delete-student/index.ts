@@ -71,6 +71,7 @@ Deno.serve(async (request) => {
   }
 
   const authClient = createClient(supabaseUrl, anonKey, {
+    global: { headers: { Authorization: authorization } },
     auth: { persistSession: false, autoRefreshToken: false },
   });
   const token = authorization.slice('Bearer '.length);
@@ -78,6 +79,10 @@ Deno.serve(async (request) => {
   if (authError || !authData.user) {
     return respond(request, { error: 'Sesiune invalidă. Autentifică-te din nou.' }, 401);
   }
+
+  const { data: allowed, error: securityError } = await authClient.rpc('academy_session_allowed');
+  if (securityError) return respond(request, { error: 'Verificarea securității nu este disponibilă.' }, 503);
+  if (allowed !== true) return respond(request, { error: 'Sesiune revocată sau cont blocat.' }, 403);
 
   const admin = createClient(supabaseUrl, serviceRoleKey, {
     auth: { persistSession: false, autoRefreshToken: false },

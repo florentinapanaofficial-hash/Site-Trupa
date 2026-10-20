@@ -1,159 +1,115 @@
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useLayoutEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { BookOpen, Home, Mic2, Piano, Music2, Library, Puzzle, FolderOpen, Users, Settings, Menu } from 'lucide-react';
 import { useAuth } from '../lib/auth';
 import { logEvent } from '../lib/activity';
+import { useTeacherMode } from '../lib/useTeacherMode';
 import TeacherModeToggle from './TeacherModeToggle';
+import Spinner from './ui/Spinner';
 
-const STUDENT_LINKS = [
-    { to: '/', label: 'Acasă', icon: '🏠', end: true },
-    { to: '/repertoriul-meu', label: 'Repertoriul meu', icon: '🎼' },
-    { to: '/red', label: 'RED', icon: '📚' },
-    { to: '/jocuri', label: 'Jocuri', icon: '🧩' },
-    { to: '/portofoliu', label: 'Portofoliu', icon: '📁' },
-    { to: '/cursuri-online/', label: 'Cursuri online / grupe de elevi' },
-    { to: '/orga/', label: 'Orgă' },
-    { to: '/canto/', label: 'Canto' },
+const SHARED_LINKS = [
+    { to: '/red/', label: 'Resurse de teorie', Icon: Library },
+    { to: '/jocuri/', label: 'Jocuri muzicale', Icon: Puzzle },
+    { to: '/portofoliu/', label: 'Portofoliu', Icon: FolderOpen },
+    { to: '/cursuri-online/', label: 'Cursuri online', Icon: Users },
 ];
 
 function initials(name, email) {
-    const source = (name || email || '?').trim();
-    const parts = source.split(/\s+/).filter(Boolean);
-    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
-    return source.slice(0, 2).toUpperCase();
+    const parts = (name || email || '?').trim().split(/\s+/).filter(Boolean);
+    return parts.length >= 2 ? (parts[0][0] + parts[1][0]).toUpperCase() : (parts[0] || '?').slice(0, 2).toUpperCase();
 }
 
 export default function Layout() {
     const { profile, user, isTeacher, isInspector, signOut } = useAuth();
+    const [teacherMode] = useTeacherMode();
     const location = useLocation();
     const navigate = useNavigate();
     const [menuOpen, setMenuOpen] = useState(false);
+    const [signOutError, setSignOutError] = useState('');
+    const path = location.pathname;
+    const isCanto = path === '/canto' || path.startsWith('/canto/');
+    const isInstrument = path === '/instrument' || path.startsWith('/instrument/');
+    const isSelection = path.replace(/\/$/, '') === '/dashboard';
 
+    useLayoutEffect(() => { setMenuOpen(false); }, [path]);
     useEffect(() => {
-        setMenuOpen(false);
-        logEvent(profile?.id, 'page_view', location.pathname);
-    }, [location.pathname, profile?.id]);
+        logEvent(profile?.id, 'page_view', path);
+    }, [path, profile?.id]);
+    useEffect(() => {
+        if (!menuOpen) return undefined;
+        function closeOnEscape(event) { if (event.key === 'Escape') setMenuOpen(false); }
+        document.addEventListener('keydown', closeOnEscape);
+        return () => document.removeEventListener('keydown', closeOnEscape);
+    }, [menuOpen]);
 
     async function handleSignOut() {
-        await signOut();
-        navigate('/login', { replace: true });
+        setSignOutError('');
+        try {
+            await signOut();
+            navigate('/login/', { replace: true });
+        } catch (error) {
+            console.error('[Academy] Deconectarea a eșuat:', error.message);
+            setSignOutError('Nu am putut încheia sesiunea. Încearcă din nou.');
+        }
     }
 
-    const linkClass = ({ isActive }) =>
-        `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${isActive
-            ? 'bg-brand-500/15 text-white ring-1 ring-brand-400/40'
-            : 'text-slate-400 hover:bg-white/5 hover:text-slate-100'
-        }`;
+    const linkClass = ({ isActive }) => `flex min-h-11 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${isActive
+        ? 'bg-brand-500/15 text-white ring-1 ring-brand-400/40'
+        : 'text-slate-300 hover:bg-white/5 hover:text-white'}`;
+
+    function navigation(mobile = false) {
+        const links = isCanto ? [{ to: '/canto/', label: 'Biblioteca Canto', Icon: Mic2 }]
+            : isInstrument ? [
+                { to: '/instrument/', label: 'Repertoriu și partituri', Icon: Music2, end: true },
+                { to: '/instrument/claviatura/', label: 'Claviatură virtuală', Icon: Piano },
+            ] : [];
+        return <>
+            <nav aria-label={mobile ? 'Navigare mobilă' : 'Navigare principală'} className="mt-6 space-y-1">
+                <NavLink to="/dashboard/" end className={linkClass}><Home size={19} aria-hidden="true" />Alege disciplina</NavLink>
+                {links.length > 0 && <div className="py-3">
+                    <p className="mb-3 px-3 text-xs font-semibold uppercase tracking-widest text-gold-300">{isCanto ? 'Canto' : 'Instrument-Orgă'}</p>
+                    {links.map(({ to, label, Icon, end }) => <NavLink key={to} to={to} end={end} className={linkClass}><Icon size={19} aria-hidden="true" />{label}</NavLink>)}
+                </div>}
+                {!isSelection && <div className="border-t border-white/10 pt-3">
+                    {SHARED_LINKS.map(({ to, label, Icon }) => <NavLink key={to} to={to} className={linkClass}><Icon size={19} aria-hidden="true" />{label}</NavLink>)}
+                    {!isCanto && !isInstrument && <NavLink to="/repertoriul-meu/" className={linkClass}><Music2 size={19} aria-hidden="true" />Repertoriul meu</NavLink>}
+                </div>}
+                {isTeacher && teacherMode && <NavLink to="/admin/" className={linkClass}><Settings size={19} aria-hidden="true" />Panou profesor</NavLink>}
+                <a href="https://revista.florentinapanaofficial.ro/" target="_blank" rel="noopener noreferrer" className="mt-5 flex min-h-12 items-center gap-3 rounded-xl border border-gold-400/30 bg-gold-400/10 px-3 py-3 text-sm font-bold tracking-wider text-gold-300 transition hover:bg-gold-400/20"><BookOpen size={22} aria-hidden="true" />REVISTA<span className="sr-only"> (se deschide într-un tab nou)</span></a>
+            </nav>
+            {isTeacher && <div className="mt-6 rounded-xl border border-gold-500/25 bg-gold-500/5 p-3"><TeacherModeToggle /></div>}
+        </>;
+    }
 
     return (
-        <div className="min-h-screen lg:flex">
-            <aside className="hidden w-64 shrink-0 border-r border-white/10 bg-ink-900/60 p-4 lg:block">
+        <div className="min-h-screen lg:flex lg:items-start">
+            <aside aria-label="Meniu lateral" className="sticky top-0 hidden h-screen w-64 shrink-0 self-start overflow-y-auto border-r border-white/10 bg-ink-900/60 p-4 lg:block">
                 <Brand />
-                <nav className="mt-6 space-y-1">
-                    <a href="/revista/" className="block px-3 py-2.5 text-sm font-medium text-gold-400">Revista</a>
-                    <a href="/studio/" className="block px-3 py-2.5 text-sm font-medium text-gold-400">Studio</a>
-                    {STUDENT_LINKS.map((link) => (
-                        <NavLink key={link.to} to={link.to} end={link.end} className={linkClass}>
-                            <span aria-hidden="true">{link.icon}</span>
-                            {link.label}
-                        </NavLink>
-                    ))}
-                    {isTeacher && (
-                        <>
-                            <NavLink to="/admin" className={linkClass}>
-                                <span aria-hidden="true">⚙️</span>
-                                Panou profesor
-                            </NavLink>
-                        </>
-                    )}
-                </nav>
-
-                {isTeacher && (
-                    <div className="mt-6 rounded-xl border border-gold-500/25 bg-gold-500/5 p-3">
-                        <TeacherModeToggle />
-                    </div>
-                )}
+                {navigation()}
             </aside>
-
-            <div className="flex min-w-0 flex-1 flex-col">
-                <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-white/10 bg-ink-950/90 px-4 py-3 backdrop-blur">
-                    <div className="lg:hidden">
-                        <Brand compact />
-                    </div>
-
-                    <div className="ml-auto flex items-center gap-3">
-                        <div className="hidden text-right sm:block">
-                            <p className="text-sm font-semibold text-slate-100">
-                                {profile?.full_name || user?.email}
-                            </p>
-                            <p className="text-xs text-slate-500">
-                                {isTeacher ? 'Profesor' : isInspector ? 'Inspector' : 'Elev'} · Palatul Copiilor Pitești
-                            </p>
+            <div className="flex min-w-0 flex-1 flex-col self-stretch">
+                <header className="sticky top-0 z-30 border-b border-white/10 bg-ink-950/95 backdrop-blur">
+                    <div className="flex items-center justify-between gap-3 px-4 py-3">
+                        <div className="lg:hidden"><Brand compact /></div>
+                        <div className="ml-auto flex items-center gap-3">
+                            <div className="hidden text-right sm:block"><p className="text-sm font-semibold text-slate-100">{profile?.full_name || user?.email}</p><p className="text-xs text-slate-400">{isTeacher ? 'Profesor' : isInspector ? 'Inspector' : 'Elev'} · Palatul Copiilor Pitești</p></div>
+                            <span className="hidden size-10 place-items-center rounded-full bg-brand-500/20 text-sm font-bold text-brand-200 sm:grid">{initials(profile?.full_name, user?.email)}</span>
+                            <button type="button" className="btn-ghost px-3 py-2" onClick={handleSignOut}>Ieșire</button>
+                            <button type="button" className="btn-ghost px-3 py-2 lg:hidden" onClick={() => setMenuOpen((open) => !open)} aria-expanded={menuOpen} aria-controls="academy-mobile-menu" aria-label="Meniu"><Menu size={22} aria-hidden="true" /></button>
                         </div>
-                        <span className="grid h-10 w-10 place-items-center rounded-full bg-brand-500/20 text-sm font-bold text-brand-200">
-                            {initials(profile?.full_name, user?.email)}
-                        </span>
-                        <button type="button" className="btn-ghost px-3 py-2" onClick={handleSignOut}>
-                            Ieșire
-                        </button>
-                        <button
-                            type="button"
-                            className="btn-ghost px-3 py-2 lg:hidden"
-                            onClick={() => setMenuOpen((open) => !open)}
-                            aria-expanded={menuOpen}
-                            aria-label="Meniu"
-                        >
-                            ☰
-                        </button>
                     </div>
+                    {menuOpen && <div id="academy-mobile-menu" className="max-h-[calc(100dvh-5rem)] overflow-y-auto border-t border-white/10 bg-ink-900 px-4 pb-5 lg:hidden">{navigation(true)}</div>}
                 </header>
-
-                {menuOpen && (
-                    <nav className="space-y-1 border-b border-white/10 bg-ink-900 p-4 lg:hidden">
-                        <a href="/revista/" className="block px-3 py-2.5 text-sm font-medium text-gold-400">Revista</a>
-                        <a href="/studio/" className="block px-3 py-2.5 text-sm font-medium text-gold-400">Studio</a>
-                        {STUDENT_LINKS.map((link) => (
-                            <NavLink key={link.to} to={link.to} end={link.end} className={linkClass}>
-                                <span aria-hidden="true">{link.icon}</span>
-                                {link.label}
-                            </NavLink>
-                        ))}
-                        {isTeacher && (
-                            <>
-                                <NavLink to="/admin" className={linkClass}>
-                                    <span aria-hidden="true">⚙️</span>
-                                    Panou profesor
-                                </NavLink>
-                                <div className="mt-3 rounded-xl border border-gold-500/25 bg-gold-500/5 p-3">
-                                    <TeacherModeToggle />
-                                </div>
-                            </>
-                        )}
-                    </nav>
-                )}
-
+                {signOutError && <p role="alert" className="mx-4 mt-4 rounded-xl border border-rose-300/30 bg-rose-300/10 p-3 text-sm text-rose-100">{signOutError}</p>}
                 <main className="mx-auto w-full max-w-6xl flex-1 p-4 sm:p-6">
-                    <Outlet />
+                    <Suspense fallback={<Spinner label="Se încarcă disciplina…" />}><Outlet /></Suspense>
                 </main>
-
-                <footer className="border-t border-white/10 px-4 py-5 text-center text-xs text-slate-500">
-                    Academy Music · Florentina Pană · Palatul Copiilor Pitești — materialele sunt protejate
-                    prin drept de autor și destinate exclusiv elevilor înscriși.
-                </footer>
+                <footer className="border-t border-white/10 px-4 py-5 text-center text-xs text-slate-400">Academy Music · Florentina Pană · Palatul Copiilor Pitești — materialele sunt protejate prin drept de autor și destinate exclusiv elevilor înscriși.</footer>
             </div>
         </div>
     );
 }
 
 function Brand({ compact = false }) {
-    return (
-        <div className="flex items-center gap-3">
-            <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-brand-500 to-gold-500 text-lg">
-                🎵
-            </span>
-            <div>
-                <p className="font-display text-lg leading-tight text-white">Academy Music</p>
-                {!compact && <p className="text-xs text-slate-500">Palatul Copiilor Pitești</p>}
-            </div>
-        </div>
-    );
+    return <div className="flex min-w-0 items-center gap-3"><span aria-hidden="true" className="grid size-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand-500 to-gold-500 text-lg">♫</span><div><p className="font-display text-base leading-tight text-white sm:text-lg">Academy Music</p>{!compact && <p className="text-xs text-slate-400">Palatul Copiilor Pitești</p>}</div></div>;
 }

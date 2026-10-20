@@ -1,19 +1,26 @@
-import { useEffect, useState } from 'react';
+import { useTeacherMode } from '../lib/useTeacherMode';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FileText, Plus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../lib/auth';
-import { CANTO_VARIANTS } from '../lib/canto';
-import CantoAudio from '../components/CantoAudio';
+import CantoPieceStudio from '../components/CantoPieceStudio';
 import Modal from '../components/ui/Modal';
 import Spinner from '../components/ui/Spinner';
 
+const RecordingStudio = lazy(() => import('../components/RecordingStudio'));
+const SecurePdfViewer = lazy(() => import('../components/SecurePdfViewer'));
+
 export default function Canto() {
-    const { isTeacher } = useAuth();
+    const { isTeacher: teacherRole, profile, isInspector } = useAuth();
+    const [teacherMode] = useTeacherMode();
+    const isTeacher = teacherRole && teacherMode;
     const [pieces, setPieces] = useState(null);
     const [error, setError] = useState('');
     const [search, setSearch] = useState('');
     const [group, setGroup] = useState('');
+    const [recordingPiece, setRecordingPiece] = useState(null);
+    const [score, setScore] = useState(null);
     const [lyrics, setLyrics] = useState(null);
 
     async function load() {
@@ -58,15 +65,21 @@ export default function Canto() {
             {error && <div role="alert" className="text-sm text-brand-200">{error} <button type="button" className="btn-ghost" onClick={load}>Reîncearcă</button></div>}
             {pieces === null ? <Spinner label="Se încarcă Canto…" /> : !error && !filtered.length ? <p className="text-slate-400">Nicio piesă găsită.</p> : (
                 <div className="divide-y divide-white/10">
-                    {filtered.map((piece) => <article key={piece.id} className="grid min-w-0 gap-4 py-5 xl:grid-cols-[minmax(160px,1fr)_minmax(210px,1fr)_minmax(210px,1fr)_auto] xl:items-center">
-                        <div className="min-w-0"><h2 className="break-words text-lg font-semibold text-white">{piece.title}</h2><p className="mt-1 break-words text-sm text-slate-400">{piece.grupa || 'Fără grupă'}</p></div>
-                        {CANTO_VARIANTS.map((variant) => <div key={variant.key} className="min-w-0"><p className="mb-2 text-xs font-semibold text-slate-300">{variant.label}</p><CantoAudio piece={piece} variant={variant} /></div>)}
+                    {filtered.map((piece) => <article key={piece.id} className="card my-5 min-w-0 space-y-4 border border-white/10 bg-gradient-to-br from-ink-900 to-ink-950">
+                        <div className="min-w-0"><h2 className="break-words text-lg font-semibold text-white">{piece.title}</h2><p className="mt-1 break-words text-sm text-slate-400">{piece.grupa || 'Fără grupă'}</p>{piece.description && <p className="mt-2 text-sm text-slate-300">{piece.description}</p>}</div>
+                        <CantoPieceStudio piece={piece} />
+                        {!isInspector && <button type="button" className="btn-gold" onClick={() => { document.querySelectorAll("audio").forEach(audio => audio.pause()); setRecordingPiece(piece); }}>REC · Înregistrează tema</button>}
+                        {piece.score_path && <button type="button" className="btn-ghost justify-self-start" onClick={() => setScore(piece)}>Vezi partitura</button>}
                         <button type="button" className="btn-ghost inline-flex items-center justify-center gap-2 justify-self-start" disabled={!piece.versuri_text} aria-label={`Vezi versuri — ${piece.title}`} onClick={() => setLyrics(piece)}><FileText size={16} aria-hidden="true" /> Vezi versuri</button>
                     </article>)}
                 </div>
             )}
+            {recordingPiece && <Suspense fallback={<Spinner label="Se încarcă studioul de înregistrare…" />}><RecordingStudio open piece={recordingPiece} onClose={() => setRecordingPiece(null)} /></Suspense>}
             <Modal open={Boolean(lyrics)} title={lyrics?.title || 'Versuri'} onClose={() => setLyrics(null)} wide>
                 <div className="max-h-[65vh] overflow-y-auto whitespace-pre-wrap break-words text-base leading-8 text-slate-100" tabIndex={0} aria-label="Versurile piesei">{lyrics?.versuri_text}</div>
+            </Modal>
+            <Modal open={Boolean(score)} title={score ? `Partitura — ${score.title}` : "Partitură"} onClose={() => setScore(null)} wide>
+                {score && <Suspense fallback={<Spinner label="Se încarcă partitura…" />}><SecurePdfViewer path={score.score_path} watermark={profile?.full_name || "Academy Music"} /></Suspense>}
             </Modal>
         </section>
     );

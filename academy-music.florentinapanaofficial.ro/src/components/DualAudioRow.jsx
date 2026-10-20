@@ -1,5 +1,5 @@
 import SecureAudioPlayer from './SecureAudioPlayer';
-import CantoAudio from './CantoAudio';
+import PieceAudio from './PieceAudio';
 import { VARIANT_LIST, resolveAudioSource } from '../lib/pieces';
 
 export default function DualAudioRow({
@@ -71,7 +71,7 @@ export default function DualAudioRow({
                             </p>
 
                             {piece.discipline === 'canto' ? (
-                                <CantoAudio piece={piece} variant={{ ...variant, url: variant.urlColumn, path: variant.pathColumn }} />
+                                <PieceAudio piece={piece} variant={{ ...variant, url: variant.urlColumn, path: variant.pathColumn }} />
                             ) : source ? (
                                 <SecureAudioPlayer
                                     audioUrl={source.value}

@@ -17,7 +17,7 @@ import { generateKeyPairSync } from 'node:crypto';
 import { loginEmailForIdentity, signInWithIdentity } from './studentCredentials.js';
 import { runInNewContext } from 'node:vm';
 import { transformWithEsbuild } from 'vite';
-import { cantoPayload, saveCantoPiece, validateCantoMp3, MAX_CANTO_MP3 } from './canto.js';
+import { cantoPayload, saveCantoPiece, saveMusicPiece, saveStudyResource, validateScorePdf, validateCantoMp3, MAX_CANTO_MP3 } from './canto.js';
 
 test('Canto validates text and MP3, preserves unchanged audio and rolls back new uploads on failure', async () => {
     const form = { title: ' Titlu manual ', grupa: ' Grupa 1 ', versuri_text: 'Strofa 1\n\n<script>text</script>', positive_url: 'https://cdn.example/voice.mp3', negative_url: '', is_published: true };
@@ -99,6 +99,7 @@ test('Canto migration is repeatable, preserves pieces and uses caller RLS in its
 test('create-student requires an active teacher and stores synthetic email and real metadata', async () => {
     let handler;
     let role = 'teacher';
+    let sessionAllowed = true;
     let active = true;
     let duplicate = false;
     let profileFailure = false;
@@ -125,11 +126,15 @@ test('create-student requires an active teacher and stores synthetic email and r
     runInNewContext(transformed.code, {
         Request, Response, Set,
         Deno: { env: { get: (name) => name }, serve: (callback) => { handler = callback; } },
-        createClient: (_url, key) => key === 'SUPABASE_SERVICE_ROLE_KEY' ? admin : { auth: { getUser: async () => ({ data: { user: { id: 'teacher' } } }) } },
+        createClient: (_url, key) => key === 'SUPABASE_SERVICE_ROLE_KEY' ? admin : { rpc: async () => ({ data: sessionAllowed }), auth: { getUser: async () => ({ data: { user: { id: 'teacher' } } }) } },
     });
     const input = { firstName: 'Andrei', lastName: 'Popescu', username: 'andrei.popescu', password: 'ParolaTest!1234' };
     const request = (body = input, authorization = 'Bearer session') => new Request('https://academy.example/create-student', { method: 'POST', headers: { Authorization: authorization, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     assert.equal((await handler(request(input, ''))).status, 401);
+    sessionAllowed = false;
+    assert.equal((await handler(request())).status, 403);
+    assert.equal(creations.length, 0);
+    sessionAllowed = true;
     role = 'student';
     assert.equal((await handler(request())).status, 403);
     role = 'teacher'; active = false;
@@ -141,7 +146,7 @@ test('create-student requires an active teacher and stores synthetic email and r
     duplicate = false;
     assert.equal(creations.length, 0);
     assert.equal((await handler(request())).status, 201);
-    assert.deepEqual(JSON.parse(JSON.stringify(creations[0])), { email: loginEmailForIdentity(input.username), password: input.password, email_confirm: true, user_metadata: { full_name: 'Andrei Popescu' } });
+    assert.deepEqual(JSON.parse(JSON.stringify(creations[0])), { email: loginEmailForIdentity(input.username), password: input.password, email_confirm: true, app_metadata: { academy_provisioned: true }, user_metadata: { full_name: 'Andrei Popescu' } });
     assert.deepEqual(JSON.parse(JSON.stringify(profiles[0])), { full_name: 'Andrei Popescu', username: 'andrei.popescu', role: 'student' });
     profileFailure = true;
     assert.equal((await handler(request())).status, 500);
@@ -743,4 +748,62 @@ test('online and catalog RLS isolate students, deny inspector writes and preserv
         assert.equal((await db.query('select * from catalog_teme')).rows.length, 0);
         await assert.rejects(db.query(`insert into catalog_teme(student_id,student_name,drive_url) values('${student}','','https://drive.google.com/file/d/inactive-file/view')`), /row-level security/);
     } finally { await db.close(); }
+});
+
+test('music UPDATE preserves row identity, assignments and existing files; validates PDF and rolls back only new uploads', async () => {
+    const existing = { id: 'existing-piece', discipline: 'orga', audio_pozitiv_path: 'old/positive.mp3', score_path: 'old/score.pdf', created_by: 'original-teacher' };
+    const form = { title: 'Updated title', description: 'Updated study notes', level: 'mediu', tags: 'legato, ritm', versuri_text: '[00:01.00]Strofa', positive_url: '', negative_url: '', is_published: true };
+    const mp3 = new File(['ID3valid-audio'], 'negative.mp3', { type: 'audio/mpeg' });
+    const pdf = new File(['%PDF-1.7 valid-score'], 'score.pdf', { type: 'application/pdf' });
+    const uploaded = [], removed = [], filters = [];
+    let writes = 0, failed = false, payload;
+    const query = { eq: (key,value) => { filters.push([key,value]); return query; }, select: () => ({ single: async () => ({ data: failed ? null : { ...existing, ...payload }, error: failed ? { message: 'denied' } : null }) }) };
+    const options = {
+        client: { from: table => { assert.equal(table, 'pieces'); return { update: value => { writes++; payload = value; return query; }, insert: () => { throw Error('must UPDATE, never INSERT'); } }; } },
+        upload: async path => { uploaded.push(path); }, removeUploaded: async paths => { removed.push(...paths); }, form, piece: existing, userId: 'teacher',
+    };
+    const saved = await saveMusicPiece({ ...options, files: { negativ: mp3 } });
+    assert.equal(saved.id, existing.id);
+    assert.equal(saved.audio_pozitiv_path, existing.audio_pozitiv_path);
+    assert.equal(saved.score_path, existing.score_path);
+    assert.equal(saved.created_by, existing.created_by);
+    assert.equal(payload.versuri_text, '[00:01.00]Strofa');
+    assert.equal('created_by' in payload, false);
+    assert.equal('score_path' in payload, false);
+    assert.match(payload.audio_negativ_path, /^orga\/[a-f0-9-]+\/negativ.mp3$/);
+    assert.deepEqual(filters, [['id','existing-piece'],['discipline','orga']]);
+    const scoreUpdate = await saveMusicPiece({ ...options, files: { score: pdf } });
+    assert.match(scoreUpdate.score_path, /^orga\/[a-f0-9-]+\/score.pdf$/);
+    assert.equal(scoreUpdate.audio_pozitiv_path, existing.audio_pozitiv_path);
+    await assert.rejects(validateScorePdf(new File(['not pdf'], 'false.pdf', { type: 'application/pdf' })), /antet PDF/);
+    const before = writes;
+    await assert.rejects(saveMusicPiece({ ...options, files: { score: new File(['invalid'], 'score.pdf', { type: 'application/pdf' }) } }));
+    assert.equal(writes, before);
+    const successfulUploads = uploaded.length;
+    failed = true;
+    await assert.rejects(saveMusicPiece({ ...options, files: { pozitiv: mp3, score: pdf } }));
+    assert.deepEqual(removed, uploaded.slice(successfulUploads));
+    assert.equal(removed.includes(existing.score_path), false);
+    assert.equal(removed.includes(existing.audio_pozitiv_path), false);
+    await assert.rejects(saveMusicPiece({ ...options, piece: { ...existing, discipline: 'canto' } }), /Disciplină/);
+});
+
+
+test('RED resource update preserves existing PDF and cleans up a new PDF if database update is rejected', async () => {
+    const resource = { id: 'resource', file_path: 'old/resource.pdf' };
+    const form = { title: 'Lecție', discipline: 'comun', category: 'fisa-teoretica', description: 'Teorie', external_url: '' };
+    let payload, failed = false;
+    const removed = [], uploaded = [];
+    const query = { eq: (key,id) => { assert.equal(key, 'id'); assert.equal(id, resource.id); return query; }, select: () => ({ single: async () => ({ data: failed ? null : { ...resource, ...payload }, error: failed ? { message: 'denied' } : null }) }) };
+    const options = { resource, form, userId: 'teacher', client: { from: table => { assert.equal(table, 'resources'); return { update: value => { payload=value; return query; } }; } }, upload: async path => uploaded.push(path), removeUploaded: async paths => removed.push(...paths) };
+    const saved = await saveStudyResource(options);
+    assert.equal(saved.file_path, resource.file_path);
+    assert.equal('file_path' in payload, false);
+    assert.equal('created_by' in payload, false);
+    const pdf = new File(['%PDF-1.7 lesson'], 'lesson.pdf', { type: 'application/pdf' });
+    failed = true;
+    await assert.rejects(saveStudyResource({ ...options, file: pdf }));
+    assert.deepEqual(removed, uploaded);
+    assert.equal(removed.includes(resource.file_path), false);
+    await assert.rejects(saveStudyResource({ ...options, form: { ...form, external_url: 'javascript:alert(1)' } }));
 });

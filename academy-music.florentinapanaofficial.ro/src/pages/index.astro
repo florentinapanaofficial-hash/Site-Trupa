@@ -1,9 +1,164 @@
 ---
 import AcademyLayout from '../layouts/AcademyLayout.astro';
+
+const title = 'Academy Music – Suport educațional pentru performanță';
+const description = 'Descoperă Academy Music: lecții de canto și orgă, exerciții interactive și resurse de teorie muzicală. Intră în clasa virtuală și începe studiul!';
+const features = [
+    { number: '01', title: 'Învață în ritmul tău', text: 'Revino la lecții și aprofundează noțiunile muzicale, pas cu pas.' },
+    { number: '02', title: 'Transformă teoria în practică', text: 'Completează studiul cu exerciții, claviatură virtuală și unelte interactive.' },
+    { number: '03', title: 'Păstrează legătura cu muzica', text: 'Continuă pregătirea dintre lecții, cu materialele și îndrumarea profesorului.' },
+];
 ---
-<AcademyLayout>
-    <div id="root"></div>
-    <script>
-        import '../main.jsx';
-    </script>
+<AcademyLayout title={title} description={description}>
+    <a href="#continut" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-gold-400 focus:p-3 focus:text-ink-950">Sari la conținut</a>
+    <div class="landing-shell overflow-hidden">
+        <header class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-6 sm:px-8">
+            <a href="/" aria-label="Academy Music – pagina de start" class="flex items-center gap-3">
+                <span aria-hidden="true" class="grid size-11 place-items-center rounded-2xl border border-gold-400/30 bg-gold-400/10 text-2xl text-gold-300">♫</span>
+                <span class="text-lg font-semibold tracking-tight">Academy <span class="text-gold-300">Music</span><span class="block text-[10px] font-medium uppercase tracking-[0.25em] text-slate-400">Spațiul tău de studiu muzical</span></span>
+            </a>
+            <nav aria-label="Navigare principală" class="flex items-center gap-5">
+                <a href="#cum-inveti" class="hidden text-sm text-slate-300 transition hover:text-white md:inline">Cum înveți</a>
+                <a href="#e-learning" class="hidden text-sm text-slate-300 transition hover:text-white md:inline">E-Learning</a>
+                <a href="/login/" class="btn-ghost">Intră în cont <span aria-hidden="true">↗</span></a>
+            </nav>
+        </header>
+
+        <main id="continut">
+            <p data-session-error role="alert" hidden class="mx-auto max-w-7xl rounded-xl border border-rose-300/30 bg-rose-300/10 px-5 py-4 text-sm text-rose-100"></p>
+            <section aria-labelledby="hero-title" class="relative mx-auto grid max-w-7xl items-center gap-14 px-5 pb-20 pt-12 sm:px-8 sm:pt-20 lg:grid-cols-[1.1fr_1fr] lg:gap-16 lg:pb-28">
+                <div>
+                    <p class="mb-6 inline-flex items-center gap-2 rounded-full border border-gold-400/20 bg-gold-400/5 px-4 py-2 text-xs font-medium tracking-wide text-gold-300"><span aria-hidden="true" class="size-1.5 rounded-full bg-gold-400"></span>Educație muzicală, dincolo de sala de curs</p>
+                    <h1 id="hero-title" class="max-w-2xl text-4xl leading-[1.12] sm:text-5xl lg:text-[3.4rem]">Academy Music <span class="mt-3 block text-gold-300">Suport educațional pentru performanță</span></h1>
+                    <p class="mt-7 max-w-xl text-base leading-relaxed text-slate-300 sm:text-lg">Muzica se învață cu pasiune, exercițiu și îndrumare. Aici găsești suport digital, lecții și unelte interactive pentru studiul de canto și instrument-orgă.</p>
+                    <div class="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                        <a href="/login/" class="btn-gold min-h-14 px-6 text-base">Începe Pregătirea Muzicală <span aria-hidden="true">→</span></a>
+                        <a href="https://florentinapanaofficial.ro/" class="btn-ghost min-h-14 px-6">Vizitează Site-ul <span aria-hidden="true">↗</span></a>
+                    </div>
+                    <p class="mt-5 text-xs leading-relaxed text-slate-400">Ai deja cont de elev? Folosește datele primite de la profesor.<br />Ești părinte? <a href="/register/" class="text-gold-300 underline decoration-gold-400/40 underline-offset-4 hover:text-white">Înregistrează elevul cu acord parental.</a></p>
+                    <div class="mt-9 flex flex-wrap gap-x-6 gap-y-3 border-t border-white/10 pt-6 text-xs font-medium text-slate-300">
+                        <span><span aria-hidden="true" class="mr-2 text-gold-300">✦</span>Canto & instrument-orgă</span>
+                        <span><span aria-hidden="true" class="mr-2 text-teal-300">✦</span>Teorie & practică</span>
+                        <span><span aria-hidden="true" class="mr-2 text-rose-300">✦</span>Studiu ghidat</span>
+                    </div>
+                </div>
+
+                <div class="music-stage relative mx-auto w-full max-w-lg rounded-[2rem] border border-white/15 bg-ink-900 p-5 shadow-2xl shadow-black/40 sm:p-7">
+                    <div class="mb-7 flex items-center justify-between gap-3 text-xs">
+                        <span class="flex items-center gap-2 uppercase tracking-[0.2em] text-slate-400"><span aria-hidden="true" class="size-2 rounded-full bg-teal-300"></span>Explorează Academy</span>
+                        <span class="rounded-full bg-white/5 px-3 py-1.5 text-slate-300">Prezentare</span>
+                    </div>
+                    <div data-music-showcase role="region" aria-roledescription="carusel" aria-label="Descoperă modurile de studiu">
+                        <div class="showcase-visual relative grid h-60 place-items-center overflow-hidden rounded-2xl border border-white/10 sm:h-72" aria-hidden="true">
+                            <div class="music-orbit absolute size-48 rounded-full border border-gold-400/20"></div>
+                            <div class="absolute size-64 rounded-full border border-gold-400/10"></div>
+                            <svg viewBox="0 0 220 180" class="relative z-10 h-44 w-56 text-gold-300" fill="none">
+                                <rect x="87" y="22" width="46" height="86" rx="23" fill="currentColor" fill-opacity=".13" stroke="currentColor" stroke-width="3" />
+                                <path d="M75 80v7a35 35 0 0 0 70 0v-7M110 122v30M89 153h42M99 43h22M99 55h22M99 67h22" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                                <path d="M35 69v32M48 58v54M61 77v17M159 71v30M172 58v53M185 79v15" stroke="currentColor" stroke-opacity=".45" stroke-width="4" stroke-linecap="round" />
+                            </svg>
+                            <span class="absolute left-6 top-7 text-3xl text-teal-300">♪</span><span class="absolute bottom-6 right-8 text-4xl text-rose-300">♫</span>
+                        </div>
+                        <div class="pt-6" aria-live="polite" aria-atomic="true">
+                            <div data-slide>
+                                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-gold-300">01 / Canto</p>
+                                <h2 class="mt-2 text-2xl">Dă voce pasiunii tale.</h2>
+                                <p class="mt-3 min-h-16 text-sm leading-relaxed text-slate-300">Descoperă repertoriul și materialele de studiu care te ajută să exersezi între lecții.</p>
+                            </div>
+                            <div data-slide hidden>
+                                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-teal-300">02 / Instrument-orgă</p>
+                                <h2 class="mt-2 text-2xl">Fiecare clapă, un pas înainte.</h2>
+                                <p class="mt-3 min-h-16 text-sm leading-relaxed text-slate-300">Explorează notele, ritmul și exercițiile interactive pentru studiul instrumentului.</p>
+                            </div>
+                            <div data-slide hidden>
+                                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-rose-300">03 / Teorie muzicală</p>
+                                <h2 class="mt-2 text-2xl">Înțelege muzica pe care o cânți.</h2>
+                                <p class="mt-3 min-h-16 text-sm leading-relaxed text-slate-300">Leagă practica de teorie cu articole, explicații și resurse educaționale din revistă.</p>
+                            </div>
+                        </div>
+                        <div data-slide-controls hidden class="mt-5 flex-wrap items-center gap-2 border-t border-white/10 pt-5">
+                            {['Canto', 'Instrument-orgă', 'Teorie'].map((label, index) => (
+                                <button type="button" data-slide-button aria-pressed={index === 0 ? 'true' : 'false'} class="slide-button min-h-11 rounded-xl border border-white/10 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-gold-300/60">{label}</button>
+                            ))}
+                        </div>
+                    </div>
+                    <div aria-hidden="true" class="mt-6 flex h-9 items-center justify-center gap-1.5">
+                        {Array.from({ length: 23 }, (_, index) => <span class="music-bar w-1.5 rounded-full bg-gold-400/60" style={`--bar-height: ${12 + (index * 17 % 25)}px; --bar-delay: ${index * -0.13}s`}></span>)}
+                    </div>
+                </div>
+            </section>
+
+            <section id="cum-inveti" aria-labelledby="study-title" class="mx-auto max-w-7xl px-5 pb-20 sm:px-8">
+                <div class="mb-8 max-w-2xl"><p class="text-xs font-semibold uppercase tracking-[0.2em] text-gold-300">Mai aproape de muzică</p><h2 id="study-title" class="mt-3 text-3xl sm:text-4xl">Un spațiu pentru curiozitate și progres.</h2></div>
+                <div class="grid gap-4 md:grid-cols-3">
+                    {features.map((feature) => <article class="rounded-2xl border border-white/10 bg-white/[0.025] p-6"><span class="text-sm font-semibold text-gold-300">{feature.number} /</span><h3 class="mt-5 text-xl">{feature.title}</h3><p class="mt-3 text-sm leading-relaxed text-slate-300">{feature.text}</p></article>)}
+                </div>
+            </section>
+
+            <section id="e-learning" aria-labelledby="learning-title" class="mx-auto max-w-7xl px-5 pb-20 sm:px-8">
+                <div class="learning-card grid items-center gap-8 rounded-[2rem] border border-teal-300/20 p-7 sm:p-10 lg:grid-cols-[0.7fr_1.3fr] lg:gap-16">
+                    <div class="relative mx-auto grid h-48 w-full max-w-xs place-items-center rounded-2xl border border-teal-300/15 bg-ink-950/40" aria-hidden="true">
+                        <svg viewBox="0 0 220 150" class="w-56 max-w-full text-teal-200" fill="none">
+                            <path d="M110 124c-25-20-53-22-85-12V26c32-10 60-8 85 12 25-20 53-22 85-12v86c-32-10-60-8-85 12Z" fill="currentColor" fill-opacity=".07" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+                            <path d="M110 38v86M43 49c18-3 34 0 49 8M43 66c18-3 34 0 49 8M43 83c18-3 34 0 49 8M131 54h42M131 67h42M131 80h30" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                        <span class="absolute -right-2 top-4 rounded-xl border border-gold-400/20 bg-ink-900 px-4 py-2 text-2xl text-gold-300">♫</span>
+                    </div>
+                    <div><p class="text-xs font-semibold uppercase tracking-[0.2em] text-teal-200">Lecturi care inspiră</p><h2 id="learning-title" class="mt-3 text-3xl sm:text-4xl">E-Learning by Claudiu Pană</h2><p class="mt-5 max-w-2xl leading-relaxed text-slate-300">Descoperă materiale teoretice, sfaturi de studiu și articole informative menite să îți completeze educația muzicală.</p><a href="https://revista.florentinapanaofficial.ro/" target="_blank" rel="noopener noreferrer" class="btn-ghost mt-7 min-h-12 border-teal-300/30 text-teal-100">Explorează Revista <span aria-hidden="true">↗</span><span class="sr-only"> (se deschide într-un tab nou)</span></a></div>
+                </div>
+            </section>
+        </main>
+        <footer class="mx-auto flex max-w-7xl flex-col gap-4 border-t border-white/10 px-5 py-7 text-xs leading-relaxed text-slate-400 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+            <p>Academy Music · Orgă și canto · Palatul Copiilor Pitești</p>
+            <div class="flex flex-wrap gap-5"><a href="https://florentinapanaofficial.ro/" class="hover:text-white">Site-ul oficial</a><a href="/login/" class="hover:text-white">Autentificare</a><a href="/register/" class="hover:text-white">Înregistrare cu acord parental</a></div>
+        </footer>
+    </div>
 </AcademyLayout>
+
+<script>
+    async function resumeSession() {
+        try {
+            if (!window.localStorage.getItem('academy-music-auth')) return;
+        } catch (error) {
+            if (!(error instanceof DOMException) || error.name !== 'SecurityError') throw error;
+            console.warn('[Academy landing] Stocarea locală nu este disponibilă; folosește autentificarea.');
+            return;
+        }
+        const { resumeLandingSession } = await import('../lib/landingSession');
+        await resumeLandingSession();
+    }
+    resumeSession().catch((error) => {
+        console.error('[Academy landing] Verificarea sesiunii a eșuat:', error.message);
+        const notice = document.querySelector<HTMLElement>('[data-session-error]');
+        if (notice) {
+            notice.textContent = 'Nu am putut verifica sesiunea salvată. Reîncarcă pagina sau folosește butonul Intră în cont.';
+            notice.hidden = false;
+        }
+    });
+    const showcase = document.querySelector('[data-music-showcase]');
+    if (showcase) {
+        const slides = [...showcase.querySelectorAll<HTMLElement>('[data-slide]')];
+        const buttons = [...showcase.querySelectorAll<HTMLButtonElement>('[data-slide-button]')];
+        const controls = showcase.querySelector<HTMLElement>('[data-slide-controls]');
+        buttons.forEach((button, index) => {
+            button.addEventListener('click', () => {
+                slides.forEach((slide, slideIndex) => { slide.hidden = slideIndex !== index; });
+                buttons.forEach((item, buttonIndex) => { item.setAttribute('aria-pressed', String(buttonIndex === index)); });
+            });
+        });
+        if (controls) { controls.hidden = false; controls.style.display = 'flex'; }
+    }
+</script>
+
+<style>
+    .landing-shell { background: radial-gradient(ellipse at 75% 15%, #d4a9330c, transparent 45%), radial-gradient(ellipse at 5% 55%, #c9344b0a, transparent 40%), #070609; }
+    .music-stage { background: linear-gradient(145deg, #201b23, #0d0c11 70%); }
+    .showcase-visual { background: radial-gradient(ellipse at center, #d4a93314, transparent 70%), #0d0c11; }
+    .learning-card { background: linear-gradient(115deg, #15342f70, #101617 60%, #0d0c11); }
+    .slide-button[aria-pressed='true'] { color: #f0d894; border-color: #e8c46880; background: #e8c46812; }
+    .music-bar { height: var(--bar-height); animation: music-pulse 1.6s ease-in-out var(--bar-delay) 3; transform-origin: center; }
+    .music-orbit { animation: music-glow 3s ease-in-out 1; }
+    @keyframes music-pulse { 0%, 100% { transform: scaleY(.45); } 50% { transform: scaleY(1); } }
+    @keyframes music-glow { 50% { transform: scale(1.08); opacity: .5; } }
+    @media (prefers-reduced-motion: reduce) { :global(html) { scroll-behavior: auto; } .music-bar, .music-orbit { animation: none; } }
+</style>

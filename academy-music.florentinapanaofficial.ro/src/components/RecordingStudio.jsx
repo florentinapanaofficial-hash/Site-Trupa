@@ -1,5 +1,6 @@
+import KaraokeLyrics from './KaraokeLyrics';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { supabase, BUCKET_PORTFOLIO } from '../lib/supabase';
+import { supabase, BUCKET_MEDIA, BUCKET_PORTFOLIO } from '../lib/supabase';
 import { useAuth } from '../lib/auth';
 import { getSignedUrl, safeFileName, uploadFile } from '../lib/media';
 import { resolveAudioSource } from '../lib/pieces';
@@ -16,6 +17,10 @@ import Modal from './ui/Modal';
 
 export default function RecordingStudio({ open, piece, onClose, onSubmitted }) {
     const { profile } = useAuth();
+    const [lyricTime, setLyricTime] = useState(0);
+    const [mix, setMix] = useState(0.2);
+    const captureRef = useRef(null);
+    const mountedRef = useRef(true);
     const [withVideo, setWithVideo] = useState(false);
     const [autoBacking, setAutoBacking] = useState(true);
     const [phase, setPhase] = useState('idle');
@@ -30,13 +35,15 @@ export default function RecordingStudio({ open, piece, onClose, onSubmitted }) {
     const timerRef = useRef(null);
     const previewRef = useRef(null);
 
-    const negativ = piece ? resolveAudioSource(piece, 'negativ') : null;
+    const negativ = piece ? resolveAudioSource(piece, 'negativ') || (piece.audio_negativ_path ? { kind: 'storage', value: piece.audio_negativ_path } : null) : null;
 
     const teardown = useCallback(() => {
         if (timerRef.current) {
             clearInterval(timerRef.current);
             timerRef.current = null;
         }
+        if (sessionRef.current) { sessionRef.current.recorder.onstop = null; sessionRef.current.recorder.ondataavailable = null; }
+        captureRef.current?.abort();
         sessionRef.current?.stopEverything();
         sessionRef.current = null;
     }, []);
@@ -47,7 +54,17 @@ export default function RecordingStudio({ open, piece, onClose, onSubmitted }) {
         return undefined;
     }, [open, teardown]);
 
-    useEffect(() => () => teardown(), [teardown]);
+    useEffect(() => {
+        mountedRef.current = true;
+        const hide = () => {
+            if (!document.hidden) return;
+            if (sessionRef.current) stop();
+            else if (captureRef.current && !captureRef.current.signal.aborted) { captureRef.current.abort(); setPhase('idle'); setNotice('Activarea a fost anulată deoarece aplicația a trecut în fundal.'); }
+        };
+        document.addEventListener('visibilitychange', hide);
+        window.addEventListener('pagehide', teardown);
+        return () => { mountedRef.current = false; teardown(); document.removeEventListener('visibilitychange', hide); window.removeEventListener('pagehide', teardown); };
+    }, [teardown]);
 
     useEffect(
         () => () => {
@@ -56,7 +73,20 @@ export default function RecordingStudio({ open, piece, onClose, onSubmitted }) {
         [result]
     );
 
+    useEffect(() => {
+        if (phase !== 'recording') return;
+        let frame;
+        const tick = () => {
+            const backing = sessionRef.current?.backing;
+            if (backing) setLyricTime(backing.currentTime);
+            frame = requestAnimationFrame(tick);
+        };
+        frame = requestAnimationFrame(tick);
+        return () => cancelAnimationFrame(frame);
+    }, [phase]);
+
     async function prepare() {
+        if (phase !== 'headphones') return;
         setError('');
         setNotice('');
 
@@ -66,35 +96,36 @@ export default function RecordingStudio({ open, piece, onClose, onSubmitted }) {
         }
 
         setPhase('preparing');
+        const abort = new AbortController(); captureRef.current = abort;
 
         try {
             let backingUrl = null;
             if (autoBacking && negativ) {
                 backingUrl =
-                    negativ.kind === 'url' ? negativ.value : await getSignedUrl('academy-media', negativ.value);
+                    negativ.kind === 'url' ? negativ.value : await getSignedUrl(BUCKET_MEDIA, negativ.value);
             }
 
-            const session = await createStudioSession({ withVideo, backingUrl });
+            if (abort.signal.aborted) return;
+            const session = await createStudioSession({ withVideo, backingUrl, mix, signal: abort.signal });
+            if (abort.signal.aborted || !mountedRef.current) { session.stopEverything(); return; }
             sessionRef.current = session;
-
-            if (backingUrl && !session.backingMixed) {
-                setNotice(
-                    'Negativul se aude, dar nu a putut fi inclus în înregistrare. Dă-l pe difuzor ca să se audă în temă.'
-                );
-            }
 
             if (withVideo && previewRef.current) {
                 previewRef.current.srcObject = session.userStream;
             }
 
-            setPhase('ready');
+            session.userStream.getTracks().forEach(track => track.addEventListener('ended', () => { stop(); setNotice('Dispozitivul a fost deconectat; înregistrarea s-a oprit.'); }, { once: true }));
+            session.context.addEventListener('statechange', () => { if (session.context.state === 'suspended' || session.context.state === 'interrupted') { stop(); setNotice('Înregistrarea a fost oprită deoarece dispozitivul audio a fost întrerupt.'); } });
+            start();
         } catch (err) {
+            if (abort.signal.aborted || !mountedRef.current) return;
+            teardown();
             const message =
                 err?.name === 'NotAllowedError'
                     ? 'Ai refuzat accesul la microfon. Permite-l din bara de adrese și încearcă din nou.'
                     : err?.name === 'NotFoundError'
                         ? 'Nu am găsit microfon sau cameră pe acest dispozitiv.'
-                        : 'Nu am putut porni înregistrarea.';
+                        : err?.message || 'Nu am putut porni înregistrarea.';
             setError(message);
             setPhase('idle');
         }
@@ -105,7 +136,7 @@ export default function RecordingStudio({ open, piece, onClose, onSubmitted }) {
         if (!session) return;
 
         chunksRef.current = [];
-        setElapsed(0);
+        setElapsed(0); setLyricTime(0);
         setError('');
 
         session.recorder.ondataavailable = (event) => {
@@ -113,7 +144,10 @@ export default function RecordingStudio({ open, piece, onClose, onSubmitted }) {
         };
 
         session.recorder.onstop = () => {
+            if (!mountedRef.current || captureRef.current?.signal.aborted) return;
             const blob = new Blob(chunksRef.current, { type: session.mimeType });
+            sessionRef.current = null; captureRef.current = null;
+            if (!blob.size) { setError('Înregistrarea este goală. Reîncearcă și înregistrează cel puțin o secundă.'); setPhase('idle'); return; }
             setResult({ blob, url: URL.createObjectURL(blob), mimeType: session.mimeType });
             setPhase('review');
         };
@@ -122,7 +156,7 @@ export default function RecordingStudio({ open, piece, onClose, onSubmitted }) {
 
         if (session.backing) {
             session.backing.currentTime = 0;
-            session.backing.play().catch(() => { });
+            session.backing.play().catch(() => { stop(); setError('Negativul nu a putut porni. Înregistrarea a fost oprită; reîncearcă sau înregistrează fără negativ.'); });
         }
 
         const startedAt = Date.now();
@@ -145,14 +179,14 @@ export default function RecordingStudio({ open, piece, onClose, onSubmitted }) {
         }
 
         session.backing?.pause();
-        if (session.recorder.state !== 'inactive') session.recorder.stop();
+        session.stopEverything();
     }
 
     function retry() {
         if (result?.url) URL.revokeObjectURL(result.url);
         setResult(null);
         setElapsed(0);
-        setPhase('ready');
+        setPhase('idle');
     }
 
     async function submit() {
@@ -268,11 +302,19 @@ export default function RecordingStudio({ open, piece, onClose, onSubmitted }) {
                             Folosește căști: altfel negativul intră a doua oară prin microfon și se aude dublat.
                         </p>
 
-                        <button type="button" className="btn-primary w-full" onClick={prepare}>
-                            Pregătește înregistrarea
+                        <button type="button" className="btn-primary w-full" onClick={() => setPhase('headphones')}>
+                            REC · Pregătește tema
                         </button>
                     </>
                 )}
+
+                {phase === 'headphones' && <div className="space-y-4">
+                    <h3 className="text-xl font-semibold text-gold-300">Regulă de studio</h3>
+                    <p>Regulă de studio: Pentru a evita microfonia (țiuitul) și a auzi negativul corect, conectează căștile cu microfon!</p>
+                    <p className="text-sm text-slate-300">Microfonul pornește numai după confirmare, pentru înregistrarea temei. Începe cu volumul redus. Aplicația nu poate verifica fizic căștile.</p>
+                    <button type="button" className="btn-gold" onClick={prepare}>Sunt gata, am conectat căștile!</button>
+                    <button type="button" className="btn-ghost ml-3" onClick={() => setPhase('idle')}>Anulează</button>
+                </div>}
 
                 {phase === 'preparing' && (
                     <p className="py-6 text-center text-sm text-slate-400">
@@ -280,7 +322,7 @@ export default function RecordingStudio({ open, piece, onClose, onSubmitted }) {
                     </p>
                 )}
 
-                {(phase === 'ready' || phase === 'recording') && (
+                {phase === 'recording' && (
                     <>
                         {withVideo && (
                             <video
@@ -301,17 +343,15 @@ export default function RecordingStudio({ open, piece, onClose, onSubmitted }) {
                                 <span className="font-mono text-lg text-white">{formatClock(elapsed)}</span>
                             </div>
 
-                            {phase === 'ready' ? (
-                                <button type="button" className="btn-primary" onClick={start}>
-                                    ● Start înregistrare
-                                </button>
-                            ) : (
-                                <button type="button" className="btn-ghost" onClick={stop}>
-                                    ■ Stop
-                                </button>
-                            )}
+                            <button type="button" className="btn-ghost" onClick={stop}>■ Stop</button>
                         </div>
 
+                        {piece?.versuri_text && <section className="space-y-3 rounded-xl border border-gold-400/20 p-4" aria-label="Versuri ajutătoare pentru temă">
+                            <h3 className="font-semibold text-gold-300">Versuri ajutătoare · doar vizual</h3>
+                            <p className="text-xs text-slate-300">{autoBacking && negativ ? 'Urmăresc negativul din înregistrare. Fișierul audio conține vocea și negativul, nu textul afișat.' : 'Fără negativ, versurile rămân vizibile fără sincronizare audio.'}</p>
+                            <KaraokeLyrics text={piece.versuri_text} time={autoBacking && negativ ? lyricTime : -1} />
+                        </section>}
+                        <label className="block text-sm text-slate-200">Reverb Dry/Wet · {Math.round(mix * 100)}%<input type="range" min="0" max="1" step="0.01" value={mix} className="mt-3 block w-full accent-gold-400" onChange={event => { const value = Number(event.target.value); setMix(value); sessionRef.current?.setMix(value); }} /></label>
                         <p className="text-xs text-slate-500">
                             Durata maximă este de 10 minute; înregistrarea se oprește singură la final.
                         </p>

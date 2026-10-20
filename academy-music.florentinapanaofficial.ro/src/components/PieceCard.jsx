@@ -1,3 +1,5 @@
+import PieceAudio from './PieceAudio';
+import { CANTO_VARIANTS } from '../lib/canto';
 import SecureAudioPlayer from './SecureAudioPlayer';
 import { resolveAudioSource } from '../lib/pieces';
 
@@ -32,6 +34,7 @@ export default function PieceCard({ piece, onOpenScore }) {
             {piece.description && <p className="text-sm text-slate-400">{piece.description}</p>}
 
             <div className="space-y-2">
+                {CANTO_VARIANTS.filter((variant) => !piece[variant.url] && piece[variant.path]).map((variant) => <div key={variant.key}><p className="mb-1 text-xs text-slate-300">{variant.label}</p><PieceAudio piece={piece} variant={variant} /></div>)}
                 {negativ && <SecureAudioPlayer audioUrl={negativ.value} label="Negativ (acompaniament)" />}
                 {pozitiv && (
                     <SecureAudioPlayer audioUrl={pozitiv.value} label="Pozitiv (cu voce ghid)" accent="gold" />

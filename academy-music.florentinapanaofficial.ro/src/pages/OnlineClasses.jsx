@@ -1,3 +1,4 @@
+import { useTeacherMode } from '../lib/useTeacherMode';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CalendarDays, Video, Plus, Pencil, Trash2, Save, X } from 'lucide-react';
@@ -8,7 +9,9 @@ const DAYS = ['Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă', 'Dumi
 const blank = { id: null, name: '', weekday: 1, start_time: '16:00', duration_minutes: 60, students: [] };
 
 export default function OnlineClasses() {
-    const { isTeacher, isInspector } = useAuth();
+    const { isTeacher: teacherRole, isInspector } = useAuth();
+    const [teacherMode] = useTeacherMode();
+    const isTeacher = teacherRole && teacherMode;
     const [groups, setGroups] = useState(null);
     const [students, setStudents] = useState([]);
     const [members, setMembers] = useState([]);

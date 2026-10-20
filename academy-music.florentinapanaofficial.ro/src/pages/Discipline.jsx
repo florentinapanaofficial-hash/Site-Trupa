@@ -1,3 +1,4 @@
+import { useTeacherMode } from '../lib/useTeacherMode';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
@@ -12,7 +13,7 @@ import EmptyState from '../components/ui/EmptyState';
 const META = {
     orga: {
         icon: '🎹',
-        title: 'Orgă',
+        title: 'Instrument-Orgă',
         subtitle: 'Repertoriu, acompaniamente și partituri pentru orgă electronică.',
     },
     canto: {
@@ -30,8 +31,11 @@ const LEVELS = [
 ];
 
 export default function Discipline({ discipline }) {
-    const { profile, isTeacher } = useAuth();
+    const { profile, isTeacher: teacherRole } = useAuth();
+    const [teacherMode] = useTeacherMode();
+    const isTeacher = teacherRole && teacherMode;
     const navigate = useNavigate();
+    const [loadError, setLoadError] = useState('');
     const [pieces, setPieces] = useState(null);
     const [level, setLevel] = useState('toate');
     const [search, setSearch] = useState('');
@@ -42,20 +46,24 @@ export default function Discipline({ discipline }) {
         let active = true;
         setPieces(null);
 
-        supabase
+        setLoadError('');
+        const query = supabase
             .from('pieces')
             .select('*')
             .eq('discipline', discipline)
             .order('level', { ascending: true })
-            .order('title', { ascending: true })
-            .then(({ data }) => {
-                if (active) setPieces(data || []);
-            });
+            .order('title', { ascending: true });
+        if (!isTeacher) query.eq('is_published', true);
+        query.then(({ data, error }) => {
+            if (!active) return;
+            if (error) setLoadError('Repertoriul nu a putut fi încărcat. Reîncarcă pagina.');
+            setPieces(error ? [] : data || []);
+        });
 
         return () => {
             active = false;
         };
-    }, [discipline]);
+    }, [discipline, isTeacher]);
 
     const filtered = useMemo(() => {
         if (!pieces) return [];
@@ -72,7 +80,7 @@ export default function Discipline({ discipline }) {
 
     function openScore(piece) {
         setScorePiece(piece);
-        logEvent(profile?.id, 'open_score', `/${discipline}`, { piece_id: piece.id });
+        logEvent(profile?.id, 'open_score', discipline === 'orga' ? '/instrument/' : '/canto/', { piece_id: piece.id });
     }
 
     return (
@@ -89,7 +97,7 @@ export default function Discipline({ discipline }) {
                     <button
                         type="button"
                         className="btn-gold"
-                        onClick={() => navigate(`/admin/piese?add=${discipline}`)}
+                        onClick={() => navigate(`/admin/piese/?add=${discipline}`)}
                     >
                         ＋ Adaugă piesă
                     </button>
@@ -122,6 +130,7 @@ export default function Discipline({ discipline }) {
                 </div>
             </div>
 
+            {loadError && <p role="alert" className="text-sm text-brand-200">{loadError}</p>}
             {pieces === null ? (
                 <Spinner label="Se încarcă repertoriul…" />
             ) : filtered.length === 0 ? (

@@ -1,10 +1,11 @@
+import GenerateLyricsButton from '../../components/GenerateLyricsButton';
 import { useEffect, useState } from 'react';
 import { FileText, Pencil, Save, Trash2, Upload, X } from 'lucide-react';
 import { supabase, BUCKET_MEDIA } from '../../lib/supabase';
 import { useAuth } from '../../lib/auth';
 import { uploadFile } from '../../lib/media';
 import { CANTO_VARIANTS, EMPTY_CANTO, saveCantoPiece } from '../../lib/canto';
-import CantoAudio from '../../components/CantoAudio';
+import PieceAudio from '../../components/PieceAudio';
 import Modal from '../../components/ui/Modal';
 import Spinner from '../../components/ui/Spinner';
 
@@ -19,6 +20,7 @@ export default function AdminCanto() {
     const [lyrics, setLyrics] = useState(null);
     const [deleting, setDeleting] = useState(null);
     const [search, setSearch] = useState('');
+    const [aiBusy, setAiBusy] = useState(false);
     const [status, setStatus] = useState({ busy: false, error: '', info: '' });
     const [loadError, setLoadError] = useState('');
 
@@ -63,14 +65,14 @@ export default function AdminCanto() {
     async function persist(values, selectedFiles, piece) {
         return saveCantoPiece({
             client: supabase, form: values, files: selectedFiles, piece, userId: profile.id,
-            upload: (path, file) => uploadFile(BUCKET_MEDIA, path, file, { contentType: 'audio/mpeg' }),
+            upload: (path, file) => uploadFile(BUCKET_MEDIA, path, file, { contentType: file.type || (path.endsWith('.pdf') ? 'application/pdf' : 'audio/mpeg') }),
             removeUploaded: (paths) => supabase.storage.from(BUCKET_MEDIA).remove(paths),
         });
     }
 
     async function save(event) {
         event.preventDefault();
-        if (status.busy) return;
+        if ((status.busy || aiBusy)) return;
         setStatus({ busy: true, error: '', info: '' });
         try {
             await persist(form, files, editing);
@@ -83,7 +85,7 @@ export default function AdminCanto() {
     }
 
     async function replace(piece, variant, file) {
-        if (!file || status.busy) return;
+        if (!file || (status.busy || aiBusy)) return;
         setStatus({ busy: true, error: '', info: '' });
         try {
             const saved = await persist(piece, { [variant.key]: file }, piece);
@@ -96,7 +98,7 @@ export default function AdminCanto() {
     }
 
     async function saveLyrics() {
-        if (status.busy) return;
+        if ((status.busy || aiBusy)) return;
         if (!lyrics.piece) {
             setForm((previous) => ({ ...previous, versuri_text: lyrics.text }));
             setLyrics(null);
@@ -115,7 +117,7 @@ export default function AdminCanto() {
     }
 
     async function remove() {
-        if (!deleting || status.busy) return;
+        if (!deleting || (status.busy || aiBusy)) return;
         setStatus({ busy: true, error: '', info: '' });
         try {
             const { data, error } = await supabase.from('pieces').delete().eq('id', deleting.id)
@@ -142,7 +144,7 @@ export default function AdminCanto() {
             </header>
 
             <form onSubmit={save} className="space-y-3 border-y border-white/10 py-4" aria-label={editing ? 'Editează piesa Canto' : 'Adaugă piesă Canto'}>
-                <fieldset disabled={status.busy} className="grid min-w-0 gap-3 xl:grid-cols-[minmax(150px,1.3fr)_minmax(120px,1fr)_minmax(150px,1fr)_minmax(150px,1fr)_auto]">
+                <fieldset disabled={(status.busy || aiBusy)} className="grid min-w-0 gap-3 xl:grid-cols-[minmax(150px,1.3fr)_minmax(120px,1fr)_minmax(150px,1fr)_minmax(150px,1fr)_auto]">
                     <div className="min-w-0">
                         <label className="label" htmlFor="canto-title">Titlul piesei</label>
                         <input id="canto-title" className="input" required maxLength={120} value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} />
@@ -162,22 +164,30 @@ export default function AdminCanto() {
                         <FileText size={16} aria-hidden="true" /> {form.versuri_text ? 'Editează versuri' : 'Adaugă versuri'}
                     </button>
                 </fieldset>
+                <fieldset disabled={(status.busy || aiBusy)} className="grid gap-3 sm:grid-cols-2">
+                    <div><label className="label" htmlFor="canto-description">Descriere / indicații de studiu</label><textarea id="canto-description" className="input" maxLength={600} value={form.description || ''} onChange={(event) => setForm({ ...form, description: event.target.value })} /></div>
+                    <div key={fileKey}><label className="label" htmlFor="canto-score">Partitură PDF</label><input id="canto-score" type="file" accept=".pdf,application/pdf" className="input" onChange={(event) => setFiles({ ...files, score: event.target.files?.[0] || null })} /></div>
+                </fieldset>
+                {editing && <p className="text-xs text-slate-300">Disciplina: Canto. Audio și PDF existente se păstrează dacă nu alegi fișiere noi.</p>}
                 <details className="text-sm text-slate-400">
                     <summary className="cursor-pointer">Linkuri audio existente</summary>
                     <div className="mt-2 grid gap-3 sm:grid-cols-2">
                         {CANTO_VARIANTS.map((variant) => <div key={variant.key} className="min-w-0">
                             <label className="label" htmlFor={`canto-url-${variant.key}`}>URL {variant.label}</label>
-                            <input id={`canto-url-${variant.key}`} type="url" className="input" disabled={status.busy || Boolean(files[variant.key])} value={form[variant.url] || ''} onChange={(event) => setForm({ ...form, [variant.url]: event.target.value })} />
+                            <input id={`canto-url-${variant.key}`} type="url" className="input" disabled={(status.busy || aiBusy) || Boolean(files[variant.key])} value={form[variant.url] || ''} onChange={(event) => setForm({ ...form, [variant.url]: event.target.value })} />
                         </div>)}
                     </div>
                 </details>
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                    <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={form.is_published} disabled={status.busy} onChange={(event) => setForm({ ...form, is_published: event.target.checked })} /> Publicată pentru elevi</label>
+                    <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={form.is_published} disabled={(status.busy || aiBusy)} onChange={(event) => setForm({ ...form, is_published: event.target.checked })} /> Publicată pentru elevi</label>
                     <div className="flex flex-wrap gap-2">
-                        {editing && <button type="button" disabled={status.busy} className="btn-ghost inline-flex items-center gap-2" onClick={reset}><X size={16} aria-hidden="true" /> Anulează editarea</button>}
-                        <button type="submit" disabled={status.busy} className="btn-gold inline-flex items-center gap-2"><Save size={16} aria-hidden="true" /> {status.busy ? 'Se salvează…' : editing ? 'Salvează modificările' : 'Adaugă piesa'}</button>
+                        {editing && <button type="button" disabled={(status.busy || aiBusy)} className="btn-ghost inline-flex items-center gap-2" onClick={reset}><X size={16} aria-hidden="true" /> Anulează editarea</button>}
+                        <button type="submit" disabled={(status.busy || aiBusy)} className="btn-gold inline-flex items-center gap-2"><Save size={16} aria-hidden="true" /> {status.busy ? 'Se salvează…' : editing ? 'Salvează modificările' : 'Adaugă piesa'}</button>
                     </div>
                 </div>
+                <GenerateLyricsButton key={editing?.id || 'new'} piece={editing} disabled={(status.busy || aiBusy) || Boolean(files.pozitiv)} onBusyChange={setAiBusy} onGenerated={text => setForm(previous => ({ ...previous, versuri_text: text }))} />
+                <label className="label" htmlFor="canto-draft-lyrics">Versuri / text sincronizat (LRC)</label>
+                <textarea id="canto-draft-lyrics" className="input min-h-28" maxLength={100000} disabled={status.busy || aiBusy} value={form.versuri_text} onChange={event => setForm(previous => ({ ...previous, versuri_text: event.target.value }))} />
             </form>
 
             {status.error && !lyrics && !deleting && <p role="alert" className="text-sm text-brand-200">{status.error}</p>}
@@ -195,40 +205,41 @@ export default function AdminCanto() {
                                 <p className="break-words font-semibold text-white">{piece.title}</p>
                                 <p className="mt-1 break-words text-slate-400">{piece.grupa || 'Fără grupă'}</p>
                                 <p className="mt-1 text-xs text-slate-500">{piece.is_published ? 'Publicată' : 'Ciornă'}</p>
-                                <button type="button" disabled={status.busy} className="btn-ghost mt-2 inline-flex items-center gap-1 text-xs" aria-label={`Editează ${piece.title}`} onClick={() => edit(piece)}><Pencil size={14} aria-hidden="true" /> Editează</button>
+                                <button type="button" disabled={(status.busy || aiBusy)} className="btn-ghost mt-2 inline-flex items-center gap-1 text-xs" aria-label={`Editează ${piece.title}`} onClick={() => edit(piece)}><Pencil size={14} aria-hidden="true" /> Editează</button>
                             </td>
                             {CANTO_VARIANTS.map((variant) => <td key={variant.key} className="px-3 py-4">
-                                <CantoAudio piece={piece} variant={variant} />
-                                <label className={`btn-ghost relative mt-2 inline-flex cursor-pointer items-center gap-1 text-xs ${status.busy ? 'opacity-50' : ''}`}>
+                                <PieceAudio piece={piece} variant={variant} />
+                                <label className={`btn-ghost relative mt-2 inline-flex cursor-pointer items-center gap-1 text-xs ${(status.busy || aiBusy) ? 'opacity-50' : ''}`}>
                                     <Upload size={14} aria-hidden="true" /> Înlocuiește
-                                    <input type="file" className="sr-only" accept=".mp3,audio/mpeg" aria-label={`Înlocuiește ${variant.label} — ${piece.title}`} disabled={status.busy} onChange={(event) => { replace(piece, variant, event.target.files?.[0]); event.target.value = ''; }} />
+                                    <input type="file" className="sr-only" accept=".mp3,audio/mpeg" aria-label={`Înlocuiește ${variant.label} — ${piece.title}`} disabled={(status.busy || aiBusy)} onChange={(event) => { replace(piece, variant, event.target.files?.[0]); event.target.value = ''; }} />
                                 </label>
                             </td>)}
-                            <td className="px-3 py-4"><button type="button" disabled={status.busy} className="btn-ghost inline-flex items-center gap-1 text-xs" aria-label={`Versuri — ${piece.title}`} onClick={() => { setStatus({ ...status, error: '' }); setLyrics({ piece, text: piece.versuri_text || '' }); }}><FileText size={14} aria-hidden="true" /> {piece.versuri_text ? 'Vezi / editează' : 'Adaugă versuri'}</button></td>
-                            <td className="px-3 py-4"><button type="button" disabled={status.busy} className="btn-ghost inline-flex items-center gap-1 text-xs text-brand-200" aria-label={`Șterge ${piece.title}`} onClick={() => { setStatus({ ...status, error: '' }); setDeleting(piece); }}><Trash2 size={14} aria-hidden="true" /> Șterge piesă</button></td>
+                            <td className="px-3 py-4"><button type="button" disabled={(status.busy || aiBusy)} className="btn-ghost inline-flex items-center gap-1 text-xs" aria-label={`Versuri — ${piece.title}`} onClick={() => { setStatus({ ...status, error: '' }); setLyrics({ piece, text: piece.versuri_text || '' }); }}><FileText size={14} aria-hidden="true" /> {piece.versuri_text ? 'Vezi / editează' : 'Adaugă versuri'}</button></td>
+                            <td className="px-3 py-4"><button type="button" disabled={(status.busy || aiBusy)} className="btn-ghost inline-flex items-center gap-1 text-xs text-brand-200" aria-label={`Șterge ${piece.title}`} onClick={() => { setStatus({ ...status, error: '' }); setDeleting(piece); }}><Trash2 size={14} aria-hidden="true" /> Șterge piesă</button></td>
                         </tr>)}</tbody>
                     </table>
                 </div>
             )}
 
-            <Modal open={Boolean(lyrics)} title={lyrics?.piece ? `Versuri — ${lyrics.piece.title}` : 'Adaugă versuri'} onClose={() => { if (!status.busy) setLyrics(null); }} wide>
+            <Modal open={Boolean(lyrics)} title={lyrics?.piece ? `Versuri — ${lyrics.piece.title}` : 'Adaugă versuri'} onClose={() => { if (!(status.busy || aiBusy)) setLyrics(null); }} wide>
                 {lyrics && <div className="space-y-4">
+                    <GenerateLyricsButton key={lyrics.piece?.id || 'draft'} piece={lyrics.piece || editing} disabled={(status.busy || aiBusy) || Boolean(files.pozitiv)} onBusyChange={setAiBusy} onGenerated={text => setLyrics(previous => ({ ...previous, text }))} />
                     <label className="label" htmlFor="canto-lyrics">Textul versurilor</label>
-                    <textarea id="canto-lyrics" className="input min-h-80 whitespace-pre-wrap" maxLength={100000} disabled={status.busy} value={lyrics.text} onChange={(event) => setLyrics({ ...lyrics, text: event.target.value })} />
+                    <textarea id="canto-lyrics" className="input min-h-80 whitespace-pre-wrap" maxLength={100000} disabled={(status.busy || aiBusy)} value={lyrics.text} onChange={(event) => setLyrics({ ...lyrics, text: event.target.value })} />
                     {status.error && <p role="alert" className="text-sm text-brand-200">{status.error}</p>}
                     <div className="flex flex-wrap justify-end gap-2">
-                        <button type="button" disabled={status.busy} className="btn-ghost" onClick={() => setLyrics(null)}>Anulează</button>
-                        <button type="button" disabled={status.busy} className="btn-gold inline-flex items-center gap-2" onClick={saveLyrics}><Save size={16} aria-hidden="true" /> {lyrics.piece ? 'Salvează versurile' : 'Aplică versurile'}</button>
+                        <button type="button" disabled={(status.busy || aiBusy)} className="btn-ghost" onClick={() => setLyrics(null)}>Anulează</button>
+                        <button type="button" disabled={(status.busy || aiBusy)} className="btn-gold inline-flex items-center gap-2" onClick={saveLyrics}><Save size={16} aria-hidden="true" /> {lyrics.piece ? 'Salvează versurile' : 'Aplică versurile'}</button>
                     </div>
                 </div>}
             </Modal>
-            <Modal open={Boolean(deleting)} title="Șterge piesa Canto" onClose={() => { if (!status.busy) setDeleting(null); }}>
+            <Modal open={Boolean(deleting)} title="Șterge piesa Canto" onClose={() => { if (!(status.busy || aiBusy)) setDeleting(null); }}>
                 <div className="space-y-4">
                     <p className="break-words text-sm text-slate-300">Ștergi definitiv „{deleting?.title}” din bibliotecă și alocările ei? Operația nu poate fi anulată.</p>
                     {status.error && <p role="alert" className="text-sm text-brand-200">{status.error}</p>}
                     <div className="flex flex-wrap justify-end gap-2">
-                        <button type="button" disabled={status.busy} className="btn-ghost" onClick={() => setDeleting(null)}>Anulează</button>
-                        <button type="button" disabled={status.busy} className="btn-gold inline-flex items-center gap-2" onClick={remove}><Trash2 size={16} aria-hidden="true" /> Confirmă ștergerea</button>
+                        <button type="button" disabled={(status.busy || aiBusy)} className="btn-ghost" onClick={() => setDeleting(null)}>Anulează</button>
+                        <button type="button" disabled={(status.busy || aiBusy)} className="btn-gold inline-flex items-center gap-2" onClick={remove}><Trash2 size={16} aria-hidden="true" /> Confirmă ștergerea</button>
                     </div>
                 </div>
             </Modal>

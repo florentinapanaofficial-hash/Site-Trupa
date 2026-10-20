@@ -15,10 +15,14 @@
         "dev": "astro dev --port 5180",
         "build": "astro build && node scripts/compress.mjs",
         "preview": "astro preview --port 5180",
-        "test": "node --test src/lib/learning.check.mjs",
+        "test": "node --test src/lib/learning.check.mjs src/lib/security.check.mjs src/lib/canto.check.mjs",
         "test:browser": "node scripts/verify-learning.mjs",
+        "test:landing": "node scripts/verify-landing.mjs",
+        "test:navigation": "node scripts/verify-navigation.mjs",
+        "test:admin": "node scripts/verify-admin.mjs",
         "test:server": "node --test scripts/server.check.mjs",
-        "start": "node ./dist/server/entry.mjs"
+        "start": "node ./dist/server/entry.mjs",
+        "test:canto": "node scripts/verify-canto.mjs"
     },
     "dependencies": {
         "@astrojs/mdx": "^8.1.0",

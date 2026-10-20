@@ -18,6 +18,14 @@ export default defineConfig({
     adapter: node({ mode: 'standalone' }),
     server: { host: '0.0.0.0', port: 4180 },
     trailingSlash: 'always',
+    security: {
+        allowedDomains: [
+            { hostname: 'academy-music.florentinapanaofficial.ro' },
+            { hostname: 'localhost' },
+            { hostname: '127.0.0.1' },
+            ...(serverEnv.ACADEMY_PUBLIC_ORIGIN ? [{ hostname: new URL(serverEnv.ACADEMY_PUBLIC_ORIGIN).hostname }] : []),
+        ],
+    },
     integrations: [react(), mdx()],
     vite: {
         ssr: { external: ['googleapis', '@supabase/supabase-js'] },

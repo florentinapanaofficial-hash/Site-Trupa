@@ -1,9 +1,12 @@
+import GenerateLyricsButton from '../../components/GenerateLyricsButton';
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase, BUCKET_MEDIA } from '../../lib/supabase';
 import { useAuth } from '../../lib/auth';
-import { safeFileName, uploadFile } from '../../lib/media';
-import { VARIANT_LIST, isSafeHttpUrl } from '../../lib/pieces';
+import { Pencil } from 'lucide-react';
+import { saveMusicPiece } from '../../lib/canto';
+import { uploadFile } from '../../lib/media';
+import { VARIANT_LIST } from '../../lib/pieces';
 import Modal from '../../components/ui/Modal';
 import Spinner from '../../components/ui/Spinner';
 import EmptyState from '../../components/ui/EmptyState';
@@ -14,6 +17,7 @@ const EMPTY_FORM = {
     composer: '',
     level: 'incepator',
     description: '',
+    versuri_text: '',
     youtube_id: '',
     tags: '',
     is_published: true,
@@ -35,6 +39,8 @@ export default function AdminPieces() {
     const [files, setFiles] = useState({ negativ: null, pozitiv: null, score: null });
     const [targetGroups, setTargetGroups] = useState([]);
     const [targetStudents, setTargetStudents] = useState([]);
+    const [aiBusy, setAiBusy] = useState(false);
+    const [editing, setEditing] = useState(null);
     const [modalOpen, setModalOpen] = useState(false);
     const [state, setState] = useState({ busy: false, error: '', info: '' });
 
@@ -46,17 +52,17 @@ export default function AdminPieces() {
         }
         if (requestedDiscipline !== 'orga') return;
 
-        setForm({ ...EMPTY_FORM, discipline: requestedDiscipline });
-        setModalOpen(true);
+        openEditor();
         setSearchParams({}, { replace: true });
     }, [searchParams, setSearchParams, navigate]);
 
     async function load() {
-        const { data } = await supabase
+        const { data, error } = await supabase
             .from('pieces')
             .select('*')
             .eq('discipline', 'orga')
             .order('created_at', { ascending: false });
+        if (error) { setState((previous) => ({ ...previous, info: '', error: 'Repertoriul nu a putut fi încărcat.' })); return; }
         setPieces(data || []);
     }
 
@@ -71,6 +77,10 @@ export default function AdminPieces() {
                 .eq('role', 'student')
                 .order('full_name'),
         ]).then(([groupsResult, studentsResult]) => {
+            if (groupsResult.error || studentsResult.error) {
+                setState((previous) => ({ ...previous, error: 'Destinațiile de alocare nu au putut fi încărcate.' }));
+                return;
+            }
             setGroups(groupsResult.data || []);
             setStudents(studentsResult.data || []);
         });
@@ -87,123 +97,69 @@ export default function AdminPieces() {
         setList(list.includes(id) ? list.filter((item) => item !== id) : [...list, id]);
     }
 
-    /** Fișierele unei piese alocate unei grupe stau împreună, sub folderul grupei. */
-    function storagePrefix() {
-        if (targetGroups.length === 1) {
-            const slug = groups.find((group) => group.id === targetGroups[0])?.slug;
-            if (slug) return `groups/${slug}`;
-        }
-        return form.discipline;
-    }
-
-    async function uploadIfPresent(file, folder) {
-        if (!file) return null;
-        const path = `${storagePrefix()}/${folder}/${Date.now()}-${safeFileName(file.name)}`;
-        await uploadFile(BUCKET_MEDIA, path, file);
-        return path;
+    function openEditor(piece = null) {
+        setEditing(piece);
+        setForm(piece ? { ...EMPTY_FORM, ...piece, composer: piece.composer || '', description: piece.description || '',
+            youtube_id: piece.youtube_id || '', tags: (piece.tags || []).join(', '),
+            positive_url: piece.positive_url || '', negative_url: piece.negative_url || '', versuri_text: piece.versuri_text || '' } : { ...EMPTY_FORM });
+        setModes({ pozitiv: piece?.audio_pozitiv_path && !piece.positive_url ? 'local' : 'online', negativ: piece?.audio_negativ_path && !piece.negative_url ? 'local' : 'online' });
+        setFiles({ negativ: null, pozitiv: null, score: null });
+        setTargetGroups([]); setTargetStudents([]);
+        setState({ busy: false, error: '', info: '' });
+        setModalOpen(true);
     }
 
     async function handleSubmit(event) {
         event.preventDefault();
+        if ((state.busy || aiBusy)) return;
         setState({ busy: true, error: '', info: '' });
-
+        let saved;
         try {
-            if (files.score && files.score.type !== 'application/pdf') {
-                throw new Error('Partitura trebuie să fie un fișier PDF.');
-            }
-
             for (const variant of VARIANT_LIST) {
-                const url = form[variant.urlColumn].trim();
-                if (modes[variant.key] === 'online' && url && !isSafeHttpUrl(url)) {
-                    throw new Error(
-                        `Linkul pentru ${variant.label} trebuie să înceapă cu http:// sau https://.`
-                    );
+                if (modes[variant.key] === 'local' && !files[variant.key] && !editing?.[variant.pathColumn]) {
+                    throw new Error('Alege un MP3 pentru ' + variant.label + ' sau revino la URL CDN.');
                 }
             }
-
-            const scorePath = await uploadIfPresent(files.score, 'partituri');
-
-            const { data: created, error } = await supabase
-                .from('pieces')
-                .insert({
-                    discipline: form.discipline,
-                    title: form.title.trim(),
-                    composer: form.composer.trim() || null,
-                    level: form.level,
-                    description: form.description.trim() || null,
-                    youtube_id: form.youtube_id.trim() || null,
-                    tags: form.tags
-                        .split(',')
-                        .map((tag) => tag.trim())
-                        .filter(Boolean),
-                    is_published: form.is_published,
-                    audio_negativ_path: null,
-                    audio_pozitiv_path: null,
-                    negative_url: modes.negativ === 'online' ? form.negative_url.trim() || null : null,
-                    positive_url: modes.pozitiv === 'online' ? form.positive_url.trim() || null : null,
-                    score_path: scorePath,
-                    created_by: profile.id,
-                })
-                .select('id')
-                .single();
-            if (error) throw error;
-
-            if (targetGroups.length) {
-                await supabase.from('group_pieces').insert(
-                    targetGroups.map((groupId) => ({
-                        group_id: groupId,
-                        piece_id: created.id,
-                        added_by: profile.id,
-                    }))
-                );
-            }
-
-            if (targetStudents.length) {
-                await supabase.from('student_pieces').insert(
-                    targetStudents.map((studentId) => ({
-                        student_id: studentId,
-                        piece_id: created.id,
-                        assigned_by: profile.id,
-                    }))
-                );
-            }
-
-            const allocated = targetGroups.length + targetStudents.length;
-
-            setForm(EMPTY_FORM);
-            setModes(EMPTY_MODES);
-            setFiles({ negativ: null, pozitiv: null, score: null });
-            setTargetGroups([]);
-            setTargetStudents([]);
-            event.target.reset();
-            setModalOpen(false);
-            setState({
-                busy: false,
-                error: '',
-                info: allocated
-                    ? `Piesa a fost adăugată și alocată (${allocated} destinații).`
-                    : 'Piesa a fost adăugată în catalog.',
+            saved = await saveMusicPiece({
+                client: supabase, form: { ...form, positive_url: modes.pozitiv === 'online' ? form.positive_url : '', negative_url: modes.negativ === 'online' ? form.negative_url : '' },
+                files: { score: files.score, pozitiv: modes.pozitiv === 'local' ? files.pozitiv : null, negativ: modes.negativ === 'local' ? files.negativ : null },
+                piece: editing, userId: profile.id, discipline: 'orga',
+                upload: (path, file) => uploadFile(BUCKET_MEDIA, path, file),
+                removeUploaded: (paths) => supabase.storage.from(BUCKET_MEDIA).remove(paths),
             });
-            load();
-        } catch (err) {
-            setState({ busy: false, error: err?.message || 'Salvarea a eșuat.', info: '' });
+            if (!editing && targetGroups.length) {
+                const { error } = await supabase.from('group_pieces').insert(targetGroups.map((group_id) => ({ group_id, piece_id: saved.id, added_by: profile.id })));
+                if (error) throw new Error('Piesa a fost salvată, dar alocarea la grupe a eșuat. Folosește panoul de alocări; nu recrea piesa.');
+            }
+            if (!editing && targetStudents.length) {
+                const { error } = await supabase.from('student_pieces').insert(targetStudents.map((student_id) => ({ student_id, piece_id: saved.id, assigned_by: profile.id })));
+                if (error) throw new Error('Piesa a fost salvată, dar alocarea la elevi a eșuat. Folosește panoul de alocări; nu recrea piesa.');
+            }
+            setModalOpen(false);
+            setState({ busy: false, error: '', info: editing ? 'Modificările au fost salvate.' : 'Piesa a fost adăugată.' });
+            await load();
+        } catch (error) {
+            if (saved) { setEditing(saved); await load(); }
+            setState({ busy: false, error: error.message || 'Salvarea a eșuat.', info: '' });
         }
     }
 
     async function togglePublished(piece) {
-        await supabase.from('pieces').update({ is_published: !piece.is_published }).eq('id', piece.id);
-        load();
+        try {
+            const { data, error } = await supabase.from('pieces').update({ is_published: !piece.is_published }).eq('id', piece.id).select('id').single();
+            if (error || !data) throw new Error('Starea piesei nu a putut fi actualizată.');
+            await load();
+        } catch (error) { setState({ busy: false, error: error.message, info: '' }); }
     }
 
     async function remove(piece) {
-        if (!window.confirm(`Ștergi definitiv piesa „${piece.title}”?`)) return;
-
-        const paths = [piece.audio_negativ_path, piece.audio_pozitiv_path, piece.score_path].filter(
-            Boolean
-        );
-        if (paths.length) await supabase.storage.from(BUCKET_MEDIA).remove(paths);
-        await supabase.from('pieces').delete().eq('id', piece.id);
-        load();
+        if (!window.confirm('Ștergi definitiv piesa „' + piece.title + '”?')) return;
+        try {
+            const { data, error } = await supabase.from('pieces').delete().eq('id', piece.id).select('id').single();
+            if (error || !data) throw new Error('Piesa nu a putut fi ștearsă.');
+            setState({ busy: false, error: '', info: 'Piesa a fost ștearsă. Fișierele istorice rămân pentru curățare administrativă.' });
+            await load();
+        } catch (error) { setState({ busy: false, error: error.message, info: '' }); }
     }
 
     return (
@@ -215,17 +171,18 @@ export default function AdminPieces() {
                         Fiecare piesă poate avea varianta pozitivă și negativă, din fișier local sau link.
                     </p>
                 </div>
-                <button type="button" className="btn-gold" onClick={() => setModalOpen(true)}>
+                <button type="button" className="btn-gold" onClick={() => openEditor()}>
                     ＋ Adaugă piesă
                 </button>
             </div>
 
+            {state.error && !modalOpen && <p role="alert" className="text-sm text-brand-200">{state.error}</p>}
             {state.info && !modalOpen && (
                 <p className="rounded-lg bg-emerald-500/15 px-3 py-2 text-sm text-emerald-200">{state.info}</p>
             )}
 
-            <Modal open={modalOpen} title="Adaugă o piesă nouă" onClose={() => setModalOpen(false)} wide>
-                <form onSubmit={handleSubmit} className="space-y-4">
+            <Modal open={modalOpen} title={editing ? `Editează: ${editing.title}` : "Adaugă o piesă nouă"} onClose={() => { if (!(state.busy || aiBusy)) setModalOpen(false); }} wide>
+                <form onSubmit={handleSubmit} className="space-y-4"><fieldset disabled={(state.busy || aiBusy)} className="space-y-4">
                     <div className="grid gap-4 sm:grid-cols-2">
                         <div>
                             <label className="label" htmlFor="discipline">
@@ -275,6 +232,8 @@ export default function AdminPieces() {
                         />
                     </div>
 
+                    {editing && <p className="text-sm text-slate-300">Fișierele existente sunt păstrate dacă nu alegi înlocuitori. Alocările nu se modifică la editare.</p>}
+                    <div><label className="label" htmlFor="piece-lyrics">Versuri / text sincronizat (LRC)</label><textarea id="piece-lyrics" className="input min-h-24" maxLength={100000} value={form.versuri_text} onChange={update("versuri_text")} /><GenerateLyricsButton key={editing?.id || 'new'} piece={editing} disabled={(state.busy || aiBusy) || Boolean(files.pozitiv)} onBusyChange={setAiBusy} onGenerated={text => setForm(previous => ({ ...previous, versuri_text: text }))} /></div>
                     <div className="grid gap-3 lg:grid-cols-2">
                         {VARIANT_LIST.map((variant) => (
                             <VariantField
@@ -312,7 +271,7 @@ export default function AdminPieces() {
                         />
                     </div>
 
-                    <fieldset className="rounded-xl border border-white/10 bg-ink-800/40 p-3">
+                    {!editing && <fieldset className="rounded-xl border border-white/10 bg-ink-800/40 p-3">
                         <legend className="px-1 text-sm font-semibold text-slate-200">
                             Destinație / alocare directă
                         </legend>
@@ -365,12 +324,8 @@ export default function AdminPieces() {
                             </div>
                         </div>
 
-                        {targetGroups.length === 1 && (
-                            <p className="mt-2 text-xs text-slate-500">
-                                Fișierele se vor urca în <code>groups/{groups.find((g) => g.id === targetGroups[0])?.slug}/</code>
-                            </p>
-                        )}
-                    </fieldset>
+
+                    </fieldset>}
 
                     <label className="flex items-center gap-2 text-sm text-slate-300">
                         <input type="checkbox" checked={form.is_published} onChange={update('is_published')} className="h-4 w-4 accent-gold-500" />
@@ -383,11 +338,11 @@ export default function AdminPieces() {
                         <button type="button" className="btn-ghost" onClick={() => setModalOpen(false)}>
                             Renunță
                         </button>
-                        <button type="submit" className="btn-gold" disabled={state.busy}>
-                            {state.busy ? 'Se încarcă…' : 'Salvează piesa'}
+                        <button type="submit" className="btn-gold" disabled={(state.busy || aiBusy)}>
+                            {state.busy ? 'Se încarcă…' : editing ? 'Salvează modificările' : 'Salvează piesa'}
                         </button>
                     </div>
-                </form>
+                </fieldset></form>
             </Modal>
 
             <section className="space-y-3">
@@ -437,6 +392,7 @@ export default function AdminPieces() {
                                             </button>
                                         </td>
                                         <td className="px-4 py-3 text-right">
+                                            <button type="button" className="btn-ghost mr-3" onClick={() => openEditor(piece)} aria-label={`Editează ${piece.title}`}><Pencil size={15} aria-hidden="true" />Editează</button>
                                             <button type="button" className="text-xs text-brand-300 hover:text-brand-200" onClick={() => remove(piece)}>
                                                 Șterge
                                             </button>
@@ -471,6 +427,7 @@ function FileField({ id, label, accept, onChange }) {
 
 const MODES = [
     { value: 'online', label: 'URL CDN' },
+    { value: 'local', label: 'Upload MP3' },
 ];
 
 function VariantField({ variant, mode, url, onModeChange, onUrlChange, onFileChange }) {
@@ -500,7 +457,7 @@ function VariantField({ variant, mode, url, onModeChange, onUrlChange, onFileCha
             {mode === 'local' ? (
                 <input
                     type="file"
-                    accept="audio/*"
+                    accept=".mp3,audio/mpeg"
                     aria-label={`Fișier audio ${variant.label}`}
                     className="input text-xs file:mr-2 file:rounded-lg file:border-0 file:bg-white/10 file:px-2 file:py-1 file:text-slate-200"
                     onChange={(event) => onFileChange(event.target.files?.[0] || null)}

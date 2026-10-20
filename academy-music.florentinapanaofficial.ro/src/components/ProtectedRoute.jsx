@@ -49,7 +49,7 @@ export default function ProtectedRoute({ children, requireTeacher = false }) {
 
     // Garda din interfață dublează RLS-ul; baza de date rămâne sursa de adevăr.
     if (requireTeacher && !isTeacher) {
-        return <Navigate to="/" replace />;
+        return <Navigate to="/dashboard/" replace />;
     }
 
     return children;

@@ -1,0 +1,206 @@
+import assert from 'node:assert/strict';
+import { createServer } from 'node:http';
+import { spawn } from 'node:child_process';
+import { once } from 'node:events';
+import { fileURLToPath } from 'node:url';
+import { mkdir } from 'node:fs/promises';
+import { chromium, expect } from '@playwright/test';
+
+function studyPdf() {
+    const objects = ['<< /Type /Catalog /Pages 2 0 R >>', '<< /Type /Pages /Kids [3 0 R] /Count 1 >>', '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 200 200] /Resources << >> /Contents 4 0 R >>', '<< /Length 0 >>\nstream\n\nendstream'];
+    let text = '%PDF-1.4\n';
+    const offsets = [0];
+    for (const [i, object] of objects.entries()) { offsets.push(Buffer.byteLength(text)); text += (i + 1) + ' 0 obj\n' + object + '\nendobj\n'; }
+    const xref = Buffer.byteLength(text);
+    text += 'xref\n0 5\n0000000000 65535 f \n' + offsets.slice(1).map(offset => String(offset).padStart(10, '0') + ' 00000 n \n').join('');
+    return Buffer.from(text + 'trailer\n<< /Size 5 /Root 1 0 R >>\nstartxref\n' + xref + '\n%%EOF\n');
+}
+
+const userId = '11111111-1111-4111-8111-111111111111';
+const sessionId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+const accessToken = 'header.' + Buffer.from(JSON.stringify({ sub: userId, session_id: sessionId, exp: Math.floor(Date.now()/1000)+3600 })).toString('base64url') + '.signature';
+const profile = { id: userId, full_name: 'Elev Test', role: 'student', is_active: true, disciplines: ['canto', 'orga'] };
+const upstream = createServer((request, response) => {
+    response.setHeader('Content-Type', 'application/json');
+    if (request.url.startsWith('/auth/v1/user')) return response.end(JSON.stringify({ id: userId }));
+    if (request.url === '/rest/v1/rpc/academy_check_session') return response.end('"ok"');
+    response.statusCode = 500; response.end('{"error":"Unexpected test request"}');
+});
+upstream.listen(0, '127.0.0.1');
+await once(upstream, 'listening');
+const cwd = fileURLToPath(new URL('../', import.meta.url));
+const server = spawn(process.execPath, ['dist/server/entry.mjs'], {
+    cwd, env: { ...process.env, HOST: '127.0.0.1', PORT: '0', ASTRO_NODE_LOGGING: 'enabled', NODE_ENV: 'production',
+        VITE_SUPABASE_URL: `http://127.0.0.1:${upstream.address().port}`, VITE_SUPABASE_ANON_KEY: 'test-anon', SUPABASE_SERVICE_ROLE_KEY: 'test-service',
+        ACADEMY_TRUSTED_IP_HEADER: 'x-forwarded-for', ACADEMY_TRUSTED_PROXY_HOPS: '1' },
+    stdio: ['ignore', 'pipe', 'pipe'],
+});
+let output = '';
+server.stdout.on('data', chunk => { output += chunk; });
+server.stderr.on('data', chunk => { output += chunk; });
+let browser;
+try {
+    const base = await new Promise((resolve, reject) => {
+        const timer = setTimeout(() => reject(new Error(`Server not ready: ${output}`)), 15000);
+        server.once('error', error => { clearTimeout(timer); reject(error); });
+        server.once('exit', code => { clearTimeout(timer); reject(new Error(`Server exited: ${code}; ${output}`)); });
+        server.stdout.on('data', () => {
+            const address = output.match(/http:\/\/127\.0\.0\.1:\d+/)?.[0];
+            if (address) { clearTimeout(timer); resolve(address); }
+        });
+    });
+    browser = await chromium.launch({ headless: true });
+    async function open(viewport, path = '/dashboard/', role = 'student') {
+        const context = await browser.newContext({ viewport, extraHTTPHeaders: { 'x-forwarded-for': '198.51.100.1' } });
+        await context.addCookies([{ name: 'academy-access', value: accessToken, url: base, httpOnly: true, sameSite: 'Lax' }]);
+        await context.addInitScript(({ accessToken, userId }) => {
+            localStorage.setItem('academy-music-auth', JSON.stringify({ access_token: accessToken, refresh_token: 'test-refresh', expires_at: Math.floor(Date.now()/1000)+3600, expires_in: 3600, token_type: 'bearer', user: { id: userId, aud: 'authenticated' } }));
+        }, { accessToken, userId });
+        const page = await context.newPage();
+        const resources = [{ id: 'resource-id', title: 'Lecție RED', category: 'fisa-teoretica', discipline: 'comun', description: 'Explicații inițiale', external_url: 'https://example.test/lesson', file_path: 'old/resource.pdf' }];
+        const rows = [{ id: path.includes('/canto') ? 'canto-piece' : 'orga-piece', discipline: path.includes('/canto') ? 'canto' : 'orga', title: path.includes('/canto') ? 'Piesă canto' : 'Piesă orgă', description: 'Descriere inițială', composer: 'Profesor', level: 'incepator', is_published: true, positive_url: 'https://example.test/existing.mp3', negative_url: null, tags: [], versuri_text: '', grupa: 'Grupa 1' }];
+        const writes = [], uploads = [];
+        let insertions = 0;
+        const errors = [];
+        const chunks = [];
+        const tables = [];
+        page.on('pageerror', error => errors.push(error.message));
+        page.on('request', request => {
+            if (request.url().includes('/_astro/') && request.url().endsWith('.js')) chunks.push(new URL(request.url()).pathname);
+            if (request.url().includes('/rest/v1/')) tables.push(new URL(request.url()).pathname);
+        });
+        await page.route('**/*', async route => {
+            const url = new URL(route.request().url());
+            if (url.pathname.startsWith('/auth/v1/')) return route.fulfill({ contentType: 'application/json', body: JSON.stringify({ id: userId }) });
+            if (url.pathname.startsWith('/storage/v1/object/sign/') && route.request().method() === 'GET' && url.pathname.endsWith('.pdf')) return route.fulfill({ contentType: 'application/pdf', body: studyPdf() });
+            if (url.pathname.startsWith('/storage/v1/object/sign/')) return route.fulfill({ contentType: 'application/json', body: JSON.stringify({ signedURL: '/object/sign/test.' + (url.pathname.endsWith('.pdf') ? 'pdf' : 'mp3') + '?token=test' }) });
+            if (url.pathname.startsWith('/storage/v1/object/')) {
+                uploads.push(url.pathname);
+                return route.fulfill({ contentType: 'application/json', body: JSON.stringify({ Key: url.pathname }) });
+            }
+            if (!url.pathname.startsWith('/rest/v1/')) return route.continue();
+            if (url.pathname === '/rest/v1/resources') {
+                if (route.request().method() === 'PATCH') {
+                    const payload = route.request().postDataJSON();
+                    writes.push({ id: url.searchParams.get('id'), payload });
+                    Object.assign(resources[0], payload);
+                    return route.fulfill({ contentType: 'application/json', body: JSON.stringify(resources[0]) });
+                }
+                return route.fulfill({ contentType: 'application/json', body: JSON.stringify(resources) });
+            }
+            if (url.pathname === '/rest/v1/pieces') {
+                if (route.request().method() === 'PATCH') {
+                    const payload = route.request().postDataJSON();
+                    writes.push({ id: url.searchParams.get('id'), payload });
+                    Object.assign(rows[0], payload);
+                    return route.fulfill({ contentType: 'application/json', body: JSON.stringify(rows[0]) });
+                }
+                if (route.request().method() === 'POST') insertions++;
+                return route.fulfill({ contentType: 'application/json', body: JSON.stringify(rows) });
+            }
+            const body = url.pathname === '/rest/v1/profiles' ? (url.searchParams.get('select') === 'id,full_name' ? [] : { ...profile, role })
+                : url.pathname === '/rest/v1/rpc/start_activity_session' ? sessionId : [];
+            return route.fulfill({ contentType: 'application/json', body: JSON.stringify(body), headers: { 'Content-Range': '0-0/0' } });
+        });
+        await page.goto(base + path);
+        return { context, page, errors, chunks, tables, rows, writes, uploads, get insertions() { return insertions; } };
+    }
+
+    for (const viewport of [{ width: 390, height: 844 }, { width: 1440, height: 1000 }]) {
+        const fixture = await open(viewport, '/admin/piese/', 'teacher');
+        const { page, context, errors } = fixture;
+        await expect(page.getByRole('heading', { name: 'Repertoriu Orgă', exact: true })).toBeVisible();
+        const mainToggle = page.locator('main').getByRole('switch', { name: 'Comută modul profesor' });
+        await expect(mainToggle).toHaveAttribute('aria-checked', 'true');
+        await page.getByRole('button', { name: 'Editează Piesă orgă', exact: true }).click();
+        const dialog = page.getByRole('dialog', { name: 'Editează: Piesă orgă' });
+        await expect(dialog.getByLabel('Titlu', { exact: true })).toHaveValue('Piesă orgă');
+        await expect(dialog.getByLabel('Descriere / indicații de studiu')).toHaveValue('Descriere inițială');
+        await expect(dialog.getByLabel('Disciplină', { exact: true })).toHaveValue('orga');
+        await dialog.getByLabel('Titlu', { exact: true }).fill('Orgă actualizată');
+        await dialog.getByLabel('Descriere / indicații de studiu').fill('Indicații noi');
+        await dialog.getByLabel('Versuri / text sincronizat (LRC)').fill('[00:01.00]Text nou');
+        await dialog.locator('div.rounded-xl').filter({ hasText: 'Negativ' }).getByRole('button', { name: 'Upload MP3' }).click();
+        await dialog.getByLabel('Fișier audio Negativ').setInputFiles({ name: 'negative.mp3', mimeType: 'audio/mpeg', buffer: Buffer.from('ID3test-audio') });
+        await dialog.getByLabel('Partitură (PDF)').setInputFiles({ name: 'score.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.7 test') });
+        await dialog.getByRole('button', { name: 'Salvează modificările', exact: true }).click();
+        await expect(dialog).toBeHidden();
+        await expect(page.getByRole('cell', { name: 'Orgă actualizată', exact: true })).toBeVisible();
+        assert.equal(fixture.writes.length, 1);
+        assert.equal(fixture.writes[0].id, 'eq.orga-piece');
+        assert.equal(fixture.writes[0].payload.description, 'Indicații noi');
+        assert.match(fixture.writes[0].payload.audio_negativ_path, /^orga\//);
+        assert.match(fixture.writes[0].payload.score_path, /score.pdf$/);
+        assert.equal('audio_pozitiv_path' in fixture.writes[0].payload, false);
+        assert.equal('created_by' in fixture.writes[0].payload, false);
+        assert.equal(fixture.uploads.length, 2);
+        assert.equal(fixture.insertions, 0);
+        assert.equal(fixture.rows[0].id, 'orga-piece');
+        assert.equal(fixture.rows[0].positive_url, 'https://example.test/existing.mp3');
+        await mainToggle.click();
+        await expect(page.getByRole('heading', { name: 'Instrument-Orgă', exact: true })).toBeVisible();
+        await expect(page.getByRole('button', { name: /Adaugă piesă|Editează|Șterge|Salvează/ })).toHaveCount(0);
+        await expect(page.getByRole('link', { name: 'Panou profesor' })).toHaveCount(0);
+        await expect(page.locator('audio')).toHaveCount(2);
+        await expect(page).toHaveURL(base + '/admin/piese/');
+        const visibleSwitches = page.getByRole('switch', { name: 'Comută modul profesor' });
+        for (const toggle of await visibleSwitches.all()) await expect(toggle).toHaveAttribute('aria-checked', 'false');
+        await page.locator('main').getByRole('switch').click();
+        await expect(page.getByRole('button', { name: 'Editează Orgă actualizată' })).toBeVisible();
+        assert.equal(fixture.writes.length, 1, 'preview must not mutate DB');
+        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+        assert.deepEqual(errors, []);
+        await context.close();
+        console.log('Admin ' + viewport.width + 'px PASS: prefilled edit, PATCH existing ID, MP3/PDF uploads, same row, shared live preview and restore.');
+    }
+    const canto = await open({ width: 1440, height: 1000 }, '/admin/canto/', 'teacher');
+    await expect(canto.page.getByRole('button', { name: /Editează/ }).first()).toBeVisible();
+    await canto.page.getByRole('button', { name: /Editează/ }).first().click();
+    await expect(canto.page.getByLabel('Titlul piesei')).toHaveValue('Piesă canto');
+    await canto.page.getByLabel('Descriere / indicații de studiu').fill('Descriere canto actualizată');
+    await canto.page.getByLabel('Partitură PDF', { exact: true }).setInputFiles({ name: 'score.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.7 canto') });
+    await canto.page.getByRole('button', { name: 'Salvează modificările', exact: true }).click();
+    await expect(canto.page.getByRole('status')).toContainText('Piesa a fost salvată.');
+    assert.equal(canto.writes[0].id, 'eq.canto-piece');
+    assert.match(canto.writes[0].payload.score_path, /^canto\//);
+    await canto.page.locator('main').getByRole('switch').click();
+    await expect(canto.page.getByRole('region', { name: 'Biblioteca Canto' })).toBeVisible();
+    await expect(canto.page.getByRole('button', { name: /Adaugă|Editează|Șterge|Salvează/ })).toHaveCount(0);
+    await expect(canto.page.getByRole('link', { name: /Gestionează|Panou profesor/ })).toHaveCount(0);
+    await canto.page.getByRole('button', { name: 'Vezi partitura', exact: true }).click();
+    const score = canto.page.getByRole('dialog', { name: 'Partitura — Piesă canto' });
+    await expect(score.getByText('Pagina 1 din 1', { exact: true })).toBeVisible();
+    await expect(score.locator('canvas')).toBeVisible();
+    await expect.poll(async () => score.locator('canvas').evaluate(canvas => canvas.width)).toBe(250);
+    await canto.page.keyboard.press('Escape');
+    await canto.page.getByRole('link', { name: 'Alege disciplina', exact: true }).click();
+    await canto.page.getByRole('link', { name: 'Deschide Canto', exact: true }).click();
+    await expect(canto.page.getByRole('switch', { name: 'Comută modul profesor' })).toHaveAttribute('aria-checked', 'false');
+    await expect(canto.page.getByRole('link', { name: /Gestionează|Panou profesor/ })).toHaveCount(0);
+    await expect(canto.page.getByRole('region', { name: 'Biblioteca Canto' })).toBeVisible();
+    assert.deepEqual(canto.errors, []);
+    await canto.context.close();
+    console.log('Canto PASS: UPDATE description/PDF, student UI, rendered private PDF and SPA preview persistence.');
+    const red = await open({ width: 1440, height: 900 }, '/admin/resurse/', 'teacher');
+    await red.page.getByRole('button', { name: 'Editează Lecție RED' }).click();
+    await expect(red.page.getByLabel('Titlu', { exact: true })).toHaveValue('Lecție RED');
+    await red.page.getByLabel('Descriere', { exact: true }).fill('Explicații actualizate');
+    await red.page.getByRole('button', { name: 'Salvează modificările', exact: true }).click();
+    await expect(red.page.getByText('Resursa a fost actualizată.', { exact: true })).toBeVisible();
+    assert.equal(red.writes[0].id, 'eq.resource-id');
+    assert.equal('file_path' in red.writes[0].payload, false, 'unchanged PDF must be preserved');
+    await red.page.getByRole('button', { name: 'Editează Lecție RED' }).click();
+    await red.page.locator('input[type=file]').setInputFiles({ name: 'lesson.pdf', mimeType: 'application/pdf', buffer: studyPdf() });
+    await red.page.getByRole('button', { name: 'Salvează modificările', exact: true }).click();
+    await expect(red.page.getByText('Resursa a fost actualizată.', { exact: true })).toBeVisible();
+    assert.match(red.writes[1].payload.file_path, /^red\//);
+    assert.equal(red.writes[1].id, 'eq.resource-id');
+    assert.deepEqual(red.errors, []);
+    await red.context.close();
+    console.log('RED PASS: prefilled resource UPDATE preserving unchanged PDF and uploading its replacement.');
+
+} finally {
+    if (browser) await browser.close();
+    if (server.exitCode === null && server.signalCode === null) { const exited = once(server, 'exit'); server.kill(); await exited; }
+    await new Promise((resolve, reject) => upstream.close(error => error ? reject(error) : resolve()));
+}
