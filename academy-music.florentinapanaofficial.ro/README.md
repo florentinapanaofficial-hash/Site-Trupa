@@ -497,3 +497,13 @@ Această implementare nu publică automat funcția, nu setează chei și nu tran
 ### Validare Modulul 4
 
 `npm test` include parser/AI, graful Web Audio, anularea/cleanup-ul microfonului, autorizarea Edge și migrarea cooldown în PostgreSQL/PGlite. După `npm run build`, rulează `npm run test:canto`: Chromium 390/1440 px, microfon virtual și audio PCM sintetic (cu byte ranges reale), gardă de căști exclusiv la REC, zero captare la Play, MediaRecorder real cu microfon virtual, permisiune refuzată, Stop/fundal și revizuire, trimitere multipart simulată cu fișier audio nenul, highlight pe cuvânt și reduced motion; UI AI cu răspunsuri simulate în ambele editoare. Browserul de test este mut. Nu se trimit fișiere sau chei către furnizor și nu se verifică automat calitatea perceptivă a reverbului/transcrierii reale.
+
+## Personalizare, niveluri de studiu și prezență
+
+Migrarea incrementală `supabase/migrations/20261020000007_study_levels_presence.sql` se aplică după migrarea catalogului de teme și celelalte migrări anterioare (inclusiv `20261020000005_security_sessions.sql` și `20261020000006_generate_lyrics.sql`), înainte de publicarea frontendului actualizat. Ea adaugă `profiles.study_level` (distinct de `grade_level`), protejează schimbarea nivelului la profesor, păstrează bucketul `avatars` privat și configurează RLS pentru canalul privat Realtime `academy:online`. Nu lărgește accesul elevilor la profilurile celorlalți.
+
+Biblioteca afișează piesele publicate, dar accesul la audio/PDF rămâne controlat separat de `can_access_piece` și Storage RLS. Nivelul următor se deblochează numai când există cel puțin o piesă alocată în nivelul elevului și fiecare piesă distinctă are o temă audio/video asociată prin `piece_id` în `catalog_teme` sau `submissions`. Lipsa alocărilor nu deblochează nivelul. Înregistrările din pian fără asociere la o piesă nu sunt luate în calcul.
+
+Avatarurile acceptă JPEG, PNG și WebP până la 5 MB. Prezența transmite doar numele și un URL semnat temporar al avatarului; nu folosește starea Presence ca autorizare și nu expune lista de profiluri prin RLS.
+
+După migrare, validează cu `npm test`, `npx vite build`, `npm run build`, `npm run test:admin` și `npm run test:canto`. Migrarea și prezența live trebuie verificate în proiectul Supabase înainte de deploy.

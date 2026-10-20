@@ -1,6 +1,7 @@
 import SecureAudioPlayer from './SecureAudioPlayer';
 import PieceAudio from './PieceAudio';
 import { VARIANT_LIST, resolveAudioSource } from '../lib/pieces';
+import { Lock } from 'lucide-react';
 
 export default function DualAudioRow({
     index,
@@ -11,9 +12,12 @@ export default function DualAudioRow({
     isFirst,
     isLast,
     actions = null,
+    locked = false,
+    onLocked,
 }) {
     return (
-        <article className="card p-4">
+        <article className={`card relative p-4 ${locked ? 'overflow-hidden' : ''}`}>
+            <div className={locked ? 'opacity-45' : ''}>
             <div className="flex items-start gap-3">
                 <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-brand-500/20 text-sm font-bold text-brand-200">
                     {index + 1}
@@ -27,9 +31,9 @@ export default function DualAudioRow({
                     </p>
                 </div>
 
-                {actions}
+                {!locked && actions}
 
-                {onRemove && (
+                {!locked && onRemove && (
                     <div className="flex shrink-0 gap-1">
                         <button
                             type="button"
@@ -60,7 +64,7 @@ export default function DualAudioRow({
                 )}
             </div>
 
-            <div className="mt-3 grid gap-3 lg:grid-cols-2">
+            {!locked && <div className="mt-3 grid gap-3 lg:grid-cols-2">
                 {VARIANT_LIST.map((variant) => {
                     const source = resolveAudioSource(piece, variant.key);
 
@@ -86,7 +90,12 @@ export default function DualAudioRow({
                         </div>
                     );
                 })}
+            </div>}
             </div>
+            {locked && <button type="button" className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-ink-950/65 p-4 text-center text-sm font-semibold text-white transition hover:bg-ink-950/75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-gold-400" onClick={onLocked} aria-label={`Piesa ${piece.title} este blocată. Vezi condițiile de deblocare.`}>
+                <Lock size={26} aria-hidden="true" /><span>Piesă blocată</span>
+                <span className="text-xs font-normal text-slate-200">Finalizează temele nivelului tău pentru a debloca nivelul următor.</span>
+            </button>}
         </article>
     );
 }

@@ -156,6 +156,7 @@ test('built standalone server serves JSON APIs, SSR pages and private security h
             assert.match(response.headers.get('permissions-policy'), /camera=\(self "https:\/\/meet\.academy\.test"\)/);
             const csp = response.headers.get('content-security-policy');
             assert.match(csp, /frame-ancestors 'none'/);
+            assert.match(csp, /connect-src[^;]*https:\/\/tonejs\.github\.io/);
             assert.ok(!csp.includes('unsafe-eval'));
             assert.match(csp, /https:\/\/meet\.academy\.test/);
             for (const script of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)) {

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { supabase, BUCKET_AVATARS } from '../../lib/supabase';
 import { useAuth } from '../../lib/auth';
-import { invalidateSignedUrl, safeFileName, uploadFile } from '../../lib/media';
+import { invalidateSignedUrl, uploadFile } from '../../lib/media';
 import Avatar from '../../components/Avatar';
 import DualAudioRow from '../../components/DualAudioRow';
 import PieceSelectorModal from '../../components/PieceSelectorModal';
@@ -144,8 +144,9 @@ export default function StudentDetail({ student, allPieces, onBack, onStudentCha
         const file = event.target.files?.[0];
         if (!file) return;
 
-        if (!file.type.startsWith('image/')) {
-            setStatus({ busy: false, error: 'Alege un fișier imagine.' });
+        const extensions = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+        if (!extensions[file.type]) {
+            setStatus({ busy: false, error: 'Alege o fotografie JPEG, PNG sau WebP.' });
             return;
         }
         if (file.size > MAX_AVATAR_BYTES) {
@@ -158,7 +159,7 @@ export default function StudentDetail({ student, allPieces, onBack, onStudentCha
 
         try {
             // Prefixul cu id-ul elevului este cerut de politica RLS de pe bucketul `avatars`.
-            const path = `${student.id}/${Date.now()}-${safeFileName(file.name)}`;
+            const path = `${student.id}/${Date.now()}.${extensions[file.type]}`;
             await uploadFile(BUCKET_AVATARS, path, file);
 
             const { error } = await supabase
@@ -255,7 +256,7 @@ export default function StudentDetail({ student, allPieces, onBack, onStudentCha
                         <input
                             ref={fileInputRef}
                             type="file"
-                            accept="image/*"
+                            accept="image/jpeg,image/png,image/webp"
                             className="hidden"
                             onChange={handleAvatar}
                             disabled={status.busy}
@@ -269,7 +270,7 @@ export default function StudentDetail({ student, allPieces, onBack, onStudentCha
                 <p className="rounded-lg bg-brand-500/15 px-3 py-2 text-sm text-brand-200">{status.error}</p>
             )}
 
-            <section className="card grid gap-4 sm:grid-cols-3">
+            <section className="card grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <div>
                     <label className="label" htmlFor="student-role">
                         Rol
@@ -303,6 +304,15 @@ export default function StudentDetail({ student, allPieces, onBack, onStudentCha
                             }
                         }}
                     />
+                </div>
+
+                <div>
+                    <label className="label" htmlFor="student-study-level">Nivel de studiu</label>
+                    <select id="student-study-level" className="input" value={student.study_level || 'incepator'} disabled={status.busy || !['student', 'elev'].includes(student.role)} onChange={(event) => patchStudent({ study_level: event.target.value })}>
+                        <option value="incepator">Începător</option>
+                        <option value="mediu">Mediu</option>
+                        <option value="avansat">Avansat</option>
+                    </select>
                 </div>
 
                 <div>

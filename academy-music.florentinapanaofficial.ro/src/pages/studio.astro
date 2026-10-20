@@ -13,7 +13,7 @@ const mediaUrl = 'https://media.florentinapanaofficial.ro/Hore%202026%20FP%20Ban
         <nav class="flex gap-6 text-sm text-gold-400"><a href="/">Academy Music</a><a href="/revista/">Revista</a></nav>
         <h1 class="text-3xl text-white">Studio Academy Music</h1>
         <HomeworkStudio client:load />
-        <VirtualPiano client:load />
+        <VirtualPiano client:load splitView={false} desktopSamples={false} />
         <ScoreEditor client:visible />
         <StudentQuizPlayer quizId="note-muzicale-intro" client:visible />
         <section class="space-y-4"><h2 class="text-2xl text-white">Audiție: pulsul muzical</h2>

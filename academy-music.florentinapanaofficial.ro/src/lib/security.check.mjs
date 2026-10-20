@@ -95,11 +95,14 @@ test('SQL migration: real RLS, atomic IP locking, session replacement, consent a
             create function auth.jwt() returns jsonb language sql stable as $$ select coalesce(nullif(current_setting('request.jwt.claims',true),''),'{}')::jsonb $$;
             create function auth.role() returns text language sql stable as $$ select auth.jwt()->>'role' $$;
             create schema storage;
-            create table storage.buckets(id text primary key,name text,public boolean);
+            create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);
             create table storage.objects(id uuid primary key default gen_random_uuid(),bucket_id text,name text);
             alter table storage.objects enable row level security;
             create function storage.foldername(text) returns text[] language sql as $$ select string_to_array($1,'/') $$;
-            grant usage on schema auth,storage to authenticated,service_role;
+            create function storage.extension(text) returns text language sql immutable as $$ select split_part($1,'.',2) $$;
+            create schema realtime; create table realtime.messages(extension text);
+            create function realtime.topic() returns text language sql stable as $$ select 'academy:online' $$;
+            grant usage on schema auth,storage,realtime to authenticated,service_role;
         `);
         for (const name of ['schema.sql', 'setup_quizzes.sql', 'setup_student_homework.sql', 'setup_online_classes.sql', 'setup_catalog_teme.sql']) {
             await db.exec(await readFile(new URL(`../../supabase/${name}`, import.meta.url), 'utf8'));

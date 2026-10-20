@@ -6,6 +6,8 @@ import { logEvent } from '../lib/activity';
 import { useTeacherMode } from '../lib/useTeacherMode';
 import TeacherModeToggle from './TeacherModeToggle';
 import Spinner from './ui/Spinner';
+import Avatar from './Avatar';
+import LivePresence from './LivePresence';
 
 const SHARED_LINKS = [
     { to: '/red/', label: 'Resurse de teorie', Icon: Library },
@@ -13,11 +15,6 @@ const SHARED_LINKS = [
     { to: '/portofoliu/', label: 'Portofoliu', Icon: FolderOpen },
     { to: '/cursuri-online/', label: 'Cursuri online', Icon: Users },
 ];
-
-function initials(name, email) {
-    const parts = (name || email || '?').trim().split(/\s+/).filter(Boolean);
-    return parts.length >= 2 ? (parts[0][0] + parts[1][0]).toUpperCase() : (parts[0] || '?').slice(0, 2).toUpperCase();
-}
 
 export default function Layout() {
     const { profile, user, isTeacher, isInspector, signOut } = useAuth();
@@ -93,7 +90,7 @@ export default function Layout() {
                         <div className="lg:hidden"><Brand compact /></div>
                         <div className="ml-auto flex items-center gap-3">
                             <div className="hidden text-right sm:block"><p className="text-sm font-semibold text-slate-100">{profile?.full_name || user?.email}</p><p className="text-xs text-slate-400">{isTeacher ? 'Profesor' : isInspector ? 'Inspector' : 'Elev'} · Palatul Copiilor Pitești</p></div>
-                            <span className="hidden size-10 place-items-center rounded-full bg-brand-500/20 text-sm font-bold text-brand-200 sm:grid">{initials(profile?.full_name, user?.email)}</span>
+                            <Avatar path={profile?.avatar_path} name={profile?.full_name || user?.email} size="sm" className="hidden sm:inline-grid" />
                             <button type="button" className="btn-ghost px-3 py-2" onClick={handleSignOut}>Ieșire</button>
                             <button type="button" className="btn-ghost px-3 py-2 lg:hidden" onClick={() => setMenuOpen((open) => !open)} aria-expanded={menuOpen} aria-controls="academy-mobile-menu" aria-label="Meniu"><Menu size={22} aria-hidden="true" /></button>
                         </div>
@@ -101,9 +98,12 @@ export default function Layout() {
                     {menuOpen && <div id="academy-mobile-menu" className="max-h-[calc(100dvh-5rem)] overflow-y-auto border-t border-white/10 bg-ink-900 px-4 pb-5 lg:hidden">{navigation(true)}</div>}
                 </header>
                 {signOutError && <p role="alert" className="mx-4 mt-4 rounded-xl border border-rose-300/30 bg-rose-300/10 p-3 text-sm text-rose-100">{signOutError}</p>}
-                <main className="mx-auto w-full max-w-6xl flex-1 p-4 sm:p-6">
-                    <Suspense fallback={<Spinner label="Se încarcă disciplina…" />}><Outlet /></Suspense>
-                </main>
+                <div className="mx-auto flex w-full max-w-[1600px] flex-1 flex-col gap-6 p-4 sm:p-6 xl:flex-row">
+                    <main className="min-w-0 flex-1">
+                        <Suspense fallback={<Spinner label="Se încarcă disciplina…" />}><Outlet /></Suspense>
+                    </main>
+                    <aside className="w-full shrink-0 xl:w-64"><LivePresence profile={profile} /></aside>
+                </div>
                 <footer className="border-t border-white/10 px-4 py-5 text-center text-xs text-slate-400">Academy Music · Florentina Pană · Palatul Copiilor Pitești — materialele sunt protejate prin drept de autor și destinate exclusiv elevilor înscriși.</footer>
             </div>
         </div>

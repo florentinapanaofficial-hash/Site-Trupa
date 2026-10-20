@@ -9,6 +9,9 @@ import SecurePdfViewer from '../components/SecurePdfViewer';
 import Modal from '../components/ui/Modal';
 import Spinner from '../components/ui/Spinner';
 import EmptyState from '../components/ui/EmptyState';
+import { useStudyProgress } from '../lib/useStudyProgress';
+import { isStudyLevelLocked, studyLevelLabel } from '../lib/studyLevels';
+import StudyProgressNotice from '../components/StudyProgressNotice';
 
 const META = {
     orga: {
@@ -34,6 +37,8 @@ export default function Discipline({ discipline }) {
     const { profile, isTeacher: teacherRole } = useAuth();
     const [teacherMode] = useTeacherMode();
     const isTeacher = teacherRole && teacherMode;
+    const studyProgress = useStudyProgress(profile, !isTeacher);
+    const [lockNotice, setLockNotice] = useState('');
     const navigate = useNavigate();
     const [loadError, setLoadError] = useState('');
     const [pieces, setPieces] = useState(null);
@@ -83,8 +88,15 @@ export default function Discipline({ discipline }) {
         logEvent(profile?.id, 'open_score', discipline === 'orga' ? '/instrument/' : '/canto/', { piece_id: piece.id });
     }
 
+    function practicePiece(piece) {
+        logEvent(profile?.id, 'open_score', '/instrument/claviatura/', { piece_id: piece.id });
+        navigate('/instrument/claviatura/?piece=' + encodeURIComponent(piece.id));
+    }
+
     return (
         <div className="space-y-6">
+            {!isTeacher && <StudyProgressNotice state={studyProgress} />}
+            {lockNotice && <p role="status" aria-live="polite" className="rounded-lg border border-gold-400/20 bg-gold-400/10 p-3 text-sm text-gold-200">{lockNotice}</p>}
             <header className="card flex flex-wrap items-start justify-between gap-4">
                 <div>
                     <span className="text-3xl" aria-hidden="true">
@@ -93,7 +105,9 @@ export default function Discipline({ discipline }) {
                     <h1 className="mt-2 font-display text-3xl text-white">{meta.title}</h1>
                     <p className="mt-1 text-sm text-slate-400">{meta.subtitle}</p>
                 </div>
-                {isTeacher && (
+                <div className="flex flex-wrap gap-2">
+                    {discipline === 'orga' && <button type="button" className="btn-ghost" onClick={() => navigate('/instrument/claviatura/')}>🎹 Deschide claviatura</button>}
+                    {isTeacher && (
                     <button
                         type="button"
                         className="btn-gold"
@@ -101,7 +115,8 @@ export default function Discipline({ discipline }) {
                     >
                         ＋ Adaugă piesă
                     </button>
-                )}
+                    )}
+                </div>
             </header>
 
             <div className="flex flex-col gap-3 sm:flex-row">
@@ -141,9 +156,10 @@ export default function Discipline({ discipline }) {
                 />
             ) : (
                 <div className="grid gap-4 lg:grid-cols-2">
-                    {filtered.map((piece) => (
-                        <PieceCard key={piece.id} piece={piece} onOpenScore={openScore} />
-                    ))}
+                    {filtered.map((piece) => {
+                        const locked = !isTeacher && isStudyLevelLocked(piece.level, studyProgress.progress.unlockedLevels);
+                        return <PieceCard key={piece.id} piece={piece} locked={locked} onLocked={() => setLockNotice('Info: profilul tău este ' + studyLevelLabel(studyProgress.progress.studyLevel) + '. Trimite toate temele asociate pieselor alocate nivelului curent pentru a debloca nivelul următor.')} onOpenScore={openScore} onPractice={discipline === 'orga' ? practicePiece : undefined} />;
+                    })}
                 </div>
             )}
 

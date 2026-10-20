@@ -70,8 +70,8 @@ export default function AdminStudents() {
 
     async function patch(id, changes) {
         const { data, error } = await supabase.from('profiles').update(changes)
-            .eq('id', id).in('role', ['student', 'elev']).select('id, is_active').single();
-        if (error || !data || ('is_active' in changes && data.is_active !== changes.is_active)) {
+            .eq('id', id).in('role', ['student', 'elev']).select('id, is_active, study_level').single();
+        if (error || !data || ('is_active' in changes && data.is_active !== changes.is_active) || ('study_level' in changes && data.study_level !== changes.study_level)) {
             throw new Error('Modificarea elevului nu a putut fi salvată.');
         }
         await load();
@@ -229,12 +229,13 @@ export default function AdminStudents() {
                 <EmptyState icon="🧒" title="Niciun elev găsit" />
             ) : (
                 <div className="overflow-x-auto">
-                    <table className="w-full min-w-[620px] text-left text-sm">
+                    <table className="w-full min-w-[760px] text-left text-sm">
                         <caption className="sr-only">Elevii înscriși și starea conturilor</caption>
                         <thead className="border-b border-white/10 text-slate-400">
                             <tr>
                                 <th scope="col" className="px-3 py-3">Nume și prenume</th>
                                 <th scope="col" className="px-3 py-3">Username</th>
+                                <th scope="col" className="px-3 py-3">Nivel</th>
                                 <th scope="col" className="px-3 py-3">Repertoriu</th>
                                 <th scope="col" className="px-3 py-3">Stare</th>
                                 <th scope="col" className="px-3 py-3">Acțiuni</th>
@@ -253,6 +254,7 @@ export default function AdminStudents() {
                                             </button>
                                         </td>
                                         <td className="px-3 py-3 text-gold-300">{student.username || '—'}</td>
+                                        <td className="px-3 py-3 text-slate-300">{{ incepator: 'Începător', mediu: 'Mediu', avansat: 'Avansat' }[student.study_level || 'incepator']}</td>
                                         <td className="px-3 py-3 text-slate-300">{assigned} {assigned === 1 ? 'piesă' : 'piese'}</td>
                                         <td className={`px-3 py-3 ${student.is_active ? 'text-emerald-300' : 'text-brand-200'}`}>{student.is_active ? 'Activ' : 'Inactiv'}</td>
                                         <td className="px-3 py-3">

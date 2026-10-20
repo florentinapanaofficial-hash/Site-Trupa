@@ -1,12 +1,15 @@
 import { useTeacherMode } from '../lib/useTeacherMode';
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FileText, Plus } from 'lucide-react';
+import { FileText, Lock, Plus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../lib/auth';
 import CantoPieceStudio from '../components/CantoPieceStudio';
 import Modal from '../components/ui/Modal';
 import Spinner from '../components/ui/Spinner';
+import StudyProgressNotice from '../components/StudyProgressNotice';
+import { useStudyProgress } from '../lib/useStudyProgress';
+import { isStudyLevelLocked, studyLevelLabel } from '../lib/studyLevels';
 
 const RecordingStudio = lazy(() => import('../components/RecordingStudio'));
 const SecurePdfViewer = lazy(() => import('../components/SecurePdfViewer'));
@@ -15,6 +18,8 @@ export default function Canto() {
     const { isTeacher: teacherRole, profile, isInspector } = useAuth();
     const [teacherMode] = useTeacherMode();
     const isTeacher = teacherRole && teacherMode;
+    const studyProgress = useStudyProgress(profile, !isTeacher);
+    const [lockNotice, setLockNotice] = useState('');
     const [pieces, setPieces] = useState(null);
     const [error, setError] = useState('');
     const [search, setSearch] = useState('');
@@ -52,6 +57,8 @@ export default function Canto() {
                 <h1 className="font-display text-3xl text-white">Canto</h1>
                 {isTeacher && <Link to="/admin/canto/" className="btn-gold inline-flex items-center gap-2"><Plus size={16} aria-hidden="true" /> Adaugă piesă</Link>}
             </header>
+            {!isTeacher && <StudyProgressNotice state={studyProgress} />}
+            {lockNotice && <p role="status" aria-live="polite" className="rounded-lg border border-gold-400/20 bg-gold-400/10 p-3 text-sm text-gold-200">{lockNotice}</p>}
             <div className="flex flex-col gap-3 sm:flex-row">
                 <input type="search" className="input sm:max-w-xs" aria-label="Caută în Canto" placeholder="Piesă sau grupă" value={search} onChange={(event) => setSearch(event.target.value)} />
                 <div className="flex items-center gap-2 text-sm text-slate-300">
@@ -65,16 +72,22 @@ export default function Canto() {
             {error && <div role="alert" className="text-sm text-brand-200">{error} <button type="button" className="btn-ghost" onClick={load}>Reîncearcă</button></div>}
             {pieces === null ? <Spinner label="Se încarcă Canto…" /> : !error && !filtered.length ? <p className="text-slate-400">Nicio piesă găsită.</p> : (
                 <div className="divide-y divide-white/10">
-                    {filtered.map((piece) => <article key={piece.id} className="card my-5 min-w-0 space-y-4 border border-white/10 bg-gradient-to-br from-ink-900 to-ink-950">
+                    {filtered.map((piece) => {
+                        const locked = !isTeacher && isStudyLevelLocked(piece.level, studyProgress.progress.unlockedLevels);
+                        return <article key={piece.id} className="card relative my-5 min-w-0 space-y-4 overflow-hidden border border-white/10 bg-gradient-to-br from-ink-900 to-ink-950">
                         <div className="min-w-0"><h2 className="break-words text-lg font-semibold text-white">{piece.title}</h2><p className="mt-1 break-words text-sm text-slate-400">{piece.grupa || 'Fără grupă'}</p>{piece.description && <p className="mt-2 text-sm text-slate-300">{piece.description}</p>}</div>
-                        <CantoPieceStudio piece={piece} />
-                        {!isInspector && <button type="button" className="btn-gold" onClick={() => { document.querySelectorAll("audio").forEach(audio => audio.pause()); setRecordingPiece(piece); }}>REC · Înregistrează tema</button>}
-                        {piece.score_path && <button type="button" className="btn-ghost justify-self-start" onClick={() => setScore(piece)}>Vezi partitura</button>}
-                        <button type="button" className="btn-ghost inline-flex items-center justify-center gap-2 justify-self-start" disabled={!piece.versuri_text} aria-label={`Vezi versuri — ${piece.title}`} onClick={() => setLyrics(piece)}><FileText size={16} aria-hidden="true" /> Vezi versuri</button>
-                    </article>)}
+                        {!locked ? <>
+                            <CantoPieceStudio piece={piece} />
+                            {!isInspector && <button type="button" className="btn-gold" onClick={() => { document.querySelectorAll("audio").forEach(audio => audio.pause()); setRecordingPiece(piece); }}>REC · Înregistrează tema</button>}
+                            {piece.score_path && <button type="button" className="btn-ghost justify-self-start" onClick={() => setScore(piece)}>Vezi partitura</button>}
+                            <button type="button" className="btn-ghost inline-flex items-center justify-center gap-2 justify-self-start" disabled={!piece.versuri_text} aria-label={`Vezi versuri — ${piece.title}`} onClick={() => setLyrics(piece)}><FileText size={16} aria-hidden="true" /> Vezi versuri</button>
+                        </> : <div className="min-h-24" aria-hidden="true" />}
+                        {locked && <button type="button" className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-ink-950/75 p-4 text-center font-semibold text-white" onClick={() => setLockNotice('Info: profilul tău este ' + studyLevelLabel(studyProgress.progress.studyLevel) + '. Trimite toate temele asociate pieselor alocate nivelului curent pentru a debloca nivelul următor.')} aria-label={`Piesa ${piece.title} este blocată. Vezi condițiile de deblocare.`}><Lock size={28} aria-hidden="true" /><span>Piesă blocată</span><span className="text-xs font-normal text-slate-200">Finalizează temele nivelului tău pentru a debloca nivelul următor.</span></button>}
+                    </article>;
+                    })}
                 </div>
             )}
-            {recordingPiece && <Suspense fallback={<Spinner label="Se încarcă studioul de înregistrare…" />}><RecordingStudio open piece={recordingPiece} onClose={() => setRecordingPiece(null)} /></Suspense>}
+            {recordingPiece && <Suspense fallback={<Spinner label="Se încarcă studioul de înregistrare…" />}><RecordingStudio open piece={recordingPiece} onClose={() => setRecordingPiece(null)} onSubmitted={() => void studyProgress.reload()} /></Suspense>}
             <Modal open={Boolean(lyrics)} title={lyrics?.title || 'Versuri'} onClose={() => setLyrics(null)} wide>
                 <div className="max-h-[65vh] overflow-y-auto whitespace-pre-wrap break-words text-base leading-8 text-slate-100" tabIndex={0} aria-label="Versurile piesei">{lyrics?.versuri_text}</div>
             </Modal>

@@ -16,24 +16,27 @@ function initials(name) {
 }
 
 /** Avatarele stau într-un bucket privat, deci au nevoie de URL semnat, ca orice alt material. */
-export default function Avatar({ path, name, size = 'md', className = '' }) {
-    const [url, setUrl] = useState(null);
+export default function Avatar({ path, name, size = 'md', className = '', signedUrl }) {
+    const [url, setUrl] = useState(signedUrl || null);
 
     useEffect(() => {
         let active = true;
-        setUrl(null);
+        setUrl(signedUrl || null);
+        if (signedUrl) return undefined;
         if (!path) return undefined;
 
         getSignedUrl(BUCKET_AVATARS, path)
             .then((value) => {
                 if (active) setUrl(value);
             })
-            .catch(() => { });
+            .catch((error) => {
+                console.error('[Academy] Fotografia de profil nu a putut fi încărcată:', error.message);
+            });
 
         return () => {
             active = false;
         };
-    }, [path]);
+    }, [path, signedUrl]);
 
     const base = `${SIZES[size]} shrink-0 rounded-full object-cover ${className}`;
 

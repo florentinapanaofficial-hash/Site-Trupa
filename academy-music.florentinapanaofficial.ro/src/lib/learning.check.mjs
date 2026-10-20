@@ -634,6 +634,19 @@ test('three octaves, distinct QWERTY mappings and ADSR presets use only oscillat
     assert.ok(fallback.calls.some((call) => call[0] === 'cancelScheduledValues'));
 });
 
+test('virtual piano lazy-loads desktop samples after selecting the native mobile fallback', async () => {
+    const source = await readFile(new URL('../components/VirtualPiano.jsx', import.meta.url), 'utf8');
+    assert.doesNotMatch(source, /import\s+.*from\s+['"]tone['"]/);
+    const mobileGate = source.indexOf("if (deviceType === 'mobile')");
+    const audioImport = source.indexOf("await import('tone')");
+    assert.ok(mobileGate >= 0 && audioImport > mobileGate);
+    assert.ok(source.indexOf('new Tone.Sampler', audioImport) > audioImport);
+    assert.match(source, /splitView = true/);
+    assert.match(source, /SecurePdfViewer path=\{selectedPiece\.score_path\}/);
+    const studio = await readFile(new URL('../pages/studio.astro', import.meta.url), 'utf8');
+    assert.match(studio, /splitView=\{false\} desktopSamples=\{false\}/);
+});
+
 test('metronome schedules on the audio clock, accents four beats and cancels pending work', () => {
     const audio = fakeAudio();
     const visuals = new Map();
@@ -689,11 +702,14 @@ test('online and catalog RLS isolate students, deny inspector writes and preserv
             create role anon; create role authenticated; create schema auth;
             create table auth.users(id uuid primary key, raw_user_meta_data jsonb);
             create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;
-            create schema storage; create table storage.buckets(id text primary key,name text,public boolean);
+            create schema storage; create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);
             create table storage.objects(id uuid primary key default gen_random_uuid(),bucket_id text,name text);
             alter table storage.objects enable row level security;
             create function storage.foldername(text) returns text[] language sql as $$ select string_to_array($1,'/') $$;
-            grant usage on schema auth,storage to authenticated;
+            create function storage.extension(text) returns text language sql immutable as $$ select split_part($1,'.',2) $$;
+            create schema realtime; create table realtime.messages(extension text);
+            create function realtime.topic() returns text language sql stable as $$ select 'academy:online' $$;
+            grant usage on schema auth,storage,realtime to authenticated;
         `);
         for (const filename of ['schema.sql', 'setup_quizzes.sql', 'setup_student_homework.sql', 'setup_online_classes.sql', 'setup_online_classes.sql', 'setup_catalog_teme.sql', 'setup_catalog_teme.sql']) await db.exec(await readFile(new URL(`../../supabase/${filename}`, import.meta.url), 'utf8'));
         await db.exec(`

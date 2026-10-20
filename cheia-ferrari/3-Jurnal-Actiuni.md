@@ -5066,3 +5066,56 @@ Karaoke pe materialele salvate de profesor, generare AI la cerere în Admin și 
 - Microfonul/monitorizarea nu se activează la ascultare. Căștile nu pot fi detectate fizic; volumul trebuie redus, iar latența/calitatea reverbului trebuie ascultate pe hardware real. Safari/iOS și video pe dispozitive reale rămân de verificat. Versurile ajutătoare sunt vizuale; fișierul audio include voce + negativ, nu versuri vorbite/suprapuse.
 - **Migrarea nouă și Edge Function nu au fost aplicate/publicate live; OPENAI_API_KEY nu a fost configurată. Nu s-a făcut deploy Railway sau commit.** Urmează activarea separată conform README, cu buget controlat și material original/autorizat. Testele nu reprezintă verificarea facturării/calității Whisper sau a unui upload real Google Drive.
 - Nu trimite către AI înregistrări personale/ale minorilor sau materiale fără drepturi/autorizările necesare. Este obligatorie revizuirea textului și alinierii pozitiv/negativ. Cererile deja ajunse la furnizor pot costa chiar dacă browserul este închis. Restricția de două minute nu înlocuiește limitele de buget ale furnizorului. Protecția playerului nu este DRM absolut.
+
+## 📝 20 oct 2026 — Academy: Modul 5, Instrument-Orgă
+
+### Obiectiv
+Implementarea claviaturii virtuale responsive pe /instrument/claviatura/, cu motor audio adaptiv și afișarea simultană a partiturilor din repertoriu.
+
+### Modificări
+- VirtualPiano.jsx: Tone.js și cele șapte sample-uri Salamander Grand Piano se încarcă asincron numai pe desktop și în modul split view; pe mobil și în /studio/ rămâne sintetizatorul Web Audio local. Sunt păstrate tastele PC, pointer/touch multitouch, feedback glow, înregistrarea și redarea temei.
+- Split view cu selecție alfabetică a partiturilor accesibile, PDF prin SecurePdfViewer și navigare din cardurile /instrument/ cu ID-ul piesei în query string; accesul la catalog rămâne protejat de RLS.
+- Discipline.jsx și PieceCard.jsx: acțiuni pentru deschiderea claviaturii și exersarea unei piese alese.
+- studio.astro: păstrat modulul standalone existent, fără sample-uri externe sau split view.
+- middleware.js: permis hostul tonejs.github.io în connect-src; atribuire CC BY 3.0 pentru sample-uri.
+- package.json/package-lock.json: Tone 14.9.17 declarat explicit; learning.check.mjs și server.check.mjs: regresii pentru importul audio lazy și CSP.
+
+### Validări
+- Build Academy: PASS; chunk VirtualPiano 16.288 bytes, chunk Tone.js 345.269 bytes încărcat dinamic separat. Sample-urile alese răspund 200 și permit CORS.
+- npm test: 41/41 PASS; npm run test:server: 16/16 PASS; npm run test:navigation: PASS la 390px și 1440px.
+- npm run seo:check: 64 pagini HTML, 0 FAIL | 0 WARN. Shell Academy noindex/nofollow; title 52 și description 136 caractere. Fără modificări metadata/JSON-LD/imagine sau date GSC.
+
+### Greșeli detectate / riscuri / pași următori
+- Testarea audio finală pe boxe/căști și măsurarea latenței trebuie făcute pe desktop și mobil real; sample-urile se descarcă doar pe desktop și cer internet, iar fallback-ul mobil funcționează local. Nu s-a făcut deploy sau commit.
+- npm a raportat 13 vulnerabilități în arborele Academy (3 moderate, 6 high, 4 critical); nu s-a rulat npm audit fix, fiind în afara scopului și necesitând triere separată.
+
+## 📝 20 oct 2026 — Academy: avataruri, niveluri și prezență
+
+### Obiectiv
+Completarea personalizării elevilor, accesului gradual la repertoriu și prezenței online în aplicația privată Academy.
+
+### Modificări
+- StudentDetail: upload avatar JPEG/PNG/WebP max 5 MB; avatarul rămâne în bucket privat și `profiles.avatar_path`. Nivelul Începător/Mediu/Avansat este salvat separat în `profiles.study_level`, controlat de profesor și afișat în lista Admin. Headerul și LivePresence reutilizează Avatar.
+- `useStudyProgress` și `get_my_study_progress()` calculează progresul pe piese publicate alocate direct sau prin grupă în nivelul curent. Audio-ul din `catalog_teme` și audio/video din `submissions` se numără distinct după `piece_id`; 0/0 nu deblochează nimic.
+- Discipline, Canto și RepertoriulMeu afișează piesele publicate, dar ascund controalele audio/PDF pentru nivelurile blocate și prezintă o explicație accesibilă. Deblocarea nivelului următor este validată server-side; Storage RLS continuă să protejeze fișierele.
+- `LivePresence.jsx` folosește canalul privat Supabase `academy:online`, avataruri cu URL semnat temporar și RLS pe `realtime.messages`; nu se expune accesul la profilurile altor elevi.
+- Migrarea `20261020000007_study_levels_presence.sql`, schema consolidată și README au fost actualizate; au fost adăugate teste unitare și PGlite pentru pragul de 100%, vizibilitatea metadatelor și izolarea media.
+
+### Validări
+- `npx vite build`: PASS; `npm run build` Academy: PASS (avertismente Astro pentru fișiere `.jsx` din `src/pages/` și avertismente Vite pentru module Node externalizate).
+- `npm test`: 47/47 PASS; include validarea SQL/RLS în PGlite și cazuri pentru zero alocări, progres incomplet și deblocare la 100%.
+- `npm run test:admin`: PASS la 390px și 1440px; `npm run test:canto`: PASS la 390px și 1440px.
+- `npm run seo:check`: 64 pagini HTML, 0 FAIL | 0 WARN. Aplicația Academy rămâne noindex/nofollow; fără schimbări la metadata, JSON-LD sau imagini publice. Fără date GSC.
+
+### Riscuri / pași următori
+- Migrarea nu a fost aplicată în Supabase live; aplic-o înainte de testul cu conturi reale. Verifică separat autentificarea canalului Presence și încărcarea/URL-urile semnate ale avatarurilor în proiectul Supabase.
+- Buildul React și testele automate au trecut, dar avatar upload și Presence live nu au fost verificate cu date/servicii reale.
+
+### De făcut manual de către Claudiu înainte de testul live / deploy
+1. În Supabase SQL Editor, aplică `supabase/migrations/20261020000007_study_levels_presence.sql` după migrările `20261020000005_security_sessions.sql` și `20261020000006_generate_lyrics.sql`. Verifică execuția completă fără erori; nu este suficientă doar editarea `schema.sql` din repository.
+2. Autentifică-te ca profesor, setează pentru un cont de test `Începător`, atribuie-i cel puțin două piese pentru acest nivel și verifică că o piesă de nivel Mediu rămâne încuiată. Încarcă o temă audio/video asociată fiecărei piese prin `piece_id`; confirmă deblocarea Mediu și accesul media, apoi verifică faptul că Avansat rămâne încuiat. Testează și cazul 0 piese alocate (nu se deblochează).
+3. Încarcă avataruri JPEG, PNG și WebP sub limita de 5 MB și verifică afișarea în Admin, header și LivePresence. Încearcă un fișier nepermis sau prea mare și confirmă mesajul de validare; verifică în Storage că bucketul `avatars` este privat.
+4. Autentifică două conturi Academy în browsere/profiluri separate și verifică join/leave-ul în widgetul „Cine este online”; deconectează un cont și confirmă dispariția lui. Confirmă că utilizatorii anonimi nu pot subscrie și că nu s-a lărgit accesul RLS la `profiles`.
+5. După migrare și testele Supabase live, publică aplicația și fă o verificare scurtă pe desktop și mobil. Testează separat sunetul claviaturii Modulului 5 pe hardware real; SEO/buildurile locale nu verifică latența audio sau integrarea Supabase live.
+
+Migrarea Supabase, uploadul cu fișiere reale, Realtime live și deployul nu au fost rulate de agent.
