@@ -1,5 +1,6 @@
 import GenerateLyricsButton from '../../components/GenerateLyricsButton';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { FileText, Pencil, Save, Trash2, Upload, X } from 'lucide-react';
 import { supabase, BUCKET_MEDIA } from '../../lib/supabase';
 import { useAuth } from '../../lib/auth';
@@ -11,6 +12,9 @@ import Spinner from '../../components/ui/Spinner';
 
 export default function AdminCanto() {
     const { profile } = useAuth();
+    const [params, setParams] = useSearchParams();
+    const editId = params.get('edit');
+    const formRef = useRef(null);
     const [pieces, setPieces] = useState(null);
     const [groups, setGroups] = useState([]);
     const [form, setForm] = useState({ ...EMPTY_CANTO });
@@ -46,6 +50,20 @@ export default function AdminCanto() {
         load();
         supabase.from('study_groups').select('name').order('position').then(({ data }) => setGroups(data || []));
     }, []);
+
+    useEffect(() => {
+        if (!editId || pieces === null || loadError) return;
+        const piece = pieces.find(item => item.id === editId);
+        if (piece) edit(piece);
+        else setStatus({ busy: false, error: 'Piesa solicitată nu a fost găsită în biblioteca Canto.', info: '' });
+        setParams(previous => { const next = new URLSearchParams(previous); next.delete('edit'); return next; }, { replace: true });
+    }, [editId, pieces, loadError, setParams]);
+
+    useEffect(() => {
+        if (!editing) return;
+        formRef.current?.scrollIntoView({ block: 'start', behavior: 'auto' });
+        formRef.current?.querySelector('input')?.focus({ preventScroll: true });
+    }, [editing?.id]);
 
     function reset() {
         setForm({ ...EMPTY_CANTO });
@@ -143,7 +161,8 @@ export default function AdminCanto() {
                 <input type="search" className="input sm:max-w-xs" aria-label="Caută piese Canto" placeholder="Piesă sau grupă" value={search} onChange={(event) => setSearch(event.target.value)} />
             </header>
 
-            <form onSubmit={save} className="space-y-3 border-y border-white/10 py-4" aria-label={editing ? 'Editează piesa Canto' : 'Adaugă piesă Canto'}>
+            <form ref={formRef} onSubmit={save} className="space-y-3 border-y border-white/10 py-4" aria-label={editing ? 'Editează piesa Canto' : 'Adaugă piesă Canto'}>
+                {editing && <h3 className="text-lg font-semibold text-white">Editează: {editing.title} — audio și versuri</h3>}
                 <fieldset disabled={(status.busy || aiBusy)} className="grid min-w-0 gap-3 xl:grid-cols-[minmax(150px,1.3fr)_minmax(120px,1fr)_minmax(150px,1fr)_minmax(150px,1fr)_auto]">
                     <div className="min-w-0">
                         <label className="label" htmlFor="canto-title">Titlul piesei</label>

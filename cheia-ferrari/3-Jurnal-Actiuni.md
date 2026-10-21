@@ -1,3 +1,22 @@
+## 📝 22 oct 2026 — Canto: acces direct la editarea negativului și versurilor
+
+### Obiectiv
+Claudiu nu găsea butonul de editare când folosea biblioteca Canto din contul de profesor. Editorul Admin exista deja, dar cardurile /canto/ aveau numai linkul global Adaugă piesă, fără acces la editarea piesei selectate.
+
+### Modificări
+- Academy src/pages/Canto.jsx: link profesor-only pe fiecare card, Editează piesa · negativ și versuri → /admin/canto/?edit=ID. Respectă comutatorul Profesor/Elev existent; nu adaugă acces de editare elevilor.
+- src/pages/admin/AdminCanto.jsx: consumă parametrul edit, identifică piesa în biblioteca încărcată și reutilizează edit(piece), fără editor/salvare duplicată. Formularul este adus în vedere și focalizat pe titlu, cu antet explicit. Parametrul este eliminat după consumare pentru a nu reseta modificările după salvare/reîncărcare. Piesă inexistentă raportează eroare explicită.
+- scripts/verify-admin.mjs: teste noi la 390/1440px pentru link de card, formular precompletat/focus, upload negativ + versuri, PATCH același ID, păstrare pozitiv, zero INSERT, link absent în previzualizarea Elev și zero overflow/runtime errors. README actualizat direct pentru fluxul profesorului.
+
+### Validări
+- npm run build Academy: PASS. npm run test:admin: PASS, inclusiv noile două scenarii Canto și regresiile Admin, PDF/editor/MIDI. Diagnostics zero erori în fișierele schimbate; git diff --check curat.
+- Audit inițial și seo:check final: **64 pagini verificate, 0 FAIL / 0 WARN**. Pagini protejate noindex, metadata publice/JSON-LD nemodificate și fără imagini noi. Nu există date GSC noi sau afirmații de ranking.
+
+### Riscuri și pași următori
+- Claudiu a cerut ulterior commit și push: fixul și documentația se publică pe main în Academy și Site-Trupa, după verificarea excluderii secretelor. Deploy Railway rămâne de confirmat. Nu se modifică SQL, CORS, roluri sau chei. Pentru a vedea editarea, contul trebuie să fie profesor și comutatorul Profesor activ.
+
+---
+
 ## 📝 21 oct 2026 — Publicare Academy: Studio dry, partituri, dueluri și Joc AI
 
 ### Obiectiv

@@ -616,3 +616,8 @@ Promptul trimite numai tema/nivelul din liste fixe, fără nume, profil, pseudon
 npm test include validarea strictă, auth/origin/input, cote exacte și SQL/RLS real, răspunsuri protejate, scor persistent, refuzuri/JSON invalid/timeout OpenAI. npm run test:games verifică ruta Astro compilată (401/403/400 fără apel plătit), player 390/1440px cu **OpenAI simulat și DB PGlite reală**: lipsă cheie, feedback, conexiune pierdută după salvare și retry fără duplicare, reload/reluare, scoruri 4/5 și 5/5 și cota fără apel suplimentar. Include și regresiile duel/ritm/podium.
 
 Nu se execută automat migrarea în proiectul Supabase live și nu se consumă credit OpenAI în teste. Primul apel real se verifică după SQL + configurarea cheii.
+
+
+### Canto — editare directă pentru profesor
+
+În biblioteca /canto/, cu modul Profesor activ, fiecare piesă are linkul **Editează piesa · negativ și versuri**, care deschide /admin/canto/?edit=ID în formularul existent, completat și focalizat pe piesa aleasă. Acolo poți încărca **Upload MP3 Negativ**, completa **Versuri / text sincronizat (LRC)** și apăsa **Salvează modificările**. Audio/PDF existente rămân neschimbate dacă nu alegi înlocuitori. Linkul nu apare elevilor sau în previzualizarea Elev; RLS rămâne neschimbat.

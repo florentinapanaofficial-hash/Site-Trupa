@@ -199,6 +199,30 @@ try {
         await context.close();
         console.log('Admin ' + viewport.width + 'px PASS: karaoke job submission/status, prefilled edit, PATCH existing ID, MP3/PDF uploads, same row, shared live preview and restore.');
     }
+    for (const width of [390, 1440]) {
+        const fixture = await open({ width, height: 1000 }, '/canto/', 'teacher');
+        const { page } = fixture;
+        await page.getByRole('link', { name: 'Editează Piesă canto', exact: true }).click();
+        await expect(page.getByRole('form', { name: 'Editează piesa Canto' })).toBeVisible();
+        await expect(page.getByLabel('Titlul piesei')).toHaveValue('Piesă canto');
+        await expect(page.getByLabel('Titlul piesei')).toBeFocused();
+        await page.getByLabel('Upload MP3 Negativ', { exact: true }).setInputFiles({ name: 'negativ.mp3', mimeType: 'audio/mpeg', buffer: Buffer.from('ID3-negative-audio') });
+        await page.getByLabel('Versuri / text sincronizat (LRC)', { exact: true }).fill('[00:01.00]Versuri pentru studiu');
+        await page.getByRole('button', { name: 'Salvează modificările', exact: true }).click();
+        await expect(page.getByText('Piesa a fost salvată.', { exact: true })).toBeVisible();
+        assert.equal(fixture.writes.length, 1);
+        assert.equal(fixture.writes[0].id, 'eq.canto-piece');
+        assert.equal(fixture.writes[0].payload.versuri_text, '[00:01.00]Versuri pentru studiu');
+        assert.match(fixture.writes[0].payload.audio_negativ_path, /^canto\//);
+        assert.equal(fixture.rows[0].positive_url, 'https://example.test/existing.mp3');
+        assert.equal(fixture.insertions, 0);
+        await page.locator('main').getByRole('switch').click();
+        await expect(page.getByRole('link', { name: /Editează/ })).toHaveCount(0);
+        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+        assert.deepEqual(fixture.errors, []);
+        await fixture.context.close();
+        console.log('Canto edit entry ' + width + 'px PASS: teacher card link, prefilled/focused existing editor, negative MP3 + lyrics PATCH same ID, positive preserved, no student edit link.');
+    }
     const canto = await open({ width: 1440, height: 1000 }, '/admin/canto/', 'teacher');
     await expect(canto.page.getByRole('button', { name: /Editează/ }).first()).toBeVisible();
     await canto.page.getByRole('button', { name: /Editează/ }).first().click();

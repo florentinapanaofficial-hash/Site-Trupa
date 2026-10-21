@@ -1,7 +1,7 @@
 import { useTeacherMode } from '../lib/useTeacherMode';
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Lock, Plus } from 'lucide-react';
+import { Lock, Pencil, Plus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../lib/auth';
 import CantoPieceStudio from '../components/CantoPieceStudio';
@@ -75,6 +75,7 @@ export default function Canto() {
                         const locked = !isTeacher && isStudyLevelLocked(piece.level, studyProgress.progress.unlockedLevels);
                         return <article key={piece.id} className="card relative my-5 min-w-0 space-y-4 overflow-hidden border border-white/10 bg-gradient-to-br from-ink-900 to-ink-950">
                         <div className="min-w-0"><h2 className="break-words text-lg font-semibold text-white">{piece.title}</h2><p className="mt-1 break-words text-sm text-slate-400">{piece.grupa || 'Fără grupă'}</p>{piece.description && <p className="mt-2 text-sm text-slate-300">{piece.description}</p>}</div>
+                        {isTeacher && <Link to={'/admin/canto/?edit=' + encodeURIComponent(piece.id)} className="btn-ghost inline-flex items-center gap-2" aria-label={'Editează ' + piece.title}><Pencil size={16} aria-hidden="true" /> Editează piesa · negativ și versuri</Link>}
                         {!locked ? <>
                             <CantoPieceStudio piece={piece} canGenerate={isTeacher} onLyricsSaved={text => setPieces(previous => previous.map(item => item.id === piece.id ? { ...item, versuri_text: text } : item))} />
                             {!isInspector && <button type="button" className="btn-gold" onClick={() => { document.querySelectorAll("audio").forEach(audio => audio.pause()); setRecordingPiece(piece); }}>REC · Înregistrează tema</button>}
