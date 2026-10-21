@@ -274,6 +274,8 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOi...
 cd academy-music.florentinapanaofficial.ro
 npm install
 npm run dev      # http://localhost:5180
+# În alt terminal, cu serverul dev pornit:
+npm run test:login:dev # landing → login și reload, mobil/desktop
 npm run build    # bundle de producție în dist/
 npm start        # servește dist/ cu headerele de securitate
 ```
@@ -470,7 +472,7 @@ Timestamp-urile `<...>` delimitează cuvintele; un tag fără text poate marca f
 
 Butonul **REC · Înregistrează tema** al piesei deschide studioul existent de teme (încărcat la cerere). Alegerea audio/video nu activează dispozitivele. **REC · Pregătește tema** afișează regula de studio; numai **Sunt gata, am conectat căștile!** poate solicita microfonul/camera și porni înregistrarea. Aplicația nu poate detecta fizic căștile: folosește căști cu microfon și volum redus, nu difuzoare.
 
-Vocea trece prin ramuri gain dry și ConvolverNode (impuls stereo Room de 1,8 s) → gain wet, apoi gain de ieșire redus și compresor/limiter. Semnalul procesat este monitorizat în căști și capturat de MediaRecorder, împreună cu negativul dacă este selectat. În timpul REC apar versurile ajutătoare sincronizate cu timpul real al negativului, folosind același parser/highlight/auto-scroll; sunt doar vizuale, nu se transformă în voce și nu se includ ca text în fișierul audio. Sliderul Dry/Wet ajustează mixul în timpul REC. Vocea nu este trimisă către AI. Nu se promite latență zero; aceasta depinde de dispozitiv/browser/căști (Bluetooth poate avea întârziere mare).
+Vocea trece prin ramuri gain dry și ConvolverNode (impuls stereo Room de 1,8 s) → gain wet, apoi gain de ieșire redus și compresor/limiter. Semnalul procesat este monitorizat numai în căști. MediaRecorder captează o ramură separată direct din sursa microfonului, înainte de gain/reverb/limiter; negativul este conectat exclusiv la ieșirea pentru căști și nu este inclus în fișier. Captura audio din RecordingStudio este dry inclusiv pentru temele standard și modul video (camera rămâne inclusă la video). În timpul REC apar versurile ajutătoare sincronizate cu timpul real al negativului, folosind același parser/highlight/auto-scroll; sunt doar vizuale, nu se transformă în voce și nu se includ ca text în fișierul audio. Sliderul Dry/Wet ajustează numai audiția în căști în timpul REC, nu fișierul capturat. Vocea nu este trimisă către AI. Nu se promite latență zero; aceasta depinde de dispozitiv/browser/căști (Bluetooth poate avea întârziere mare).
 
 Stop sau trecerea în fundal oprește REC, eliberează imediat microfonul/contextul și păstrează fișierul pentru revizuire. **Trimite tema** este o acțiune separată, explicită; audio folosește endpointul existent de teme/Drive, iar video fluxul existent de portofoliu. Înregistrarea nu se trimite automat. O nouă încercare cere din nou confirmarea căștilor. Oprire automată la 10 minute; înregistrările goale sunt respinse cu mesaj.
 
@@ -521,3 +523,96 @@ Biblioteca afișează piesele publicate, dar accesul la audio/PDF rămâne contr
 Avatarurile acceptă JPEG, PNG și WebP până la 5 MB. Prezența transmite doar numele și un URL semnat temporar al avatarului; nu folosește starea Presence ca autorizare și nu expune lista de profiluri prin RLS.
 
 După migrare, validează cu `npm test`, `npx vite build`, `npm run build`, `npm run test:admin` și `npm run test:canto`. Migrarea și prezența live trebuie verificate în proiectul Supabase înainte de deploy.
+
+### Canto — fereastră de versuri sincronizate
+
+- „Vezi versuri” deschide aceeași fereastră karaoke care se deschide automat la Play pentru pozitiv sau negativ. Play/Pauză, Stop și poziția din fereastră controlează aceeași sursă audio, fără dublarea redării. Schimbarea variantei oprește sursa precedentă. Închiderea ferestrei nu oprește muzica.
+- Textul cu timestamp-uri Enhanced LRC evidențiază cuvântul curent și derulează linia activă după ceasul audio, inclusiv după seek. Textul simplu nu primește timpi inventați; timestamp-urile doar pe linie rămân sincronizare pe linie. Pozitivul și negativul trebuie să aibă aceeași aliniere temporală pentru a reutiliza aceiași timpi.
+- Profesorul poate genera direct din această fereastră folosind integrarea `generate-lyrics` existentă. Configurează `OPENAI_API_KEY` în Supabase Edge Functions Secrets și publică funcția/migrarea conform secțiunii AI de mai sus. Nu introduce cheia OpenAI în `.env` cu prefix `VITE_` și nu o confunda cu cheia publică Supabase.
+- Generarea necesită un pozitiv MP3 salvat în Storage (maximum 24 MB), consimțământ și drept de prelucrare. Ciorna poate fi previzualizată/editată; numai „Salvează versurile sincronizate” actualizează coloana `versuri_text`. Elevul folosește rezultatul salvat și nu declanșează cereri AI.
+- `npm run test:canto` acoperă fereastra pe mobil/desktop, auto-deschiderea ambelor variante, clock/seek/scroll pe cuvânt și generarea/salvarea manuală de către profesor. Configurația reală OpenAI, costurile și precizia pe înregistrări muzicale necesită verificare separată.
+
+### Orgă — bibliotecă PDF și propriul demo MIDI
+
+- Ruta autentificată `/instrument/partituri/`, accesibilă din meniul Instrument și din repertoriu, listează piesele Orgă care au `score_path`. Căutarea după titlu, filtrarea pe nivel și paginarea (12 PDF-uri/pagină) sunt executate în Supabase, fără descărcarea întregii biblioteci. Elevul vede numai materiale publicate, cu RLS și blocarea nivelurilor existente păstrate inclusiv la accesarea directă prin `?piece=...`.
+- Profesor: „Încarcă partitură PDF” deschide formularul existent `/admin/piese/?add=orga`. Completează titlul și nivelul, atașează PDF-ul în câmpul „Partitură (PDF)” și salvează/publică piesa. Fișierele audio sunt opționale. Repetă pentru fiecare partitură; nu s-a introdus un upload multiplu sau un bucket nou.
+- Elev: alege tema; PDF-ul privat este afișat deasupra editorului de note, cu pagini/zoom și watermark. Notele se introduc manual; nu se face recunoaștere automată PDF → MIDI. Editorul păstrează limitele existente (128 note/pauze, 120 BPM la export).
+- „Exportă MIDI” descarcă fișierul și pregătește demo-ul din aceiași bytes. „Studiază pe claviatură” pregătește demo fără descărcare. Apasă „Pornește studiul”: claviatura profesorului redă/evidențiază compoziția elevului, iar claviatura elevului rămâne disponibilă simultan prin touch, taste PC sau USB MIDI, cu mixer separat, viteză și buclă A–B.
+- Modificarea compoziției/instrumentului sau previzualizarea în editor invalidează demo-ul anterior, pentru a evita partituri și sunete nealiniate. Nu se salvează automat ciornele în DB: exportă MIDI înainte de schimbarea temei/închiderea paginii; un MIDI salvat se poate încărca ulterior în studio. Nu este necesară o migrare SQL nouă.
+- Stilurile editorului și studioului sunt importate explicit și în shell-ul SPA Astro, ca să nu depindă de CSS-ul paginii publice `/studio/`. Playerul MIDI suplimentar se încarcă numai când primește o sursă, nu la pornirea demo-ului nativ; CSP nu este relaxat.
+- `npm run test:admin` verifică la 390px și 1440px: biblioteca/paginarea/căutarea, canvas PDF deasupra editorului, export MIDI cu note/durate/pauze exacte, sunetul demo (oscilator 261,63 Hz pentru Do4), clapă evidențiată și claviatura elevului simultană, invalidarea demo-ului și blocarea nivelurilor. Testele folosesc PDF/date sintetice, fără modificări în Supabase live.
+
+### Etapa 1 — voce dry și confirmare Studio securizată
+
+- `startLiveMonitor` expune sursa brută `input`; `createStudioSession` o leagă direct de un `MediaStreamAudioDestinationNode` dedicat recorderului. Pozitivul/negativul nu este mixat în captură. Negativul se aude în căști; reverb-ul și limiterul rămân pe monitorizare. Nu se cer echo cancellation, noise suppression sau AGC software. Browserul/dispozitivul poate aplica propria procesare/resampling; formatul existent rămâne WebM/Opus sau MP4, nu WAV studio lossless.
+- Folosește căști: izolarea grafului Web Audio nu poate elimina negativul recaptat acustic prin microfon de la difuzoare sau o intrare hardware de tip Stereo Mix. Înregistrările vechi deja mixate nu pot fi transformate retroactiv în voce separată.
+- În Supabase SQL Editor, aplică `supabase/migrations/20261021000003_studio_dry_notification_security.sql` după `20261021000001_virtual_studio.sql` și migrările de securitate necesare proiectului. Noua migrare este tranzacțională și repetabilă; nu șterge înregistrări. Pentru instalări noi, `supabase/schema.sql` include acum și infrastructura Studio plus protecția notificărilor. Nu rerula schema completă în locul migrării incrementale pe o bază existentă.
+- RLS selectează doar cererea proprie finalizată și necitită a unui cont activ. Pentru că elevul/profesorul împart rolul PostgreSQL `authenticated`, privilegiile pe coloană singure nu îi diferențiază. Triggerul `guard_studio_notification_update` compară toate datele OLD/NEW, ignorând exclusiv `notification_seen_at`, refuză celelalte modificări cu SQLSTATE 42501 și setează data confirmării pe server. Confirmarea nu poate fi anulată sau rescrisă de elev. Profesorul păstrează actualizarea masterului/statusului; rolurile administrative PostgreSQL/service_role rămân privilegiate.
+- `npm test` verifică atacuri reale PGlite/RLS: modificări URL/status/proprietar/piesă/ID/dată, inclusiv împreună cu confirmarea; acces străin/inactiv, pending, confirmare repetată/resetată, timestamp server, flux profesor și o politică permisivă simulată. Testele audio verifică ramura dry și cleanup-ul în modurile audio/video, cu/fără negativ. `test:canto` folosește MediaRecorder real cu microfon sintetic și verifică ramurile recorder/monitor.
+- Această etapă nu adaugă Joc Ritmic, clasament sau multiplayer. Testarea migrării în Supabase live și audiția pe hardware real rămân separate de testele locale.
+
+
+## Etapa 2 — Joc Ritmic, podium și dueluri quiz între elevi
+
+### Activarea în Supabase
+
+1. Proiectele existente trebuie să aibă deja banca din `supabase/setup_quizzes.sql` (migrarea `20261020000003_quizzes.sql`). Dacă nu există tabelele `quizzes` / `quiz_questions`, aplică întâi acel script.
+2. Aplică **doar** `supabase/migrations/20261021000004_games_live.sql` în SQL Editor. Migrarea este tranzacțională și repetabilă. Pentru o instalare nouă, `supabase/schema.sql` include banca și Etapa 2. Nu reaplica schema integrală pe baza live pentru această actualizare.
+3. Migrarea adaugă `live_quiz_rooms` în publicația `supabase_realtime`, dacă există. Browserul ascultă Postgres Changes cu RLS; verificarea periodică (2 s în duel, 5 s în lista duelurilor, 10 s în notificarea globală) păstrează funcționarea când WebSocket-ul lipsește. Nu sunt necesare chei secret/service în browser.
+4. Sunt pregătite două quiz-uri, fiecare cu cinci întrebări: **Note și portativ** și **Ritm și expresie**. Conținutul nou se pregătește în SQL Editor, în `quizzes` / `quiz_questions`; se afișează numai quiz-urile publicate. Nu există încă un editor vizual nou pentru banca de întrebări. Rularea repetată a migrării nu rescrie editările profesorului. Duelurile folosesc copii ale întrebărilor/soluțiilor, stabile pe durata jocului.
+
+### Flux elev
+
+- În **Jocuri muzicale → Dueluri quiz**, elevul selectează un quiz pregătit și un adversar din lista participanților voluntari sau trimite codul privat al duelului. Provocarea directă apare și în dashboard/celelalte pagini ale contului destinatarului. Destinatarul acceptă/refuză; doar două conturi pot participa. Invitația expiră în 10 minute.
+- Acceptarea pornește automat aceleași întrebări pentru ambii elevi. Timpul ales este de 10/20/30/60 secunde pe întrebare. Se permite un singur răspuns confirmat, 100 puncte pentru răspuns corect, fără bonus de viteză. După ambele răspunsuri sau deadline urmează 4 secunde de recapitulare, apoi următoarea întrebare. La final se afișează câștigătorul sau egalitatea.
+- Reîncărcarea paginii permite redeschiderea duelului din lista proprie. Deadline-urile sunt în DB; părăsirea paginii nu oprește cronometrul. Tranzițiile expirate se materializează la următoarea interogare a duelului/inboxului/clasamentului participantului, fără cron/worker. Rezultatele și răspunsurile rămân persistente.
+- **Orgă → Joc Ritmic**, linkul din Studio sau tabul din Jocuri deschid o rundă cu 12 note / 10 secunde. Input: A/S/D/F/G, clape tactile sau MIDI USB. Motorul comun extras în `src/lib/rhythm.js` păstrează evaluarea din Studio. Scor: max(0, round(note corecte × 1000 / 12) − 20 × apăsări greșite). Minimum 25 secunde între porniri. La eroare de salvare se poate reîncerca aceeași rundă fără duplicare (maximum 3 minute de la start).
+- **Clasament**: maximum 50 de participanți; cel mai bun scor ritmic + cel mai bun duel finalizat normalizat la 1000, maximum 2000 în total. Încercările nu se însumează. Scorurile egale primesc același loc. Avatarurile folosesc bucket-ul privat existent și URL-uri semnate.
+- Pseudonimul și participarea în clasament/lista de adversari sunt voluntare și implicit oprite. Nu se publică numele complete. Participarea prin cod rămâne posibilă fără listarea generală. Retragerea elimină utilizatorul la următoarea actualizare și oprește emiterea de URL-uri noi pentru fotografia sa în acest context; URL-urile deja semnate expiră conform TTL configurat. Regulile existente de acces pentru proprietar/profesor rămân valabile.
+
+### Securitate și verificare
+
+- `game_profiles`, `rhythm_attempts`, `live_quiz_rooms`, `live_quiz_questions`, `live_quiz_members`, `live_quiz_answers` au RLS. Mutările de joc sunt numai prin RPC-uri SECURITY DEFINER cu search_path gol și verificarea sesiunii/contului activ; RPC-urile interne nu sunt apelabile de elev. Cheile răspunsurilor și rezultatele adversarului la întrebarea curentă nu sunt expuse înainte de recapitulare.
+- Scorul ritmic este recalculat din evenimentele clientului, cu pattern creat de server, limită de evenimente/timp și închidere idempotentă. **Nu este anti-cheat invulnerabil:** un browser modificat poate fabrica apăsări. Nu folosi rezultatul drept examen certificat sau recompensă cu valoare financiară.
+- Teste: `npm test` include SQL/RLS/adversarial și motorul comun; `npm run test:games` pornește SSR de test și două contexte Playwright, cu baza PGlite reală în spatele RPC-urilor. Verifică invitație din dashboard, acceptare, reconectare, deadline, progresie, scoruri, salvare ritmică cu retry, podium/avatare/opt-out și layout 390/1440 px. WebSocket-ul extern este blocat intenționat: acest test validează fallback-ul HTTP, nu o instanță Supabase Realtime live.
+- Aplicarea migrării și livrarea Realtime în proiectul Supabase/Railway real necesită validare după publicare. Nu au fost executate automat asupra contului live.
+
+
+## Jocuri AI — generare OpenAI și studiu individual
+
+### Activare și testare
+
+1. În Supabase SQL Editor aplică **supabase/migrations/20261021000005_ai_games.sql**. Necesită tabela profiles existentă, nu banca de quiz-uri pentru dueluri. Nu reaplica schema consolidată integrală pe proiectul existent.
+2. În **.env al aplicației Academy**, adaugă variabila server-only (nu trimite cheia în chat și nu o pune în Git):
+
+~~~dotenv
+OPENAI_API_KEY=<cheia-ta-api-openai>
+~~~
+
+Nu folosi prefixele VITE_ sau PUBLIC_. Cheia dintr-o Edge Function Supabase de versuri nu configurează automat serverul Astro. Exemplul fără secret este în .env.example.
+3. Păstrează configurarea Supabase existentă: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY și SUPABASE_SERVICE_ROLE_KEY. Cheia service_role este server-only, diferită de cheia anon/publică.
+4. Configurează accesul API, facturarea și alertele/limitele de buget în proiectul OpenAI pentru **gpt-4o-mini**. Abonamentul ChatGPT nu oferă automat credit API.
+5. Repornește serverul cu **npm run dev -- --host 127.0.0.1**, autentifică-te la http://localhost:5180/ și deschide **Jocuri muzicale → Joc AI** (/jocuri/?tab=ai). Alege Teorie/Instrumente/Ritm și Începător/Intermediar, apoi Generează un joc nou.
+6. Pe Railway adaugă OPENAI_API_KEY în Variables pentru serviciul **Academy**, apoi redeploy/restart. Nu o pune în serviciul site-ului public și nu o publica în variabile VITE sau screenshot-uri.
+
+### Fișiere și contract
+
+- src/pages/api/games/generate.js este ruta Astro server-side, prerender=false. Refolosește autentificarea middleware-ului existent. src/lib/aiGamesServer.js conține implementarea testabilă pentru prompt, OpenAI, validare, limite și persistență.
+- src/components/AIGamePlayer.jsx afișează întrebările pe rând, verifică selecția pe server, oferă feedback/explicație și scor salvat, cu reluare în același tab după reload. Cheia OpenAI nu ajunge în browser.
+- POST /api/games/generate/ acceptă action=generate, topic=teorie|instrumente|ritm, level=incepator|mediu. Numai sesiuni active elev/profesor, same-origin, JSON maximum 8 KB; fără prompt liber, date personale sau user_id/scor de la client.
+- OpenAI primește prompt educațional în română și response_format=json_schema, strict=true. Obiectul generat are title și questions; fiecare întrebare are prompt, options (4 string-uri distincte), correctIndex (0–3) și explanation. Exact **5 întrebări**, titlu maximum 100 caractere, întrebare 350, variantă 120, explicație 500. Refuzurile, răspunsurile trunchiate/invalide, câmpurile suplimentare, întrebările duplicate și indexurile greșite sunt respinse explicit, nu înlocuite cu jocuri fictive. Timeout 25 secunde, răspuns maximum 64 KB.
+- Browserul primește numai ID/titlu/întrebări/opțiuni, **nu soluțiile în avans**. action=answer cu gameId/questionIndex/answerIndex validează proprietarul și ordinea, salvează răspunsul și returnează feedbackul pentru acea întrebare. Retry identic este idempotent; schimbarea unui răspuns confirmat este respinsă. action=resume cu gameId recuperează numai jocul propriu și feedbackul deja obținut.
+- Migrarea creează ai_game_sessions privat și RPC-uri numai pentru service_role, fără citiri/mutări directe de elev. Scorul **0–5**, răspunsurile și data finalizării rămân persistente. Jocurile expiră după 24 ore. sessionStorage păstrează numai ID-ul jocului, separat pe cont. Renunțarea la reluare/închiderea tabului nu șterge răspunsurile din DB, dar nu există încă o pagină nouă de istoric AI.
+- Scorurile AI sunt pentru **studiu individual**, separate de dueluri/podium și de notele școlare. Nu publicăm automat quiz-urile generate în banca de dueluri.
+
+### Buget, confidențialitate și limite
+
+Rezervare atomică în DB, comună tuturor instanțelor Railway: **o generare/minut/cont, 10/cont în ultimele 24h, 200/platformă în ultimele 24h**. Inclusiv erorile consumă rezervarea pentru a evita apelurile plătite nelimitate. Cheia absentă este detectată înainte de rezervare; răspunsurile/reluările nu apelează OpenAI. Limitele aplicației nu înlocuiesc controlul facturării furnizorului.
+
+Promptul trimite numai tema/nivelul din liste fixe, fără nume, profil, pseudonim, voce sau date ale copilului. Nu relaxăm CSP/CORS și nu includem scripturi externe de joc. Formatul valid nu garantează corectitudinea muzicală, moderarea perfectă sau întrebări mereu diferite: AI poate greși/repetă, iar explicațiile neclare trebuie discutate cu profesorul.
+
+### Validări
+
+npm test include validarea strictă, auth/origin/input, cote exacte și SQL/RLS real, răspunsuri protejate, scor persistent, refuzuri/JSON invalid/timeout OpenAI. npm run test:games verifică ruta Astro compilată (401/403/400 fără apel plătit), player 390/1440px cu **OpenAI simulat și DB PGlite reală**: lipsă cheie, feedback, conexiune pierdută după salvare și retry fără duplicare, reload/reluare, scoruri 4/5 și 5/5 și cota fără apel suplimentar. Include și regresiile duel/ritm/podium.
+
+Nu se execută automat migrarea în proiectul Supabase live și nu se consumă credit OpenAI în teste. Primul apel real se verifică după SQL + configurarea cheii.

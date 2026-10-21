@@ -15,14 +15,16 @@
         "dev": "astro dev --port 5180",
         "build": "astro build && node scripts/compress.mjs",
         "preview": "astro preview --port 5180",
-        "test": "node --test src/lib/learning.check.mjs src/lib/security.check.mjs src/lib/canto.check.mjs src/lib/studyLevels.check.mjs src/lib/studyLevels.sql.check.mjs src/lib/studio.check.mjs src/lib/audio-processing.check.mjs",
+        "test": "node --test src/lib/learning.check.mjs src/lib/security.check.mjs src/lib/canto.check.mjs src/lib/studyLevels.check.mjs src/lib/studyLevels.sql.check.mjs src/lib/studio.check.mjs src/lib/audio-processing.check.mjs src/lib/games.check.mjs src/lib/aiGames.check.mjs",
         "test:browser": "node scripts/verify-learning.mjs",
+        "test:login:dev": "node scripts/verify-login-dev.mjs",
         "test:landing": "node scripts/verify-landing.mjs",
         "test:navigation": "node scripts/verify-navigation.mjs",
         "test:admin": "node scripts/verify-admin.mjs",
         "test:server": "node --test scripts/server.check.mjs",
         "start": "node ./dist/server/entry.mjs",
-        "test:canto": "node scripts/verify-canto.mjs"
+        "test:canto": "node scripts/verify-canto.mjs",
+        "test:games": "node scripts/verify-games.mjs"
     },
     "dependencies": {
         "@astrojs/mdx": "^8.1.0",

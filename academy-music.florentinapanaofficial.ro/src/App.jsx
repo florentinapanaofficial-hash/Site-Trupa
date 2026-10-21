@@ -9,6 +9,7 @@ import NotFound from './pages/NotFound';
 import Spinner from './components/ui/Spinner';
 import { isSupabaseConfigured } from './lib/supabase';
 
+const ScoreLibrary = lazy(() => import('./pages/ScoreLibrary'));
 const Discipline = lazy(() => import('./pages/Discipline'));
 const Canto = lazy(() => import('./pages/Canto'));
 const VirtualPiano = lazy(() => import('./components/VirtualPiano'));
@@ -32,6 +33,7 @@ export default function App() {
                     <Route path="/" element={<Navigate to="/dashboard/" replace />} />
                     <Route path="/canto/" element={<Canto />} />
                     <Route path="/instrument/" element={<Discipline discipline="orga" />} />
+                    <Route path="/instrument/partituri/" element={<ScoreLibrary />} />
                     <Route path="/instrument/claviatura/" element={<VirtualPiano />} />
                     <Route path="/orga/" element={<Navigate to="/instrument/" replace />} />
                     <Route path="/repertoriul-meu/" element={<RepertoriulMeu />} />

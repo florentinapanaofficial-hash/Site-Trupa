@@ -106,7 +106,9 @@ export default function Discipline({ discipline }) {
                     <p className="mt-1 text-sm text-slate-400">{meta.subtitle}</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
+                    {discipline === 'orga' && <button type="button" className="btn-gold" onClick={() => navigate('/instrument/partituri/')}>Biblioteca de partituri</button>}
                     {discipline === 'orga' && <button type="button" className="btn-ghost" onClick={() => navigate('/instrument/claviatura/')}>🎹 Deschide claviatura</button>}
+                    {discipline === 'orga' && <button type="button" className="btn-ghost" onClick={() => navigate('/jocuri/?tab=ritm')}>🎮 Joc Ritmic</button>}
                     {isTeacher && (
                     <button
                         type="button"

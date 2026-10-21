@@ -67,13 +67,14 @@ try {
             window.AudioContext = class extends NativeAudioContext {
                 constructor(...args) { super(...args); window.__contexts.push(this); }
                 trace(node, type) { const connect = node.connect.bind(node); node.connect = target => { window.__recordingConnections.push({ type, target: target.constructor.name }); return connect(target); }; return node; }
+                createMediaStreamSource(stream) { return this.trace(super.createMediaStreamSource(stream), 'microphone'); }
                 createMediaElementSource(element) { return this.trace(super.createMediaElementSource(element), 'backing'); }
                 createDynamicsCompressor() { return this.trace(super.createDynamicsCompressor(), 'voice'); }
             };
         });
         const page = await context.newPage();
         const rows = [{ id: path.includes('/canto') ? 'canto-piece' : 'orga-piece', discipline: path.includes('/canto') ? 'canto' : 'orga', title: path.includes('/canto') ? 'Piesă canto' : 'Piesă orgă', description: 'Descriere inițială', composer: 'Profesor', level: 'incepator', is_published: true, positive_url: null, negative_url: null, tags: [], versuri_text: Array.from({ length: 15 }, (_, n) => '[00:' + String(n).padStart(2,'0') + '.00]<00:' + String(n).padStart(2,'0') + '.00>Nota ' + n + '<00:' + String(n).padStart(2,'0') + '.80>').join('\n'), audio_pozitiv_path: 'canto/positive.mp3', negative_url: 'https://media.florentinapanaofficial.ro/negative.mp3', grupa: 'Grupa 1' }];
-        const writes = [], uploads = [], aiRequests = [], homeworkRequests = [];
+        const writes = [], uploads = [], aiRequests = [], homeworkRequests = [], studioRequests = [];
         let releaseAi; const aiPending = new Promise(resolve => { releaseAi = resolve; });
         let aiResponse = { lrc: "[00:01.00]<00:01.00>Vers AI<00:02.00>" }, aiStatus = 200;
         let insertions = 0;
@@ -99,6 +100,10 @@ try {
                 assert.equal(form.get('pieceId'), rows[0].id);
                 homeworkRequests.push(file.size);
                 return route.fulfill({ contentType: 'application/json', body: JSON.stringify({ webViewLink: 'https://drive.google.com/file/d/test-homework/view' }) });
+            }
+            if (url.pathname === '/rest/v1/studio_requests' && route.request().method() === 'POST') {
+                studioRequests.push(route.request().postDataJSON());
+                return route.fulfill({ status: 201, contentType: 'application/json', body: '{}' });
             }
             if (url.pathname === '/functions/v1/generate-lyrics') {
                 aiRequests.push(route.request().postDataJSON());
@@ -133,7 +138,7 @@ try {
             return route.fulfill({ contentType: 'application/json', body: JSON.stringify(body), headers: { 'Content-Range': '0-0/0' } });
         });
         await page.goto(base + path);
-        return { context, page, errors, chunks, tables, rows, writes, uploads, aiRequests, homeworkRequests, completeAi() { releaseAi(); }, setAiFailure() { aiStatus = 503; aiResponse = { error: "Generarea AI nu este configurată." }; }, get insertions() { return insertions; } };
+        return { context, page, errors, chunks, tables, rows, writes, uploads, aiRequests, homeworkRequests, studioRequests, completeAi() { releaseAi(); }, setAiFailure() { aiStatus = 503; aiResponse = { error: "Generarea AI nu este configurată." }; }, get insertions() { return insertions; } };
     }
 
     for (const viewport of [{ width: 390, height: 844 }, { width: 1440, height: 1000 }]) {
@@ -147,6 +152,7 @@ try {
         assert.equal(await page.evaluate(() => window.__micCalls), 0, 'playback must never activate the mic');
         await expect(page.getByText('Regulă de studio', { exact: true })).toHaveCount(0);
         await page.getByRole('button', { name: 'Stop karaoke', exact: true }).click();
+        await page.getByRole('dialog').getByRole('button', { name: 'Închide', exact: true }).click();
         await page.getByRole('button', { name: 'REC · Înregistrează tema', exact: true }).click();
         await expect(page.getByRole('dialog', { name: 'Înregistrează tema — Piesă canto' })).toBeVisible();
         assert.equal(await page.evaluate(() => window.__micCalls), 0);
@@ -165,7 +171,9 @@ try {
         await expect(helperLyrics).toBeVisible();
         await expect(helperLyrics.locator('[data-word-active="true"]')).toHaveText('Nota 0');
         await expect(helperLyrics.locator('[data-word-active="true"]')).toHaveText('Nota 1', { timeout: 3000 });
-        assert.equal(await page.evaluate(() => ['voice', 'backing'].every(type => window.__recordingConnections.some(link => link.type === type && link.target === 'MediaStreamAudioDestinationNode'))), true, 'both processed voice and negative must be recorded');
+        assert.equal(await page.evaluate(() => window.__recordingConnections.some(link => link.type === 'microphone' && link.target === 'MediaStreamAudioDestinationNode')), true, 'microphone must feed the recorder before effects');
+        assert.equal(await page.evaluate(() => window.__recordingConnections.some(link => ['voice', 'backing'].includes(link.type) && link.target === 'MediaStreamAudioDestinationNode')), false, 'processed voice and negative must never feed the recorder');
+        assert.equal(await page.evaluate(() => window.__recordingConnections.some(link => link.type === 'backing' && link.target === 'AudioDestinationNode')), true, 'negative remains audible in headphones');
 
         const mix = page.getByRole('slider', { name: /Reverb Dry/ });
         await mix.focus(); await page.keyboard.press('End'); await expect(mix).toHaveValue('1');
@@ -193,7 +201,9 @@ try {
         assert.equal(f.homeworkRequests.length, 1);
         assert.ok(f.homeworkRequests[0] > 0);
         await page.getByRole('dialog').getByRole('button', { name: 'Închide', exact: true }).first().click();
-        await page.getByText('Karaoke · negativ', { exact: true }).click();
+        await page.getByRole('button', { name: 'Vezi versuri — Piesă canto', exact: true }).click();
+        await expect(page.getByRole('dialog', { name: 'Karaoke · negativ — Piesă canto', exact: true })).toBeVisible();
+        await page.getByRole('dialog').getByRole('button', { name: 'Închide', exact: true }).click();
 
         await expect(page.getByLabel('Versuri karaoke', { exact: true })).toHaveCount(0);
         await page.getByRole('button', { name: 'Redă Negativ — Piesă canto', exact: true }).click();
@@ -208,16 +218,18 @@ try {
         await expect(page.getByLabel('Versuri karaoke', { exact: true }).locator('[data-word-active="true"]')).toHaveText('Nota 0');
         await page.getByRole('button', { name: 'Play karaoke', exact: true }).click();
         await expect(page.getByRole('button', { name: 'Pauză Negativ — Piesă canto', exact: true })).toBeVisible();
-        await page.getByRole('button', { name: 'Stop Negativ — Piesă canto', exact: true }).click();
+        await page.getByRole('button', { name: 'Stop karaoke', exact: true }).click();
         await expect(page.getByRole('button', { name: 'Play karaoke', exact: true })).toBeVisible();
         assert.equal(f.aiRequests.length, 0, 'student playback must never invoke AI');
 
         const karaoke = page.getByLabel('Versuri karaoke', { exact: true });
         await expect(karaoke).toBeVisible();
+        await page.getByRole('dialog').getByRole('button', { name: 'Închide', exact: true }).click();
         await page.getByRole('button', { name: 'Redă Pozitiv — Piesă canto', exact: true }).click();
-        const position = page.getByRole('slider', { name: 'Poziție în piesă — Pozitiv — Piesă canto', exact: true });
+        await expect(page.getByRole('dialog', { name: 'Karaoke · pozitiv — Piesă canto', exact: true })).toBeVisible();
+        const position = page.getByRole('slider', { name: 'Poziție karaoke', exact: true });
         await expect(position).toBeEnabled();
-        await page.getByRole('button', { name: 'Pauză Pozitiv — Piesă canto', exact: true }).click();
+        await page.getByRole('button', { name: 'Pauză karaoke', exact: true }).click();
         await position.focus(); await page.keyboard.press('Home'); await page.keyboard.press('ArrowRight');
         await expect(karaoke.locator('[data-word-active="true"]')).toHaveText('Nota 0');
         await page.locator('audio').first().evaluate(audio => { audio.currentTime = 7.2; });
@@ -232,7 +244,59 @@ try {
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
         assert.deepEqual(f.errors, []);
         await context.close();
-        console.log(`Canto ${viewport.width}px PASS: headphone guard, mic only after homework REC/confirmation, real MediaRecorder/reverb with fake mic, recorded negative+voice graph, synchronized visual lyrics during REC, wet slider, stop/denial/background cleanup, negative auto-open, shared Play/Pause/Stop, playback/seek/word highlight/scroll and zero student AI requests.`);
+        console.log(`Canto ${viewport.width}px PASS: headphone guard, mic only after homework REC/confirmation, real MediaRecorder/reverb with fake mic, dry microphone-only recording graph, backing/reverb monitor-only, synchronized visual lyrics during REC, wet slider, stop/denial/background cleanup, negative auto-open, shared Play/Pause/Stop, playback/seek/word highlight/scroll and zero student AI requests.`);
+    }
+    for (const width of [390, 1440]) {
+        const f = await open({ width, height: 1000 }, '/canto/');
+        const { page } = f;
+        await page.getByRole('button', { name: 'REC · Înregistrează tema', exact: true }).click();
+        await page.getByRole('button', { name: 'REC · Pregătește tema', exact: true }).click();
+        await page.getByRole('button', { name: 'Sunt gata, am conectat căștile!', exact: true }).click();
+        await expect(page.getByRole('slider', { name: /Reverb Dry/ })).toBeVisible();
+        await page.waitForTimeout(400);
+        await page.getByRole('button', { name: '■ Stop', exact: true }).click();
+        await page.getByRole('button', { name: '🎧 Trimite la Studio pentru Masterizare', exact: true }).click();
+        await expect(page.getByRole('status').filter({ hasText: 'Înregistrarea ta a fost trimisă la Studio.' })).toBeVisible();
+        assert.equal(f.studioRequests.length, 1);
+        const request = f.studioRequests[0];
+        assert.equal(request.student_id, userId);
+        assert.equal(request.song_id, 'canto-piece');
+        assert.equal(request.raw_audio_url, 'raw/' + userId + '/' + request.id + '/take.webm');
+        assert.ok(f.uploads.some(path => path.endsWith('/student_records/' + request.raw_audio_url)));
+        assert.equal(f.homeworkRequests.length, 0, 'Studio send must not submit a second homework');
+        assert.equal(await page.evaluate(() => window.__recordingConnections.some(link => ['voice', 'backing'].includes(link.type) && link.target === 'MediaStreamAudioDestinationNode')), false);
+        assert.deepEqual(f.errors, []);
+        await f.context.close();
+        console.log('Dry Studio upload ' + width + 'px PASS: microphone-only recording, private raw upload and matching request, no homework duplicate.');
+    }
+    for (const width of [390, 1440]) {
+        const f = await open({ width, height: 1000 }, '/canto/', 'teacher');
+        const { page } = f;
+        await page.getByRole('button', { name: 'Vezi versuri — Piesă canto', exact: true }).click();
+        await page.getByRole('button', { name: '✨ Generează Versuri Automat (AI)', exact: true }).click();
+        await expect(page.getByRole('button', { name: 'Confirm și generez', exact: true })).toBeDisabled();
+        await page.getByRole('checkbox', { name: /Confirm că am dreptul/ }).check();
+        await page.getByRole('button', { name: 'Confirm și generez', exact: true }).click();
+        f.completeAi();
+        const draft = page.getByRole('textbox', { name: 'Versuri AI de revizuit', exact: true });
+        await expect(draft).toHaveValue('[00:01.00]<00:01.00>Vers AI<00:02.00>');
+        assert.equal(f.writes.length, 0, 'Karaoke generation must remain a draft');
+        await draft.fill('[00:01.00]<00:01.00>Revizie <00:01.50>profesor<00:02.00>');
+        await page.getByRole('button', { name: 'Salvează versurile sincronizate', exact: true }).click();
+        await expect(draft).toHaveCount(0);
+        assert.equal(f.writes.length, 1);
+        assert.deepEqual(Object.keys(f.writes[0].payload), ['versuri_text']);
+        await page.getByRole('button', { name: 'Play karaoke', exact: true }).click();
+        await page.getByRole('button', { name: 'Pauză karaoke', exact: true }).click();
+        await page.locator('audio').nth(1).evaluate(audio => { audio.currentTime = 1.6; });
+        await expect(page.getByLabel('Versuri karaoke', { exact: true }).locator('[data-word-active="true"]')).toHaveText('profesor');
+        await page.reload();
+        await page.getByRole('button', { name: 'Vezi versuri — Piesă canto', exact: true }).click();
+        await expect(page.getByLabel('Versuri karaoke', { exact: true })).toContainText('Revizie profesor');
+        assert.equal(f.aiRequests.length, 1, 'Opening saved lyrics must not generate again');
+        assert.deepEqual(f.errors, []);
+        await f.context.close();
+        console.log('Canto lyrics AI window ' + width + 'px PASS: consent, reviewed draft, lyrics-only UPDATE, word clock and saved reload.');
     }
     for (const path of ['/admin/canto/', '/admin/piese/']) {
         const f = await open({ width: 1440, height: 1000 }, path, 'teacher');

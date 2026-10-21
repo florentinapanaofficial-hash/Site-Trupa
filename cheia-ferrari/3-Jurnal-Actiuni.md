@@ -1,3 +1,162 @@
+## 📝 21 oct 2026 — Publicare Academy: Studio dry, partituri, dueluri și Joc AI
+
+### Obiectiv
+La cererea explicită a lui Claudiu, commit și push pe main pentru Academy și sincronizarea fișierelor Academy/jurnalului în Site-Trupa. Se includ toate implementările locale ale sesiunii, păstrate până acum necomise: login dev, versuri sincronizate, bibliotecă PDF/editor/MIDI, Studio dry/RLS, Joc Ritmic, podium, dueluri și fundație Joc AI.
+
+### Modificări și validări
+- Fișierele publicate sunt cele documentate în intrările precedente, plus .env.example fără secrete; .env este ignorat de ambele repository-uri. Scanarea conținutului staged trebuie să treacă înainte de commit; nu se publică valori reale de chei sau tokenuri.
+- Validări deja executate pe implementare: Academy build PASS, 60/60 teste PASS, test:games mobil/desktop cu SQL real și OpenAI simulat PASS, Admin/Canto/bibliotecă/MIDI PASS după integrarea duelurilor; login dev 390/1440 PASS după ultimul restart. Ultimul seo:check: 64 pagini, 0 FAIL / 0 WARN. Metadata publice/JSON-LD nemodificate; fără date GSC noi.
+- Claudiu a adăugat configurarea locală OpenAI: verificată exclusiv prezența variabilelor obligatorii, fără afișarea valorilor. Server repornit, login HTTP 200, endpoint AI neautentificat HTTP 401. Nu s-a consumat credit OpenAI și nu s-a testat generarea live.
+
+### Riscuri și pași următori
+- Push-ul codului nu confirmă deploy Railway, configurarea OPENAI_API_KEY în Variables sau aplicarea migrărilor live; acestea rămân de verificat. Claudiu a spus că a introdus SQL, fără rezultat Run verificat independent.
+- Adresa publică configurată este https://academy-music.florentinapanaofficial.ro/; local http://localhost:5180/. Rolul contului controlează accesul, nu browserul. Vizualizarea Profesor/Elev este previzualizare, nu schimbare de rol sau simulare a alocărilor unui elev real.
+
+---
+
+## 📝 21 oct 2026 — Fundație Jocuri AI: OpenAI server-side și scor persistent
+
+### Obiectiv
+La cererea lui Claudiu: endpoint Astro pentru quiz-uri muzicale AI și componentă React interactivă, cu configurare sigură a cheii, fără a modifica duelurile pregătite anterior. Claudiu a spus că a introdus SQL în Supabase; nu a furnizat rezultatul Run și nu s-a verificat direct aplicarea live a noii migrări AI.
+
+### Modificări
+- Academy src/pages/api/games/generate.js, prerender=false, delegă către src/lib/aiGamesServer.js. Middleware-ul existent verifică sesiunea; endpoint-ul verifică same-origin, JSON/corp <=8 KB, enum-uri temă/nivel, fără prompt liber, user_id sau scor de la client. OPENAI_API_KEY și SUPABASE_SERVICE_ROLE_KEY rămân exclusiv server-side.
+- OpenAI Chat Completions gpt-4o-mini, structured outputs json_schema strict, prompt educațional original în română, fără versuri/date personale/linkuri; numai tema/nivelul sunt trimise. Exact 5 întrebări × 4 opțiuni, correctIndex și explicație. Validare manuală strictă suplimentară (chei, tipuri, lungimi, duplicate, indexuri), timeout 25s și răspuns maximum 64 KB. Erori configurare, refuz, JSON invalid/trunchiat, rețea/cotă/bază de date explicite; fără jocuri fictive de rezervă.
+- Migrare supabase/migrations/20261021000005_ai_games.sql, inclusă în schema consolidată pentru instalări noi: ai_game_sessions cu RLS și zero acces direct anon/authenticated; RPC-uri numai service_role pentru buget și răspunsuri. Rezervare atomică între instanțe: 1 generare/minut/cont, 10/cont/24h și 200/platformă/24h; și eșecurile consumă rezervarea, nu cheia lipsă. Actualizarea răspunsurilor este serializată și idempotentă, scor 0–5 calculat server-side, fără divulgarea soluțiilor viitoare.
+- AIGamePlayer.jsx: selecție Teorie/Instrumente/Ritm + Începător/Intermediar, întrebări pe rând, feedback vizual/textual la selecție după confirmarea serverului, retry fără duplicate și resume după reload. SessionStorage conține numai ID-ul jocului, separat pe cont; scorul/răspunsurile/data finalizării sunt persistente în DB. Tab nou Joc AI în Jocuri.jsx; scorurile nu sunt publicate în clasament sau în banca duelurilor.
+- .env.example documentează variabila fără secret; README.md descrie SQL, cheia locală/Railway, contractul și limitele. package.json include aiGames.check.mjs în npm test; fixture SQL de test în scripts/fixtures/ai-games.mjs, browser verificat prin verify-games.mjs.
+
+### Validări
+- npm test: **60/60 PASS**. Teste strict JSON și output invalid/null/oversized/refusal/timeout, origin/session/input înainte de apel plătit, DB/RLS cu roluri reale, cote exacte per cont/platformă, expirare, proprietar, răspuns unic, scor autoritativ, resume și chei de răspuns protejate.
+- npm run build: PASS (avertismentele preexistente Node externalizat/chunk mare), diagnostics zero erori în fișierele verificate; git diff --check curat.
+- npm run test:games: PASS. Ruta Astro compilată verificată prin HTTP real (401 fără cont, 403 cross-origin, 400 temă invalidă), fără apel AI. Browser 390/1440px, două conturi, OpenAI simulat și DB PGlite reală: lipsă cheie, generare, feedback corect/greșit, răspuns deja salvat cu răspuns HTTP pierdut și retry fără dublare, reload/reluare, scoruri persistente 4/5 și 5/5, quota fără apel suplimentar, zero erori runtime/overflow. Regresiile duel/ritm/podium rămân PASS.
+- Serverul local a fost restaurat persistent (academy-ai-games-preview), login HTTP 200; test:login:dev 390/1440px PASS fără erori runtime. Nu s-a verificat parola unui cont real și nu s-a apelat OpenAI live.
+- seo:check final Site-Trupa: **64 pagini, 0 FAIL / 0 WARN**. Ruta Academy este protejată/noindex; metadata publice/JSON-LD/sitemap nemodificate și fără imagini noi. Fără date GSC noi sau afirmații despre ranking/CTR.
+
+### Riscuri și pași următori
+- Migrarea AI necesară este 20261021000005_ai_games.sql, distinctă de Etapa 2 (00004). Confirmarea SQL live și primul apel OpenAI real se fac după configurarea cheii și restart. Nu s-au citit/afișat chei reale, nu s-a consumat credit API în teste și nu s-a făcut commit/push.
+- AI poate produce erori pedagogice/repetări; formatul valid nu dovedește corectitudinea muzicală sau moderarea perfectă. UI și documentația recomandă discutarea neclarităților cu profesorul. Fundația nu include istoric vizual AI nou, autorat vizual sau publicare automată în dueluri.
+- Prima scriere README a eșuat temporar fără a modifica fișierul; documentația a fost reaplicată și verificată. Testele au identificat și corectat label accesibil la selectorul de nivel și header proxy absent din fixture SSR, fără relaxarea securității.
+
+---
+
+## 📝 21 oct 2026 — Etapa 2: quiz-uri pregătite și dueluri între elevi
+
+### Obiectiv
+Implementarea Jocului Ritmic separat, podiumului și competițiilor quiz. Claudiu a clarificat în cursul implementării că dorește quiz-uri pregătite și provocări elev–elev, nu întrebări lansate manual de profesor. Arhitectura intermediară cu profesor-gazdă a fost înlocuită înainte de livrare; nu s-a aplicat în Supabase.
+
+### Modificări
+- Migrare nouă Academy: supabase/migrations/20261021000004_games_live.sql, sincronizată în supabase/schema.sql pentru instalări noi. Tabele game_profiles, rhythm_attempts, live_quiz_rooms/questions/members/answers; RLS, mutări numai prin RPC, verificări academy_active/is_teacher existente, funcții interne neapelabile de elev și chei de răspuns inaccesibile direct. Validare conținut quiz înainte de snapshot și limitare invitații (3 active recente / 30 pe zi).
+- Două quiz-uri pregătite (5 întrebări fiecare): Note și portativ, Ritm și expresie. Creare invitație nominală sau prin cod, acceptare/refuz, doi participanți, aceleași întrebări și timer server. Scor 100/răspuns corect, fără avantaj de latență; recapitulare 4 secunde și avans automat. Copii imuabile ale întrebărilor pentru fiecare duel; reconnect/redeschidere, închidere după deadline inclusiv dacă ambele browsere au fost închise. Tranzițiile se materializează la citirea stării/inboxului/clasamentului participantului, nu printr-un worker/cron nou.
+- Componente noi: QuizDuel.jsx, DuelInvitations.jsx (notificare în tot contul), GameProfile.jsx, RhythmGame.jsx și Leaderboard.jsx. Taburi noi în Jocuri.jsx, intrări Orgă în Discipline.jsx/Layout.jsx și link în InteractiveStudio.jsx. Realtime Postgres Changes cu filtrare RLS, plus fallback HTTP explicit: 2 secunde duel, 5 secunde inbox, 10 secunde notificări.
+- src/lib/rhythm.js extrage matchNote/lowerBound/accuracy/HIT_WINDOW; interactiveStudio.js reexportă API-ul pentru a păstra studioul existent. Joc Ritmic: 12 note / 10 secunde, taste/ecran/MIDI, scor recalculat server-side, fereastră ±180ms cu aceeași toleranță numerică din Studio, salvare idempotentă și retry. Serverul nu poate certifica autenticitatea apăsărilor produse de un browser modificat; nu se prezintă drept anti-cheat invulnerabil.
+- Podium cu avatare private și pseudonime, opțiune implicit dezactivată pentru clasament/lista de adversari; fără expunerea numelor complete. Cele mai bune scoruri ritm + duel normalizat, maximum 2000; fără însumarea încercărilor. Retragerea oprește listarea și emiterea de noi URL-uri pentru acest context; URL-urile deja semnate expiră la TTL. Politicile existente proprietar/profesor pentru avatare se păstrează.
+- README.md descrie instalarea, fluxurile, scorurile, confidențialitatea și limitele verificării. package.json adaugă test:games; teste noi src/lib/games.check.mjs și scripts/verify-games.mjs. Toate modificările locale anterioare au fost păstrate, fără commit/push.
+
+### Validări
+- npm test Academy: **55/55 PASS**, inclusiv SQL real PGlite, migrare repetabilă, încercări de falsificare/UPDATE direct, acces adversar/terț, răspuns dublu, termen-limită, opțiuni invalide, revocare sesiune, expirarea invitației, snapshot și finalizare offline.
+- npm run build Academy: PASS, cu avertismentele existente pentru module Node externalizate/chunk-uri; zero erori de build. VS Code diagnostics: zero erori în fișierele verificate; git diff --check fără probleme.
+- npm run test:games: PASS. Două contexte autentificate separate, 390/1440px, UI legat la RPC-uri SQL reale prin adaptorul de test: invitație primită în dashboard, acceptare, două răspunsuri, reconectare, runde automate/expirare/câștigător, eroare bibliotecă + retry, apăsări ritmice cronometrate, eroare salvare + retry fără duplicate, podium/avatare/opt-out, zero overflow și page errors. WebSocket extern blocat intenționat; testul validează fallback-ul, nu livrarea Supabase Realtime live.
+- npm run test:admin și npm run test:canto: PASS mobil/desktop; bibliotecă PDF/editor/demo MIDI, karaoke, versuri AI și captură Studio dry păstrate.
+- Previzualizare locală restaurată și persistentă la http://localhost:5180/ (academy-stage2-duel-preview), login HTTP 200; test:login:dev PASS la 390/1440px pentru navigare/formular/reload, fără erori runtime. Nu s-a folosit parola unui cont real pentru această verificare.
+- Audit SEO inițial și seo:check final Site-Trupa: **64 pagini, 0 FAIL / 0 WARN**. Rute protejate existente, fără schimbări metadata publice/JSON-LD/sitemap; imaginile de avatar reutilizează componenta cu alt. Fără date GSC noi și fără afirmații de creștere de poziții/CTR.
+
+### Riscuri și pași următori
+- Claudiu trebuie să aplice migrarea Etapa 2 în SQL Editor; dacă banca quizzes/quiz_questions lipsește, se aplică întâi supabase/setup_quizzes.sql. Nu se rulează schema consolidată integrală pe baza existentă. Migrarea incrementală este verificată local, nu aplicată/verificată în proiectul Supabase live.
+- Banca nouă conține quiz-uri gata de jucat, dar nu include un editor vizual nou de autorat; alte întrebări se pregătesc în SQL Editor. Notificările/Realtime reale și Railway necesită verificare după publicare cu două conturi reale.
+- Greșeli detectate și remediate în validare: quoting SQL la generare, fixture fără granturile implicite Supabase/UID SQL Editor, importuri duplicate din cauza CRLF la reorganizare, test de eroare GET care era recuperată automat de SDK (fixture schimbată în eroare non-retriabilă). Problemele nu au fost ascunse prin relaxarea securității sau a testelor de produs.
+
+---
+
+## 📝 21 oct 2026 — Etapa 1 Studio: stem vocal dry și notificări securizate
+
+### Obiectiv
+Exclusiv Etapa 1 cerută de Claudiu: înregistrare numai microfon, negativ/reverb doar în căști, UPDATE elev strict pentru confirmarea notificării. Claudiu a confirmat că autentificarea reală este rezolvată. Etapa 2 nu a fost implementată.
+
+### Modificări
+- src/lib/liveMonitor.js expune input (sursa MediaStream microfon). src/lib/recorder.js conectează această sursă direct la destinația MediaRecorder, înainte de gain/reverb/limiter. Negativul este conectat exclusiv la ieșirea de audiție, backingMixed=false. Camera video este păstrată, audio-ul rămâne dry în toate modurile RecordingStudio.
+- src/components/RecordingStudio.jsx explică izolarea, riscul recaptării acustice și faptul că Dry/Wet controlează numai căștile. Ajutorul versurilor nu mai promite un fișier mixt. Trimiterea la Studio reutilizează blobul dry, fără procesare suplimentară.
+- Migrare nouă supabase/migrations/20261021000003_studio_dry_notification_security.sql: DROP/CREATE politica de confirmare, granturi UPDATE limitate, trigger SECURITY INVOKER cu search_path gol care compară OLD/NEW în afara notification_seen_at. Elevul activ confirmă numai propria cerere completed/necitită; URL/status/identitate/date sunt nemodificabile, timestamp-ul este pus pe server. Profesorul și rolurile administrative păstrează fluxul de masterizare.
+- supabase/schema.sql sincronizată cu infrastructura Studio de bază și protecția nouă pentru instalări curate. Pe baza live se aplică migrarea incrementală, nu schema consolidată integrală.
+- README actualizat; src/lib/canto.check.mjs, src/lib/studio.check.mjs și scripts/verify-canto.mjs extinse. Modificările locale anterioare pentru login/Canto/biblioteca Orgă au fost păstrate.
+
+### Validări
+- Academy npm test: 51/51 PASS. Audio: toate combinațiile audio/video și cu/fără negativ, ramură dry unică și cleanup la abort. SQL PGlite: migrare repetabilă, atacuri URL/status/proprietar/piesă/ID/dată cu/fără confirmare, pending/străin/inactiv, confirmare unică/timestamp server, profesor processing/completed și rezistență la politică permisivă suplimentară.
+- Academy build PASS. test:canto PASS la 390px/1440px: MediaRecorder real cu microfon virtual, graful dry, negativ audibil doar în monitor, upload privat raw și tichet corelat, zero temă duplicată; testele AI/versuri anterioare păstrate.
+- test:admin PASS la 390px/1440px, inclusiv bibliotecă PDF/demo MIDI și uploaduri/UPDATE existente. Diagnostics fără erori; diff check curat.
+- Site-Trupa seo:check: 64 pagini verificate, 0 FAIL | 0 WARN. Nu se modifică metadata/JSON-LD sau imagini; fără măsurători GSC și fără afirmații de ranking.
+
+### Riscuri / pași următori
+- Migrarea nu a fost aplicată în Supabase live. Rulează întâi migrarea Studio de bază dacă lipsește, apoi scriptul incremental nou; testează elev/profesor cu date reale.
+- Căștile sunt obligatorii pentru a evita recaptarea acustică a negativului; o intrare hardware Stereo Mix sau procesarea dispozitivului nu pot fi eliminate prin graful browserului. Înregistrările mixate vechi nu devin retroactiv dry.
+- Formatele existente WebM/Opus ori MP4 sunt păstrate; dry înseamnă fără mix/efecte în aplicație, nu promisiune de WAV lossless. Audiția pe hardware real rămâne de verificat.
+- Fără commit/push sau deploy nou. Joc Ritmic, clasament și multiplayer nu fac parte din această etapă.
+
+## 📝 21 oct 2026 — Orgă: bibliotecă de partituri și demo MIDI propriu
+
+### Obiectiv
+Elevul alege o partitură PDF din bibliotecă, vede documentul deasupra editorului, scrie notele și studiază pe claviatură alături de propriul demo MIDI.
+
+### Modificări
+- ScoreLibrary.jsx: rută autentificată /instrument/partituri/, căutare după titlu, filtrare pe nivel și paginare Supabase de 12 partituri. Reutilizează pieces.score_path, bucketul privat, SecurePdfViewer și regulile de publicare/nivel; nu introduce tabele/bucketuri sau migrare noi.
+- Tema selectată prin ?piece afișează PDF-ul sus și ScoreEditor jos. Exportul MIDI sau „Studiază pe claviatură” transmite exact aceiași bytes către InteractiveStudio, fără reîncărcare manuală obligatorie.
+- InteractiveStudio primește initialMidi și redă compoziția elevului pe claviatura demo, cu sunet și evidențiere; claviatura elevului este utilizabilă simultan. Notele din registre îndepărtate sunt urmărite prin derulare; viteză/mixer/buclă/USB MIDI reutilizate.
+- Editarea notelor/instrumentului sau Play Compoziție invalidează demo-ul anterior pentru a evita suprapuneri/date vechi. Exportul integrat oprește previzualizarea. Compozițiile nu sunt salvate automat: elevul este informat să exporte MIDI înainte de schimbarea temei/închiderea paginii.
+- Linkuri noi în App.jsx, Layout.jsx și Discipline.jsx. Profesorul folosește formularul existent /admin/piese/?add=orga pentru PDF-uri; upload individual, nu upload multiplu.
+- Shell-ul SPA importă explicit CSS-ul editorului/studioului: în build, Astro îl atribuise doar paginii publice studio, cauzând overflow. Playerul MIDI suplimentar se încarcă doar când are sursă, evitând inițializarea inutilă care genera erori CSP; CSP nu a fost relaxat.
+- README actualizat și testele existente verify-admin.mjs extinse, fără infrastructură nouă sau acces la date live.
+
+### Validări
+- Academy build PASS; npm test: 50/50 PASS.
+- test:admin PASS la 390px și 1440px, inclusiv căutare/paginare bibliotecă, PDF canvas real deasupra editorului, MIDI exact cu Do4/Do6 și pauză de optime, sunet 261,63 Hz, clape evidențiate și input simultan elev, auto-follow registru înalt, invalidarea demo-ului și acces direct la nivel blocat.
+- test:navigation PASS la 390px/1440px și încărcarea separată Instrument/Canto; test:canto PASS, inclusiv generare AI din fereastra de versuri și revizuire/salvare.
+- Site-Trupa seo:check: 64 pagini verificate, 0 FAIL | 0 WARN. Ruta nouă este internă/noindex; metadata și JSON-LD existente nemodificate, nicio imagine nouă, fără date GSC sau afirmații de ranking.
+
+### Riscuri / pași următori
+- PDF-urile sunt transcrise manual de elev; nu s-a introdus recunoaștere automată PDF → MIDI. Editorul păstrează limita existentă de 128 note/pauze și 120 BPM la export.
+- Verificările browser folosesc PDF și backend sintetice; încărcarea/reluarea cu fișiere și conturi reale rămân de verificat. Nu au fost aplicate migrări sau încărcate materiale în Supabase live.
+- Modificările sunt locale, fără commit/push în această intervenție. Fixul login și fereastra Canto din intervențiile precedente au fost păstrate.
+
+## 📝 21 oct 2026 — Canto: fereastră karaoke și extragere AI din versuri
+
+### Obiectiv
+Conectarea „Vezi versuri” și a ambelor variante audio la o fereastră sincronizată, cu extragere AI rezervată profesorului.
+
+### Modificări
+- CantoPieceStudio: fereastră karaoke la Play pozitiv/negativ și la „Vezi versuri”; eliminată fereastra statică duplicată din Canto.jsx. Controalele Play/Pauză/Stop și seek folosesc aceleași elemente audio, fără playback duplicat.
+- Profesorul poate utiliza GenerateLyricsButton existent direct din fereastră: confirmare drepturi/consimțământ, generare în ciornă, revizuire și UPDATE exclusiv pe versuri_text. Starea bibliotecii este actualizată după salvare, inclusiv pentru REC.
+- SecureAudioPlayer expune seek/durată prin controlsRef. Reutilizate parserul Enhanced LRC și rendererul KaraokeLyrics pentru evidențiere pe cuvânt, scroll și reduced motion; nu se inventează timpi pentru text nesincronizat.
+- README și scripts/verify-canto.mjs actualizate. Cheia OpenAI rămâne în Secrets pentru funcția Supabase generate-lyrics, nu în frontend; nu au fost citite/afișate chei pentru această modificare.
+
+### Validări
+- Academy build PASS; npm test: 50/50 PASS; test:canto: PASS la 390px/1440px pentru fereastra ambelor surse, seek/word highlight/scroll, profesor AI cu ciornă și salvare manuală, reload persistent și zero AI la redare elev.
+- test:admin PASS la 390px/1440px, inclusiv UPDATE/PDF/previzualizare și coada karaoke. Diagnostics fără erori; diff check curat.
+- Site-Trupa seo:check: 64 pagini verificate, 0 FAIL | 0 WARN. Metadata/JSON-LD nemodificate, fără imagini noi sau date GSC; nu se raportează rezultate de ranking.
+
+### Riscuri / pași următori
+- Funcția generate-lyrics și migrarea cooldown trebuie publicate/aplicate în Supabase, iar OPENAI_API_KEY trebuie configurată în Edge Functions Secrets. Nu am făcut deploy, nu am apelat OpenAI real și nu am consumat credite; testele furnizorului sunt simulate.
+- Transcrierea muzicală poate greși. Verifică textul și timpii pe o înregistrare autorizată; pozitivul și negativul trebuie să fie aliniate temporal. Dacă furnizorul întoarce doar segmente, se evidențiază linia, nu se promit timestamp-uri pe cuvânt inexistente.
+- Modificările sunt locale, fără commit/push nou; se păstrează și fixul anterior pentru login dev.
+
+## 📝 21 oct 2026 — Remediere ecran negru la login local
+
+### Obiectiv
+Restabilirea navigării din landing către autentificare în serverul Astro dev.
+
+### Modificări
+- Cauză reprodusă în Chromium: SPA încărcată din script Astro fără preambulul React Fast Refresh; eroare runtime «@vitejs/plugin-react can't detect preamble». Separat, buildul rulat peste dev invalidase cache-ul Vite (504 Outdated Optimize Dep).
+- Catch-all Academy: importă scripturile Astro before-hydration înaintea entrypointului React, reutilizând inițializarea integrării existente. Nu relaxează CSP și nu modifică autentificarea sau cheile.
+- Adăugat scripts/verify-login-dev.mjs și npm run test:login:dev; README documentează serverul dev necesar.
+
+### Validări
+- Login dev: PASS la 390px și 1440px, click din landing, formular vizibil, reload direct, fără erori runtime/module.
+- Academy build, test:landing și test:navigation: PASS, inclusiv sesiuni și încărcarea separată a disciplinelor.
+- Site-Trupa seo:check: 64 pagini verificate, 0 FAIL | 0 WARN. Metadata și JSON-LD nu au fost modificate; nicio imagine nouă, limitele metadata existente neschimbate. Fără date GSC noi.
+
+### Riscuri / pași următori
+- Verificarea nu autentifică un cont real și nu aplică migrări Supabase. Evită rularea buildului concomitent cu dev, pentru a nu invalida cache-ul comun Vite; repornește dev după build.
+- Fixul este local; nu a fost făcut un nou commit/push în această intervenție.
+
 ## 📝 21 oct 2026 — Publicare Academy Music și previzualizare locală
 
 ### Obiectiv

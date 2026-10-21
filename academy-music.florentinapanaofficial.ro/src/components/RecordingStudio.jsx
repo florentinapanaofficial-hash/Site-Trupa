@@ -343,7 +343,7 @@ export default function RecordingStudio({ open, piece, onClose, onSubmitted }) {
                         </label>
 
                         <p className="rounded-lg bg-white/5 px-3 py-2 text-xs text-slate-400">
-                            Folosește căști: altfel negativul intră a doua oară prin microfon și se aude dublat.
+                            Se înregistrează doar microfonul, fără negativ sau efectele de monitorizare. Folosește căști pentru ca negativul să nu fie recaptat acustic de microfon.
                         </p>
 
                         <button type="button" className="btn-primary w-full" onClick={() => setPhase('headphones')}>
@@ -355,7 +355,7 @@ export default function RecordingStudio({ open, piece, onClose, onSubmitted }) {
                 {phase === 'headphones' && <div className="space-y-4">
                     <h3 className="text-xl font-semibold text-gold-300">Regulă de studio</h3>
                     <p>Regulă de studio: Pentru a evita microfonia (țiuitul) și a auzi negativul corect, conectează căștile cu microfon!</p>
-                    <p className="text-sm text-slate-300">Microfonul pornește numai după confirmare, pentru înregistrarea temei. Începe cu volumul redus. Aplicația nu poate verifica fizic căștile.</p>
+                    <p className="text-sm text-slate-300">Microfonul pornește numai după confirmare. Negativul și reverb-ul se aud doar în căști; fișierul trimis conține microfonul neprocesat (dry). Începe cu volumul redus. Aplicația nu poate verifica fizic căștile.</p>
                     <button type="button" className="btn-gold" onClick={prepare}>Sunt gata, am conectat căștile!</button>
                     <button type="button" className="btn-ghost ml-3" onClick={() => setPhase('idle')}>Anulează</button>
                 </div>}
@@ -392,10 +392,10 @@ export default function RecordingStudio({ open, piece, onClose, onSubmitted }) {
 
                         {piece?.versuri_text && <section className="space-y-3 rounded-xl border border-gold-400/20 p-4" aria-label="Versuri ajutătoare pentru temă">
                             <h3 className="font-semibold text-gold-300">Versuri ajutătoare · doar vizual</h3>
-                            <p className="text-xs text-slate-300">{autoBacking && negativ ? 'Urmăresc negativul din înregistrare. Fișierul audio conține vocea și negativul, nu textul afișat.' : 'Fără negativ, versurile rămân vizibile fără sincronizare audio.'}</p>
+                            <p className="text-xs text-slate-300">{autoBacking && negativ ? 'Versurile urmăresc negativul auzit în căști. Fișierul trimis conține doar microfonul, fără negativ, reverb sau textul afișat.' : 'Fără negativ, versurile rămân vizibile fără sincronizare audio.'}</p>
                             <KaraokeLyrics text={piece.versuri_text} time={autoBacking && negativ ? lyricTime : -1} />
                         </section>}
-                        <label className="block text-sm text-slate-200">Reverb Dry/Wet · {Math.round(mix * 100)}%<input type="range" min="0" max="1" step="0.01" value={mix} className="mt-3 block w-full accent-gold-400" onChange={event => { const value = Number(event.target.value); setMix(value); sessionRef.current?.setMix(value); }} /></label>
+                        <label className="block text-sm text-slate-200">Reverb Dry/Wet în căști · {Math.round(mix * 100)}%<input type="range" min="0" max="1" step="0.01" value={mix} className="mt-3 block w-full accent-gold-400" onChange={event => { const value = Number(event.target.value); setMix(value); sessionRef.current?.setMix(value); }} /></label>
                         <p className="text-xs text-slate-500">
                             Durata maximă este de 10 minute; înregistrarea se oprește singură la final.
                         </p>

@@ -9,6 +9,7 @@ import TeacherModeToggle from './TeacherModeToggle';
 import Spinner from './ui/Spinner';
 import Avatar from './Avatar';
 import LivePresence from './LivePresence';
+import DuelInvitations from './DuelInvitations';
 
 const SHARED_LINKS = [
     { to: '/red/', label: 'Resurse de teorie', Icon: Library },
@@ -106,7 +107,9 @@ export default function Layout() {
         const links = isCanto ? [{ to: '/canto/', label: 'Biblioteca Canto', Icon: Mic2 }]
             : isInstrument ? [
                 { to: '/instrument/', label: 'Repertoriu și partituri', Icon: Music2, end: true },
+                { to: '/instrument/partituri/', label: 'Biblioteca de partituri', Icon: Library },
                 { to: '/instrument/claviatura/', label: 'Claviatură virtuală', Icon: Piano },
+                { to: '/jocuri/?tab=ritm', label: 'Joc Ritmic', Icon: Puzzle },
             ] : [];
         return <>
             <nav aria-label={mobile ? 'Navigare mobilă' : 'Navigare principală'} className="mt-6 space-y-1">
@@ -145,6 +148,7 @@ export default function Layout() {
                     </div>
                     {menuOpen && <div id="academy-mobile-menu" className="max-h-[calc(100dvh-5rem)] overflow-y-auto border-t border-white/10 bg-ink-900 px-4 pb-5 lg:hidden">{navigation(true)}</div>}
                 </header>
+                {!isInspector && profile?.id && <DuelInvitations userId={profile.id} />}
                 {studioNotice && <section role="status" className="mx-4 mt-4 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gold-300/40 bg-gold-300/10 p-4 shadow-lg shadow-black/20">
                     <p className="font-semibold text-gold-100">🎉 Felicitări! Piesa ta a fost masterizată și este disponibilă în Portofoliu!</p>
                     <div className="flex flex-wrap items-center gap-2">

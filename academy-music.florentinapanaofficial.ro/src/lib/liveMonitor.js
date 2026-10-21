@@ -49,6 +49,6 @@ export async function startLiveMonitor({ signal, mix = 0.2, createContext = () =
         source.connect(convolver).connect(wet).connect(output);
         output.connect(limiter).connect(context.destination);
         setReverbMix(dry, wet, mix, context);
-        return { stream, context, output: limiter, stop, setMix: value => setReverbMix(dry, wet, value, context) };
+        return { stream, context, input: source, output: limiter, stop, setMix: value => setReverbMix(dry, wet, value, context) };
     } catch (error) { stop(); throw error; }
 }

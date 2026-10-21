@@ -13,7 +13,7 @@ function loadBacking(url, signal) {
     return new Promise((resolve, reject) => {
         const element = new Audio();
         element.crossOrigin = 'anonymous'; element.preload = 'auto';
-        const fail = () => finish(new Error('Negativul nu poate fi inclus în temă. Verifică sursa/CORS sau înregistrează fără negativ.'));
+        const fail = () => finish(new Error('Negativul nu poate fi redat în căști. Verifică sursa/CORS sau înregistrează fără negativ.'));
         const abort = () => finish(new DOMException('Anulat', 'AbortError'));
         const ready = () => finish(null);
         const timer = setTimeout(fail, 15000);
@@ -47,17 +47,19 @@ export async function createStudioSession({ withVideo, backingUrl, mix = 0.2, si
     }
     signal.addEventListener('abort', stopEverything, { once: true });
     try {
-        destination = live.context.createMediaStreamDestination(); live.output.connect(destination);
+        destination = live.context.createMediaStreamDestination();
+        // Capture the microphone before monitor gain, reverb and limiter.
+        live.input.connect(destination);
         if (backingUrl) {
             backing = await loadBacking(backingUrl, signal);
             backingNode = live.context.createMediaElementSource(backing);
-            backingNode.connect(destination); backingNode.connect(live.context.destination);
+            backingNode.connect(live.context.destination);
         }
         if (signal.aborted) throw new DOMException('Anulat', 'AbortError');
         const tracks = [...destination.stream.getAudioTracks(), ...(withVideo ? live.stream.getVideoTracks() : [])];
         const mimeType = pickMimeType(withVideo);
         recorder = new MediaRecorder(new MediaStream(tracks), mimeType ? { mimeType } : undefined);
-        return { recorder, context: live.context, userStream: live.stream, backing, backingMixed: Boolean(backingNode), setMix: live.setMix, stopEverything, mimeType: mimeType || (withVideo ? 'video/webm' : 'audio/webm') };
+        return { recorder, context: live.context, userStream: live.stream, backing, backingMixed: false, setMix: live.setMix, stopEverything, mimeType: mimeType || (withVideo ? 'video/webm' : 'audio/webm') };
     } catch (error) { stopEverything(); throw error; }
 }
 

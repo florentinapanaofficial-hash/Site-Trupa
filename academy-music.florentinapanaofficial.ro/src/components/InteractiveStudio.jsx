@@ -92,8 +92,12 @@ function Waterfall({ model, actions, running, sequence, pausedPosition }) {
     return <canvas ref={canvasRef} width={boardWidth} height={180} className="is-waterfall" aria-label="Note MIDI în cascadă" role="img" />;
 }
 
-export default function InteractiveStudio({ isHomeworkMode = false, onSubmitHomework } = {}) {
-    const [sequence, setSequence] = useState(demoSequence);
+export default function InteractiveStudio({ isHomeworkMode = false, onSubmitHomework, initialMidi } = {}) {
+    const [sequence, setSequence] = useState(() => {
+        if (!initialMidi) return demoSequence;
+        const parsed = parseStudioMidi(initialMidi.bytes);
+        return { ...parsed, name: initialMidi.name };
+    });
     const model = useRef(null);
     if (!model.current) model.current = { sequence, clock: new StudioClock(), running: false, starting: false, version: 0, rate: 1, loop: false, a: 0, b: sequence.duration, hits: new Set(), hitTotal: 0, expectedTotal: 0, start: 0, wrong: 0, voices: new Map(), feedback: {}, instrument: 'piano', mediaActive: false, ended: false, demoLevel: 0.65, studentLevel: 0.8, demoMuted: false, metronome: false, signature: '4/4', buffering: false };
     const rootRef = useRef(null);
@@ -110,6 +114,19 @@ export default function InteractiveStudio({ isHomeworkMode = false, onSubmitHome
     homeworkRef.current.enabled = isHomeworkMode === true;
     const actions = useRef({});
     const [view, setView] = useState({ position: 0, running: false, teacher: '', student: '', feedback: {}, hits: 0, expected: sequence.notes.length, wrong: 0, ended: false });
+    useEffect(() => {
+        if (!initialMidi || !view.running || !view.teacher) return;
+        const key = keys[Number(view.teacher.split(',')[0])];
+        if (!key) return;
+        const frame = requestAnimationFrame(() => {
+            const scroller = scrollRef.current;
+            if (!scroller) return;
+            const left = scroller.scrollLeft;
+            const width = scroller.clientWidth;
+            if (key.left < left || key.left + key.width > left + width) scroller.scrollLeft = Math.max(0, key.left - Math.min(120, width / 3));
+        });
+        return () => cancelAnimationFrame(frame);
+    }, [initialMidi, view.running, view.teacher]);
     const [animation, setAnimation] = useState(false);
     const [rate, setRate] = useState(1);
     const [instrument, setInstrument] = useState('piano');
@@ -470,13 +487,18 @@ export default function InteractiveStudio({ isHomeworkMode = false, onSubmitHome
     }, [isHomeworkMode]);
 
     useEffect(() => {
-        void import('html-midi-player');
-        return () => { if (playerUrlRef.current) URL.revokeObjectURL(playerUrlRef.current); };
-    }, []);
+        if (!playerSrc) return;
+        let active = true;
+        void import('html-midi-player').catch(() => {
+            if (active) setMessage('Playerul MIDI suplimentar nu a putut fi încărcat. Folosește studioul interactiv pentru redare.');
+        });
+        return () => { active = false; };
+    }, [playerSrc]);
+    useEffect(() => () => { if (playerUrlRef.current) URL.revokeObjectURL(playerUrlRef.current); }, []);
 
     useEffect(() => {
         homeworkRef.current.mounted = true;
-        scrollRef.current.scrollLeft = keys[48].left;
+        scrollRef.current.scrollLeft = initialMidi ? Math.max(0, (keys[sequence.notes[0].note]?.left || 0) - 120) : keys[48].left;
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) setAnimation(false);
         const keydown = (event) => {
             if (event.repeat || event.ctrlKey || event.metaKey || event.altKey || !rootRef.current?.contains(document.activeElement) || event.target.closest('input,select,textarea,[contenteditable="true"]')) return;
@@ -541,6 +563,7 @@ export default function InteractiveStudio({ isHomeworkMode = false, onSubmitHome
     return <section ref={rootRef} tabIndex={0} className="interactive-studio not-prose" aria-label="Studio interactiv MIDI"
         onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) releaseAll(); }}>
         <header className="is-header"><div><h2>Studio interactiv</h2><p className="is-filename">{sequence.name}</p></div>
+            {!isHomeworkMode && !recordingLocked && <a className="is-button" href="/jocuri/?tab=ritm">Joc Ritmic</a>}
             <button type="button" className="is-button" onClick={() => setAnimation(!animation)} aria-pressed={animation}><Monitor size={17} />Schimbă vederea: {animation ? 'Mod Animație' : 'Mod Simplu'}</button>
         </header>
         <div className="is-toolbar">

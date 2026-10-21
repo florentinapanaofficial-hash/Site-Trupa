@@ -1,7 +1,7 @@
 import { useTeacherMode } from '../lib/useTeacherMode';
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FileText, Lock, Plus } from 'lucide-react';
+import { Lock, Plus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../lib/auth';
 import CantoPieceStudio from '../components/CantoPieceStudio';
@@ -26,7 +26,6 @@ export default function Canto() {
     const [group, setGroup] = useState('');
     const [recordingPiece, setRecordingPiece] = useState(null);
     const [score, setScore] = useState(null);
-    const [lyrics, setLyrics] = useState(null);
 
     async function load() {
         setError('');
@@ -77,10 +76,9 @@ export default function Canto() {
                         return <article key={piece.id} className="card relative my-5 min-w-0 space-y-4 overflow-hidden border border-white/10 bg-gradient-to-br from-ink-900 to-ink-950">
                         <div className="min-w-0"><h2 className="break-words text-lg font-semibold text-white">{piece.title}</h2><p className="mt-1 break-words text-sm text-slate-400">{piece.grupa || 'Fără grupă'}</p>{piece.description && <p className="mt-2 text-sm text-slate-300">{piece.description}</p>}</div>
                         {!locked ? <>
-                            <CantoPieceStudio piece={piece} />
+                            <CantoPieceStudio piece={piece} canGenerate={isTeacher} onLyricsSaved={text => setPieces(previous => previous.map(item => item.id === piece.id ? { ...item, versuri_text: text } : item))} />
                             {!isInspector && <button type="button" className="btn-gold" onClick={() => { document.querySelectorAll("audio").forEach(audio => audio.pause()); setRecordingPiece(piece); }}>REC · Înregistrează tema</button>}
                             {piece.score_path && <button type="button" className="btn-ghost justify-self-start" onClick={() => setScore(piece)}>Vezi partitura</button>}
-                            <button type="button" className="btn-ghost inline-flex items-center justify-center gap-2 justify-self-start" disabled={!piece.versuri_text} aria-label={`Vezi versuri — ${piece.title}`} onClick={() => setLyrics(piece)}><FileText size={16} aria-hidden="true" /> Vezi versuri</button>
                         </> : <div className="min-h-24" aria-hidden="true" />}
                         {locked && <button type="button" className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-ink-950/75 p-4 text-center font-semibold text-white" onClick={() => setLockNotice('Info: profilul tău este ' + studyLevelLabel(studyProgress.progress.studyLevel) + '. Trimite toate temele asociate pieselor alocate nivelului curent pentru a debloca nivelul următor.')} aria-label={`Piesa ${piece.title} este blocată. Vezi condițiile de deblocare.`}><Lock size={28} aria-hidden="true" /><span>Piesă blocată</span><span className="text-xs font-normal text-slate-200">Finalizează temele nivelului tău pentru a debloca nivelul următor.</span></button>}
                     </article>;
@@ -88,9 +86,7 @@ export default function Canto() {
                 </div>
             )}
             {recordingPiece && <Suspense fallback={<Spinner label="Se încarcă studioul de înregistrare…" />}><RecordingStudio open piece={recordingPiece} onClose={() => setRecordingPiece(null)} onSubmitted={() => void studyProgress.reload()} /></Suspense>}
-            <Modal open={Boolean(lyrics)} title={lyrics?.title || 'Versuri'} onClose={() => setLyrics(null)} wide>
-                <div className="max-h-[65vh] overflow-y-auto whitespace-pre-wrap break-words text-base leading-8 text-slate-100" tabIndex={0} aria-label="Versurile piesei">{lyrics?.versuri_text}</div>
-            </Modal>
+
             <Modal open={Boolean(score)} title={score ? `Partitura — ${score.title}` : "Partitură"} onClose={() => setScore(null)} wide>
                 {score && <Suspense fallback={<Spinner label="Se încarcă partitura…" />}><SecurePdfViewer path={score.score_path} watermark={profile?.full_name || "Academy Music"} /></Suspense>}
             </Modal>

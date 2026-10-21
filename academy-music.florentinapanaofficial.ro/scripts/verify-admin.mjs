@@ -3,7 +3,8 @@ import { createServer } from 'node:http';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import { fileURLToPath } from 'node:url';
-import { mkdir } from 'node:fs/promises';
+import { mkdir, readFile } from 'node:fs/promises';
+import midiPackage from '@tonejs/midi';
 import { chromium, expect } from '@playwright/test';
 
 function studyPdf() {
@@ -56,9 +57,26 @@ try {
         await context.addInitScript(({ accessToken, userId }) => {
             localStorage.setItem('academy-music-auth', JSON.stringify({ access_token: accessToken, refresh_token: 'test-refresh', expires_at: Math.floor(Date.now()/1000)+3600, expires_in: 3600, token_type: 'bearer', user: { id: userId, aud: 'authenticated' } }));
         }, { accessToken, userId });
+        if (path.includes('/partituri/')) await context.addInitScript(() => {
+            window.__scoreAudio = [];
+            const NativeAudioContext = window.AudioContext;
+            window.AudioContext = class extends NativeAudioContext {
+                createOscillator() {
+                    const oscillator = super.createOscillator();
+                    const start = oscillator.start.bind(oscillator);
+                    oscillator.start = when => { window.__scoreAudio.push({ frequency: oscillator.frequency.value, when, audioTime: this.currentTime }); return start(when); };
+                    return oscillator;
+                }
+            };
+        });
         const page = await context.newPage();
         const resources = [{ id: 'resource-id', title: 'Lecție RED', category: 'fisa-teoretica', discipline: 'comun', description: 'Explicații inițiale', external_url: 'https://example.test/lesson', file_path: 'old/resource.pdf' }];
         const rows = [{ id: path.includes('/canto') ? 'canto-piece' : 'orga-piece', discipline: path.includes('/canto') ? 'canto' : 'orga', title: path.includes('/canto') ? 'Piesă canto' : 'Piesă orgă', description: 'Descriere inițială', composer: 'Profesor', level: 'incepator', is_published: true, positive_url: 'https://example.test/existing.mp3', negative_url: null, tags: [], versuri_text: '', grupa: 'Grupa 1' }];
+        const libraryMode = path.includes('/partituri/');
+        if (libraryMode) {
+            rows.splice(0, rows.length, ...Array.from({ length: 14 }, (_, index) => ({ id: 'score-' + index, title: 'Studiu ' + String(index + 1).padStart(2, '0'), discipline: 'orga', composer: 'Profesor', level: index === 1 ? 'avansat' : 'incepator', score_path: 'scores/studiu-' + index + '.pdf', is_published: true })));
+        }
+        const libraryRequests = [];
         const writes = [], uploads = [], audioJobs = [];
         let insertions = 0;
         const errors = [];
@@ -98,6 +116,15 @@ try {
                 return route.fulfill({ contentType: 'application/json', body: JSON.stringify(audioJobs) });
             }
             if (url.pathname === '/rest/v1/pieces') {
+                if (libraryMode) {
+                    libraryRequests.push(url);
+                    let result = rows.filter(row => (!url.searchParams.has('id') || url.searchParams.get('id') === 'eq.' + row.id) && (!url.searchParams.has('level') || url.searchParams.get('level') === 'eq.' + row.level));
+                    if (url.searchParams.has('title')) result = result.filter(row => row.title.includes(url.searchParams.get('title').slice(7, -1)));
+                    const count = result.length;
+                    const offset = Number(url.searchParams.get('offset') || 0);
+                    const limit = Number(url.searchParams.get('limit') || count);
+                    return route.fulfill({ contentType: 'application/json', body: JSON.stringify(result.slice(offset, offset + limit)), headers: { 'Access-Control-Expose-Headers': 'Content-Range', 'Content-Range': offset + '-' + Math.max(offset, offset + Math.min(limit, count) - 1) + '/' + count } });
+                }
                 if (route.request().method() === 'PATCH') {
                     const payload = route.request().postDataJSON();
                     writes.push({ id: url.searchParams.get('id'), payload });
@@ -112,7 +139,7 @@ try {
             return route.fulfill({ contentType: 'application/json', body: JSON.stringify(body), headers: { 'Content-Range': '0-0/0' } });
         });
         await page.goto(base + path);
-        return { context, page, errors, chunks, tables, rows, writes, uploads, audioJobs, get insertions() { return insertions; } };
+        return { context, page, errors, chunks, tables, rows, writes, uploads, audioJobs, libraryRequests, get insertions() { return insertions; } };
     }
 
     for (const viewport of [{ width: 390, height: 844 }, { width: 1440, height: 1000 }]) {
@@ -217,6 +244,71 @@ try {
     assert.deepEqual(red.errors, []);
     await red.context.close();
     console.log('RED PASS: prefilled resource UPDATE preserving unchanged PDF and uploading its replacement.');
+    for (const width of [390, 1440]) {
+        const f = await open({ width, height: 1000 }, '/instrument/partituri/');
+        const { page } = f;
+        await expect(page.getByRole('heading', { name: 'Biblioteca de partituri · Orgă' })).toBeVisible();
+        await expect(page.getByRole('article')).toHaveCount(12);
+        await expect(page.getByRole('button', { name: 'Nivel încă blocat' })).toBeDisabled();
+        await page.getByRole('button', { name: 'Pagina următoare', exact: true }).click();
+        await expect(page.getByRole('article')).toHaveCount(2);
+        assert.ok(f.libraryRequests.some(url => url.searchParams.get('offset') === '12'));
+        await page.getByRole('searchbox', { name: 'Caută partitură' }).fill('Studiu 01');
+        await page.getByRole('button', { name: 'Caută', exact: true }).click();
+        await expect(page.getByRole('article')).toHaveCount(1);
+        await page.getByRole('button', { name: 'Alege tema — Studiu 01', exact: true }).click();
+        const pdf = page.getByRole('region', { name: 'Partitura de referință', exact: true });
+        await expect(pdf.locator('canvas')).toBeVisible();
+        await expect.poll(() => pdf.locator('canvas').evaluate(canvas => canvas.width)).toBeGreaterThan(100);
+        const editor = page.getByRole('region', { name: 'Editor de partituri', exact: true });
+        await expect(editor.locator('svg[role=img]')).toBeVisible();
+        assert.ok((await pdf.boundingBox()).y < (await editor.boundingBox()).y, 'PDF must be above note editor');
+        await editor.getByText('Doime', { exact: true }).click();
+        await editor.getByRole('button', { name: 'Adaugă Do4', exact: true }).click();
+        await editor.getByText('Optime', { exact: true }).click();
+        await editor.getByRole('button', { name: 'Pauză', exact: true }).click();
+        await editor.getByRole('radio', { name: 'Doime', exact: true }).check({ force: true });
+        await editor.getByRole('button', { name: 'Adaugă Do6', exact: true }).click();
+        await editor.getByRole('button', { name: 'Play Compoziție', exact: true }).click();
+        await expect(editor.getByRole('button', { name: 'Oprește compoziția', exact: true })).toBeVisible();
+        const downloadEvent = page.waitForEvent('download');
+        await editor.getByRole('button', { name: 'Exportă MIDI', exact: true }).click();
+        const midi = new midiPackage.Midi(await readFile(await (await downloadEvent).path()));
+        assert.deepEqual(midi.tracks[0].notes.map(note => [note.midi, note.time, note.duration]), [[60, 0, 1], [84, 1.25, 1]]);
+        await expect(editor.getByRole('button', { name: 'Play Compoziție', exact: true })).toBeVisible();
+        const studio = page.getByRole('region', { name: 'Studio interactiv MIDI', exact: true });
+        await expect(studio).toContainText('Studiu 01 — compoziția mea');
+        await page.evaluate(() => { window.__scoreAudio = []; });
+        await studio.getByRole('button', { name: 'Pornește studiul', exact: true }).click();
+        const teacherKeys = studio.getByRole('group', { name: 'Claviatura profesorului', exact: true });
+        await expect(teacherKeys.locator('[data-note="60"]')).toHaveAttribute('data-state', 'teacher');
+        await expect.poll(() => page.evaluate(() => window.__scoreAudio.some(note => Math.abs(note.frequency - 261.6256) < 0.1))).toBe(true);
+        const studentKey = studio.getByRole('group', { name: 'Claviatura elevului', exact: true }).locator('[data-note="60"]');
+        await studentKey.focus();
+        await page.keyboard.down('Enter');
+        await expect(studentKey).toHaveAttribute('data-state', /held|correct|wrong/);
+        await page.keyboard.up('Enter');
+        await expect(teacherKeys.locator('[data-note="84"]')).toHaveAttribute('data-state', 'teacher', { timeout: 5000 });
+        await expect.poll(async () => {
+            const key = await teacherKeys.locator('[data-note="84"]').boundingBox();
+            const scroller = await studio.getByLabel('Claviaturi cu derulare orizontală', { exact: true }).boundingBox();
+            return key.x >= scroller.x && key.x + key.width <= scroller.x + scroller.width;
+        }).toBe(true);
+        await studio.getByRole('button', { name: 'Pauză studiu', exact: true }).click();
+        await editor.getByRole('button', { name: 'Adaugă Sol4', exact: true }).click();
+        await expect(studio).toHaveCount(0);
+        await editor.getByRole('button', { name: 'Studiază pe claviatură', exact: true }).click();
+        await expect(studio).toBeVisible();
+        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+        assert.ok(f.libraryRequests.every(url => url.searchParams.get('discipline') === 'eq.orga' && url.searchParams.get('is_published') === 'eq.true'));
+        await page.goto(base + '/instrument/partituri/?piece=score-1');
+        await expect(page.getByText('Partitura aparține unui nivel încă blocat pentru contul tău.', { exact: true })).toBeVisible();
+        await expect(page.getByRole('region', { name: 'Editor de partituri', exact: true })).toHaveCount(0);
+        assert.deepEqual(f.errors, []);
+        await f.context.close();
+        console.log('Score library ' + width + 'px PASS: search/pagination, private PDF above editor, exact MIDI/rests, audible/visual demo, simultaneous student keyboard, revised demo and level guard.');
+    }
+
 
 } finally {
     if (browser) await browser.close();

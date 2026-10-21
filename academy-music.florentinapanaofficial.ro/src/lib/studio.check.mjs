@@ -31,6 +31,8 @@ test('Virtual Studio migration is repeatable and keeps request/storage access sc
         await execute(db, '../../supabase/schema.sql');
         await execute(db, '../../supabase/migrations/20261021000001_virtual_studio.sql');
         await execute(db, '../../supabase/migrations/20261021000001_virtual_studio.sql');
+        await execute(db, '../../supabase/migrations/20261021000003_studio_dry_notification_security.sql');
+        await execute(db, '../../supabase/migrations/20261021000003_studio_dry_notification_security.sql');
 
         const catalog = await db.query(`
             select
@@ -75,6 +77,50 @@ test('Virtual Studio migration is repeatable and keeps request/storage access sc
         const rawDeletePolicy = storagePolicies.rows.find(({ policyname }) => policyname === 'student_records_raw_delete_own');
         assert.match(rawDeletePolicy.qual, /not\s*\(\s*exists/i);
         assert.match(rawDeletePolicy.qual, /\bstudio_requests\b/i);
+
+        const student = '11111111-1111-4111-8111-111111111111';
+        const other = '22222222-2222-4222-8222-222222222222';
+        const teacher = '33333333-3333-4333-8333-333333333333';
+        const song = '44444444-4444-4444-8444-444444444444';
+        const requestId = '55555555-5555-4555-8555-555555555555';
+        const pendingId = '66666666-6666-4666-8666-666666666666';
+        await db.exec(`
+            insert into auth.users(id) values ('${student}'), ('${other}'), ('${teacher}');
+            update public.profiles set role='teacher' where id='${teacher}';
+            insert into public.pieces(id,title,discipline,is_published) values ('${song}','Studio test','orga',true);
+            insert into public.studio_requests(id,student_id,song_id,raw_audio_url,final_audio_url,status) values
+                ('${requestId}','${student}','${song}','raw/take.webm','mastered/master.wav','completed'),
+                ('${pendingId}','${student}','${song}','raw/take2.webm',null,'pending');
+            set role authenticated; set request.jwt.claim.sub='${student}';
+        `);
+        const row = async () => (await db.query(`select * from public.studio_requests where id='${requestId}'`)).rows[0];
+        const original = await row();
+        for (const change of ["final_audio_url='forged'", "status='processing'", "status='pending'", "raw_audio_url='forged'", `song_id='${pendingId}'`, `student_id='${other}'`, `id='${other}'`, "created_at='2000-01-01'"]) {
+            for (const ack of ['', ',notification_seen_at=now()']) {
+                await assert.rejects(db.query(`update public.studio_requests set ${change}${ack} where id='${requestId}'`), /permission denied|notification_seen_at|row-level security/i);
+                assert.deepEqual(await row(), original);
+            }
+        }
+        const ack = async (id = requestId, value = 'now()') => db.query(`update public.studio_requests set notification_seen_at=${value} where id='${id}' returning *`);
+        assert.equal((await ack(pendingId)).rows.length, 0);
+        await db.exec(`set request.jwt.claim.sub='${other}'`);
+        assert.equal((await ack()).rows.length, 0);
+        await db.exec(`reset role; set request.jwt.claim.sub=''; update public.profiles set is_active=false where id='${student}'; set role authenticated; set request.jwt.claim.sub='${student}'`);
+        assert.equal((await ack()).rows.length, 0);
+        await db.exec(`reset role; set request.jwt.claim.sub=''; update public.profiles set is_active=true where id='${student}'; set role authenticated; set request.jwt.claim.sub='${student}'`);
+        const acknowledged = (await ack(requestId, "'2000-01-01'")).rows[0];
+        assert.ok(new Date(acknowledged.notification_seen_at).getUTCFullYear() > 2000);
+        assert.deepEqual({ ...acknowledged, notification_seen_at: null }, original);
+        assert.equal((await ack()).rows.length, 0);
+        assert.equal((await ack(requestId, 'null')).rows.length, 0);
+        await db.exec(`set request.jwt.claim.sub='${teacher}'`);
+        assert.equal((await db.query(`update public.studio_requests set status='processing' where id='${pendingId}' returning status`)).rows[0].status, 'processing');
+        assert.equal((await db.query(`update public.studio_requests set status='completed',final_audio_url='mastered/final.wav' where id='${pendingId}' returning status`)).rows[0].status, 'completed');
+        // A permissive legacy policy must not bypass the column guard.
+        await db.exec(`reset role; create policy legacy_permissive_update on public.studio_requests for update to authenticated using(true) with check(true); set role authenticated; set request.jwt.claim.sub='${student}'`);
+        await assert.rejects(db.query(`update public.studio_requests set final_audio_url='forged',notification_seen_at=now() where id='${pendingId}'`), /notification_seen_at/);
+        await assert.rejects(ack(requestId, 'null'), /notification_seen_at/);
+
     } finally {
         await db.close();
     }

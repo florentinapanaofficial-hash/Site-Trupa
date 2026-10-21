@@ -1,10 +1,21 @@
-import { useMemo, useState } from 'react';
+import { lazy, Suspense, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import GameProfile from '../components/GameProfile';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../lib/auth';
 import games from '../data/games.json';
 
+const RhythmGame = lazy(() => import('../components/RhythmGame'));
+const Leaderboard = lazy(() => import('../components/Leaderboard'));
+const QuizDuel = lazy(() => import('../components/QuizDuel'));
+const AIGamePlayer = lazy(() => import('../components/AIGamePlayer'));
+
 export default function Jocuri() {
-    const [tab, setTab] = useState('quiz');
+    const [params, setParams] = useSearchParams();
+    const tab = params.get('tab') || 'quiz';
+    const { isInspector } = useAuth();
+    const [profileRevision, setProfileRevision] = useState(0);
+    function setTab(value) { setParams({ tab: value }); }
 
     return (
         <div className="space-y-6">
@@ -14,15 +25,15 @@ export default function Jocuri() {
                 </span>
                 <h1 className="mt-2 font-display text-3xl text-white">Jocuri muzicale</h1>
                 <p className="mt-1 text-sm text-slate-400">
-                    Verifică-ți cunoștințele de teorie și dezleagă rebusul. Scorul la quiz se salvează
-                    automat.
+                    Antrenează-ți ritmul, rezolvă quiz-uri pregătite și provoacă un coleg la duel. Rezultatele se salvează în cont.
                 </p>
             </header>
 
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
                 {[
                     { id: 'quiz', label: '❓ Quiz' },
                     { id: 'rebus', label: '🔡 Rebus' },
+                    ...(!isInspector ? [{ id: 'ai', label: '✨ Joc AI' }, { id: 'ritm', label: '🎹 Joc Ritmic' }, { id: 'duel', label: '⚔️ Dueluri quiz' }, { id: 'clasament', label: '🏆 Clasament' }] : []),
                 ].map((item) => (
                     <button
                         key={item.id}
@@ -38,7 +49,10 @@ export default function Jocuri() {
                 ))}
             </div>
 
-            {tab === 'quiz' ? <Quiz /> : <Rebus />}
+            {!isInspector && ['ritm','duel','clasament'].includes(tab) && <GameProfile onSaved={() => setProfileRevision(x => x + 1)} />}
+            <Suspense fallback={<p role="status">Se deschide jocul…</p>}>
+                {tab === 'rebus' ? <Rebus /> : !isInspector && tab === 'ai' ? <AIGamePlayer /> : !isInspector && tab === 'ritm' ? <RhythmGame /> : !isInspector && tab === 'duel' ? <QuizDuel profileRevision={profileRevision} /> : !isInspector && tab === 'clasament' ? <Leaderboard key={profileRevision} /> : <Quiz />}
+            </Suspense>
         </div>
     );
 }

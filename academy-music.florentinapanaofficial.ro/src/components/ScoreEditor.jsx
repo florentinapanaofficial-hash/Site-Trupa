@@ -9,7 +9,7 @@ const names = { C: 'Do', D: 'Re', E: 'Mi', F: 'Fa', G: 'Sol', A: 'La', B: 'Si' }
 const noteLabel = (pitch) => `${names[pitch[0]]}${pitch.slice(1)}`;
 const buttonClass = 'inline-flex min-h-10 items-center justify-center gap-2 rounded-md border border-white/20 bg-ink-900 px-3 py-2 text-sm text-white hover:border-gold-400 disabled:cursor-not-allowed disabled:opacity-40';
 
-export default function ScoreEditor() {
+export default function ScoreEditor({ onMidiReady, onCompositionChange } = {}) {
     const durationGroup = useId();
     const [composition, setComposition] = useState([]);
     const [duration, setDuration] = useState('q');
@@ -26,6 +26,8 @@ export default function ScoreEditor() {
     const playbackRef = useRef({ version: 0, active: false, timer: null });
     const downloadRef = useRef({ url: null, timer: null });
     const mountedRef = useRef(true);
+
+    useEffect(() => { onCompositionChange?.(); }, [composition, instrument, onCompositionChange]);
 
     function stop() {
         playbackRef.current.version += 1;
@@ -66,6 +68,7 @@ export default function ScoreEditor() {
     async function play() {
         if (playbackRef.current.active || !composition.length) return;
         stop();
+        onCompositionChange?.();
         const version = playbackRef.current.version;
         playbackRef.current.active = true;
         setPlaying(true);
@@ -81,12 +84,15 @@ export default function ScoreEditor() {
     }
 
     function exportMidi() {
+        if (onMidiReady) stop();
         try {
             if (!composition.length) return;
             const download = downloadRef.current;
             clearTimeout(download.timer);
             if (download.url) URL.revokeObjectURL(download.url);
-            download.url = URL.createObjectURL(new Blob([scoreMidi(composition, instrument)], { type: 'audio/midi' }));
+            const bytes = scoreMidi(composition, instrument);
+            onMidiReady?.(bytes);
+            download.url = URL.createObjectURL(new Blob([bytes], { type: 'audio/midi' }));
             const link = document.createElement('a');
             link.href = download.url;
             link.download = 'compozitia-mea.mid';
@@ -157,6 +163,7 @@ export default function ScoreEditor() {
             <button type="button" className={buttonClass} disabled={!composition.length} onClick={playing ? stop : () => void play()}>{playing ? <Square size={17} /> : <Play size={17} />}{playing ? 'Oprește compoziția' : 'Play Compoziție'}</button>
             <button type="button" className={buttonClass} onClick={exportMidi} disabled={!composition.length}><Download size={17} />Exportă MIDI</button>
         </div>
+        {onMidiReady && <button type="button" className={buttonClass} disabled={playing || !composition.some(note => note.pitch)} onClick={() => { try { stop(); onMidiReady(scoreMidi(composition, instrument)); setMessage('Demo pregătit pe claviatura de mai jos. Apasă Pornește studiul.'); } catch (failure) { setMessage(failure.message || 'Demo-ul MIDI nu a putut fi pregătit.'); } }}>Studiază pe claviatură</button>}
         <div ref={scrollRef} className="overflow-x-auto overscroll-x-contain rounded-md border border-white/20 bg-white" aria-label="Portativ cu derulare orizontală" tabIndex={0}>
             <div ref={staffRef} className="score-staff h-[220px] w-max min-w-full select-none text-black"
                 onPointerDown={(event) => { if (event.button !== 0) return; pointerRef.current = { id: event.pointerId, x: event.clientX, y: event.clientY, scroll: scrollRef.current.scrollLeft }; }}

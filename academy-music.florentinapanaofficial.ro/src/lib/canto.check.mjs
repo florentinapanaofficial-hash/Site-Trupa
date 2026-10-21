@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { PGlite } from '@electric-sql/pglite';
 import { parseLrc, activeLyricIndex, parseTimestamp } from './lrc.js';
 import { startLiveMonitor } from './liveMonitor.js';
+import { createStudioSession } from './recorder.js';
 import { transcriptionToLrc } from '../../supabase/functions/_shared/lyrics.js';
 import { createLyricsHandler } from '../../supabase/functions/generate-lyrics/handler.js';
 
@@ -62,6 +63,68 @@ test('live monitor routes dry and convolver wet paths through gain/limiter and r
     assert.equal(mock.track.stopped, 1);
     assert.equal(mock.context.state, 'closed');
     assert.ok(mock.nodes.filter(node => node.type !== 'destination').every(node => node.disconnected));
+});
+
+test('recorder captures only dry microphone, keeps backing and reverb in headphones, and cleans up audio/video sessions', async () => {
+    const names = ['window', 'navigator', 'Audio', 'MediaStream', 'MediaRecorder'];
+    const saved = new Map(names.map(name => [name, Object.getOwnPropertyDescriptor(globalThis, name)]));
+    try {
+        for (const withVideo of [false, true]) for (const hasBacking of [false, true]) {
+            const mock = audioMock();
+            const captureTrack = { stopped: 0, stop() { this.stopped++; } };
+            const videoTrack = { stopped: 0, stop() { this.stopped++; } };
+            mock.stream.getVideoTracks = () => withVideo ? [videoTrack] : [];
+            mock.stream.getTracks = () => [mock.track, ...(withVideo ? [videoTrack] : [])];
+            const capture = { type: 'capture', disconnected: false, disconnect() { this.disconnected = true; }, stream: { getAudioTracks: () => [captureTrack], getTracks: () => [captureTrack] } };
+            mock.context.createMediaStreamDestination = () => capture;
+            mock.context.createMediaElementSource = () => {
+                const backing = { type: 'backing', connections: [], disconnected: false, connect(target) { this.connections.push(target); return target; }, disconnect() { this.disconnected = true; } };
+                mock.nodes.push(backing); return backing;
+            };
+            let constraints;
+            const values = {
+                window: { AudioContext: function () { return mock.context; } },
+                navigator: { mediaDevices: { getUserMedia: async input => { constraints = input; return mock.stream; } } },
+                Audio: class extends EventTarget {
+                    pause() { this.paused = true; }
+                    removeAttribute() { this.src = ''; }
+                    load() { if (this.src) queueMicrotask(() => this.dispatchEvent(new Event('canplaythrough'))); }
+                },
+                MediaStream: class { constructor(tracks) { this.tracks = tracks; } getTracks() { return this.tracks; } },
+                MediaRecorder: class {
+                    static isTypeSupported() { return true; }
+                    constructor(stream) { this.stream = stream; this.state = 'inactive'; }
+                    start() { this.state = 'recording'; }
+                    stop() { this.state = 'inactive'; }
+                },
+            };
+            for (const [name, value] of Object.entries(values)) Object.defineProperty(globalThis, name, { configurable: true, value });
+            const abort = new AbortController();
+            const session = await createStudioSession({ withVideo, backingUrl: hasBacking ? 'https://example.test/negative.mp3' : null, mix: 1, signal: abort.signal });
+            assert.deepEqual(constraints.audio, { echoCancellation: false, noiseSuppression: false, autoGainControl: false });
+            assert.equal(Boolean(constraints.video), withVideo);
+            assert.deepEqual(session.recorder.stream.getTracks(), [captureTrack, ...(withVideo ? [videoTrack] : [])]);
+            assert.equal(session.backingMixed, false);
+            assert.deepEqual(mock.nodes.filter(node => node.connections.includes(capture)).map(node => node.type), ['source']);
+            if (hasBacking) assert.deepEqual(mock.nodes.find(node => node.type === 'backing').connections, [mock.context.destination]);
+            session.setMix(0); session.setMix(1);
+            assert.deepEqual(mock.nodes.filter(node => node.connections.includes(capture)).map(node => node.type), ['source']);
+            session.recorder.start();
+            abort.abort(); session.stopEverything();
+            assert.equal(session.recorder.state, 'inactive');
+            assert.equal(captureTrack.stopped, 1);
+            assert.equal(mock.track.stopped, 1);
+            if (withVideo) assert.equal(videoTrack.stopped, 1);
+            assert.equal(mock.context.state, 'closed');
+            assert.ok(capture.disconnected);
+            assert.ok(mock.nodes.filter(node => node.type !== 'destination').every(node => node.disconnected));
+        }
+    } finally {
+        for (const [name, descriptor] of saved) {
+            if (descriptor) Object.defineProperty(globalThis, name, descriptor);
+            else delete globalThis[name];
+        }
+    }
 });
 
 test('pending microphone permission is cancelled safely and rejected permission closes AudioContext', async () => {

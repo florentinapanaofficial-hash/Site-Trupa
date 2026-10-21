@@ -49,7 +49,10 @@ export default function SecureAudioPlayer({ audioUrl, label = 'Audio', accent = 
         if (audio.readyState > 0) audio.currentTime = 0;
         setPlaying(false); setCurrent(0); clock.current?.(0); onPlayingChange?.(false);
     }
-    useImperativeHandle(controlsRef, () => ({ togglePlay, stop }));
+    useImperativeHandle(controlsRef, () => ({ togglePlay, stop, seek(time) {
+        const audio = audioRef.current;
+        if (audio && Number.isFinite(time) && Number.isFinite(audio.duration)) { audio.currentTime = Math.max(0, Math.min(time, audio.duration)); updateTime(audio); }
+    }, duration }));
     return <div onContextMenu={event => event.preventDefault()} className="protected min-w-0 rounded-2xl border border-white/15 bg-gradient-to-br from-ink-800 to-ink-950 p-4 shadow-lg">
         <p className="mb-3 truncate text-sm font-semibold text-white">{label}</p>
         <div className="flex items-center gap-3">

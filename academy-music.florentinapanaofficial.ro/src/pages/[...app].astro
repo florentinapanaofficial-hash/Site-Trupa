@@ -1,5 +1,7 @@
 ---
 import AcademyLayout from '../layouts/AcademyLayout.astro';
+import '../components/InteractiveStudio.css';
+import '../components/ScoreEditor.css';
 const pathname = Astro.url.pathname;
 if (pathname.startsWith('/api/')) {
     return new Response(JSON.stringify({ error: 'Endpoint inexistent.' }), {
@@ -16,6 +18,7 @@ if (/^\/(revista|studio)(\/|$)/.test(pathname) || pathname.split('/').pop().incl
 } : {})}>
     <div id="root"></div>
     <script>
+        import 'astro:scripts/before-hydration.js';
         import '../main.jsx';
     </script>
 </AcademyLayout>
