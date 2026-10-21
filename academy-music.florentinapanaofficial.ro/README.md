@@ -51,6 +51,13 @@ Versurile sunt randate ca text React, nu HTML; elevul le poate citi în modal sa
 
 Verificări: `npm test`, `npm run build`, `npm run test:browser -- --canto`, cu `ACADEMY_TEST_URL` setat spre preview. Testul browser necesită `ffmpeg` și verifică MP3 real la 1440/390 px, editare, înlocuire independentă, refuz DB/cleanup, versuri și XSS literal, filtrare, redare/excludere, repertoriu comun, ștergere/anulare, retry, metadata și lipsa overflow-ului. Supabase este simulat; migrarea este testată separat în PostgreSQL PGlite inclusiv repetabilitate, limite și RLS. Capturi: `.astro/screenshots/canto-{admin,student,lyrics}-{1440,390}.png`.
 
+## Generare karaoke locală cu SpectraLayers
+
+În **Admin → Piese**, butonul „🎛️ Generează Karaoke (SpectraLayers 12)” creează un job în `audio_processing_queue`. Adminul primește statusul prin Supabase Realtime, ascultă fișierul rezultat din bucketul privat `karaoke-audio` și îl poate asigna explicit drept negativ pentru piesă; apoi îl poate aloca elevilor prin fluxul obișnuit de repertoriu. Elevii autorizați pot citi numai fișierul karaoke referit de o piesă la care au acces.
+
+Aplică `supabase/migrations/20261021000002_audio_processing_queue.sql` în Supabase înainte de deploy. Pentru bridge, urmează pașii din [local-spectralayers-bridge/README.md](./local-spectralayers-bridge/README.md). `SUPABASE_SERVICE_ROLE_KEY` rămâne exclusiv pe PC-ul profesorului, niciodată în bundle-ul web. Argumentele CLI nu sunt presupuse: confirmă automatizarea acceptată de versiunea/ediția SpectraLayers 12 instalată și configurează runnerul local cu `{input}` și `{output}`.
+
+Migrarea adaugă politici RLS pentru profesori, bucket privat, un singur job activ per piesă și înscriere Realtime. `result_url` păstrează locatorul privat `karaoke-audio:negative/<song-id>/<job-id>.<ext>`, nu un URL semnat cu expirare.
 ## Studio Interactiv MIDI + MP3
 
 `src/components/InteractiveStudio.jsx` este integrată în `/studio/`, separat de pianul care înregistrează teme. Include un studiu MIDI demonstrativ preîncărcat și permite alegerea fișierelor locale `.mid`/`.midi` (maximum 5 MB, 20.000 de note melodice, 20 de minute) și `.mp3` (maximum 100 MB). Fișierele și scorul rămân în browser până la trimiterea explicită a înregistrării în modul Temă; MIDI-ul și negativul de studiu nu sunt trimise automat. Parserul `@tonejs/midi` aplică harta de tempo a fișierului; pistele de percuție sunt excluse și atacurile simultane duplicate ale aceleiași note sunt reunite.
@@ -238,7 +245,7 @@ supabase functions deploy delete-student
 
 Funcțiile verifică tokenul și rolul profesorului activ. `create-student` creează elevul cu Auth Admin API; `delete-student` șterge definitiv numai conturi cu rol de elev și curăță fișierele din bucket-urile private `avatars` și `portfolio`. Ștergerea contului elimină în cascadă profilul, repertoriul individual, temele, sesiunile și activitatea asociată. În fișa elevului, ștergerea cere introducerea username-ului și nu poate fi anulată.
 
-Cheia `SUPABASE_SERVICE_ROLE_KEY` este folosită numai în Supabase Edge Functions și nu trebuie pusă în `.env`-ul Vite ori într-o variabilă `VITE_*`.
+Cheia `SUPABASE_SERVICE_ROLE_KEY` este folosită numai pe server (Supabase Edge Functions și bridge-ul local de încredere) și nu trebuie pusă în `.env`-ul Vite ori într-o variabilă `VITE_*`.
 
 3. În aplicație, deschide **Panou profesor → Elevi → Adaugă elev**. Formularul cere numai prenume, nume, username și parolă (12–128 caractere); parola poate fi și generată din buton. Numele real este salvat în `user_metadata.full_name` și profil. După creare, transmite elevului datele afișate: parola apare o singură dată și nu este salvată în profil.
 4. Elevul se autentifică folosind username-ul și parola. Profesorii existenți se pot autentifica în continuare cu email și parola lor.
@@ -498,6 +505,13 @@ Această implementare nu publică automat funcția, nu setează chei și nu tran
 
 `npm test` include parser/AI, graful Web Audio, anularea/cleanup-ul microfonului, autorizarea Edge și migrarea cooldown în PostgreSQL/PGlite. După `npm run build`, rulează `npm run test:canto`: Chromium 390/1440 px, microfon virtual și audio PCM sintetic (cu byte ranges reale), gardă de căști exclusiv la REC, zero captare la Play, MediaRecorder real cu microfon virtual, permisiune refuzată, Stop/fundal și revizuire, trimitere multipart simulată cu fișier audio nenul, highlight pe cuvânt și reduced motion; UI AI cu răspunsuri simulate în ambele editoare. Browserul de test este mut. Nu se trimit fișiere sau chei către furnizor și nu se verifică automat calitatea perceptivă a reverbului/transcrierii reale.
 
+## Casa de Discuri Virtuală (Virtual Studio)
+
+Cererile de masterizare sunt salvate în `studio_requests`; piesa este referită prin `song_id` la `public.pieces`. Elevul trimite înregistrarea audio din etapa de ascultare a `RecordingStudio`, iar fluxul standard de teme către Drive rămâne neschimbat. Profesorul gestionează cererile pending/processing în `/admin/studio/`, descarcă brutul, îl procesează offline și încarcă masterul final. Piesele completed apar în secțiunea „Lansările mele” din `/portofoliu/`.
+
+Înainte de publicarea frontendului, aplică `supabase/migrations/20261021000001_virtual_studio.sql` în Supabase SQL Editor după schema Academy și migrările existente până la `20261020000007_study_levels_presence.sql`. Migrarea este repetabilă; creează tabela și enum-ul, păstrează bucketul `student_records` privat și aplică politicile de acces pentru elev/profesor. Căile din tabel sunt chei Storage, nu URL-uri publice sau URL-uri semnate. Frontendul emite linkuri semnate doar pentru utilizatorii autorizați. Limita configurată pentru bucket și uploadul masterului este 200 MB.
+
+`notification_seen_at` ține evidența confirmării alertei elevului după finalizarea unei piese. Migrarea nu trebuie rulată cu cheia service-role din browser. `npm test` verifică local repetabilitatea migrării, enum-ul, RLS și politicile Storage; verificarea locală nu aplică migrarea în proiectul Supabase live.
 ## Personalizare, niveluri de studiu și prezență
 
 Migrarea incrementală `supabase/migrations/20261020000007_study_levels_presence.sql` se aplică după migrarea catalogului de teme și celelalte migrări anterioare (inclusiv `20261020000005_security_sessions.sql` și `20261020000006_generate_lyrics.sql`), înainte de publicarea frontendului actualizat. Ea adaugă `profiles.study_level` (distinct de `grade_level`), protejează schimbarea nivelului la profesor, păstrează bucketul `avatars` privat și configurează RLS pentru canalul privat Realtime `academy:online`. Nu lărgește accesul elevilor la profilurile celorlalți.

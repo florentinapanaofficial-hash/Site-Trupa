@@ -59,7 +59,7 @@ try {
         const page = await context.newPage();
         const resources = [{ id: 'resource-id', title: 'Lecție RED', category: 'fisa-teoretica', discipline: 'comun', description: 'Explicații inițiale', external_url: 'https://example.test/lesson', file_path: 'old/resource.pdf' }];
         const rows = [{ id: path.includes('/canto') ? 'canto-piece' : 'orga-piece', discipline: path.includes('/canto') ? 'canto' : 'orga', title: path.includes('/canto') ? 'Piesă canto' : 'Piesă orgă', description: 'Descriere inițială', composer: 'Profesor', level: 'incepator', is_published: true, positive_url: 'https://example.test/existing.mp3', negative_url: null, tags: [], versuri_text: '', grupa: 'Grupa 1' }];
-        const writes = [], uploads = [];
+        const writes = [], uploads = [], audioJobs = [];
         let insertions = 0;
         const errors = [];
         const chunks = [];
@@ -88,6 +88,15 @@ try {
                 }
                 return route.fulfill({ contentType: 'application/json', body: JSON.stringify(resources) });
             }
+            if (url.pathname === '/rest/v1/audio_processing_queue') {
+                if (route.request().method() === 'POST') {
+                    const payload = route.request().postDataJSON();
+                    const job = { ...payload, id: 'audio-job', status: 'pending', result_url: null, error_message: null, created_at: '2026-10-21T12:00:00.000Z' };
+                    audioJobs.push(job);
+                    return route.fulfill({ status: 201, contentType: 'application/json', body: JSON.stringify(job) });
+                }
+                return route.fulfill({ contentType: 'application/json', body: JSON.stringify(audioJobs) });
+            }
             if (url.pathname === '/rest/v1/pieces') {
                 if (route.request().method() === 'PATCH') {
                     const payload = route.request().postDataJSON();
@@ -103,13 +112,23 @@ try {
             return route.fulfill({ contentType: 'application/json', body: JSON.stringify(body), headers: { 'Content-Range': '0-0/0' } });
         });
         await page.goto(base + path);
-        return { context, page, errors, chunks, tables, rows, writes, uploads, get insertions() { return insertions; } };
+        return { context, page, errors, chunks, tables, rows, writes, uploads, audioJobs, get insertions() { return insertions; } };
     }
 
     for (const viewport of [{ width: 390, height: 844 }, { width: 1440, height: 1000 }]) {
         const fixture = await open(viewport, '/admin/piese/', 'teacher');
         const { page, context, errors } = fixture;
         await expect(page.getByRole('heading', { name: 'Repertoriu Orgă', exact: true })).toBeVisible();
+        const karaokeButton = page.getByRole('button', { name: '🎛️ Generează Karaoke (SpectraLayers 12)', exact: true });
+        await expect(karaokeButton).toBeVisible();
+        await karaokeButton.click();
+        const karaokeDialog = page.getByRole('dialog', { name: 'Generează Karaoke — Piesă orgă' });
+        await karaokeDialog.getByRole('button', { name: '🎛️ Generează Karaoke (SpectraLayers 12)', exact: true }).click();
+        await expect(karaokeDialog.getByText('în așteptare')).toBeVisible();
+        assert.equal(fixture.audioJobs.length, 1);
+        assert.equal(fixture.audioJobs[0].song_id, 'orga-piece');
+        assert.equal(fixture.audioJobs[0].original_url, 'https://example.test/existing.mp3');
+        await karaokeDialog.getByRole('button', { name: 'Închide' }).click();
         const mainToggle = page.locator('main').getByRole('switch', { name: 'Comută modul profesor' });
         await expect(mainToggle).toHaveAttribute('aria-checked', 'true');
         await page.getByRole('button', { name: 'Editează Piesă orgă', exact: true }).click();
@@ -151,7 +170,7 @@ try {
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
         assert.deepEqual(errors, []);
         await context.close();
-        console.log('Admin ' + viewport.width + 'px PASS: prefilled edit, PATCH existing ID, MP3/PDF uploads, same row, shared live preview and restore.');
+        console.log('Admin ' + viewport.width + 'px PASS: karaoke job submission/status, prefilled edit, PATCH existing ID, MP3/PDF uploads, same row, shared live preview and restore.');
     }
     const canto = await open({ width: 1440, height: 1000 }, '/admin/canto/', 'teacher');
     await expect(canto.page.getByRole('button', { name: /Editează/ }).first()).toBeVisible();

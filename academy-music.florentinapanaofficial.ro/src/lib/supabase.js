@@ -37,5 +37,7 @@ export const SUPABASE_ANON_KEY = anonKey || FALLBACK_KEY;
 export const SIGNED_URL_TTL = Number(import.meta.env.VITE_SIGNED_URL_TTL) || 300;
 
 export const BUCKET_MEDIA = 'academy-media';
+export const BUCKET_KARAOKE = 'karaoke-audio';
 export const BUCKET_PORTFOLIO = 'portfolio';
 export const BUCKET_AVATARS = 'avatars';
+export const BUCKET_STUDENT_RECORDS = 'student_records';

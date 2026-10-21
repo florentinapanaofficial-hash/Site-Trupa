@@ -1,4 +1,5 @@
 import GenerateLyricsButton from '../../components/GenerateLyricsButton';
+import AdminKaraokeGenerator from '../../components/AdminKaraokeGenerator';
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase, BUCKET_MEDIA } from '../../lib/supabase';
@@ -392,6 +393,7 @@ export default function AdminPieces() {
                                             </button>
                                         </td>
                                         <td className="px-4 py-3 text-right">
+                                            <AdminKaraokeGenerator piece={piece} onAssigned={load} />
                                             <button type="button" className="btn-ghost mr-3" onClick={() => openEditor(piece)} aria-label={`Editează ${piece.title}`}><Pencil size={15} aria-hidden="true" />Editează</button>
                                             <button type="button" className="text-xs text-brand-300 hover:text-brand-200" onClick={() => remove(piece)}>
                                                 Șterge

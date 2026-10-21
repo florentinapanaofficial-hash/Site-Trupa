@@ -11,6 +11,7 @@ import AdminActivity from './AdminActivity';
 import AdminSubmissions from './AdminSubmissions';
 import AdminTeaching from './AdminTeaching';
 import AdminCanto from './AdminCanto';
+import AdminStudio from './AdminStudio';
 
 const CantoPreview = lazy(() => import('../Canto'));
 const InstrumentPreview = lazy(() => import('../Discipline'));
@@ -25,6 +26,7 @@ const TABS = [
     { to: '/admin/resurse/', label: 'RED' },
     { to: '/admin/elevi/', label: 'Elevi' },
     { to: '/admin/teme/', label: 'Teme' },
+    { to: '/admin/studio/', label: 'Tichete Studio (Mixaj)' },
     { to: '/admin/activitate/', label: 'Activitate' },
 ];
 
@@ -78,6 +80,7 @@ export default function AdminPanel() {
                 <Route path="resurse" element={<AdminResources />} />
                 <Route path="elevi" element={<AdminStudents />} />
                 <Route path="teme" element={<AdminSubmissions />} />
+                <Route path="studio" element={<AdminStudio />} />
                 <Route path="activitate" element={<AdminActivity />} />
                 <Route path="*" element={<Navigate to="/admin/" replace />} />
             </Routes>

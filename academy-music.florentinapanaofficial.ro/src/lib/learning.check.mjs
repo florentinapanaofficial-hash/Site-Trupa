@@ -554,7 +554,7 @@ test('SQL migrations preserve legacy results, grade new quizzes and isolate stud
     const teacher = '33333333-3333-4333-8333-333333333333';
     try {
         await db.exec(`
-            create role anon; create role authenticated;
+            create role anon; create role authenticated; create role service_role;
             create schema auth;
             create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
             grant usage on schema auth to authenticated;
@@ -699,7 +699,7 @@ test('online and catalog RLS isolate students, deny inspector writes and preserv
     const inspector = '44444444-4444-4444-8444-444444444444';
     try {
         await db.exec(`
-            create role anon; create role authenticated; create schema auth;
+            create role anon; create role authenticated; create role service_role; create schema auth;
             create table auth.users(id uuid primary key, raw_user_meta_data jsonb);
             create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;
             create schema storage; create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);

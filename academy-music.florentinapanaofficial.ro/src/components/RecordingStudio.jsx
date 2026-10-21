@@ -1,9 +1,9 @@
 import KaraokeLyrics from './KaraokeLyrics';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { supabase, BUCKET_MEDIA, BUCKET_PORTFOLIO } from '../lib/supabase';
+import { supabase, BUCKET_MEDIA, BUCKET_PORTFOLIO, BUCKET_STUDENT_RECORDS } from '../lib/supabase';
 import { useAuth } from '../lib/auth';
 import { getSignedUrl, safeFileName, uploadFile } from '../lib/media';
-import { resolveAudioSource } from '../lib/pieces';
+import { getAudioStorageLocation, resolveAudioSource } from '../lib/pieces';
 import { logEvent } from '../lib/activity';
 import { uploadHomeworkToDrive } from '../lib/submitHomework';
 import {
@@ -101,8 +101,12 @@ export default function RecordingStudio({ open, piece, onClose, onSubmitted }) {
         try {
             let backingUrl = null;
             if (autoBacking && negativ) {
-                backingUrl =
-                    negativ.kind === 'url' ? negativ.value : await getSignedUrl(BUCKET_MEDIA, negativ.value);
+                if (negativ.kind === 'url') backingUrl = negativ.value;
+                else {
+                    const storage = getAudioStorageLocation(negativ.value, BUCKET_MEDIA);
+                    if (!storage) throw new Error('Calea negativului nu este validă.');
+                    backingUrl = await getSignedUrl(storage.bucket, storage.path);
+                }
             }
 
             if (abort.signal.aborted) return;
@@ -217,13 +221,13 @@ export default function RecordingStudio({ open, piece, onClose, onSubmitted }) {
                 title: `${piece.title} — înregistrare`,
                 student_note: note.trim() || null,
                 media_path: path,
-                media_type: withVideo ? 'video' : 'audio',
+                media_type: 'video',
             });
             if (insertError) throw insertError;
 
             logEvent(profile.id, 'recording_submitted', '/', {
                 piece_id: piece.id,
-                with_video: withVideo,
+                with_video: true,
             });
 
             teardown();
@@ -231,6 +235,46 @@ export default function RecordingStudio({ open, piece, onClose, onSubmitted }) {
             onClose();
         } catch (err) {
             setError(err?.message || 'Trimiterea temei a eșuat.');
+            setPhase('review');
+        }
+    }
+
+    async function submitToStudio() {
+        if (!result || !profile?.id || withVideo) return;
+        setPhase('studio-uploading');
+        setError('');
+        let uploadedPath = '';
+        try {
+            const requestId = crypto.randomUUID();
+            const extension = extensionFor(result.mimeType);
+            const base = safeFileName(piece.title);
+            const path = `raw/${profile.id}/${requestId}/take.${extension}`;
+            const file = new File([result.blob], `${base}.${extension}`, { type: result.mimeType });
+            await uploadFile(BUCKET_STUDENT_RECORDS, path, file);
+            uploadedPath = path;
+
+            const { error: insertError } = await supabase.from('studio_requests').insert({
+                id: requestId,
+                student_id: profile.id,
+                song_id: piece.id,
+                raw_audio_url: path,
+            });
+            if (insertError) {
+                const { error: cleanupError } = await supabase.storage.from(BUCKET_STUDENT_RECORDS).remove([path]);
+                if (cleanupError) console.error('[Academy] Înregistrarea brută nu a putut fi eliminată după eșecul cererii:', cleanupError.message);
+                uploadedPath = '';
+                throw insertError;
+            }
+
+            logEvent(profile.id, 'studio_request_submitted', '/', { song_id: piece.id, request_id: requestId });
+            setPhase('studio-submitted');
+            onSubmitted?.();
+        } catch (err) {
+            if (uploadedPath) {
+                const { error: cleanupError } = await supabase.storage.from(BUCKET_STUDENT_RECORDS).remove([uploadedPath]);
+                if (cleanupError) console.error('[Academy] Înregistrarea brută temporară nu a putut fi eliminată:', cleanupError.message);
+            }
+            setError(err?.message || 'Trimiterea către Studio a eșuat. Încearcă din nou.');
             setPhase('review');
         }
     }
@@ -246,7 +290,7 @@ export default function RecordingStudio({ open, piece, onClose, onSubmitted }) {
         onClose();
     }
 
-    const busy = phase === 'preparing' || phase === 'uploading';
+    const busy = phase === 'preparing' || phase === 'uploading' || phase === 'studio-uploading';
 
     return (
         <Modal
@@ -387,13 +431,15 @@ export default function RecordingStudio({ open, piece, onClose, onSubmitted }) {
                                 Trimite tema
                             </button>
                         </div>
+                        {!withVideo && <button type="button" className="btn-gold w-full" onClick={submitToStudio}>🎧 Trimite la Studio pentru Masterizare</button>}
                     </>
                 )}
 
                 {phase === 'submitted' && <div className="space-y-4 py-6"><p role="status" className="text-sm text-emerald-200">Tema a fost trimisă cu succes domnului profesor!</p><button type="button" className="btn-gold" onClick={handleClose}>Închide</button></div>}
+                {phase === 'studio-submitted' && <div className="space-y-4 py-6"><p role="status" className="text-sm text-emerald-200">Înregistrarea ta a fost trimisă la Studio. Te anunțăm când masterul este gata!</p><button type="button" className="btn-gold" onClick={handleClose}>Închide</button></div>}
 
-                {phase === 'uploading' && (
-                    <p className="py-6 text-center text-sm text-slate-400">Se trimite tema…</p>
+                {(phase === 'uploading' || phase === 'studio-uploading') && (
+                    <p className="py-6 text-center text-sm text-slate-400">{phase === 'studio-uploading' ? 'Se trimite la Studio…' : 'Se trimite tema…'}</p>
                 )}
 
                 {notice && (

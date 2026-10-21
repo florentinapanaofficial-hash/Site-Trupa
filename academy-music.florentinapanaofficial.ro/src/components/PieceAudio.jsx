@@ -3,7 +3,7 @@ import SecureAudioPlayer from './SecureAudioPlayer';
 import { RefreshCw } from 'lucide-react';
 import { BUCKET_MEDIA } from '../lib/supabase';
 import { getSignedAudioUrl, invalidateSignedAudioUrl } from '../lib/media';
-import { isSafeHttpUrl } from '../lib/pieces';
+import { getAudioStorageLocation, isSafeHttpUrl } from '../lib/pieces';
 
 export default function PieceAudio({ piece, variant, onClock, onPlayback, onPlayingChange, controlsRef }) {
     const [url, setUrl] = useState('');
@@ -11,6 +11,7 @@ export default function PieceAudio({ piece, variant, onClock, onPlayback, onPlay
     const [retry, setRetry] = useState(0);
     const external = piece[variant.url];
     const path = piece[variant.path];
+    const storage = getAudioStorageLocation(path, BUCKET_MEDIA);
 
     useEffect(() => {
         let active = true;
@@ -18,13 +19,13 @@ export default function PieceAudio({ piece, variant, onClock, onPlayback, onPlay
         setError('');
         if (isSafeHttpUrl(external)) {
             setUrl(external);
-        } else if (path) {
-            getSignedAudioUrl(BUCKET_MEDIA, path).then((signed) => {
+        } else if (storage) {
+            getSignedAudioUrl(storage.bucket, storage.path).then((signed) => {
                 if (active) setUrl(signed);
             }).catch(() => { if (active) setError('Accesul audio nu a putut fi pregătit.'); });
         }
         return () => { active = false; };
-    }, [external, path, retry]);
+    }, [external, path, storage?.bucket, storage?.path, retry]);
 
     if (!isSafeHttpUrl(external) && !path) return <span className="text-xs text-slate-500">Indisponibil</span>;
 
@@ -36,7 +37,7 @@ export default function PieceAudio({ piece, variant, onClock, onPlayback, onPlay
                 <div className="text-xs text-brand-200">
                     <p role="alert">{error}</p>
                     <button type="button" className="btn-ghost inline-flex items-center gap-1 text-xs" onClick={() => {
-                        if (path) invalidateSignedAudioUrl(BUCKET_MEDIA, path);
+                        if (storage) invalidateSignedAudioUrl(storage.bucket, storage.path);
                         setRetry((previous) => previous + 1);
                     }}><RefreshCw size={14} aria-hidden="true" /> Reîncearcă {variant.label}</button>
                 </div>
@@ -59,7 +60,7 @@ export default function PieceAudio({ piece, variant, onClock, onPlayback, onPlay
                 <div className="text-xs text-brand-200">
                     <p role="alert">{error}</p>
                     <button type="button" className="btn-ghost inline-flex items-center gap-1 text-xs" onClick={() => {
-                        if (path) invalidateSignedAudioUrl(BUCKET_MEDIA, path);
+                        if (storage) invalidateSignedAudioUrl(storage.bucket, storage.path);
                         setRetry((previous) => previous + 1);
                     }}><RefreshCw size={14} aria-hidden="true" /> Reîncearcă {variant.label}</button>
                 </div>

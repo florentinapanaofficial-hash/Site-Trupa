@@ -15,7 +15,7 @@
         "dev": "astro dev --port 5180",
         "build": "astro build && node scripts/compress.mjs",
         "preview": "astro preview --port 5180",
-        "test": "node --test src/lib/learning.check.mjs src/lib/security.check.mjs src/lib/canto.check.mjs src/lib/studyLevels.check.mjs src/lib/studyLevels.sql.check.mjs",
+        "test": "node --test src/lib/learning.check.mjs src/lib/security.check.mjs src/lib/canto.check.mjs src/lib/studyLevels.check.mjs src/lib/studyLevels.sql.check.mjs src/lib/studio.check.mjs src/lib/audio-processing.check.mjs",
         "test:browser": "node scripts/verify-learning.mjs",
         "test:landing": "node scripts/verify-landing.mjs",
         "test:navigation": "node scripts/verify-navigation.mjs",

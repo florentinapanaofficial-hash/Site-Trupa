@@ -8,6 +8,7 @@ import Spinner from '../components/ui/Spinner';
 import EmptyState from '../components/ui/EmptyState';
 import HomeworkCatalog from '../components/HomeworkCatalog';
 import { uploadHomeworkToDrive } from '../lib/submitHomework';
+import StudioReleaseCard from '../components/StudioReleaseCard';
 
 const MAX_SIZE = {
     video: 200 * 1024 * 1024,
@@ -29,6 +30,8 @@ export default function Portofoliu() {
     const [pieces, setPieces] = useState([]);
     const [form, setForm] = useState({ title: '', pieceId: '', note: '', file: null });
     const [state, setState] = useState({ busy: false, error: '', info: '', progress: 0 });
+    const [studioRequests, setStudioRequests] = useState(null);
+    const [studioError, setStudioError] = useState('');
     const [catalogVersion, setCatalogVersion] = useState(0);
 
     async function loadSubmissions() {
@@ -40,9 +43,26 @@ export default function Portofoliu() {
         setSubmissions(data || []);
     }
 
+    async function loadStudioRequests() {
+        const { data, error } = await supabase
+            .from('studio_requests')
+            .select('id, song_id, final_audio_url, status, created_at, pieces!studio_requests_song_id_fkey(title)')
+            .eq('student_id', profile.id)
+            .eq('status', 'completed')
+            .order('created_at', { ascending: false });
+        if (error) {
+            console.error('[Academy] Nu s-au putut încărca lansările din Studio:', error.message);
+            setStudioError('Lansările Studio nu s-au putut încărca. Reîncearcă mai târziu.');
+            setStudioRequests([]);
+            return;
+        }
+        setStudioRequests(data || []);
+    }
+
     useEffect(() => {
         if (!profile?.id) return;
         loadSubmissions();
+        if (!isInspector) void loadStudioRequests();
         supabase
             .from('pieces')
             .select('id, title, discipline')
@@ -138,6 +158,17 @@ export default function Portofoliu() {
                     lasă observații și notă.
                 </p>
             </header>
+            {!isInspector && <section className="card space-y-4 border border-gold-400/20">
+                <div>
+                    <p className="text-xs font-semibold uppercase tracking-widest text-gold-300">Virtual Studio</p>
+                    <h2 className="mt-1 font-display text-2xl text-white">Lansările mele</h2>
+                    <p className="mt-1 text-sm text-slate-400">Piesele tale mixate și masterizate, gata de ascultat și descărcat.</p>
+                </div>
+                {studioRequests === null ? <Spinner label="Se încarcă lansările…" />
+                    : studioError ? <p role="alert" className="text-sm text-rose-200">{studioError}</p>
+                        : studioRequests.length === 0 ? <p className="text-sm text-slate-400">Lansările finalizate vor apărea aici.</p>
+                            : <div className="grid gap-4 lg:grid-cols-2">{studioRequests.map((request) => <StudioReleaseCard key={request.id} request={request} />)}</div>}
+            </section>}
 
             {!isInspector && <form onSubmit={handleSubmit} className="card space-y-4">
                 <h2 className="text-lg font-semibold text-white">Încarcă o temă nouă</h2>

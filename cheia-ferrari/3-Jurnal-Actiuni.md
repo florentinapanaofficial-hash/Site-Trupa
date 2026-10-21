@@ -1,3 +1,66 @@
+## 📝 21 oct 2026 — Publicare Academy Music și previzualizare locală
+
+### Obiectiv
+Commit și push la cererea lui Claudiu pentru starea curentă Academy Music, inclusiv Virtual Studio și bridge-ul karaoke.
+
+### Modificări
+- Publicarea modificărilor Academy aflate în lucru: securitate/sesiuni, Canto, niveluri/Presence, Virtual Studio, procesare karaoke și teste/documentație asociate.
+- Sincronizarea fișierelor Academy deja urmărite în Site-Trupa și actualizarea jurnalului/trackerului.
+- Previzualizare locală disponibilă la http://localhost:5180/ (HTTP 200); fișierele .env nu sunt incluse în commit. Scanarea fișierelor de publicat a găsit numai placeholder-ul documentat pentru cheia privată, fără credențiale reale identificate.
+
+### Validări
+- Academy npm test: 50/50 PASS; npm run test:server: 16/16 PASS; build producție PASS.
+- Bridge npm test: 4/4 PASS. Testul Admin anterior: PASS la 390px și 1440px.
+- Site-Trupa npm run seo:audit: 64 pagini verificate, 0 FAIL | 0 WARN. Fără modificări noi de metadata, fără măsurători GSC sau afirmații de ranking.
+
+### Riscuri / pași următori
+- Push-ul nu confirmă succesul deployului Railway și nu remediază configurația API din Railway.
+- Migrările Supabase și automatizarea SpectraLayers necesită configurare și verificare live separate; cheile rămân exclusiv în configurația locală/server.
+
+## 📝 21 oct 2026 — Procesare karaoke locală cu SpectraLayers în Academy Music
+
+### Obiectiv
+Adăugarea unei cozi private Supabase și a unei punți locale Windows pentru a procesa o piesă la cerere, a publica rezultatul privat și a-l asigna explicit drept negativ.
+
+### Modificări
+- Academy: migrarea `20261021000002_audio_processing_queue.sql` adaugă tabela cu statusuri pending/processing/completed/error, RLS profesor, limită de un job activ per piesă, bucket privat `karaoke-audio` și înregistrarea Realtime. `result_url` este un locator Storage, nu un URL semnat expirabil.
+- Admin: butonul de generare din lista Piese creează jobul și ascultă schimbările; după finalizare profesorul poate previzualiza rezultatul și îl poate asigna ca negativ. Playerele elevului și Record Studio rezolvă noul bucket privat.
+- Bridge separat `local-spectralayers-bridge`: ascultă joburi, recuperează joburi rămase processing după timeout, validează hosturile externe, descarcă audio, lansează executabilul cu `execFile`, încarcă output-ul și marchează eroarea/succesul. Fișierele temporare sunt izolate și curățate.
+- Actualizate schema consolidată, README Academy și verificările UI/PGlite/bridge. `.env` nu a fost citit sau modificat.
+
+### Validări
+- Academy `npm test`: 50/50 PASS; migrarea PGlite este repetabilă și verifică politicile, bucketul, validarea locatorului și compatibilitatea path-urilor.
+- Bridge `npm test`: 4/4 PASS; `node --check bridge.js` PASS.
+- Academy `npm run build`: PASS; rămân avertismentele Astro existente pentru fișiere `.jsx` în `src/pages`.
+- `npm run test:admin`: PASS la 390px și 1440px, inclusiv inserarea jobului și statusul pending.
+- Site-Trupa `npm run seo:audit`: 64 pagini, 0 FAIL | 0 WARN; nicio pagină publică sau metadata SEO nu a fost modificată. Nu există date GSC noi.
+- Diagnostics: fără erori pe fișierele modificate; `git diff --check` curat.
+
+### Riscuri / pași următori
+- Migrarea nu a fost aplicată în Supabase live; Claudiu trebuie să o ruleze înainte de deploy.
+- `SPECTRALAYERS_ARGS_JSON` rămâne placeholder intenționat: trebuie configurată sintaxa de CLI/automatizare verificată pentru ediția/build-ul SpectraLayers 12 instalat sau un wrapper local. Nu am presupus că `-batch` este suportat.
+- `SUPABASE_SERVICE_ROLE_KEY` oferă acces amplu și trebuie configurată numai pe PC-ul de încredere al profesorului, niciodată în frontend sau repository. Verifică manual separarea, uploadul, playbackul și asignarea după configurare.
+## 📝 21 oct 2026 — Casa de Discuri Virtuală în Academy Music
+
+### Obiectiv
+Implementarea fluxului elev–profesor pentru înregistrarea brută, procesarea offline și publicarea masterului în portofoliul elevului, cu acces protejat și notificare la autentificare.
+
+### Modificări
+- Academy: `RecordingStudio.jsx` trimite explicit înregistrarea audio către bucketul privat `student_records` și creează o cerere `pending`; trimiterea obișnuită a temei rămâne neschimbată.
+- Academy: `/portofoliu/` afișează lansările `completed` cu player și link de descărcare semnat. Layout-ul afișează alerta de master nou până când elevul o confirmă.
+- Academy: tab-ul `/admin/studio/` permite profesorului să descarce brutul (trecând cererea în `processing`) și să încarce masterul (actualizând cererea la `completed`).
+- Adăugată migrarea `20261021000001_virtual_studio.sql`, documentația README și verificarea PGlite de repetabilitate/RLS/politici Storage (`studio.check.mjs`).
+
+### Validări
+- Academy `npm test`: 48/48 PASS, inclusiv migrarea Virtual Studio rulată de două ori; RLS tabel, bucket privat și cele cinci politici Storage verificate.
+- Academy `npm run build`: PASS; 42 asseturi precomprimate. Rămân avertismentele existente Astro pentru fișiere React din `src/pages`, module Node externalizate și chunk-uri >500 kB.
+- Site-Trupa `seo:audit` și `seo:check`: 64 pagini, 0 FAIL | 0 WARN. Diagnosticele fișierelor modificate nu raportează erori; `git diff --check` curat.
+- Nicio modificare de metadata SEO/GSC. Nu s-a făcut verificare live a autentificării sau Storage Supabase.
+
+### Riscuri / pași următori
+- Migrarea SQL nu a fost aplicată în Supabase live; Claudiu trebuie să o ruleze în SQL Editor înainte de deploy și să confirme succesul.
+- După aplicare/deploy, verifică uploadul brut ca elev, descărcarea/update-ul ca profesor, masterizarea, redarea/descărcarea elevului și confirmarea notificării. Impactul în ranking nu a fost măsurat.
+
 ## 📝 20 oct 2026 — Publicare generală repository Academy
 
 ### Obiectiv

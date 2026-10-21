@@ -1,7 +1,8 @@
-import { Suspense, useEffect, useLayoutEffect, useState } from 'react';
-import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Suspense, useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { BookOpen, Home, Mic2, Piano, Music2, Library, Puzzle, FolderOpen, Users, Settings, Menu } from 'lucide-react';
 import { useAuth } from '../lib/auth';
+import { supabase } from '../lib/supabase';
 import { logEvent } from '../lib/activity';
 import { useTeacherMode } from '../lib/useTeacherMode';
 import TeacherModeToggle from './TeacherModeToggle';
@@ -22,7 +23,54 @@ export default function Layout() {
     const location = useLocation();
     const navigate = useNavigate();
     const [menuOpen, setMenuOpen] = useState(false);
+    const [studioNotice, setStudioNotice] = useState(null);
+    const [studioNoticeError, setStudioNoticeError] = useState('');
+    const [studioNoticeBusy, setStudioNoticeBusy] = useState(false);
     const [signOutError, setSignOutError] = useState('');
+    const loadStudioNotice = useCallback(async () => {
+        if (!profile?.id || isTeacher || isInspector) {
+            setStudioNotice(null);
+            return;
+        }
+        setStudioNoticeError('');
+        const { data, error } = await supabase
+            .from('studio_requests')
+            .select('id')
+            .eq('student_id', profile.id)
+            .eq('status', 'completed')
+            .is('notification_seen_at', null)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+        if (error) {
+            console.error('[Academy] Notificarea Studio nu a putut fi verificată:', error.message);
+            setStudioNoticeError('Nu am putut verifica dacă ai o piesă nouă în Studio.');
+            return;
+        }
+        setStudioNotice(data || null);
+    }, [profile?.id, isTeacher, isInspector]);
+
+    useEffect(() => { void loadStudioNotice(); }, [loadStudioNotice]);
+
+    async function dismissStudioNotice() {
+        if (!studioNotice || studioNoticeBusy) return;
+        setStudioNoticeBusy(true);
+        setStudioNoticeError('');
+        try {
+            const { error } = await supabase
+                .from('studio_requests')
+                .update({ notification_seen_at: new Date().toISOString() })
+                .eq('id', studioNotice.id)
+                .is('notification_seen_at', null);
+            if (error) throw error;
+            setStudioNotice(null);
+        } catch (error) {
+            console.error('[Academy] Confirmarea notificării Studio a eșuat:', error.message);
+            setStudioNoticeError('Notificarea nu a putut fi marcată ca văzută. Reîncearcă.');
+        } finally {
+            setStudioNoticeBusy(false);
+        }
+    }
     const path = location.pathname;
     const isCanto = path === '/canto' || path.startsWith('/canto/');
     const isInstrument = path === '/instrument' || path.startsWith('/instrument/');
@@ -97,6 +145,14 @@ export default function Layout() {
                     </div>
                     {menuOpen && <div id="academy-mobile-menu" className="max-h-[calc(100dvh-5rem)] overflow-y-auto border-t border-white/10 bg-ink-900 px-4 pb-5 lg:hidden">{navigation(true)}</div>}
                 </header>
+                {studioNotice && <section role="status" className="mx-4 mt-4 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gold-300/40 bg-gold-300/10 p-4 shadow-lg shadow-black/20">
+                    <p className="font-semibold text-gold-100">🎉 Felicitări! Piesa ta a fost masterizată și este disponibilă în Portofoliu!</p>
+                    <div className="flex flex-wrap items-center gap-2">
+                        <Link to="/portofoliu/" className="btn-gold" onClick={() => void dismissStudioNotice()}>Vezi portofoliul</Link>
+                        <button type="button" className="btn-ghost" onClick={() => void dismissStudioNotice()} disabled={studioNoticeBusy}>{studioNoticeBusy ? 'Se salvează…' : 'Am înțeles'}</button>
+                    </div>
+                </section>}
+                {studioNoticeError && <p role="alert" className="mx-4 mt-3 rounded-xl border border-rose-300/30 bg-rose-300/10 p-3 text-sm text-rose-100">{studioNoticeError} <button type="button" className="ml-2 underline" onClick={() => void loadStudioNotice()}>Reîncearcă</button></p>}
                 {signOutError && <p role="alert" className="mx-4 mt-4 rounded-xl border border-rose-300/30 bg-rose-300/10 p-3 text-sm text-rose-100">{signOutError}</p>}
                 <div className="mx-auto flex w-full max-w-[1600px] flex-1 flex-col gap-6 p-4 sm:p-6 xl:flex-row">
                     <main className="min-w-0 flex-1">

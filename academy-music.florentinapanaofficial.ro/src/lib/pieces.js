@@ -40,6 +40,16 @@ export function resolveAudioSource(piece, variantKey) {
     return null;
 }
 
+export function getAudioStorageLocation(value, defaultBucket = 'academy-media') {
+    if (typeof value !== 'string' || !value.trim()) return null;
+    const prefix = 'karaoke-audio:';
+    if (value.startsWith(prefix)) {
+        const path = value.slice(prefix.length);
+        return path ? { bucket: 'karaoke-audio', path } : null;
+    }
+    return { bucket: defaultBucket, path: value };
+}
+
 export function hasAnyAudio(piece) {
     return VARIANT_LIST.some((variant) => resolveAudioSource(piece, variant.key) !== null);
 }
