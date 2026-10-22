@@ -1,9 +1,35 @@
-import { isIP } from 'node:net';
-
 import { SECURITY_MESSAGES } from './securityMessages.js';
 export { SECURITY_MESSAGES };
 export const CONSENT_VERSION = '2026-10-20';
 export const ACCESS_COOKIE = 'academy-access';
+
+function isIPv4(value) {
+    const parts = value.split('.');
+    return parts.length === 4 && parts.every((part) => /^(0|[1-9]\d{0,2})$/.test(part) && Number(part) <= 255);
+}
+
+function isIPv6(value) {
+    if (!value || value.includes('%')) return false;
+    if (value.includes('.')) {
+        const separator = value.lastIndexOf(':');
+        if (separator < 0 || !isIPv4(value.slice(separator + 1))) return false;
+        value = `${value.slice(0, separator)}:0:0`;
+    }
+    if (!/^[\da-f:]+$/i.test(value)) return false;
+    const compressed = value.includes('::');
+    if (compressed && value.indexOf('::') !== value.lastIndexOf('::')) return false;
+    const groups = value.split(':').filter(Boolean);
+    if (!groups.every((group) => group.length <= 4)) return false;
+    return compressed ? groups.length < 8 : groups.length === 8;
+}
+
+function isIP(value) { return typeof value === 'string' && (isIPv4(value) ? 4 : isIPv6(value) ? 6 : 0); }
+
+function base64UrlText(value) {
+    const base64 = value.replace(/-/g, '+').replace(/_/g, '/');
+    const binary = atob(base64 + '='.repeat((4 - base64.length % 4) % 4));
+    return new TextDecoder().decode(Uint8Array.from(binary, (character) => character.charCodeAt(0)));
+}
 
 export class SecurityError extends Error {
     constructor(code, status = 401, message = SECURITY_MESSAGES[code]) {
@@ -13,7 +39,7 @@ export class SecurityError extends Error {
     }
 }
 
-export function clientIP(request, clientAddress, env) {
+export function clientIP(request, clientAddress, env, trustedPlatformAddress = false) {
     const header = env.ACADEMY_TRUSTED_IP_HEADER;
     let ip;
     if (header) {
@@ -24,7 +50,7 @@ export function clientIP(request, clientAddress, env) {
         if (header === 'x-real-ip' && (chain.length !== 1 || hops !== 1)) throw new SecurityError('proxy_configuration', 503);
         ip = chain[chain.length - hops];
     } else {
-        if (env.NODE_ENV === 'production') throw new SecurityError('proxy_configuration', 503);
+        if (env.NODE_ENV === 'production' && !trustedPlatformAddress) throw new SecurityError('proxy_configuration', 503);
         ip = clientAddress;
     }
     if (ip?.startsWith('::ffff:') && isIP(ip.slice(7)) === 4) ip = ip.slice(7);
@@ -36,9 +62,9 @@ export function verifiedSessionId(token) {
     // Call only after Auth has verified the token with getUser().
     let payload;
     try {
-        payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString());
+        payload = JSON.parse(base64UrlText(token.split('.')[1]));
     } catch (error) {
-        if (!(error instanceof SyntaxError || error instanceof TypeError)) throw error;
+        if (!(error instanceof SyntaxError || error instanceof TypeError || error instanceof DOMException)) throw error;
         throw new SecurityError('unauthorized');
     }
     if (!payload || typeof payload !== 'object' || Array.isArray(payload)) throw new SecurityError('unauthorized');
@@ -57,7 +83,7 @@ export function createSecurityBackend(env, createClient) {
     const admin = createClient(url, service, options);
     const auth = () => createClient(url, anon, options).auth;
 
-    async function check(token, request, address, register = false) {
+    async function check(token, request, address, register = false, trustedPlatformAddress = false) {
         const { data, error } = await auth().getUser(token);
         if (error) {
             const invalid = [400, 401, 403].includes(error.status);
@@ -68,7 +94,7 @@ export function createSecurityBackend(env, createClient) {
         const { data: result, error: checkError } = await admin.rpc('academy_check_session', {
             p_user_id: data.user.id,
             p_session_id: sessionId,
-            p_ip: clientIP(request, address, env),
+            p_ip: clientIP(request, address, env, trustedPlatformAddress),
             p_user_agent: request.headers.get('user-agent') || '',
             p_register: register,
         });
@@ -101,9 +127,11 @@ export function writeAccessCookie(cookies, request, session) {
 }
 
 export function jsonResponse(body, status = 200) {
-    return new Response(JSON.stringify(body), { status, headers: {
-        'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'private, no-store',
-    } });
+    return new Response(JSON.stringify(body), {
+        status, headers: {
+            'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'private, no-store',
+        }
+    });
 }
 
 export function securityFailure(error) {
@@ -136,7 +164,7 @@ export async function readAuthInput(request) {
         }
     } finally { reader.releaseLock(); }
     try {
-        const input = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+        const input = JSON.parse(await new Blob(chunks).text());
         if (!input || typeof input !== 'object' || Array.isArray(input)) throw new SyntaxError();
         return input;
     } catch (error) {
@@ -159,7 +187,7 @@ export async function secureAcademyRequest(context, env, createClient) {
     if (path === '/' && !token) return null;
     try {
         if (!token) throw new SecurityError('unauthorized');
-        context.locals.academySecurity = await createSecurityBackend(env, createClient).check(token, request, context.clientAddress);
+        context.locals.academySecurity = await createSecurityBackend(env, createClient).check(token, request, context.clientAddress, false, Boolean(context.locals.cfContext));
         if (path === '/orga') return new Response(null, { status: 301, headers: { Location: '/instrument/', 'Cache-Control': 'private, no-store' } });
         if (path === '/') return new Response(null, { status: 303, headers: { Location: '/dashboard/', 'Cache-Control': 'private, no-store' } });
         return null;

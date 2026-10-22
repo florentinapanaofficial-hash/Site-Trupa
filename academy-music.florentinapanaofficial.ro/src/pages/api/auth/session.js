@@ -10,11 +10,11 @@ export async function POST({ request, cookies, locals }) {
         return jsonResponse({ ok: true });
     } catch (error) { return securityFailure(error); }
 }
-export async function DELETE({ request, cookies }) {
+export async function DELETE({ request, cookies, locals }) {
     try {
         await readAuthInput(request);
         const token = request.headers.get('authorization')?.replace(/^Bearer /, '');
-        if (token) await createSecurityBackend(process.env, createClient).end(token);
+        if (token) await createSecurityBackend(locals?.workerEnv ?? {}, createClient).end(token);
         cookies.delete(ACCESS_COOKIE, { path: '/' });
         return jsonResponse({ ok: true });
     } catch (error) { return securityFailure(error); }

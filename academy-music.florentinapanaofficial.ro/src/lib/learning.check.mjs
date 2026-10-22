@@ -12,7 +12,7 @@ import { demoSequence, parseStudioMidi, matchNote, accuracy, loopPosition, Studi
 import midiPackage from '@tonejs/midi';
 import { scoreTimeline, scoreMidi, pitchFromStaff, scorePitchNumber } from './scoreEditor.js';
 import { parseMidi } from 'midi-file';
-import { createHomeworkUpload } from './homeworkUpload.js';
+import { createGoogleDrive, createHomeworkUpload } from './homeworkUpload.js';
 import { generateKeyPairSync } from 'node:crypto';
 import { loginEmailForIdentity, signInWithIdentity } from './studentCredentials.js';
 import { runInNewContext } from 'node:vm';
@@ -35,10 +35,12 @@ test('Canto validates text and MP3, preserves unchanged audio and rolls back new
     let fail = false;
     const response = { select: () => ({ single: async () => ({ data: fail ? null : { id: 'piece', ...saved }, error: fail ? { message: 'denied' } : null }) }) };
     const query = { ...response, eq: () => query };
-    const client = { from: (table) => {
-        assert.equal(table, 'pieces');
-        return { insert: (payload) => { saved = payload; return response; }, update: (payload) => { saved = payload; return query; } };
-    } };
+    const client = {
+        from: (table) => {
+            assert.equal(table, 'pieces');
+            return { insert: (payload) => { saved = payload; return response; }, update: (payload) => { saved = payload; return query; } };
+        }
+    };
     const options = { client, form, userId: 'teacher', upload: async (path) => uploaded.push(path), removeUploaded: async (paths) => { cleaned.push(...paths); } };
     const created = await saveCantoPiece({ ...options, files: { pozitiv: mp3 } });
     assert.equal(created.title, 'Titlu manual');
@@ -223,8 +225,7 @@ test('Drive homework validates JSON/legacy service accounts, authorization, mult
                         assert.equal(options.supportsAllDrives, true);
                         assert.ok(['audio/midi', 'audio/mpeg'].includes(options.media.mimeType));
                         assert.match(options.requestBody.name, /^Elev_test_(Audio|MIDI)\.(mid|mp3)$/);
-                        let content = '';
-                        for await (const chunk of options.media.body) content += chunk.toString();
+                        const content = await options.media.body.text();
                         assert.equal(content, options.media.mimeType === 'audio/mpeg' ? 'ID3audio' : 'MThdtest');
                         if (fail || uploads === failAtUpload) throw new Error('secret upstream error');
                         return { data: driveResponse };
@@ -376,6 +377,55 @@ test('Drive homework validates JSON/legacy service accounts, authorization, mult
     const jsonDriveFailure = await upload(request());
     assert.equal(jsonDriveFailure.status, 502);
     assert.doesNotMatch(await jsonDriveFailure.text(), /secret upstream/);
+});
+
+test('Google Drive Web client signs a service-account JWT and uploads multipart files with one OAuth token', async () => {
+    const pair = generateKeyPairSync('rsa', { modulusLength: 2048 });
+    const privateKey = await crypto.subtle.importKey('pkcs8', pair.privateKey.export({ type: 'pkcs8', format: 'der' }), { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['sign']);
+    const publicKey = await crypto.subtle.importKey('spki', pair.publicKey.export({ type: 'spki', format: 'der' }), { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']);
+    let tokenRequests = 0;
+    let uploadRequests = 0;
+    const requestFetch = async (input, init) => {
+        const url = new URL(input);
+        if (url.hostname === 'oauth2.googleapis.com') {
+            tokenRequests += 1;
+            const parameters = new URLSearchParams(init.body);
+            assert.equal(parameters.get('grant_type'), 'urn:ietf:params:oauth:grant-type:jwt-bearer');
+            const assertion = parameters.get('assertion');
+            const [encodedHeader, encodedClaims, encodedSignature] = assertion.split('.');
+            assert.deepEqual(JSON.parse(Buffer.from(encodedHeader, 'base64url').toString()), { alg: 'RS256', typ: 'JWT' });
+            assert.deepEqual(JSON.parse(Buffer.from(encodedClaims, 'base64url').toString()), {
+                iss: 'worker@example.test', scope: 'https://www.googleapis.com/auth/drive.file',
+                aud: 'https://oauth2.googleapis.com/token', iat: 1700000000, exp: 1700003600,
+            });
+            assert.equal(await crypto.subtle.verify('RSASSA-PKCS1-v1_5', publicKey, Buffer.from(encodedSignature, 'base64url'), new TextEncoder().encode(`${encodedHeader}.${encodedClaims}`)), true);
+            return Response.json({ access_token: 'synthetic-access-token', expires_in: 3600 });
+        }
+        uploadRequests += 1;
+        assert.equal(url.hostname, 'www.googleapis.com');
+        assert.equal(url.pathname, '/upload/drive/v3/files');
+        assert.equal(url.searchParams.get('uploadType'), 'multipart');
+        assert.equal(url.searchParams.get('supportsAllDrives'), 'true');
+        assert.equal(url.searchParams.get('fields'), 'id,webViewLink');
+        assert.equal(init.headers.Authorization, 'Bearer synthetic-access-token');
+        assert.match(init.headers['Content-Type'], /^multipart\/related; boundary=academy-/);
+        const boundary = init.headers['Content-Type'].split('boundary=')[1];
+        const body = await init.body.text();
+        assert.ok(body.includes(JSON.stringify({ name: 'Tema.mid', parents: ['folder-id'] })));
+        assert.ok(body.includes('Content-Type: audio/midi\r\n\r\nMThdtest\r\n'));
+        assert.ok(body.endsWith(`--${boundary}--`));
+        return Response.json({ id: `file-${uploadRequests}`, webViewLink: `https://drive.google.com/file/d/file-${uploadRequests}/view` });
+    };
+    const drive = createGoogleDrive({ email: 'worker@example.test', privateKey, fetch: requestFetch, now: () => 1700000000000 });
+    const options = {
+        requestBody: { name: 'Tema.mid', parents: ['folder-id'] },
+        media: { mimeType: 'audio/midi', body: new File(['MThdtest'], 'Tema.mid', { type: 'audio/midi' }) },
+        fields: 'id,webViewLink', supportsAllDrives: true,
+    };
+    assert.equal((await drive.files.create(options)).data.id, 'file-1');
+    assert.equal((await drive.files.create(options)).data.id, 'file-2');
+    assert.equal(tokenRequests, 1);
+    assert.equal(uploadRequests, 2);
 });
 
 test('score editor maps staff positions and exports exact note/rest timings including trailing silence', () => {
@@ -773,7 +823,7 @@ test('music UPDATE preserves row identity, assignments and existing files; valid
     const pdf = new File(['%PDF-1.7 valid-score'], 'score.pdf', { type: 'application/pdf' });
     const uploaded = [], removed = [], filters = [];
     let writes = 0, failed = false, payload;
-    const query = { eq: (key,value) => { filters.push([key,value]); return query; }, select: () => ({ single: async () => ({ data: failed ? null : { ...existing, ...payload }, error: failed ? { message: 'denied' } : null }) }) };
+    const query = { eq: (key, value) => { filters.push([key, value]); return query; }, select: () => ({ single: async () => ({ data: failed ? null : { ...existing, ...payload }, error: failed ? { message: 'denied' } : null }) }) };
     const options = {
         client: { from: table => { assert.equal(table, 'pieces'); return { update: value => { writes++; payload = value; return query; }, insert: () => { throw Error('must UPDATE, never INSERT'); } }; } },
         upload: async path => { uploaded.push(path); }, removeUploaded: async paths => { removed.push(...paths); }, form, piece: existing, userId: 'teacher',
@@ -787,7 +837,7 @@ test('music UPDATE preserves row identity, assignments and existing files; valid
     assert.equal('created_by' in payload, false);
     assert.equal('score_path' in payload, false);
     assert.match(payload.audio_negativ_path, /^orga\/[a-f0-9-]+\/negativ.mp3$/);
-    assert.deepEqual(filters, [['id','existing-piece'],['discipline','orga']]);
+    assert.deepEqual(filters, [['id', 'existing-piece'], ['discipline', 'orga']]);
     const scoreUpdate = await saveMusicPiece({ ...options, files: { score: pdf } });
     assert.match(scoreUpdate.score_path, /^orga\/[a-f0-9-]+\/score.pdf$/);
     assert.equal(scoreUpdate.audio_pozitiv_path, existing.audio_pozitiv_path);
@@ -810,8 +860,8 @@ test('RED resource update preserves existing PDF and cleans up a new PDF if data
     const form = { title: 'Lecție', discipline: 'comun', category: 'fisa-teoretica', description: 'Teorie', external_url: '' };
     let payload, failed = false;
     const removed = [], uploaded = [];
-    const query = { eq: (key,id) => { assert.equal(key, 'id'); assert.equal(id, resource.id); return query; }, select: () => ({ single: async () => ({ data: failed ? null : { ...resource, ...payload }, error: failed ? { message: 'denied' } : null }) }) };
-    const options = { resource, form, userId: 'teacher', client: { from: table => { assert.equal(table, 'resources'); return { update: value => { payload=value; return query; } }; } }, upload: async path => uploaded.push(path), removeUploaded: async paths => removed.push(...paths) };
+    const query = { eq: (key, id) => { assert.equal(key, 'id'); assert.equal(id, resource.id); return query; }, select: () => ({ single: async () => ({ data: failed ? null : { ...resource, ...payload }, error: failed ? { message: 'denied' } : null }) }) };
+    const options = { resource, form, userId: 'teacher', client: { from: table => { assert.equal(table, 'resources'); return { update: value => { payload = value; return query; } }; } }, upload: async path => uploaded.push(path), removeUploaded: async paths => removed.push(...paths) };
     const saved = await saveStudyResource(options);
     assert.equal(saved.file_path, resource.file_path);
     assert.equal('file_path' in payload, false);

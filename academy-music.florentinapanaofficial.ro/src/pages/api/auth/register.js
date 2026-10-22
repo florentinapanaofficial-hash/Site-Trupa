@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import { createSecurityBackend, CONSENT_VERSION, readAuthInput, jsonResponse, securityFailure, SecurityError } from '../../../lib/securityServer.js';
 export const prerender = false;
 
-export async function POST({ request }) {
+export async function POST({ request, locals }) {
     try {
         const input = await readAuthInput(request);
         if (input.parentalConsent !== true) throw new SecurityError('consent_required', 400, 'Acordul părintelui/tutorelui legal este obligatoriu.');
@@ -11,7 +11,7 @@ export async function POST({ request }) {
             || typeof input.fullName !== 'string' || !input.fullName.trim() || input.fullName.length > 120) {
             throw new SecurityError('invalid_input', 400, 'Completează numele, un email valid și o parolă de 12–128 caractere.');
         }
-        const backend = createSecurityBackend(process.env, createClient);
+        const backend = createSecurityBackend(locals?.workerEnv ?? {}, createClient);
         const { error } = await backend.auth().signUp({
             email: input.email.trim().toLowerCase(), password: input.password,
             options: { data: { full_name: input.fullName.trim(), parental_consent: true, consent_version: CONSENT_VERSION } },

@@ -4,6 +4,6 @@ import { createAIGameHandler } from '../../../lib/aiGamesServer.js';
 export const prerender = false;
 
 export const POST = (context) => createAIGameHandler({
-    env: process.env,
+    env: context.locals.workerEnv ?? {},
     createClient,
 })(context);

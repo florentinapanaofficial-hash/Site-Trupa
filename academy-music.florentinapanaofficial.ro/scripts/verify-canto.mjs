@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
-import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import { fileURLToPath } from 'node:url';
 import { chromium, expect } from '@playwright/test';
+import { startWorkerPreview } from './worker-preview.mjs';
 
 function wave() {
     const sampleRate = 8000, samples = sampleRate * 16;
@@ -17,7 +17,7 @@ function wave() {
 
 const userId = '11111111-1111-4111-8111-111111111111';
 const sessionId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
-const accessToken = 'header.' + Buffer.from(JSON.stringify({ sub: userId, session_id: sessionId, exp: Math.floor(Date.now()/1000)+3600 })).toString('base64url') + '.signature';
+const accessToken = 'header.' + Buffer.from(JSON.stringify({ sub: userId, session_id: sessionId, exp: Math.floor(Date.now() / 1000) + 3600 })).toString('base64url') + '.signature';
 const profile = { id: userId, full_name: 'Elev Test', role: 'student', is_active: true, disciplines: ['canto', 'orga'] };
 const upstream = createServer((request, response) => {
     response.setHeader('Content-Type', 'application/json');
@@ -28,12 +28,7 @@ const upstream = createServer((request, response) => {
 upstream.listen(0, '127.0.0.1');
 await once(upstream, 'listening');
 const cwd = fileURLToPath(new URL('../', import.meta.url));
-const server = spawn(process.execPath, ['dist/server/entry.mjs'], {
-    cwd, env: { ...process.env, HOST: '127.0.0.1', PORT: '0', ASTRO_NODE_LOGGING: 'enabled', NODE_ENV: 'production',
-        VITE_SUPABASE_URL: `http://127.0.0.1:${upstream.address().port}`, VITE_SUPABASE_ANON_KEY: 'test-anon', SUPABASE_SERVICE_ROLE_KEY: 'test-service',
-        ACADEMY_TRUSTED_IP_HEADER: 'x-forwarded-for', ACADEMY_TRUSTED_PROXY_HOPS: '1' },
-    stdio: ['ignore', 'pipe', 'pipe'],
-});
+const server = startWorkerPreview({ NODE_ENV: 'production', VITE_SUPABASE_URL: `http://127.0.0.1:${upstream.address().port}`, VITE_SUPABASE_ANON_KEY: 'test-anon', SUPABASE_SERVICE_ROLE_KEY: 'test-service' });
 let output = '';
 server.stdout.on('data', chunk => { output += chunk; });
 server.stderr.on('data', chunk => { output += chunk; });
@@ -53,7 +48,7 @@ try {
         const context = await browser.newContext({ viewport, extraHTTPHeaders: { 'x-forwarded-for': '198.51.100.1' } });
         await context.addCookies([{ name: 'academy-access', value: accessToken, url: base, httpOnly: true, sameSite: 'Lax' }]);
         await context.addInitScript(({ accessToken, userId }) => {
-            localStorage.setItem('academy-music-auth', JSON.stringify({ access_token: accessToken, refresh_token: 'test-refresh', expires_at: Math.floor(Date.now()/1000)+3600, expires_in: 3600, token_type: 'bearer', user: { id: userId, aud: 'authenticated' } }));
+            localStorage.setItem('academy-music-auth', JSON.stringify({ access_token: accessToken, refresh_token: 'test-refresh', expires_at: Math.floor(Date.now() / 1000) + 3600, expires_in: 3600, token_type: 'bearer', user: { id: userId, aud: 'authenticated' } }));
         }, { accessToken, userId });
         await context.addInitScript(() => {
             window.__micCalls = 0; window.__streams = []; window.__contexts = []; window.__recordingConnections = [];
@@ -73,7 +68,7 @@ try {
             };
         });
         const page = await context.newPage();
-        const rows = [{ id: path.includes('/canto') ? 'canto-piece' : 'orga-piece', discipline: path.includes('/canto') ? 'canto' : 'orga', title: path.includes('/canto') ? 'Piesă canto' : 'Piesă orgă', description: 'Descriere inițială', composer: 'Profesor', level: 'incepator', is_published: true, positive_url: null, negative_url: null, tags: [], versuri_text: Array.from({ length: 15 }, (_, n) => '[00:' + String(n).padStart(2,'0') + '.00]<00:' + String(n).padStart(2,'0') + '.00>Nota ' + n + '<00:' + String(n).padStart(2,'0') + '.80>').join('\n'), audio_pozitiv_path: 'canto/positive.mp3', negative_url: 'https://media.florentinapanaofficial.ro/negative.mp3', grupa: 'Grupa 1' }];
+        const rows = [{ id: path.includes('/canto') ? 'canto-piece' : 'orga-piece', discipline: path.includes('/canto') ? 'canto' : 'orga', title: path.includes('/canto') ? 'Piesă canto' : 'Piesă orgă', description: 'Descriere inițială', composer: 'Profesor', level: 'incepator', is_published: true, positive_url: null, negative_url: null, tags: [], versuri_text: Array.from({ length: 15 }, (_, n) => '[00:' + String(n).padStart(2, '0') + '.00]<00:' + String(n).padStart(2, '0') + '.00>Nota ' + n + '<00:' + String(n).padStart(2, '0') + '.80>').join('\n'), audio_pozitiv_path: 'canto/positive.mp3', negative_url: 'https://media.florentinapanaofficial.ro/negative.mp3', grupa: 'Grupa 1' }];
         const writes = [], uploads = [], aiRequests = [], homeworkRequests = [], studioRequests = [];
         let releaseAi; const aiPending = new Promise(resolve => { releaseAi = resolve; });
         let aiResponse = { lrc: "[00:01.00]<00:01.00>Vers AI<00:02.00>" }, aiStatus = 200;

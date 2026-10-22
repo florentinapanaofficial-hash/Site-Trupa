@@ -1,3 +1,28 @@
+## 📝 22 oct 2026 — Migrare Academy Music la Cloudflare Workers
+
+### Obiectiv
+Migrarea Academy Music de la adaptorul Node/Railway la Cloudflare Workers, păstrând SSR și API-urile Supabase/OpenAI, eliminând Node APIs din rutele runtime și configurând deploy automat pe push în `main`.
+
+### Modificări
+- Academy `astro.config.mjs`: `@astrojs/cloudflare`, `output: 'server'`, sesiuni Astro dezactivate (aplicația folosește cookie-ul propriu), optimizarea imaginilor la build. `wrangler.jsonc`: entrypoint Astro Workers, assets și domeniu custom.
+- Endpoint-urile și middleware-ul citesc Workers bindings injectate central. `securityServer.js` folosește numai Web APIs pentru IP/JWT/body parsing; `aiGamesServer.js` procesează JSON fără Buffer.
+- `homeworkUpload.js`: Google Service Account JWT RS256 prin Web Crypto și Google Drive REST multipart/related prin Fetch; eliminat `googleapis`/stream Node. Playerul MIDI CommonJS rămâne client-only pe pagina Studio pentru a nu ajunge în SSR Worker.
+- Wrangler preview, smoke test workerd și GitHub Actions la push `main`; eliminate adaptorul Node, `googleapis`, `sirv`, `server.mjs`, `railway.toml`, serverul Node și compresia custom. Actualizate testele browser și README; `.dev.vars.example` fără secrete.
+
+### Validări
+- `npm ci`: PASS. `npm test`: **61/61 PASS**. Google Drive REST/JWT verificat cu chei sintetice, fără cereri live.
+- `npm run test:worker`: build SSR PASS, request Workerd către homepage PASS cu CSP/noindex, API AI fără sesiune **401 JSON**, `wrangler deploy --dry-run` PASS (79 assets).
+- Browser pe workerd: `test:games`, `test:admin`, `test:canto`, `test:landing`, `test:navigation` PASS, inclusiv mobil/desktop.
+- Diagnostics zero erori în fișierele runtime și smoke test; `git diff --check` curat. Build-ul mai raportează avertismente Vite/dependență MIDI browser și chunkuri mari, fără blocarea Worker-ului.
+- Fără schimbări metadata/JSON-LD ale site-ului public, fără date GSC noi și fără afirmații de poziționare; Academy rămâne noindex. Nu s-a făcut deploy live.
+
+### Riscuri și pași următori
+- Pentru deploy, setează în GitHub Actions `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`; în Cloudflare Worker, secretele Supabase service role, OpenAI și Google Drive. Confirmă domeniul custom în zona Cloudflare și URL-urile Redirect Supabase.
+- `npm ci` raportează **13 vulnerabilități** în arborele dependențelor (3 moderate, 6 high, 4 critical); nu s-a rulat `npm audit fix` pentru a evita upgrade-uri fără analiză.
+- Integrarea Google Drive a fost testată cu fetch simulat; primul upload real și credențialele Shared Drive rămân de verificat după deploy. Workflow-ul nu a fost pornit, fiindcă necesită secrete Cloudflare.
+
+---
+
 ## 📝 22 oct 2026 — Canto: acces direct la editarea negativului și versurilor
 
 ### Obiectiv

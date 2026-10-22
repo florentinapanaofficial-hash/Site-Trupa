@@ -1,15 +1,12 @@
 import assert from 'node:assert/strict';
-import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import { fileURLToPath } from 'node:url';
 import { mkdir } from 'node:fs/promises';
 import { chromium, expect } from '@playwright/test';
+import { startWorkerPreview } from './worker-preview.mjs';
 
 const cwd = fileURLToPath(new URL('../', import.meta.url));
-const server = spawn(process.execPath, ['dist/server/entry.mjs'], {
-    cwd, env: { ...process.env, HOST: '127.0.0.1', PORT: '0', ASTRO_NODE_LOGGING: 'enabled' },
-    stdio: ['ignore', 'pipe', 'pipe'],
-});
+const server = startWorkerPreview();
 let output = '';
 server.stdout.on('data', (chunk) => { output += chunk; });
 server.stderr.on('data', (chunk) => { output += chunk; });
@@ -76,9 +73,9 @@ try {
     for (const status of [200, 503]) {
         const context = await browser.newContext();
         const sessionId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
-        const accessToken = 'header.' + Buffer.from(JSON.stringify({ session_id: sessionId, exp: Math.floor(Date.now()/1000)+3600 })).toString('base64url') + '.signature';
+        const accessToken = 'header.' + Buffer.from(JSON.stringify({ session_id: sessionId, exp: Math.floor(Date.now() / 1000) + 3600 })).toString('base64url') + '.signature';
         await context.addInitScript(({ accessToken }) => {
-            localStorage.setItem('academy-music-auth', JSON.stringify({ access_token: accessToken, refresh_token: 'test-refresh', expires_at: Math.floor(Date.now()/1000)+3600, expires_in: 3600, token_type: 'bearer', user: { id: '11111111-1111-4111-8111-111111111111', aud: 'authenticated' } }));
+            localStorage.setItem('academy-music-auth', JSON.stringify({ access_token: accessToken, refresh_token: 'test-refresh', expires_at: Math.floor(Date.now() / 1000) + 3600, expires_in: 3600, token_type: 'bearer', user: { id: '11111111-1111-4111-8111-111111111111', aud: 'authenticated' } }));
         }, { accessToken });
         const page = await context.newPage();
         let checked = 0;

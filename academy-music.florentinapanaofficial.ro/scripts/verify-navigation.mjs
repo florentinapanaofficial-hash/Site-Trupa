@@ -1,14 +1,14 @@
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
-import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import { fileURLToPath } from 'node:url';
 import { mkdir } from 'node:fs/promises';
 import { chromium, expect } from '@playwright/test';
+import { startWorkerPreview } from './worker-preview.mjs';
 
 const userId = '11111111-1111-4111-8111-111111111111';
 const sessionId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
-const accessToken = 'header.' + Buffer.from(JSON.stringify({ sub: userId, session_id: sessionId, exp: Math.floor(Date.now()/1000)+3600 })).toString('base64url') + '.signature';
+const accessToken = 'header.' + Buffer.from(JSON.stringify({ sub: userId, session_id: sessionId, exp: Math.floor(Date.now() / 1000) + 3600 })).toString('base64url') + '.signature';
 const profile = { id: userId, full_name: 'Elev Test', role: 'student', is_active: true, disciplines: ['canto', 'orga'] };
 const upstream = createServer((request, response) => {
     response.setHeader('Content-Type', 'application/json');
@@ -19,12 +19,7 @@ const upstream = createServer((request, response) => {
 upstream.listen(0, '127.0.0.1');
 await once(upstream, 'listening');
 const cwd = fileURLToPath(new URL('../', import.meta.url));
-const server = spawn(process.execPath, ['dist/server/entry.mjs'], {
-    cwd, env: { ...process.env, HOST: '127.0.0.1', PORT: '0', ASTRO_NODE_LOGGING: 'enabled', NODE_ENV: 'production',
-        VITE_SUPABASE_URL: `http://127.0.0.1:${upstream.address().port}`, VITE_SUPABASE_ANON_KEY: 'test-anon', SUPABASE_SERVICE_ROLE_KEY: 'test-service',
-        ACADEMY_TRUSTED_IP_HEADER: 'x-forwarded-for', ACADEMY_TRUSTED_PROXY_HOPS: '1' },
-    stdio: ['ignore', 'pipe', 'pipe'],
-});
+const server = startWorkerPreview({ NODE_ENV: 'production', VITE_SUPABASE_URL: `http://127.0.0.1:${upstream.address().port}`, VITE_SUPABASE_ANON_KEY: 'test-anon', SUPABASE_SERVICE_ROLE_KEY: 'test-service' });
 let output = '';
 server.stdout.on('data', chunk => { output += chunk; });
 server.stderr.on('data', chunk => { output += chunk; });
@@ -44,7 +39,7 @@ try {
         const context = await browser.newContext({ viewport, extraHTTPHeaders: { 'x-forwarded-for': '198.51.100.1' } });
         await context.addCookies([{ name: 'academy-access', value: accessToken, url: base, httpOnly: true, sameSite: 'Lax' }]);
         await context.addInitScript(({ accessToken, userId }) => {
-            localStorage.setItem('academy-music-auth', JSON.stringify({ access_token: accessToken, refresh_token: 'test-refresh', expires_at: Math.floor(Date.now()/1000)+3600, expires_in: 3600, token_type: 'bearer', user: { id: userId, aud: 'authenticated' } }));
+            localStorage.setItem('academy-music-auth', JSON.stringify({ access_token: accessToken, refresh_token: 'test-refresh', expires_at: Math.floor(Date.now() / 1000) + 3600, expires_in: 3600, token_type: 'bearer', user: { id: userId, aud: 'authenticated' } }));
         }, { accessToken, userId });
         const page = await context.newPage();
         const errors = [];
@@ -122,10 +117,15 @@ try {
         await nav.getByRole('link', { name: 'Alege disciplina' }).click();
         await expect(page.getByRole('heading', { name: 'Ce vrei să studiezi astăzi?' })).toBeVisible();
         await page.getByRole('link', { name: 'Deschide Instrument-Orgă' }).click();
-        await expect(page.getByRole('heading', { name: 'Instrument-Orgă', exact: true })).toBeVisible();
-        if (viewport.width < 1024) await page.getByRole('button', { name: 'Meniu', exact: true }).click();
+        await expect(page.getByRole('heading', { level: 1, name: 'Instrument-Orgă', exact: true })).toBeVisible();
+        if (viewport.width < 1024) {
+            await expect(nav).toBeHidden();
+            await page.getByRole('button', { name: 'Meniu', exact: true }).click();
+        }
         await expect(nav.getByRole('link', { name: 'Biblioteca Canto' })).toHaveCount(0);
-        await nav.getByRole('link', { name: 'Claviatură virtuală' }).click();
+        const keyboardLink = nav.getByRole('link', { name: 'Claviatură virtuală' });
+        assert.equal(await keyboardLink.count(), 1, `url=${page.url()} nav=${await nav.count()} visible=${await nav.isVisible().catch(() => false)} text=${await page.locator('body').innerText()}`);
+        await keyboardLink.click();
         await expect(page.getByRole('region', { name: /pian|claviatur/i })).toBeVisible();
         assert.ok(chunks.some(path => /\/VirtualPiano[.-]/.test(path)));
         assert.deepEqual(errors, []);

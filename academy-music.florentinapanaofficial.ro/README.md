@@ -3,7 +3,7 @@
 Platformă LMS pentru cursurile de **orgă** și **canto** de la Palatul Copiilor Pitești.
 Subdomeniu țintă: `academy-music.florentinapanaofficial.ro`
 
-Stack: **Astro 7 (SSR + API Node standalone) + React 18 + MDX + TailwindCSS 4 + Supabase** (Auth, Postgres, Storage privat). Audio: URL-uri directe Cloudflare R2/CDN; Canto acceptă și upload MP3 privat în Supabase Storage.
+Stack: **Astro 7 (SSR Cloudflare Workers) + React 18 + MDX + TailwindCSS 4 + Supabase** (Auth, Postgres, Storage privat). Audio: URL-uri directe Cloudflare R2/CDN; Canto acceptă și upload MP3 privat în Supabase Storage.
 
 ---
 
@@ -86,11 +86,11 @@ Implicit, „Trimite Tema” folosește helperul comun `src/lib/submitHomework.j
 
 Același flux este folosit pentru înregistrările **audio** din `RecordingStudio` și fișierele **audio/MIDI** din Portofoliu; titlul, mesajul și piesa sunt păstrate ca metadata. Video și imaginile continuă pe fluxul existent `submissions`/Storage. Înregistrările istorice din Storage nu sunt migrate sau șterse. `HomeworkCatalog.jsx` afișează linkurile cu paginare și reîmprospătare în portofoliul elevului și în pagina principală a profesorului. RLS permite elevului doar înregistrările proprii, profesorului catalogul, iar inspectorului îi interzice trimiterea și accesul la catalogul personal. Un callback opțional `onSubmitHomework` poate suprascrie integrarea din InteractiveStudio și trebuie să arunce eroare la eșec; responsabilitatea persistenței revine integrării personalizate.
 
-Configurare server: `GOOGLE_CREDENTIALS` (JSON-ul complet al Service Account-ului, cu `type: "service_account"`, `client_email` și `private_key`), `GOOGLE_DRIVE_FOLDER_ID`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`. JSON-ul se parsează numai pe server; cheia RSA acceptă newline-uri reale sau `\n`. `GOOGLE_CREDENTIALS` are prioritate: o valoare invalidă sau goală produce 503 explicit, fără fallback la alte credențiale. Pentru configurațiile existente, `GOOGLE_CLIENT_EMAIL` și `GOOGLE_PRIVATE_KEY` rămân acceptate numai când `GOOGLE_CREDENTIALS` lipsește. Local, configurarea citește `.env` Academy și folosește `.env` din rădăcina workspace-ului ca fallback; mediul procesului are prioritate. Pe Railway configurează variabilele în serviciul Academy, apoi build și restart. Credențialele Google nu primesc prefix `VITE_`/`PUBLIC_` și nu ajung în bundle-ul browserului. `googleapis` se încarcă numai după autentificare și validarea fișierelor, apoi folosește JWT cu emailul și cheia din Service Account, scope `drive.file`, `files.create`, `supportsAllDrives: true`; fișierele primesc nume generate server-side din numele normalizat al elevului și sufixul Audio/MIDI.
+Configurare Workers: `GOOGLE_CREDENTIALS` (JSON-ul complet al Service Account-ului, cu `type: "service_account"`, `client_email` și `private_key`), `GOOGLE_DRIVE_FOLDER_ID`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`. JSON-ul se parsează numai pe server; cheia RSA acceptă newline-uri reale sau `\\n`. `GOOGLE_CREDENTIALS` are prioritate: o valoare invalidă sau goală produce 503 explicit, fără fallback la alte credențiale. Pentru configurațiile existente, `GOOGLE_CLIENT_EMAIL` și `GOOGLE_PRIVATE_KEY` rămân acceptate numai când `GOOGLE_CREDENTIALS` lipsește. În producție, secretele Google sunt Cloudflare Worker Secrets; URL-ul și cheia anon Supabase sunt variabile GitHub Actions folosite la build și ajung doar în bundle-ul client ca valori publice. Local, variabilele build se citesc din `.env`, iar secretele runtime din `.dev.vars` (pornește de la `.dev.vars.example`). Credențialele Google nu primesc prefix `VITE_`/`PUBLIC_` și nu ajung în bundle-ul browserului. Integrarea Drive folosește JWT RS256 prin Web Crypto și Google Drive REST multipart, `supportsAllDrives: true`; fișierele primesc nume generate server-side din numele normalizat al elevului și sufixul Audio/MIDI.
 
 **Important:** activează Google Drive API și acordă Service Account-ului drept de creare în folderul unui **Shared Drive** (de exemplu Contributor). Un Service Account nu are cotă proprie de stocare; un folder My Drive doar partajat cu adresa lui nu este suficient. Alternativa necesită OAuth al unui utilizator sau delegare Workspace, neimplementate aici. Nu se creează permisiuni `anyone`: linkul nu acordă acces automat elevului; profesorul și elevul au nevoie de permisiunile Drive potrivite. Înainte de activare aplică `supabase/setup_catalog_teme.sql`, după migrarea rolurilor online; nu a fost aplicată automat pe Supabase live. Stabilește accesul, retenția și informarea privind transferul temelor în Google Drive înainte de utilizarea cu date reale. Ștergerea unui profil elimină rândurile catalogului prin cascade, nu și fișierele externe din Drive; retenția Drive se gestionează separat.
 
-Serverul `npm start` pornește direct `node ./dist/server/entry.mjs`, generat de adaptorul `@astrojs/node` în modul `standalone`. `output: 'server'` randează paginile și API-ul la cerere, fără fallback HTML pe `/api/`. Middleware-ul Astro păstrează CSP, hash-urile scripturilor inline, permisiunile media și `noindex`; `scripts/compress.mjs` comprimă numai activele client (negocierea fișierelor precomprimate depinde de proxy/CDN, nu de serverul standalone). Verificare focalizată: `npm run test:browser -- --drive-upload` pentru helperul HTTP, respectiv `--homework` pentru REC + trimitere, cu `ACADEMY_TEST_URL` către serverul Academy. API-ul Drive este simulat în teste, fără scrieri live. Scenariul REC poate fi blocat de problema MP3 preexistentă consemnată în jurnal. La succes, numai după upload și înscrierea în catalog, endpoint-ul returnează 201 JSON cu `success: true`, `id`, `webViewLink` și, pentru perechi audio/MIDI, `midiId`/`midiWebViewLink`. Dacă uploadul reușește dar catalogul sau al doilea fișier eșuează, răspunsul avertizează explicit despre confirmarea parțială, fără succes fals. Endpoint-ul verifică JSON-ul Service Account și parsarea RSA a cheii și returnează 503 explicit pentru o valoare invalidă; nu afișează cheia sau răspunsurile sensibile ale serviciilor externe.
+Astro rulează cu `output: 'server'` pe Cloudflare Workers; paginile și API-urile sunt SSR, fără fallback HTML pe `/api/`. `npm run preview` pornește Wrangler local în `workerd`; `npm run deploy` construiește și publică Worker-ul. Middleware-ul păstrează CSP, hash-urile scripturilor inline, permisiunile media și `noindex`. Verificare focalizată: `npm test` pentru testele logice și `npm run test:worker` pentru build + Wrangler dry-run; testele browser folosesc `ACADEMY_TEST_URL` către Worker-ul local. API-ul Drive este simulat în teste, fără scrieri live. La succes, numai după upload și înscrierea în catalog, endpoint-ul returnează 201 JSON cu `success: true`, `id`, `webViewLink` și, pentru perechi audio/MIDI, `midiId`/`midiWebViewLink`. Dacă uploadul reușește dar catalogul sau al doilea fișier eșuează, răspunsul avertizează explicit despre confirmarea parțială, fără succes fals. Endpoint-ul verifică JSON-ul Service Account și parsarea RSA a cheii și returnează 503 explicit pentru o valoare invalidă; nu afișează cheia sau răspunsurile sensibile ale serviciilor externe.
 
 Verificare de catalog: `npm run test:browser -- --drive-catalog` testează trimitere MIDI/audio din portofoliu, metadata, Bearer, eșec/retry, confirmare, linkuri elev/profesor și lipsa cererilor Storage la 1440/390 px. Serviciile sunt simulate; fixture-ul audio testează upload-ul, nu decodarea/redarea. `npm test` rulează și migrarea repetabilă cu PostgreSQL PGlite: RLS, roluri, date generate de server, nume verificat și constrângeri de link.
 
@@ -135,7 +135,7 @@ Instalează modulul inclus `supabase/jitsi/mod_academy_roles.lua` în directorul
 
 Activează `muc_lobby_rooms` și `persistent_lobby` pe VirtualHost, plus modulele [lobby_autostart](https://github.com/jitsi-contrib/prosody-plugins/tree/main/lobby_autostart) și [token_lobby_bypass](https://github.com/jitsi-contrib/prosody-plugins/tree/main/token_lobby_bypass) pe componenta MUC. Numai profesorul primește claim-ul semnat `lobby_bypass=true`; elevii și inspectorii necesită aprobare. Lobby-ul trebuie să fie activ de la crearea sălii, nu doar după comanda din React. Verifică ordinea hook-urilor pentru versiunea Prosody instalată și accesul conturilor interne Jicofo/Jibri înainte de producție; modulul inclus este pentru participanții Academy și refuză intrările fără context JWT.
 
-Setează și `JITSI_DOMAIN` în mediul serverului Academy (Railway) pentru CSP și delegarea permisiunilor iframe. Inspectorul pornește cu `startWithAudioMuted/startWithVideoMuted`, fără GUM inițial, fără comenzi media și cu `camera/microphone/display-capture 'none'` pe iframe. Audio de studiu: `disableAEC`, `disableNS`, `disableAGC`, `disableAP` și constraints fără echo cancellation/noise suppression. Folosește căști: anularea ecoului este intenționat oprită.
+Setează și `JITSI_DOMAIN` ca secret/variabilă a Worker-ului pentru CSP și delegarea permisiunilor iframe. Inspectorul pornește cu `startWithAudioMuted/startWithVideoMuted`, fără GUM inițial, fără comenzi media și cu `camera/microphone/display-capture 'none'` pe iframe. Audio de studiu: `disableAEC`, `disableNS`, `disableAGC`, `disableAP` și constraints fără echo cancellation/noise suppression. Folosește căști: anularea ecoului este intenționat oprită.
 
 Înainte de `JITSI_SECURE_LOBBY_READY=true`, testează cu conturi reale: elev înaintea profesorului rămâne în lobby; profesorul este moderator automat; aprobare/refuz manual; elevul altei grupe primește 403 inclusiv prin apel direct; tokenul nu funcționează în altă sală; inspectorul nu solicită dispozitive și nu poate activa transmisia. Aceste verificări depind de serverul extern și nu sunt demonstrate de testele locale cu Jitsi simulat. Configurează acordurile de procesare a datelor și informarea participanților pentru serviciul video ales.
 
@@ -146,9 +146,9 @@ Setează și `JITSI_DOMAIN` în mediul serverului Academy (Railway) pentru CSP �
 ```
 academy-music.florentinapanaofficial.ro/
 ├── index.html
-├── server.mjs                 # compatibilitate: importă entrypoint-ul standalone
+├── wrangler.jsonc             # entrypoint și assets Cloudflare Workers
 ├── src/middleware.js          # CSP și headere pentru răspunsurile SSR/API
-├── railway.toml               # configurație deploy
+├── .github/workflows/         # deploy automat la push pe main
 ├── supabase/schema.sql        # tabele, funcții, RLS, buckete
 ├── supabase/migrations/       # migrări SQL incrementale
 └── supabase/functions/       # funcții server-side pentru administrare conturi
@@ -272,12 +272,10 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOi...
 
 ```bash
 cd academy-music.florentinapanaofficial.ro
-npm install
-npm run dev      # http://localhost:5180
-# În alt terminal, cu serverul dev pornit:
-npm run test:login:dev # landing → login și reload, mobil/desktop
-npm run build    # bundle de producție în dist/
-npm start        # servește dist/ cu headerele de securitate
+npm ci
+npm run dev      # Astro dev pe workerd, http://localhost:5180
+npm run build    # Worker SSR și active în dist/
+npm run preview  # Wrangler local, același runtime ca producția
 ```
 
 ---
@@ -316,14 +314,13 @@ npm start        # servește dist/ cu headerele de securitate
 
 ---
 
-## 6. Deploy pe Railway
+## 6. Deploy pe Cloudflare Workers
 
-1. **New Project → Deploy from GitHub repo** (sau `railway up` din acest folder). Pentru monorepo setează **Root Directory** la `academy-music.florentinapanaofficial.ro`, branch `main` și fișierul de configurare al acestui serviciu la `/academy-music.florentinapanaofficial.ro/railway.toml`. Verifică să nu rămână un override de start către un server SPA/static.
-2. **Variables**: adaugă `VITE_SUPABASE_URL` și `VITE_SUPABASE_ANON_KEY`, plus variabilele Google Drive descrise mai sus. Variabilele `VITE_*` se citesc **la build**, deci după modificarea lor e nevoie de redeploy.
-3. Build: `npm install && npm run build`. Start: `HOST=0.0.0.0 node ./dist/server/entry.mjs` (sau `npm start` cu `HOST=0.0.0.0` în mediu). Adaptorul citește automat `PORT` injectat de Railway; nu fixa portul Railway în cod. Local, portul implicit este 4180. Healthcheck: `/`.
-4. După deploy verifică URL-ul Railway: `/` → 200; GET `/api/upload-homework/` → 405 JSON; POST fără autentificare → 401 JSON; API inexistent → 404 JSON. Un răspuns HTML 200 pe API indică încă un deployment/start/config greșit, nu confirmă funcționarea uploadului. Testul cu upload autentificat și permisiunile Drive rămâne separat.
-5. **Settings → Networking → Custom Domain**: `academy-music.florentinapanaofficial.ro`. În DNS adaugă `CNAME` de la `academy-music` către hostul oferit de Railway.
-6. În Supabase → **Authentication → URL Configuration**, adaugă subdomeniul la Redirect URLs.
+1. Creează un Worker conectat la repository-ul Academy sau lasă GitHub Actions să-l creeze la primul deploy. Workflow-ul `.github/workflows/deploy-workers.yml` publică automat fiecare push pe `main` și poate fi pornit manual.
+2. În GitHub → Settings → Secrets and variables → Actions, configurează secrets `CLOUDFLARE_API_TOKEN` (Workers Scripts: Edit) și `CLOUDFLARE_ACCOUNT_ID`; configurează repository variables `VITE_SUPABASE_URL` și `VITE_SUPABASE_ANON_KEY` pentru build.
+3. În Cloudflare Worker → Settings → Variables and Secrets, adaugă `SUPABASE_SERVICE_ROLE_KEY`, `OPENAI_API_KEY`, `GOOGLE_CREDENTIALS` și `GOOGLE_DRIVE_FOLDER_ID` ca **secrets**. Configurează `SUPABASE_HOST`, `MEDIA_ORIGIN`, `JITSI_DOMAIN`, `ACADEMY_TRUSTED_IP_HEADER` și `ACADEMY_TRUSTED_PROXY_HOPS` ca variables unde sunt necesare. Nu pune secrete în `wrangler.jsonc` sau GitHub variables.
+4. `wrangler.jsonc` configurează SSR entrypoint-ul Astro, assets și custom domain `academy-music.florentinapanaofficial.ro`. Activează domeniul în zona Cloudflare înainte de deploy și verifică DNS-ul să nu mai trimită trafic la Railway. Nu este activat `nodejs_compat`; logica runtime folosește Workers/Web APIs.
+5. După deploy verifică `/` → 200; GET `/api/upload-homework/` → 405 JSON; POST neautentificat → 401 JSON; API inexistent → 404 JSON. În Supabase → **Authentication → URL Configuration**, adaugă domeniul Academy la Redirect URLs.
 
 ---
 
@@ -351,7 +348,7 @@ Nu s-au aplicat automat migrări pe proiectul live. Testele SQL folosesc Postgre
 - Încarcă audio în bucketul R2 și activează un custom domain, de exemplu `https://media.florentinapanaofficial.ro`.
 - Setează `Content-Type` audio corect, suport pentru range requests și CORS `GET`/`HEAD` pentru originile Academy. Folosește `Cache-Control: public, max-age=31536000, immutable` numai pentru chei versionate; schimbă cheia când înlocuiești fișierul.
 - Actualizează `pieces.positive_url` și `pieces.negative_url` cu URL-uri absolute. Câmpurile vechi `audio_*_path` nu mai sunt redate și nu au fost migrate/șterse automat. Piesele care au doar căi vechi rămân fără audio până la completarea URL-urilor.
-- `MEDIA_ORIGIN` se setează pe server dacă domeniul diferă de cel implicit; CSP acceptă numai originea configurată. După schimbarea serverului sau un build nou, repornește `npm start`.
+- `MEDIA_ORIGIN` se setează ca Worker variable dacă domeniul diferă de cel implicit; CSP acceptă numai originea configurată. După schimbarea variabilelor, redeploy Worker-ul.
 - Nu există garanție de cost zero: R2 are cote și costuri pentru stocare/operații peste plan; jurnalul JSON consumă spațiu Postgres. Pianul folosește **0 bytes de fișiere audio**, nu zero spațiu de baze de date. Portofoliile și materialele private existente nu au fost migrate.
 
 ### Mini-cursuri MDX
@@ -379,11 +376,10 @@ Cele patru carduri Google Workspace din `src/pages/admin/AdminDashboard.jsx` fol
 `npm run build` generează serverul SSR și activele client, plus variante `.br`/`.gz`. Adaptorul standalone livrează activele `/_astro/` cu cache immutable, iar middleware-ul setează `no-cache` pentru HTML. Rutele private rămân React + Supabase, fără randarea datelor elevilor pe server. Astro avertizează despre fișierele JSX existente în `src/pages/`; acestea sunt importate de SPA, nu tratate drept pagini Astro.
 
 ```bash
-npm test                   # LRC, audio direct, pian, migrări SQL/RLS
-npm run build
-npm run test:server        # pornește/oprește entrypoint-ul compilat pe un port liber; JSON API, SSR, CSP, noindex
-npm start                  # implicit portul 4180; PORT=4185 pentru test:browser
-npm run test:browser       # implicit http://127.0.0.1:4185; ACADEMY_TEST_URL pentru alt port
+npm test                   # logică, Web Crypto, Drive REST simulat, migrări SQL/RLS
+npm run test:worker        # build SSR + Wrangler deploy dry-run
+npm run preview            # Worker local pe workerd
+npm run test:browser       # setează ACADEMY_TEST_URL către preview-ul local
 ```
 
 Testul de browser cere un build configurat cu variabilele publice Supabase existente și interceptează toate cererile către acel proiect: nu scrie în baza live. Include verificări la 1440px/390px și capturi în `.astro/screenshots/`. Chromium se instalează cu `npx playwright install chromium`. Fișierele media CDN și fonturile pot fi cerute public în timpul testelor.
@@ -397,8 +393,7 @@ Implementare: `src/middleware.js`, `src/lib/securityServer.js`, `src/pages/api/a
 
 1. Aplică toate migrările în ordine, după schema și modulele de bază. Migrarea de securitate este idempotentă.
 2. Configurează **doar în mediul serverului** `SUPABASE_SERVICE_ROLE_KEY`; nu folosi prefixul `VITE_` și nu publica cheia.
-3. Configurează `ACADEMY_TRUSTED_IP_HEADER=x-forwarded-for` și `ACADEMY_TRUSTED_PROXY_HOPS=1` **numai dacă** infrastructura garantează că ultimul proxy de încredere adaugă/suprascrie IP-ul real. Pentru un header `x-real-ip` suprascris de proxy folosește tot `1`. Verifică topologia Railway înainte de activare. Fără această configurație, autentificarea în producție răspunde 503, nu inventează un IP și nu acceptă orbește primul IP transmis de browser. Local se folosește `Astro.clientAddress`; modul de dezvoltare nu reprezintă o configurație de producție.
-   Pentru domeniul temporar Railway configurează și `ACADEMY_PUBLIC_ORIGIN=https://DOMENIUL-TAU.up.railway.app` înainte de build; Astro acceptă headerele Host/Forwarded doar pentru hostname-urile explicit permise. Domeniul canonical și localhost sunt deja permise.
+3. Workers furnizează IP-ul clientului prin `cfContext`; nu seta trusted-proxy headers manual în Cloudflare. În dezvoltare, `Astro.clientAddress` este folosit numai în afara producției. Domeniul canonical este permis în configurația Astro.
 4. Publică aplicația Astro și funcțiile Edge actualizate `create-student` și `delete-student`. Fluxul profesorului marchează conturile provisionate exclusiv în `app_metadata`; nu pretinde că profesorul este părintele și nu inventează consimțământ.
 5. Testează loginul cu un cont de test și două sesiuni independente, apoi activează global din SQL Editor:
 
@@ -498,7 +493,7 @@ Profesorul confirmă explicit drepturile și prelucrarea înainte de trimitere. 
 Această implementare nu publică automat funcția, nu setează chei și nu transmite înregistrări reale.
 
 1. Aplică `supabase/migrations/20261020000006_generate_lyrics.sql` după migrarea de securitate `20261020000005`. Creează numai tabelul/RPC service-only pentru cooldown; nu schimbă piesele sau politicile existente. Dacă folosești SQL Editor, înregistrează și versiunea în istoricul migrărilor conform fluxului proiectului.
-2. În Supabase Dashboard → Edge Functions → Secrets, configurează **OPENAI_API_KEY**, folosind un proiect cu buget controlat. Nu pune cheia în frontend, Railway `VITE_*`, Git sau mesaje. `SUPABASE_URL`, `SUPABASE_ANON_KEY` și `SUPABASE_SERVICE_ROLE_KEY` sunt variabilele server ale funcției.
+2. În Supabase Dashboard → Edge Functions → Secrets, configurează **OPENAI_API_KEY**, folosind un proiect cu buget controlat. Nu pune cheia în frontend, Cloudflare `VITE_*`, Git sau mesaje. `SUPABASE_URL`, `SUPABASE_ANON_KEY` și `SUPABASE_SERVICE_ROLE_KEY` sunt variabilele server ale funcției.
 3. Din directorul Academy, cu CLI autentificat: `npx --no-install supabase functions deploy generate-lyrics --no-verify-jwt`. Configurația dezactivează doar verificarea gateway-ului; handlerul verifică explicit JWT-ul, sesiunea și rolul înainte de acces. Nu elimina aceste verificări.
 4. Publică frontendul separat. Verifică funcția cu un cont profesor și un pozitiv original/autorizat ≤24 MB. Fără secret/migrare/funcție publicată, UI afișează eroare și păstrează textul.
 5. Test audio manual: pe `/canto/`, verifică mai întâi karaoke fără microfon. Apoi alege REC pentru temă, conectează căștile, confirmă regula și testează Dry/Wet, Stop, revizuirea și trimiterea explicită. Ascultarea reală și Safari/iOS trebuie validate pe dispozitivele țintă.
@@ -575,7 +570,7 @@ După migrare, validează cu `npm test`, `npx vite build`, `npm run build`, `npm
 - `game_profiles`, `rhythm_attempts`, `live_quiz_rooms`, `live_quiz_questions`, `live_quiz_members`, `live_quiz_answers` au RLS. Mutările de joc sunt numai prin RPC-uri SECURITY DEFINER cu search_path gol și verificarea sesiunii/contului activ; RPC-urile interne nu sunt apelabile de elev. Cheile răspunsurilor și rezultatele adversarului la întrebarea curentă nu sunt expuse înainte de recapitulare.
 - Scorul ritmic este recalculat din evenimentele clientului, cu pattern creat de server, limită de evenimente/timp și închidere idempotentă. **Nu este anti-cheat invulnerabil:** un browser modificat poate fabrica apăsări. Nu folosi rezultatul drept examen certificat sau recompensă cu valoare financiară.
 - Teste: `npm test` include SQL/RLS/adversarial și motorul comun; `npm run test:games` pornește SSR de test și două contexte Playwright, cu baza PGlite reală în spatele RPC-urilor. Verifică invitație din dashboard, acceptare, reconectare, deadline, progresie, scoruri, salvare ritmică cu retry, podium/avatare/opt-out și layout 390/1440 px. WebSocket-ul extern este blocat intenționat: acest test validează fallback-ul HTTP, nu o instanță Supabase Realtime live.
-- Aplicarea migrării și livrarea Realtime în proiectul Supabase/Railway real necesită validare după publicare. Nu au fost executate automat asupra contului live.
+- Aplicarea migrării și livrarea Realtime în proiectul Supabase/Workers real necesită validare după publicare. Nu au fost executate automat asupra contului live.
 
 
 ## Jocuri AI — generare OpenAI și studiu individual
@@ -593,7 +588,7 @@ Nu folosi prefixele VITE_ sau PUBLIC_. Cheia dintr-o Edge Function Supabase de v
 3. Păstrează configurarea Supabase existentă: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY și SUPABASE_SERVICE_ROLE_KEY. Cheia service_role este server-only, diferită de cheia anon/publică.
 4. Configurează accesul API, facturarea și alertele/limitele de buget în proiectul OpenAI pentru **gpt-4o-mini**. Abonamentul ChatGPT nu oferă automat credit API.
 5. Repornește serverul cu **npm run dev -- --host 127.0.0.1**, autentifică-te la http://localhost:5180/ și deschide **Jocuri muzicale → Joc AI** (/jocuri/?tab=ai). Alege Teorie/Instrumente/Ritm și Începător/Intermediar, apoi Generează un joc nou.
-6. Pe Railway adaugă OPENAI_API_KEY în Variables pentru serviciul **Academy**, apoi redeploy/restart. Nu o pune în serviciul site-ului public și nu o publica în variabile VITE sau screenshot-uri.
+6. În Cloudflare Worker adaugă OPENAI_API_KEY ca secret, apoi redeploy. Nu o pune în serviciul site-ului public și nu o publica în variabile VITE sau screenshot-uri.
 
 ### Fișiere și contract
 
@@ -607,7 +602,7 @@ Nu folosi prefixele VITE_ sau PUBLIC_. Cheia dintr-o Edge Function Supabase de v
 
 ### Buget, confidențialitate și limite
 
-Rezervare atomică în DB, comună tuturor instanțelor Railway: **o generare/minut/cont, 10/cont în ultimele 24h, 200/platformă în ultimele 24h**. Inclusiv erorile consumă rezervarea pentru a evita apelurile plătite nelimitate. Cheia absentă este detectată înainte de rezervare; răspunsurile/reluările nu apelează OpenAI. Limitele aplicației nu înlocuiesc controlul facturării furnizorului.
+Rezervare atomică în DB, comună tuturor instanțelor Workers: **o generare/minut/cont, 10/cont în ultimele 24h, 200/platformă în ultimele 24h**. Inclusiv erorile consumă rezervarea pentru a evita apelurile plătite nelimitate. Cheia absentă este detectată înainte de rezervare; răspunsurile/reluările nu apelează OpenAI. Limitele aplicației nu înlocuiesc controlul facturării furnizorului.
 
 Promptul trimite numai tema/nivelul din liste fixe, fără nume, profil, pseudonim, voce sau date ale copilului. Nu relaxăm CSP/CORS și nu includem scripturi externe de joc. Formatul valid nu garantează corectitudinea muzicală, moderarea perfectă sau întrebări mereu diferite: AI poate greși/repetă, iar explicațiile neclare trebuie discutate cu profesorul.
 

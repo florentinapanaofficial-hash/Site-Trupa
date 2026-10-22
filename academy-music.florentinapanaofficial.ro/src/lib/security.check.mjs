@@ -22,6 +22,7 @@ test('proxy trust: ignores spoofed leftmost IP, rejects missing/unconfigured hea
     assert.throws(() => clientIP(request({}), '127.0.0.1', { NODE_ENV: 'production' }), SecurityError);
     assert.throws(() => clientIP(request({}, { 'x-forwarded-for': '1.2.3.4' }), '127.0.0.1', { ...env, ACADEMY_TRUSTED_PROXY_HOPS: '2' }), SecurityError);
     assert.equal(clientIP(request({}), '::ffff:127.0.0.1', {}), '127.0.0.1');
+    assert.equal(clientIP(request({}), '198.51.100.8', { NODE_ENV: 'production' }, true), '198.51.100.8');
     assert.throws(() => verifiedSessionId('broken'), SecurityError);
     assert.throws(() => verifiedSessionId('header.bnVsbA.signature'), SecurityError);
     assert.equal(verifiedSessionId(token()), first);
@@ -59,9 +60,11 @@ test('middleware distinguishes JSON failures, page redirects, expired sessions a
     ]) {
         const deleted = [];
         const url = new URL(`https://academy.test${path}`);
-        const context = { request: new Request(url), url, clientAddress: '127.0.0.1', locals: {}, cookies: {
-            get: () => ({ value: token() }), delete: (...args) => deleted.push(args),
-        } };
+        const context = {
+            request: new Request(url), url, clientAddress: '127.0.0.1', locals: {}, cookies: {
+                get: () => ({ value: token() }), delete: (...args) => deleted.push(args),
+            }
+        };
         const response = await secureAcademyRequest(context, env, () => ({
             auth: { getUser: async () => ({ data: { user: { id: student } } }) },
             rpc: async () => ({ data: result, error }),
@@ -75,7 +78,7 @@ test('middleware distinguishes JSON failures, page redirects, expired sessions a
 });
 
 test('public homepage avoids backend configuration and clears expired cookies without hiding outages', async () => {
-    const context = (value) => ({ request: new Request('https://academy.test/'), url: new URL('https://academy.test/'), clientAddress: '127.0.0.1', locals: {}, cookies: { get: () => value ? { value } : undefined, delete: () => {} } });
+    const context = (value) => ({ request: new Request('https://academy.test/'), url: new URL('https://academy.test/'), clientAddress: '127.0.0.1', locals: {}, cookies: { get: () => value ? { value } : undefined, delete: () => { } } });
     assert.equal(await secureAcademyRequest(context(), {}, () => { throw Error('must not create client'); }), null);
     const env = { VITE_SUPABASE_URL: 'https://test.supabase.co', VITE_SUPABASE_ANON_KEY: 'anon', SUPABASE_SERVICE_ROLE_KEY: 'service' };
     const invalidClient = () => ({ auth: { getUser: async () => ({ data: { user: null }, error: { status: 401 } }) } });

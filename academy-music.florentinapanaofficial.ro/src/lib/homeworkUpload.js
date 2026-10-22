@@ -1,6 +1,3 @@
-import { Readable } from 'node:stream';
-import { createPrivateKey } from 'node:crypto';
-
 const MAX_FILE_BYTES = 50 * 1024 * 1024;
 const MAX_BODY_BYTES = MAX_FILE_BYTES + 5 * 1024 * 1024 + 64 * 1024;
 const formats = {
@@ -10,25 +7,103 @@ const formats = {
 
 const driveLink = /^https:\/\/drive\.google\.com\/file\/d\/[a-zA-Z0-9_-]+\/view(?:\?[^\s]*)?$/;
 
+function base64Url(bytes) {
+    let binary = '';
+    for (const byte of bytes) binary += String.fromCharCode(byte);
+    return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+}
+
+function encodeJson(value) { return base64Url(new TextEncoder().encode(JSON.stringify(value))); }
+
+async function importPrivateKey(pem) {
+    const encoded = pem.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\s/g, '');
+    const binary = atob(encoded);
+    const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+    return crypto.subtle.importKey('pkcs8', bytes, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['sign']);
+}
+
+export function createGoogleDrive({ email, privateKey, fetch: requestFetch = globalThis.fetch, now = Date.now }) {
+    let cachedAccessToken;
+    let accessTokenExpiresAt = 0;
+    let accessTokenPromise;
+    const accessToken = async () => {
+        if (cachedAccessToken && now() < accessTokenExpiresAt - 60000) return cachedAccessToken;
+        if (accessTokenPromise) return accessTokenPromise;
+        accessTokenPromise = (async () => {
+            const issuedAt = Math.floor(now() / 1000);
+            const claims = {
+                iss: email,
+                scope: 'https://www.googleapis.com/auth/drive.file',
+                aud: 'https://oauth2.googleapis.com/token',
+                iat: issuedAt,
+                exp: issuedAt + 3600,
+            };
+            const unsigned = `${encodeJson({ alg: 'RS256', typ: 'JWT' })}.${encodeJson(claims)}`;
+            const signature = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', privateKey, new TextEncoder().encode(unsigned));
+            const assertion = `${unsigned}.${base64Url(new Uint8Array(signature))}`;
+            const response = await requestFetch('https://oauth2.googleapis.com/token', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer', assertion }),
+            });
+            const token = await response.json();
+            if (!response.ok || typeof token.access_token !== 'string') throw new Error('Google OAuth token exchange failed');
+            cachedAccessToken = token.access_token;
+            accessTokenExpiresAt = now() + Math.max(0, Number(token.expires_in) || 3600) * 1000;
+            return cachedAccessToken;
+        })();
+        try { return await accessTokenPromise; }
+        finally { accessTokenPromise = undefined; }
+    };
+
+    return {
+        files: {
+            create: async ({ requestBody, media, fields, supportsAllDrives }) => {
+                const uploadUrl = new URL('https://www.googleapis.com/upload/drive/v3/files');
+                uploadUrl.searchParams.set('uploadType', 'multipart');
+                uploadUrl.searchParams.set('supportsAllDrives', String(supportsAllDrives));
+                uploadUrl.searchParams.set('fields', fields);
+                const boundary = `academy-${crypto.randomUUID()}`;
+                const contentType = `multipart/related; boundary=${boundary}`;
+                const body = new Blob([
+                    `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(requestBody)}\r\n`,
+                    `--${boundary}\r\nContent-Type: ${media.mimeType}\r\n\r\n`,
+                    media.body,
+                    `\r\n--${boundary}--`,
+                ], { type: contentType });
+                const response = await requestFetch(uploadUrl, {
+                    method: 'POST',
+                    headers: { Authorization: `Bearer ${await accessToken()}`, 'Content-Type': contentType },
+                    body,
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error('Google Drive upload failed');
+                return { data };
+            },
+        },
+    };
+}
+
 async function checkFile(file) {
     const extension = file.name.split('.').pop().toLowerCase();
     const mimeType = Object.hasOwn(formats, extension) ? formats[extension] : null;
     if (!mimeType) return { error: 'Format audio/MIDI neacceptat.', status: 415 };
     if (file.size > MAX_FILE_BYTES || (['mid', 'midi'].includes(extension) && file.size > 5 * 1024 * 1024)) return { error: 'Fișier prea mare: maximum 50 MB audio sau 5 MB MIDI.', status: 413 };
-    const header = Buffer.from(await file.slice(0, 16).arrayBuffer());
+    const header = new Uint8Array(await file.slice(0, 16).arrayBuffer());
+    const signature = (start, end) => new TextDecoder().decode(header.subarray(start, end));
     const valid = {
-        mid: header.toString('ascii', 0, 4) === 'MThd', midi: header.toString('ascii', 0, 4) === 'MThd',
-        mp3: header.toString('ascii', 0, 3) === 'ID3' || (header[0] === 255 && (header[1] & 224) === 224),
-        webm: header.subarray(0, 4).equals(Buffer.from([26, 69, 223, 163])),
-        ogg: header.toString('ascii', 0, 4) === 'OggS',
-        m4a: header.toString('ascii', 4, 8) === 'ftyp', mp4: header.toString('ascii', 4, 8) === 'ftyp',
-        wav: header.toString('ascii', 0, 4) === 'RIFF' && header.toString('ascii', 8, 12) === 'WAVE',
+        mid: signature(0, 4) === 'MThd', midi: signature(0, 4) === 'MThd',
+        mp3: signature(0, 3) === 'ID3' || (header[0] === 255 && (header[1] & 224) === 224),
+        webm: header[0] === 26 && header[1] === 69 && header[2] === 223 && header[3] === 163,
+        ogg: signature(0, 4) === 'OggS',
+        m4a: signature(4, 8) === 'ftyp', mp4: signature(4, 8) === 'ftyp',
+        wav: signature(0, 4) === 'RIFF' && signature(8, 12) === 'WAVE',
     }[extension];
     if (!valid) return { error: 'Conținutul fișierului nu corespunde formatului declarat.', status: 415 };
     return { extension, mimeType };
 }
 
-export function createHomeworkUpload({ env, createClient, createDrive }) {
+export function createHomeworkUpload({ env, createClient, createDrive = createGoogleDrive, fetch: requestFetch = globalThis.fetch }) {
     return async function upload(request) {
         const respond = (body, status = 200) => new Response(JSON.stringify(body), {
             status, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', Vary: 'Origin' },
@@ -52,6 +127,7 @@ export function createHomeworkUpload({ env, createClient, createDrive }) {
             if (profileError || !profile?.is_active || !['student', 'elev', 'teacher', 'profesor'].includes(profile.role)) return respond({ error: 'Nu ai permisiunea de a trimite teme.' }, 403);
             let email;
             let key;
+            let privateKey;
             try {
                 const credentials = hasJsonCredentials
                     ? JSON.parse(env.GOOGLE_CREDENTIALS)
@@ -64,11 +140,13 @@ export function createHomeworkUpload({ env, createClient, createDrive }) {
                 }
                 email = credentials.client_email;
                 key = credentials.private_key.replace(/\\n/g, '\n');
-                if (createPrivateKey(key).asymmetricKeyType !== 'rsa') throw new Error('Invalid key type');
+                privateKey = await importPrivateKey(key);
             } catch {
-                return respond({ error: hasJsonCredentials
-                    ? 'Configurația Google Drive este invalidă. Profesorul trebuie să verifice GOOGLE_CREDENTIALS (JSON Service Account și cheie RSA).'
-                    : 'Cheia Google Drive este invalidă. Profesorul trebuie să verifice GOOGLE_CLIENT_EMAIL și GOOGLE_PRIVATE_KEY în configurația serverului.' }, 503);
+                return respond({
+                    error: hasJsonCredentials
+                        ? 'Configurația Google Drive este invalidă. Profesorul trebuie să verifice GOOGLE_CREDENTIALS (JSON Service Account și cheie RSA).'
+                        : 'Cheia Google Drive este invalidă. Profesorul trebuie să verifice GOOGLE_CLIENT_EMAIL și GOOGLE_PRIVATE_KEY în configurația serverului.'
+                }, 503);
             }
             const contentType = request.headers.get('content-type') || '';
             if (!contentType.startsWith('multipart/form-data;')) return respond({ error: 'Trimite fișierul prin formular multipart.' }, 415);
@@ -104,10 +182,10 @@ export function createHomeworkUpload({ env, createClient, createDrive }) {
             }
             const { extension, mimeType } = checked;
             const baseName = String(profile.full_name || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 60) || 'Elev';
-            const drive = await createDrive({ email, key });
+            const drive = await createDrive({ email, key, privateKey, fetch: requestFetch });
             const { data } = await drive.files.create({
                 requestBody: { name: `${baseName}_Audio.${extension}`, parents: [env.GOOGLE_DRIVE_FOLDER_ID] },
-                media: { mimeType, body: Readable.fromWeb(file.stream()) },
+                media: { mimeType, body: file },
                 fields: 'id,webViewLink', supportsAllDrives: true,
             });
             if (typeof data?.id !== 'string' || !data.id || !data.webViewLink) return respond({ error: 'Drive nu a returnat linkul temei. Verifică în folder înainte de retrimitere.' }, 502);
@@ -117,7 +195,7 @@ export function createHomeworkUpload({ env, createClient, createDrive }) {
                 try {
                     ({ data: midiData } = await drive.files.create({
                         requestBody: { name: `${baseName}_MIDI.mid`, parents: [env.GOOGLE_DRIVE_FOLDER_ID] },
-                        media: { mimeType: formats.mid, body: Readable.fromWeb(midiFile.stream()) },
+                        media: { mimeType: formats.mid, body: midiFile },
                         fields: 'id,webViewLink', supportsAllDrives: true,
                     }));
                 } catch { midiData = null; }

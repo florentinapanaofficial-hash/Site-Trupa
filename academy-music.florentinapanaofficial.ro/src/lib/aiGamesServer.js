@@ -8,15 +8,17 @@ export const AI_QUIZ_SCHEMA = {
     type: 'object', additionalProperties: false, required: ['title', 'questions'],
     properties: {
         title: { type: 'string' },
-        questions: { type: 'array', minItems: 5, maxItems: 5, items: {
-            type: 'object', additionalProperties: false, required: ['prompt', 'options', 'correctIndex', 'explanation'],
-            properties: {
-                prompt: { type: 'string' },
-                options: { type: 'array', minItems: 4, maxItems: 4, items: { type: 'string' } },
-                correctIndex: { type: 'integer', enum: [0, 1, 2, 3] },
-                explanation: { type: 'string' },
-            },
-        } },
+        questions: {
+            type: 'array', minItems: 5, maxItems: 5, items: {
+                type: 'object', additionalProperties: false, required: ['prompt', 'options', 'correctIndex', 'explanation'],
+                properties: {
+                    prompt: { type: 'string' },
+                    options: { type: 'array', minItems: 4, maxItems: 4, items: { type: 'string' } },
+                    correctIndex: { type: 'integer', enum: [0, 1, 2, 3] },
+                    explanation: { type: 'string' },
+                },
+            }
+        },
     },
 };
 
@@ -43,9 +45,11 @@ export function validateAIQuiz(value) {
 }
 function publicGame(row) {
     const quiz = validateAIQuiz(row.quiz);
-    return { id: row.id, title: quiz.title, topic: row.topic, level: row.level,
+    return {
+        id: row.id, title: quiz.title, topic: row.topic, level: row.level,
         questions: quiz.questions.map(({ prompt, options }) => ({ prompt, options })),
-        score: row.score, answers: row.answers, completed: row.status === 'completed' };
+        score: row.score, answers: row.answers, completed: row.status === 'completed'
+    };
 }
 function databaseError(error) {
     const statuses = { P0429: 429, P0404: 404, P0409: 409, '42501': 403, '22023': 400 };
@@ -65,7 +69,7 @@ async function providerJSON(response) {
             chunks.push(value);
         }
     } finally { reader.releaseLock(); }
-    try { return JSON.parse(Buffer.concat(chunks).toString('utf8')); }
+    try { return JSON.parse(await new Blob(chunks).text()); }
     catch (error) { if (!(error instanceof SyntaxError)) throw error; invalidQuiz(); }
 }
 
@@ -78,7 +82,7 @@ export function createAIGameHandler({ env, createClient, fetch: requestAI = glob
             const input = await readAuthInput(request);
             const action = input.action || 'generate';
             const allowed = action === 'generate' ? ['action', 'topic', 'level'] : action === 'resume' ? ['action', 'gameId'] : ['action', 'gameId', 'questionIndex', 'answerIndex'];
-            if (!['generate','answer','resume'].includes(action) || Object.keys(input).some(key => !allowed.includes(key))) throw new AIGameError('Cerere de joc invalidă.');
+            if (!['generate', 'answer', 'resume'].includes(action) || Object.keys(input).some(key => !allowed.includes(key))) throw new AIGameError('Cerere de joc invalidă.');
             if (action === 'generate') {
                 if (!Object.hasOwn(TOPICS, input.topic) || !Object.hasOwn(LEVELS, input.level)) throw new AIGameError('Alege tema și nivelul din lista disponibilă.');
                 if (!env.OPENAI_API_KEY?.trim()) throw new AIGameError('Generarea AI nu este configurată. Profesorul trebuie să adauge OPENAI_API_KEY pe server.', 503, 'ai_not_configured');
@@ -97,7 +101,7 @@ export function createAIGameHandler({ env, createClient, fetch: requestAI = glob
                 const { data, error } = await admin.from('ai_game_sessions').select('id,topic,level,status,quiz,score,answers,created_at').eq('id', input.gameId).eq('user_id', userId).maybeSingle();
                 if (error) databaseError(error);
                 if (!data) throw new AIGameError('Jocul nu a fost găsit.', 404, 'not_found');
-                if (!['ready','completed'].includes(data.status) || Date.parse(data.created_at) < Date.now() - 86400000) throw new AIGameError('Jocul a expirat sau nu este disponibil.', 409, 'game_unavailable');
+                if (!['ready', 'completed'].includes(data.status) || Date.parse(data.created_at) < Date.now() - 86400000) throw new AIGameError('Jocul a expirat sau nu este disponibil.', 409, 'game_unavailable');
                 return jsonResponse({ game: publicGame(data) });
             }
             const reservation = await admin.rpc('ai_game_reserve', { p_user: userId, p_topic: input.topic, p_level: input.level });
@@ -108,7 +112,8 @@ export function createAIGameHandler({ env, createClient, fetch: requestAI = glob
                 response = await requestAI('https://api.openai.com/v1/chat/completions', {
                     method: 'POST', signal: AbortSignal.any([AbortSignal.timeout(25000), request.signal]),
                     headers: { Authorization: 'Bearer ' + env.OPENAI_API_KEY.trim(), 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ model: 'gpt-4o-mini', max_completion_tokens: 2500, response_format: { type: 'json_schema', json_schema: { name: 'music_quiz', strict: true, schema: AI_QUIZ_SCHEMA } },
+                    body: JSON.stringify({
+                        model: 'gpt-4o-mini', max_completion_tokens: 2500, response_format: { type: 'json_schema', json_schema: { name: 'music_quiz', strict: true, schema: AI_QUIZ_SCHEMA } },
                         messages: [
                             { role: 'system', content: 'Ești un profesor de muzică pentru copii. Generează un quiz educativ original, scurt și prietenos, în limba română cu diacritice. Returnează STRICT un obiect JSON valid conform schemei, fără Markdown, fără blocuri de cod și fără text exterior. Exact 5 întrebări diferite, fiecare cu 4 variante distincte, un singur răspuns corect indicat prin correctIndex (0-3) și o explicație simplă. Titlu 3-100 caractere, întrebare 5-350, variantă 1-120, explicație 5-500. Faptele și notația trebuie să fie corecte și neambigue. Fără versuri, citate din opere protejate, date personale, linkuri sau subiecte nepotrivite copiilor. Nu cere elevului să furnizeze date personale. Încurajează învățarea, nu umilirea sau competiția agresivă.' },
                             { role: 'user', content: 'Tema: ' + TOPICS[input.topic] + '. Nivel: ' + LEVELS[input.level] + '. Creează un nou set de exerciții pentru studiu individual.' },
@@ -116,7 +121,7 @@ export function createAIGameHandler({ env, createClient, fetch: requestAI = glob
                     }),
                 });
             } catch (error) {
-                if (['AbortError','TimeoutError'].includes(error.name)) throw new AIGameError('Generarea a fost întreruptă sau a durat prea mult. Încearcă mai târziu.', 504, 'ai_timeout');
+                if (['AbortError', 'TimeoutError'].includes(error.name)) throw new AIGameError('Generarea a fost întreruptă sau a durat prea mult. Încearcă mai târziu.', 504, 'ai_timeout');
                 if (error instanceof TypeError) throw new AIGameError('Nu putem contacta serviciul AI. Încearcă mai târziu.', 502, 'ai_unavailable');
                 throw error;
             }
@@ -128,7 +133,7 @@ export function createAIGameHandler({ env, createClient, fetch: requestAI = glob
             let result;
             try { result = await providerJSON(response); }
             catch (error) {
-                if (['AbortError','TimeoutError'].includes(error.name)) throw new AIGameError('Generarea a fost întreruptă sau a durat prea mult. Încearcă mai târziu.', 504, 'ai_timeout');
+                if (['AbortError', 'TimeoutError'].includes(error.name)) throw new AIGameError('Generarea a fost întreruptă sau a durat prea mult. Încearcă mai târziu.', 504, 'ai_timeout');
                 throw error;
             }
             if (!result || typeof result !== 'object' || Array.isArray(result)) invalidQuiz();

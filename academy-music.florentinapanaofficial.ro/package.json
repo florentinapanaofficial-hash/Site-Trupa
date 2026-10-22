@@ -12,23 +12,23 @@
         }
     },
     "scripts": {
-        "dev": "astro dev --port 5180",
-        "build": "astro build && node scripts/compress.mjs",
-        "preview": "astro preview --port 5180",
+        "dev": "astro dev --host 127.0.0.1 --port 5180",
+        "build": "astro build",
+        "preview": "wrangler dev --local --ip 127.0.0.1 --port 5180",
+        "deploy": "npm run build && wrangler deploy",
+        "test:worker": "npm run build && node scripts/worker.check.mjs && wrangler deploy --dry-run",
         "test": "node --test src/lib/learning.check.mjs src/lib/security.check.mjs src/lib/canto.check.mjs src/lib/studyLevels.check.mjs src/lib/studyLevels.sql.check.mjs src/lib/studio.check.mjs src/lib/audio-processing.check.mjs src/lib/games.check.mjs src/lib/aiGames.check.mjs",
         "test:browser": "node scripts/verify-learning.mjs",
         "test:login:dev": "node scripts/verify-login-dev.mjs",
         "test:landing": "node scripts/verify-landing.mjs",
         "test:navigation": "node scripts/verify-navigation.mjs",
         "test:admin": "node scripts/verify-admin.mjs",
-        "test:server": "node --test scripts/server.check.mjs",
-        "start": "node ./dist/server/entry.mjs",
         "test:canto": "node scripts/verify-canto.mjs",
         "test:games": "node scripts/verify-games.mjs"
     },
     "dependencies": {
+        "@astrojs/cloudflare": "^14.4.2",
         "@astrojs/mdx": "^8.1.0",
-        "@astrojs/node": "^11.1.8",
         "@astrojs/react": "^7.1.0",
         "@jitsi/react-sdk": "^1.4.4",
         "@supabase/supabase-js": "^2.105.4",
@@ -37,7 +37,6 @@
         "@vexflow-fonts/academico": "^1.0.1",
         "@vexflow-fonts/bravura": "^1.0.2",
         "astro": "^7.4.0",
-        "googleapis": "^186.0.0",
         "html-midi-player": "^1.6.0",
         "lucide-react": "^1.59.0",
         "midi-writer-js": "^3.2.1",
@@ -45,7 +44,6 @@
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
         "react-router-dom": "^7.18.4",
-        "sirv": "^3.0.2",
         "tone": "14.9.17",
         "vexflow": "^5.0.0"
     },
@@ -55,6 +53,7 @@
         "@tailwindcss/vite": "^4.3.3",
         "@vitejs/plugin-react": "^4.3.4",
         "tailwindcss": "^4.3.3",
-        "vite": "^6.0.7"
+        "vite": "^6.0.7",
+        "wrangler": "^4.151.3"
     }
 }
