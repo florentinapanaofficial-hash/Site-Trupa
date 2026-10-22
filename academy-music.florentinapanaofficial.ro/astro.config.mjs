@@ -24,6 +24,9 @@ export default defineConfig({
     },
     integrations: [react(), mdx()],
     vite: {
+        resolve: {
+            alias: [{ find: /^node-fetch$/, replacement: fileURLToPath(new URL('./src/lib/native-fetch.js', import.meta.url)) }],
+        },
         define: Object.fromEntries(['VITE_SUPABASE_URL', 'VITE_SUPABASE_ANON_KEY', 'VITE_SIGNED_URL_TTL'].map((key) => [`import.meta.env.${key}`, JSON.stringify(env[key] || process.env[key] || '')])),
         plugins: [tailwindcss()],
         css: { postcss: { plugins: [] } },

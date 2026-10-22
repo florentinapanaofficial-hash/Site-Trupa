@@ -1,3 +1,23 @@
+## 📝 22 oct 2026 — Alias Web fetch pentru buildul Cloudflare
+
+### Obiectiv
+Remedierea erorii Vite/Rolldown `Failed to resolve import "node-fetch"` din fallback-ul Node al `@magenta/music/esm/core/compat/global.js`.
+
+### Modificări
+- `academy-music.florentinapanaofficial.ro/astro.config.mjs`: alias exact `node-fetch` către shim-ul proiectului `src/lib/native-fetch.js`, care exportă `globalThis.fetch` nativ. Nu se adaugă un polyfill Node sau o dependență npm.
+- `src/lib/native-fetch.js`: shim ESM cu export default și named pentru Fetch API.
+
+### Validări
+- `npm run build` pe Node 22.22.0: PASS; eroarea de rezolvare `node-fetch` nu mai apare.
+- `npm run test:worker`: build SSR, request real în Workerd și `wrangler deploy --dry-run` PASS.
+- `npm run test:admin`: browser PASS la 390px/1440px, inclusiv Studio/biblioteca MIDI. Diagnostics fără erori; fără modificări SEO, date GSC sau măsurători de ranking.
+
+### Riscuri și pași următori
+- Aliasul înlocuiește fallback-ul Node al `@magenta/music` cu Fetch API-ul nativ; aplicația țintă este Workers/browser, fără runtime Node server.
+- Commit/push pe ambele repository-uri declanșează workflow-ul. Rezultatul deploy-ului live se confirmă în GitHub Actions după push.
+
+---
+
 ## 📝 22 oct 2026 — Aliniere Node CI la Astro MDX
 
 ### Obiectiv

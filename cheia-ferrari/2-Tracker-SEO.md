@@ -3,6 +3,7 @@ Aici vom nota evoluția săptămânală pentru a ne asigura că creștem, nu bat
 
 | Data | Cuvânt Cheie Monitorizat | Poziție YouTube (Est.) | Poziție Site (Google GSC) | Notițe / Acțiuni Luate |
 |---|---|---|---|---|
+| 22 oct 2026 | Academy Music / build Workers node-fetch | - | - | Alias Vite node-fetch → native fetch pentru fallback-ul browser/Workers din Magenta. Build Node 22.22, smoke Workerd, Wrangler dry-run și Admin browser 390/1440 PASS. Academy noindex; fără metadata publică, date GSC sau măsurători ranking noi. |
 | 22 oct 2026 | Academy Music / Node 22.22 CI engine | - | - | Aliniate workflow și engines la cerința @astrojs/mdx >=22.22; npm 10.9 `ci --engine-strict`, build SSR, smoke Workerd și Wrangler dry-run PASS. Fără schimbări SEO publice, date GSC sau măsurători ranking noi. |
 | 22 oct 2026 | Academy Music / reparare GitHub Actions npm ci | - | - | Regenerat package-lock cu npm 10.9 pentru Node 22.12; instalarea strictă, build SSR, smoke Workerd și Wrangler dry-run PASS. Acțiuni GitHub actualizate la v5. Noindex/metadata neschimbate; fără date GSC sau măsurători ranking noi. |
 | 22 oct 2026 | Academy Music / migrare Cloudflare Workers | - | - | Astro SSR Workers și deploy automat configurat; `npm ci`, 61/61 teste, smoke workerd + Wrangler dry-run și suite browser Admin/Canto/Jocuri/Landing/Navigare PASS. Academy rămâne noindex; metadata publice nemodificate, fără date GSC sau măsurători de ranking noi. Deploy live și setarea secretelor rămân de făcut. |
