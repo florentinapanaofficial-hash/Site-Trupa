@@ -1,3 +1,23 @@
+## 📝 22 oct 2026 — Reparare GitHub Actions npm ci pentru Workers
+
+### Obiectiv
+Repararea deploy-ului automat Academy după eșecul `npm ci` și avertismentul runtime Node al acțiunilor GitHub.
+
+### Modificări
+- `.github/workflows/deploy-workers.yml`: `actions/checkout@v5` și `actions/setup-node@v5`; runtime-ul aplicației este fixat la Node `22.12.0`, conform `engines >=22.12.0` din `package.json`. Cache-ul indică explicit `package-lock.json`, iar instalarea folosește `npm ci --engine-strict`.
+- Reprodus eșecul cu npm 10.9.0 (npm inclus în Node 22.12): lockfile-ul precedent omitea toate variantele platformă ale `esbuild@0.28.2`. Regenerat numai `package-lock.json` cu npm 10.9.0, păstrând manifestul neschimbat.
+
+### Validări
+- `npx npm@10.9.0 ci --engine-strict`: PASS (513 pachete instalate, inclusiv metadatele opționale esbuild).
+- `npm run test:worker`: build Astro SSR PASS, smoke test real în Workerd PASS, Wrangler deploy dry-run PASS.
+- Lockfile-ul a fost verificat prin `npm ci` cu versiunea npm din linia Node aleasă; fără modificări ale `package.json`. SEO public, metadata și JSON-LD nemodificate; fără date GSC sau măsurători de ranking noi.
+
+### Riscuri și pași următori
+- Node 20 nu este compatibil cu cerința actuală Astro 7/Cloudflare (`engines >=22.12.0`); acțiunile `@v5` folosesc runtime-ul suportat al runnerului, separat de Node 22 al aplicației.
+- Commit/push declanșează workflow-ul Academy; succesul deploy-ului Cloudflare depinde de secrets/vars deja configurate în GitHub și Cloudflare. Nu s-au făcut schimbări de secrete.
+
+---
+
 ## 📝 22 oct 2026 — Migrare Academy Music la Cloudflare Workers
 
 ### Obiectiv
