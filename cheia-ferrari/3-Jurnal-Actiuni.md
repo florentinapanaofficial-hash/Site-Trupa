@@ -1,3 +1,22 @@
+## 📝 22 oct 2026 — Aliniere Node CI la Astro MDX
+
+### Obiectiv
+Rezolvarea `EBADENGINE` în GitHub Actions: `@astrojs/mdx@8.1.0` cere Node `>=22.22.0`, peste pragul anterior 22.12.0.
+
+### Modificări
+- `.github/workflows/deploy-workers.yml`: `actions/setup-node@v5` folosește Node `22.22.0`; instalarea rămâne `npm ci --engine-strict`.
+- `package.json` și metadatele root din `package-lock.json`: engines aliniat la `>=22.22.0`. Lockfile sincronizat cu npm 10.9, fără schimbarea versiunilor dependențelor.
+
+### Validări
+- `Node 22.22.0` + `npm 10.9.0`: `npm ci --engine-strict` PASS.
+- `npm run test:worker`: Astro SSR build PASS, smoke test Workerd PASS, Wrangler dry-run PASS.
+- `package.json` neschimbat în dependențe; lockfile-ul păstrează versiunile și include platformele native opționale necesare. Fără schimbări metadata/JSON-LD publice sau rezultate GSC noi.
+
+### Riscuri și pași următori
+- Node 20 nu este compatibil cu engine-ul MDX/Astro curent. Push-ul pe `main` declanșează un nou workflow; deploy-ul live se confirmă separat din Actions.
+
+---
+
 ## 📝 22 oct 2026 — Reparare GitHub Actions npm ci pentru Workers
 
 ### Obiectiv
