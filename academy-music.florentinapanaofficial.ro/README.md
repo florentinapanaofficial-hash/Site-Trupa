@@ -511,9 +511,23 @@ Cererile de masterizare sunt salvate în `studio_requests`; piesa este referită
 Înainte de publicarea frontendului, aplică `supabase/migrations/20261021000001_virtual_studio.sql` în Supabase SQL Editor după schema Academy și migrările existente până la `20261020000007_study_levels_presence.sql`. Migrarea este repetabilă; creează tabela și enum-ul, păstrează bucketul `student_records` privat și aplică politicile de acces pentru elev/profesor. Căile din tabel sunt chei Storage, nu URL-uri publice sau URL-uri semnate. Frontendul emite linkuri semnate doar pentru utilizatorii autorizați. Limita configurată pentru bucket și uploadul masterului este 200 MB.
 
 `notification_seen_at` ține evidența confirmării alertei elevului după finalizarea unei piese. Migrarea nu trebuie rulată cu cheia service-role din browser. `npm test` verifică local repetabilitatea migrării, enum-ul, RLS și politicile Storage; verificarea locală nu aplică migrarea în proiectul Supabase live.
-## Personalizare, niveluri de studiu și prezență
+## Personalizare, module de studiu și prezență
 
 Migrarea incrementală `supabase/migrations/20261020000007_study_levels_presence.sql` se aplică după migrarea catalogului de teme și celelalte migrări anterioare (inclusiv `20261020000005_security_sessions.sql` și `20261020000006_generate_lyrics.sql`), înainte de publicarea frontendului actualizat. Ea adaugă `profiles.study_level` (distinct de `grade_level`), protejează schimbarea nivelului la profesor, păstrează bucketul `avatars` privat și configurează RLS pentru canalul privat Realtime `academy:online`. Nu lărgește accesul elevilor la profilurile celorlalți.
+
+Pentru baza existentă, după migrările anterioare, aplică **noua** migrare [20261024000004_five_study_modules.sql](supabase/migrations/20261024000004_five_study_modules.sql) în SQL Editor **înainte de publicarea frontendului cu module**. Nu reaplica migrările istorice după ea și nu rula schema integrală pe baza live. Schema consolidată include modulele pentru instalări noi. Migrarea convertește atât profilurile, cât și piesele, fără recrearea rândurilor sau a alocărilor:
+
+| Identificator stocat | Modul | Conversie istorică |
+|---|---|---|
+| `modul_1` | Începător / Inițiere | `incepator` |
+| `modul_2` | Elementar | modul nou |
+| `modul_3` | Intermediar | `mediu` |
+| `modul_4` | Avansat | `avansat` |
+| `modul_5` | Măiestrie / Performance | modul nou |
+
+În **Administrare → Elevi → Detalii → Evaluare teme audio**, profesorul alege unul dintre cele cinci module și apasă **Salvează modulul**. Selectarea singură nu salvează; sunt permise salturile și revenirea la un modul anterior. UPDATE-ul direct verifică nivelul anterior pentru a preveni suprascrierea unei modificări concurente; la conflict reîncarcă evaluările. RLS și triggerul profilurilor interzic autopromovarea elevului; funcțiile de sesiune existente rămân active.
+
+Formularele pentru piese Orgă și Canto folosesc aceiași identificatori. Filtrele bibliotecilor, partituri, repertoriul și negativele oferite în Canto Studio respectă ordinea cumulativă 1–5. Finalizarea pieselor alocate deblochează numai modulul imediat următor (1→2→3→4→5), fără a actualiza automat profilul; modulul 5 este terminal. Temele audio temporizate fără `piece_id` nu intră în acest calcul, la fel ca înainte. Dificultatea jocurilor AI (`incepator/mediu`) este independentă și nu se schimbă.
 
 Biblioteca afișează piesele publicate, dar accesul la audio/PDF rămâne controlat separat de `can_access_piece` și Storage RLS. Nivelul următor se deblochează numai când există cel puțin o piesă alocată în nivelul elevului și fiecare piesă distinctă are o temă audio/video asociată prin `piece_id` în `catalog_teme` sau `submissions`. Lipsa alocărilor nu deblochează nivelul. Înregistrările din pian fără asociere la o piesă nu sunt luate în calcul.
 
@@ -644,8 +658,21 @@ Pentru mediile existente, aplică `supabase/migrations/20261024000002_student_re
 - Datele trimise de elev trebuie să coincidă cu un rând din `homework_assignments`, creat exclusiv de profesor. Modificarea ceasului local, falsificarea datelor sau un apel REST direct nu ocolesc politicile PostgreSQL/Storage. Rolurile `student` și aliasul istoric `elev` sunt acceptate; inspectorii nu pot preda sau evalua.
 - Bucketul privat `homework-audio` acceptă MP3, WAV, OGG, WebM, M4A și AAC, maximum **30 MB**. Calea este `UID/assignmentUUID/fileUUID.ext`. Storage verifică aceeași fereastră înainte de INSERT, blochează suprascrierea/ștergerea din client și limitează citirea la proprietar/profesor, cu sesiune validă. Audio este redat prin URL semnat temporar, reînnoibil din panoul profesorului.
 - O singură temă audio poate fi predată per interval. Starea inițială este `pending`, fără feedback; numai profesorul poate modifica `status` și `teacher_feedback`, nu fișierul, elevul sau intervalul. Elevul vede apoi aprobarea/respingerea și feedbackul. O temă respinsă se reface într-un interval nou creat de profesor.
-- „Deblochează nivelul următor” actualizează direct `profiles.study_level`: `incepator → mediu → avansat`, cu verificarea nivelului vechi pentru a evita promovarea dublă din panouri concurente. Nu există promovare peste nivelul avansat. Protecția existentă a profilurilor împiedică autopromovarea elevului.
+- Selectorul „Modul de studiu” și „Salvează modulul” actualizează direct `profiles.study_level` cu unul dintre cele cinci module, inclusiv salturi și reveniri. Verificarea valorii anterioare evită suprascrierile concurente; protecția profilurilor împiedică autopromovarea elevului. Aplică și migrarea `20261024000004_five_study_modules.sql` descrisă mai sus.
 - Alegerea fișierului permite și captura audio oferită de dispozitiv; aceasta nu este disponibilă uniform în toate browserele. Pentru înregistrare se poate folosi studioul existent și fișierul rezultat. Fluxurile existente Studio/Google Drive și jurnalul MIDI al pianului rămân separate; fereastra strictă se aplică noului flux audio, nu le modifică retroactiv.
 - Storage și PostgreSQL nu formează o tranzacție comună. Dacă uploadul reușește, dar termenul expiră ori confirmarea INSERT eșuează, interfața nu declară predarea reușită. Reîncarcă lista înainte de retry; pot rămâne obiecte neasociate, pentru curățare administrativă server-side după verificarea referințelor. Nu se șterge automat un fișier a cărui predare ar fi putut reuși.
 
 Validări: `npm test` include testele helperului și politicile reale în PGlite (migrare repetată, date falsificate, limite temporale incluzive, izolare elevi, Storage privat, evaluare/profil și compatibilitate MIDI). `npm run test:homework` verifică în Chromium fluxul elevului, evaluarea și promovarea la 390px/1440px, cu backend simulat; nu încarcă fișiere în Supabase live.
+
+## Studio canto pentru temele cu termen
+
+`src/components/student/CantoStudio.tsx` este integrat în fiecare interval din „Repertoriul meu”, prin `HomeworkSubmit`. Primește `assignmentId`, `submissionStart`, `submissionEnd`, lista opțională `pieces` (`id`, `title`, `negative_url`, `audio_negativ_path`) și callbackul `onSubmitted`. Pagina oferă doar piese de canto cu negativ și nivel deblocat; autorizarea reală a fișierelor rămâne în RLS/Storage.
+
+- Selectarea negativului folosește sursa HTTP validată sau helperul comun pentru URL-uri semnate, inclusiv prefixul `karaoke-audio:`. Redarea poate fi controlată înaintea înregistrării și repornește de la început la REC.
+- Microfonul pornește exclusiv după apăsarea „Înregistrează vocea”, cu confirmarea folosirii căștilor. `AudioContext` alimentează un VU-metru RMS accesibil; nu trimite microfonul spre difuzoare. `MediaRecorder` primește direct streamul microfonului, deci negativul nu este mixat în fișierul predat. Căștile previn captarea lui acustică.
+- STOP finalizează segmentele recorderului, oprește pistele și eliberează contextul/nodurile/timerele audio. Înregistrarea are limită de 10 minute și 30 MB; se oprește și la expirarea ferestrei, ascunderea paginii ori deconectarea microfonului. Părăsirea componentei anulează și o permisiune de microfon aflată în așteptare, prin eliberarea streamului la rezolvare.
+- Înregistrarea poate fi ascultată sau refăcută înainte de trimitere. Predarea folosește același helper `submitTimedHomework` și verificările PostgreSQL/Storage; expirarea permite ascultarea, nu predarea. Uploadul manual și studioul sunt blocate reciproc cât timp o operație este activă.
+- Limita noului flux `homework-audio` rămâne **30 MB**, conform migrării. Modificarea raportată la **50 MB** nu este presupusă pentru toate bucketurile și nu schimbă această limită în client. Limita `student_records` și interfața separată pentru mastere Studio nu sunt modificate aici.
+- Ruta veche `/api/upload-homework/` primește acum corect `locals.workerEnv`; testele rutei verifică metodele, autentificarea, originea și propagarea configurației Worker. Uploadul Drive efectiv necesită în continuare credențialele Google configurate în mediul server, nu în browser.
+
+Validare: `npm test` include `src/lib/homeworkRoute.check.mjs`; `npm run test:homework` folosește un microfon Chromium simulat cu fișier WAV determinist și API-urile reale AudioContext/MediaRecorder pentru semnal VU, captură doar voce, preview, predare, expirare, refuzul permisiunii și cleanup la demontare, la 390px/1440px. Supabase este simulat în acest test; nu se trimit înregistrări în producție. Fișierul WAV temporar este șters după test.

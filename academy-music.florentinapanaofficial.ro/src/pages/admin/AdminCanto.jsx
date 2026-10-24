@@ -1,3 +1,4 @@
+import { STUDY_LEVELS, normalizeStudyLevel } from '../../lib/studyLevels';
 import GenerateLyricsButton from '../../components/GenerateLyricsButton';
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -74,7 +75,7 @@ export default function AdminCanto() {
 
     function edit(piece) {
         setEditing(piece);
-        setForm({ ...EMPTY_CANTO, ...piece });
+        setForm({ ...EMPTY_CANTO, ...piece, level: normalizeStudyLevel(piece.level) || 'modul_1' });
         setFiles({});
         setFileKey((previous) => previous + 1);
         setStatus({ busy: false, error: '', info: '' });
@@ -172,6 +173,12 @@ export default function AdminCanto() {
                         <label className="label" htmlFor="canto-group">Grupa</label>
                         <input id="canto-group" className="input" list="canto-groups" maxLength={100} value={form.grupa} onChange={(event) => setForm({ ...form, grupa: event.target.value })} />
                         <datalist id="canto-groups">{groupNames.map((name) => <option key={name} value={name} />)}</datalist>
+                    </div>
+                    <div className="min-w-0">
+                        <label className="label" htmlFor="canto-module">Modul de studiu</label>
+                        <select id="canto-module" className="input" value={form.level} onChange={(event) => setForm({ ...form, level: event.target.value })}>
+                            {STUDY_LEVELS.map((module) => <option key={module.value} value={module.value}>{module.label}</option>)}
+                        </select>
                     </div>
                     {CANTO_VARIANTS.map((variant) => (
                         <div className="min-w-0" key={`${fileKey}-${variant.key}`}>

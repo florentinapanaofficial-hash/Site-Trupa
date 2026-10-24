@@ -9,6 +9,7 @@ import Modal from '../../components/ui/Modal';
 import Spinner from '../../components/ui/Spinner';
 import EmptyState from '../../components/ui/EmptyState';
 import HomeworkEvaluator from '../../components/admin/HomeworkEvaluator';
+import { studyLevelLabel } from '../../lib/studyLevels';
 
 const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
 
@@ -308,12 +309,9 @@ export default function StudentDetail({ student, allPieces, onBack, onStudentCha
                 </div>
 
                 <div>
-                    <label className="label" htmlFor="student-study-level">Nivel de studiu</label>
-                    <select id="student-study-level" className="input" value={student.study_level || 'incepator'} disabled={status.busy || !['student', 'elev'].includes(student.role)} onChange={(event) => patchStudent({ study_level: event.target.value })}>
-                        <option value="incepator">Începător</option>
-                        <option value="mediu">Mediu</option>
-                        <option value="avansat">Avansat</option>
-                    </select>
+                    <span className="label">Modul de studiu</span>
+                    <p>{studyLevelLabel(student.study_level)}</p>
+                    <p className="text-xs text-slate-400">Alege și salvează modulul în panoul de evaluare de mai jos.</p>
                 </div>
 
                 <div>
@@ -332,7 +330,7 @@ export default function StudentDetail({ student, allPieces, onBack, onStudentCha
                 </div>
             </section>
 
-            {['student', 'elev'].includes(student.role) && <HomeworkEvaluator key={student.id + student.study_level} studentId={student.id} onLevelChange={(updated) => onStudentChange?.({ ...student, ...updated })} />}
+            {['student', 'elev'].includes(student.role) && <HomeworkEvaluator key={student.id} studentId={student.id} onLevelChange={(updated) => onStudentChange?.({ ...student, ...updated })} />}
 
             {['student', 'elev'].includes(student.role) && !isSelf && (
                 <section className="card border border-red-500/20">

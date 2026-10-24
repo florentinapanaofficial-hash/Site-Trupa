@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import CantoStudio, { type CantoBackingPiece } from './CantoStudio';
 import { supabase } from '../../lib/supabase';
 import { submissionState, submitTimedHomework } from '../../lib/timedHomework';
 
@@ -7,15 +8,17 @@ type HomeworkSubmitProps = {
     submissionStart: string;
     submissionEnd: string;
     onSubmitted?: () => void;
+    pieces?: CantoBackingPiece[];
 };
 type Assignment = { id: string; submission_start: string; submission_end: string };
 type Submission = { assignment_id: string; status: string; teacher_feedback: string | null };
 const dateLabel = (date: string) => new Date(date).toLocaleString('ro-RO');
 
-export default function HomeworkSubmit({ assignmentId, submissionStart, submissionEnd, onSubmitted }: HomeworkSubmitProps) {
+export default function HomeworkSubmit({ assignmentId, submissionStart, submissionEnd, onSubmitted, pieces = [] }: HomeworkSubmitProps) {
     const [now, setNow] = useState(Date.now);
     const [file, setFile] = useState<File | null>(null);
     const [busy, setBusy] = useState(false);
+    const [studioBusy, setStudioBusy] = useState(false);
     const [sent, setSent] = useState(false);
     const [error, setError] = useState('');
     const uploading = useRef(false);
@@ -33,7 +36,7 @@ export default function HomeworkSubmit({ assignmentId, submissionStart, submissi
     }, []);
 
     async function submit() {
-        if (uploading.current) return;
+        if (uploading.current || studioBusy) return;
         setError('');
         if (submissionState(submissionStart, submissionEnd) !== 'open') {
             setNow(Date.now());
@@ -64,15 +67,16 @@ export default function HomeworkSubmit({ assignmentId, submissionStart, submissi
                         : <>
                             <p className="text-sm text-slate-400">Poți preda până la {dateLabel(submissionEnd)}. Maximum 30 MB.</p>
                             <label className="label">Fișier audio (sau înregistrare, dacă dispozitivul permite)
-                                <input className="input mt-2" type="file" accept="audio/mpeg,audio/wav,audio/x-wav,audio/ogg,audio/webm,audio/mp4,audio/aac" capture="user" disabled={busy} onChange={(event) => setFile(event.target.files?.[0] || null)} />
+                                <input className="input mt-2" type="file" accept="audio/mpeg,audio/wav,audio/x-wav,audio/ogg,audio/webm,audio/mp4,audio/aac" capture="user" disabled={busy || studioBusy} onChange={(event) => setFile(event.target.files?.[0] || null)} />
                             </label>
-                            <button type="button" className="btn btn-primary" disabled={busy || !file} onClick={() => void submit()}>{busy ? 'Se trimite…' : 'Înregistrează/Trimite tema'}</button>
+                            <button type="button" className="btn btn-primary" disabled={busy || studioBusy || !file} onClick={() => void submit()}>{busy ? 'Se trimite…' : 'Înregistrează/Trimite tema'}</button>
                         </>}
+        {!sent && <CantoStudio assignmentId={assignmentId} submissionStart={submissionStart} submissionEnd={submissionEnd} pieces={pieces} externalBusy={busy} onBusyChange={setStudioBusy} onSubmitted={() => { setSent(true); onSubmitted?.(); }} />}
         {error && <p role="alert" className="text-red-300">{error}</p>}
     </div>;
 }
 
-export function StudentHomework({ studentId }: { studentId: string }) {
+export function StudentHomework({ studentId, pieces = [] }: { studentId: string; pieces?: CantoBackingPiece[] }) {
     const [assignments, setAssignments] = useState<Assignment[]>([]);
     const [submissions, setSubmissions] = useState<Submission[]>([]);
     const [revision, setRevision] = useState(0);
@@ -110,7 +114,7 @@ export function StudentHomework({ studentId }: { studentId: string }) {
                     {submission ? <>
                         <p>Evaluare: {submission.status === 'approved' ? 'Aprobată' : submission.status === 'rejected' ? 'Respinsă' : 'În așteptare'}</p>
                         {submission.teacher_feedback && <p className="whitespace-pre-wrap">Feedback: {submission.teacher_feedback}</p>}
-                    </> : <HomeworkSubmit assignmentId={assignment.id} submissionStart={assignment.submission_start} submissionEnd={assignment.submission_end} onSubmitted={() => setRevision((value) => value + 1)} />}
+                    </> : <HomeworkSubmit assignmentId={assignment.id} submissionStart={assignment.submission_start} submissionEnd={assignment.submission_end} pieces={pieces} onSubmitted={() => setRevision((value) => value + 1)} />}
                 </article>;
             })}
         </>}

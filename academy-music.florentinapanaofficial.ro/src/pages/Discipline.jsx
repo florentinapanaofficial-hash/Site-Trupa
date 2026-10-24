@@ -10,7 +10,7 @@ import Modal from '../components/ui/Modal';
 import Spinner from '../components/ui/Spinner';
 import EmptyState from '../components/ui/EmptyState';
 import { useStudyProgress } from '../lib/useStudyProgress';
-import { isStudyLevelLocked, studyLevelLabel } from '../lib/studyLevels';
+import { isStudyLevelLocked, normalizeStudyLevel, STUDY_LEVELS, studyLevelLabel } from '../lib/studyLevels';
 import StudyProgressNotice from '../components/StudyProgressNotice';
 
 const META = {
@@ -26,12 +26,7 @@ const META = {
     },
 };
 
-const LEVELS = [
-    { value: 'toate', label: 'Toate nivelurile' },
-    { value: 'incepator', label: 'Începător' },
-    { value: 'mediu', label: 'Mediu' },
-    { value: 'avansat', label: 'Avansat' },
-];
+const LEVELS = [{ value: 'toate', label: 'Toate modulele' }, ...STUDY_LEVELS];
 
 export default function Discipline({ discipline }) {
     const { profile, isTeacher: teacherRole } = useAuth();
@@ -74,7 +69,7 @@ export default function Discipline({ discipline }) {
         if (!pieces) return [];
         const query = search.trim().toLowerCase();
         return pieces.filter((piece) => {
-            const matchesLevel = level === 'toate' || piece.level === level;
+            const matchesLevel = level === 'toate' || normalizeStudyLevel(piece.level) === level;
             const matchesQuery =
                 !query ||
                 piece.title.toLowerCase().includes(query) ||

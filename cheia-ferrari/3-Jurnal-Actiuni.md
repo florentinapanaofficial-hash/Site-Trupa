@@ -1,3 +1,78 @@
+## 📝 24 oct 2026 — Cinci module de studiu și selecție directă pentru profesor
+
+### Obiectiv
+Înlocuirea celor trei niveluri cu cinci module ordonate, cu atribuire directă de către profesor și acces coerent la repertoriu, partituri și negative în Canto Studio.
+
+### Modificări
+- Academy: `src/lib/studyLevels.js` definește `modul_1`…`modul_5`: Începător / Inițiere, Elementar, Intermediar, Avansat, Măiestrie / Performance. Compatibilitate semantică pentru date istorice: începător→1, mediu→3, avansat→4.
+- Migrare nouă `supabase/migrations/20261024000004_five_study_modules.sql` și schema consolidată: conversie profiluri/piese, defaults și CHECK pentru cinci identificatori, progresie imediată 1→2→3→4→5, modulul 5 terminal. Nu se recreează piesele și nu se relaxează RLS/triggerul profilurilor.
+- `HomeworkEvaluator.tsx`: selector cu cinci module și salvare explicită direct în `profiles.study_level`, inclusiv salturi și reveniri; verifică valoarea anterioară pentru concurență și afișează erorile. `StudentDetail.jsx` folosește același selector, fără remount la salvare; `AdminStudents.jsx` afișează etichetele comune.
+- Formularele `AdminPieces.jsx`, `AdminCanto.jsx` și `src/lib/canto.js` salvează module canonice pentru ambele discipline. `Discipline.jsx`, `RepertoriulMeu.jsx`, `PieceCard.jsx`, `PieceSelectorModal.jsx`, `StudyProgressNotice.jsx` folosesc ordinea și etichetele comune; Canto Studio primește numai negative disponibile din modulele accesibile.
+- Teste actualizate: `studyLevels.check.mjs`, `studyLevels.sql.check.mjs`, `security.check.mjs`, `learning.check.mjs`, `verify-homework.mjs`, `verify-admin.mjs`, `verify-canto.mjs`. Documentația README explică migrarea, conversia și operarea selectorului. Modificările anterioare pentru Canto Studio/ruta Drive au fost păstrate.
+
+### Validări
+- `npm test`: **79/79 PASS**, 0 FAIL, 0 SKIP; SQL real PGlite pentru migrare repetată, conversie istorică, constrângeri, toate tranzițiile, acces Storage și atribuirea oricărui modul de profesor, inclusiv revenire. Elevul nu se poate autopromova; suita de sesiuni/RLS rămâne verde.
+- `npm run test:homework`: Chromium **390/1440 px PASS**; alegerea fără salvare nu scrie, salturi 1→3→5 și reveniri, valoarea anterioară în UPDATE, eroare explicită fără fals succes, plus înregistrare/predare cu termen.
+- `npm run test:admin` și `npm run test:canto`: **PASS 390/1440 px**; filtre Supabase pentru toate cele cinci module, actualizări canonice Orgă/Canto, fără overflow mobil, PDF/audio/AI și înregistrare dry păstrate.
+- `npm run test:worker`: build, Workerd smoke și Wrangler **dry-run PASS**, fără deploy. Warnings Astro preexistente pentru fișiere JSX în directorul de pagini; nu sunt erori de build.
+- `npm run seo:check`: **64 pagini HTML | 0 FAIL | 0 WARN**. Metadata publică, JSON-LD și imaginile publice nu au fost modificate; limitele proiectului rămân title 50–58 / description 130–150 (maxime 60/155). Fără măsurători GSC noi și fără afirmații despre ranking.
+- Diagnostice editor fără erori în fișierele schimbate verificate; `git diff --check` PASS în ambele repository-uri.
+
+### Riscuri / pași următori
+Claudiu a confirmat în sesiune că a introdus SQL-ul în Supabase. Confirmarea nu înlocuiește un test funcțional live; nu am modificat date reale și nu am publicat frontendul. Claudiu a solicitat apoi commit/push în ambele repository-uri: publicăm codul și jurnalul pe main; deploy-ul efectiv și testul cu profesor/elev real rămân de confirmat separat. Nu reaplica migrarea istorică de trei niveluri după migrarea nouă. Temele temporizate fără piece_id nu intră în progresia pe piese (comportament păstrat); dificultatea jocurilor AI este independentă. Verificările sunt locale; impactul SEO după publicare necesită comparație GSC la 2–4 săptămâni.
+
+---
+
+## 📝 24 oct 2026 — Canto Studio și repararea rutei de predare
+
+### Obiectiv
+Corectarea wrapperului upload-homework și integrarea unui studio canto cu negativ, VU-metru, voce înregistrată, previzualizare și predare în fereastra profesorului.
+
+### Modificări
+- `academy-music.florentinapanaofficial.ro/src/pages/api/upload-homework.js`: contextul primește acum `locals`, pentru a transmite `workerEnv` helperului existent fără ReferenceError. `src/lib/homeworkRoute.check.mjs` execută ruta și verifică JSON/405, lipsa autentificării/401, origine/403 și propagarea configurației Worker până la verificarea Auth (fetch simulat).
+- `src/components/student/CantoStudio.tsx`: selecție negativ HTTP validat sau privat prin helperul comun (inclusiv karaoke-audio), confirmare căști, AudioContext și VU RMS, MediaRecorder direct pe streamul microfonului, fără mixarea negativului și fără monitorizarea vocii în difuzoare. STOP oferă preview și predare explicită prin submitTimedHomework. Limitare 10 minute/30 MB; oprire la termen, pagină ascunsă sau microfon deconectat; cleanup piste/noduri/context/timere/blob URL, inclusiv la permisiune întârziată și demontare.
+- `src/components/student/HomeworkSubmit.tsx`: studio în fiecare temă, ascultare după expirare dar fără predare, blocare reciprocă între uploadul manual și studio. `src/pages/RepertoriulMeu.jsx`: numai negative canto din repertoriu cu nivel deblocat, fără eliminarea verificărilor RLS.
+- `scripts/verify-homework.mjs`: microfon Chromium cu WAV determinist, AudioContext/MediaRecorder reale, VU cu semnal măsurat >0, identitatea pistelor recorderului = microfon, preview redabil, predare, expirare, refuz permisiune, demontare în timpul înregistrării și permisiune rezolvată după demontare. WAV temporar șters la final.
+- README și scriptul npm test actualizate. Nu s-au modificat schema sau politicile Supabase. Claudiu raportează aplicarea migrărilor lipsă și configurarea unui bucket la 50 MB; această setare nu este presupusă pentru toate bucketurile. Fluxul nou păstrează limita proprie de 30 MB; neconcordanța separată a masterelor Studio nu este modificată în această cerere.
+
+### Validări
+- `npm --prefix academy-music.florentinapanaofficial.ro test`: **79/79 PASS**.
+- `npm --prefix academy-music.florentinapanaofficial.ro run test:homework`: **PASS la 390px/1440px**, cu backend Supabase simulat și API-uri audio browser reale.
+- `npm --prefix academy-music.florentinapanaofficial.ro run test:worker`: **build PASS, Workerd smoke PASS, Wrangler dry-run PASS**. Avertismente Astro preexistente pentru ecranele React în pages și bundle-uri mari, fără erori de build.
+- `npm run seo:check`: **64 pagini, 0 FAIL, 0 WARN** (audit inițial identic). Metadata publică/title/description, JSON-LD, imagini/alt și sitemap nemodificate; fără date noi GSC sau afirmații de ranking.
+- Diagnostics pentru componentă, integrare și rută: fără erori; git diff --check PASS. În implementare a fost corectată ordinea parametrilor helperului de nivel înainte de validarea finală; fixture-ul de microfon folosește semnal determinist pentru a evita rezultate dependente de liniștea microfonului simulat.
+
+### Riscuri și pași următori
+- Nu s-au făcut uploaduri în Supabase/Drive live, cereri OpenAI ori modificări în producție; nu s-a făcut commit/push/deploy pentru acest pas. Fluxul Drive real necesită credențialele Google din Worker.
+- Înregistrarea dry necesită căști pentru a evita recaptarea acustică a negativului. Compatibilitatea reală Safari/iOS și permisiunile dispozitivului rămân de verificat după publicare.
+- Predarea în Storage și INSERT nu sunt atomice; se păstrează mesajele explicite ale helperului existent la expirare/confirmare eșuată și recomandarea de reîncărcare înainte de retry.
+
+## 📝 24 oct 2026 — Audit Academy: schemă live și integrări
+
+### Obiectiv
+Verificare solicitată de Claudiu pentru tabele lipsă și funcționalități Academy, fără modificări în producție.
+
+### Verificări și rezultate
+- Inventariate referințele SQL din aplicație, RPC-urile directe/dinamice, bucketurile și Edge Functions. Supabase live a fost verificat strict read-only, prin OpenAPI cu rol service, SELECT cu limit=0 pentru confirmarea lipsurilor și metadatele bucketurilor. Nu s-au citit înregistrări ale elevilor, parole, sesiuni sau conținut audio; cheile nu au fost afișate.
+- Confirmate live tabelele și coloanele pentru profiles, pieces, repertoriu, teme, studiu, jocuri, grupe, catalog și Studio, inclusiv student_homework/homework_assignments/student_repertoire. Nu s-au găsit coloane lipsă în tabelele existente față de declarațiile locale SQL comparate; nu reprezintă verificare a tipurilor/constrângerilor/politicilor live.
+- **Lipsesc live** public.audio_processing_queue (404 PGRST205) și bucketul privat karaoke-audio. Migrarea aferentă: academy-music.florentinapanaofficial.ro/supabase/migrations/20261021000002_audio_processing_queue.sql. Generarea negativului nu poate funcționa în această stare; necesită și bridge-ul audio configurat separat.
+- **Lipsesc live** public.academy_lyrics_requests și RPC academy_reserve_lyrics_request; tabela confirmată prin 404 PGRST205. Migrarea: supabase/migrations/20261020000006_generate_lyrics.sql. Edge Function generate-lyrics răspunde 404 NOT_FOUND la cererea GET de verificare; generarea versurilor AI nu este publicată complet.
+- Edge Function class-access: 404 NOT_FOUND; cursurile Jitsi nu pot obține acces prin funcția prevăzută. create-student și delete-student răspund 405 la GET, confirmând endpointurile existente, nu operațiile efective de creare/ștergere. Nu s-au trimis POST-uri de administrare ori cereri OpenAI/Jitsi.
+- Bucket student_records: limita live este 104857600 bytes (100 MiB), în timp ce migrarea virtual_studio și UI AdminStudio prevăd 209715200 bytes (200 MiB). Uploadurile de master între aceste praguri vor fi respinse de Storage. Nu s-a modificat configurația live.
+- **Bug local reprodus**: src/pages/api/upload-homework.js folosește locals fără a-l primi în context. Apelul direct al handlerului aruncă ReferenceError: locals is not defined. Afectează fluxul vechi către Google Drive, nu noua predare audio direct în Supabase. Testele helperului nu acoperă acest wrapper.
+- Site-ul public răspunde HTTP 200 cu CSP. GitHub Actions prin API public a răspuns 404; aceasta nu dovedește eșecul deploy-ului și nu permite confirmarea lui fără acces autentificat.
+
+### Validări
+- npm test Academy: **77/77 PASS**; bridge local: **4/4 PASS**.
+- Browser: test:admin, test:canto, test:games, test:navigation, test:homework și test:landing **PASS**, inclusiv verificările mobile/desktop disponibile. Acestea folosesc backenduri simulate/local SQL și nu certifică integrările externe live.
+- test:worker: **build PASS, smoke Workerd PASS, Wrangler dry-run PASS**. Diagnostics editor: fără erori, dar eroarea JS din wrapper a fost confirmată prin execuție.
+- Nu s-au modificat pagini/layout/conținut sau metadata. Ultimul seo:check din sesiune: **64 pagini, 0 FAIL, 0 WARN**. Fără date noi GSC/ranking.
+
+### Riscuri și pași următori
+- Auditul nu repară automat codul și nu aplică migrări, deploy-uri sau modificări de date. Fișierele repository modificate în acest pas sunt doar jurnalul și trackerul SEO.
+- Pregătit în artefactele sesiunii un SQL numai de citire pentru verificarea exactă în SQL Editor a politicilor, RLS, triggerelor, permisiunilor, constrângerilor și publicațiilor Realtime. Aceste detalii live nu sunt expuse integral prin OpenAPI și rămân de verificat.
+- Priorități: corectarea wrapperului upload-homework cu test la nivel de rută; aplicarea migrărilor lipsă după verificarea dependențelor; deploy generate-lyrics/class-access și configurarea secretelor; reconcilierea limitei student_records; test live cu cont profesor și elev după remediere.
+
 ## 📝 24 oct 2026 — Publicare teme audio Academy Music
 
 ### Obiectiv

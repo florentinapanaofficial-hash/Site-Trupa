@@ -44,8 +44,14 @@ test('Canto validates text and MP3, preserves unchanged audio and rolls back new
     const options = { client, form, userId: 'teacher', upload: async (path) => uploaded.push(path), removeUploaded: async (paths) => { cleaned.push(...paths); } };
     const created = await saveCantoPiece({ ...options, files: { pozitiv: mp3 } });
     assert.equal(created.title, 'Titlu manual');
+    assert.equal(created.level, 'modul_1');
     assert.equal(saved.positive_url, null);
     assert.match(saved.audio_pozitiv_path, /^canto\/[a-f0-9-]+\/pozitiv.mp3$/);
+    for (let rank = 1; rank <= 5; rank++) {
+        const selected = await saveCantoPiece({ ...options, piece: created, form: { ...form, level: 'modul_' + rank } });
+        assert.equal(selected.level, 'modul_' + rank);
+    }
+    await assert.rejects(saveCantoPiece({ ...options, form: { ...form, level: 'modul_6' } }), /modul/i);
     await saveCantoPiece({ ...options, piece: { id: 'piece' } });
     assert.equal('audio_pozitiv_path' in saved, false);
     assert.equal('audio_negativ_path' in saved, false);
@@ -833,6 +839,7 @@ test('music UPDATE preserves row identity, assignments and existing files; valid
     assert.equal(saved.audio_pozitiv_path, existing.audio_pozitiv_path);
     assert.equal(saved.score_path, existing.score_path);
     assert.equal(saved.created_by, existing.created_by);
+    assert.equal(payload.level, 'modul_3');
     assert.equal(payload.versuri_text, '[00:01.00]Strofa');
     assert.equal('created_by' in payload, false);
     assert.equal('score_path' in payload, false);

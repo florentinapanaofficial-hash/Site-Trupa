@@ -1,20 +1,9 @@
+import { studyLevelLabel, studyLevelRank } from '../lib/studyLevels';
 import PieceAudio from './PieceAudio';
 import { CANTO_VARIANTS } from '../lib/canto';
 import SecureAudioPlayer from './SecureAudioPlayer';
 import { resolveAudioSource } from '../lib/pieces';
 import { Lock } from 'lucide-react';
-
-const LEVEL_STYLE = {
-    incepator: 'bg-emerald-500/15 text-emerald-300',
-    mediu: 'bg-gold-500/15 text-gold-400',
-    avansat: 'bg-brand-500/20 text-brand-200',
-};
-
-const LEVEL_LABEL = {
-    incepator: 'Începător',
-    mediu: 'Mediu',
-    avansat: 'Avansat',
-};
 
 export default function PieceCard({ piece, onOpenScore, onPractice, locked = false, onLocked }) {
     const negativ = resolveAudioSource(piece, 'negativ');
@@ -28,8 +17,8 @@ export default function PieceCard({ piece, onOpenScore, onPractice, locked = fal
                     <h3 className="truncate text-lg font-semibold text-white">{piece.title}</h3>
                     {piece.composer && <p className="text-sm text-slate-400">{piece.composer}</p>}
                 </div>
-                <span className={`badge shrink-0 ${LEVEL_STYLE[piece.level] || LEVEL_STYLE.incepator}`}>
-                    {LEVEL_LABEL[piece.level] || piece.level}
+                <span className={`badge max-w-[50%] whitespace-normal text-right ${studyLevelRank(piece.level) <= 2 ? 'bg-emerald-500/15 text-emerald-300' : studyLevelRank(piece.level) === 3 ? 'bg-gold-500/15 text-gold-400' : 'bg-brand-500/20 text-brand-200'}`}>
+                    {studyLevelLabel(piece.level)}
                 </span>
             </header>
 

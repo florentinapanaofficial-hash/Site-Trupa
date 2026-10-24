@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../lib/auth';
 import { generateTemporaryPassword, suggestUsername } from '../../lib/studentCredentials';
 import Avatar from '../../components/Avatar';
+import { studyLevelLabel } from '../../lib/studyLevels';
 import StudentDetail from './StudentDetail';
 import UnlockUserButton from '../../components/admin/UnlockUserButton';
 import Modal from '../../components/ui/Modal';
@@ -255,7 +256,7 @@ export default function AdminStudents() {
                                             </button>
                                         </td>
                                         <td className="px-3 py-3 text-gold-300">{student.username || '—'}</td>
-                                        <td className="px-3 py-3 text-slate-300">{{ incepator: 'Începător', mediu: 'Mediu', avansat: 'Avansat' }[student.study_level || 'incepator']}</td>
+                                        <td className="px-3 py-3 text-slate-300">{studyLevelLabel(student.study_level)}</td>
                                         <td className="px-3 py-3 text-slate-300">{assigned} {assigned === 1 ? 'piesă' : 'piese'}</td>
                                         <td className={`px-3 py-3 ${student.is_active && !student.is_locked ? 'text-emerald-300' : 'text-brand-200'}`}>{student.is_locked ? 'Restricționat (IP)' : student.is_active ? 'Activ' : 'Inactiv'}</td>
                                         <td className="px-3 py-3">

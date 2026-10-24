@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { supabase } from '../../lib/supabase';
 import { getSignedAudioUrl } from '../../lib/media';
-import { STUDY_LEVELS } from '../../lib/studyLevels';
+import { STUDY_LEVELS, normalizeStudyLevel, studyLevelLabel } from '../../lib/studyLevels';
 import { HOMEWORK_BUCKET, submissionState } from '../../lib/timedHomework';
 
 type Status = 'pending' | 'approved' | 'rejected';
@@ -18,6 +18,7 @@ export default function HomeworkEvaluator({ studentId, onLevelChange }: Props) {
     const [homework, setHomework] = useState<Homework[]>([]);
     const [assignments, setAssignments] = useState<Assignment[]>([]);
     const [profile, setProfile] = useState<Profile | null>(null);
+    const [selectedModule, setSelectedModule] = useState('');
     const [feedback, setFeedback] = useState<Record<string, string>>({});
     const [audio, setAudio] = useState<Record<string, string>>({});
     const [loading, setLoading] = useState(true);
@@ -50,6 +51,7 @@ export default function HomeworkEvaluator({ studentId, onLevelChange }: Props) {
                 if (active) {
                     setHomework(rows.data || []);
                     setProfile(student.data);
+                    setSelectedModule(normalizeStudyLevel(student.data.study_level) || '');
                     setAssignments(windows.data || []);
                     setFeedback(Object.fromEntries((rows.data || []).map((row) => [row.id, row.teacher_feedback || ''])));
                 }
@@ -101,19 +103,16 @@ export default function HomeworkEvaluator({ studentId, onLevelChange }: Props) {
             setNotice('Intervalul de predare a fost creat.');
         });
     }
-    const levelIndex = STUDY_LEVELS.findIndex((level) => level.value === profile?.study_level);
-    const nextLevel = levelIndex >= 0 ? STUDY_LEVELS[levelIndex + 1] : undefined;
-    async function promote() {
+    async function saveModule() {
         await run(async () => {
-            if (!profile || !nextLevel) throw new Error('Nu există un nivel următor disponibil.');
-            // Compare-and-set prevents two open panels from promoting twice.
-            const { data, error: updateError } = await supabase.from('profiles').update({ study_level: nextLevel.value })
+            if (!profile || !STUDY_LEVELS.some((module) => module.value === selectedModule)) throw new Error('Selectează un modul valid.');
+            const { data, error: updateError } = await supabase.from('profiles').update({ study_level: selectedModule })
                 .eq('id', studentId).in('role', ['student', 'elev']).eq('study_level', profile.study_level)
                 .select('id,study_level,role').single();
             if (updateError) throw updateError;
             setProfile(data);
             onLevelChange?.(data);
-            setNotice(`Nivel deblocat: ${nextLevel.label}.`);
+            setNotice(`Modul salvat: ${studyLevelLabel(data.study_level)}.`);
         });
     }
     return <section className="card space-y-4">
@@ -142,9 +141,15 @@ export default function HomeworkEvaluator({ studentId, onLevelChange }: Props) {
                 </div>
             </article>)}
             <div className="border-t border-white/10 pt-4 space-y-2">
-                <p>Nivel actual: {STUDY_LEVELS.find((level) => level.value === profile?.study_level)?.label || 'Necunoscut'}</p>
-                <button type="button" className="btn btn-primary" disabled={busy || !nextLevel || !['student', 'elev'].includes(profile?.role || '')} onClick={() => void promote()}>Deblochează nivelul următor{nextLevel ? `: ${nextLevel.label}` : ''}</button>
-                {profile?.study_level === 'avansat' && <p className="text-sm text-slate-400">Elevul este deja la nivelul maxim.</p>}
+                <p>Modul actual: {studyLevelLabel(profile?.study_level)}</p>
+                <label className="label" htmlFor={`homework-module-${studentId}`}>Modul de studiu
+                    <select id={`homework-module-${studentId}`} className="input" value={selectedModule} disabled={busy || !profile || !['student', 'elev'].includes(profile.role)} onChange={(event) => setSelectedModule(event.target.value)}>
+                        <option value="" disabled>Selectează modulul</option>
+                        {STUDY_LEVELS.map((module) => <option key={module.value} value={module.value}>{module.label}</option>)}
+                    </select>
+                </label>
+                <p className="text-sm text-slate-400">Poți atribui direct orice modul, inclusiv unul anterior. Modificarea se aplică numai după salvare.</p>
+                <button type="button" className="btn btn-primary" disabled={busy || !selectedModule || selectedModule === profile?.study_level || !['student', 'elev'].includes(profile?.role || '')} onClick={() => void saveModule()}>Salvează modulul</button>
             </div>
         </>}
     </section>;

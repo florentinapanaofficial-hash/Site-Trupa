@@ -5,6 +5,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase, BUCKET_MEDIA } from '../../lib/supabase';
 import { useAuth } from '../../lib/auth';
 import { Pencil } from 'lucide-react';
+import { STUDY_LEVELS, normalizeStudyLevel, studyLevelLabel } from '../../lib/studyLevels';
 import { saveMusicPiece } from '../../lib/canto';
 import { uploadFile } from '../../lib/media';
 import { VARIANT_LIST } from '../../lib/pieces';
@@ -16,7 +17,7 @@ const EMPTY_FORM = {
     discipline: 'orga',
     title: '',
     composer: '',
-    level: 'incepator',
+    level: 'modul_1',
     description: '',
     versuri_text: '',
     youtube_id: '',
@@ -100,7 +101,8 @@ export default function AdminPieces() {
 
     function openEditor(piece = null) {
         setEditing(piece);
-        setForm(piece ? { ...EMPTY_FORM, ...piece, composer: piece.composer || '', description: piece.description || '',
+        setForm(piece ? { ...EMPTY_FORM, ...piece,
+            level: normalizeStudyLevel(piece.level) || 'modul_1', composer: piece.composer || '', description: piece.description || '',
             youtube_id: piece.youtube_id || '', tags: (piece.tags || []).join(', '),
             positive_url: piece.positive_url || '', negative_url: piece.negative_url || '', versuri_text: piece.versuri_text || '' } : { ...EMPTY_FORM });
         setModes({ pozitiv: piece?.audio_pozitiv_path && !piece.positive_url ? 'local' : 'online', negativ: piece?.audio_negativ_path && !piece.negative_url ? 'local' : 'online' });
@@ -199,9 +201,7 @@ export default function AdminPieces() {
                                 Nivel
                             </label>
                             <select id="level" className="input" value={form.level} onChange={update('level')}>
-                                <option value="incepator">Începător</option>
-                                <option value="mediu">Mediu</option>
-                                <option value="avansat">Avansat</option>
+                                {STUDY_LEVELS.map((module) => <option key={module.value} value={module.value}>{module.label}</option>)}
                             </select>
                         </div>
 
@@ -371,7 +371,7 @@ export default function AdminPieces() {
                                     <tr key={piece.id}>
                                         <td className="px-4 py-3 font-medium text-slate-100">{piece.title}</td>
                                         <td className="px-4 py-3 text-slate-400">{piece.discipline === 'orga' ? 'Orgă' : 'Canto'}</td>
-                                        <td className="px-4 py-3 text-slate-400">{piece.level}</td>
+                                        <td className="px-4 py-3 text-slate-400">{studyLevelLabel(piece.level)}</td>
                                         <td className="px-4 py-3 text-slate-400">
                                             {[
                                                 piece.audio_pozitiv_path && 'pozitiv (local)',

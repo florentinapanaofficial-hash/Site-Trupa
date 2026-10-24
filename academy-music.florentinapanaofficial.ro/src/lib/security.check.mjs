@@ -137,6 +137,7 @@ test('SQL migration: real RLS, atomic IP locking, session replacement, consent a
         await db.query('insert into student_homework(student_id,events) values($1,$2)', [other, '[{"note":60,"timestamp":0,"duration":100}]']);
         await db.exec(homeworkMigration);
         await db.exec(homeworkMigration);
+        await db.exec(await readFile(new URL('../../supabase/migrations/20261024000004_five_study_modules.sql', import.meta.url), 'utf8'));
         const claims = async (role, uid, sid) => {
             await db.exec(`reset role; set role ${role};`);
             await db.query(`select set_config('request.jwt.claim.sub',$1,false),set_config('request.jwt.claims',$2,false)`, [uid || '', JSON.stringify({ sub: uid, session_id: sid, role })]);
@@ -313,7 +314,7 @@ test('SQL migration: real RLS, atomic IP locking, session replacement, consent a
             const id = (await submit(open)).rows[0].id;
             await assert.rejects(submit(open), /unique constraint/);
             assert.equal((await db.query('update student_homework set status=$1 where id=$2 returning id', ['approved', id])).rows.length, 0);
-            await assert.rejects(db.query('update profiles set study_level=$1 where id=$2', ['mediu', other]), /numai de profesor/);
+            await assert.rejects(db.query('update profiles set study_level=$1 where id=$2', ['modul_3', other]), /numai de profesor/);
             assert.equal((await db.query('update storage.objects set name=$1 where name=$2 returning id', ['moved.webm', path(open)])).rows.length, 0);
             assert.equal((await db.query('delete from storage.objects where name=$1 returning id', [path(open)])).rows.length, 0);
             await owner();
@@ -326,8 +327,10 @@ test('SQL migration: real RLS, atomic IP locking, session replacement, consent a
             assert.equal((await db.query('select status from student_homework where id=$1', [id])).rows[0].status, 'approved');
             await assert.rejects(db.query('update student_homework set audio_path=$1 where id=$2', ['tampered.mp3', id]), /permission denied/);
             await assert.rejects(db.query('update student_homework set status=$1 where id=$2', ['invalid', id]), /check constraint/);
-            await db.query('update profiles set study_level=$1 where id=$2', ['mediu', other]);
-            assert.equal((await db.query('select study_level from profiles where id=$1', [other])).rows[0].study_level, 'mediu');
+            for (const module of ['modul_3', 'modul_5', 'modul_2', 'modul_4', 'modul_1']) {
+                await db.query('update profiles set study_level=$1 where id=$2', [module, other]);
+                assert.equal((await db.query('select study_level from profiles where id=$1', [other])).rows[0].study_level, module);
+            }
             await claims('authenticated', other, first);
             assert.equal((await db.query('select teacher_feedback from student_homework where id=$1', [id])).rows[0].teacher_feedback, 'Foarte bine!');
             await db.query('insert into student_homework(student_id,events) values($1,$2)', [other, '[{"note":60,"timestamp":0,"duration":100}]']);

@@ -1,10 +1,11 @@
+import { normalizeStudyLevel } from './studyLevels.js';
 import { isSafeHttpUrl } from './pieces.js';
 
 export const CANTO_VARIANTS = [
     { key: 'pozitiv', label: 'Pozitiv', url: 'positive_url', path: 'audio_pozitiv_path' },
     { key: 'negativ', label: 'Negativ', url: 'negative_url', path: 'audio_negativ_path' },
 ];
-export const EMPTY_CANTO = { title: '', grupa: '', description: '', versuri_text: '', positive_url: '', negative_url: '', is_published: true };
+export const EMPTY_CANTO = { title: '', level: 'modul_1', grupa: '', description: '', versuri_text: '', positive_url: '', negative_url: '', is_published: true };
 export const MAX_CANTO_MP3 = 30 * 1024 * 1024;
 
 export function cantoPayload(form) {
@@ -44,12 +45,14 @@ export async function saveMusicPiece({ client, upload, removeUploaded, form, fil
     const payload = cantoPayload(form);
     if (discipline === 'orga') {
         delete payload.grupa;
-        if (!['incepator', 'mediu', 'avansat'].includes(form.level)) throw new Error('Nivel invalid.');
-        payload.level = form.level;
+
         payload.composer = String(form.composer || '').trim() || null;
         payload.youtube_id = String(form.youtube_id || '').trim() || null;
         payload.tags = String(form.tags || '').split(',').map((tag) => tag.trim()).filter(Boolean);
     }
+    const level = normalizeStudyLevel(form.level ?? piece?.level ?? (discipline === 'canto' ? 'modul_1' : null));
+    if (!level) throw new Error('Modul de studiu invalid.');
+    payload.level = level;
     if (form.description !== undefined) {
         if (String(form.description).length > 600) throw new Error('Descrierea poate avea maximum 600 de caractere.');
         payload.description = String(form.description).trim() || null;

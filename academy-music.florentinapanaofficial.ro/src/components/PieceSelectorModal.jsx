@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Modal from './ui/Modal';
 import { VARIANT_LIST, resolveAudioSource } from '../lib/pieces';
 
-const LEVEL_LABEL = { incepator: 'Începător', mediu: 'Mediu', avansat: 'Avansat' };
+import { studyLevelLabel } from '../lib/studyLevels';
 
 export default function PieceSelectorModal({ open, pieces, selectedIds, onClose, onConfirm }) {
     const [draft, setDraft] = useState(() => new Set(selectedIds));
@@ -96,7 +96,7 @@ export default function PieceSelectorModal({ open, pieces, selectedIds, onClose,
                                         <span className="block truncate text-xs text-slate-500">
                                             {piece.composer || 'Compozitor nespecificat'} ·{' '}
                                             {piece.discipline === 'orga' ? 'Orgă' : 'Canto'} ·{' '}
-                                            {LEVEL_LABEL[piece.level] || piece.level}
+                                            {studyLevelLabel(piece.level)}
                                         </span>
                                     </span>
                                     <span className="shrink-0 text-xs text-slate-500">

@@ -68,7 +68,7 @@ try {
             };
         });
         const page = await context.newPage();
-        const rows = [{ id: path.includes('/canto') ? 'canto-piece' : 'orga-piece', discipline: path.includes('/canto') ? 'canto' : 'orga', title: path.includes('/canto') ? 'Piesă canto' : 'Piesă orgă', description: 'Descriere inițială', composer: 'Profesor', level: 'incepator', is_published: true, positive_url: null, negative_url: null, tags: [], versuri_text: Array.from({ length: 15 }, (_, n) => '[00:' + String(n).padStart(2, '0') + '.00]<00:' + String(n).padStart(2, '0') + '.00>Nota ' + n + '<00:' + String(n).padStart(2, '0') + '.80>').join('\n'), audio_pozitiv_path: 'canto/positive.mp3', negative_url: 'https://media.florentinapanaofficial.ro/negative.mp3', grupa: 'Grupa 1' }];
+        const rows = [{ id: path.includes('/canto') ? 'canto-piece' : 'orga-piece', discipline: path.includes('/canto') ? 'canto' : 'orga', title: path.includes('/canto') ? 'Piesă canto' : 'Piesă orgă', description: 'Descriere inițială', composer: 'Profesor', level: 'modul_1', is_published: true, positive_url: null, negative_url: null, tags: [], versuri_text: Array.from({ length: 15 }, (_, n) => '[00:' + String(n).padStart(2, '0') + '.00]<00:' + String(n).padStart(2, '0') + '.00>Nota ' + n + '<00:' + String(n).padStart(2, '0') + '.80>').join('\n'), audio_pozitiv_path: 'canto/positive.mp3', negative_url: 'https://media.florentinapanaofficial.ro/negative.mp3', grupa: 'Grupa 1' }];
         const writes = [], uploads = [], aiRequests = [], homeworkRequests = [], studioRequests = [];
         let releaseAi; const aiPending = new Promise(resolve => { releaseAi = resolve; });
         let aiResponse = { lrc: "[00:01.00]<00:01.00>Vers AI<00:02.00>" }, aiStatus = 200;
@@ -323,6 +323,7 @@ try {
         await expect(draft).toHaveValue('[00:01.00]Revizie profesor');
         await page.getByRole('button', { name: 'Salvează modificările', exact: true }).click();
         await expect.poll(() => f.writes.length).toBe(1);
+        assert.equal(f.writes[0].payload.level, 'modul_1');
         assert.equal(f.writes[0].payload.versuri_text, '[00:01.00]Revizie profesor');
         if (path.includes('/canto/')) {
             const requestsAfterSave = f.aiRequests.length;

@@ -66,10 +66,10 @@ try {
         });
         const page = await context.newPage();
         const resources = [{ id: 'resource-id', title: 'Lecție RED', category: 'fisa-teoretica', discipline: 'comun', description: 'Explicații inițiale', external_url: 'https://example.test/lesson', file_path: 'old/resource.pdf' }];
-        const rows = [{ id: path.includes('/canto') ? 'canto-piece' : 'orga-piece', discipline: path.includes('/canto') ? 'canto' : 'orga', title: path.includes('/canto') ? 'Piesă canto' : 'Piesă orgă', description: 'Descriere inițială', composer: 'Profesor', level: 'incepator', is_published: true, positive_url: 'https://example.test/existing.mp3', negative_url: null, tags: [], versuri_text: '', grupa: 'Grupa 1' }];
+        const rows = [{ id: path.includes('/canto') ? 'canto-piece' : 'orga-piece', discipline: path.includes('/canto') ? 'canto' : 'orga', title: path.includes('/canto') ? 'Piesă canto' : 'Piesă orgă', description: 'Descriere inițială', composer: 'Profesor', level: 'modul_1', is_published: true, positive_url: 'https://example.test/existing.mp3', negative_url: null, tags: [], versuri_text: '', grupa: 'Grupa 1' }];
         const libraryMode = path.includes('/partituri/');
         if (libraryMode) {
-            rows.splice(0, rows.length, ...Array.from({ length: 14 }, (_, index) => ({ id: 'score-' + index, title: 'Studiu ' + String(index + 1).padStart(2, '0'), discipline: 'orga', composer: 'Profesor', level: index === 1 ? 'avansat' : 'incepator', score_path: 'scores/studiu-' + index + '.pdf', is_published: true })));
+            rows.splice(0, rows.length, ...Array.from({ length: 14 }, (_, index) => ({ id: 'score-' + index, title: 'Studiu ' + String(index + 1).padStart(2, '0'), discipline: 'orga', composer: 'Profesor', level: index === 1 ? 'modul_4' : 'modul_1', score_path: 'scores/studiu-' + index + '.pdf', is_published: true })));
         }
         const libraryRequests = [];
         const writes = [], uploads = [], audioJobs = [], unlockRequests = [];
@@ -176,6 +176,8 @@ try {
         await expect(dialog.getByLabel('Titlu', { exact: true })).toHaveValue('Piesă orgă');
         await expect(dialog.getByLabel('Descriere / indicații de studiu')).toHaveValue('Descriere inițială');
         await expect(dialog.getByLabel('Disciplină', { exact: true })).toHaveValue('orga');
+        await expect(dialog.getByLabel('Nivel', { exact: true })).toHaveValue('modul_1');
+        assert.equal(await dialog.getByLabel('Nivel', { exact: true }).locator('option').count(), 5);
         await dialog.getByLabel('Titlu', { exact: true }).fill('Orgă actualizată');
         await dialog.getByLabel('Descriere / indicații de studiu').fill('Indicații noi');
         await dialog.getByLabel('Versuri / text sincronizat (LRC)').fill('[00:01.00]Text nou');
@@ -187,6 +189,7 @@ try {
         await expect(page.getByRole('cell', { name: 'Orgă actualizată', exact: true })).toBeVisible();
         assert.equal(fixture.writes.length, 1);
         assert.equal(fixture.writes[0].id, 'eq.orga-piece');
+        assert.equal(fixture.writes[0].payload.level, 'modul_1');
         assert.equal(fixture.writes[0].payload.description, 'Indicații noi');
         assert.match(fixture.writes[0].payload.audio_negativ_path, /^orga\//);
         assert.match(fixture.writes[0].payload.score_path, /score.pdf$/);
@@ -287,6 +290,15 @@ try {
         await expect(page.getByRole('heading', { name: 'Biblioteca de partituri · Orgă' })).toBeVisible();
         await expect(page.getByRole('article')).toHaveCount(12);
         await expect(page.getByRole('button', { name: 'Nivel încă blocat' })).toBeDisabled();
+        const moduleFilter = page.getByLabel('Nivel partitură');
+        assert.equal(await moduleFilter.locator('option').count(), 6);
+        for (let rank = 1; rank <= 5; rank++) {
+            await moduleFilter.selectOption('modul_' + rank);
+            await expect.poll(() => f.libraryRequests.at(-1)?.searchParams.get('level')).toBe('eq.modul_' + rank);
+            await expect(page.getByRole('article')).toHaveCount(rank === 1 ? 12 : rank === 4 ? 1 : 0);
+        }
+        await moduleFilter.selectOption('');
+        await expect(page.getByRole('article')).toHaveCount(12);
         await page.getByRole('button', { name: 'Pagina următoare', exact: true }).click();
         await expect(page.getByRole('article')).toHaveCount(2);
         assert.ok(f.libraryRequests.some(url => url.searchParams.get('offset') === '12'));
