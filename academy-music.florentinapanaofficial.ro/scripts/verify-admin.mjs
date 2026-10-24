@@ -72,8 +72,9 @@ try {
             rows.splice(0, rows.length, ...Array.from({ length: 14 }, (_, index) => ({ id: 'score-' + index, title: 'Studiu ' + String(index + 1).padStart(2, '0'), discipline: 'orga', composer: 'Profesor', level: index === 1 ? 'avansat' : 'incepator', score_path: 'scores/studiu-' + index + '.pdf', is_published: true })));
         }
         const libraryRequests = [];
-        const writes = [], uploads = [], audioJobs = [];
+        const writes = [], uploads = [], audioJobs = [], unlockRequests = [];
         let insertions = 0;
+        let studentLocked = true;
         const errors = [];
         const chunks = [];
         const tables = [];
@@ -90,6 +91,11 @@ try {
             if (url.pathname.startsWith('/storage/v1/object/')) {
                 uploads.push(url.pathname);
                 return route.fulfill({ contentType: 'application/json', body: JSON.stringify({ Key: url.pathname }) });
+            }
+            if (url.pathname === '/api/admin/unlock-user/' && route.request().method() === 'POST') {
+                unlockRequests.push(route.request().postDataJSON());
+                studentLocked = false;
+                return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true, message: 'Contul elevului a fost deblocat.' }) });
             }
             if (!url.pathname.startsWith('/rest/v1/')) return route.continue();
             if (url.pathname === '/rest/v1/resources') {
@@ -129,13 +135,25 @@ try {
                 if (route.request().method() === 'POST') insertions++;
                 return route.fulfill({ contentType: 'application/json', body: JSON.stringify(rows) });
             }
-            const body = url.pathname === '/rest/v1/profiles' ? (url.searchParams.get('select') === 'id,full_name' ? [] : { ...profile, role })
+            const studentList = url.pathname === '/rest/v1/profiles' && url.searchParams.get('role') === 'in.(student,elev)';
+            const body = url.pathname === '/rest/v1/profiles'
+                ? url.searchParams.get('select') === 'id,full_name' ? [] : studentList ? [{ ...profile, role: 'student', is_locked: studentLocked }] : { ...profile, role }
                 : url.pathname === '/rest/v1/rpc/start_activity_session' ? sessionId : [];
             return route.fulfill({ contentType: 'application/json', body: JSON.stringify(body), headers: { 'Content-Range': '0-0/0' } });
         });
         await page.goto(base + path);
-        return { context, page, errors, chunks, tables, rows, writes, uploads, audioJobs, libraryRequests, get insertions() { return insertions; } };
+        return { context, page, errors, chunks, tables, rows, writes, uploads, audioJobs, libraryRequests, unlockRequests, get insertions() { return insertions; } };
     }
+
+    const unlock = await open({ width: 390, height: 844 }, '/admin/elevi/', 'teacher');
+    await expect(unlock.page.getByRole('button', { name: 'Deblochează Elev', exact: true })).toBeVisible();
+    await unlock.page.getByRole('button', { name: 'Deblochează Elev', exact: true }).click();
+    await expect(unlock.page.getByRole('status')).toHaveText('Contul elevului a fost deblocat.');
+    await expect(unlock.page.getByRole('button', { name: 'Deblochează Elev', exact: true })).toHaveCount(0);
+    assert.deepEqual(unlock.unlockRequests, [{ user_id: userId }]);
+    assert.deepEqual(unlock.errors, []);
+    await unlock.context.close();
+    console.log('Student unlock PASS: teacher-only table action posts the selected user ID, reports success, and refreshes the locked row.');
 
     for (const viewport of [{ width: 390, height: 844 }, { width: 1440, height: 1000 }]) {
         const fixture = await open(viewport, '/admin/piese/', 'teacher');

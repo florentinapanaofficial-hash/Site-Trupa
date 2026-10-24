@@ -415,7 +415,9 @@ Implementare: `src/middleware.js`, `src/lib/securityServer.js`, `src/pages/api/a
 
 ### Administrarea blocărilor
 
-Consultă `security_alerts` și `user_security_logs` în Supabase cu un administrator autorizat. Pentru deblocare, verifică situația cu părintele; execută într-o tranzacție, cu UUID-ul real în loc de `USER_UUID`:
+Profesorul activ poate debloca un elev din **Panou profesor → Elevi** (`/admin/elevi/`), folosind butonul „Deblochează Elev” afișat pentru conturile restricționate prin IP. Endpointul `POST /api/admin/unlock-user/` verifică originea, sesiunea și rolul profesorului; cheia `SUPABASE_SERVICE_ROLE_KEY` rămâne exclusiv în runtime-ul serverului. La deblocare, istoricul IP al elevului este resetat înainte de `is_locked=false`, pentru a preveni blocarea imediată la următoarea autentificare; alertele de securitate rămân păstrate.
+
+Consultă `security_alerts` și `user_security_logs` în Supabase cu un administrator autorizat. Ca procedură manuală de administrare, verifică situația cu părintele și execută într-o tranzacție, cu UUID-ul real în loc de `USER_UUID`:
 
 ```sql
 begin;

@@ -5,6 +5,7 @@ import { useAuth } from '../../lib/auth';
 import { generateTemporaryPassword, suggestUsername } from '../../lib/studentCredentials';
 import Avatar from '../../components/Avatar';
 import StudentDetail from './StudentDetail';
+import UnlockUserButton from '../../components/admin/UnlockUserButton';
 import Modal from '../../components/ui/Modal';
 import Spinner from '../../components/ui/Spinner';
 import EmptyState from '../../components/ui/EmptyState';
@@ -256,15 +257,18 @@ export default function AdminStudents() {
                                         <td className="px-3 py-3 text-gold-300">{student.username || '—'}</td>
                                         <td className="px-3 py-3 text-slate-300">{{ incepator: 'Începător', mediu: 'Mediu', avansat: 'Avansat' }[student.study_level || 'incepator']}</td>
                                         <td className="px-3 py-3 text-slate-300">{assigned} {assigned === 1 ? 'piesă' : 'piese'}</td>
-                                        <td className={`px-3 py-3 ${student.is_active ? 'text-emerald-300' : 'text-brand-200'}`}>{student.is_active ? 'Activ' : 'Inactiv'}</td>
+                                        <td className={`px-3 py-3 ${student.is_active && !student.is_locked ? 'text-emerald-300' : 'text-brand-200'}`}>{student.is_locked ? 'Restricționat (IP)' : student.is_active ? 'Activ' : 'Inactiv'}</td>
                                         <td className="px-3 py-3">
-                                            <button type="button" className="btn-ghost inline-flex items-center gap-2" title={student.is_active ? 'Dezactivează contul' : 'Reactivează contul'}
-                                                disabled={student.id === profile?.id || statusBusy}
-                                                aria-label={`${student.is_active ? 'Dezactivează' : 'Reactivează'} ${student.full_name}`}
-                                                onClick={() => { setStatusTarget(student); setStatusError(''); }}>
-                                                {student.is_active ? <UserRoundX size={16} aria-hidden="true" /> : <UserRoundCheck size={16} aria-hidden="true" />}
-                                                {student.is_active ? 'Dezactivează' : 'Reactivează'}
-                                            </button>
+                                            <div className="space-y-2">
+                                                <button type="button" className="btn-ghost inline-flex items-center gap-2" title={student.is_active ? 'Dezactivează contul' : 'Reactivează contul'}
+                                                    disabled={student.id === profile?.id || statusBusy}
+                                                    aria-label={`${student.is_active ? 'Dezactivează' : 'Reactivează'} ${student.full_name}`}
+                                                    onClick={() => { setStatusTarget(student); setStatusError(''); }}>
+                                                    {student.is_active ? <UserRoundX size={16} aria-hidden="true" /> : <UserRoundCheck size={16} aria-hidden="true" />}
+                                                    {student.is_active ? 'Dezactivează' : 'Reactivează'}
+                                                </button>
+                                                {student.is_locked && <UnlockUserButton userId={student.id} onUnlocked={load} />}
+                                            </div>
                                         </td>
                                     </tr>
                                 );

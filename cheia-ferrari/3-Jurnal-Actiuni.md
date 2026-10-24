@@ -1,3 +1,23 @@
+## 📝 24 oct 2026 — Deblocare securizată conturi elevi
+
+### Obiectiv
+Adăugarea unei acțiuni pentru profesor care deblochează elevii blocați de limita de IP fără să expună cheia service role în browser.
+
+### Modificări
+- `academy-music.florentinapanaofficial.ro/src/pages/api/admin/unlock-user.ts`: endpoint POST cu validare UUID și same-origin, sesiune verificată, autorizare explicită pentru profesor activ și actualizare exclusivă a profilurilor elevilor prin `SUPABASE_SERVICE_ROLE_KEY`. Istoricul IP care ar fi declanșat blocarea este curățat înainte de deblocare; alertele de securitate rămân păstrate.
+- `academy-music.florentinapanaofficial.ro/src/components/admin/UnlockUserButton.tsx` și `src/pages/admin/AdminStudents.jsx`: buton administrativ doar pentru profilurile blocate, stări loading/succes/eroare și reîncărcarea listei; [README](../academy-music.florentinapanaofficial.ro/README.md) documentează noul flux și păstrează procedura SQL manuală ca alternativă.
+- Teste API pentru roluri, origine, ID, istoric IP și erori; test browser pentru fluxul butonului.
+
+### Validări
+- `npm test`: 68/68 PASS; `npm run test:admin`: PASS; `npx astro check`: 0 erori, 0 warninguri, 0 hints.
+- `npm run build` și `npm run test:worker`: PASS; Worker workerd a servit SSR, iar Wrangler deploy dry-run PASS.
+- `npm run seo:check`: 64 pagini verificate, 0 FAIL, 0 WARN. Nu s-au modificat metadata publice, schema JSON-LD ori măsurători GSC.
+
+### Riscuri și pași următori
+- Acțiunea live necesită `SUPABASE_SERVICE_ROLE_KEY` ca Secret în Worker Production și deploy-ul versiunii curente. Validările de endpoint au folosit mock-uri; nu s-a modificat niciun cont real sau Supabase live.
+
+---
+
 ## 📝 22 oct 2026 — Alias Web fetch pentru buildul Cloudflare
 
 ### Obiectiv
