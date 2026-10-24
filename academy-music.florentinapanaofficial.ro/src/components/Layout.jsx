@@ -1,6 +1,6 @@
 import { Suspense, useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { BookOpen, Home, Mic2, Piano, Music2, Library, Puzzle, FolderOpen, Users, Settings, Menu } from 'lucide-react';
+import { BookOpen, Home, Mic2, Piano, Music2, Library, Puzzle, FolderOpen, Users, Settings, Menu, UserRound } from 'lucide-react';
 import { useAuth } from '../lib/auth';
 import { supabase } from '../lib/supabase';
 import { logEvent } from '../lib/activity';
@@ -12,6 +12,7 @@ import LivePresence from './LivePresence';
 import DuelInvitations from './DuelInvitations';
 
 const SHARED_LINKS = [
+    { to: '/profil/', label: 'Profilul meu', Icon: UserRound },
     { to: '/red/', label: 'Resurse de teorie', Icon: Library },
     { to: '/jocuri/', label: 'Jocuri muzicale', Icon: Puzzle },
     { to: '/portofoliu/', label: 'Portofoliu', Icon: FolderOpen },

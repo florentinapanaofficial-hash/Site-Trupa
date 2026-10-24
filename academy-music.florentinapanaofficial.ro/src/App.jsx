@@ -8,6 +8,8 @@ import SetupRequired from './pages/SetupRequired';
 import NotFound from './pages/NotFound';
 import Spinner from './components/ui/Spinner';
 import { isSupabaseConfigured } from './lib/supabase';
+import { useAuth } from './lib/auth';
+import StudentProfile from './components/student/StudentProfile';
 
 const ScoreLibrary = lazy(() => import('./pages/ScoreLibrary'));
 const Discipline = lazy(() => import('./pages/Discipline'));
@@ -21,6 +23,17 @@ const AdminPanel = lazy(() => import('./pages/admin/AdminPanel'));
 const OnlineClasses = lazy(() => import('./pages/OnlineClasses'));
 const LiveClass = lazy(() => import('./components/LiveClass'));
 
+function StudentProfileRoute() {
+    const { profile, updateAvatarPath } = useAuth();
+    if (!profile) return <div className="grid min-h-64 place-items-center"><Spinner label="Se încarcă profilul…" /></div>;
+    return <StudentProfile
+        id={profile.id}
+        full_name={profile.full_name}
+        avatar_path={profile.avatar_path}
+        onAvatarUpdated={updateAvatarPath}
+    />;
+}
+
 export default function App() {
     if (!isSupabaseConfigured) return <SetupRequired />;
     return (
@@ -30,6 +43,7 @@ export default function App() {
                 <Route path="/register/" element={<Login />} />
                 <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
                     <Route path="/dashboard/" element={<Dashboard />} />
+                    <Route path="/profil/" element={<StudentProfileRoute />} />
                     <Route path="/" element={<Navigate to="/dashboard/" replace />} />
                     <Route path="/canto/" element={<Canto />} />
                     <Route path="/instrument/" element={<Discipline discipline="orga" />} />

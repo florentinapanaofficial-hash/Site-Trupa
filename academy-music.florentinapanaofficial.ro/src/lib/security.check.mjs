@@ -103,6 +103,7 @@ test('SQL migration: real RLS, atomic IP locking, session replacement, consent a
             alter table storage.objects enable row level security;
             create function storage.foldername(text) returns text[] language sql as $$ select string_to_array($1,'/') $$;
             create function storage.extension(text) returns text language sql immutable as $$ select split_part($1,'.',2) $$;
+            create function public.uuid_generate_v4() returns uuid language sql volatile as $$ select gen_random_uuid() $$;
             create schema realtime; create table realtime.messages(extension text);
             create function realtime.topic() returns text language sql stable as $$ select 'academy:online' $$;
             grant usage on schema auth,storage,realtime to authenticated,service_role;
@@ -125,6 +126,13 @@ test('SQL migration: real RLS, atomic IP locking, session replacement, consent a
         const migration = await readFile(new URL('../../supabase/migrations/20261020000005_security_sessions.sql', import.meta.url), 'utf8');
         await db.exec(migration);
         await db.exec(migration);
+        const avatarMigration = await readFile(new URL('../../supabase/migrations/20261024000001_student_profile_avatars.sql', import.meta.url), 'utf8');
+        await db.exec(avatarMigration);
+        await db.exec(avatarMigration);
+        await db.exec('drop table public.student_repertoire cascade');
+        const repertoireMigration = await readFile(new URL('../../supabase/migrations/20261024000002_student_repertoire.sql', import.meta.url), 'utf8');
+        await db.exec(repertoireMigration);
+        await db.exec(repertoireMigration);
         const claims = async (role, uid, sid) => {
             await db.exec(`reset role; set role ${role};`);
             await db.query(`select set_config('request.jwt.claim.sub',$1,false),set_config('request.jwt.claims',$2,false)`, [uid || '', JSON.stringify({ sub: uid, session_id: sid, role })]);
@@ -212,6 +220,77 @@ test('SQL migration: real RLS, atomic IP locking, session replacement, consent a
             await db.query('select academy_end_session($1,$2)', [teacher, first]);
             await claims('authenticated', teacher, first);
             assert.equal((await db.query('select academy_session_allowed() allowed')).rows[0].allowed, false);
+        });
+        await t.test('student repertoire is private per student and backing tracks are teacher-managed', async () => {
+            await owner();
+            assert.equal(await check(other, first, '198.51.100.9', true), 'ok');
+            await db.exec(`
+                insert into public.student_repertoire(student_id,title,status) values('${student}','Another student song','wishlist');
+                insert into storage.objects(bucket_id,name) values('backing_tracks','teacher/track.mp3');
+            `);
+            await claims('authenticated', other, first);
+            const ownPiece = (await db.query(
+                "insert into student_repertoire(student_id,title,status) values($1,$2,$3) returning id,student_id,status",
+                [other, 'My song', 'wishlist']
+            )).rows[0];
+            assert.ok(ownPiece.id);
+            assert.equal(ownPiece.student_id, other);
+            assert.match((await db.query("select column_default from information_schema.columns where table_schema='public' and table_name='student_repertoire' and column_name='id'")).rows[0].column_default, /uuid_generate_v4/);
+            assert.equal((await db.query('select count(*)::int count from student_repertoire')).rows[0].count, 1);
+            await assert.rejects(
+                db.query('insert into student_repertoire(student_id,title,status) values($1,$2,$3)', [other, 'Invalid stage', 'on_stage']),
+                /student_repertoire_status_check|check constraint/
+            );
+            assert.equal((await db.query("select count(*)::int count from storage.objects where bucket_id='backing_tracks'")).rows[0].count, 1);
+            await assert.rejects(
+                db.query('insert into student_repertoire(student_id,title,status) values($1,$2,$3)', [student, 'Not mine', 'wishlist']),
+                /row-level security/
+            );
+            assert.equal((await db.query('update student_repertoire set status=$1 where student_id=$2 returning id', ['in_progress', student])).rows.length, 0);
+            assert.equal((await db.query('delete from student_repertoire where student_id=$1 returning id', [student])).rows.length, 0);
+            await db.query('update student_repertoire set status=$1 where id=$2', ['in_progress', ownPiece.id]);
+            await assert.rejects(
+                db.query("insert into storage.objects(bucket_id,name) values('backing_tracks','student/not-allowed.mp3')"),
+                /row-level security/
+            );
+
+            await owner();
+            assert.equal(await check(teacher, second, '198.51.100.11', true), 'ok');
+            await claims('authenticated', teacher, second);
+            assert.equal((await db.query('select count(*)::int count from student_repertoire')).rows[0].count, 2);
+            await db.query('update student_repertoire set status=$1 where student_id=$2', ['stage_ready', student]);
+            await db.query("insert into student_repertoire(student_id,title,status) values($1,$2,$3)", [student, 'Teacher-added song', 'wishlist']);
+            assert.equal((await db.query("delete from student_repertoire where title='Teacher-added song' returning id")).rows.length, 1);
+            await db.query("insert into storage.objects(bucket_id,name) values('backing_tracks','teacher/new-track.wav')");
+            await db.query("update storage.objects set name='teacher/updated-track.wav' where bucket_id='backing_tracks' and name='teacher/track.mp3'");
+            await db.query("delete from storage.objects where bucket_id='backing_tracks' and name='teacher/updated-track.wav'");
+            assert.equal((await db.query("select file_size_limit from storage.buckets where id='backing_tracks'")).rows[0].file_size_limit, 31457280);
+            assert.equal((await db.query("select public from storage.buckets where id='backing_tracks'")).rows[0].public, false);
+            assert.deepEqual((await db.query("select allowed_mime_types from storage.buckets where id='backing_tracks'")).rows[0].allowed_mime_types, ['audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/aac']);
+        });
+        await t.test('students can update only their own avatar and active sessions can read avatars', async () => {
+            await owner();
+            assert.equal(await check(other, first, '198.51.100.9', true), 'ok');
+            await claims('authenticated', other, first);
+            assert.equal((await db.query('select academy_active() active')).rows[0].active, true);
+            assert.equal((await db.query("select count(*)::int count from storage.objects where bucket_id='avatars'")).rows[0].count, 1);
+
+            await db.query('update profiles set avatar_path=$1 where id=$2', [`${other}/new.webp`, other]);
+            await assert.rejects(
+                db.query('update profiles set avatar_path=$1 where id=$2', [`${student}/not-mine.webp`, other]),
+                /Aceste setări de profil/
+            );
+            await db.query('insert into storage.objects(bucket_id,name) values($1,$2)', ['avatars', `${other}/new.webp`]);
+            await assert.rejects(
+                db.query('insert into storage.objects(bucket_id,name) values($1,$2)', ['avatars', `${student}/not-mine.webp`]),
+                /row-level security/
+            );
+            await assert.rejects(
+                db.query('update storage.objects set name=$1 where bucket_id=$2 and name=$3', [`${student}/moved.webp`, 'avatars', `${other}/new.webp`]),
+                /row-level security/
+            );
+            assert.equal((await db.query("select file_size_limit from storage.buckets where id='avatars'")).rows[0].file_size_limit, 2097152);
+            assert.equal((await db.query("select public from storage.buckets where id='avatars'")).rows[0].public, false);
         });
     } finally { await db.close(); }
 });

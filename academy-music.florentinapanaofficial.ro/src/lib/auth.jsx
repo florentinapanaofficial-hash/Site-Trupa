@@ -118,7 +118,10 @@ export function AuthProvider({ children }) {
             const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/login/` });
             if (error) throw error;
         }
-        return { session, user: session?.user ?? null, profile, loading, securityError,
+        function updateAvatarPath(avatarPath) {
+            setProfile((current) => current?.id === session?.user?.id ? { ...current, avatar_path: avatarPath } : current);
+        }
+        return { session, user: session?.user ?? null, profile, loading, securityError, updateAvatarPath,
             isTeacher: ['teacher', 'profesor'].includes(profile?.role), isInspector: profile?.role === 'inspector',
             signIn, signOut, resetPassword };
     }, [session, profile, loading, securityError]);

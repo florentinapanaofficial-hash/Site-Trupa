@@ -3,6 +3,8 @@ Aici vom nota evoluția săptămânală pentru a ne asigura că creștem, nu bat
 
 | Data | Cuvânt Cheie Monitorizat | Poziție YouTube (Est.) | Poziție Site (Google GSC) | Notițe / Acțiuni Luate |
 |---|---|---|---|---|
+| 24 oct 2026 | Academy Music / repertoriu personal elevi | - | - | Portofoliu „Piese de vis / În lucru / Gata de scenă”, negative audio private cu acces profesor la upload și URL-uri semnate la redare. Teste 70/70, Workerd/Wrangler PASS; SEO local 64 pagini, 0 FAIL / 0 WARN. Fără impact metadata publică sau date GSC. |
+| 24 oct 2026 | Academy Music / profil elev și avatar | - | - | Ecran autentificat `/profil/`, upload privat cu maximum 2 MB și politici RLS limitate la UID; profesorul păstrează administrarea existentă. Audit local Site-Trupa: 64 pagini, 0 FAIL, 0 WARN. Fără modificări SEO publice, date GSC sau măsurători de ranking. |
 | 24 oct 2026 | Academy Music / conturi elevi | - | - | Buton profesor pentru deblocarea conturilor restricționate prin IP, cu endpoint server-side și cheie service role păstrată pe server. Fără modificări SEO/GSC; build și audit SEO: 64 pagini, 0 FAIL, 0 WARN. |
 | 22 oct 2026 | Academy Music / build Workers node-fetch | - | - | Alias Vite node-fetch → native fetch pentru fallback-ul browser/Workers din Magenta. Build Node 22.22, smoke Workerd, Wrangler dry-run și Admin browser 390/1440 PASS. Academy noindex; fără metadata publică, date GSC sau măsurători ranking noi. |
 | 22 oct 2026 | Academy Music / Node 22.22 CI engine | - | - | Aliniate workflow și engines la cerința @astrojs/mdx >=22.22; npm 10.9 `ci --engine-strict`, build SSR, smoke Workerd și Wrangler dry-run PASS. Fără schimbări SEO publice, date GSC sau măsurători ranking noi. |

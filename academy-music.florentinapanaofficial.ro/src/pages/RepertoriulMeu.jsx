@@ -8,6 +8,7 @@ import { useAuth } from '../lib/auth';
 import { useStudyProgress } from '../lib/useStudyProgress';
 import { isStudyLevelLocked, studyLevelLabel } from '../lib/studyLevels';
 import StudyProgressNotice from '../components/StudyProgressNotice';
+import Repertoire from '../components/student/Repertoire';
 
 export default function RepertoriulMeu() {
     const { profile, isInspector, isTeacher } = useAuth();
@@ -25,6 +26,7 @@ export default function RepertoriulMeu() {
             </header>
 
             {!isTeacher && <StudyProgressNotice state={studyProgress} />}
+            {!isTeacher && !isInspector && profile?.id && <Repertoire studentId={profile.id} />}
             {lockNotice && <p role="status" aria-live="polite" className="rounded-lg border border-gold-400/20 bg-gold-400/10 p-3 text-sm text-gold-200">{lockNotice}</p>}
             {repertoireError && <p role="alert" className="text-sm text-brand-200">{repertoireError}</p>}
             {rows === null ? (

@@ -40,4 +40,5 @@ export const BUCKET_MEDIA = 'academy-media';
 export const BUCKET_KARAOKE = 'karaoke-audio';
 export const BUCKET_PORTFOLIO = 'portfolio';
 export const BUCKET_AVATARS = 'avatars';
+export const BUCKET_BACKING_TRACKS = 'backing_tracks';
 export const BUCKET_STUDENT_RECORDS = 'student_records';

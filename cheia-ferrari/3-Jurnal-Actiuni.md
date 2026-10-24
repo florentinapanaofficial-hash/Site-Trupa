@@ -1,3 +1,51 @@
+## 📝 24 oct 2026 — Portofoliu de artist în trei stadii
+
+### Obiectiv
+Elevii își organizează repertoriul în trei etape și ascultă negative private încărcate de profesori, fără schimbări în autentificare.
+
+### Modificări
+- `academy-music.florentinapanaofficial.ro/supabase/migrations/20261024000002_student_repertoire.sql`: tabel cu UUID, constrângere de stare, RLS pe proprietar/profesor și sesiune activă; bucket privat `backing_tracks` de 30 MB, doar MIME audio MPEG/WAV/OGG/AAC, citibil de utilizatorii autentificați și administrabil doar de profesori.
+- `academy-music.florentinapanaofficial.ro/src/components/student/Repertoire.tsx`: formular de adăugare, trei coloane/stadii, mutare cu săgeți, URL-uri semnate temporare și mesaje/erori cu reîncercare.
+- `src/pages/RepertoriulMeu.jsx` afișează componenta elevului lângă biblioteca existentă; `src/lib/supabase.js` adaugă constanta bucketului. `supabase/schema.sql`, README și testele RLS au fost aliniate.
+- Logica de autentificare nu a fost modificată.
+
+### Validări
+- `npm --prefix academy-music.florentinapanaofficial.ro test`: **70/70 PASS**; testul PGlite verifică migrarea repetabilă și de la tabel curat, UUID implicit, constrângerea stadiilor, izolarea între elevi și drepturile profesorului în tabel/Storage.
+- `npm --prefix academy-music.florentinapanaofficial.ro run test:worker`: build PASS, smoke test Workerd PASS și Wrangler deploy dry-run PASS.
+- `npm --prefix academy-music.florentinapanaofficial.ro run test:navigation`: PASS la 390px și 1440px. Diagnostics pe fișierele modificate: fără erori; `git diff --check` curat.
+- `npm run seo:check`: **64 pagini, 0 FAIL, 0 WARN**. Nicio schimbare la metadata, JSON-LD, sitemap ori măsurători GSC.
+
+### Riscuri și pași următori
+- Aplică migrarea `20261024000002_student_repertoire.sql` în Supabase înainte de deploy. Verificarea a folosit PGlite și Worker local; nu s-au încărcat negative în Supabase live.
+- Nu s-a făcut commit, push sau deploy.
+
+---
+
+## 📝 24 oct 2026 — Profil elev și avatar privat
+
+### Obiectiv
+Adăugarea ecranului de profil al elevului pentru schimbarea sigură a fotografiei, folosind bucketul Supabase existent `avatars`.
+
+### Modificări
+- `academy-music.florentinapanaofficial.ro/src/components/student/StudentProfile.tsx`: ecran React prietenos, placeholder muzical, validare JPEG/PNG/WebP și limită 2 MB, cale unică în folderul UID-ului, upload privat, actualizare `profiles.avatar_path`, mesaje accesibile și curățarea fișierelor orfane.
+- `academy-music.florentinapanaofficial.ro/src/App.jsx`, `src/components/Layout.jsx` și `src/lib/auth.jsx`: rută protejată `/profil/`, link în navigație și sincronizarea avatarului din antet fără reîncărcare.
+- `academy-music.florentinapanaofficial.ro/supabase/migrations/20261024000001_student_profile_avatars.sql` și `supabase/schema.sql`: bucket privat limitat la 2 MB, citire pentru sesiuni autentificate active, scriere/actualizare/ștergere pe folderul UID propriu și permisiunea profesorului păstrată; triggerul permite elevului să schimbe doar calea avatarului propriu.
+- `src/pages/admin/StudentDetail.jsx`, testele SQL/RLS și `README.md`: limita de upload a profesorului aliniată și instrucțiuni de aplicare a migrației.
+
+### Validări
+- `node --test academy-music.florentinapanaofficial.ro/src/lib/security.check.mjs`: 13/13 PASS; testele verifică migrarea idempotentă, update-ul avatarului propriu, refuzul căilor/fișierelor altui UID, bucket privat și citirea autentificată.
+- `npm --prefix academy-music.florentinapanaofficial.ro test`: 69/69 PASS; `test:navigation`: PASS la 390px și 1440px.
+- `npm --prefix academy-music.florentinapanaofficial.ro run test:worker`: build PASS, smoke test Workerd PASS, Wrangler deploy dry-run PASS. Diagnostics pentru fișierele modificate: fără erori.
+- `npm run seo:check`: 64 pagini, 0 FAIL, 0 WARN. Nicio modificare la metadata publică, JSON-LD sau sitemap; fără date GSC noi ori măsurători de ranking.
+- `npm --prefix academy-music.florentinapanaofficial.ro run test:admin`: FAIL repetat la aserțiunea existentă din `scripts/verify-admin.mjs:151` (mesajul de succes al deblocării lipsește; starea elevului devine „Activ”). Fluxul de deblocare nu a fost modificat în această sesiune.
+
+### Riscuri și pași următori
+- Aplică migrația în Supabase Dashboard → SQL Editor înainte de deploy; migrarea live și uploadul cu un cont real nu au fost executate.
+- Investighează separat aserțiunea de succes a testului `test:admin`; nu s-au schimbat endpointul și componenta de deblocare.
+- Nu s-a făcut commit, push sau deploy.
+
+---
+
 ## 📝 24 oct 2026 — Deblocare securizată conturi elevi
 
 ### Obiectiv

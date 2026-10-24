@@ -396,7 +396,11 @@ begin
     or new.is_active is distinct from old.is_active
     or new.grade_level is distinct from old.grade_level
     or new.study_level is distinct from old.study_level
-    or new.avatar_path is distinct from old.avatar_path
+    or (
+      new.avatar_path is distinct from old.avatar_path
+      and new.avatar_path is not null
+      and split_part(new.avatar_path, '/', 1) is distinct from auth.uid()::text
+    )
   ) then
     raise exception 'Aceste setări de profil pot fi schimbate numai de profesor.' using errcode = '42501';
   end if;
@@ -709,20 +713,30 @@ on conflict (id) do update set public = false;
 
 -- Fotografii de profil ale unor minori: bucket privat, niciodată public.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values ('avatars', 'avatars', false, 5242880, array['image/jpeg', 'image/png', 'image/webp'])
+values ('avatars', 'avatars', false, 2097152, array['image/jpeg', 'image/png', 'image/webp'])
 on conflict (id) do update set public = false, file_size_limit = excluded.file_size_limit, allowed_mime_types = excluded.allowed_mime_types;
 
 drop policy if exists avatars_read on storage.objects;
 create policy avatars_read on storage.objects
   for select to authenticated
-  using (
-    bucket_id = 'avatars' and public.academy_active()
-    and ((storage.foldername(name))[1] = auth.uid()::text or public.is_teacher())
-  );
+  using (bucket_id = 'avatars' and public.academy_active());
 
 drop policy if exists avatars_write on storage.objects;
 create policy avatars_write on storage.objects
   for insert to authenticated
+  with check (
+    bucket_id = 'avatars' and public.academy_active()
+    and ((storage.foldername(name))[1] = auth.uid()::text or public.is_teacher())
+    and lower(storage.extension(name)) in ('jpg', 'jpeg', 'png', 'webp')
+  );
+
+drop policy if exists avatars_update on storage.objects;
+create policy avatars_update on storage.objects
+  for update to authenticated
+  using (
+    bucket_id = 'avatars' and public.academy_active()
+    and ((storage.foldername(name))[1] = auth.uid()::text or public.is_teacher())
+  )
   with check (
     bucket_id = 'avatars' and public.academy_active()
     and ((storage.foldername(name))[1] = auth.uid()::text or public.is_teacher())
@@ -1190,6 +1204,57 @@ drop trigger if exists studio_notification_update_guard on public.studio_request
 create trigger studio_notification_update_guard
   before update on public.studio_requests
   for each row execute function public.guard_studio_notification_update();
+
+
+-- Portofoliul personal și negativele încărcate exclusiv de profesori.
+create table if not exists public.student_repertoire (
+  id uuid primary key default gen_random_uuid(),
+  student_id uuid not null references public.profiles(id) on delete cascade,
+  title text not null,
+  status text not null check (status in ('wishlist', 'in_progress', 'stage_ready')),
+  audio_path text,
+  created_at timestamptz not null default now()
+);
+create index if not exists student_repertoire_student_created_idx
+  on public.student_repertoire(student_id, created_at);
+alter table public.student_repertoire enable row level security;
+revoke all on public.student_repertoire from public, anon, authenticated;
+grant select, insert, update, delete on public.student_repertoire to authenticated;
+grant all on public.student_repertoire to service_role;
+drop policy if exists student_repertoire_valid_session on public.student_repertoire;
+create policy student_repertoire_valid_session on public.student_repertoire
+  as restrictive for all to authenticated
+  using (public.academy_active()) with check (public.academy_active());
+drop policy if exists student_repertoire_select on public.student_repertoire;
+create policy student_repertoire_select on public.student_repertoire
+  for select to authenticated using (public.academy_active() and (student_id = auth.uid() or public.is_teacher()));
+drop policy if exists student_repertoire_insert on public.student_repertoire;
+create policy student_repertoire_insert on public.student_repertoire
+  for insert to authenticated with check (public.academy_active() and (student_id = auth.uid() or public.is_teacher()));
+drop policy if exists student_repertoire_update on public.student_repertoire;
+create policy student_repertoire_update on public.student_repertoire
+  for update to authenticated using (public.academy_active() and (student_id = auth.uid() or public.is_teacher()))
+  with check (public.academy_active() and (student_id = auth.uid() or public.is_teacher()));
+drop policy if exists student_repertoire_delete on public.student_repertoire;
+create policy student_repertoire_delete on public.student_repertoire
+  for delete to authenticated using (public.academy_active() and (student_id = auth.uid() or public.is_teacher()));
+
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('backing_tracks', 'backing_tracks', false, 31457280, array['audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/aac'])
+on conflict (id) do update set public = false, file_size_limit = excluded.file_size_limit, allowed_mime_types = excluded.allowed_mime_types;
+drop policy if exists backing_tracks_read on storage.objects;
+create policy backing_tracks_read on storage.objects for select to authenticated
+  using (bucket_id = 'backing_tracks' and public.academy_active());
+drop policy if exists backing_tracks_insert_teacher on storage.objects;
+create policy backing_tracks_insert_teacher on storage.objects for insert to authenticated
+  with check (bucket_id = 'backing_tracks' and public.academy_active() and public.is_teacher());
+drop policy if exists backing_tracks_update_teacher on storage.objects;
+create policy backing_tracks_update_teacher on storage.objects for update to authenticated
+  using (bucket_id = 'backing_tracks' and public.academy_active() and public.is_teacher())
+  with check (bucket_id = 'backing_tracks' and public.academy_active() and public.is_teacher());
+drop policy if exists backing_tracks_delete_teacher on storage.objects;
+create policy backing_tracks_delete_teacher on storage.objects for delete to authenticated
+  using (bucket_id = 'backing_tracks' and public.academy_active() and public.is_teacher());
 
 commit;
 

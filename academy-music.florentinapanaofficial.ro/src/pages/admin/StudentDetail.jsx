@@ -9,7 +9,7 @@ import Modal from '../../components/ui/Modal';
 import Spinner from '../../components/ui/Spinner';
 import EmptyState from '../../components/ui/EmptyState';
 
-const MAX_AVATAR_BYTES = 5 * 1024 * 1024;
+const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
 
 export default function StudentDetail({ student, allPieces, onBack, onStudentChange, onPatch }) {
     const { profile } = useAuth();
@@ -150,7 +150,7 @@ export default function StudentDetail({ student, allPieces, onBack, onStudentCha
             return;
         }
         if (file.size > MAX_AVATAR_BYTES) {
-            setStatus({ busy: false, error: 'Fotografia depășește 5 MB.' });
+            setStatus({ busy: false, error: 'Fotografia depășește 2 MB.' });
             return;
         }
 
@@ -262,7 +262,7 @@ export default function StudentDetail({ student, allPieces, onBack, onStudentCha
                             disabled={status.busy}
                         />
                     </label>
-                    <span className="text-xs text-slate-600">JPG sau PNG, maximum 5 MB</span>
+                    <span className="text-xs text-slate-600">JPG, PNG sau WebP, maximum 2 MB</span>
                 </div>
             </header>
 

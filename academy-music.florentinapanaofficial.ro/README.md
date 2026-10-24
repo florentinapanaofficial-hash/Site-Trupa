@@ -618,3 +618,19 @@ Nu se execută automat migrarea în proiectul Supabase live și nu se consumă c
 ### Canto — editare directă pentru profesor
 
 În biblioteca /canto/, cu modul Profesor activ, fiecare piesă are linkul **Editează piesa · negativ și versuri**, care deschide /admin/canto/?edit=ID în formularul existent, completat și focalizat pe piesa aleasă. Acolo poți încărca **Upload MP3 Negativ**, completa **Versuri / text sincronizat (LRC)** și apăsa **Salvează modificările**. Audio/PDF existente rămân neschimbate dacă nu alegi înlocuitori. Linkul nu apare elevilor sau în previzualizarea Elev; RLS rămâne neschimbat.
+
+
+## Profilul elevului și fotografiile avatar
+
+Pagina autentificată `/profil/` permite schimbarea fotografiei de profil. Componenta acceptă JPEG, PNG și WebP de maximum 2 MB, încarcă fișierul în folderul cu UID-ul elevului din bucketul privat `avatars`, apoi actualizează `profiles.avatar_path`. Imaginile sunt afișate prin URL-uri semnate, nu prin URL-uri publice. Limita de upload este aliniată și în interfața profesorului.
+
+Pentru proiectele deja instalate, aplică o singură dată `supabase/migrations/20261024000001_student_profile_avatars.sql` din Supabase Dashboard → SQL Editor înainte de deploy. Aceasta păstrează bucketul privat, setează limita la 2 MB, permite sesiunilor active autentificate să citească fotografiile și restrânge uploadul, actualizarea și ștergerea la folderul UID propriu. Rolul de profesor păstrează accesul administrativ existent la fotografiile elevilor. Triggerul profilului permite elevului să schimbe numai `avatar_path` către propriul folder; celelalte câmpuri protejate rămân blocate.
+
+`supabase/schema.sql` include aceeași configurație pentru instalări noi. Bucketul nu trebuie făcut public și nu sunt necesare chei Supabase de service role în browser.
+
+
+## Portofoliul personal al elevului
+
+În `/repertoriul-meu/`, elevii au un portofoliu de artist în trei stadii: „Piese de vis”, „În lucru” și „Gata de scenă”. Pot adăuga titluri și le pot muta între stadii; pentru piesele cu `audio_path`, aplicația generează URL-uri semnate temporare din bucketul privat `backing_tracks`. Profesorii pot încărca, actualiza și șterge negative, iar elevii autentificați le pot asculta.
+
+Pentru mediile existente, aplică `supabase/migrations/20261024000002_student_repertoire.sql` în Supabase Dashboard → SQL Editor înainte de deploy. Migrarea creează tabelul cu RLS (propriile rânduri pentru elevi, toate rândurile pentru profesori), politica de sesiune activă și bucketul privat `backing_tracks` cu limita 30 MB și tipurile MIME audio MPEG/WAV/OGG/AAC. `supabase/schema.sql` include aceeași configurare pentru instalările noi.
