@@ -8,6 +8,7 @@ import PieceSelectorModal from '../../components/PieceSelectorModal';
 import Modal from '../../components/ui/Modal';
 import Spinner from '../../components/ui/Spinner';
 import EmptyState from '../../components/ui/EmptyState';
+import HomeworkEvaluator from '../../components/admin/HomeworkEvaluator';
 
 const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
 
@@ -330,6 +331,8 @@ export default function StudentDetail({ student, allPieces, onBack, onStudentCha
                     </button>
                 </div>
             </section>
+
+            {['student', 'elev'].includes(student.role) && <HomeworkEvaluator key={student.id + student.study_level} studentId={student.id} onLevelChange={(updated) => onStudentChange?.({ ...student, ...updated })} />}
 
             {['student', 'elev'].includes(student.role) && !isSelf && (
                 <section className="card border border-red-500/20">

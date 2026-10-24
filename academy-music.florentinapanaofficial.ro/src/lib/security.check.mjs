@@ -133,6 +133,10 @@ test('SQL migration: real RLS, atomic IP locking, session replacement, consent a
         const repertoireMigration = await readFile(new URL('../../supabase/migrations/20261024000002_student_repertoire.sql', import.meta.url), 'utf8');
         await db.exec(repertoireMigration);
         await db.exec(repertoireMigration);
+        const homeworkMigration = await readFile(new URL('../../supabase/migrations/20261024000003_timed_audio_homework.sql', import.meta.url), 'utf8');
+        await db.query('insert into student_homework(student_id,events) values($1,$2)', [other, '[{"note":60,"timestamp":0,"duration":100}]']);
+        await db.exec(homeworkMigration);
+        await db.exec(homeworkMigration);
         const claims = async (role, uid, sid) => {
             await db.exec(`reset role; set role ${role};`);
             await db.query(`select set_config('request.jwt.claim.sub',$1,false),set_config('request.jwt.claims',$2,false)`, [uid || '', JSON.stringify({ sub: uid, session_id: sid, role })]);
@@ -267,6 +271,82 @@ test('SQL migration: real RLS, atomic IP locking, session replacement, consent a
             assert.equal((await db.query("select file_size_limit from storage.buckets where id='backing_tracks'")).rows[0].file_size_limit, 31457280);
             assert.equal((await db.query("select public from storage.buckets where id='backing_tracks'")).rows[0].public, false);
             assert.deepEqual((await db.query("select allowed_mime_types from storage.buckets where id='backing_tracks'")).rows[0].allowed_mime_types, ['audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/aac']);
+        });
+        await t.test('timed audio homework rejects forged dates and protects review, storage and promotion', async () => {
+            await owner();
+            assert.equal(await check(other, first, '198.51.100.9', true), 'ok');
+            assert.equal(await check(teacher, second, '198.51.100.11', true), 'ok');
+            await claims('authenticated', teacher, second);
+            const legacy = await db.query('select * from student_homework where student_id=$1 and audio_path is null', [other]);
+            assert.equal(legacy.rows.length, 1);
+            const now = Date.now();
+            const assignment = async (from, until) => (await db.query(
+                'insert into homework_assignments(student_id,submission_start,submission_end) values($1,$2,$3) returning *',
+                [other, new Date(from), new Date(until)])).rows[0];
+            const open = await assignment(now - 60000, now + 60000);
+            const future = await assignment(now + 60000, now + 120000);
+            const expired = await assignment(now - 120000, now - 60000);
+            await assert.rejects(assignment(now + 1000, now), /check constraint/);
+            const path = a => other + '/' + a.id + '/recording.webm';
+            const submit = (a, extra = {}) => {
+                const row = { student_id: other, assignment_id: a.id, audio_path: path(a), submission_start: a.submission_start, submission_end: a.submission_end, ...extra };
+                return db.query('insert into student_homework(student_id,assignment_id,audio_path,submission_start,submission_end,status,teacher_feedback) values($1,$2,$3,$4,$5,$6,$7) returning id',
+                    [row.student_id,row.assignment_id,row.audio_path,row.submission_start,row.submission_end,row.status || 'pending',row.teacher_feedback || null]);
+            };
+            await claims('authenticated', other, first);
+            await assert.rejects(assignment(now, now + 60000), /row-level security/);
+            for (const a of [future, expired]) {
+                await assert.rejects(db.query('insert into storage.objects(bucket_id,name) values($1,$2)', ['homework-audio', path(a)]), /row-level security/);
+                await assert.rejects(submit(a), /row-level security/);
+            }
+            await owner();
+            await db.exec('create policy test_legacy_storage on storage.objects for all to authenticated using(true) with check(true)');
+            await db.exec('create policy test_legacy_homework on student_homework for all to authenticated using(true) with check(true)');
+            await claims('authenticated', other, first);
+            await assert.rejects(db.query('insert into storage.objects(bucket_id,name) values($1,$2)', ['homework-audio', path(expired)]), /row-level security/);
+            await assert.rejects(submit(open), /row-level security/);
+            await db.query('insert into storage.objects(bucket_id,name) values($1,$2)', ['homework-audio', path(open)]);
+            await assert.rejects(submit(open, { submission_end: new Date(now + 3600000) }), /row-level security/);
+            await assert.rejects(submit(open, { status: 'approved' }), /row-level security/);
+            await assert.rejects(submit(open, { teacher_feedback: 'Self approved' }), /row-level security/);
+            await assert.rejects(submit(open, { student_id: student }), /row-level security/);
+            const id = (await submit(open)).rows[0].id;
+            await assert.rejects(submit(open), /unique constraint/);
+            assert.equal((await db.query('update student_homework set status=$1 where id=$2 returning id', ['approved', id])).rows.length, 0);
+            await assert.rejects(db.query('update profiles set study_level=$1 where id=$2', ['mediu', other]), /numai de profesor/);
+            assert.equal((await db.query('update storage.objects set name=$1 where name=$2 returning id', ['moved.webm', path(open)])).rows.length, 0);
+            assert.equal((await db.query('delete from storage.objects where name=$1 returning id', [path(open)])).rows.length, 0);
+            await owner();
+            await db.exec('drop policy test_legacy_homework on student_homework');
+            await claims('authenticated', student, first);
+            assert.equal((await db.query('select * from student_homework where id=$1', [id])).rows.length, 0);
+            assert.equal((await db.query('select * from storage.objects where name=$1', [path(open)])).rows.length, 0);
+            await claims('authenticated', teacher, second);
+            await db.query('update student_homework set status=$1,teacher_feedback=$2 where id=$3', ['approved', 'Foarte bine!', id]);
+            assert.equal((await db.query('select status from student_homework where id=$1', [id])).rows[0].status, 'approved');
+            await assert.rejects(db.query('update student_homework set audio_path=$1 where id=$2', ['tampered.mp3', id]), /permission denied/);
+            await assert.rejects(db.query('update student_homework set status=$1 where id=$2', ['invalid', id]), /check constraint/);
+            await db.query('update profiles set study_level=$1 where id=$2', ['mediu', other]);
+            assert.equal((await db.query('select study_level from profiles where id=$1', [other])).rows[0].study_level, 'mediu');
+            await claims('authenticated', other, first);
+            assert.equal((await db.query('select teacher_feedback from student_homework where id=$1', [id])).rows[0].teacher_feedback, 'Foarte bine!');
+            await db.query('insert into student_homework(student_id,events) values($1,$2)', [other, '[{"note":60,"timestamp":0,"duration":100}]']);
+            await owner();
+            await db.query("update profiles set role='student' where id=$1", [other]);
+            await db.exec('begin');
+            for (const [from, until] of [["now()", "now() + interval '1 hour'"], ["now() - interval '1 hour'", "now()"]]) {
+                await claims('authenticated', teacher, second);
+                const boundary = (await db.query('insert into homework_assignments(student_id,submission_start,submission_end) values($1,' + from + ',' + until + ') returning id', [other])).rows[0];
+                await claims('authenticated', other, first);
+                assert.equal((await db.query('select homework_window_open($1,$2) allowed', [boundary.id, other])).rows[0].allowed, true);
+                const audioPath = other + '/' + boundary.id + '/boundary.webm';
+                await db.query('insert into storage.objects(bucket_id,name) values($1,$2)', ['homework-audio', audioPath]);
+                await db.query('insert into student_homework(student_id,assignment_id,audio_path,submission_start,submission_end) select student_id,id,$1,submission_start,submission_end from homework_assignments where id=$2', [audioPath, boundary.id]);
+            }
+            await db.exec('commit');
+            await owner();
+            await db.exec('drop policy test_legacy_storage on storage.objects');
+            assert.equal((await db.query("select public from storage.buckets where id='homework-audio'")).rows[0].public, false);
         });
         await t.test('students can update only their own avatar and active sessions can read avatars', async () => {
             await owner();

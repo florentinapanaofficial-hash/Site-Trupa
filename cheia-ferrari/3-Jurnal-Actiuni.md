@@ -1,3 +1,44 @@
+## 📝 24 oct 2026 — Publicare teme audio Academy Music
+
+### Obiectiv
+Commit și push solicitate de Claudiu pentru temele audio și componentele Academy deja validate, în repository-ul Academy și copia versionată din Site-Trupa.
+
+### Modificări
+- Publicare a migrării cu fereastră strictă, componentelor elev/profesor, testelor și documentației. Repository-ul Academy conține și modificările anterioare nepublicate pentru profil/avatar, repertoriu și deblocarea conturilor, folosite în fișierele comune și acoperite de validările existente.
+- Claudiu confirmă introducerea migrării SQL în Supabase; aplicarea live este raportată de utilizator, nu verificată direct prin conexiune la baza de date.
+
+### Validări
+- Validările din aceeași sesiune: **77/77 teste PASS**, Chromium teme **390px/1440px PASS**, build/Workerd/Wrangler dry-run **PASS**, SEO local **64 pagini, 0 FAIL, 0 WARN**.
+- Ambele ramuri locale main erau sincronizate cu origin/main înainte de commit, după fetch; verificarea whitespace este curată. Fără modificări noi de metadata, JSON-LD, imagini sau date GSC.
+
+### Riscuri și pași următori
+- Push-ul pe main în Academy declanșează workflow-ul deploy-workers; succesul deploy-ului nu este echivalent cu succesul push-ului și trebuie verificat separat.
+- Verificarea live a ciclului profesor → elev → predare → evaluare rămâne după deploy; păstrează limitările Storage/INSERT și captura audio descrise în intrarea implementării.
+
+## 📝 24 oct 2026 — Teme audio cu termen strict și evaluare profesor
+
+### Obiectiv
+Predare audio într-o fereastră stabilită de profesor, evaluare cu feedback și promovare directă la nivelul următor, fără regresii în temele existente.
+
+### Modificări
+- `academy-music.florentinapanaofficial.ro/supabase/migrations/20261024000003_timed_audio_homework.sql`: intervale profesor în `homework_assignments`, coloanele audio/evaluare în `student_homework`, RLS restrictiv pentru intervalul inclusiv și concordanța cu sursa profesorului, proprietar, rol și sesiune activă. Upload privat în `homework-audio` (30 MB); citire proprietar/profesor, fără suprascriere/ștergere din client. Profesorul poate actualiza numai statusul și feedbackul; o temă audio per interval.
+- `src/components/student/HomeworkSubmit.tsx` și `src/lib/timedHomework.js`: stări înainte/în/după interval, actualizare automată, validare tip/dimensiune audio, verificare înainte de upload și INSERT, erori explicite. Lista intervalelor și evaluărilor este integrată în `src/pages/RepertoriulMeu.jsx`.
+- `src/components/admin/HomeworkEvaluator.tsx`: creare intervale, ascultare prin URL semnat temporar, aprobare/respingere cu feedback și UPDATE direct pe `profiles.study_level` cu compararea nivelului anterior. Integrat în `src/pages/admin/StudentDetail.jsx` și sincronizat cu profilul din panoul părinte.
+- `supabase/schema.sql`, README și scripturile npm aliniate; teste adăugate în `src/lib/timedHomework.check.mjs`, `src/lib/security.check.mjs` și `scripts/verify-homework.mjs`. Rolul istoric `elev` rămâne compatibil cu `student`; jurnalul MIDI și fluxul Studio/Google Drive existent rămân separate.
+
+### Validări
+- `npm --prefix academy-music.florentinapanaofficial.ro test`: **77/77 PASS**. SQL real în PGlite: migrare repetată, rând MIDI păstrat, date falsificate respinse, upload/predare înainte și după termen respinse, limite exacte start/end acceptate, izolare între elevi, evaluare și protecția nivelului.
+- `npm --prefix academy-music.florentinapanaofficial.ro run test:homework`: **PASS la 390px și 1440px**, Chromium cu backend simulat: fereastră, upload, evaluare, feedback, promovare și creare interval.
+- `npm --prefix academy-music.florentinapanaofficial.ro run test:worker`: **build PASS, smoke Workerd PASS, Wrangler deploy dry-run PASS**. Avertismentele Astro pentru ecranele React din directorul pages rămân preexistente; nu sunt erori de build.
+- `npm run seo:check`: **64 pagini verificate, 0 FAIL, 0 WARN**; audit inițial identic. Metadata publică (limite title/description), JSON-LD, imagini/alt și sitemap nemodificate; nu există măsurători GSC noi sau afirmații de ranking.
+- Diagnostics pe componente/helper/pagini: fără erori. `git diff --check`: PASS.
+
+### Riscuri și pași următori
+- Aplică migrarea nouă în Supabase înainte de deploy. Nu s-au aplicat SQL sau uploaduri în proiectul Supabase live; nu s-a făcut commit, push ori deploy.
+- Storage și INSERT nu sunt atomice: expirarea după upload poate lăsa un obiect fără temă asociată. Mesajul nu pretinde succes; reîncarcă lista înainte de retry și curăță administrativ doar obiectele confirmate ca neasociate.
+- Captura audio din selector depinde de browser/dispozitiv; studioul existent poate furniza fișierul. Pentru retrimiterea unei teme respinse, profesorul creează un interval nou.
+- În dezvoltare, verificările au identificat și corectat constrângerea MIDI care respingea audio fără evenimente și necesitatea rolului istoric elev. Testele finale trec; verificarea live a primului ciclu predare/evaluare rămâne după migrare și deploy.
+
 ## 📝 24 oct 2026 — Portofoliu de artist în trei stadii
 
 ### Obiectiv
