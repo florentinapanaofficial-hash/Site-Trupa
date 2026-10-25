@@ -2,24 +2,24 @@
 @plugin '@tailwindcss/typography';
 
 @theme {
-    --color-brand-50: #fdf4f5;
-    --color-brand-100: #fbe8ea;
-    --color-brand-200: #f5c9cf;
-    --color-brand-300: #eda3ad;
-    --color-brand-400: #e06b7c;
-    --color-brand-500: #c9344b;
-    --color-brand-600: #a82640;
-    --color-brand-700: #871f35;
-    --color-brand-800: #651728;
-    --color-brand-900: #43101b;
+    --color-brand-50: #fdf4ff;
+    --color-brand-100: #fae8ff;
+    --color-brand-200: #f5d0fe;
+    --color-brand-300: #f0abfc;
+    --color-brand-400: #e879f9;
+    --color-brand-500: #d946ef;
+    --color-brand-600: #c026d3;
+    --color-brand-700: #a21caf;
+    --color-brand-800: #86198f;
+    --color-brand-900: #701a75;
 
-    --color-ink-800: #17161c;
-    --color-ink-900: #0d0c11;
-    --color-ink-950: #070609;
+    --color-ink-800: #171020;
+    --color-ink-900: #100a1b;
+    --color-ink-950: #08040f;
 
-    --color-gold-300: #f0d894;
-    --color-gold-400: #e8c468;
-    --color-gold-500: #d4a933;
+    --color-gold-300: #a5f3fc;
+    --color-gold-400: #67e8f9;
+    --color-gold-500: #22d3ee;
 
     --font-display: 'Playfair Display', Georgia, serif;
     --font-sans: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -47,6 +47,11 @@
     body {
         @apply bg-ink-950 text-slate-100 antialiased;
         font-family: var(--font-sans);
+        background-image:
+            radial-gradient(ellipse at 12% 8%, rgb(217 70 239 / 11%), transparent 38%),
+            radial-gradient(ellipse at 88% 18%, rgb(34 211 238 / 9%), transparent 34%),
+            radial-gradient(ellipse at 55% 100%, rgb(124 58 237 / 12%), transparent 42%);
+        background-attachment: fixed;
     }
 
     h1,
@@ -67,11 +72,11 @@
 
 @layer components {
     .card {
-        @apply rounded-2xl border border-white/10 bg-ink-900/80 p-5 shadow-lg shadow-black/30;
+        @apply rounded-2xl border border-white/10 bg-ink-900/70 p-5 shadow-lg shadow-black/30 backdrop-blur-xl;
     }
 
     .btn-primary {
-        @apply btn bg-brand-500 text-white hover:bg-brand-600;
+        @apply btn bg-brand-500 text-white shadow-lg shadow-brand-500/20 hover:bg-brand-400 hover:shadow-brand-500/35;
     }
 
     .btn-ghost {
@@ -79,11 +84,11 @@
     }
 
     .btn-gold {
-        @apply btn bg-gold-500 text-ink-950 hover:bg-gold-400;
+        @apply btn bg-gold-400 text-ink-950 shadow-lg shadow-cyan-400/20 hover:bg-gold-300 hover:shadow-cyan-300/35;
     }
 
     .input {
-        @apply w-full rounded-xl border border-white/15 bg-ink-800 px-4 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-brand-400;
+        @apply w-full rounded-xl border border-white/15 bg-ink-800/90 px-4 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-gold-400;
     }
 
     .label {

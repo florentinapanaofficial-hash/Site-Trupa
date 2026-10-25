@@ -9,7 +9,7 @@ import Modal from '../components/ui/Modal';
 import Spinner from '../components/ui/Spinner';
 import StudyProgressNotice from '../components/StudyProgressNotice';
 import { useStudyProgress } from '../lib/useStudyProgress';
-import { isStudyLevelLocked, studyLevelLabel } from '../lib/studyLevels';
+import { isStudyLevelLocked, normalizeStudyLevel, STUDY_LEVELS, studyLevelLabel } from '../lib/studyLevels';
 
 const RecordingStudio = lazy(() => import('../components/RecordingStudio'));
 const SecurePdfViewer = lazy(() => import('../components/SecurePdfViewer'));
@@ -24,6 +24,7 @@ export default function Canto() {
     const [error, setError] = useState('');
     const [search, setSearch] = useState('');
     const [group, setGroup] = useState('');
+    const [selectedModule, setSelectedModule] = useState('toate');
     const [recordingPiece, setRecordingPiece] = useState(null);
     const [score, setScore] = useState(null);
 
@@ -48,7 +49,10 @@ export default function Canto() {
     useEffect(() => { load(); }, []);
     const groups = [...new Set((pieces || []).map((piece) => piece.grupa).filter(Boolean))].sort();
     const query = search.trim().toLowerCase();
-    const filtered = (pieces || []).filter((piece) => (!group || piece.grupa === group) && `${piece.title} ${piece.grupa || ''}`.toLowerCase().includes(query));
+    const filtered = (pieces || []).filter((piece) =>
+        (selectedModule === 'toate' || normalizeStudyLevel(piece.level) === selectedModule)
+        && (!group || piece.grupa === group)
+        && `${piece.title} ${piece.grupa || ''}`.toLowerCase().includes(query));
 
     return (
         <section className="min-w-0 space-y-5" aria-label="Biblioteca Canto">
@@ -57,6 +61,22 @@ export default function Canto() {
                 {isTeacher && <Link to="/admin/canto/" className="btn-gold inline-flex items-center gap-2"><Plus size={16} aria-hidden="true" /> Adaugă piesă</Link>}
             </header>
             {!isTeacher && <StudyProgressNotice state={studyProgress} />}
+            <section className="space-y-3" aria-label="Selector rapid de module Canto">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                    <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-200">Alege modulul</h2>
+                    <span className="text-xs text-slate-400">Modulul 1–5</span>
+                </div>
+                <div role="group" aria-label="Modulele de studiu Canto" className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+                    {[{ value: 'toate', label: 'Toate modulele' }, ...STUDY_LEVELS].map((option) => (
+                        <button key={option.value} type="button" title={option.label} aria-label={option.label} aria-pressed={selectedModule === option.value} onClick={() => setSelectedModule(option.value)}
+                            className={`min-h-16 rounded-2xl border px-3 py-3 text-sm font-semibold transition [touch-action:manipulation] ${selectedModule === option.value
+                                ? 'border-cyan-300/80 bg-cyan-300/15 text-cyan-50 shadow-[0_0_22px_rgba(34,211,238,0.2)]'
+                                : 'border-white/10 bg-ink-900/70 text-slate-300 hover:border-fuchsia-300/50 hover:bg-fuchsia-400/10 hover:text-white'}`}>
+                            {option.value === 'toate' ? 'Toate' : `Modulul ${option.value.slice(-1)}`}
+                        </button>
+                    ))}
+                </div>
+            </section>
             {lockNotice && <p role="status" aria-live="polite" className="rounded-lg border border-gold-400/20 bg-gold-400/10 p-3 text-sm text-gold-200">{lockNotice}</p>}
             <div className="flex flex-col gap-3 sm:flex-row">
                 <input type="search" className="input sm:max-w-xs" aria-label="Caută în Canto" placeholder="Piesă sau grupă" value={search} onChange={(event) => setSearch(event.target.value)} />

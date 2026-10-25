@@ -236,10 +236,24 @@ try {
         await page.locator('audio').first().evaluate(audio => { audio.currentTime = 10.2; });
         await expect(karaoke.locator('[data-word-active="true"]')).toHaveText('Nota 10');
         await expect.poll(() => karaoke.evaluate(element => element.scrollTop)).toBeGreaterThan(100);
+        const karaokePlayer = page.getByRole('group', { name: 'Player karaoke', exact: true });
+        await expect(karaokePlayer).toBeVisible();
+        assert.equal(await karaokePlayer.evaluate(element => getComputedStyle(element).position), 'sticky');
+        await page.setViewportSize({ width: viewport.width, height: 420 });
+        const karaokeDialog = page.getByRole('dialog', { name: 'Karaoke · pozitiv — Piesă canto', exact: true });
+        const scrollBody = karaokeDialog.locator('[data-modal-scroll-body]');
+        await expect(scrollBody).toBeVisible();
+        await scrollBody.evaluate(element => { element.scrollTop = element.scrollHeight; });
+        await expect.poll(async () => {
+            const [playerBox, bodyBox] = await Promise.all([karaokePlayer.boundingBox(), scrollBody.boundingBox()]);
+            return playerBox && bodyBox ? Math.abs(playerBox.y - bodyBox.y) : Infinity;
+        }).toBeLessThanOrEqual(24);
+        assert.equal(await karaokePlayer.evaluate(element => getComputedStyle(element).position), 'sticky');
+        await page.setViewportSize(viewport);
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
         assert.deepEqual(f.errors, []);
         await context.close();
-        console.log(`Canto ${viewport.width}px PASS: headphone guard, mic only after homework REC/confirmation, real MediaRecorder/reverb with fake mic, dry microphone-only recording graph, backing/reverb monitor-only, synchronized visual lyrics during REC, wet slider, stop/denial/background cleanup, negative auto-open, shared Play/Pause/Stop, playback/seek/word highlight/scroll and zero student AI requests.`);
+        console.log(`Canto ${viewport.width}px PASS: headphone guard, mic only after homework REC/confirmation, real MediaRecorder/reverb with fake mic, dry microphone-only recording graph, backing/reverb monitor-only, synchronized visual lyrics during REC, wet slider, stop/denial/background cleanup, negative auto-open, shared Play/Pause/Stop, sticky player, playback/seek/word highlight/scroll and zero student AI requests.`);
     }
     for (const width of [390, 1440]) {
         const f = await open({ width, height: 1000 }, '/canto/');

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-export default function Modal({ open, title, onClose, children, wide = false }) {
+export default function Modal({ open, title, onClose, children, wide = false, scrollableBody = false }) {
     useEffect(() => {
         if (!open) return undefined;
 
@@ -31,15 +31,15 @@ export default function Modal({ open, title, onClose, children, wide = false }) 
             }}
         >
             <div
-                className={`my-8 w-full ${wide ? 'max-w-5xl' : 'max-w-lg'} animate-fade-up rounded-2xl border border-white/10 bg-ink-900 shadow-2xl`}
+                className={`my-8 w-full ${wide ? 'max-w-5xl' : 'max-w-lg'} ${scrollableBody ? 'flex max-h-[calc(100dvh-6rem)] flex-col overflow-hidden' : ''} animate-fade-up rounded-2xl border border-white/10 bg-ink-900 shadow-2xl`}
             >
-                <header className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+                <header className={`flex items-center justify-between border-b border-white/10 px-5 py-4 ${scrollableBody ? 'shrink-0' : ''}`}>
                     <h2 className="min-w-0 break-words text-lg font-semibold text-slate-100">{title}</h2>
                     <button type="button" className="btn-ghost shrink-0 px-3 py-1.5" onClick={onClose}>
                         Închide
                     </button>
                 </header>
-                <div className="p-5">{children}</div>
+                <div className={`p-5 ${scrollableBody ? 'min-h-0 flex-1 overflow-y-auto' : ''}`} data-modal-scroll-body={scrollableBody ? '' : undefined}>{children}</div>
             </div>
         </div>
     );

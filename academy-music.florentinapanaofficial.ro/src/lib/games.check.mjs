@@ -5,6 +5,7 @@ import { PGlite } from '@electric-sql/pglite';
 import { matchNote, rhythmScore } from './rhythm.js';
 const ids = ['11111111-1111-4111-8111-111111111111','22222222-2222-4222-8222-222222222222','33333333-3333-4333-8333-333333333333','44444444-4444-4444-8444-444444444444'];
 const migration = await readFile(new URL('../../supabase/migrations/20261021000004_games_live.sql', import.meta.url),'utf8');
+const annualStarsMigration = await readFile(new URL('../../supabase/migrations/20261025000001_annual_stars.sql', import.meta.url),'utf8');
 async function setup() {
     const db = new PGlite();
     await db.exec(        `create role anon; create role authenticated; create role service_role;
@@ -18,6 +19,7 @@ async function setup() {
         insert into public.profiles values ('${ids[0]}','student',true,'${ids[0]}/photo.webp'),('${ids[1]}','student',true,'${ids[1]}/photo.webp'),('${ids[2]}','student',true,null),('${ids[3]}','teacher',true,null);`);
     await db.exec(await readFile(new URL('../../supabase/setup_quizzes.sql', import.meta.url),'utf8'));
     await db.exec(migration); await db.exec(migration);
+    await db.exec(annualStarsMigration); await db.exec(annualStarsMigration);
     await db.exec(`insert into public.quizzes(id,title,is_published) values ('ready','Quiz pregătit',true),('draft','Ciornă',false);
         insert into public.quiz_questions(quiz_id,prompt,options,correct_option,position) values ('ready','Do?', '["Do","Re"]',0,0),('ready','Re?', '["Do","Re"]',1,1),('draft','Ascuns?', '["A","B"]',0,0);`);
     return db;
@@ -25,6 +27,26 @@ async function setup() {
 async function as(db, id) { await db.exec(`reset role; set request.jwt.claim.sub='${id}'; set role authenticated;`); }
 async function rpc(db,name,...args) { return (await db.query(`select public.${name}(${args.map((_,i)=>'$'+(i+1)).join(',')}) as value`,args)).rows[0].value; }
 async function admin(db,sql) { await db.exec('reset role;'); await db.exec(sql); }
+
+test('annual stars use verified current-year results and respect opt-in visibility', async () => {
+    const db = await setup(); try {
+        await admin(db, [
+            "insert into public.game_profiles(user_id,alias,visible) values ('" + ids[0] + "','Star Student',true),('" + ids[1] + "','Hidden Student',false),('" + ids[2] + "','No Results',true)",
+            'drop trigger if exists grade_quiz_result on public.quiz_results',
+            "insert into public.quiz_results(user_id,quiz_id,score,total,created_at) values ('" + ids[0] + "','ready',2,2,date_trunc('year',now())+interval '1 day'),('" + ids[0] + "','ready',8,8,date_trunc('year',now())-interval '1 day'),('" + ids[1] + "','ready',1,2,date_trunc('year',now())+interval '1 day')",
+            "insert into public.rhythm_attempts(user_id,pattern,started_at,finished_at,score,hits,mistakes) values ('" + ids[0] + "','[]'::jsonb,date_trunc('year',now())+interval '2 days',now(),500,3,1)",
+            "insert into public.live_quiz_rooms(id,host_id,title,status,duration_seconds,created_at) values ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','" + ids[0] + "','Duel anual','completed',20,date_trunc('year',now())+interval '3 days')",
+            "insert into public.live_quiz_questions(room_id,position,prompt,options,correct_option) values ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',0,'Intrebare?','[\"A\",\"B\"]',0)",
+            "insert into public.live_quiz_members(room_id,user_id,alias) values ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','" + ids[0] + "','Star Student')",
+            "insert into public.live_quiz_answers(room_id,user_id,position,choice,points) values ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','" + ids[0] + "',0,0,100)"
+        ].join(';'));
+        await as(db, ids[0]);
+        const rows = await rpc(db, 'game_annual_stars');
+        assert.deepEqual(rows.map(row => ({ user_id: row.user_id, stars: row.stars })), [{ user_id: ids[0], stars: 6 }]);
+        await db.exec('reset role; set role anon;');
+        await assert.rejects(() => rpc(db, 'game_annual_stars'), /permission denied/);
+    } finally { await db.close(); }
+});
 
 test('shared rhythm matching preserves Studio window, closest note and duplicate protection',()=>{
     const notes=[{id:0,note:60,time:1},{id:1,note:60,time:1.2}];

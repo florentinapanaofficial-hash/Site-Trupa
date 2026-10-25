@@ -48,7 +48,7 @@ try {
     }
     console.log('PASS: built Astro AI route rejects anonymous, cross-origin and invalid-topic requests before any provider call.');
     browser = await chromium.launch({ headless: true });
-    const rpcNames = new Set(['game_set_profile', 'game_opponents', 'game_rhythm_start', 'game_rhythm_finish', 'game_leaderboard', 'game_live_create', 'game_live_join', 'game_live_cancel', 'game_live_answer', 'game_live_state', 'game_live_inbox']);
+    const rpcNames = new Set(['game_set_profile', 'game_opponents', 'game_rhythm_start', 'game_rhythm_finish', 'game_leaderboard', 'game_annual_stars', 'game_live_create', 'game_live_join', 'game_live_cancel', 'game_live_answer', 'game_live_state', 'game_live_inbox']);
     let aiConfigured = false; let aiCalls = 0; let failAnswerResponse = true; let lastPattern; let failLibrary = false; let failSave = true; let saves = 0; let signRequests = 0;
     async function open(id, width, path = '/jocuri/?tab=duel') {
         const context = await browser.newContext({ viewport: { width, height: 1000 }, extraHTTPHeaders: { 'x-forwarded-for': '198.51.100.1' } });
@@ -140,11 +140,11 @@ try {
     await expect(a.page.getByText(/Scor salvat:/)).toBeVisible(); assert.equal(saves, 1);
     const attempt = (await db.query('select score,hits from public.rhythm_attempts where finished_at is not null')).rows[0]; assert.ok(attempt.hits >= 10, 'At least ten timed browser presses should match: ' + JSON.stringify(attempt));
     await admin(`update public.profiles set avatar_path=id::text||'/photo.webp';`);
-    await a.page.goto(base + '/jocuri/?tab=clasament'); await expect(a.page.getByLabel('Podium', { exact: true })).toBeVisible(); await expect(a.page.getByRole('list', { name: 'Punctaje' }).getByText('Pianist A', { exact: true })).toBeVisible();
+    await a.page.goto(base + '/jocuri/?tab=clasament'); await expect(a.page.getByLabel('Podium', { exact: true }).getByText('Pianist A', { exact: true })).toBeVisible();
     assert.ok(signRequests > 0, 'Opt-in avatar requests must be signed');
     for (const fixture of [a, b]) { const overflow = await fixture.page.evaluate(() => document.documentElement.scrollWidth > innerWidth); assert.equal(overflow, false); assert.deepEqual(fixture.errors, []); }
     await a.page.getByRole('form', { name: 'Identitate în jocuri' }).getByRole('checkbox').uncheck(); await a.page.getByRole('button', { name: 'Salvează preferințele' }).click();
-    await expect(a.page.getByRole('list', { name: 'Punctaje' }).getByText('Pianist A', { exact: true })).toHaveCount(0);
+    await expect(a.page.getByLabel('Podium', { exact: true }).getByText('Pianist A', { exact: true })).toHaveCount(0);
     console.log('PASS: mobile rhythm timed presses, server score, failed-save retry without duplicates, opt-in avatar podium, withdrawal and zero viewport overflow/page errors.');
     await a.page.goto(base + '/jocuri/?tab=ai');
     await expect(a.page.getByRole('heading', { name: '✨ Antrenament muzical cu AI' })).toBeVisible();

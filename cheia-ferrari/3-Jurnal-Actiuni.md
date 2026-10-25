@@ -5628,3 +5628,26 @@ Completarea personalizării elevilor, accesului gradual la repertoriu și prezen
 5. După migrare și testele Supabase live, publică aplicația și fă o verificare scurtă pe desktop și mobil. Testează separat sunetul claviaturii Modulului 5 pe hardware real; SEO/buildurile locale nu verifică latența audio sau integrarea Supabase live.
 
 Migrarea Supabase, uploadul cu fișiere reale, Realtime live și deployul nu au fost rulate de agent.
+
+## 📝 25 oct 2026 — Academy: Dark Neon, meniul tabla smart și podium anual
+
+### Obiectiv
+Finalizarea experienței Academiei RED Music pentru tablă smart, cu interfață Dark Neon, acces rapid pe roluri și podium anual cu steluțe.
+
+### Modificări
+- Temă Dark Neon cu fundal închis, text cu contrast ridicat, suprafețe glassmorphism și accente magenta/cyan/violet.
+- Meniu lateral fix cu tile-uri pătrate touch-friendly și stare activă neon; dashboard cu acces rapid la Canto, Instrument-Orgă, quiz-uri, partituri, RED și administrare doar pentru profesor.
+- Selectorul Canto pentru modulele 1–5 păstrat; playerul karaoke rămâne fixat deasupra versurilor derulabile și sincronizate; clape virtuale și quiz-uri existente validate în UI.
+- Podium anual opt-in alimentat de RPC Supabase securizat; migrarea și schema consolidată sunt în repository, fără aplicare live.
+- Importul React lazy pentru podium reparat; verificarea browserului actualizată pentru dashboard-ul nou, tile-uri pătrate și sidebar fix.
+
+### Validări
+- Academy build: PASS; avertismente existente pentru fișiere JSX în src/pages/ și opțiunea Vite deprecated.
+- Academy unit/SQL: 80/80; browser: navigation, admin, Canto și games PASS pe mobil/desktop, inclusiv podium și lipsa overflow-ului.
+- Site principal npm run seo:check: 64 pagini, 0 FAIL, 0 WARN. Metadata publică, JSON-LD și GSC nemodificate.
+- Diagnostics: fără erori; git diff --check PASS.
+
+### Greșeli detectate / riscuri / pași următori
+- Testul de navigare inițial presupunea vechiul dashboard cu acordeoane/sidebar sticky; a fost aliniat la tile-uri și sidebar fix. Importul lazy lipsă a fost remediat înainte de retestare.
+- Migrarea anuală nu a fost aplicată pe Supabase live și nu s-a făcut deploy. Verificarea pe dispozitive audio reale și confirmarea setărilor de vizibilitate cu elevi reali rămân pentru etapa aprobată de publicare.
+- Nu există măsurători comparative GSC; auditul tehnic local nu demonstrează efect asupra rankingului.

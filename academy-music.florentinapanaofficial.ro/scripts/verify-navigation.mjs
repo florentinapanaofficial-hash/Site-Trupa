@@ -69,19 +69,21 @@ try {
         await expect(page.getByRole('link', { name: 'Deschide Instrument-Orgă', exact: true })).toHaveAttribute('href', '/instrument/');
         assert.equal(chunks.some(path => /\/(Canto|Discipline|VirtualPiano)[.-]/.test(path)), false, chunks.join('\n'));
         assert.equal(tables.some(path => /pieces|submissions|quiz_results/.test(path)), false, 'selection must not fetch discipline content or old stats');
-        const summaries = page.locator('summary');
-        await summaries.first().focus();
-        await page.keyboard.press('Enter');
-        await expect(page.getByText(/Lecții, negative și materiale pentru studiul vocal/)).toBeVisible();
-        await expect(page).toHaveURL(`${base}/dashboard/`);
-        await summaries.nth(1).click();
-        await expect(page.getByText('Exerciții, partituri și claviatură virtuală pentru studiul instrumentului.')).toBeVisible();
+        const appGrid = page.locator('[aria-label="Aplicațiile Academiei"]');
+        await expect(appGrid).toBeVisible();
+        await expect(appGrid.getByRole('link', { name: 'Deschide Canto', exact: true })).toHaveAttribute('href', '/canto/');
+        await expect(appGrid.getByRole('link', { name: 'Deschide Instrument-Orgă', exact: true })).toHaveAttribute('href', '/instrument/');
+        await expect(appGrid.getByRole('link', { name: 'Deschide Quiz-uri & dueluri', exact: true })).toBeVisible();
+        await expect(appGrid.getByRole('link', { name: 'Deschide Administrare', exact: true })).toHaveCount(0);
         const sidebar = page.getByRole('complementary', { name: 'Meniu lateral' });
         if (viewport.width >= 1024) {
             await expect(sidebar).toBeVisible();
             const style = await sidebar.evaluate(element => ({ position: getComputedStyle(element).position, height: element.clientHeight }));
-            assert.equal(style.position, 'sticky');
+            assert.equal(style.position, 'fixed');
             assert.equal(style.height, viewport.height);
+            const cantoTile = await sidebar.getByRole('link', { name: 'Biblioteca Canto' }).boundingBox();
+            assert.ok(cantoTile.width >= 84 && cantoTile.height >= 84, 'sidebar tiles remain touch-friendly');
+            assert.ok(Math.abs(cantoTile.width - cantoTile.height) <= 2, 'sidebar tiles remain square');
             await page.locator('main').evaluate(element => { const filler = document.createElement('div'); filler.style.height = '2000px'; filler.dataset.testFiller = ''; element.append(filler); });
             await page.evaluate(() => window.scrollTo(0, 900));
             await expect.poll(async () => page.evaluate(() => window.scrollY)).toBeGreaterThan(100);
@@ -100,7 +102,7 @@ try {
         await expect(nav.getByRole('link', { name: /REVISTA/ })).toHaveAttribute('href', 'https://revista.florentinapanaofficial.ro/');
         await expect(nav.getByRole('link', { name: /REVISTA/ })).toHaveAttribute('target', '_blank');
         await expect(nav.getByRole('link', { name: /REVISTA/ })).toHaveAttribute('rel', 'noopener noreferrer');
-        await expect(nav.getByRole('link', { name: 'Claviatură virtuală' })).toHaveCount(0);
+        await expect(nav.getByRole('link', { name: 'Claviatură virtuală' })).toBeVisible();
         if (viewport.width < 1024) await page.getByRole('button', { name: 'Meniu', exact: true }).click();
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
         if (process.env.ACADEMY_SCREENSHOT_DIR) {
@@ -113,7 +115,7 @@ try {
         assert.equal(chunks.some(path => /\/(Discipline|VirtualPiano)[.-]/.test(path)), false);
         if (viewport.width < 1024) await page.getByRole('button', { name: 'Meniu', exact: true }).click();
         await expect(nav.getByRole('link', { name: 'Biblioteca Canto' })).toBeVisible();
-        await expect(nav.getByRole('link', { name: 'Claviatură virtuală' })).toHaveCount(0);
+        await expect(nav.getByRole('link', { name: 'Claviatură virtuală' })).toBeVisible();
         await nav.getByRole('link', { name: 'Alege disciplina' }).click();
         await expect(page.getByRole('heading', { name: 'Ce vrei să studiezi astăzi?' })).toBeVisible();
         await page.getByRole('link', { name: 'Deschide Instrument-Orgă' }).click();
@@ -122,7 +124,7 @@ try {
             await expect(nav).toBeHidden();
             await page.getByRole('button', { name: 'Meniu', exact: true }).click();
         }
-        await expect(nav.getByRole('link', { name: 'Biblioteca Canto' })).toHaveCount(0);
+        await expect(nav.getByRole('link', { name: 'Biblioteca Canto' })).toBeVisible();
         const keyboardLink = nav.getByRole('link', { name: 'Claviatură virtuală' });
         assert.equal(await keyboardLink.count(), 1, `url=${page.url()} nav=${await nav.count()} visible=${await nav.isVisible().catch(() => false)} text=${await page.locator('body').innerText()}`);
         await keyboardLink.click();
@@ -130,7 +132,7 @@ try {
         assert.ok(chunks.some(path => /\/VirtualPiano[.-]/.test(path)));
         assert.deepEqual(errors, []);
         await context.close();
-        console.log(`Navigation ${viewport.width}px PASS: two cards, accessible Info, contextual menus, REVISTA, scroll and discipline switching.`);
+        console.log(`Navigation ${viewport.width}px PASS: dashboard app grid, square touch targets, fixed sidebar, contextual menus, REVISTA and discipline switching.`);
     }
     const isolated = await open({ width: 1440, height: 900 }, '/instrument/');
     await expect(isolated.page.getByRole('heading', { name: 'Instrument-Orgă', exact: true })).toBeVisible();
@@ -138,6 +140,7 @@ try {
     await isolated.context.close();
     const teacher = await open({ width: 1440, height: 900 }, '/dashboard/', 'teacher');
     await expect(teacher.page.getByRole('link', { name: 'Panou profesor' })).toBeVisible();
+    await expect(teacher.page.locator('[aria-label="Aplicațiile Academiei"]').getByRole('link', { name: 'Deschide Administrare', exact: true })).toHaveAttribute('href', '/admin/');
     await expect(teacher.page.getByRole('switch', { name: 'Comută modul profesor' })).toBeVisible();
     await teacher.page.setViewportSize({ width: 1440, height: 240 });
     const shortSidebar = teacher.page.getByRole('complementary', { name: 'Meniu lateral' });

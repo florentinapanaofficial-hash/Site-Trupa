@@ -10,7 +10,7 @@ Stack: **Astro 7 (SSR Cloudflare Workers) + React 18 + MDX + TailwindCSS 4 + Sup
 ## Pagina publică de start
 
 - `/` este landing-ul public Astro: Hero cu prezentare manuală Canto/Instrument-orgă/Teorie, butoane către `/login/` și site-ul oficial, plus secțiunea E-Learning către revista externă (tab nou cu `noopener noreferrer`). Ilustrațiile sunt SVG inline și elemente CSS; nu se descarcă imagini externe sau instrumentele dashboard-ului.
-- `/dashboard/` este dashboard-ul existent, protejat. Loginul și navigarea Acasă trimit aici; nu se afișează conținut educațional privat pe landing.
+- `/dashboard/` este dashboard-ul protejat, cu o grilă touch-friendly pentru Canto, Orgă, quiz-uri/dueluri, partituri, RED, cursuri, portofoliu și administrarea profesorului. Loginul și navigarea Acasă trimit aici; nu se afișează conținut educațional privat pe landing.
 - Un cookie valid la `/` produce redirect server-side către `/dashboard/`. Fără cookie, pagina este publică și nu apelează Supabase. Dacă browserul păstrează o sesiune locală, aceasta se validează prin `/api/auth/session/` înainte de redirect; serviciile indisponibile afișează o eroare explicită.
 - Prezentarea se schimbă numai la cererea vizitatorului, inclusiv din tastatură; nu există autoplay. Animația decorativă se oprește în mai puțin de 5 secunde și respectă `prefers-reduced-motion`. Fără JavaScript rămân disponibile textul, prima prezentare și toate linkurile.
 - Se păstrează politica existentă `noindex, nofollow` pentru Academy; pagina publică nu activează automat indexarea SEO.
@@ -22,10 +22,14 @@ Stack: **Astro 7 (SSR Cloudflare Workers) + React 18 + MDX + TailwindCSS 4 + Sup
 - `/canto/` încarcă biblioteca vocală existentă; `/instrument/` încarcă repertoriul Orgă, iar `/instrument/claviatura/` claviatura virtuală existentă. Engine-ul nou de pian rămâne separat. Canto include acum monitorizare cu reverb și karaoke pe linie/cuvânt, descrise în secțiunea Modulul 4.
 - `/orga/` rămâne compatibilă prin redirect 301 server-side către `/instrument/` pentru utilizatorii autentificați și fallback React `replace`. Toate rutele disciplinei rămân protejate prin middleware/Auth/RLS existente.
 - Paginile de discipline, uneltele, resursele comune și panoul profesorului folosesc importuri dinamice React `lazy`. Dashboard-ul nu importă playerul Canto, PDF-ul, claviatura sau panoul admin. Un fallback Suspense local păstrează layout-ul și meniul vizibile în timpul încărcării.
-- Sidebar desktop: `sticky top-0 h-screen overflow-y-auto`, cu scroll independent pe ecrane joase. Mobil: header sticky și meniu pliabil cu scroll propriu, Escape și închidere la schimbarea rutei.
-- Navigarea la dashboard arată doar Alege disciplina, REVISTA și, pentru profesor, administrarea/toggle-ul existent. În Canto se afișează biblioteca vocală; în Instrument, repertoriul și claviatura. Resursele de teorie, jocurile, portofoliul și cursurile online rămân disponibile după alegerea disciplinei, fără încărcarea lor până la acces. Schimbarea disciplinei se face prin Alege disciplina. Rutele comune vechi sunt păstrate.
+- Sidebar desktop: rail fix `w-56` cu butoane-app pătrate, touch-friendly, stare activă neon și scroll independent pe ecrane joase. Mobil: header sticky și meniu pliabil cu grilă de scurtături și scroll propriu, Escape și închidere la schimbarea rutei.
+- Scurtăturile Canto, Orgă, Partituri, Claviatură, Jocuri, RED, Portofoliu, Cursuri și Profil rămân accesibile din rail pe toate rutele. Profesorul vede separat Panou profesor și poate previzualiza experiența elevului; rolurile Supabase, ProtectedRoute și RLS nu sunt schimbate.
 - REVISTA este același link extern pe desktop/mobil: `https://revista.florentinapanaofficial.ro/`, cu `target="_blank" rel="noopener noreferrer"`. Rolurile și drepturile profesorului nu sunt schimbate de noua navigare.
 - Validare după build: `npm run test:navigation` verifică în Chromium desktop/mobil cele două carduri, Info, meniurile, scroll-ul real, REVISTA și cererile de bundle-uri pentru izolarea disciplinelor. Opțional: `ACADEMY_SCREENSHOT_DIR` pentru capturi în afara repository-ului.
+
+## Podium anual cu steluțe
+
+Migrarea `supabase/migrations/20261025000001_annual_stars.sql` adaugă RPC-ul `game_annual_stars()`; aplic-o în Supabase înainte de publicarea frontendului. Totalul folosește doar rezultate verificate server-side din anul calendaristic Europe/Bucharest: câte o steluță per răspuns corect la quiz individual, notă potrivită în jocul ritmic și răspuns corect într-un duel. Clasamentul arată doar aliasurile elevilor activi care au optat pentru vizibilitate prin `game_profiles.visible`; nu expune nume reale și respectă retragerea acordului. `supabase/schema.sql` păstrează aceeași definiție pentru mediile de test.
 
 ## Biblioteca Canto
 
