@@ -1,3 +1,21 @@
+## 📝 30 oct 2026 — Audit separare Academy și Node pentru site-ul Florentina
+
+### Obiectiv
+Verificarea izolării proiectelor după separarea Academiei, a compatibilității Node pentru site-ul Florentina și a curățeniei dependențelor.
+
+### Modificări
+- Confirmate 198 de ștergeri Git, toate exclusiv în `academy-music.florentinapanaofficial.ro/`; nicio schimbare/staging în paginile site-ului Florentina. Ștergerile corespund separării declarate de Claudiu și au rămas nestaged.
+- Runtime activ: Node v25.8.0 / npm 11.11.0. `package.json` și `package-lock.json` cer Node >=22.12.0; Astro blocat 7.3.3 cere tot >=22.12.0. Nu a fost necesară schimbarea engine-ului.
+- Aplicate actualizări de securitate non-breaking în `package-lock.json` și reinstalare strictă `npm ci`. Audit producție: 0 vulnerabilități. Audit complet: 7 vulnerabilități exclusiv în dependențe de dezvoltare (5 low, 2 moderate); `--force` ar retrograda Jest/Tailwind, deci nu a fost folosit.
+- Nicio modificare de conținut, metadata, JSON-LD sau pagini publice; fără date GSC noi.
+
+### Validări
+- `npm run seo:check`: build PASS; 64 pagini, 0 FAIL / 0 WARN.
+- `npm test`: 101/101 PASS. `npm run check-links`: 63/63 URL-uri externe valide.
+- `npm audit --omit=dev`: 0 vulnerabilități. `git diff --check`: PASS.
+
+### Riscuri / pași următori
+Node instalat global poate schimba versiunea folosită de shell-uri prin PATH, dar versiunea activă v25.8.0 satisface cerința proiectului. Cele 198 de ștergeri Academy rămân modificări Git intenționate, nestaged și necomise; nu au fost alterate. Vulnerabilitățile rămase sunt doar de dezvoltare și necesită evaluare separată dacă se dorește eliminarea fără downgrade major.
 ## 📝 24 oct 2026 — Cinci module de studiu și selecție directă pentru profesor
 
 ### Obiectiv
